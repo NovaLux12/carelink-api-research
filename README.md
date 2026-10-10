@@ -10,6 +10,7 @@
 [![Claims](https://img.shields.io/badge/claims-source--cited-informational)]()
 [![Pinned](https://img.shields.io/badge/regression-93%20assertions%20·%20exit%200-brightgreen)]()
 [![Part of](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)]()
+[![License: MIT](https://img.shields.io/badge/license-MIT-8A2BE2.svg)](LICENSE)
 
 *Start here → [**`docs/00-summary-the-map.md`**](docs/00-summary-the-map.md)*
 
