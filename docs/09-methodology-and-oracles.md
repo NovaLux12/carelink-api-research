@@ -22,7 +22,8 @@ filename is the same file: `VERSION-AXIS` =
 `findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md`, `COMMONCRAWL` =
 `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md`, `CHUNK-CORPUS` =
 `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`, `JSMAP-HUNT` =
-`findings-log/probe-2026-10-08/recon/JSMAP-HUNT.md`.
+`findings-log/probe-2026-10-08/recon/JSMAP-HUNT.md`, `PROBE-FINDINGS` =
+`findings-log/probe-2026-10-08/PROBE-FINDINGS.md`.
 
 ## 1. The constraints every pass ran under
 
@@ -184,9 +185,9 @@ Practical consequences, all visible in this repo:
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
   `regression/hurl/` holds 41 assertions; exit 0 = the public surface has not
   drifted since 2026-10-08 [source: docs/00-summary-the-map.md;
-  work/VALIDATION-RUNBOOK.md Tier 5]. The config checks deliberately pin the
-  vendor's *current wrong* `lhpro` bound so a vendor fix breaks the test and
-  updates the note [source: HURL-05].
+  findings-log/probe-2026-10-08/work/VALIDATION-RUNBOOK.md Tier 5]. The config
+  checks deliberately pin the vendor's *current wrong* `lhpro` bound so a vendor
+  fix breaks the test and updates the note [source: HURL-05].
 - Redaction rules (six of them in the README) exist because breaking them
   leaked something: never commit a credential, never publish internal hostnames,
   never publish raw archive captures, never report a parked-namespace name,

@@ -113,9 +113,8 @@ ARCHIVE-URLS §1].
 **OBSERVED** [source: SECURITY S2; CLAIM-AUDIT-2026-10-09.md]: `S256` → 302 to the
 login page (**accepted**); **`plain` → 302 (accepted)**; `none` → 302 with
 `invalid_request` (**rejected**); **omitted entirely → 302 (accepted)**.
-`code_challenge_methods_supported` advertises `S256` **and** `plain`.
-
-The bridge correctly hardcodes `S256`; no change needed — recorded only so nobody
+`code_challenge_methods_supported` advertises `S256` **and** `plain`. The bridge
+correctly hardcodes `S256`; no change needed — recorded only so nobody
 "simplifies" it to the default [source: AUTH-TENANT §2]. The weakness is that PKCE
 is **client-enforced only**: the redirect is a custom URI scheme, on Android any
 app can register the same scheme, and PKCE is the mitigation for a malicious app
@@ -126,19 +125,15 @@ intercepting that redirect. Severity low-moderate [source: SECURITY S2].
 `device_code` is off the table, so a CareLink client must use the
 **authorization_code + refresh_token** pair; there is no simpler headless path
 [source: PROBE-FINDINGS deep §1]. Method-sensitive endpoints on the login hosts —
-a GET-only probe reads several of these as dead [source: PROBE-FINDINGS deep §5]:
+a GET-only probe reads several of these as dead [source: PROBE-FINDINGS deep §5;
+AUTH-TENANT §5]:
 
 | Path | GET | POST | Verdict |
 |---|---|---|---|
 | `/oauth/revoke` | 404 | **401 `invalid_client`** | **live, POST-only** |
 | `/oidc/logout` | 200 HTML | 200 HTML | live |
 | `/userinfo` | 401 `Unauthorized` | — | live |
-| `/connect/session/status` | 404 | 404 | **advertised in the SSO config but genuinely absent** |
-
-`/connect/session/status` is declared as `usersession_status_endpoint_path` on
-the login host and 404s on both GET and POST with an empty body — dead config, or
-it answers only under an authenticated session with a different method or tenant.
-Low value; recorded so it is not re-probed [source: AUTH-TENANT §5].
+| `/connect/session/status` | 404 | 404 | **advertised in the SSO config but genuinely absent** — either dead config or it answers only under an authenticated session with a different method or tenant |
 
 ## 5. The legacy Layer7 flow — and why it is dead
 
@@ -147,10 +142,8 @@ Low value; recorded so it is not re-probed [source: AUTH-TENANT §5].
 `client_id`. The flow is **Layer7/CA-gateway OAuth v2 under an `/mmcl` prefix**
 with an **opaque token** and a `roles` model — **there is no JWT `audience` at
 all** — and scope is `profile openid roles country` with **no `offline_access`**
-[source: AUTH-TENANT §6].
-
-Endpoint families, **PUBLISHED** from the archived EU config [source: ARCHIVE-URLS
-§2c]: `/mmcl/auth/oauth/v2/{authorize,token,token/revoke}` ·
+[source: AUTH-TENANT §6]. Endpoint families, **PUBLISHED** from the archived EU
+config [source: ARCHIVE-URLS §2c]: `/mmcl/auth/oauth/v2/{authorize,token,token/revoke}` ·
 `/mmcl/openid/connect/v1/userinfo` · `/mmcl/connect/session/{logout,status}` ·
 `/mmcl/connect/device/{register,register/client,renew,remove,list,metadata}` ·
 `/mmcl/connect/client/initialize` · `/mmcl/connect/enterprise/browser` ·
@@ -209,7 +202,6 @@ the Auth0 track no longer has this exposure [source: ARCHIVE-URLS §7].
 - Config *filenames* are region-keyed but **client identity is not**: the CLINICAL
   region carries its own distinct legacy `client_id` inside a file named for the
   **US** region [source: AUTH-TENANT §6].
-
 > ⚠ **Correction preserved — 403 is NOT evidence of absence in this bucket.** The
 > `configs/v1` namespace returns `AccessDenied`, not `NoSuchKey`, for absent keys,
 > so every 403 is indistinguishable from "exists but unreadable". This
@@ -250,8 +242,8 @@ first kid agrees; the second does not:
 
 The last three characters differ (`lLOJ` vs `lOOJ` — `L` against `O`). Every other
 kid agrees across files. **Unresolved.** Both are given rather than one silently
-picked: the `AUTH-TENANT` form comes from the pairwise four-way JWKS comparison,
-so treat it as the better-attested one and confirm against the live
+picked: the `AUTH-TENANT` form comes from the pairwise four-way JWKS comparison, so
+treat it as the better-attested one and confirm against the live
 `/.well-known/jwks.json` before relying on either. `PROBE-FINDINGS.md` deep §7 and
 `SECURITY-FINDINGS.md` truncate the kid to `80YhF8…` and take no side.
 
@@ -261,6 +253,5 @@ so treat it as the better-attested one and confirm against the live
 |---|---|
 | Would a patient host accept a shadow-tenant token? | Blocked on a token |
 | JWKS kids for `carelink-login-trials.minimed.com` | **Unknown — not in any source.** The four-way comparison never covered the clinical tenant, so "disjoint" is established for the four compared issuers only |
-| `/mfa/challenge` | **Unknown** — advertised, no probe result in any source |
-| An email address from `/userinfo` | Not obtainable for this client without a server-side scope change |
+| `/mfa/challenge`, and an email address from `/userinfo` | **Unknown** — advertised but no probe result in any source; and the email scope is not obtainable for this client without a server-side change |
 

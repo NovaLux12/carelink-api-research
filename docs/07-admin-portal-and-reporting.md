@@ -1,7 +1,7 @@
 # Admin portal and reporting
 
-Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md`,
-`recon/HCP-CONFIG-SCHEMA.md`, `recon/AWS-GATEWAYS.md`, `CROSS-REGION-CONFIG-FINDINGS.md`,
+Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/{JS-API-SURFACE,
+HCP-CONFIG-SCHEMA,AWS-GATEWAYS}.md`, `CROSS-REGION-CONFIG-FINDINGS.md`,
 `SECURITY-FINDINGS.md`, `AUTH-TENANT-FINDINGS.md`.
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
@@ -16,6 +16,7 @@ companion `hp-runtime.js` 8,597 B. The decisive negative: **zero** occurrences o
 one is Medtronic's** (`dev.commoncore.medtronic.eu`); the other 12 are Pusher, Mixpanel,
 cdnjs, webpjs and w3.org. Source it for `hcp/*` and device tables; never for the patient
 API [source: findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md].
+
 **The bundle is deployed on more than one host.** `carelink.medtronic.com` serves a
 **byte-identical** copy (3,397,615 B, sha256 `2a7fa8e7af519c2b`, `cmp` identical to
 `carelinkhp.minimed.eu`) and `carelink-support.medtronic.com` serves the same document. So
@@ -34,10 +35,10 @@ call-sites**, including the logbook/marker fields (`removalType`, `removalReason
 [source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
 
 > **⚠ Correction — preserved.** An earlier note claimed neither `main.js` nor `runtime.js`
-> contains a `sourceMappingURL` comment. **False** — `hp-main.js` contains the token at
-> byte offset 1791807. What is true is that it is not a *directive*: it is the string
-> literal inside webpack's bundled `worker-loader`, carried alongside the workers. The
-> conclusion is unchanged; the reason originally given for it was wrong.
+> contains a `sourceMappingURL` comment. **False** — `hp-main.js` contains the token at byte
+> offset 1791807. What is true is that it is not a *directive*: it is the string literal
+> inside webpack's bundled `worker-loader`, carried alongside the workers. The conclusion is
+> unchanged; the reason originally given for it was wrong.
 
 ## The `hcp/*` surface
 
@@ -46,17 +47,13 @@ call-sites**, including the logbook/marker fields (`removalType`, `removalReason
 `" /hcp/linkedPatient"` **with a leading space**, so a raw-byte grep for
 `/hcp/linkedPatient` misses it. All live on the portal origin; no separate API host.
 
-| family | distinct | notes |
-|---|---:|---|
-| `hcp/patients/*` | 47 | incl. 18 `((patientId))/*` |
-| `hcp/clinics/*` | 40 | incl. `toggle/*` kill-switches and 5 MFA endpoints |
-| `hcp/user/*` | 29 | the whole clinic-user admin surface |
-| `hcp/configuration/*` | 21 | 6 direct + 15 `public/*` |
-| `hcp/reports/*` | 10 | 4 are audit-log reports |
-| `hcp/insights/v1/*` · `hcp/dataUpload/*` | 8 · 6 | |
-| `hcp/anonymization/*` · `hcp/access-data/*` · `hcp/follow-up/*` | 4 · 4 · 4 | + `hcp/v2/clinics/access-data` |
-| `hcp/user…` remote / `fastLinking` / `linkedPatient` · `hcp/sso/*` | 7 · 3 | sso = login / logout / reauth |
-| others: `registrationCheck`, `ping/ping`, `locale`, `countries`, `remoteLinking`, `settings-calculator` | 14 | 4 have **0** call sites in the main bundle |
+Counts by family: **`patients` 47** (incl. 18 `((patientId))/*`) · **`clinics` 40** ·
+**`user` 29** · `configuration` 21 (6 direct + 15 `public/*`) · `reports` 10 (4 audit-log) ·
+`insights/v1` 8 · `dataUpload` 6 · `fastLinking`/`linkedPatient`/remote-user 7 ·
+`anonymization` 4 · `access-data` 4 (+ `hcp/v2/clinics/access-data`) · `follow-up` 4 ·
+`sso` 3 (login/logout/reauth) · others 14 (`registrationCheck`, `ping/ping`, `locale`,
+`countries`, `remoteLinking`, `settings-calculator`), of which 4 have **0** call sites in
+the main bundle.
 
 > **⚠ Unresolved source disagreement.** `JS-API-SURFACE.md` §2.1 records **12**
 > `hcp/clinics/toggle/*` endpoints; §7.7 of the same file and `AUTH-TENANT-FINDINGS.md` §7
@@ -80,7 +77,6 @@ side of the logbook vocabulary: three endpoints, previously documented as one.
 `/oauth/*` surface. Pusher channel names are reversible —
 `transformedChannelId($){return ($*$+$).toString(16)}` is unkeyed, so channel-name opacity
 provides no authorisation; `retinaEnabled` and `cuaEnabled` both ship **off**.
-
 ## `/hcp/configuration/*` and the header contract
 
 ```
@@ -90,12 +86,12 @@ PREFIX  = /hcp/configuration/public/<key>
 
 `X-System-ID` is mandatory and its **value** is validated: absent, empty (`X-System-ID;`)
 or invented (`NotARealClient`) all return **412, 0 bytes**; `ProWeb` **and** `proweb` both
-return 200. It is a **client-identity selector the vendor enumerates**, rejected at the
-edge **before routing** (`x-cache: Error from cloudfront`, `x-amz-cf-pop: LHR5-P7` —
-CloudFront in front of an API Gateway). The value comparison is case-insensitive even
-though the **key namespace is case-sensitive**. `Accept` is not load-bearing — the whole
-contract is `X-System-ID: ProWeb`. Only the `public/` subtree is behind this check
-[source: findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
+return 200. It is a **client-identity selector the vendor enumerates**, rejected at the edge
+**before routing** (`x-cache: Error from cloudfront`, `x-amz-cf-pop: LHR5-P7` — CloudFront
+in front of an API Gateway). The value comparison is case-insensitive even though the **key
+namespace is case-sensitive**; `Accept` is not load-bearing — the whole contract is
+`X-System-ID: ProWeb`, and only the `public/` subtree is behind this check [source:
+findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
 
 With the header, **13 of the 15 bundle-declared `public/*` keys return JSON**, one is
 token-gated (`personal/media/config/<locale>` → 401) and one is an empty `{}`
@@ -109,8 +105,7 @@ token-gated (`personal/media/config/<locale>` → 401) and one is an empty `{}`
 | `pow.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` |
 | `cua.crm.settings` | same shape, `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire |
 | `hcp.banner.notifications` | discloses a **maintenance window** (`2026-08-20T16:00Z`→`16:45Z`) to unauthenticated callers, and hardcodes `timezone: "PT"` on an EU portal |
-| `pow.follow.up.settings` | email rate limits, a URL-validating regex, a 3-domain allowlist, HTML-sanitising char replacements |
-| `pow.country.media.groups` · `pow.invite.to.personal.uri` | 37 + 51 country codes in two groups; a bare `https://carelink.minimed.eu` |
+| `pow.follow.up.settings` · `pow.country.media.groups` · `pow.invite.to.personal.uri` | email rate limits, a URL-validating regex, a 3-domain allowlist; 37 + 51 country codes in two groups; a bare `https://carelink.minimed.eu` |
 | `pow.nutrino.cc.{broker,metadata}.service.config` | the `commoncore` report hosts and sub-paths — see below |
 
 Three divergences between the HCP `cua.*` and patient `csr.*` control-code documents matter
@@ -180,12 +175,8 @@ base   https://commoncore.medtronic.{eu,com}/reports-broker/v1/ocl
 
 | endpoint | service | unauth |
 |---|---|---|
-| `/reports/generateReport` | broker | 403 |
-| `/reports/reportStatus` | broker | 403 |
-| `/reports/reportCsv` | broker | 403 |
-| `/reports/reportPdf` | broker | 403 |
-| `/reports/ReportDataTimelinesRange/patients` | metadata | 403 |
-| `/reports/ReportDataTimelinesForCalendar` | metadata | 403 |
+| `/reports/generateReport` · `reportStatus` · `reportCsv` · `reportPdf` | broker | 403 |
+| `/reports/ReportDataTimelinesRange/patients` · `ReportDataTimelinesForCalendar` | metadata | 403 |
 
 `dev.commoncore.medtronic.eu` resolves but is **502** (backend down).
 `commoncore.minimed.eu` is also 502 — a **different host**, not a twin [source:
@@ -197,13 +188,13 @@ The same two service configs are published **unauthenticated inside the patient 
 config** as `nutrino.cc.{broker,metadata}.service.config`, complete with a
 `security_headers["x-api-key"]`: **EU** ships the literal placeholder
 `%#$^&#GFFG@#*%&#$` (not a credential); **US** ships a real-looking base64 token, 18+
-chars; **trials** ships a **different** real-looking base64 token. This is the same class
-of defect as the hardcoded bundle key, but worse in two ways: it is on the patient host,
-served unauthenticated to any internet client; and **the EU value has been passing every
-internal review as obviously-fake while nobody noticed the other two carry real material.**
-Whether either key is live was **deliberately not tested** — that needs an authenticated
-call to a production medical-data service. **The values are deliberately not reproduced
-here.** Report *that the keys are exposed and where*, never the keys [source:
+chars; **trials** ships a **different** real-looking base64 token. Same class of defect as
+the hardcoded bundle key, but worse in two ways: it is on the patient host, served
+unauthenticated to any internet client; and **the EU value has been passing every internal
+review as obviously-fake while nobody noticed the other two carry real material.** Whether
+either key is live was **deliberately not tested** — that needs an authenticated call to a
+production medical-data service. **The values are deliberately not reproduced here.** Report
+*that the keys are exposed and where*, never the keys [source:
 findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md].
 
 **Do not conflate three distinct credentials:** (1) the nutrino config keys above; (2) the
@@ -227,19 +218,18 @@ Bounded enumeration (90 requests, cap reached, GET + one OPTIONS preflight per h
 
 **The enumeration found no new paths, because the question was malformed.** On AWS API
 Gateway **REST** APIs, `403 Missing Authentication Token` is the **unmatched-route** error,
-not an auth-gate: a certainly-absent UUID returns **byte-identical output** to the
-published root, `404` is never emitted at all (zero 404s in 90 requests), and all 44 of the
-403s carry the same 42-byte body. A usage-plan denial would read `{"message":"Forbidden"}`
-and never appeared. A dummy `X-Api-Key` header changed nothing, so **no usage-plan key is
-required**.
+not an auth-gate: a certainly-absent UUID returns **byte-identical output** to the published
+root, `404` is never emitted at all (zero 404s in 90 requests), and all 44 of the 403s carry
+the same 42-byte body. A usage-plan denial would read `{"message":"Forbidden"}` and never
+appeared. A dummy `X-Api-Key` header changed nothing, so **no usage-plan key is required**.
 
 The one working discriminator runs the other way: **on dialog-lite,
-`500 InternalServerErrorException` ⇒ the path is matched and routed** (`GET /prodous/` →
-403 but `GET /prodous/<uuid>` → 500). Which reveals the structural finding:
+`500 InternalServerErrorException` ⇒ the path is matched and routed** (`GET /prodous/` → 403
+but `GET /prodous/<uuid>` → 500). Which reveals the structural finding:
 
 > **Both dialog-lite deployments are a single stage-wide `ANY /{proxy+}` catch-all over the
-> whole stage, with a Lambda proxy integration that raises on every invocation** — on GET
-> and on OPTIONS, with and without `X-Api-Key`, across 22 distinct request shapes and two
+> whole stage, with a Lambda proxy integration that raises on every invocation** — on GET and
+> on OPTIONS, with and without `X-Api-Key`, across 22 distinct request shapes and two
 > independent regions. `dialog-lite/v1` in the published URL is therefore **not an API
 > Gateway resource**; it is opaque path data handed to the Lambda, and the service has no
 > route table to enumerate. **No `Access-Control-*` header appears on any of the 90
@@ -250,14 +240,12 @@ The one working discriminator runs the other way: **on dialog-lite,
 `{proxy+}` at the stage root**, so no GET or OPTIONS request reached any backend on any of
 the three gateways. Three readings are consistent with the evidence and cannot be separated
 with GET-only probing: no routes are deployed in the `prod` stage; routes exist only for
-other verbs; or the live stage is not `prod`.
-
-The complete observed response header set is six keys and nothing else — `date`,
-`content-type`, `content-length` (36 routed-and-failed / 42 no route), `x-amzn-errortype`,
-`x-amzn-requestid` (a fresh UUID per request) and `x-amz-apigw-id`. **Nothing in any
-response reveals stage, region, mapping template or backend service name.** Latency is the
-only region-correlated signal in the whole dataset (EU ~73–93 ms, US ~256–402 ms)
-[source: findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md].
+other verbs; or the live stage is not `prod`. The complete observed response header set is
+six keys and nothing else (`date`, `content-type`, `content-length` 36/42,
+`x-amzn-errortype`, `x-amzn-requestid`, `x-amz-apigw-id`) — **nothing in any response
+reveals stage, region, mapping template or backend service name**, and latency is the only
+region-correlated signal in the whole dataset (EU ~73–93 ms, US ~256–402 ms) [source:
+findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md].
 
 ## The biggest blind spot
 

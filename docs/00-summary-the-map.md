@@ -46,7 +46,8 @@ shadow token is not a key-reuse risk.
 | `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
 | `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
 | `/connect/pde/v3/*` | 403 on every route probed. Never touched. Untested whether any route exists. |
-| `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | The reports backend. Never archived in any crawl; the biggest known blind spot. |
+| `/patient/reports/*` **on `carelink.minimed.eu`** | **Live, gated 401/405.** Previously mapped only to `commoncore` and recorded unreachable — this supersedes that. The reports namespace is not where we thought it was. |
+| `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | Still live at path but **CloudFront 502 "could not resolve the origin domain name"** — an origin-side DNS failure, not an absence. Never archived in any crawl. |
 
 ## The version axis serves exactly two documents
 
@@ -195,4 +196,20 @@ the hardcoded-key finding spans two hosts, not one.
 | Report bodies from `commoncore` | an authenticated request — **never archived in any crawl** |
 | Whether any PDE v3 route exists | OPTIONS probes beyond the current budget |
 
-`regression/hurl/` pins 41 of these facts so they fail loudly rather than rot.
+### Drift, 2026-10-10
+
+The EU reporting-country list went **17 → 29 countries in one day**
+(+AU HR CZ EG GE IL PL RO RS SK SI AE), moving in lockstep with the InPen country
+list. Now pinned by a drift guard, because a silent rollout is how a bridge ends up
+believing a feature is unavailable.
+
+Also confirmed held: the discovery document is still byte-identical, all four
+tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed.
+
+### Frontends — there are two apps, not one
+
+`carelink.minimed.eu` and `carelink-support.minimed.eu` serve a **patient-facing
+client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
+clinician bundle replicates across **five** hosts, not two.
+
+`regression/hurl/` pins 44 of these facts so they fail loudly rather than rot.

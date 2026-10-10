@@ -124,6 +124,19 @@ check "lghpro.max (KNOWN BUG: same value)"            '.["csr.control.codes.sett
 check "vex.max (correct, control)"                    '.["csr.control.codes.settings"].ranges.vex.max' '100'
 check "gstpro.max (correct, int64 max)"               '.["csr.control.codes.settings"].ranges.gstpro.max' '9223372036854775807'
 
+# --- DRIFT GUARD: the reports-country rollout is a live, moving fence --------
+# Observed drift, not a bug. On 2026-10-09 the key carried 17 countries; by
+# 2026-10-10 it carried 29 (+AU HR CZ EG GE IL PL RO RS SK SI AE), growing in
+# lockstep with personal.inpen.supported.countries. Pinned at the CURRENT value
+# on purpose: a further rollout fails this check, which is the point. A silent
+# rollout is how a bridge ends up believing a feature is unavailable.
+check "reporting countries drifted 17 -> 29 (drift guard)" '.["personal.common.core.reporting.enabled.countries"] | length' '29'
+check "inpen countries moved in lockstep" '.["personal.inpen.supported.countries"].enabledPerCountry | length' '29'
+# The EU doc's reporting list must NOT contain US — that country lives in the
+# .com deployment's own list. Asserting the invariant, not my earlier conflation
+# of the two lists (which silently failed and was a wrong claim about the data).
+check "eu reporting list excludes US (invariant)" '.["personal.common.core.reporting.enabled.countries"] | index("US") != null' 'false'
+
 # --- Global, not regional: the device vocabulary is identical everywhere -----
 # Verified across carelink.minimed.eu / .com / carelink-trials.minimed.com.
 # If this ever differs by region, the CC880 mapping in #95 stops being a single

@@ -162,13 +162,24 @@ which is consistent with trials running `clinical.environment = true`.
 
   | key | hash (all three) |
   |---|---|
-  | `personal.device.family.to.model.mapping` | `215e6671de09` |
+  | `personal.device.family.to.model.mapping` | `8ce419a22fd3` |
   | `system.settings.transfer.feature.config.device.mapping` | `90a93c057aec` |
   | `logbook.supported.entry.types` | `98c562842920` |
   | `csr.control.codes.settings.predefined_control_codes` | `c7c0f04fb4b0` |
   | `system.logbook.entry.validation.config` | **DIFFERS** — `null`/`null`/schema |
 
-  So the published device vocabulary is **global, not regional**: one
+  
+> **CORRECTION (2026-10-10):** an earlier version of this note gave the family-map
+> hash as `215e6671de09`. That value is **wrong and unreproducible** — the map
+> hashes to `8ce419a22fd3` on every artefact on disk and on the live body. The
+> regression suite (`regression/hurl/05-public-config.check.sh`) asserted the
+> correct value throughout and passed, which is how the error surfaced: the pinned
+> hash was right and the hand-written note was wrong. Same failure class as the
+> source-map edit in `CHUNK-CORPUS-FINDINGS.md` — a claim in prose that was never
+> re-derived from the artefact. **Values quoted in notes are not evidence; the
+> pinned assertion is.**
+
+So the published device vocabulary is **global, not regional**: one
   authoritative map. That is now pinned by
   `hurl/05-public-config.check.sh`, which re-derives the hash from the US and
   trials deployments on every run.
