@@ -1,3 +1,10 @@
+# Oracle probe matrix — raw evidence table
+
+The one-request-per-row log behind `recon/VERSION-AXIS.md`. Kept because the
+oracle distinction (`MissingAuthenticationTokenException` = no route vs
+`UnauthorizedException` + `x-ca-err: 990` = reached the Layer7 authoriser) is
+established from this table, and a reader should be able to re-derive it.
+
 | # | namespace | host | ver | method | path tail | status | content-type | bytes | x-amzn-errortype | x-cache | CORS | t | body head |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | connect/carepartner | clcloud.minimed.eu | v13 | GET | `v13/be-periodic-data` | **403** | application/json | 42 | MissingAuthToken | Error | - | 0.07s | {message:Missing Authentication Token} |
