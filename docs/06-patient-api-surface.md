@@ -145,18 +145,38 @@ Also newly recorded: `v6/discover/android/{3.6,3.8}` is **live (200) on
 `clcloud-trials.minimed.com` only** — a legacy doc that is app-version-collapsed
 (`android/3.8` byte-identical to `android/3.6` except the echoed config string).
 
-## `/connect/pde/v3/*` — never touched, and not where you think
+## `/connect/pde/v3/*` — probed on both methods, no route (2026-10-11)
 
-All six probed PDE paths (`v3/display/message`, `v3/discover/android/3.6`,
-`v1/display/message`, `v2/display/message`) plus `connect/csr/v2/display/message` and the
-bare `connect/v2/display/message` returned **403 `MissingAuthenticationTokenException`,
-42 B, no CORS headers, no `x-cum-signature`** — the router's no-route response, **not** a
-token gate. PDE v3 is *not* behind a token on the GET path; it is not on the GET path at
-all [source: findings-log/probe-2026-10-08/recon/VERSION-AXIS.md].
+All PDE paths (`v1`/`v2`/`v3/display/message` plus `v3/discover/android/3.6`)
+returned **403 `MissingAuthenticationTokenException`, 42 B, no CORS headers**
+on GET **and** on OPTIONS — the router's no-route response on both methods, not
+a token gate [source: findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md].
 
-**Caveat:** a 403 on GET does not prove the resource is unregistered — `v6/display/message`
-is 403 on GET and perfectly real. OPTIONS was not run on the PDE namespace (request cap
-exhausted). Until then the honest phrasing is **"no GET route", not "absent"**.
+**Update 2026-10-11 (area C, OBSERVED):** the VERSION-AXIS v6 caveat ("403 on
+GET does not prove unregistered — OPTIONS was never run, cap exhausted") is now
+discharged for PDE on `clcloud.minimed.eu`. GET-403 + OPTIONS-403 with
+MissingAuthenticationTokenException and no CORS on every PDE cell means **no
+route on any tested method**, not merely "no GET route". Single-host scope —
+cross-host OPTIONS check still open.
+
+## `/connect/csr/*` and bare `/connect/v2` — two live POST-only routes (2026-10-11, NEW)
+
+**OBSERVED** [source: findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] —
+30 of a 30 cap, GET + OPTIONS only, controls first, each hit reproduced 3×:
+
+| path | GET | OPTIONS | verdict |
+|---|---|---|---|
+| `connect/csr/v2/display/message` | 403 MissingAuthToken, 42 B | **200** + `access-control-allow-origin: *`, `allow-methods: OPTIONS,POST`, 0 B | **LIVE, POST-only — NEW, in no prior note** |
+| `connect/v2/display/message` (bare pre-carepartner cumulus) | 403 MissingAuthToken, 42 B | **200** + `access-control-allow-origin: *`, `allow-methods: POST,OPTIONS`, 0 B | **LIVE, POST-only — NEW** |
+| `connect/csr/v1/display/message`, `connect/csr/v3/display/message` | 403 | 403, no CORS | dead |
+| bare `connect/carepartner/`, `connect/carepartner/v13`, `connect/carepartner/v13/discover` | 403 | 403, no CORS | dead — the router answers at leaves, not prefix parents |
+
+Same signature by which POST-only `v6/display/message` was found. INFERRED
+(assumption shown): the live method is most likely POST, as both hits
+advertise POST in `Allow`/`CORS` methods — but without a token the body cannot
+be observed, so "POST-only" means "registered with a non-GET method", not
+"POST returns data". Which of {csr/v2, bare v2, v6, v11, v12, v13} returns data
+with a real token remains token-gated.
 
 ## Existence oracles — how to probe this host family without a token
 
