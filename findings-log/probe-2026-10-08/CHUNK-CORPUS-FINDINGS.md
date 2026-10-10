@@ -104,9 +104,30 @@ wrong one for config-driven apps. Worth keeping for the patient-side surfaces.
 
 ## OpenAPI / source maps — both negative, both now closed
 
-- **Source maps:** no `.map` file exists for any of the three eager bundles, and
-  neither `main.js` nor `runtime.js` contains a `sourceMappingURL` comment. The
-  standard "just fetch `<bundle>.js.map`" shortcut does not apply here.
+- **Source maps: definitively absent.**
+  **CORRECTION (2026-10-10):** an earlier note here claimed that neither `main.js`
+  nor `runtime.js` contains a `sourceMappingURL` comment. That is **false** —
+  `hp-main.js` does contain the token, at byte offset 1791807. What is true is that
+  it is not a *directive*: it is the string literal inside webpack's bundled
+  `worker-loader`, carried alongside the workers. The conclusion below is
+  unchanged, but the reason given for it was wrong.
+
+  Exhaustive follow-up (`recon/JSMAP-HUNT.md`): zero of the 224 held chunks carry
+  `sourceMappingURL` (case-insensitive offline grep, no inline `data:` map), and
+  62 live `.map` probes across four portals — 15 stratified clinic chunks, 20
+  patient-portal chunks, all eager bundles on three hosts, plus `/maps/`,
+  `/sourcemaps/` alternates and two fabricated controls — every one returned a
+  not-found signal. No `SourceMap` / `X-SourceMap` / `Link: rel=sourcemap` header
+  on any real JS response either. So the minified-strings ceiling stands. The same
+  pass found a **bonus**: the patient portal's 3.4 MB main bundle is served at the
+  *domain root*, and offline grep of it yields the vendor's own `deviceFamily`
+  vocabulary (module `45559`): `{BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN}`,
+  matched with `startsWith()`. See §"Patient app" below for why that matters to
+  issue #81.
+
+  *Fact-check note: the false claim was a grep that hit without proving what it was
+  said to prove — same class as the `dict.get("a.b.c")` hash collision.*
+
 - **Published API spec:** probed the conventional discovery set
   (`/swagger.json`, `/openapi.json`, `/api-docs`, `/v2|v3/api-docs`,
   `/swagger/v1/swagger.json`, `/.well-known/openapi.json`, `/api/schema`,

@@ -215,9 +215,15 @@ suffix is missing. **20/20 no map.**
 | 29 | `carelink.minimed.com/runtime.79e2f9040b1dad8f.js.map` | **404** | `text/html; charset=iso-8859-1` | 196 | **no map** |
 | 30 | `carelink.minimed.com/429.a0690bc198e0315a.js.map` | **404** | `text/html; charset=iso-8859-1` | 196 | no map |
 
-† The `/maps/` probe on `carelinkhp` was intentionally sent with a **tampered**
-hash (`…c6b5`) to also confirm that the SPA fallback does not depend on the hash
-being a real one. It is indistinguishable from the correct-hash probe.
+† The `/maps/` and `/sourcemaps/` probes test the two alternate directories a
+source map is sometimes deployed under. Both were sent with a hash that is either
+correct or fabricated; on these hosts the response is identical either way, which
+is exactly why `Content-Type` is the only safe discriminator.
+
+**Bytes are the decompressed on-disk size.** The portal's own `index.html` is
+5518 B; rows 11–15 and 25/27 return it (or the patient portal's 1833 B index)
+because those hosts rewrite unknown paths under their SPA root. Rows 10 and
+23–24 are the real index pages, fetched to read the asset names out of them.
 
 **Header check (0 extra requests).** Response headers on all five real-JS
 fetches — including the patient main bundle and the largest clinic chunk — were
@@ -267,7 +273,7 @@ const e = {BLE:"BLE", BLE_X:"BLE_X", SIMPLERA:"SIMPLERA",
            SIMPLERA_X:"SIMPLERA_X", GUARDIAN:"GUARDIAN"}
 ```
 
-and the consumption site, byte ~2 963 961:
+and the consumption site, byte offset **2 964 066**:
 
 ```js
 this.userService.getDeviceFamily(p?.username)
@@ -341,10 +347,10 @@ host's not-found response is uniform.
    225 and the corpus is closed; a new chunk means a new build → see above).
 3. An **authenticated** surface serves source maps (nothing unauthenticated was
    left untested — every `.map` path probed returned a not-found signal).
-4. Someone obtains the build output from a **non-HTTP channel** — npm, a CI
-   artefact, a Sentry/Bugsnag upload, a bug-report attachment. The bundles
-   themselves are not published to npm (`grep` of `package.json` / no
-   `minimed` packages in the workspace `node_modules`).
+4. Someone obtains the build output from a **non-HTTP channel** — a CI artefact,
+   a sourcemap-monitoring service (Sentry/Bugsnag/Datadog) upload, or a
+   bug-report attachment. None of these is reachable from here; the HTTP
+   surfaces are now closed.
 
 **Do not re-run this pass.** Record the negative here so it is never repeated.
 

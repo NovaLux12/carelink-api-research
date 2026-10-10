@@ -1,0 +1,162 @@
+# The map
+
+One page. What exists on Medtronic's CareLink surface, confirmed read-only and
+unauthenticated. Everything here is dated; the full reasoning lives in
+`findings-log/`.
+
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a
+vendor document served without a login · **INFERRED** = reasoned, not seen.
+
+---
+
+## Three deployments, one product
+
+| Deployment | Patient host | Cumulus host | Auth tenant | Country default |
+|---|---|---|---|---|
+| EU / OUS | `carelink.minimed.eu` | `clcloud.minimed.eu` | `carelink-login.minimed.eu` | `GB` |
+| US | `carelink.minimed.com` | `clcloud.minimed.com` | `carelink-login.minimed.com` | `US` |
+| Trials / clinical | `carelink-trials.minimed.com` | `clcloud-trials.minimed.com` | `carelink-login-trials.minimed.com` | `US` |
+
+Each host sends a given country to **its own** `clcloud` sibling — `.eu → .eu`,
+`.com → .com`. Symmetric, no anomaly. `GB` is `region: OUS` (Outside US), not
+`EU`.
+
+A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
+(OIDC live, different JWKS kids). **All four tenants have completely disjoint
+signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
+shadow token is not a key-reuse risk.
+
+## API namespaces
+
+| Namespace | Notes |
+|---|---|
+| `/patient/*` | What most third-party clients use. `monitor/data`, `countries/settings`, `users/me`, `connect/data`. Unauthenticated → `401 InvalidToken`. |
+| `/patient/v2/configuration/public` | **Unauthenticated, 69 keys.** The single best find — see *Configuration*. |
+| `/api/carepartner/v2/*` | What the app's `baseUrlCareLink` declares, but no client actually uses it. |
+| `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
+| `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
+| `/connect/pde/v3/*` | 403 on every route probed. Never touched. Untested whether any route exists. |
+| `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | The reports backend. Never archived in any crawl; the biggest known blind spot. |
+
+## The version axis serves exactly two documents
+
+Probing an `android/X.Y` cell past 3.8 does not give you a new API — it re-derives
+one of two known documents. Every cell from 3.9 upward is byte-identical except
+the echoed request string (`"config": "android,12.0"`). **The "enum is
+open-ended" note is superseded: there is no undiscovered Auth0+v13 fallback.**
+
+```
+Auth0 + cumulus v13 + CLINICAL   →  3.6, 3.7, 3.8
+Auth0 + cumulus v11              →  3.5
+no Auth0, cumulus v2, no CLINICAL →  3.9 – 12.0 (one document)
+```
+
+**`v12/display/message` is live** and was in no prior note. Our fork's
+`BLE_API_VERSIONS = [13, 11, 6, 5]` therefore contains a permanently dead `v5`
+and omits a live `v12` — nothing that changes behaviour today (v13 answers
+first), but the list is inaccurate.
+
+**`v11/discover` is host-dependent**, and this **contradicts** an earlier claim
+that the discovery document is global: `.com` serves an 18105 B legacy doc
+(cumulus v2, no Auth0, no CLINICAL, no `baseUrlCms`); `.eu` and `-trials` serve
+the 20345 B Auth0/v13 doc. The claim still holds for v13, re-verified
+byte-identical to the on-disk capture.
+
+## Configuration — the unauthenticated find
+
+`GET https://carelink.minimed.{eu,com}/patient/v2/configuration/public`
+(unauthenticated, gzip, 69 keys) exists on **all three deployments**. 34 of 69
+keys are regional. It contains:
+
+| key | what it gives you |
+|---|---|
+| `personal.device.family.to.model.mapping` | **The complete 16-family device vocabulary.** |
+| `system.settings.transfer.feature.config.device.mapping` | `{"BLE780":"780G","CC880":"MiniMed™ Flex"}` — the Flex naming. |
+| `logbook.supported.entry.types` | 12 entry types. |
+| `system.logbook.entry.validation.config` | **`null` on both patient regions, full schema on trials** — 12 sensor locations, 5 clinical removal reasons, 8 dose units. |
+| `csr.control.codes.settings` | Device **control** codes (`dpml`/`tup`/`vex`/`tcc`). **Not** the NGP alarm set. |
+| `mmm.data.api.url`, `personal.patient.timeline.config.host` | Undocumented AWS API Gateways. |
+
+Hash-verified **global, not regional**: the family map, the Flex naming, the
+logbook entry types and the control codes are byte-identical across all three
+deployments.
+
+Two caveats that matter for anyone parsing this:
+
+- The endpoint **serves gzip unconditionally**, ignoring `Accept-Encoding`
+  (RFC 9110 §8.4 violation).
+- The `SIMPLERA` model list contains **trailing-whitespace padding**
+  (`"MMT-5100       "`). An exact-match parser silently misses them.
+
+## Device vocabulary
+
+Sixteen families, published by the vendor:
+
+```
+GM  BLE700  BLE720  BLE740  BLE770  BLE780  GST  SIMPLERA
+SIMPLERACC  SIMPLERACCOLID  NMX7  CC840  CC880  NMX8  INSTINCT  EAGLE
+```
+
+`CC880` is the Minimed Flex and contains `MMT-8062/8063/8082-8085`. Note it
+contains **no** `BLE` and **no** `FLEX` token — which is exactly why a matcher
+that greps for those two strings misses the device entirely.
+
+Medtronic is not internally consistent about spelling: `SIMPLERA_SYSTEM` is the
+enum but `"Simplera™ system"` is the value; `COSMOS` is the enum but `"Cosmos"`
+is the value. **Family matching must be case-insensitive and must handle the
+display-name spelling.**
+
+`MMT-8600`/`MMT-8601` are absent from the portal bundle's device table but
+present in the patient config under `SIMPLERACC`. Two partial tables, both wrong.
+
+## Existence oracles — how to probe without a token
+
+This is the reusable method. Established with positive controls.
+
+| Host family | Signal |
+|---|---|
+| `clcloud.*` | `x-amzn-errortype: MissingAuthenticationTokenException` = **no route** (every fabricated control). `UnauthorizedException` + `x-ca-err: 990` = **request reached Medtronic's Layer7 authorizer**. An `OPTIONS` returning `access-control-allow-origin: *` proves the resource exists even when GET is undefined (this is how POST-only `v6` was found). The plain 403 status line is uniform and carries no signal. |
+| `carelinkhp.*` (portal) | `200 JSON` published · `412` precondition (missing client header) · `401` exists but gated · `404` absent · `405` POST-only. Namespace is case-sensitive. |
+
+Latency is not an oracle. `403` on a fabricated path and on a dead version is
+byte-identical.
+
+## Frontends
+
+`carelinkhp.minimed.eu` is the **clinician portal, not the mobile app** — of 13
+host literals in its 3.4 MB bundle, exactly one is Medtronic's, and it contains
+zero `/patient/*`, `medicalDeviceFamily` or NGP tokens. Source it for `hcp/*`
+and device tables, never for the patient API.
+
+Its `hp-runtime.js` holds a **225-entry lazy-chunk manifest**. All 224 chunks
+were fetched and mined: they are view code — 3 hosts, 3 path literals, 0 device
+families, 0 NGP codes. Their value is **89 field names** at call-sites, including
+the logbook/marker fields (`removalType`, `removalReason`,
+`sensorInsertionLocation`, `timecapUnscrewed`) that the deferred work needed.
+
+**No source maps exist** on any bundle (verified for all 224 chunks offline,
+plus a stratified `.js.map` sample).
+
+`carelink.medtronic.com` serves a **byte-identical** copy of the portal bundle —
+the hardcoded-key finding spans two hosts, not one.
+
+## Traps
+
+| Trap | Detail |
+|---|---|
+| `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. ~50 collected names are false positives. |
+| Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. |
+| Unconditional gzip | `carelink.minimed.eu` ignores `Accept-Encoding`. |
+| Raw archive captures | Common Crawl/Wayback contain live `jsessionid_*` and plaintext-base64 OAuth `sessionData`. Facts only. |
+
+## What we still do not know
+
+| Question | Blocked on |
+|---|---|
+| Which field carries `deviceFamily`, and in what casing | an authenticated `monitor/data` response |
+| The NGP alarm-code vocabulary | an authenticated `application` config — 73 `hcp/configuration/*` paths probed, all closed |
+| `relativeOffset` semantics for pump-offset rounding | a real token |
+| Report bodies from `commoncore` | an authenticated request — **never archived in any crawl** |
+| Whether any PDE v3 route exists | OPTIONS probes beyond the current budget |
+
+`regression/hurl/` pins 41 of these facts so they fail loudly rather than rot.
