@@ -2,7 +2,7 @@
 
 # CareLink API research
 
-**A read-only map of one of the least-documented medical APIs in production.**
+**Medtronic publishes no API documentation. This is what their API looks like from the outside.**
 
 [![MIT](https://img.shields.io/badge/license-MIT-8A2BE2.svg)](LICENSE)
 [![read-only](https://img.shields.io/badge/method-read--only%20%C2%B7%20unauthenticated-8A2BE2)]()
@@ -17,27 +17,27 @@
 
 ## The short version
 
-Medtronic publishes **no API documentation**. Every third-party CareLink client —
-including the one that feeds Nightscout — reverse-engineers the same surface
-independently.
+Every third-party CareLink client — including the one that feeds Nightscout —
+reverse-engineers this surface independently, because there's nothing to read.
+This repo is that work, done once and cited.
 
-The surprise is how much is available **without a credential at all**: one
+The surprise is how much answers **without a credential at all**: one
 unauthenticated file names every device family Medtronic makes, another answers
-for 117 countries, and a third lets you map which API routes exist without ever
+for 117 countries, and a third lets you map which routes exist without ever
 holding a token.
 
-Everything here was gathered **read-only, unauthenticated, one request per second**.
-No credentials. No login. No authentication attempted.
+Gathered **read-only, unauthenticated, one request per second**. No credentials.
+No login. No authentication attempted.
 
 ---
 
-## Three things worth knowing before you read on
+## Three things that change how you'd approach it
 
 ### One dial, two documents
 
 The app-version axis looks like a knob. It isn't — it resolves to one of exactly
-two documents. Probing a new version number usually re-derives something already
-known, which closes off a whole class of wasted work.
+two documents, so probing a new version number usually re-derives something you
+already have.
 
 ```mermaid
 flowchart LR
@@ -54,7 +54,7 @@ flowchart LR
 ### You can map an API without a token
 
 The most reusable thing here. The 403 status line is uniform and carries no
-signal — but the error *type* does, and an `OPTIONS` preflight finds routes a
+signal — the error *type* does, and an `OPTIONS` preflight finds routes a
 GET-only probe calls dead.
 
 ```mermaid
@@ -82,16 +82,21 @@ flowchart TB
         u1["carelink.minimed.com"] --> u2["clcloud.minimed.com"]
         t1["carelink-trials.minimed.com"] --> t2["clcloud-trials.minimed.com"]
     end
-    a1["tenant #1"] -. "same policy<br/>DIFFERENT keys" .-> e1
-    a2["tenant #2"] -.-> u1
-    a3["tenant #3"] -.-> t1
-    s["tenant #4<br/>shadow domain"]
-    g["carelinkhp — clinician portal<br/>⚠ hcp/* only"]
-    p["carelink.minimed.eu — patient client<br/>70 /patient/* endpoints"]
+    a1["tenant #1<br/>carelink-login.minimed.eu"] -. "same policy<br/>DIFFERENT keys" .-> e1
+    a2["tenant #2<br/>carelink-login.minimed.com"] -.-> u1
+    a3["tenant #3<br/>carelink-login-trials…"] -.-> t1
+    s["tenant #4<br/>carelink-login.medtronic.com"]
+    s -.-> a1
+    g["carelinkhp.minimed.eu<br/>clinician portal · hcp/* only"]
+    e1 -.-> g
+    p["carelink.minimed.eu<br/>patient client · 70 /patient/*"]
+    e1 -.-> p
     cfg["/patient/v2/configuration/public<br/>UNAUTHENTICATED · 69 keys"]
+    e1 -.-> cfg
     style s fill:#3b2f2f,stroke:#f66
     style cfg fill:#2f3b2f,stroke:#6f6,stroke-width:2px
-    style p fill:#2f3b2f,stroke:#6f6,stroke-width:2px
+    style p fill:#2f3b2f,stroke:#6f6
+    style g fill:#3b3b2f,stroke:#fd6
 ```
 
 ---
@@ -197,8 +202,8 @@ cd carelink-api-research
 |---|---|
 | What's already known | [`docs/00-summary-the-map.md`](docs/00-summary-the-map.md) |
 | Something to work on | [`docs/11-suggested-research-areas.md`](docs/11-suggested-research-areas.md) |
-| The rules before probing | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) · [`AGENTS.md`](AGENTS.md) §7 |
-| Submit a finding | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) |
+| The rules before probing | [`AGENTS.md`](AGENTS.md) §7 · [`docs/09`](docs/09-methodology-and-oracles.md) |
+| Submit a finding, or run a session | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) |
 
 ---
 
@@ -243,17 +248,26 @@ Claims are labelled **OBSERVED** (seen in a live response), **PUBLISHED** (in a
 vendor document served without a login) or **INFERRED** (reasoned, not seen). Four
 repo issues stay open *on purpose*, because they need a token.
 
-We have also been wrong here, on the record, **seven times**: a claim without
-evidence, a grep that hit without proving, a hash comparison over a lookup that
-silently returned null, a verification that read back the wrong target, a heading
-that counted wrong, a citation pointing at a file that didn't exist, and a
-published claim that contradicted its own source table. Every correction is kept
-in `findings-log/` rather than quietly fixed — a research note that only records
-its successes isn't one.
+**We have been wrong here fourteen times, on the record.** Seven while writing,
+seven more found by an independent audit of all twelve pages. The recurring
+shapes:
 
-An independent accuracy audit of all twelve pages found **seven more errors**,
-all since fixed. The regression suite caught one of them by asserting the right
-value where the prose was wrong.
+- a claim stated **without evidence** — nothing to point at
+- a grep that **hit without proving** what it was said to prove
+- a hash comparison over a lookup that **silently returned null**, manufacturing
+  agreement between two different values
+- a verification that **read back the wrong target**
+- derived prose that **contradicted its own source table**, then propagated
+  faithfully into five pages — including one claiming MG_DL vs MMOL_L
+  mis-scales glucose in the wrong countries
+- a citation pointing at a **file that doesn't exist**
+- a count generalised from a **subset** (44 published as 93), with no counting
+  rule recorded
+
+Every correction stays in `findings-log/` rather than being quietly fixed. A
+research note that only records its successes isn't one. And the assertion suite
+exists because prose drifts: it caught a page asserting a hash its own log had
+already retracted.
 
 ---
 
