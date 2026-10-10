@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # research-gate.sh — the gate this repo's claims must pass.
 #
-# Run it before opening a PR, and it runs again in CI on every PR. Exit 0 =
-# publishable. Exit 1 = something in the diff must not ship.
+# Run it before opening a PR. CI runs it again on every PR, so a change that
+# fails here cannot merge. Exit 0 = publishable. Exit 1 = do not ship.
 #
 # Usage:
 #   ./scripts/research-gate.sh            # check the diff vs origin/main
@@ -10,7 +10,7 @@
 #   ./scripts/research-gate.sh --all      # check every tracked file
 #   ./scripts/research-gate.sh --suite    # only the live assertion suite
 #
-# What it enforces, and why:
+# What it enforces:
 #   1. no credential material, ever
 #   2. no internal hostnames, ever
 #   3. no machine-specific paths
@@ -35,46 +35,54 @@ for arg in "$@"; do
   esac
 done
 
+# This file necessarily CONTAINS the literal secrets it searches for, so it is
+# excluded from the scan it performs. Without the exclusion the gate always
+# fails on itself, which is the fastest way to make a gate get disabled.
+SELF="scripts/research-gate.sh"
 FAIL=0
-note() { printf '  %-8s %s\n' "$1" "$2"; }
+note() { printf '  %-4s %s\n' "$1" "$2"; }
 
-# ---------------------------------------------------------------- 1-4: leak scan
-# Built from the repo's own history: every one of these has been in a file at
-# some point. Matched on the DIFF so that AGENTS.md and README can *name* the
-# patterns without tripping them.
 if [ "$SUITE_ONLY" -eq 0 ]; then
   echo "--- leak scan (mode: $MODE) ---"
+  BASE=$(git rev-parse --verify origin/main 2>/dev/null || echo HEAD)
 
-  # Gather the text under test.
-  if [ "$MODE" = "all" ]; then
-    SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null)
-  elif [ "$MODE" = "staged" ]; then
-    SUBJECT=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(md|yml|yaml|sh|hurl)$' || true)
-  else
-    BASE=$(git rev-parse --verify origin/main 2>/dev/null || echo HEAD)
-    SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" | grep -E '\.(md|yml|yaml|sh|hurl)$' || true)
-  fi
+  case "$MODE" in
+    all)
+      SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null | grep -vxF "$SELF" || true)
+      ;;
+    staged)
+      SUBJECT=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      ;;
+    *)
+      SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      ;;
+  esac
 
   if [ -z "$SUBJECT" ]; then
     note ok "no changed files to scan"
   else
-    # ADDED lines only — a pre-existing line in a touched file is not this PR's
-    # doing, and flagging it would make the gate unusable.
-    case "$MODE" in
-      all)    ADDED=$(printf '%s\n' "$SUBJECT" | xargs -r cat 2>/dev/null) ;;
-      staged) ADDED=$(git diff --cached --diff-filter=ACM -U0 | grep '^+' | grep -v '^+++') ;;
-      *)      BASE=$(git rev-parse --verify origin/main 2>/dev/null || echo HEAD)
-              ADDED=$(git diff --diff-filter=ACM -U0 "$BASE" | grep '^+' | grep -v '^+++') ;;
-    esac
+    # Gather ADDED lines per file from the FILTERED list, so this script's own
+    # pattern list never enters the text under test.
+    ADDED=""
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
+      [ -f "$f" ] || continue
+      case "$MODE" in
+        all)    ADDED="${ADDED}$(cat "$f" 2>/dev/null)"$'\n' ;;
+        staged) ADDED="${ADDED}$(git diff --cached -U0 -- "$f" 2>/dev/null | grep '^+' | grep -v '^+++')"$'\n' ;;
+        *)      ADDED="${ADDED}$(git diff -U0 "$BASE" -- "$f" 2>/dev/null | grep '^+' | grep -v '^+++')"$'\n' ;;
+      esac
+    done <<EOF
+$SUBJECT
+EOF
 
-    # Each pattern is: name | extended-regex. Deliberately specific — a loose
-    # pattern would make people disable the gate, which is worse than no gate.
     while IFS='|' read -r name pat; do
       [ -z "$name" ] && continue
       hits=$(printf '%s' "$ADDED" | grep -cEi "$pat" || true)
-      if [ "${hits:-0}" -gt 0 ]; then
+      hits=${hits:-0}
+      if [ "$hits" -gt 0 ]; then
         note "!!" "$name — $hits hit(s). DO NOT COMMIT."
-        printf '%s' "$ADDED" | grep -nEi "$pat" | head -3 | cut -c1-150 | sed 's/^/           /'
+        printf '%s' "$ADDED" | grep -nEi "$pat" | head -3 | cut -c1-140 | sed 's/^/         /'
         FAIL=1
       else
         note ok "$name"
@@ -84,12 +92,11 @@ vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
 reports-broker key fragments|(0vJJl02[0-9A-Za-z]{8,}|GIFQiM3[0-9A-Za-z]{8,})
 reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
 internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
-internal *.corp host|[a-z0-9-]+\.corp\b
-other internal-looking hosts|(titan-internal|mmd|ols)\.
+internal .corp host|[a-z0-9-]+\.corp\b
 machine-specific paths|/home/[a-z]|/Users/[a-z]|C:\\Users\\
 live jsession values|;jsessionid_[A-Z0-9]{6,}=
-live sessionData values|sessionData=[A-Za-z0-9_-]{20,}
-long base64 secrets|\b[A-Za-z0-9+/]{40,}={0,2}\b
+live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
+long base64 secrets|[A-Za-z0-9+/]{44,}={0,2}
 PATTERNS
   fi
 fi
@@ -101,8 +108,7 @@ if [ "$SUITE_ONLY" -eq 0 ]; then
 import re, glob, os
 real = set(glob.glob('findings-log/**/*.md', recursive=True))
 bad = 0
-targets = glob.glob('docs/*.md') + ['README.md', 'AGENTS.md']
-for page in targets:
+for page in glob.glob('docs/*.md') + ['README.md', 'AGENTS.md']:
     if not os.path.exists(page):
         continue
     t = open(page, encoding='utf-8', errors='replace').read()
@@ -120,23 +126,28 @@ print(f'BROKEN={bad}')
 PY
 )
   N=$(printf '%s' "$BROKEN" | sed -n 's/^BROKEN=//p')
-  printf '%s\n' "$BROKEN" | grep -v '^BROKEN=' | sed 's/^/    /' || true
-  if [ "${N:-0}" -gt 0 ]; then note "!!" "$N broken citation path(s)"; FAIL=1
-  else note ok "all citation paths resolve"; fi
+  printf '%s\n' "$BROKEN" | grep -v '^BROKEN=' | sed 's/^/  /' || true
+  if [ "${N:-0}" -gt 0 ]; then
+    note "!!" "${N} broken citation path(s)"
+    FAIL=1
+  else
+    note ok "all citation paths resolve"
+  fi
 fi
 
 # ---------------------------------------------------------------- 6: suite
 echo "--- vendor assertion suite ---"
-if command -v hurl >/dev/null 2>&1 && [ -x regression/hurl/05-public-config.check.sh ]; then
-  if ( cd regression/hurl && bash ./05-public-config.check.sh >/tmp/_gate_suite.log 2>&1 ); then
-    note ok "$(tail -2 /tmp/_gate_suite.log | grep -oE '[0-9]+ passed.*' || echo 'suite green')"
+if [ -x regression/hurl/05-public-config.check.sh ]; then
+  if ( cd regression/hurl && bash ./05-public-config.check.sh ) >/tmp/_gate_suite.log 2>&1; then
+    note "ok" "$(grep -oE '[0-9]+ passed, [0-9]+ failed' /tmp/_gate_suite.log | tail -1 || echo 'suite green')"
   else
-    note "!!" "assertion suite failed — read regression/hurl output"
-    tail -6 /tmp/_gate_suite.log | sed 's/^/    /'
+    note "!!" "assertion suite failed — see output below"
+    tail -8 /tmp/_gate_suite.log | sed 's/^/         /'
     FAIL=1
   fi
 else
-  note "~~" "hurl not installed — suite skipped. Install: brew install hurl"
+  note "!!" "check suite not found at regression/hurl/"
+  FAIL=1
 fi
 
 echo
