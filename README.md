@@ -14,6 +14,60 @@
 
 *Start here → [**`docs/00-summary-the-map.md`**](docs/00-summary-the-map.md)*
 
+---
+
+## Contribute a finding
+
+Everything below is optional reading. If you just want to help, **copy one of
+these into your agent's chat and hit go** — each tells it to read the
+instructions and follow them.
+
+<details open>
+<summary><b>Option 1 — I want to help reverse-engineer the CareLink API</b> (copy this)</summary>
+
+```
+I want to help with https://github.com/NovaLux12/carelink-api-research
+
+Read the instructions here and follow them:
+https://github.com/NovaLux12/carelink-api-research/blob/main/CONTRIBUTING-research.md
+```
+
+</details>
+
+<details>
+<summary><b>Option 2 — I already have a finding to submit</b> (copy this)</summary>
+
+```
+I have a finding for https://github.com/NovaLux12/carelink-api-research
+
+Read the instructions here and follow them:
+https://github.com/NovaLux12/carelink-api-research/blob/main/CONTRIBUTING-research.md
+```
+
+</details>
+
+**The same two prompts are in GitHub's prompts dropdown** — the `▾` button beside
+*Write a comment* on any issue or pull request. You have to be opening an issue
+to see them, which is why they're copied out above.
+
+Then, before you open a PR:
+
+```bash
+git clone https://github.com/NovaLux12/carelink-api-research
+cd carelink-api-research
+./scripts/research-gate.sh        # must exit 0 — CI runs the same script
+```
+
+| You want to | Start at |
+|---|---|
+| See what's already known | [`docs/00-summary-the-map.md`](docs/00-summary-the-map.md) |
+| Find something to work on | [`docs/11-suggested-research-areas.md`](docs/11-suggested-research-areas.md) |
+| Read the rules before probing | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md), then [`AGENTS.md`](AGENTS.md) §7 |
+
+**A negative result counts.** Issue #84 was closed by proving something does
+*not* exist — 73 paths, 28 key names, four corpora. Proving an absence is one of
+the most useful things you can do here.
+
 </div>
 
 ---
@@ -166,36 +220,6 @@ Wrong in both ranges, and the clinician-side config carries the right one.
 </details>
 
 ---
-
-## Contribute a finding
-
-**The whole instruction set is [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md).**
-
-```bash
-git clone https://github.com/NovaLux12/carelink-api-research
-cd carelink-api-research
-cat CONTRIBUTING-research.md      # how to contribute
-./scripts/research-gate.sh        # what your change has to pass — exit 0
-```
-
-In GitHub, the **prompts panel** on any issue or comment has two entries — *Help
-reverse-engineer the CareLink API* and *Submit a finding you already have*. Either
-one tells your agent to read `CONTRIBUTING-research.md` and follow it.
-
-| You want to | Start at |
-|---|---|
-| Run a research session | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) § *Run a research session* |
-| Submit a finding you have | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) § *Submit a finding* |
-| See open areas | [`docs/11-suggested-research-areas.md`](docs/11-suggested-research-areas.md) |
-| See what's already known | [`docs/00-summary-the-map.md`](docs/00-summary-the-map.md) |
-
-The gate scans your diff for credentials and internal hostnames, validates every
-citation, and re-runs the vendor assertion suite. It runs in CI too, so a red
-gate blocks the merge regardless.
-
-**A negative result counts.** Issue #84 was closed by proving something does
-*not* exist — 73 paths, 28 key names, four corpora. Proving an absence is one of
-the most useful things you can do here.
 
 ## What's here
 
