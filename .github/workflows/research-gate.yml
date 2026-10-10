@@ -1,0 +1,57 @@
+name: research-gate
+description: Validate a research contribution before opening a PR — credential scan, citation integrity, and the live vendor assertion suite.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install hurl
+        run: |
+          # hurl is the assertion runner; the suite is skipped without it.
+          curl -sSL -o /tmp/hurl.tar.gz \
+            https://github.com/Orange-OpenSource/hurl/releases/download/7.0.0/hurl-7.0.0-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf /tmp/hurl.tar.gz -C /usr/local/bin hurl
+          hurl --version
+
+      - name: Research gate
+        run: |
+          chmod +x scripts/research-gate.sh
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            ./scripts/research-gate.sh
+          else
+            # On push to main, run everything rather than a diff that no longer exists.
+            ./scripts/research-gate.sh --all
+          fi
+
+      - name: Mermaid renders (fail if a diagram is malformed)
+        run: |
+          # A broken mermaid block renders as an error box on GitHub, which reads
+          # as "this page is broken". Cheap to catch here instead.
+          python3 - <<'PY'
+          import glob, re, sys
+          bad = 0
+          for f in glob.glob('docs/*.md') + ['README.md']:
+              text = open(f, encoding='utf-8', errors='replace').read()
+              fences = re.findall(r'```mermaid\n(.*?)```', text, re.S)
+              for i, block in enumerate(fences, 1):
+                  head = block.strip().split('\n')[0]
+                  if not re.match(r'^(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|C4Context|sankey-beta|requirementDiagram|xychart-beta)\b', head):
+                      print(f'  {f} mermaid #{i}: unrecognised diagram type: {head!r}')
+                      bad += 1
+                  if '---' in block.split('\n')[0]:
+                      print(f'  {f} mermaid #{i}: separator fused into the first row')
+                      bad += 1
+          print(f'  {bad} mermaid problem(s)')
+          sys.exit(1 if bad else 0)
+          PY
