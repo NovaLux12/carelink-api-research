@@ -54,7 +54,6 @@ flowchart LR
     style E fill:#3b3b2f,stroke:#fd6
     style KE fill:#3b3b2f,stroke:#fd6
 ```
-
 **OBSERVED.** The OAuth *policy* is identical across all of them: comparing
 `carelink-login.minimed.eu`, `carelink-login.medtronic.eu` and
 `carelink-login-trials.minimed.com` field by field, they differ only in `issuer`,
@@ -163,16 +162,16 @@ sequenceDiagram
     actor U as Patient
     participant B as Bridge
     participant A as carelink-login.minimed.eu
-    B->>B: code_verifier → code_challenge = S256(code_verifier)
+    B->>B: generate code_verifier, derive code_challenge by S256
     B->>A: GET /authorize?client_id=…&redirect_uri=com.medtronic.carepartner:/sso&code_challenge=…
-    Note over A: redirect_uri is a STRICT allowlist.<br/>An attacker redirect gets<br/>403 "redirect_uri is not in the list<br/>of allowed callback URLs".
+    Note over A: redirect_uri is a STRICT allowlist.<br/>An attacker redirect gets 403 and the<br/>message: redirect_uri is not in the list<br/>of allowed callback URLs.
     A->>U: 302 → login page
     U->>A: user authenticates
     A->>B: 302 com.medtronic.carepartner:/sso?code=…
     Note over B: ⚠ SINGLE POINT OF FAILURE<br/>custom URI scheme; PKCE is client-enforced only.
-    B->>A: POST /oauth/token (code + code_verifier)
+    B->>A: POST /oauth/token with code and code_verifier
     A->>B: access_token + refresh_token
-    Note over B,A: `offline_access` IS requested, so refresh tokens are<br/>legitimate and grant_type: refresh_token is the right call.<br/>device_code is DEFINITIVELY REJECTED — 403 unauthorized_client.<br/>`email` is NOT requested, so /userinfo cannot return one.
+    Note over B,A: offline_access IS requested, so refresh tokens are<br/>legitimate and grant_type: refresh_token is the right call.<br/>device_code is DEFINITIVELY REJECTED — 403 unauthorized_client.<br/>email is NOT requested, so /userinfo cannot return one.
 ```
 
 ## 4. What a client must actually use

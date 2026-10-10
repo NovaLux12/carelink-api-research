@@ -51,10 +51,10 @@ What is withheld:
 - **The values, everywhere.** Never in this repo.
 - **The comparison between deployments.** That is the finding that makes it
   reportable, and it is held for a disclosure decision.
-- **Whether either credential is live.** Deliberately never tested — that would
-  need an authenticated call to a production medical-data service, well outside a
-  read-only pass. "Real-looking" is a statement about *shape*, not a claim that it
-  works. Do not upgrade that without a test.
+- **Whether any credential involved is live.** Deliberately never tested — that
+  would need an authenticated call to a production medical-data service, well
+  outside a read-only pass. Nothing here should be read as a claim that anything
+  works.
 
 The one half that **is** published: the EU deployment ships a 17-character literal
 placeholder. That is published because it explains the bug class and exposes

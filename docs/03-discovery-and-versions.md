@@ -7,10 +7,17 @@ endpoint-by-endpoint patient-API tables are in
 [`06-patient-api-surface.md`](06-patient-api-surface.md), the probing method in
 [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md).
 
-Legend — **OBSERVED** = seen in a live response during this research ·
-**PUBLISHED** = in a vendor document served without a login (live, or recovered from
-a public web archive) · **INFERRED** = reasoned, not seen. Citations are
-`[source: findings-log/<file> §n]`; `PROBE-FINDINGS` =
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
+served without a login (live, or recovered from a public web archive) · **INFERRED** =
+reasoned, not seen.
+
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev:
+> [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) · → next:
+> [`04-configuration.md`](04-configuration.md) · related:
+> [`06-patient-api-surface.md`](06-patient-api-surface.md) ·
+> [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md)
+
+Citations are `[source: findings-log/<file> §n]`; `PROBE-FINDINGS` =
 `findings-log/probe-2026-10-08/PROBE-FINDINGS.md` and `VERSION-AXIS`, `ARCHIVE-URLS`,
 `CONFIG-NAMESPACE`, `CONFIG-NAMESPACE-DEEP` are `…/probe-2026-10-08/recon/<name>.md`.
 
@@ -19,8 +26,7 @@ a public web archive) · **INFERRED** = reasoned, not seen. Citations are
 ## 1. The discovery document
 
 ```
-GET https://clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}
-        /connect/carepartner/v13/discover/android/3.6
+GET https://clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}/connect/carepartner/v13/discover/android/3.6
 → 200 application/json, 20256 B, unauthenticated, no x-api-key required
 ```
 
@@ -245,8 +251,7 @@ in it is cited and no claim here depends on it.
 | Which of `{11, 12, 13}` returns the data the bridge wants, with a real token | blocked on credentials |
 | Whether the `android/3.6` pin survives the next rotation | guarded only by the ADR text and the discovery test — the runtime guard is inert (§3) |
 
-**Verification lessons applied here.** Re-probe the numbers, don't re-read the notes — the
-`pde/v3` error survived four review rounds because each trusted the previous document. And
-a hash over a lookup that can silently return `null` manufactures consensus. Both are
-written up in [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md)
-[source: CLAIM-AUDIT-2026-10-09.md; CROSS-REGION-CONFIG-FINDINGS.md].
+**Verification lessons applied here:** re-probe the numbers rather than re-reading
+notes, and never hash a lookup that can silently return `null`. Both are written up in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md) [source:
+CLAIM-AUDIT-2026-10-09.md; CROSS-REGION-CONFIG-FINDINGS.md].

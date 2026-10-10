@@ -25,19 +25,13 @@ under `/patient/v2/configuration/`. A trailing slash is accepted.
 > never appeared in any form. The comparison, the other deployments' values, and
 > whether any key is live are all withheld.
 
-This is the same class of defect as the hardcoded `x-api-key` in the portal JS
-bundle (`SECURITY-FINDINGS.md` S3), but worse in two ways:
-
-1. **It is on the patient host**, served unauthenticated to any internet client.
-2. **EU ships a placeholder while US and trials ship working-looking secrets** —
-   so the EU value has been passing every internal review as obviously-fake, and
-   nobody noticed the other two deployments carry real material.
-
-**The values are deliberately not reproduced in this file.** They exist only in
-the gitignored raw captures (`security/cfg-*.json`). Treat them as sensitive: do
-not paste them into an issue, a PR, a commit message, or any text that leaves
-this machine. If this is ever disclosed, report *that the keys are exposed and
-where*, not the keys themselves.
+> **[REDACTED — held back, 2026-10-11.]** The two reasons this mattered, the
+> statement about which deployments carry what, and the handling rules for the
+> values were all removed before publication. What remains: this is the same class
+> of defect as the hardcoded `x-api-key` in the portal JS bundle
+> (`SECURITY-FINDINGS.md` S3), and it was never tested for liveness — that would
+> need an authenticated call to a production medical-data service. The full
+> finding is preserved locally outside this repo.
 
 Not tested — and deliberately so: whether either key is live against the reports
 brokers. That needs an authenticated call to a production medical-data service,

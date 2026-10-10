@@ -250,11 +250,10 @@ sign-off.
 
 No credential was written to any file. The only auth-ish header ever sent was
 the literal string `DUMMY-NOT-A-KEY-000000000000`. Verified mechanically: the
-real-looking `x-api-key` values that exist in `security/cfg-*.json` (three
-distinct, one a 17-char literal placeholder, two 40-char tokens for the reports
-brokers) appear in **zero** of the files written by this session. This file
-follows the existing convention in `CROSS-REGION-CONFIG-FINDINGS.md`: report
-*that* the keys are exposed and *where*, never the keys.
+`x-api-key` values that exist in `security/cfg-*.json` appear in **zero** of the
+files written by this session. (Their description is itself held back from this
+repo pre-publication — see the redaction note in
+`CROSS-REGION-CONFIG-FINDINGS.md`.)
 
 ## 9. Files
 
