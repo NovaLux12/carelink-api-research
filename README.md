@@ -169,40 +169,33 @@ Wrong in both ranges, and the clinician-side config carries the right one.
 
 ## Contribute a finding
 
-Two paths in. Both end at the same gate.
+**The whole instruction set is [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md).**
 
 ```bash
 git clone https://github.com/NovaLux12/carelink-api-research
 cd carelink-api-research
-
-# working on an area? read this, it is written to be pasted into any agent
-cat docs/RESEARCH-SESSION.md
-
-# already have a finding? this is the standard
-cat CONTRIBUTING-research.md
-
-# before you open a PR — must exit 0
-./scripts/research-gate.sh
+cat CONTRIBUTING-research.md      # how to contribute
+./scripts/research-gate.sh        # what your change has to pass — exit 0
 ```
 
-**The standard, in one line:** a reader can tell what you observed, how you know
-it's true, where it came from, and how it could be wrong — without re-deriving
-anything.
+In GitHub, the **prompts panel** on any issue or comment has two entries — *Help
+reverse-engineer the CareLink API* and *Submit a finding you already have*. Either
+one tells your agent to read `CONTRIBUTING-research.md` and follow it.
 
 | You want to | Start at |
 |---|---|
-| Run a research session | [`docs/RESEARCH-SESSION.md`](docs/RESEARCH-SESSION.md) — copy-paste brief for any agent |
-| Submit a finding you already have | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) |
-| Claim an area first | the *Claim a research area* issue form |
+| Run a research session | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) § *Run a research session* |
+| Submit a finding you have | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) § *Submit a finding* |
 | See open areas | [`docs/11-suggested-research-areas.md`](docs/11-suggested-research-areas.md) |
+| See what's already known | [`docs/00-summary-the-map.md`](docs/00-summary-the-map.md) |
 
 The gate scans your diff for credentials and internal hostnames, validates every
-citation path, and re-runs the vendor assertion suite. It runs in CI too, so a
-red gate blocks the merge regardless.
+citation, and re-runs the vendor assertion suite. It runs in CI too, so a red
+gate blocks the merge regardless.
 
 **A negative result counts.** Issue #84 was closed by proving something does
-*not* exist — across 73 paths, 28 key names and four corpora. Proving an absence
-is one of the most useful things you can contribute here.
+*not* exist — 73 paths, 28 key names, four corpora. Proving an absence is one of
+the most useful things you can do here.
 
 ## What's here
 
