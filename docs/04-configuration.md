@@ -3,8 +3,15 @@
 Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/PUBLIC-CONFIG-FINDINGS.md`,
 `CROSS-REGION-CONFIG-FINDINGS.md`, `recon/CONFIG-NAMESPACE-DEEP.md`, `recon/CONFIG-NAMESPACE.md`.
 
-Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
-without a login · **INFERRED** = reasoned, not seen.
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
+served without a login (live, or recovered from a public web archive) · **INFERRED** =
+reasoned, not seen.
+
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev:
+> [`03-discovery-and-versions.md`](03-discovery-and-versions.md) · → next:
+> [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) · related:
+> [`06-patient-api-surface.md`](06-patient-api-surface.md) ·
+> [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md)
 
 ## The endpoint
 

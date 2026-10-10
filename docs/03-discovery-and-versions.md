@@ -7,6 +7,8 @@ endpoint-by-endpoint patient-API tables are in
 [`06-patient-api-surface.md`](06-patient-api-surface.md), the probing method in
 [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md).
 
+**Dated 2026-10-10.**
+
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
 served without a login (live, or recovered from a public web archive) · **INFERRED** =
 reasoned, not seen.
@@ -55,9 +57,8 @@ and it **differs between `.eu` and `.com` even though the documents are byte-ide
 so the signing key or binding is host/region specific. `git grep x-cum-signature` finds
 nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-09.md].
 
-`certificates[]` is always exactly **8 entries** and is **identical between the v13
-(patient) and v11 (trials) documents** (same sha256), so it is **not a tenant
-discriminator** — only a "did Medtronic rotate their pinned roots" tripwire
+`certificates[]` is always exactly **8 entries** and **identical between the v13 and v11
+documents**, so it is **not a tenant discriminator** — only a cert-rotation tripwire
 [source: work/METHOD-FACTS.md; VERSION-AXIS §4].
 
 ## 2. Two independent axes
@@ -65,10 +66,10 @@ discriminator** — only a "did Medtronic rotate their pinned roots" tripwire
 The URL `/connect/carepartner/{basePath}/discover/android/{version}` varies on two
 orthogonal things [source: PROBE-FINDINGS deep §2]:
 
-- **Base path = which deployment/tenant.** `v13` → the patient API. `v11` → a
-  **trials deployment** — all three regions are returned the trials tenant
-  (`carelink-trials` / `clcloud-trials`), so "v11" does not mean "older API", it is a
-  different tenant. `v10` → 204 (exists, empty). `v12` → 401. `v14/v15/v16/v20` → 403.
+- **Base path = which deployment/tenant.** `v13` → the patient API. `v11` → a **trials
+  deployment** — all three regions return the trials tenant (`carelink-trials` /
+  `clcloud-trials`), so "v11" does not mean "older API", it is a different tenant. `v10`
+  → 204 (exists, empty). `v12` → 401. `v14/v15/v16/v20` → 403.
 - **App version = which cumulus the returned document references.**
 
 | base version | status | verdict |
@@ -86,12 +87,12 @@ that no other cell carries [source: VERSION-AXIS §3a].
 
 ## 3. The version axis serves exactly two documents
 
-Probing an `android/X.Y` cell past 3.8 does not give a new API — it re-derives one
-of two known documents. Ten further cells (3.11, 3.12, 4.9, 5.1, 6.1, 7.0, 8.0, 9.0,
-11.0, 12.0) all returned 200, all legacy: no `Auth0SSOConfiguration`, `baseUrlCumulus`
-at `/connect/carepartner/v2`, `CP[]` with only `US,EU` — no CLINICAL at all. After
-normalising, every legacy cell from 3.11 to 12.0 is **byte-identical** except the
-echoed request string `"config": "android,3.11"` vs `"config": "android,12.0"`
+Probing an `android/X.Y` cell past 3.8 does not give a new API — it re-derives one of two
+known documents. Ten further cells (3.11, 3.12, 4.9, 5.1, 6.1, 7.0, 8.0, 9.0, 11.0, 12.0)
+all returned 200, all legacy: no `Auth0SSOConfiguration`, `baseUrlCumulus` at
+`/connect/carepartner/v2`, `CP[]` with only `US,EU` — no CLINICAL at all. After
+normalising, every legacy cell from 3.11 to 12.0 is **byte-identical** except the echoed
+request string `"config": "android,3.11"` vs `"config": "android,12.0"`
 [source: PROBE-FINDINGS §7].
 
 **⚠ Superseded, stated as such rather than dropped:** the earlier note "the enum is
@@ -217,23 +218,21 @@ route", not "absent"** [source: VERSION-AXIS §5].
 ### 10. Post-2026-10-10 version-axis work
 
 `recon/VERSION-AXIS.md` (2026-10-10) is the pass behind §2–§8: 70 requests, hard cap
-reached, GET+OPTIONS only, unauthenticated, and the fabricated-path controls ran
-**first** so the oracle verdict is not contaminated by the data it judges
-[source: VERSION-AXIS preamble]. The **v2 tree also has a data plane**:
+reached, GET+OPTIONS only, unauthenticated, controls run **first** so the oracle verdict
+is not contaminated by the data it judges [source: VERSION-AXIS preamble]. The **v2 tree
+also has a data plane**:
 `/patient/v2/monitor/data` → **405** (exists, POST-only) and `/patient/v2/users/me` → **401**
 (exists, token-gated) — 405 rather than 404 is the same "exists, POST-only" signature
 used elsewhere; not previously recorded [source: CONFIG-NAMESPACE-DEEP TARGET 1]. Live
 drift 2026-10-09 → 2026-10-10: the country lists grew
 (`personal.common.core.reporting.enabled.countries` 17 → 26) and the config document
 grew 20420 B → 20586 B with the same 69-key set — a rollout is in progress
-[source: CONFIG-NAMESPACE-DEEP "NEW items"].
-
-One archive limit worth knowing: only **6** archived `discover` captures exist, all
-inside a single 6-week window (2026-02-24 → 2026-03-08), and there is **no archived
-`v13` discover URL at all** — so the archives neither confirm nor refute that
-`android/3.6` → cumulus `v13` is the live generation [source: ARCHIVE-URLS §3, §8].
-Finally, `recon/DRIFT-AND-NEW-2026-10-10.md` **does not exist** in this repo; nothing
-in it is cited and no claim here depends on it.
+[source: CONFIG-NAMESPACE-DEEP "NEW items"]. Note also that only **6** archived
+`discover` captures exist, all in one 6-week window (2026-02-24 → 2026-03-08), with **no
+archived `v13` discover URL at all** — so the archives neither confirm nor refute the
+`android/3.6` → cumulus `v13` mapping [source: ARCHIVE-URLS §3, §8].
+`recon/DRIFT-AND-NEW-2026-10-10.md` **does not exist** in this repo; nothing in it is
+cited and no claim here depends on it.
 ## 11. Unresolved disagreements between sources
 
 | Disagreement | Both readings | Canonical page takes ||---|---|---|
@@ -248,10 +247,10 @@ in it is cited and no claim here depends on it.
 |---|---|
 | What `*/v12/discover/android/*` returns | token-gated on all three hosts — 401, body unreadable. **The most valuable unread cell** |
 | Whether PDE v3 has any route at all | needs an OPTIONS probe; "no GET route" is the honest phrasing |
-| Which of `{11, 12, 13}` returns the data the bridge wants, with a real token | blocked on credentials |
+| Which of `{11, 12, 13}` returns what the bridge wants, with a real token | blocked on credentials |
 | Whether the `android/3.6` pin survives the next rotation | guarded only by the ADR text and the discovery test — the runtime guard is inert (§3) |
 
-**Verification lessons applied here:** re-probe the numbers rather than re-reading
-notes, and never hash a lookup that can silently return `null`. Both are written up in
+**Verification lessons applied here:** re-probe the numbers rather than re-reading notes,
+and never hash a lookup that can silently return `null` — both are written up in
 [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md) [source:
 CLAIM-AUDIT-2026-10-09.md; CROSS-REGION-CONFIG-FINDINGS.md].
