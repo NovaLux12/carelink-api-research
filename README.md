@@ -8,7 +8,7 @@
 
 [![Method](https://img.shields.io/badge/method-read--only%20·%20unauthenticated-blue)]()
 [![Claims](https://img.shields.io/badge/claims-source--cited-informational)]()
-[![Pinned](https://img.shields.io/badge/regression-44%20assertions%20·%20exit%200-brightgreen)]()
+[![Pinned](https://img.shields.io/badge/regression-93%20assertions%20·%20exit%200-brightgreen)]()
 [![Part of](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)]()
 
 *Start here → [**`docs/00-summary-the-map.md`**](docs/00-summary-the-map.md)*
@@ -132,7 +132,7 @@ resolves. Three near-misses in one session came from trusting a status code.
 **4. `?countryCode=` is accepted and ignored.**
 The public config echoes the parameter back as a 70th key and changes nothing — it
 is region-parameterised by **host**, not parameter. The real country axis is a
-different endpoint, and it disagrees with itself: **in BE, ES and IT, `bgUnits`
+different endpoint, and it disagrees with itself: **in BE and CH, `bgUnits`
 says `MG_DL` while `glucoseUnitsDefault` says `MMOL_L`.** Read the one and not the
 other and you mis-scale every glucose value. That class of bug affects any client,
 not one device.

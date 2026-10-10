@@ -288,7 +288,7 @@ byte-size check must be made after decompression.
 6. **`INSULIN_ASSESSMENT` is unavailable in FR, RU and US**; `dateOfBirthRequired`
    is false only in RU; `stateCodes` is US-only; FR-only `certification.pdf`.
 7. **`bgUnits`/`glucoseUnitsDefault` split MG_DL vs MMOL_L by country** — and they
-   do not agree with each other. **BE, ES and IT report `MG_DL` for `bgUnits` but
+   do not agree with each other. **BE and CH report `MG_DL` for `bgUnits` but
    `MMOL_L` for `glucoseUnitsDefault`.** Two keys, same country, different units.
    Any bridge that reads one and not the other will mis-scale.
 8. **Live drift in the country lists (2026-10-09 → 2026-10-10):**
@@ -363,3 +363,22 @@ is public by design and already recorded as such in `PUBLIC-CONFIG-FINDINGS.md`.
 
 No git repo or worktree was read for writing or touched by this pass; everything
 was written under `research/probe-2026-10-08/recon/`, which is gitignored.
+
+
+> **CORRECTION (2026-10-11, verified by set arithmetic on the source table).**
+> An earlier version of this note named **BE, ES and IT** as the countries where
+> `bgUnits` and `glucoseUnitsDefault` disagree. That is wrong. Reading the two
+> rows above:
+>
+> | key | MG_DL | MMOL_L |
+> |---|---|---|
+> | `bgUnits` | AT BE CH CL DE ES FR IT US | DK FI GB IE NL NO RU SE ZA |
+> | `glucoseUnitsDefault` | AT CL DE ES FR IT US | **BE CH** DK FI GB IE NL NO RU SE ZA |
+>
+> `ES` and `IT` are `MG_DL` in **both** keys — they agree. The only
+> disagreements are **BE and CH**, and **CH was missing from the original claim
+> entirely** while two agreeing countries were named.
+>
+> The prose in this file carried the same error as its own table, so this was
+> faithfully propagated into five pages of the public repo. Corrected everywhere.
+> The magnitude is not cosmetic: `MG_DL` vs `MMOL_L` is roughly 18×.

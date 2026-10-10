@@ -31,8 +31,8 @@ findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
 all API definitions live in the eager main bundle. What they *did* add: new endpoint literals
 (`POST /hcp/sso/auth/otc/send`, `GET hcp/countries/dialCodes`,
 `GET hcp/patients/checkPhoneNumber`, `GET /connect/retina/searchfilter`,
-`POST /connect/retina/searchfilter/feedback` — the source's heading counts three, its own
-list carries five) and **89 distinct field names at HTTP call-sites**, including the
+`POST /connect/retina/searchfilter/feedback`) and **89 distinct field names at HTTP
+call-sites**, including the
 logbook/marker fields (`removalType`, `removalReason`, `sensorInsertionLocation`,
 `adhesivetapeLocation`, `timecapUnscrewed`, `notes`, `entryTs`) [source:
 findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
@@ -129,10 +129,16 @@ One endpoint answers unauthenticated where all nine siblings require the client 
 sensitivity — a CRM base URI and a version string, no PII, no credential. **The finding is
 the inconsistency, not the content.** It corroborates that the shadow deployment's content
 namespace is `pow` (version 4.5) where the patient deployments use `ocl` (14.x → 15.5)
-[source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md]. *Minor unresolved
-discrepancy:* `AUTH-TENANT-FINDINGS.md` records that 200 as `application/octet-stream`,
-`HCP-CONFIG-SCHEMA.md` as `application/json` for the same 96-byte body on
-`carelinkhp.minimed.eu`; both agree on byte count and body.
+[source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
+
+*Content-type, **settled** 2026-10-10 by live re-probe:* HTTP 200,
+`application/octet-stream`, `content-length: 96`, JSON body. An earlier record in
+`HCP-CONFIG-SCHEMA.md` said `application/json`; that record was wrong and the
+source now carries the correction. The 200 was on the shadow host
+`carelink.medtronic.eu`, not `carelinkhp.minimed.eu` — both were probed, both
+return it. Worth noting for a client: the body parses as JSON but the *type* is
+`octet-stream`, so anything branching on `content-type` will not parse a working
+response.
 
 ### Portal existence oracle — full
 
@@ -187,7 +193,6 @@ exposes nothing.
 
 What is withheld is the comparison against the other deployments. Held for a
 disclosure decision, not a technical one.
-hardcoded `x-api-key` inside the portal JS bundle, which ships to every visitor and whose
 production API base is a **`dev.` host** — **verified not live** (403 both with and without
 the key against `commoncore.medtronic.{eu,com}`, 502 against `dev.`); (3) the inert
 

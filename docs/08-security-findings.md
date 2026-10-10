@@ -192,7 +192,7 @@ Three parsing-level defects in vendor-published material:
   `normalise()` handles it, a naive `===` would not (OBSERVED) [source:
   PUBLIC-CONFIG §#81; HURL-05].
 - **Two unit keys that disagree.** `bgUnits` and `glucoseUnitsDefault` report
-  different units in **BE, ES and IT** (`MG_DL` vs `MMOL_L` in the same
+  different units in **BE and CH** (`MG_DL` vs `MMOL_L` in the same
   response) — reading one and not the other mis-scales every value (OBSERVED)
   [source: CONFIG-DEEP NEW item 7; CLAIM-AUDIT third batch].
 - **Unconditional gzip.** `carelink.minimed.eu` serves `Content-Encoding: gzip`

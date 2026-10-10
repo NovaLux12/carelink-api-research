@@ -62,7 +62,7 @@ surfaced these names is finding F5 in
 | Shadow host | What it is | Class |
 |---|---|---|
 | `carelink-login.medtronic.eu` | live OIDC document, 2753 B — **third Auth tenant** | OBSERVED |
-| `carelink-login.medtronic.com` | live OIDC document, 2765 B — **fourth Auth tenant** | OBSERVED |
+| `carelink-login.medtronic.com` | live OIDC document, size not recorded in any source — **fourth Auth tenant** | OBSERVED |
 | `clcloud.medtronic.com` | cumulus host, **gateway-gated** — 403 on the discovery path, unlike `clcloud.minimed.*` | OBSERVED |
 | `carelink.medtronic.com` | **byte-identical** copy of the clinician portal bundle (sha256 `2a7fa8e7af519c2b` on both hosts) | OBSERVED |
 | `carelink-support.medtronic.com` | serves the same 5518-byte SPA document | OBSERVED |

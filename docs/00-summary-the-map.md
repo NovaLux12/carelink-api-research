@@ -133,7 +133,7 @@ back as a 70th `countryCode` key while `default.country` stays `GB` regardless. 
 document is region-parameterised by **host**, not by parameter. The real country
 axis is `/patient/countries/settings?countryCode=…` (35 keys, swept across 18
 countries), and that sweep found something that matters: **`bgUnits` and
-`glucoseUnitsDefault` disagree in BE, ES and IT** — `MG_DL` and `MMOL_L` in the
+`glucoseUnitsDefault` disagree in BE and CH** — `MG_DL` and `MMOL_L` in the
 same response. Reading the one and not the other mis-scales every value.
 
 Also country-dependent: `mfa.status` is `REQUIRED` only in Norway;
@@ -256,6 +256,14 @@ The EU reporting-country list went **17 → 29 countries in one day**
 list. Now pinned by a drift guard, because a silent rollout is how a bridge ends up
 believing a feature is unavailable.
 
+> **Settled 2026-10-11 by live read.** Two derived sources disagreed — one recorded
+> 29 countries, the other 26, and `17 + the 11 named additions = 28`, matching
+> neither. A direct unauthenticated GET of the config on 2026-10-11 returns **6359 B
+> and 29 countries** (`AT DK FI DE IS NO ES SE CH GB BE NL LU IT ZA CL IE AU HR CZ
+> EG GE IL PL RO RS SK SI AE`). **29 is correct**; the 26 figure is retired.
+> This is the eighth recorded instance of a derived note disagreeing with a
+> primary observation — which is why the assertion is pinned rather than the prose.
+
 Also confirmed held: the discovery document is still byte-identical, all four
 tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
 — finding F6 in [`08-security-findings.md`](08-security-findings.md).
@@ -269,7 +277,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 44 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 93 of these facts so they fail loudly rather than rot.
 
 ---
 

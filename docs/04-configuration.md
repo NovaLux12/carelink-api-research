@@ -69,7 +69,7 @@ sha256 of canonical JSON, identical on all three deployments:
 
 | key | digest |
 |---|---|
-| `personal.device.family.to.model.mapping` | `215e6671de09` |
+| `personal.device.family.to.model.mapping` | `8ce419a22fd3` |
 | `system.settings.transfer.feature.config.device.mapping` | `90a93c057aec` |
 | `logbook.supported.entry.types` | `98c562842920` |
 | `csr.control.codes.settings.predefined_control_codes` | `c7c0f04fb4b0` |
@@ -119,7 +119,7 @@ no equivalent on trials; `outages.nextupdateat` is populated on trials only; eac
 deployment has its own reCAPTCHA site key and Mixpanel token.
 
 **Live drift, recorded 2026-10-09 → 2026-10-10:**
-`personal.common.core.reporting.enabled.countries` grew **17 → 26** (AU, HR, CZ, EG, GE,
+`personal.common.core.reporting.enabled.countries` grew **17 → 29** (AU, HR, CZ, EG, GE,
 IL, PL, RO, RS, SK, SI, AE) and `personal.inpen.supported.countries` grew in step. A
 rollout is in progress [source: findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md].
 
@@ -188,14 +188,14 @@ GET /patient/countries/settings?countryCode=XX   → 200 application/json, gzip,
   legal-document paths — all from `carelink.minimed.eu`. The host is not the region
   boundary; the parameter selects the market, the host only supplies the default.
 
-### ⚠ `bgUnits` and `glucoseUnitsDefault` disagree in BE, ES and IT
+### ⚠ `bgUnits` and `glucoseUnitsDefault` disagree in BE and CH
 
 | key | MMOL_L | MG_DL |
 |---|---|---|
 | `bgUnits` | GB IE NL NO SE DK FI ZA RU | US DE FR IT ES AT BE CH CL |
 | `glucoseUnitsDefault` | BE CH DK FI GB IE NL NO RU SE ZA | AT CL DE ES FR IT US |
 
-**BE, ES and IT report `MG_DL` for `bgUnits` but `MMOL_L` for
+**BE and CH report `MG_DL` for `bgUnits` but `MMOL_L` for
 `glucoseUnitsDefault`.** Two keys, same country, different units. Reading one and not the
 other mis-scales every value [source:
 findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md].

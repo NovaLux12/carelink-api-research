@@ -72,7 +72,7 @@ existed or closes the space properly.
 `/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
 countries exist in the config's own lists. The interesting ones are the ones where
 two keys disagree — we already found `bgUnits` vs `glucoseUnitsDefault`
-contradicting each other in BE/ES/IT.
+contradicting each other in BE and CH.
 
 **Attack that specifically:** sweep for *internal contradictions* in a single
 country response, not for differences between countries. Unit fields

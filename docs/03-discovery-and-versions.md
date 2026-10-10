@@ -124,7 +124,8 @@ too [source: PROBE-FINDINGS §3].
 ## 4. The Auth0 + cumulus-v13 cell matrix
 
 | Cell | Auth0 | cumulus | CLINICAL | Document |
-|---|---|---|---|---|| `*/v13/discover/android/3.6` (all 3 hosts) | yes | **v13** | yes | patient doc — what the bridge uses |
+|---|---|---|---|---|
+| `*/v13/discover/android/3.6` (all 3 hosts) | yes | **v13** | yes | patient doc — what the bridge uses |
 | `.eu` and `-trials` `v11/discover/android/3.6` | yes — the **clinical** config `carepartner_auth0_cl_sso_config_v1.json`, for all three regions | **v13** | yes | trials-tenant doc, Auth0 track |
 | `.com` `v11/discover/android/3.6` | **no** | **v2** | **no** | legacy doc — see §7 |
 | `-trials` `v6/discover/android/{3.6,3.8}` | **no** | **v2** | **no** | legacy doc — see §8 |
@@ -225,7 +226,7 @@ also has a data plane**:
 (exists, token-gated) — 405 rather than 404 is the same "exists, POST-only" signature
 used elsewhere; not previously recorded [source: CONFIG-NAMESPACE-DEEP TARGET 1]. Live
 drift 2026-10-09 → 2026-10-10: the country lists grew
-(`personal.common.core.reporting.enabled.countries` 17 → 26) and the config document
+(`personal.common.core.reporting.enabled.countries` 17 → 29) and the config document
 grew 20420 B → 20586 B with the same 69-key set — a rollout is in progress
 [source: CONFIG-NAMESPACE-DEEP "NEW items"]. Note also that only **6** archived
 `discover` captures exist, all in one 6-week window (2026-02-24 → 2026-03-08), with **no
