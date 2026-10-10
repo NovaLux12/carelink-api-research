@@ -27,16 +27,17 @@ filename is the same file: `PROBE-FINDINGS` =
 `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md`, `GAPS-0721` =
 `findings-log/medtronic-carelink-2026-07-21/03-data-model-and-gaps.md`,
 `SECURITY-FINDINGS` = `findings-log/probe-2026-10-08/SECURITY-FINDINGS.md`,
-`CLAIM-AUDIT` = `findings-log/probe-2026-10-08/audit/CLAIM-AUDIT-2026-10-09.md`.
+`CLAIM-AUDIT` = `findings-log/probe-2026-10-08/audit/CLAIM-AUDIT-2026-10-09.md`,
+`DRIFT-AND-NEW` = `findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md`.
 
 ## 1. Open questions
 
 | Question | Current best guess (class) | Exactly what would settle it | Issue |
 |---|---|---|---|
 | Which field carries `deviceFamily`, and in what casing | The **model-prefix** path is the reliable one; the family path is a guess — the vendor's own patient app matches `{BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN}` with `startsWith()` and cannot match `CC880` (OBSERVED, vendor bundle) [PATIENT-VOCAB] | **One authenticated `GET /patient/monitor/data` response**, logged key-names-only; paste verbatim strings, do not paraphrase [VALIDATION-RUNBOOK Tier 1; PATIENT-VOCAB] | #81 |
-| The NGP alarm-code vocabulary | **Not published on any unauthenticated surface** — 28 key names probed, all 404, with case-sensitivity and 401-vs-404 controls (OBSERVED negatives) [HCP-SCHEMA §7] | An authenticated `POST hcp/configuration/application` (clinician token; returns a large `appConfig` blob) or a real device/pump report [HCP-SCHEMA §7] | #84 |
+| The NGP alarm-code vocabulary | **Not published on any unauthenticated surface** — 28 key names probed, all 404, under case-sensitivity and 401-vs-404 controls; the patient bundle's `N\d\d` tokens minify to Angular internals and a Samsung device regex, so #84 is explicitly **not claimed answered** by the 2026-10-10 pass (OBSERVED negatives) [HCP-SCHEMA §7; DRIFT-AND-NEW §Not chased] | An authenticated `POST hcp/configuration/application` (clinician token; returns a large `appConfig` blob) or a real device/pump report [HCP-SCHEMA §7] | #84 |
 | Whether the alarm wire form is numeric or string (`lastAlarm.code`) | Unknown; the community alarm table is paradigm + NGP-era (INFERRED, 2015 gist) [GAPS-0721 P0.2] | Read `lastAlarm.code`'s JSON type from one live payload [VALIDATION-RUNBOOK Tier 3] | #84 |
-| Report bodies from `commoncore.medtronic.{eu,com}` | Plausibly richer than `/patient/monitor/data` — a CSV/PDF generator over pump + CGM data (INFERRED) [SECURITY-FINDINGS §reports] | An authenticated request with a real token; **never archived in any crawl**, so archives cannot help [AUTH-TENANT §9 standing blind spot] | #76 |
+| Report bodies — and from which host | Plausibly richer than `/patient/monitor/data` (INFERRED) [SECURITY-FINDINGS §reports]; the surface is wider than recorded: `/patient/reports/*` is live on `carelink.*`, gated 401/405, and `commoncore`'s 502 is an origin-side DNS failure, not absence [DRIFT-AND-NEW §2–3] | An authenticated request with a real token, per host; `commoncore` is **never archived in any crawl**, so archives cannot help [AUTH-TENANT §9 standing blind spot] | #76 |
 | Whether any `/connect/pde/v3` route exists at all | Honest phrasing is "**no GET route**", not "absent" — `v6/display/message` proves a 403-on-GET resource can be real (OBSERVED) [VERSION-AXIS §5] | ~6 OPTIONS probes (~12 s) on the PDE namespace — not run, the 70-request cap was exhausted [VERSION-AXIS §5] | not numbered in any source |
 | Which host actually returns `connect/data` with a token | Both hosts answer 401 unauthenticated; the **method** question is closed (bridge's GET/POST usage is correct), only the **host** is open (OBSERVED) [METHOD-FACTS §Conclusion for #74; CLAIM-AUDIT batch 1] | Request `connect/data` from **both** `carelink.*` and `clcloud.*` with a valid token and compare bodies [VALIDATION-RUNBOOK Tier 2] | #74 |
 | Which of cumulus `v11`/`v12`/`v13` returns the data the bridge wants | All three are live; the bridge's `BLE_API_VERSIONS = [13, 11, 6, 5]` contains a permanently dead `v5` and omits a live `v12` — behaviour unchanged today because v13 answers first (OBSERVED) [VERSION-AXIS §6, §7] | Blocked on a token — route existence is settled, data is not [PROBE-FINDINGS §7] | not numbered in any source |
@@ -78,6 +79,9 @@ itself) it appears in the open table above instead, not here.
 | Does Common Crawl cover the API surface? | **Essentially zero** — not one record for any `carelink*`/`clcloud*`/`carelinkhp*` host in either of two crawls; Wayback is the only usable archive | [COMMONCRAWL §0–§1] |
 | Is `carelink.medtronic.eu` a second portal deployment? | **No — false positive.** It serves the 5518-byte SPA fallback, md5-identical to the `carelinkhp` trap page (gzipped on the wire) | [CONFIG-DEEP TARGET 5; docs/00-summary-the-map.md correction] |
 | Is `pde/v3` status 401 or 403? | **403**, re-probed twice — the earlier 401 was a note error that propagated through three review rounds before being caught | [CLAIM-AUDIT §FOUND WRONG] |
+| What is the family-map hash? | **`8ce419a22fd3`** — the prose note's `215e6671de09` was wrong; the pinned regression assertion had been right throughout | [DRIFT-AND-NEW §Documented defect] |
+| Any new hosts since 2026-10-09? | **One**, `mdtshare2.medtronic.com`, and it is NXDOMAIN — the space was already covered | [DRIFT-AND-NEW §Clean negatives] |
+| Did the vendor mass-rotate certificates? | **No** — no certificate issued on or after 2026-10-08 in any of the four CT zones; `clcloud-trials` still on its 2026-04-13 cert, so the 2026-10-28 expiry watch stays open | [DRIFT-AND-NEW §Clean negatives] |
 
 ## 3. Unknown — not in any source
 

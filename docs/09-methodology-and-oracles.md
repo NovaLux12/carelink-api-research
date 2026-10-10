@@ -23,7 +23,8 @@ filename is the same file: `VERSION-AXIS` =
 `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md`, `CHUNK-CORPUS` =
 `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`, `JSMAP-HUNT` =
 `findings-log/probe-2026-10-08/recon/JSMAP-HUNT.md`, `PROBE-FINDINGS` =
-`findings-log/probe-2026-10-08/PROBE-FINDINGS.md`.
+`findings-log/probe-2026-10-08/PROBE-FINDINGS.md`, `DRIFT-AND-NEW` =
+`findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md`.
 
 ## 1. The constraints every pass ran under
 
@@ -139,11 +140,16 @@ token at byte offset 1791807, as a `worker-loader` string literal, not a
 directive. The conclusion (no source maps) survived; the stated reason did not.
 Same class twice more: the apparent `ngp`/`guardian` matches in the clinic bundle
 were zxcvbn dictionary noise (case-sensitive grep: 0 hits), and the patient
-bundle's three "NGP" hits were Samsung user-agent strings. **Fix:** prove what a
-hit *is* — literal vs directive, byte offset, case-sensitive control — and
-replace sampling with an exhaustive offline grep plus 62 live probes and written
-reopen conditions [source: CHUNK-CORPUS §source maps; HCP-SCHEMA §4;
-recov/PATIENT-APP-VOCABULARY.md; JSMAP-HUNT §7].
+bundle's three "NGP" hits were Samsung user-agent strings. And once more in the
+2026-10-10 drift sweep: a prose note quoted the family-map hash as `215e6671de09`
+when it actually hashes to `8ce419a22fd3` on every artefact on disk and live —
+the pinned regression assertion had been right all along and the hand-written
+note was wrong, which is how it surfaced [source: DRIFT-AND-NEW §Documented
+defect]. **Fix:** prove what a hit *is* — literal vs directive, byte offset,
+case-sensitive control — and replace sampling with an exhaustive offline grep
+plus 62 live probes and written reopen conditions; "values quoted in prose notes
+are not evidence. The pinned assertion is" [source: CHUNK-CORPUS §source maps;
+HCP-SCHEMA §4; recov/PATIENT-APP-VOCABULARY.md; JSMAP-HUNT §7; DRIFT-AND-NEW].
 
 **3. A hash comparison over a lookup that silently returned null.** The
 cross-region config comparison reported four "SAME" rows where only three were
@@ -183,11 +189,16 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 41 assertions; exit 0 = the public surface has not
+  `regression/hurl/` holds 44 assertions; exit 0 = the public surface has not
   drifted since 2026-10-08 [source: docs/00-summary-the-map.md;
   findings-log/probe-2026-10-08/work/VALIDATION-RUNBOOK.md Tier 5]. The config
   checks deliberately pin the vendor's *current wrong* `lhpro` bound so a vendor
   fix breaks the test and updates the note [source: HURL-05].
+- Where a pass's own evidence could not be written to disk, the log says so
+  instead of implying it exists: the 2026-10-10 drift sweep is explicitly a
+  **reconstruction from the agent's report**, "re-verify before treating any row
+  as OBSERVED" — a provenance caveat, not a finding [source: DRIFT-AND-NEW
+  §Provenance].
 - Redaction rules (six of them in the README) exist because breaking them
   leaked something: never commit a credential, never publish internal hostnames,
   never publish raw archive captures, never report a parked-namespace name,

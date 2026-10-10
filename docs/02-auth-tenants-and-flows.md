@@ -5,9 +5,17 @@ impersonates, PKCE state, and the legacy Layer7 flow that is dead. All of it
 read-only and unauthenticated; reasoning and verbatim bodies are in
 `findings-log/`.
 
-Legend — **OBSERVED** = seen in a live response during this research ·
-**PUBLISHED** = in a vendor document served without a login (live, or recovered
-from a public web archive) · **INFERRED** = reasoned, not seen.
+**Dated 2026-10-10.**
+
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
+served without a login (live, or recovered from a public web archive) · **INFERRED** =
+reasoned, not seen.
+
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev:
+> [`01-hosts-and-estate.md`](01-hosts-and-estate.md) · → next:
+> [`03-discovery-and-versions.md`](03-discovery-and-versions.md) · related:
+> [`04-configuration.md`](04-configuration.md) ·
+> [`08-security-findings.md`](08-security-findings.md)
 
 Citations are `[source: findings-log/<file> §n]`. Inside tables the bare filename
 is the same file: `AUTH-TENANT` = `findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md`;
@@ -26,6 +34,30 @@ is the same file: `AUTH-TENANT` = `findings-log/probe-2026-10-08/AUTH-TENANT-FIN
 | `carelink-login.medtronic.eu` | shadow | — | — | `jd0EOLxJ8XduYx4lLy3ig`, `gZMBCJcl_t25Es4U_g_ow` |
 | `carelink-login.medtronic.com` | shadow | — | — | `cEgK74cyc5LzAVI9VxEz9`, `80YhF8vW25gJ1_rR_lLOJ` — see §8 |
 | `carelink-login-trials.minimed.com` | clinical / trials | — | `carepartner.patient.cl` | **Unknown — not in any source** |
+
+```mermaid
+flowchart LR
+    subgraph POL["OAuth policy compared field-by-field — identical but for `issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"]
+        direction TB
+        A["carelink-login.minimed.eu<br/>patient · EU"]
+        B["carelink-login.minimed.com<br/>patient · US"]
+        C["carelink-login.medtronic.eu<br/>shadow"]
+        D["carelink-login.medtronic.com<br/>shadow"]
+        E["carelink-login-trials.minimed.com<br/>clinical · trials"]
+    end
+    A --- KA["8RqxnMm8vg2Go_y1LAVh9<br/>vnTNpK5RvkqVEfQgHRsqv"]
+    B --- KB["jpv2d2IuydtvKtefd5M8J<br/>qjHNmcQOpW_gvHz6zaD8"]
+    C --- KC["jd0EOLxJ8XduYx4lLy3ig<br/>gZMBCJcl_t25Es4U_g_ow"]
+    D --- KD["cEgK74cyc5LzAVI9VxEz9<br/>80YhF8vW25gJ1_rR_lLOJ ⚠ §8"]
+    E -. "never fetched —<br/>kids Unknown, not in any source" .-> KE["no kid recorded"]
+    KA --- Z["no kid is shared by any two<br/>of the four compared tenants"]
+    KB --- Z
+    KC --- Z
+    KD --- Z
+    style D fill:#3b2f2f,stroke:#f66
+    style E fill:#3b3b2f,stroke:#fd6
+    style KE fill:#3b3b2f,stroke:#fd6
+```
 
 **OBSERVED.** The OAuth *policy* is identical across all of them: comparing
 `carelink-login.minimed.eu`, `carelink-login.medtronic.eu` and
@@ -106,19 +138,46 @@ and `system.auth0.url.whitelist` (`minimed.com`, `minimed.eu`, `medtronic.com`,
 `medtronic.eu`) are **PUBLISHED** server-side *deep-link* lists, and
 `com.medtronic.carepartner:/sso` is **not** in them: that redirect is governed by
 Auth0's Allowed Callback URLs, a different mechanism [source: PUBLIC-CONFIG;
-ARCHIVE-URLS §1].
+ARCHIVE-URLS §1]. Both lists are published inside the unauthenticated 69-key
+config documented in [`04-configuration.md`](04-configuration.md).
 
 ## 3. PKCE state
 
-**OBSERVED** [source: SECURITY S2; CLAIM-AUDIT-2026-10-09.md]: `S256` → 302 to the
-login page (**accepted**); **`plain` → 302 (accepted)**; `none` → 302 with
-`invalid_request` (**rejected**); **omitted entirely → 302 (accepted)**.
+**OBSERVED** [source: SECURITY S2; CLAIM-AUDIT-2026-10-09.md]:
+
+| `code_challenge` sent | Response | Verdict |
+|---|---|---|
+| `S256` | 302 to the login page | **accepted** |
+| `plain` | 302 | **accepted** |
+| `none` | 302 with `invalid_request` | **rejected** |
+| **omitted entirely** | 302 | **accepted** |
+
 `code_challenge_methods_supported` advertises `S256` **and** `plain`. The bridge
 correctly hardcodes `S256`; no change needed — recorded only so nobody
 "simplifies" it to the default [source: AUTH-TENANT §2]. The weakness is that PKCE
 is **client-enforced only**: the redirect is a custom URI scheme, on Android any
 app can register the same scheme, and PKCE is the mitigation for a malicious app
-intercepting that redirect. Severity low-moderate [source: SECURITY S2].
+intercepting that redirect. Severity low-moderate [source: SECURITY S2]. The same
+finding is F8 in [`08-security-findings.md`](08-security-findings.md).
+
+### The code + PKCE flow the bridge actually runs
+
+```mermaid
+sequenceDiagram
+    actor U as Patient
+    participant B as Bridge
+    participant A as carelink-login.minimed.eu
+    B->>B: code_verifier → code_challenge = S256(code_verifier)
+    B->>A: GET /authorize?client_id=…&redirect_uri=com.medtronic.carepartner:/sso&code_challenge=…
+    Note over A: redirect_uri is a STRICT allowlist.<br/>An attacker redirect gets<br/>403 "redirect_uri is not in the list<br/>of allowed callback URLs".
+    A->>U: 302 → login page
+    U->>A: user authenticates
+    A->>B: 302 com.medtronic.carepartner:/sso?code=…
+    Note over B: ⚠ SINGLE POINT OF FAILURE<br/>custom URI scheme; PKCE is client-enforced only.
+    B->>A: POST /oauth/token (code + code_verifier)
+    A->>B: access_token + refresh_token
+    Note over B,A: `offline_access` IS requested, so refresh tokens are<br/>legitimate and grant_type: refresh_token is the right call.<br/>device_code is DEFINITIVELY REJECTED — 403 unauthorized_client.<br/>`email` is NOT requested, so /userinfo cannot return one.
+```
 
 ## 4. What a client must actually use
 
@@ -136,6 +195,10 @@ AUTH-TENANT §5]:
 | `/connect/session/status` | 404 | 404 | **advertised in the SSO config but genuinely absent** — either dead config or it answers only under an authenticated session with a different method or tenant |
 
 ## 5. The legacy Layer7 flow — and why it is dead
+
+The edge hosts themselves are enumerated in
+[`01-hosts-and-estate.md`](01-hosts-and-estate.md); the closure is logged in
+[`10-open-questions.md`](10-open-questions.md).
 
 **PUBLISHED.** All three `oauth20_sso_carepartner_*_v6.json` configs are 200 /
 8.2 KB, differing only in `server.hostname` (`mdtlogin` / `mdtlogin-ocl`) and

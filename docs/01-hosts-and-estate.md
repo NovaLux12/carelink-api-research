@@ -2,13 +2,19 @@
 
 What exists on the Medtronic CareLink network: the deployments, the host
 families, what each host actually is, and the namespace/version map that goes
-with them. All of it observed read-only and unauthenticated. Dated; the full
-reasoning is in `findings-log/`. This page extends
+with them. All of it observed read-only and unauthenticated. This page extends
 [`00-summary-the-map.md`](00-summary-the-map.md) — it does not contradict it.
 
-Legend — **OBSERVED** = seen in a live response during this research ·
-**PUBLISHED** = in a vendor document served without a login (live, or recovered
-from a public web archive) · **INFERRED** = reasoned, not seen.
+**Dated 2026-10-10.** The full reasoning is in `findings-log/`.
+
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
+served without a login (live, or recovered from a public web archive) · **INFERRED** =
+reasoned, not seen.
+
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · → next:
+> [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) · related:
+> [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md) ·
+> [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md)
 
 Citations are `[source: findings-log/<file> §n]`. Inside tables the bare filename
 is the same file: `PROBE-FINDINGS` = `findings-log/probe-2026-10-08/PROBE-FINDINGS.md`,
@@ -48,6 +54,11 @@ A parallel deployment that no tooling in this project knew about: `carelink.`,
 recon/RECON-SUBDOMAINS.md §4]. The `minimed` discovery document never references
 them [source: SECURITY-FINDINGS].
 
+The two shadow Auth0 tenants are compared against the patient ones in
+[`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md); the CT-log method that
+surfaced these names is finding F5 in
+[`08-security-findings.md`](08-security-findings.md).
+
 | Shadow host | What it is | Class |
 |---|---|---|
 | `carelink-login.medtronic.eu` | live OIDC document, 2753 B — **third Auth tenant** | OBSERVED |
@@ -78,7 +89,7 @@ recorded and **not diagnosed** [source: RECON-SUBDOMAINS §4.3].
 | `carelink.minimed.{eu,com}` | the patient host. `/patient/*` metadata + data, `/api/carepartner/v2/*`, all public config namespaces, and it fronts `/configs/v1/*.json` | OBSERVED — PROBE-FINDINGS §5, deep §4 |
 | `clcloud.minimed.{eu,com}` | cumulus data/compute plane | OBSERVED — PROBE-FINDINGS §5 |
 | `carelink-login.minimed.{eu,com}` | Auth0 login hosts; live OIDC + JWKS | OBSERVED — PROBE-FINDINGS §4 |
-| `carelinkhp*.minimed.eu` | Angular **clinician portal** SPA. Returns HTML for every path; not an API. `carelinkhp.minimed.com` is NXDOMAIN | OBSERVED — PROBE-FINDINGS §1, deep §6 |
+| `carelinkhp*.minimed.eu` | Angular **clinician portal** SPA. Returns HTML for every path; not an API. `carelinkhp.minimed.com` is NXDOMAIN — the bundle and its `hcp/*` surface are in [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md) | OBSERVED — PROBE-FINDINGS §1, deep §6 |
 | `commoncore.minimed.{eu,com}` | **502 on every path** — backend not serving. A *different* host from `commoncore.medtronic.*` | OBSERVED — PROBE-FINDINGS §1, deep §6 |
 | `clcloudsnp*.minimed.{eu,com}` | **static-resource server** (Spring-style); 500 `No static resource …` | OBSERVED — PROBE-FINDINGS §1, deep §6 |
 | `carelink-support*.minimed.{eu,com}` | 404 on the discovery path — not the patient API. Serves the CSR CRM at `/crm` (403) | OBSERVED — PROBE-FINDINGS §1; CROSS-REGION-CONFIG-FINDINGS |
@@ -93,6 +104,11 @@ recorded and **not diagnosed** [source: RECON-SUBDOMAINS §4.3].
 | `carelink-connect.minimed.eu` | **RETIRED** — NXDOMAIN with a stale SOA serial. Some 2024–2025 third-party write-ups still mention it | OBSERVED (2026-07-21) — PASSIVE-INFRA |
 
 ## 4. Namespace → host map
+
+Route-by-route detail for the patient namespaces is in
+[`06-patient-api-surface.md`](06-patient-api-surface.md); the clinician portal's
+`hcp/*` surface is in
+[`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md).
 
 | Host family | Namespaces it serves |
 |---|---|
@@ -155,6 +171,9 @@ recon/CONFIG-NAMESPACE-DEEP.md TARGET 1].
 
 ## 7. Traps — read before reporting any host
 
+Each trap is restated with its fix in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md).
+
 ### ⚠ `*.carelink.eu`, `*.carelink.com` and `*.clcloud.eu` are parked-domain wildcards
 
 **This is the single most important line on this page.** `carelink.eu` is
@@ -214,6 +233,9 @@ recon/JSMAP-HUNT.md §2; recon/CONFIG-NAMESPACE-DEEP.md TARGET 5; README rule 5]
 | **Published credentials** | Two vendor `x-api-key` values and one reCAPTCHA site key are known to be published. Record *that* they are exposed and *where*, never the values | README rule 1; CROSS-REGION-CONFIG-FINDINGS |
 
 ## 8. What we still do not know
+
+The consolidated list, with what would settle each, is in
+[`10-open-questions.md`](10-open-questions.md).
 
 | Question | Status |
 |---|---|

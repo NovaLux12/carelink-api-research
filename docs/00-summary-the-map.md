@@ -1,11 +1,29 @@
 # The map
 
 One page. What exists on Medtronic's CareLink surface, confirmed read-only and
-unauthenticated. Everything here is dated; the full reasoning lives in
-`findings-log/`.
+unauthenticated. **Dated 2026-10-10.** Everything here is dated; the full reasoning
+lives in `findings-log/`.
 
-Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a
-vendor document served without a login · **INFERRED** = reasoned, not seen.
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor document
+served without a login (live, or recovered from a public web archive) · **INFERRED** =
+reasoned, not seen.
+
+> **The set — 11 further pages.** This page is the entry point; every other page links
+> back here.
+>
+> | | |
+> |---|---|
+> | [`01 hosts & estate`](01-hosts-and-estate.md) | every host, the namespace→host map, DNS/CDN/PKI, the trap list |
+> | [`02 auth tenants & flows`](02-auth-tenants-and-flows.md) | the Auth0 tenants, the public client the bridge impersonates, PKCE, the dead Layer7 edge |
+> | [`03 discovery & versions`](03-discovery-and-versions.md) | the discovery document and the two-axis version matrix — where `android/3.6` is pinned |
+> | [`04 configuration`](04-configuration.md) | the unauthenticated 69-key public config, its per-key form, the real country axis |
+> | [`05 devices & vocabulary`](05-devices-and-vocabulary.md) | 16 published families, three partial model tables, spelling traps, why family matching is unreliable |
+> | [`06 patient API surface`](06-patient-api-surface.md) | every `/patient/*` route, and how to tell live from dead without a token |
+> | [`07 admin portal & reporting`](07-admin-portal-and-reporting.md) | `carelinkhp` is the clinic portal: `hcp/*`, the report brokers, the AWS gateways |
+> | [`08 security findings`](08-security-findings.md) | ranked hardening gaps F1–F10, and what was checked clean |
+> | [`09 methodology & oracles`](09-methodology-and-oracles.md) | how any of this was probed, and the four ways this project has been wrong |
+> | [`10 open questions`](10-open-questions.md) | what is unknown, what is closed, and exactly what would settle each |
+> | [`11 suggested research areas`](11-suggested-research-areas.md) | areas to pick up, each with a stated blocker and a definition of done |
 
 ---
 
@@ -19,7 +37,8 @@ vendor document served without a login · **INFERRED** = reasoned, not seen.
 
 Each host sends a given country to **its own** `clcloud` sibling — `.eu → .eu`,
 `.com → .com`. Symmetric, no anomaly. `GB` is `region: OUS` (Outside US), not
-`EU`.
+`EU`. Host-by-host detail, including the shadow deployment, is in
+[`01-hosts-and-estate.md`](01-hosts-and-estate.md).
 
 ⚠ **Correction:** `carelink.medtronic.com` serves a byte-identical copy of the
 *clinician* portal bundle, but **`carelink.medtronic.eu` does not** — it returns
@@ -31,9 +50,14 @@ deployment**: all 16 recorded `*trials*` hosts are `.com`.
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
 (OIDC live, different JWKS kids). **All four tenants have completely disjoint
 signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
-shadow token is not a key-reuse risk.
+shadow token is not a key-reuse risk. Tenant-by-tenant comparison and the PKCE
+posture are in [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
 
 ## API namespaces
+
+Route-by-route tables for the patient surface are in
+[`06-patient-api-surface.md`](06-patient-api-surface.md); the configuration namespaces in
+full are in [`04-configuration.md`](04-configuration.md).
 
 | Namespace | Notes |
 |---|---|
@@ -51,15 +75,24 @@ shadow token is not a key-reuse risk.
 
 ## The version axis serves exactly two documents
 
+The full cell-by-cell matrix is in
+[`03-discovery-and-versions.md`](03-discovery-and-versions.md).
+
 Probing an `android/X.Y` cell past 3.8 does not give you a new API — it re-derives
 one of two known documents. Every cell from 3.9 upward is byte-identical except
 the echoed request string (`"config": "android,12.0"`). **The "enum is
 open-ended" note is superseded: there is no undiscovered Auth0+v13 fallback.**
 
-```
-Auth0 + cumulus v13 + CLINICAL   →  3.6, 3.7, 3.8
-Auth0 + cumulus v11              →  3.5
-no Auth0, cumulus v2, no CLINICAL →  3.9 – 12.0 (one document)
+```mermaid
+flowchart LR
+    A["android/X.Y cell"] --> B{"which app version?"}
+    B -->|"3.6 · 3.7 · 3.8"| C["Auth0 + cumulus v13 + CLINICAL"]
+    B -->|"3.5"| D["Auth0 + cumulus v11"]
+    B -->|"3.9 – 12.0"| E["one document<br/>no Auth0 · cumulus v2 · no CLINICAL"]
+    C --> F["the pin the bridge uses"]
+    E --> G["probing a new version<br/>re-derives this same document"]
+    style C fill:#2f3b2f,stroke:#6f6,stroke-width:2px
+    style E fill:#3b3b2f,stroke:#fd6
 ```
 
 **`v12/display/message` is live** and was in no prior note. Our fork's
@@ -74,6 +107,9 @@ the 20345 B Auth0/v13 doc. The claim still holds for v13, re-verified
 byte-identical to the on-disk capture.
 
 ## Configuration — the unauthenticated find
+
+In depth — the 69 keys by group, the 34 regional keys, the per-key projection and the
+country axis — in [`04-configuration.md`](04-configuration.md).
 
 `GET https://carelink.minimed.{eu,com}/patient/v2/configuration/public`
 (unauthenticated, gzip, 69 keys) exists on **all three deployments**. 34 of 69
@@ -113,6 +149,9 @@ Two caveats that matter for anyone parsing this:
 
 ## Device vocabulary
 
+The family→model tables, the three partial sources and the spelling traps are in
+[`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md).
+
 Sixteen families, published by the vendor:
 
 ```
@@ -148,7 +187,11 @@ present in the patient config under `SIMPLERACC`. Two partial tables, both wrong
 
 ## Existence oracles — how to probe without a token
 
-This is the reusable method. Established with positive controls.
+This is the reusable method. Established with positive controls. The probing discipline
+behind it, and the four ways this project has been wrong, are in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md); the ranked security
+posture built on these observations is in
+[`08-security-findings.md`](08-security-findings.md).
 
 | Host family | Signal |
 |---|---|
@@ -159,6 +202,9 @@ Latency is not an oracle. `403` on a fabricated path and on a dead version is
 byte-identical.
 
 ## Frontends
+
+The clinician-portal bundle, the `hcp/*` surface it declares, and the AWS gateways it
+names are in [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md).
 
 `carelinkhp.minimed.eu` is the **clinician portal, not the mobile app** — of 13
 host literals in its 3.4 MB bundle, exactly one is Medtronic's, and it contains
@@ -179,6 +225,9 @@ the hardcoded-key finding spans two hosts, not one.
 
 ## Traps
 
+Read the full list, with the fix for each, in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md).
+
 | Trap | Detail |
 |---|---|
 | `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. ~50 collected names are false positives. |
@@ -187,6 +236,10 @@ the hardcoded-key finding spans two hosts, not one.
 | Raw archive captures | Common Crawl/Wayback contain live `jsessionid_*` and plaintext-base64 OAuth `sessionData`. Facts only. |
 
 ## What we still do not know
+
+Every open question, with what would settle it, is in
+[`10-open-questions.md`](10-open-questions.md); areas to pick up are in
+[`11-suggested-research-areas.md`](11-suggested-research-areas.md).
 
 | Question | Blocked on |
 |---|---|
@@ -204,9 +257,13 @@ list. Now pinned by a drift guard, because a silent rollout is how a bridge ends
 believing a feature is unavailable.
 
 Also confirmed held: the discovery document is still byte-identical, all four
-tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed.
+tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
+— finding F6 in [`08-security-findings.md`](08-security-findings.md).
 
 ### Frontends — there are two apps, not one
+
+The clinician bundle in detail is in
+[`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md).
 
 `carelink.minimed.eu` and `carelink-support.minimed.eu` serve a **patient-facing
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
