@@ -102,7 +102,7 @@ flowchart TB
 
 ---
 
-## Ten findings that surprised us
+## Nine findings that surprised us
 
 <details open>
 <summary><b>Ordered by how much they change what you'd assume</b></summary>
@@ -158,12 +158,7 @@ paired**. A real user log shows `[Fetch] Success!` and `Stale CareLink data: 475
 minutes old`. Not an empty response, a 33-day-old one, on a successful status code.
 Our fork's code comment predicted this months before anyone reported it.
 
-**9. One deployment publishes working API keys where another ships a fake.** The US
-and trials configs carry real-looking `x-api-key` values for their report brokers;
-the EU config ships the literal placeholder `%#$^&#GFFG@#*%&#$`. Which is exactly why
-nobody noticed the other two.
-
-**10. Their published configuration has a typo that rejects 2,000,000 valid values.**
+**9. Their published configuration has a typo that rejects 2,000,000 valid values.**
 `lhpro`/`lghpro` max is `4292967295`; the correct 32-bit maximum is `4294967295`.
 Wrong in both ranges, and the clinician-side config carries the right one.
 
