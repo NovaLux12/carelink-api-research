@@ -21,6 +21,13 @@ Each host sends a given country to **its own** `clcloud` sibling — `.eu → .e
 `.com → .com`. Symmetric, no anomaly. `GB` is `region: OUS` (Outside US), not
 `EU`.
 
+⚠ **Correction:** `carelink.medtronic.com` serves a byte-identical copy of the
+*clinician* portal bundle, but **`carelink.medtronic.eu` does not** — it returns
+the same 5518-byte SPA fallback as the `carelinkhp` trap (md5-identical), so it is
+a **false positive** on any status-based check. Do not treat the `.medtronic.eu`
+shadow as a second portal deployment. There is also **no fourth patient
+deployment**: all 16 recorded `*trials*` hosts are `.com`.
+
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
 (OIDC live, different JWKS kids). **All four tenants have completely disjoint
 signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
@@ -32,6 +39,9 @@ shadow token is not a key-reuse risk.
 |---|---|
 | `/patient/*` | What most third-party clients use. `monitor/data`, `countries/settings`, `users/me`, `connect/data`. Unauthenticated → `401 InvalidToken`. |
 | `/patient/v2/configuration/public` | **Unauthenticated, 69 keys.** The single best find — see *Configuration*. |
+| `/patient/v2/monitor/data` | **405 — POST-only.** *A live route exists here.* Previously unrecorded; the v2 tree is a real data plane, not just a config document. GET is undefined, so 405 rather than 404 is the tell. |
+| `/patient/v2/users/me` | **401 — exists, token-gated.** ditto. |
+| `/patient/configuration/system/<flat.name>` | **Unauthenticated per-key projection** of the 69-key doc. 21/21 non-null keys returned byte-identical subtrees in a `{"value": "<string>"}` envelope — **booleans arrive as the strings `"true"`/`"false"`**, so a `=== false` check silently never fires. |
 | `/api/carepartner/v2/*` | What the app's `baseUrlCareLink` declares, but no client actually uses it. |
 | `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
 | `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
@@ -81,6 +91,18 @@ Hash-verified **global, not regional**: the family map, the Flex naming, the
 logbook entry types and the control codes are byte-identical across all three
 deployments.
 
+**`?countryCode=` on the public config is accepted but ignored** — it is echoed
+back as a 70th `countryCode` key while `default.country` stays `GB` regardless. The
+document is region-parameterised by **host**, not by parameter. The real country
+axis is `/patient/countries/settings?countryCode=…` (35 keys, swept across 18
+countries), and that sweep found something that matters: **`bgUnits` and
+`glucoseUnitsDefault` disagree in BE, ES and IT** — `MG_DL` and `MMOL_L` in the
+same response. Reading the one and not the other mis-scales every value.
+
+Also country-dependent: `mfa.status` is `REQUIRED` only in Norway;
+`INSULIN_ASSESSMENT` is absent in FR/RU/US; `dateOfBirthRequired` is false only in
+RU.
+
 Two caveats that matter for anyone parsing this:
 
 - The endpoint **serves gzip unconditionally**, ignoring `Accept-Encoding`
@@ -96,6 +118,20 @@ Sixteen families, published by the vendor:
 GM  BLE700  BLE720  BLE740  BLE770  BLE780  GST  SIMPLERA
 SIMPLERACC  SIMPLERACCOLID  NMX7  CC840  CC880  NMX8  INSTINCT  EAGLE
 ```
+
+**⚠ This section is weaker than it looks.** The vendor's **own patient app**
+(matcher module `45559` of the patient-portal bundle, served at the root of
+`carelink.minimed.eu`) matches family with:
+
+```js
+{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }   // deviceFamily.startsWith(...)
+```
+
+`CC880` is **not** in that set, and nor is anything containing `FLEX`. So either
+the vendor's app is out of date for its own shipping device, or there is a further
+family value nobody has found. **The model-prefix path is therefore the reliable
+one, not the family path** — the six Flex model numbers agree across every source
+held. See `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md`.
 
 `CC880` is the Minimed Flex and contains `MMT-8062/8063/8082-8085`. Note it
 contains **no** `BLE` and **no** `FLEX` token — which is exactly why a matcher
