@@ -1,0 +1,276 @@
+# Admin portal and reporting
+
+Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md`,
+`recon/HCP-CONFIG-SCHEMA.md`, `recon/AWS-GATEWAYS.md`, `CROSS-REGION-CONFIG-FINDINGS.md`,
+`SECURITY-FINDINGS.md`, `AUTH-TENANT-FINDINGS.md`.
+
+Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
+without a login · **INFERRED** = reasoned, not seen.
+
+## `carelinkhp` is the clinic portal, not the mobile app
+
+`hp-main.js` — 3,397,615 B, 102 lines, minified Angular 17 webpack (`webpackChunkpow`),
+companion `hp-runtime.js` 8,597 B. The decisive negative: **zero** occurrences of
+`/patient/*`, `/connect/carepartner/*`, `/api/*`, `/pde/*`, `/oauth/*`, `monitor/`, `NGP`,
+`BLE`, `BLE_MINIMED` or `medicalDeviceFamily`, and of 13 distinct host literals **exactly
+one is Medtronic's** (`dev.commoncore.medtronic.eu`); the other 12 are Pusher, Mixpanel,
+cdnjs, webpjs and w3.org. Source it for `hcp/*` and device tables; never for the patient
+API [source: findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md].
+**The bundle is deployed on more than one host.** `carelink.medtronic.com` serves a
+**byte-identical** copy (3,397,615 B, sha256 `2a7fa8e7af519c2b`, `cmp` identical to
+`carelinkhp.minimed.eu`) and `carelink-support.medtronic.com` serves the same document. So
+the hardcoded-key and build-config findings below span **two hosts**; a remediation
+conversation naming only `carelinkhp` would fix half of it [source:
+findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
+
+`hp-runtime.js` holds a **225-entry lazy-chunk manifest**; all 224 chunks were fetched
+(4.4 MB) and added **0** Medtronic hosts, **3** API path literals and **3** `MMT-*` codes —
+all API definitions live in the eager main bundle. What they *did* add: three new endpoint
+literals (`POST /hcp/sso/auth/otc/send`, `GET hcp/countries/dialCodes`,
+`GET hcp/patients/checkPhoneNumber`, `GET /connect/retina/searchfilter`,
+`POST /connect/retina/searchfilter/feedback`) and **89 distinct field names at HTTP
+call-sites**, including the logbook/marker fields (`removalType`, `removalReason`,
+`sensorInsertionLocation`, `adhesivetapeLocation`, `timecapUnscrewed`, `notes`, `entryTs`)
+[source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
+
+> **⚠ Correction — preserved.** An earlier note claimed neither `main.js` nor `runtime.js`
+> contains a `sourceMappingURL` comment. **False** — `hp-main.js` contains the token at
+> byte offset 1791807. What is true is that it is not a *directive*: it is the string
+> literal inside webpack's bundled `worker-loader`, carried alongside the workers. The
+> conclusion is unchanged; the reason originally given for it was wrong.
+
+## The `hcp/*` surface
+
+**183 distinct path literals**, 188 const bindings; 175 begin `hcp/` and 8 begin `/hcp/`
+(a second binding of the same path, not additional endpoints). One literal is
+`" /hcp/linkedPatient"` **with a leading space**, so a raw-byte grep for
+`/hcp/linkedPatient` misses it. All live on the portal origin; no separate API host.
+
+| family | distinct | notes |
+|---|---:|---|
+| `hcp/patients/*` | 47 | incl. 18 `((patientId))/*` |
+| `hcp/clinics/*` | 40 | incl. `toggle/*` kill-switches and 5 MFA endpoints |
+| `hcp/user/*` | 29 | the whole clinic-user admin surface |
+| `hcp/configuration/*` | 21 | 6 direct + 15 `public/*` |
+| `hcp/reports/*` | 10 | 4 are audit-log reports |
+| `hcp/insights/v1/*` · `hcp/dataUpload/*` | 8 · 6 | |
+| `hcp/anonymization/*` · `hcp/access-data/*` · `hcp/follow-up/*` | 4 · 4 · 4 | + `hcp/v2/clinics/access-data` |
+| `hcp/user…` remote / `fastLinking` / `linkedPatient` · `hcp/sso/*` | 7 · 3 | sso = login / logout / reauth |
+| others: `registrationCheck`, `ping/ping`, `locale`, `countries`, `remoteLinking`, `settings-calculator` | 14 | 4 have **0** call sites in the main bundle |
+
+> **⚠ Unresolved source disagreement.** `JS-API-SURFACE.md` §2.1 records **12**
+> `hcp/clinics/toggle/*` endpoints; §7.7 of the same file and `AUTH-TENANT-FINDINGS.md` §7
+> enumerate **9** (`csv`, `patient-dashboard`, `blinded-cgm`, `therapy-data`,
+> `remote-monitoring`, `clinic-outcomes`, `clinic-user-settings`, `titr-settings`,
+> `status`), and the verbatim literal list in that same file contains **9 distinct**
+> `hcp/clinics/toggle/*` paths. The count of 12 is not reconcilable with the enumeration.
+
+**MFA / user / clinics counts.** `hcp/user/*` — **29 endpoints** (prior notes had 1),
+including `getMfaUserStatus`, `verifyMfaCode`, `sendMfaCodeAfterReCaptcha` ⇒ **the portal
+enforces MFA**; the reCAPTCHA site key arrives via authenticated
+`POST hcp/configuration/user`, so it **cannot be harvested unauthenticated**.
+`hcp/clinics/*` — **40 endpoints** (prior notes had 2), incl. the MFA policy quartet, the
+security-profile trio and the clinic-wide feature kill-switch list.
+`hcp/patients/((patientId))/logbook/{entries,entries/filled,entries/last}` — the *read*
+side of the logbook vocabulary: three endpoints, previously documented as one.
+`hcp/patients/*otc-linking*` — 6 endpoints plus `ext-otc=true&username=` on the
+`hcp/sso/login` redirect, with zero prior mention of `otc`; what the acronym stands for is
+**Unknown** — not in any source, and deliberately not guessed. `hcp/sso/{login,logout,reauth}`
++ `hcp/ping/ping` is a **second, cookie-based** session mechanism, separate from the mobile
+`/oauth/*` surface. Pusher channel names are reversible —
+`transformedChannelId($){return ($*$+$).toString(16)}` is unkeyed, so channel-name opacity
+provides no authorisation; `retinaEnabled` and `cuaEnabled` both ship **off**.
+
+## `/hcp/configuration/*` and the header contract
+
+```
+BASE    = https://carelinkhp.minimed.eu
+PREFIX  = /hcp/configuration/public/<key>
+```
+
+`X-System-ID` is mandatory and its **value** is validated: absent, empty (`X-System-ID;`)
+or invented (`NotARealClient`) all return **412, 0 bytes**; `ProWeb` **and** `proweb` both
+return 200. It is a **client-identity selector the vendor enumerates**, rejected at the
+edge **before routing** (`x-cache: Error from cloudfront`, `x-amz-cf-pop: LHR5-P7` —
+CloudFront in front of an API Gateway). The value comparison is case-insensitive even
+though the **key namespace is case-sensitive**. `Accept` is not load-bearing — the whole
+contract is `X-System-ID: ProWeb`. Only the `public/` subtree is behind this check
+[source: findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
+
+With the header, **13 of the 15 bundle-declared `public/*` keys return JSON**, one is
+token-gated (`personal/media/config/<locale>` → 401) and one is an empty `{}`
+(`cms-config.json`). The notable bodies:
+
+| key | what it publishes |
+|---|---|
+| `cua.control.codes.settings` | 778 B — the HCP twin of the patient `csr.control.codes.settings`. **Control** vocabulary (`dpml`, `tcc`, `tup`, `lhpro`, `lghpro`, `vex`, `ssd`, `gstpro`, `gstrc`), **no N-codes, no severity vocabulary** |
+| `logbook.supported.entry.types` | 226 B — **byte-identical, list-for-list, to the patient-side key**. The key is unprefixed, and unprefixed means "shared", not "patient" |
+| `user-identifier-settings?countryCode=…` | the only `public/*` key that takes a parameter and genuinely varies: US = bare 10-digit phone (`^\d{10}$`), EU/DE = 20-char Unicode class |
+| `pow.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` |
+| `cua.crm.settings` | same shape, `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire |
+| `hcp.banner.notifications` | discloses a **maintenance window** (`2026-08-20T16:00Z`→`16:45Z`) to unauthenticated callers, and hardcodes `timezone: "PT"` on an EU portal |
+| `pow.follow.up.settings` | email rate limits, a URL-validating regex, a 3-domain allowlist, HTML-sanitising char replacements |
+| `pow.country.media.groups` · `pow.invite.to.personal.uri` | 37 + 51 country codes in two groups; a bare `https://carelink.minimed.eu` |
+| `pow.nutrino.cc.{broker,metadata}.service.config` | the `commoncore` report hosts and sub-paths — see below |
+
+Three divergences between the HCP `cua.*` and patient `csr.*` control-code documents matter
+to any client written against one and pointed at the other: the `predefined_control_codes`
+array is **absent** on HCP; `lhpro`/`lghpro` max is `4294967295` on HCP but `4292967295` on
+the patient side (**almost certainly a typo** — `4294967295` is 2³²−1 and the same value
+appears twice more in the same object); and the `expiration_period_settings` default key is
+`"DEFAULT"` (HCP) vs `"default"` (patient).
+
+### ⚠ The one sibling that answers with no header at all
+
+On the **shadow** portal `carelink.medtronic.eu` (no header, unauthenticated), the same
+family was probed. `/hcp/configuration/public/pow.crm.settings` → **200, 96 B**, while
+**nine siblings** return **412** each — `cms-config.json`, `pow.invite.to.personal.uri`,
+`pow.browser.check.configuration`, `pow.mmo.config`, `pow.udi.number`,
+`pow.udi.certificate`, `logbook.supported.entry.types`, `cua.control.codes.settings`,
+`system.logbook.entry.validation.config`. `pow.crm.settings.version` → 404;
+`/hcp/configuration/{application,user,countries/getAllCountries}` → 405 (POST-only);
+`/hcp/configuration/product/info` → 404.
+
+One endpoint answers unauthenticated where all nine siblings require the client header.
+Low sensitivity — a CRM base URI and a version string, no PII, no credential. **The finding
+is the inconsistency, not the content.** It corroborates that the shadow deployment's
+content namespace is `pow` (version 4.5) where the patient deployments use `ocl`
+(14.x → 15.5) [source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
+
+> **Minor unresolved discrepancy:** `AUTH-TENANT-FINDINGS.md` records that 200 as
+> `application/octet-stream`; `HCP-CONFIG-SCHEMA.md` records `application/json` for the
+> same 96-byte body on `carelinkhp.minimed.eu`. Both agree on the byte count and the body.
+
+### Portal existence oracle — full
+
+| response | meaning on `…/configuration/public/<key>` |
+|---|---|
+| `200` + `application/json` | key exists, published unauthenticated |
+| **`401` + `application/json` + `{"error":{"type":"InvalidToken","group":"AUTH"}}`** | **key exists but is token-gated** |
+| **`404`, 0 bytes** | **key does not exist** |
+| `412`, 0 bytes | header check failed |
+| `405` | key exists but is POST-only |
+| `200` + `text/html` + exactly 5518 B | **SPA fallback — means nothing about existence** |
+
+Positive control: `…/public/personal/media/config/eu` → 401 (exists, gated) versus
+`…/public/personal/media/config` → 404 and `…/public/zzz.this.does.not.exist.zzz` → 404.
+Case-sensitivity control: `CSU.CONTROL.CODES.SETTINGS` → 404 while
+`cua.control.codes.settings` → 200. **Existence is resolvable without authentication;
+content is not.**
+
+> **⚠ A hypothesis formed and refuted — the refutation is the finding.** HCP prefixes do
+> **not** mirror patient prefixes: `hcp.control.codes.settings` → 404 (the key lives at
+> `cua.`), `hcp.logbook.supported.entry.types` → 404 (unprefixed),
+> `csr.logbook.supported.entry.types` → 404 (unprefixed). The `hcp.` namespace is a third
+> namespace, not an alias family, so the 404 list stands as a list, not a proof by mapping.
+
+**Verdict on the NGP alarm vocabulary: a firm negative.** 28 distinct key names across both
+rounds, all 404, spanning every plausible vocabulary; the 404s are trustworthy because of
+the two controls above; and the corpora already on disk agree (the 69-key patient config
+has zero `N\d\d` tokens; `hp-main.js` scores 0 case-sensitive hits for
+`N24|N35|N40|N47|N48|N50|N55|N131`, `ALARM`, `alarmCode`, `stop_using_pump`,
+`stopUsingPump`; the 224-chunk corpus contains none). Do not re-run this enumeration.
+
+## The report brokers — `commoncore.medtronic.*`
+
+```
+base   https://commoncore.medtronic.{eu,com}/reports-broker/v1/ocl
+       https://commoncore.medtronic.{eu,com}/reports-metadata/v1/ocl
+```
+
+| endpoint | service | unauth |
+|---|---|---|
+| `/reports/generateReport` | broker | 403 |
+| `/reports/reportStatus` | broker | 403 |
+| `/reports/reportCsv` | broker | 403 |
+| `/reports/reportPdf` | broker | 403 |
+| `/reports/ReportDataTimelinesRange/patients` | metadata | 403 |
+| `/reports/ReportDataTimelinesForCalendar` | metadata | 403 |
+
+`dev.commoncore.medtronic.eu` resolves but is **502** (backend down).
+`commoncore.minimed.eu` is also 502 — a **different host**, not a twin [source:
+findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
+
+### ⚠ EU ships a placeholder `x-api-key`; US and trials ship working-looking ones
+
+The same two service configs are published **unauthenticated inside the patient public
+config** as `nutrino.cc.{broker,metadata}.service.config`, complete with a
+`security_headers["x-api-key"]`: **EU** ships the literal placeholder
+`%#$^&#GFFG@#*%&#$` (not a credential); **US** ships a real-looking base64 token, 18+
+chars; **trials** ships a **different** real-looking base64 token. This is the same class
+of defect as the hardcoded bundle key, but worse in two ways: it is on the patient host,
+served unauthenticated to any internet client; and **the EU value has been passing every
+internal review as obviously-fake while nobody noticed the other two carry real material.**
+Whether either key is live was **deliberately not tested** — that needs an authenticated
+call to a production medical-data service. **The values are deliberately not reproduced
+here.** Report *that the keys are exposed and where*, never the keys [source:
+findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md].
+
+**Do not conflate three distinct credentials:** (1) the nutrino config keys above; (2) the
+hardcoded `x-api-key` inside the portal JS bundle, which ships to every visitor and whose
+production API base is a **`dev.` host** — **verified not live** (403 both with and without
+the key against `commoncore.medtronic.{eu,com}`; 502 against `dev.`); (3) the inert
+placeholder documented in `PUBLIC-CONFIG-FINDINGS.md`. Distinct artefacts.
+
+## The AWS API Gateways — structurally not browser-callable
+
+Five `*.execute-api.*.amazonaws.com` endpoints are disclosed by the patient public config.
+Bounded enumeration (90 requests, cap reached, GET + one OPTIONS preflight per host):
+
+| service | regions | probe result |
+|---|---|---|
+| dialog-lite (`mmm.data.api.url`) | EU `/prodous/`, US `/prod/`, **null on trials** | **500 JSON** (Gateway up, root unrouted) |
+| patient-timeline (`personal.patient.timeline.config.host`) | EU, US, trials | **403** `Missing Authentication Token` |
+| CSR periodic (VPC endpoint) | one per deployment | timeout — private, as expected |
+| CSR CRM | `carelink-support.minimed.{eu,com}/crm` | 403 |
+| retina | `clcloud.*` + `/connect/retina/v1/personalWebView` | **401** JSON |
+
+**The enumeration found no new paths, because the question was malformed.** On AWS API
+Gateway **REST** APIs, `403 Missing Authentication Token` is the **unmatched-route** error,
+not an auth-gate: a certainly-absent UUID returns **byte-identical output** to the
+published root, `404` is never emitted at all (zero 404s in 90 requests), and all 44 of the
+403s carry the same 42-byte body. A usage-plan denial would read `{"message":"Forbidden"}`
+and never appeared. A dummy `X-Api-Key` header changed nothing, so **no usage-plan key is
+required**.
+
+The one working discriminator runs the other way: **on dialog-lite,
+`500 InternalServerErrorException` ⇒ the path is matched and routed** (`GET /prodous/` →
+403 but `GET /prodous/<uuid>` → 500). Which reveals the structural finding:
+
+> **Both dialog-lite deployments are a single stage-wide `ANY /{proxy+}` catch-all over the
+> whole stage, with a Lambda proxy integration that raises on every invocation** — on GET
+> and on OPTIONS, with and without `X-Api-Key`, across 22 distinct request shapes and two
+> independent regions. `dialog-lite/v1` in the published URL is therefore **not an API
+> Gateway resource**; it is opaque path data handed to the Lambda, and the service has no
+> route table to enumerate. **No `Access-Control-*` header appears on any of the 90
+> responses**, including five explicit preflights — so a service published in the
+> patient-facing public config **cannot be called from a browser at all**.
+
+`patient-timeline` is the mirror image: `GET /prod/<uuid>` → 403 proves there is **no
+`{proxy+}` at the stage root**, so no GET or OPTIONS request reached any backend on any of
+the three gateways. Three readings are consistent with the evidence and cannot be separated
+with GET-only probing: no routes are deployed in the `prod` stage; routes exist only for
+other verbs; or the live stage is not `prod`.
+
+The complete observed response header set is six keys and nothing else — `date`,
+`content-type`, `content-length` (36 routed-and-failed / 42 no route), `x-amzn-errortype`,
+`x-amzn-requestid` (a fresh UUID per request) and `x-amz-apigw-id`. **Nothing in any
+response reveals stage, region, mapping template or backend service name.** Latency is the
+only region-correlated signal in the whole dataset (EU ~73–93 ms, US ~256–402 ms)
+[source: findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md].
+
+## The biggest blind spot
+
+**Prod `commoncore.medtronic.{eu,com}` has never been archived in any crawl** — only its
+`dev`/`stage1`/`preprod1` twins exist. The reports backend behind repo issue #76 is the
+**single largest unarchived surface in the project**, and report bodies from it remain
+obtainable only with an authenticated request [source:
+findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
+
+## Traps
+
+| trap | detail |
+|---|---|
+| Portal 200-for-everything | `carelinkhp.minimed.eu` returns **200 + `text/html` + exactly 5518 bytes** for every unknown path. Discriminate on `Content-Type`, never on status code — filtering on status alone would have stored 225 copies of `index.html` and reported a clean chunk sweep |
+| `*.carelink.{eu,com}`, `*.clcloud.eu` | **wildcard parking DNS**: a random string resolves and all 302 to a parked page. ~50 collected names are false positives. Never report one as a vendor asset |
+| Internal hostnames in CT logs | recorded and redacted to `<service>.<internal>.minimed.<tld>` — the finding that CT logs leak internal infrastructure names survives, the names do not |

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the map first
+    url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/00-summary-the-map.md
+    about: One page covering what exists and what is confirmed vs unknown.
+  - name: How to contribute
+    url: https://github.com/NovaLux12/carelink-api-research/blob/main/AGENTS.md
+    about: Evidence classes, the never-publish rules, and the traps.
+  - name: Pick up a research area
+    url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
+    about: 13 areas, each with a stated blocker and a definition of done.

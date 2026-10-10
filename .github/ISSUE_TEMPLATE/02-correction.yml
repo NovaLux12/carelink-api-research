@@ -1,0 +1,64 @@
+name: Claim something here is wrong
+description: A correction. These are taken seriously — this repo keeps its retractions on purpose.
+labels: ["correction", "needs-verification"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Corrections are first-class contributions here.
+
+        This project has published four distinct wrong claims and kept every one of
+        them in `findings-log/` with the correction attached. Naming the fifth is
+        a good day, not an embarrassing one.
+
+        Please point at the exact line you believe is wrong.
+
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: File and line. Be exact.
+      placeholder: "docs/04-configuration.md:112"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: Quote the claim, then say what is actually true.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Failure mode
+      options:
+        - Claim stated without evidence
+        - Evidence label wrong (INFERRED shown as OBSERVED)
+        - A grep or check that hit without proving
+        - A comparison over a lookup that returned null
+        - A verification that read back the wrong target
+        - Source superseded by a newer source
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Your evidence
+      description: The command and output that shows the current claim is wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: What it changes
+      description: |
+        Which docs are affected, and does the regression suite pin the wrong
+        claim? If it does, say so — the suite and the claim have to move together.
+    validations:
+      required: true

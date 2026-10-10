@@ -1,0 +1,58 @@
+name: Claim a research area
+description: You are taking on one of the areas in docs/11-suggested-research-areas.md.
+labels: ["research-area", "claimed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Claim before you probe.
+
+        Say what you are going to do, what the cap is, and what "closed" means.
+        That last part matters — a vaguely-bounded area is how a session ends with
+        forty requests spent and nothing written down.
+
+  - type: input
+    id: area
+    attributes:
+      label: Which area
+      description: From docs/11-suggested-research-areas.md
+      placeholder: "C — extend the oracle set to pde/v3 and csr"
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: Plan
+      description: What you will probe, in what order, and why each is justified by an observed naming pattern rather than a wordlist.
+    validations:
+      required: true
+
+  - type: input
+    id: cap
+    attributes:
+      label: Request cap
+      description: Number you will not exceed, and the delay you will hold.
+      placeholder: "30 requests, 2s apart"
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: What "closed" means
+      description: The specific result that would let you file this as done — including whether a negative counts.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirm
+      options:
+        - label: This area is not already claimed in an open issue
+          required: true
+        - label: I have read the traps list in AGENTS.md §7
+          required: true
+        - label: A negative result is an acceptable outcome for this area
+          required: false

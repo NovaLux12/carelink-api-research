@@ -1,0 +1,54 @@
+name: Security-sensitive finding
+description: Something that should not sit unaddressed — an exposed credential, internal hostname, or data path.
+labels: ["security", "needs-verification"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## For security findings, describe the exposure — never the secret.
+
+        This is a defensive research artefact. Report **that** a credential is
+        published and **where**, plus the impact. Do not paste the credential, the
+        session value, or a ready-to-run reproduction.
+
+        A redacted finding is a complete finding. A finding that leaks the thing it
+        is reporting will be closed.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One line, redacted.
+      placeholder: "US and trials configs publish real reports-broker x-api-key values; EU ships a placeholder"
+    validations:
+      required: true
+
+  - type: textarea
+    id: exposure
+    attributes:
+      label: What is exposed, and by what
+      description: The endpoint or artefact, and what a client can obtain from it without a credential. No values.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: What becomes possible. Health data scope, if relevant.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirm
+      options:
+        - label: No credential, key, token, or session value appears in this issue
+          required: true
+        - label: Any internal hostname is redacted to the form <service>.<internal>
+          required: true
+        - label: I am describing the exposure and impact, not supplying a reproduction
+          required: true
+        - label: I obtained this read-only and unauthenticated
+          required: false

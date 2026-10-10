@@ -1,0 +1,106 @@
+name: New finding
+description: Log a confirmed finding with an evidence class and a source cite.
+labels: ["finding", "needs-verification"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Every claim needs an evidence class and a source cite.
+
+        Read [AGENTS.md §2](../AGENTS.md) before filing. A finding without a
+        source cite will be closed as unverifiable — that is the single rule
+        this repo enforces hardest, because it has already produced one
+        correction for a claim made in good faith without evidence.
+
+  - type: input
+    id: subject
+    attributes:
+      label: Subject
+      description: One line. What did you find?
+      placeholder: "v12/display/message is live on all three deployments"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Evidence class
+      description: |
+        OBSERVED = you saw it in a live response.
+        PUBLISHED = it is in a vendor document served without a login.
+        INFERRED = you reasoned it, and can show the assumptions.
+      options:
+        - OBSERVED — live response
+        - PUBLISHED — vendor document, no login
+        - INFERRED — reasoned, assumptions shown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface
+      options:
+        - Hosts / estate
+        - Auth / tenants / flows
+        - Discovery / version axis
+        - Configuration (public config, per-key, country)
+        - Devices / vocabulary
+        - Patient API
+        - Clinician portal / hcp
+        - Reports / commoncore
+        - Frontends / bundles
+        - Archive / history
+        - Security
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: finding
+    attributes:
+      label: The finding
+      description: State it plainly. No hedging, no speculation mixed in.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence-detail
+    attributes:
+      label: Evidence
+      description: |
+        The command you ran, the response head, or the document fetch.
+        Paste the request so someone can re-run it. If you redacted anything,
+        say so here and state what it was.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: What does this change for someone building a CareLink client?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirm
+      options:
+        - label: I used GET only — no POST, no token exchange, no authentication attempted
+          required: true
+        - label: I slept ≥2s between requests to the same host and stayed under a stated request cap
+          required: true
+        - label: No credential, session value, patient identifier, or unredacted internal hostname appears in this issue
+          required: true
+        - label: Every claim above can be traced to a source line I can point at
+          required: true
+
+  - type: input
+    id: request-count
+    attributes:
+      label: Requests used
+      placeholder: "e.g. 14 of a 20 cap"
+    validations:
+      required: false
