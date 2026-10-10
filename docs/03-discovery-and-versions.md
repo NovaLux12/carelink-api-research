@@ -199,8 +199,8 @@ is a **gateway-level** rejection — on `clcloud.*` it means the host does not r
 path to a CareLink-app auth check at all — and is distinct from the
 `401 {"error":{"type":"InvalidToken"}}` the bridge's own endpoints return. **The wrong
 number originated in `PROBE-FINDINGS.md` §5 and propagated downstream from there**,
-including into a published document that was "corrected" from 403 to 401 off the back of
-it [source: PROBE-FINDINGS §5; CLAIM-AUDIT-2026-10-09.md].
+including into a published document that was "corrected" from 403 to 401 off the back
+of it [source: PROBE-FINDINGS §5; CLAIM-AUDIT-2026-10-09.md].
 
 **Caveat:** a 403 on GET does not prove the resource is unregistered — `v6` proves it.
 PDE v3 could equally be a POST-only route, and OPTIONS was not run on the PDE namespace
@@ -228,7 +228,6 @@ inside a single 6-week window (2026-02-24 → 2026-03-08), and there is **no arc
 `android/3.6` → cumulus `v13` is the live generation [source: ARCHIVE-URLS §3, §8].
 Finally, `recon/DRIFT-AND-NEW-2026-10-10.md` **does not exist** in this repo; nothing
 in it is cited and no claim here depends on it.
-
 ## 11. Unresolved disagreements between sources
 
 | Disagreement | Both readings | Canonical page takes ||---|---|---|

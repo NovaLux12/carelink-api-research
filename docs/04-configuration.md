@@ -48,10 +48,12 @@ in any source.
 | auth / redirect | `personal.integrations.redirect.scheme.whitelist`, `system.auth0.url.whitelist`, `captcha.key`, `personal.session.timeout` (= 30) | the bridge's `com.medtronic.carepartner:/sso` redirect is **not** in the integrations whitelist — that whitelist governs deep links, not the OAuth callback, so this is context, not a contradiction |
 | misc / operational | `personal.third.party.apps`, `outages.nextupdateat`, `default.country`, `personal.crm.settings`, `personal.retina.endpoint.config` | `captcha.key` is a reCAPTCHA **site** key, public by design |
 
-Two `nutrino.cc.*` keys carry a `security_headers["x-api-key"]`. **EU ships a literal
-placeholder; US and trials ship real-looking tokens.** Values are redacted everywhere in
-this repo — existence and shape only, never the value. Detail in
-`07-admin-portal-and-reporting.md` [source:
+Two `nutrino.cc.*` keys carry a `security_headers["x-api-key"]`. **The EU deployment
+ships a literal placeholder** — 17 characters, not a credential. That much is
+published; it explains the bug class and exposes nothing. The comparison against the
+other two deployments is **held back** for a disclosure decision — see
+[`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md). No value
+appears anywhere in this repo, in any form [source:
 findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md].
 
 ### Global vs regional — hash-verified

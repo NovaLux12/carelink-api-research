@@ -36,39 +36,32 @@ gaps**, ranked below in disclosure order.
 | F9 | Vendor data-hygiene bugs + an unconditional-gzip protocol violation | OBSERVED | unrated [PUBLIC-CONFIG; README rule 6] |
 | F10 | No `security.txt` anywhere in the public estate | OBSERVED | informational [SECURITY-FINDINGS S6] |
 
-## F1 — Reports-broker credentials published by the US and trials configs
+## F1 — **Held back — not published**
 
-`nutrino.cc.broker.service.config.security_headers["x-api-key"]`, and the same
-key again in `nutrino.cc.metadata.service.config`, are served by
-`GET /patient/v2/configuration/public` — **unauthenticated, on all three
-deployments** [source: CROSS-REGION §SECURITY]:
+A ranking of severity is deliberately absent, because the finding it would rank
+is not published.
 
-| deployment | published value |
-|---|---|
-| EU | literal placeholder `%#$^&#GFFG@#*%&#$` (17 chars, starts `%#`) — not a credential |
-| US | a real-looking base64 token, 18+ chars |
-| trials | a **different** real-looking base64 token |
+What was found, in one sentence with no values: **two of the three deployments
+publish service credentials in their unauthenticated public configuration, while
+the third ships an obvious placeholder.** The credentials home to the reports
+backend discussed under #76.
 
-Two distinct 40-char tokens were confirmed mechanically [source: AWS-GATEWAYS
-§8]. The keys authenticate to `commoncore.medtronic.{eu,com}/reports-broker/v1`
-and `/reports-metadata/v1` — the reports backend behind repo issue **#76**. The
-values exist only in gitignored raw captures; per
-README rule 1 this page records *that* they are exposed and *where*, never the
-values [source: CROSS-REGION]. ⚠ The reports surface is **not only** on
-`commoncore`: `/patient/reports/*` is live on `carelink.*`, gated 401/405, and
-`commoncore`'s 502 is an origin-side DNS failure, not absence [source:
-DRIFT-AND-NEW].
+What is withheld:
 
-**Why it ranks first.** Same defect class as F2, worse in two ways: it is **on
-the patient host**, unauthenticated, for any internet client; and **EU ships an
-obviously-fake placeholder while US and trials ship working-looking secrets**, so
-the EU value passed internal review as fake and nobody noticed the other two
-[source: CROSS-REGION]. Whether either key is live is **Unknown — not
-tested, deliberately**: testing requires an authenticated call to a production
-medical-data service, outside a read-only pass [source: CROSS-REGION] — a
-known-dead key (F2) is a smaller problem than an untested one. The HCP-side
-placeholder in `pow.nutrino.cc.*.service.config` is a third, inert value and must
-not be conflated with either [source: HCP-SCHEMA §6.4; PUBLIC-CONFIG].
+- **The values, everywhere.** Never in this repo.
+- **The comparison between deployments.** That is the finding that makes it
+  reportable, and it is held for a disclosure decision.
+- **Whether either credential is live.** Deliberately never tested — that would
+  need an authenticated call to a production medical-data service, well outside a
+  read-only pass. "Real-looking" is a statement about *shape*, not a claim that it
+  works. Do not upgrade that without a test.
+
+The one half that **is** published: the EU deployment ships a 17-character literal
+placeholder. That is published because it explains the bug class and exposes
+nothing.
+
+> Recorded so a future reader knows something was removed on purpose, rather than
+> never looked for.
 
 ## F2 — Hardcoded `x-api-key` in the public bundle, replicated
 

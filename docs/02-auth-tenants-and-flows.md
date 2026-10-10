@@ -38,22 +38,18 @@ is the same file: `AUTH-TENANT` = `findings-log/probe-2026-10-08/AUTH-TENANT-FIN
 ```mermaid
 flowchart LR
     subgraph POL["OAuth policy compared field-by-field — identical but for `issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"]
-        direction TB
         A["carelink-login.minimed.eu<br/>patient · EU"]
         B["carelink-login.minimed.com<br/>patient · US"]
         C["carelink-login.medtronic.eu<br/>shadow"]
         D["carelink-login.medtronic.com<br/>shadow"]
         E["carelink-login-trials.minimed.com<br/>clinical · trials"]
     end
-    A --- KA["8RqxnMm8vg2Go_y1LAVh9<br/>vnTNpK5RvkqVEfQgHRsqv"]
-    B --- KB["jpv2d2IuydtvKtefd5M8J<br/>qjHNmcQOpW_gvHz6zaD8"]
-    C --- KC["jd0EOLxJ8XduYx4lLy3ig<br/>gZMBCJcl_t25Es4U_g_ow"]
-    D --- KD["cEgK74cyc5LzAVI9VxEz9<br/>80YhF8vW25gJ1_rR_lLOJ ⚠ §8"]
+    A --> Z
+    B --> Z
+    C --> Z
+    D --> Z
+    Z["each holds 2 JWKS kids<br/>0 shared by any two of the four"]
     E -. "never fetched —<br/>kids Unknown, not in any source" .-> KE["no kid recorded"]
-    KA --- Z["no kid is shared by any two<br/>of the four compared tenants"]
-    KB --- Z
-    KC --- Z
-    KD --- Z
     style D fill:#3b2f2f,stroke:#f66
     style E fill:#3b3b2f,stroke:#fd6
     style KE fill:#3b3b2f,stroke:#fd6
@@ -246,6 +242,9 @@ the Auth0 track no longer has this exposure [source: ARCHIVE-URLS §7].
 
 ## 6. The `configs/v1` namespace — and what `_vN` actually means
 
+The bucket itself is a public-config trap in
+[`04-configuration.md`](04-configuration.md).
+
 - **Configs are hostname-scoped.** `carelink.minimed.com` serving the EU config
   → 403; fetching `oauth20_sso_carepartner_us_v6.json` via the `.eu` host → **403
   S3 AccessDenied** [source: PROBE-FINDINGS §4 and deep §4].
@@ -279,6 +278,10 @@ the Auth0 track no longer has this exposure [source: ARCHIVE-URLS §7].
 
 ## 7. The token-confusion question — still open
 
+Carried as an open question in
+[`10-open-questions.md`](10-open-questions.md), and as an untested item in
+[`08-security-findings.md`](08-security-findings.md).
+
 Original question: would `clcloud.minimed.eu` accept a token minted by a shadow
 tenant? Separate issuer + separate keys says it should not; token-audience/`kid`
 validation done loosely is exactly the class of bug that would make it critical.
@@ -311,6 +314,9 @@ treat it as the better-attested one and confirm against the live
 `SECURITY-FINDINGS.md` truncate the kid to `80YhF8…` and take no side.
 
 ## 9. What we still do not know
+
+The consolidated table — open, closed, and unknown — is in
+[`10-open-questions.md`](10-open-questions.md).
 
 | Question | Status |
 |---|---|

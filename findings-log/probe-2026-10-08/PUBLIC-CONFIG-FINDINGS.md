@@ -96,7 +96,7 @@ Note `logbook.enabled = false` for the EU default and `logbook.entries.page.size
 
 ### Config-integrity notes (no credentials found)
 
-- `nutrino.cc.*.security_headers."x-api-key"` is the literal placeholder
+- `nutrino.cc.*.security_headers."x-api-key"` (EU) is the literal placeholder
   `%#$^&#GFFG@#*%&#$` in both broker and metadata configs — **not a real key.**
   Distinct from the hardcoded bundle key in `SECURITY-FINDINGS.md`.
 - `captcha.key` is a Google reCAPTCHA **site** key, which is public by design.

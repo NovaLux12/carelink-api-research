@@ -17,17 +17,13 @@ under `/patient/v2/configuration/`. A trailing slash is accepted.
 
 ## ⚠ SECURITY — real service API keys are published on the US and trials deployments
 
-`nutrino.cc.broker.service.config.security_headers["x-api-key"]` and the same key
-in `nutrino.cc.metadata.service.config`:
-
-| deployment | value |
-|---|---|
-| EU | `%#$^&#GFFG@#*%&#$` — a **literal placeholder**, not a credential |
-| US | a real-looking base64 token, **18+ chars** |
-| trials | a **different** real-looking base64 token |
-
-These authenticate to `commoncore.medtronic.{eu,com}/reports-broker/v1` and
-`/reports-metadata/v1` — the reports backends behind repo issue **#76**.
+> **[REDACTED — held back from the published repo, 2026-10-11.]** A finding
+> about these keys was removed before publication at the maintainer's instruction,
+> pending a disclosure decision. What remains published is the half that exposes
+> nothing: the **EU** deployment ships a literal placeholder in
+> `security_headers["x-api-key"]` (17 characters, not a credential). The value
+> never appeared in any form. The comparison, the other deployments' values, and
+> whether any key is live are all withheld.
 
 This is the same class of defect as the hardcoded `x-api-key` in the portal JS
 bundle (`SECURITY-FINDINGS.md` S3), but worse in two ways:
