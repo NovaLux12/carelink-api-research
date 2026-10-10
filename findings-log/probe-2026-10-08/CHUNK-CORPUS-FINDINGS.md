@@ -38,7 +38,7 @@ Do not re-run this. The remaining marginal value is below.
 
 ## What the chunks DID add
 
-### Three new endpoint literals
+### Five new endpoint literals
 
 ```
 POST /hcp/sso/auth/otc/send        (found by jsrecon too)
@@ -142,3 +142,7 @@ wrong one for config-driven apps. Worth keeping for the patient-side surfaces.
 
 So there is no published OpenAPI/Swagger document to parse. That closes the
 "spec-driven discovery" avenue as a source for #76/#84.
+
+> **CORRECTION (2026-10-10):** the heading above read "Three new endpoint
+> literals" while the list below it carries five. The list is right; the count in
+> the heading was wrong. Re-verified by counting the entries directly.

@@ -33,15 +33,16 @@ and every later `jq` fails with `utf-8 codec can't decode byte 0x8b`. Use `curl
 
 ## The 69 keys, by group
 
-35 of the 69 key names are recorded in the findings logs. The other 34 are
-**Unknown** — not enumerated in any source.
+**Not all 69 key names are recoverable from the sources.** The groups below name the keys
+the findings logs actually record; the remaining key names are **Unknown** — not enumerated
+in any source.
 
 | group | keys | notes |
 |---|---|---|
 | device vocabulary | `personal.device.family.to.model.mapping`, `system.settings.transfer.feature.config.device.mapping` | 16 families; `{"BLE780":"780G","CC880":"MiniMed™ Flex"}` — see `05-devices-and-vocabulary.md` |
 | logbook | `logbook.supported.entry.types` (12 types), `logbook.enabled`, `logbook.entries.page.size` (= 30), `system.logbook.entry.validation.config` | validation config is `null` on both patient regions, full schema on trials |
 | device control codes | `csr.control.codes.settings` | `dpml`/`tup`/`lhpro`/`lghpro`/`vex`/`ssd`/`tcc`/`gstpro`/`gstrc` with ranges. **Not** the NGP alarm set — no N-codes |
-| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five live service URLs, two never previously recorded; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed |
+| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed |
 | regional feature flags | `personal.clinical.environment`, `personal.safety.notices.enabled`, `personal.data.csv.export.enable`, `personal.cookie.consent.policy.enabledGlobally`, `personal.dob.validation.enabled`, `personal.mixpanel.analytics.settings.{enabled,token}`, `personal.username.as.email.settings.enabled`, `personal.inpen.supported.countries.enabledGlobally` | see the regional table below |
 | country lists | `personal.common.core.reporting.enabled.countries`, `personal.countries.certification.enabled`, `personal.inpen.supported.countries` | grow over time — see the drift note |
 | auth / redirect | `personal.integrations.redirect.scheme.whitelist`, `system.auth0.url.whitelist`, `captcha.key`, `personal.session.timeout` (= 30) | the bridge's `com.medtronic.carepartner:/sso` redirect is **not** in the integrations whitelist — that whitelist governs deep links, not the OAuth callback, so this is context, not a contradiction |
@@ -79,8 +80,8 @@ is pinned by `hurl/05-public-config.check.sh`.
 
 ## The 34 regional keys
 
-Ten differing keys are documented. The other 24 are **Unknown** — not itemised in any
-source.
+Ten differing keys are documented. The remaining differing key names are **Unknown** — not
+itemised in any source.
 
 | key | EU | US | trials |
 |---|---|---|---|
@@ -98,6 +99,7 @@ source.
 `personal.safety.notices.enabled` is the medically relevant one: it is **true on the US
 deployment only**, and safety notices are how Medtronic communicates device advisories to
 patients. It is a regional difference, not a constant.
+
 `logbook.enabled` is false on both patient regions, which is why the entry-validation
 schema ships `null` there and populated only on trials.
 

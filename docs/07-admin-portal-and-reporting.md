@@ -1,8 +1,8 @@
 # Admin portal and reporting
 
-Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/{JS-API-SURFACE,
-HCP-CONFIG-SCHEMA,AWS-GATEWAYS}.md`, `CROSS-REGION-CONFIG-FINDINGS.md`,
-`SECURITY-FINDINGS.md`, `AUTH-TENANT-FINDINGS.md`.
+Dated 2026-10-10. Sources, all under `findings-log/probe-2026-10-08/`:
+`recon/JS-API-SURFACE.md` · `recon/HCP-CONFIG-SCHEMA.md` · `recon/AWS-GATEWAYS.md` ·
+`CROSS-REGION-CONFIG-FINDINGS.md` · `SECURITY-FINDINGS.md` · `AUTH-TENANT-FINDINGS.md`.
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.
@@ -26,13 +26,14 @@ findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
 
 `hp-runtime.js` holds a **225-entry lazy-chunk manifest**; all 224 chunks were fetched
 (4.4 MB) and added **0** Medtronic hosts, **3** API path literals and **3** `MMT-*` codes —
-all API definitions live in the eager main bundle. What they *did* add: three new endpoint
-literals (`POST /hcp/sso/auth/otc/send`, `GET hcp/countries/dialCodes`,
+all API definitions live in the eager main bundle. What they *did* add: new endpoint literals
+(`POST /hcp/sso/auth/otc/send`, `GET hcp/countries/dialCodes`,
 `GET hcp/patients/checkPhoneNumber`, `GET /connect/retina/searchfilter`,
-`POST /connect/retina/searchfilter/feedback`) and **89 distinct field names at HTTP
-call-sites**, including the logbook/marker fields (`removalType`, `removalReason`,
-`sensorInsertionLocation`, `adhesivetapeLocation`, `timecapUnscrewed`, `notes`, `entryTs`)
-[source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
+`POST /connect/retina/searchfilter/feedback` — the source's heading counts three, its own
+list carries five) and **89 distinct field names at HTTP call-sites**, including the
+logbook/marker fields (`removalType`, `removalReason`, `sensorInsertionLocation`,
+`adhesivetapeLocation`, `timecapUnscrewed`, `notes`, `entryTs`) [source:
+findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
 
 > **⚠ Correction — preserved.** An earlier note claimed neither `main.js` nor `runtime.js`
 > contains a `sourceMappingURL` comment. **False** — `hp-main.js` contains the token at byte
@@ -62,21 +63,19 @@ the main bundle.
 > `status`), and the verbatim literal list in that same file contains **9 distinct**
 > `hcp/clinics/toggle/*` paths. The count of 12 is not reconcilable with the enumeration.
 
-**MFA / user / clinics counts.** `hcp/user/*` — **29 endpoints** (prior notes had 1),
-including `getMfaUserStatus`, `verifyMfaCode`, `sendMfaCodeAfterReCaptcha` ⇒ **the portal
-enforces MFA**; the reCAPTCHA site key arrives via authenticated
-`POST hcp/configuration/user`, so it **cannot be harvested unauthenticated**.
-`hcp/clinics/*` — **40 endpoints** (prior notes had 2), incl. the MFA policy quartet, the
-security-profile trio and the clinic-wide feature kill-switch list.
-`hcp/patients/((patientId))/logbook/{entries,entries/filled,entries/last}` — the *read*
-side of the logbook vocabulary: three endpoints, previously documented as one.
+**MFA / user / clinics counts.** `hcp/user/*` — **29 endpoints** (prior notes had 1), incl.
+`getMfaUserStatus`, `verifyMfaCode`, `sendMfaCodeAfterReCaptcha` ⇒ **the portal enforces
+MFA**; the reCAPTCHA site key arrives via authenticated `POST hcp/configuration/user`, so it
+cannot be harvested unauthenticated. `hcp/clinics/*` — **40 endpoints** (prior notes had 2),
+incl. the MFA policy quartet, the security-profile trio and the clinic-wide kill-switch list.
+`hcp/patients/((patientId))/logbook/{entries,entries/filled,entries/last}` is the *read* side
+of the logbook vocabulary: three endpoints, previously documented as one.
 `hcp/patients/*otc-linking*` — 6 endpoints plus `ext-otc=true&username=` on the
 `hcp/sso/login` redirect, with zero prior mention of `otc`; what the acronym stands for is
 **Unknown** — not in any source, and deliberately not guessed. `hcp/sso/{login,logout,reauth}`
 + `hcp/ping/ping` is a **second, cookie-based** session mechanism, separate from the mobile
-`/oauth/*` surface. Pusher channel names are reversible —
-`transformedChannelId($){return ($*$+$).toString(16)}` is unkeyed, so channel-name opacity
-provides no authorisation; `retinaEnabled` and `cuaEnabled` both ship **off**.
+`/oauth/*` surface; Pusher channel names are reversible
+(`(n²+n).toString(16)`, unkeyed), and `retinaEnabled`/`cuaEnabled` both ship **off**.
 
 ## `/hcp/configuration/*` and the header contract
 
@@ -128,11 +127,10 @@ One endpoint answers unauthenticated where all nine siblings require the client 
 sensitivity — a CRM base URI and a version string, no PII, no credential. **The finding is
 the inconsistency, not the content.** It corroborates that the shadow deployment's content
 namespace is `pow` (version 4.5) where the patient deployments use `ocl` (14.x → 15.5)
-[source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
-
-> **Minor unresolved discrepancy:** `AUTH-TENANT-FINDINGS.md` records that 200 as
-> `application/octet-stream`; `HCP-CONFIG-SCHEMA.md` records `application/json` for the
-> same 96-byte body on `carelinkhp.minimed.eu`. Both agree on the byte count and the body.
+[source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md]. *Minor unresolved
+discrepancy:* `AUTH-TENANT-FINDINGS.md` records that 200 as `application/octet-stream`,
+`HCP-CONFIG-SCHEMA.md` as `application/json` for the same 96-byte body on
+`carelinkhp.minimed.eu`; both agree on byte count and body.
 
 ### Portal existence oracle — full
 
@@ -159,24 +157,17 @@ content is not.**
 
 **Verdict on the NGP alarm vocabulary: a firm negative.** 28 distinct key names across both
 rounds, all 404, spanning every plausible vocabulary, and trustworthy because of the two
-controls above; the corpora on disk agree (the 69-key patient config has zero `N\d\d`
-tokens; `hp-main.js` scores 0 case-sensitive hits for `N24|N35|N40|N47|N48|N50|N55|N131`,
-`ALARM`, `alarmCode`, `stop_using_pump`, `stopUsingPump`; the 224-chunk corpus none). Do not
-re-run this enumeration.
+controls above; the corpora on disk agree (the 69-key patient config has zero `N\d\d` tokens;
+`hp-main.js` scores 0 case-sensitive hits for `N24|N35|N40|N47|N48|N50|N55|N131`, `ALARM`,
+`alarmCode`, `stop_using_pump`, `stopUsingPump`; the 224-chunk corpus none). Do not re-run.
 
 ## The report brokers — `commoncore.medtronic.*`
 
-```
-base   https://commoncore.medtronic.{eu,com}/reports-broker/v1/ocl
-       https://commoncore.medtronic.{eu,com}/reports-metadata/v1/ocl
-```
-
-| endpoint | service | unauth |
-|---|---|---|
-| `/reports/generateReport` · `reportStatus` · `reportCsv` · `reportPdf` | broker | 403 |
-| `/reports/ReportDataTimelinesRange/patients` · `ReportDataTimelinesForCalendar` | metadata | 403 |
-
-`dev.commoncore.medtronic.eu` resolves but is **502** (backend down).
+Bases: `https://commoncore.medtronic.{eu,com}/reports-broker/v1/ocl` and
+`https://commoncore.medtronic.{eu,com}/reports-metadata/v1/ocl`. Six endpoints — broker
+`/reports/{generateReport,reportStatus,reportCsv,reportPdf}` and metadata
+`/reports/{ReportDataTimelinesRange/patients,ReportDataTimelinesForCalendar}` — all **403**
+unauthenticated. `dev.commoncore.medtronic.eu` resolves but is **502** (backend down);
 `commoncore.minimed.eu` is also 502 — a **different host**, not a twin [source:
 findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
 
@@ -211,8 +202,7 @@ Bounded enumeration (90 requests, cap reached, GET + one OPTIONS preflight per h
 | dialog-lite (`mmm.data.api.url`) | EU `/prodous/`, US `/prod/`, **null on trials** | **500 JSON** (Gateway up, root unrouted) |
 | patient-timeline (`personal.patient.timeline.config.host`) | EU, US, trials | **403** `Missing Authentication Token` |
 | CSR periodic (VPC endpoint) | one per deployment | timeout — private, as expected |
-| CSR CRM | `carelink-support.minimed.{eu,com}/crm` | 403 |
-| retina | `clcloud.*` + `/connect/retina/v1/personalWebView` | **401** JSON |
+| CSR CRM · retina | `carelink-support.minimed.{eu,com}/crm` · `clcloud.*` + `/connect/retina/v1/personalWebView` | 403 · **401** JSON |
 
 **The enumeration found no new paths, because the question was malformed.** On AWS API
 Gateway **REST** APIs, `403 Missing Authentication Token` is the **unmatched-route** error,
@@ -248,8 +238,7 @@ findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md].
 
 **Prod `commoncore.medtronic.{eu,com}` has never been archived in any crawl** — only its
 `dev`/`stage1`/`preprod1` twins exist. The reports backend behind repo issue #76 is the
-**single largest unarchived surface in the project**, and report bodies from it remain
-obtainable only with an authenticated request [source:
+**single largest unarchived surface in the project**; report bodies need a token [source:
 findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
 
 ## Traps
@@ -257,5 +246,5 @@ findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
 | trap | detail |
 |---|---|
 | Portal 200-for-everything | `carelinkhp.minimed.eu` returns **200 + `text/html` + exactly 5518 bytes** for every unknown path. Discriminate on `Content-Type`, never on status code — filtering on status alone would have stored 225 copies of `index.html` and reported a clean chunk sweep |
-| `*.carelink.{eu,com}`, `*.clcloud.eu` | **wildcard parking DNS**: a random string resolves and all 302 to a parked page. ~50 collected names are false positives. Never report one as a vendor asset |
+| `*.carelink.{eu,com}`, `*.clcloud.eu` | **wildcard parking DNS**: a random string resolves and all 302 to a parked page. ~50 collected names are false positives; never report one as a vendor asset |
 | Internal hostnames in CT logs | recorded and redacted to `<service>.<internal>.minimed.<tld>` — the finding that CT logs leak internal infrastructure names survives, the names do not |

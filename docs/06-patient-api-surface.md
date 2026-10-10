@@ -26,15 +26,18 @@ data-bearing route [source: findings-log/probe-2026-10-08/PROBE-FINDINGS.md].
 
 The hybrid `/api/carepartner/v2/patient/*` **404s**.
 
-> **⚠ Correction — preserved (2026-10-09).** The live probe in the 10-08 pass returned
-> **403**, and the note had recorded **401**. Two re-probes — same session, same UA, low
-> rate — returned **403** with the identical body, both times. The **403 is the correct
-> value**; it is a **gateway-level** rejection (on `clcloud.*` that body means the host
-> does not route the path to a CareLink-app auth check at all) and is distinct from the
-> app-level `401 {"error":{"type":"InvalidToken"}}`. A published document was "corrected"
-> from 403 to 401 off the back of this note, so **the wrong number originated in
-> `PROBE-FINDINGS.md` §5 and propagated downstream from here**; the re-probe record is in
-> `audit/CLAIM-AUDIT-2026-10-09.md`. `/patient/users/me` on clcloud behaves the same way
+> **⚠ Correction — preserved (2026-10-09), and it does *not* apply to the table above.**
+> `PROBE-FINDINGS.md` §5 records that its live probe returned **403** where the note had
+> recorded **401**; two re-probes (same session, same UA, low rate) returned **403** with the
+> identical body both times. The **403 is the correct value** and it is a **gateway-level**
+> rejection — on `clcloud.*` that body means the host does not route the path to a
+> CareLink-app auth check at all — distinct from the app-level
+> `401 {"error":{"type":"InvalidToken"}}` that the `/patient/*` rows above return. The
+> correction is attached to §5's table of four patient-data surfaces and to the `clcloud.*`
+> bodies; **a published document was "corrected" from 403 to 401 off the back of this note,
+> so the wrong number originated in `PROBE-FINDINGS.md` §5 and propagated downstream from
+> there.** `/patient/users/me` on clcloud behaves the same way. Re-probe record:
+> `audit/CLAIM-AUDIT-2026-10-09.md`
 > [source: findings-log/probe-2026-10-08/PROBE-FINDINGS.md].
 
 ## `/api/carepartner/v2/*` — declared, not used
@@ -181,6 +184,23 @@ The conventional discovery set (`/swagger.json`, `/openapi.json`, `/api-docs`,
 
 There is no published OpenAPI/Swagger document to parse; spec-driven discovery is closed
 [source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
+
+## What this means for a client
+
+Against the sweep above, the fork's `BLE_API_VERSIONS = [13, 11, 6, 5]` (the path the bridge
+POSTs to) measures like this:
+
+| version | verdict | in the list? |
+|---|---|---|
+| v13 | live, GET-capable | yes |
+| v11 | live, GET-capable | yes |
+| v12 | **live** — same shape as v11/v13 on all three hosts | **omitted** |
+| v6 | exists, **POST-only** (no GET) — the version the vendor's own config hands out | yes (harmless, the bridge POSTs) |
+| v5 | **no route at all — permanently dead, not auth-gated** | **dead weight** |
+
+Neither changes behaviour today (v13 is tried first and is live), but v5 should not be in a
+fallback list and v12 is a free extra candidate [source:
+findings-log/probe-2026-10-08/recon/VERSION-AXIS.md].
 
 ## Open question
 

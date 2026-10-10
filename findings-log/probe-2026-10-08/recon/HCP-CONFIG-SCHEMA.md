@@ -145,7 +145,7 @@ All 87 requests, both rounds. R1 = prior pass on this host; R2 = this pass.
 | R1 | `/hcp/configuration/public/cua.alarm.codes.settings` | X-System-ID: ProWeb | 404 | — | 0 | absent |
 | R1 | `/hcp/configuration/public/personal/media/config/` | X-System-ID: ProWeb | 404 | — | 0 | absent |
 | R1 | `/hcp/configuration/public/cua.control.codes.settings` | — | 412 | — | 0 | header rejected |
-| R1 | `/hcp/configuration/public/pow.crm.settings` | X-System-ID: ProWeb | 200 | application/json | 96 | **JSON** |
+| R1 | `/hcp/configuration/public/pow.crm.settings` | X-System-ID: ProWeb | 200 | application/octet-stream | 96 | **JSON body, octet-stream type** |
 | R1 | `/hcp/configuration/public/csr.alarm.codes.settings` | X-System-ID: ProWeb | 404 | — | 0 | absent |
 | R1 | `/hcp/configuration/public/personal/media/config/eu` | X-System-ID: ProWeb | 401 | application/json | 48 | EXISTS (token-gated) |
 | R1 | `/hcp/configuration/public/logbook.supported.entry.types` | — | 412 | — | 0 | header rejected |
@@ -498,3 +498,10 @@ splitting the payload half out as a token-dependent item.
   parts; re-derive those before trusting any future 404 from this host.
 - Not attempted, by instruction or by scope: `/patients/`, `/user/`, `/clinics/`
   (patient data or identity), and any POST/tokened endpoint.
+
+> **SETTLED (2026-10-10):** a source recorded this endpoint's content-type as
+> `application/json`. A live re-probe returns **`application/octet-stream`** with a
+> 96-byte JSON body — HTTP 200, `content-length: 96`. The first-hand curl measurement
+> (`AUTH-TENANT-FINDINGS.md`) is correct; the other record is wrong. The body parses as
+> JSON, so the *type* is misleading rather than the content — a naive client that
+> branches on `content-type` will not parse a working response.

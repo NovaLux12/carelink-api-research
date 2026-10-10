@@ -15,8 +15,8 @@ without a login · **INFERRED** = reasoned, not seen.
 
 ## The published vocabulary — 16 families
 
-`personal.device.family.to.model.mapping` in `/patient/v2/configuration/public`
-[PUBLISHED, OBSERVED live]:
+`personal.device.family.to.model.mapping` in `/patient/v2/configuration/public` —
+**PUBLISHED** in vendor config, the endpoint itself **OBSERVED** live:
 
 ```
 GM  BLE700  BLE720  BLE740  BLE770  BLE780  GST  SIMPLERA
