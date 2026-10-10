@@ -187,21 +187,21 @@ findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
 The same two service configs are published **unauthenticated inside the patient public
 config** as `nutrino.cc.{broker,metadata}.service.config`, complete with a
 `security_headers["x-api-key"]`: **EU** ships the literal placeholder
-`%#$^&#GFFG@#*%&#$` (not a credential); **US** ships a real-looking base64 token, 18+
-chars; **trials** ships a **different** real-looking base64 token. Same class of defect as
-the hardcoded bundle key, but worse in two ways: it is on the patient host, served
+`%#$^&#GFFG@#*%&#$` (not a credential); **US** ships a real-looking base64 token, 18+ chars;
+**trials** ships a **different** real-looking base64 token. Same class of defect as the
+hardcoded bundle key, but worse in two ways: it is on the patient host, served
 unauthenticated to any internet client; and **the EU value has been passing every internal
 review as obviously-fake while nobody noticed the other two carry real material.** Whether
 either key is live was **deliberately not tested** — that needs an authenticated call to a
-production medical-data service. **The values are deliberately not reproduced here.** Report
+production medical-data service. **The values are deliberately not reproduced here:** report
 *that the keys are exposed and where*, never the keys [source:
 findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md].
 
 **Do not conflate three distinct credentials:** (1) the nutrino config keys above; (2) the
 hardcoded `x-api-key` inside the portal JS bundle, which ships to every visitor and whose
 production API base is a **`dev.` host** — **verified not live** (403 both with and without
-the key against `commoncore.medtronic.{eu,com}`; 502 against `dev.`); (3) the inert
-placeholder documented in `PUBLIC-CONFIG-FINDINGS.md`. Distinct artefacts.
+the key against `commoncore.medtronic.{eu,com}`, 502 against `dev.`); (3) the inert
+placeholder documented in `PUBLIC-CONFIG-FINDINGS.md`.
 
 ## The AWS API Gateways — structurally not browser-callable
 
@@ -221,8 +221,7 @@ Gateway **REST** APIs, `403 Missing Authentication Token` is the **unmatched-rou
 not an auth-gate: a certainly-absent UUID returns **byte-identical output** to the published
 root, `404` is never emitted at all (zero 404s in 90 requests), and all 44 of the 403s carry
 the same 42-byte body. A usage-plan denial would read `{"message":"Forbidden"}` and never
-appeared. A dummy `X-Api-Key` header changed nothing, so **no usage-plan key is required**.
-
+appeared; a dummy `X-Api-Key` header changed nothing, so **no usage-plan key is required**.
 The one working discriminator runs the other way: **on dialog-lite,
 `500 InternalServerErrorException` ⇒ the path is matched and routed** (`GET /prodous/` → 403
 but `GET /prodous/<uuid>` → 500). Which reveals the structural finding:
