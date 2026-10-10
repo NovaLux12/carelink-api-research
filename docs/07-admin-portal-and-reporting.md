@@ -1,5 +1,7 @@
 # Admin portal and reporting
 
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev: [`06-patient-api-surface.md`](06-patient-api-surface.md) · → next: [`08-security-findings.md`](08-security-findings.md) · related: [`10-open-questions.md`](10-open-questions.md)
+
 Dated 2026-10-10. Sources, all under `findings-log/probe-2026-10-08/`:
 `recon/JS-API-SURFACE.md` · `recon/HCP-CONFIG-SCHEMA.md` · `recon/AWS-GATEWAYS.md` ·
 `CROSS-REGION-CONFIG-FINDINGS.md` · `SECURITY-FINDINGS.md` · `AUTH-TENANT-FINDINGS.md`.

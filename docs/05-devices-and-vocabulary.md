@@ -1,5 +1,7 @@
 # Devices and vocabulary
 
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev: [`04-configuration.md`](04-configuration.md) · → next: [`06-patient-api-surface.md`](06-patient-api-surface.md)
+
 Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md`,
 `PUBLIC-CONFIG-FINDINGS.md`, `AUTH-TENANT-FINDINGS.md`, `recon/HCP-CONFIG-SCHEMA.md`,
 `recon/JS-API-SURFACE.md`, `CHUNK-CORPUS-FINDINGS.md`.

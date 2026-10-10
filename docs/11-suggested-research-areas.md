@@ -1,5 +1,7 @@
 # Suggested research areas
 
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · related: [`10-open-questions.md`](10-open-questions.md)
+
 **Pick something up.** Every area below states what is known, what is missing, and
 what would close it. Nothing here is a guess dressed up as a task — each one has a
 specific blocker.

@@ -1,5 +1,7 @@
 # Patient API surface — what exists, and how to tell without a token
 
+> **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev: [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) · → next: [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md)
+
 Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/VERSION-AXIS.md`,
 `recon/CONFIG-NAMESPACE-DEEP.md`, `PROBE-FINDINGS.md`,
 `CHUNK-CORPUS-FINDINGS.md`.
@@ -39,6 +41,26 @@ The hybrid `/api/carepartner/v2/patient/*` **404s**.
 > there.** `/patient/users/me` on clcloud behaves the same way. Re-probe record:
 > `audit/CLAIM-AUDIT-2026-10-09.md`
 > [source: findings-log/probe-2026-10-08/PROBE-FINDINGS.md].
+
+
+## What answers unauthenticated, and what does not
+
+```mermaid
+flowchart TD
+    P["unauthenticated request"] --> H{which host?}
+    H -->|"carelink.minimed.*"| C1["401 InvalidToken<br/>= route exists, token missing"]
+    H -->|"clcloud.minimed.*"| C2["403 Missing Authentication Token<br/>= uniform, tells you NOTHING"]
+    C2 --> C3["read x-amzn-errortype instead"]
+    C3 -->|"MissingAuthenticationToken"| C4["no route — wasted probe"]
+    C3 -->|"Unauthorized + x-ca-err 990"| C5["reached the Layer7 authoriser<br/>the resource EXISTS"]
+    H -->|"public config / countries"| C6["200 — no credential needed"]
+    style C2 fill:#3b2f2f,stroke:#f66
+    style C5 fill:#2f3b2f,stroke:#6f6,stroke-width:2px
+```
+
+The asymmetry is the point: on `carelink.*` a 401 is informative, on
+`clcloud.*` the 403 is not. Full method in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md).
 
 ## `/api/carepartner/v2/*` — declared, not used
 

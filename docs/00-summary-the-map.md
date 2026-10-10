@@ -270,3 +270,21 @@ client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map.
 clinician bundle replicates across **five** hosts, not two.
 
 `regression/hurl/` pins 44 of these facts so they fail loudly rather than rot.
+
+---
+
+## Pages
+
+| | |
+|---|---|
+| [`01-hosts-and-estate.md`](01-hosts-and-estate.md) | Host families, deployments, what each is for |
+| [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) | The four auth tenants, the code+PKCE flow, the redirect single-point-of-failure |
+| [`03-discovery-and-versions.md`](03-discovery-and-versions.md) | The app-version axis — why only `android/3.6`–`3.8` matter |
+| [`04-configuration.md`](04-configuration.md) | The unauthenticated 69-key config file and the country axis |
+| [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) | 16 device families; why model-matching beats family-matching |
+| [`06-patient-api-surface.md`](06-patient-api-surface.md) | Patient namespaces and the existence oracles |
+| [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md) | The clinician portal, `hcp/*`, reports, the undisclosed services |
+| [`08-security-findings.md`](08-security-findings.md) | Ranked defensive findings, and what was checked and found clean |
+| [`09-methodology-and-oracles.md`](09-methodology-and-oracles.md) | How to probe this safely — and the four ways this project got it wrong |
+| [`10-open-questions.md`](10-open-questions.md) | What we don't know and exactly what would settle it |
+| [`11-suggested-research-areas.md`](11-suggested-research-areas.md) | **Open areas you can pick up** |

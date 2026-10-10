@@ -136,6 +136,28 @@ Auth0's Allowed Callback URLs, a different mechanism [source: PUBLIC-CONFIG;
 ARCHIVE-URLS §1]. Both lists are published inside the unauthenticated 69-key
 config documented in [`04-configuration.md`](04-configuration.md).
 
+
+### The flow, and where it breaks
+
+```mermaid
+sequenceDiagram
+    participant B as Bridge / any client
+    participant S as carelink-login.minimed.eu
+    participant R as com.medtronic.carepartner:/sso
+
+    B->>S: GET /authorize<br/>client_id, code_challenge=S256(verifier)<br/>redirect_uri=custom scheme
+    S-->>R: 302 ?code=...
+    Note over R,S: the custom scheme is the ONLY binding<br/>between the code and this client
+    R->>S: POST /oauth/token<br/>code + code_verifier + client_id
+    S-->>B: access_token + refresh_token
+```
+
+**That custom scheme is the single point of failure.** It is not a URL the bridge
+owns — it is the shipped Android app's, and the bridge works only because Auth0
+admits that scheme for that client. There is no bridge-owned client to fall back
+to. If Medtronic binds the callback to package-name attestation, login fails with
+an opaque redirect error and nothing in the bridge's code can prevent it.
+
 ## 3. PKCE state
 
 **OBSERVED** [source: SECURITY S2; CLAIM-AUDIT-2026-10-09.md]:
