@@ -2,7 +2,7 @@
 
 Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md`,
 `PUBLIC-CONFIG-FINDINGS.md`, `AUTH-TENANT-FINDINGS.md`, `recon/HCP-CONFIG-SCHEMA.md`,
-`recon/JS-API-SURFACE.md`, `recon/CHUNK-CORPUS-FINDINGS.md`.
+`recon/JS-API-SURFACE.md`, `CHUNK-CORPUS-FINDINGS.md`.
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.

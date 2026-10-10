@@ -2,7 +2,7 @@
 
 Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/VERSION-AXIS.md`,
 `recon/CONFIG-NAMESPACE-DEEP.md`, `PROBE-FINDINGS.md`,
-`recon/CHUNK-CORPUS-FINDINGS.md`.
+`CHUNK-CORPUS-FINDINGS.md`.
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.

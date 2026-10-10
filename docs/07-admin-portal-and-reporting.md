@@ -36,9 +36,9 @@ call-sites**, including the logbook/marker fields (`removalType`, `removalReason
 
 > **⚠ Correction — preserved.** An earlier note claimed neither `main.js` nor `runtime.js`
 > contains a `sourceMappingURL` comment. **False** — `hp-main.js` contains the token at byte
-> offset 1791807. What is true is that it is not a *directive*: it is the string literal
-> inside webpack's bundled `worker-loader`, carried alongside the workers. The conclusion is
-> unchanged; the reason originally given for it was wrong.
+> offset 1791807, though not as a directive: it is the string literal inside webpack's
+> bundled `worker-loader`, carried alongside the workers. The conclusion stands; the reason
+> originally given for it was wrong.
 
 ## The `hcp/*` surface
 
@@ -77,12 +77,12 @@ side of the logbook vocabulary: three endpoints, previously documented as one.
 `/oauth/*` surface. Pusher channel names are reversible —
 `transformedChannelId($){return ($*$+$).toString(16)}` is unkeyed, so channel-name opacity
 provides no authorisation; `retinaEnabled` and `cuaEnabled` both ship **off**.
+
 ## `/hcp/configuration/*` and the header contract
 
-```
-BASE    = https://carelinkhp.minimed.eu
-PREFIX  = /hcp/configuration/public/<key>
-```
+`BASE = https://carelinkhp.minimed.eu`, `PREFIX = /hcp/configuration/public/<key>` — all
+relative to the portal origin, no separate API host. The `hcp/` prefix is not guessed: it is
+the literal the bundle's constants table binds.
 
 `X-System-ID` is mandatory and its **value** is validated: absent, empty (`X-System-ID;`)
 or invented (`NotARealClient`) all return **412, 0 bytes**; `ProWeb` **and** `proweb` both
@@ -102,35 +102,33 @@ token-gated (`personal/media/config/<locale>` → 401) and one is an empty `{}`
 | `cua.control.codes.settings` | 778 B — the HCP twin of the patient `csr.control.codes.settings`. **Control** vocabulary (`dpml`, `tcc`, `tup`, `lhpro`, `lghpro`, `vex`, `ssd`, `gstpro`, `gstrc`), **no N-codes, no severity vocabulary** |
 | `logbook.supported.entry.types` | 226 B — **byte-identical, list-for-list, to the patient-side key**. The key is unprefixed, and unprefixed means "shared", not "patient" |
 | `user-identifier-settings?countryCode=…` | the only `public/*` key that takes a parameter and genuinely varies: US = bare 10-digit phone (`^\d{10}$`), EU/DE = 20-char Unicode class |
-| `pow.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` |
-| `cua.crm.settings` | same shape, `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire |
-| `hcp.banner.notifications` | discloses a **maintenance window** (`2026-08-20T16:00Z`→`16:45Z`) to unauthenticated callers, and hardcodes `timezone: "PT"` on an EU portal |
-| `pow.follow.up.settings` · `pow.country.media.groups` · `pow.invite.to.personal.uri` | email rate limits, a URL-validating regex, a 3-domain allowlist; 37 + 51 country codes in two groups; a bare `https://carelink.minimed.eu` |
+| `pow.crm.settings` · `cua.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` and the same shape with `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire |
+| `hcp.banner.notifications` · `pow.follow.up.settings` · `pow.country.media.groups` · `pow.invite.to.personal.uri` | a disclosed **maintenance window** (`2026-08-20T16:00Z`→`16:45Z`) with `timezone:"PT"` hardcoded on an EU portal; email rate limits, a URL regex, a 3-domain allowlist; 37 + 51 country codes; a bare `https://carelink.minimed.eu` |
 | `pow.nutrino.cc.{broker,metadata}.service.config` | the `commoncore` report hosts and sub-paths — see below |
 
 Three divergences between the HCP `cua.*` and patient `csr.*` control-code documents matter
 to any client written against one and pointed at the other: the `predefined_control_codes`
 array is **absent** on HCP; `lhpro`/`lghpro` max is `4294967295` on HCP but `4292967295` on
-the patient side (**almost certainly a typo** — `4294967295` is 2³²−1 and the same value
+the patient side (**almost certainly a typo** — `4294967295` is 2³²−1, and the same value
 appears twice more in the same object); and the `expiration_period_settings` default key is
-`"DEFAULT"` (HCP) vs `"default"` (patient).
+`"DEFAULT"` vs `"default"`.
 
 ### ⚠ The one sibling that answers with no header at all
 
 On the **shadow** portal `carelink.medtronic.eu` (no header, unauthenticated), the same
 family was probed. `/hcp/configuration/public/pow.crm.settings` → **200, 96 B**, while
 **nine siblings** return **412** each — `cms-config.json`, `pow.invite.to.personal.uri`,
-`pow.browser.check.configuration`, `pow.mmo.config`, `pow.udi.number`,
-`pow.udi.certificate`, `logbook.supported.entry.types`, `cua.control.codes.settings`,
+`pow.browser.check.configuration`, `pow.mmo.config`, `pow.udi.number`, `pow.udi.certificate`,
+`logbook.supported.entry.types`, `cua.control.codes.settings`,
 `system.logbook.entry.validation.config`. `pow.crm.settings.version` → 404;
 `/hcp/configuration/{application,user,countries/getAllCountries}` → 405 (POST-only);
 `/hcp/configuration/product/info` → 404.
 
-One endpoint answers unauthenticated where all nine siblings require the client header.
-Low sensitivity — a CRM base URI and a version string, no PII, no credential. **The finding
-is the inconsistency, not the content.** It corroborates that the shadow deployment's
-content namespace is `pow` (version 4.5) where the patient deployments use `ocl`
-(14.x → 15.5) [source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
+One endpoint answers unauthenticated where all nine siblings require the client header. Low
+sensitivity — a CRM base URI and a version string, no PII, no credential. **The finding is
+the inconsistency, not the content.** It corroborates that the shadow deployment's content
+namespace is `pow` (version 4.5) where the patient deployments use `ocl` (14.x → 15.5)
+[source: findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
 
 > **Minor unresolved discrepancy:** `AUTH-TENANT-FINDINGS.md` records that 200 as
 > `application/octet-stream`; `HCP-CONFIG-SCHEMA.md` records `application/json` for the
@@ -160,11 +158,11 @@ content is not.**
 > namespace, not an alias family, so the 404 list stands as a list, not a proof by mapping.
 
 **Verdict on the NGP alarm vocabulary: a firm negative.** 28 distinct key names across both
-rounds, all 404, spanning every plausible vocabulary; the 404s are trustworthy because of
-the two controls above; and the corpora already on disk agree (the 69-key patient config
-has zero `N\d\d` tokens; `hp-main.js` scores 0 case-sensitive hits for
-`N24|N35|N40|N47|N48|N50|N55|N131`, `ALARM`, `alarmCode`, `stop_using_pump`,
-`stopUsingPump`; the 224-chunk corpus contains none). Do not re-run this enumeration.
+rounds, all 404, spanning every plausible vocabulary, and trustworthy because of the two
+controls above; the corpora on disk agree (the 69-key patient config has zero `N\d\d`
+tokens; `hp-main.js` scores 0 case-sensitive hits for `N24|N35|N40|N47|N48|N50|N55|N131`,
+`ALARM`, `alarmCode`, `stop_using_pump`, `stopUsingPump`; the 224-chunk corpus none). Do not
+re-run this enumeration.
 
 ## The report brokers — `commoncore.medtronic.*`
 

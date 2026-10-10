@@ -11,20 +11,16 @@ impact**, never a ready-to-run recipe. Extends
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor
 document served without a login (live, or recovered from a public archive) ·
-**INFERRED** = reasoned, not seen.
-
-Citations are `[source: findings-log/<file> §n]`; inside tables the bare filename
-is the same file, rooted at `findings-log/probe-2026-10-08/`:
-`SECURITY-FINDINGS` = `SECURITY-FINDINGS.md` · `CROSS-REGION` =
-`CROSS-REGION-CONFIG-FINDINGS.md` · `AUTH-TENANT` = `AUTH-TENANT-FINDINGS.md` ·
-`ARCHIVE-URLS` = `recon/ARCHIVE-URLS.md` · `COMMONCRAWL` =
-`recon/cc/COMMONCRAWL-URLS.md` · `HCP-SCHEMA` = `recon/HCP-CONFIG-SCHEMA.md` ·
-`RECON-SUBDOMAINS` = `recon/RECON-SUBDOMAINS.md` · `PUBLIC-CONFIG` =
-`PUBLIC-CONFIG-FINDINGS.md` · `CONFIG-DEEP` = `recon/CONFIG-NAMESPACE-DEEP.md` ·
-`CONFIG-NS` = `recon/CONFIG-NAMESPACE.md` · `CLAIM-AUDIT` =
-`audit/CLAIM-AUDIT-2026-10-09.md` · `AWS-GATEWAYS` = `recon/AWS-GATEWAYS.md` ·
-`POSTURE-0721` = `../medtronic-carelink-2026-07-21/11-public-security-posture.md`
-· `HURL-05` = `regression/hurl/05-public-config.check.sh` (repo root).
+**INFERRED** = reasoned, not seen. Citations are `[source: findings-log/<file>
+§n]`; inside tables the bare filename is the same file, rooted at
+`findings-log/probe-2026-10-08/` unless marked: `SECURITY-FINDINGS` ·
+`CROSS-REGION` · `AUTH-TENANT` · `PUBLIC-CONFIG` · `CONFIG-NS` = `recon/CONFIG-NAMESPACE.md`
+· `CONFIG-DEEP` = `recon/CONFIG-NAMESPACE-DEEP.md` · `ARCHIVE-URLS` = `recon/ARCHIVE-URLS.md`
+· `COMMONCRAWL` = `recon/cc/COMMONCRAWL-URLS.md` · `HCP-SCHEMA` = `recon/HCP-CONFIG-SCHEMA.md`
+· `RECON-SUBDOMAINS` = `recon/RECON-SUBDOMAINS.md` · `AWS-GATEWAYS` = `recon/AWS-GATEWAYS.md`
+· `CLAIM-AUDIT` = `audit/CLAIM-AUDIT-2026-10-09.md` · `POSTURE-0721` =
+`../medtronic-carelink-2026-07-21/11-public-security-posture.md` · `HURL-05` =
+`regression/hurl/05-public-config.check.sh` (repo root).
 
 ## Bottom line
 
@@ -71,14 +67,14 @@ records *that* they are exposed and *where*, never the values
 **Why it ranks first.** Same defect class as F2, worse in two ways: it is **on
 the patient host**, unauthenticated, for any internet client; and **EU ships an
 obviously-fake placeholder while US and trials ship working-looking secrets**, so
-the EU value has passed internal review as fake and nobody noticed the other two
-[source: CROSS-REGION]. Whether either key is live is **Unknown — not tested,
-deliberately**: testing requires an authenticated call to a production
+the EU value has passed internal review as fake and nobody noticed the other
+two [source: CROSS-REGION]. Whether either key is live is **Unknown — not
+tested, deliberately**: testing requires an authenticated call to a production
 medical-data service, outside a read-only pass [source: CROSS-REGION]. A
 known-dead key (F2) is a smaller problem than an untested one. Do **not**
 conflate three separate values: the EU placeholder here, the bundle key in F2,
-and the inert placeholder in the HCP-side `pow.nutrino.cc.*.service.config`,
-which is "the inert placeholder … *not* the live bundle credential" [source:
+and the inert HCP-side placeholder in `pow.nutrino.cc.*.service.config`, which
+is "the inert placeholder … *not* the live bundle credential" [source:
 HCP-SCHEMA §6.4; PUBLIC-CONFIG §Config-integrity notes].
 
 ## F2 — Hardcoded `x-api-key` in the public bundle, on two hosts
@@ -111,7 +107,7 @@ Correction preserved: S3 was first recorded as one host's property and was
 no `x-content-type-options`, no `referrer-policy`, no `permissions-policy`
 [source: SECURITY-FINDINGS S1]. **Impact:** the portal is framable
 (clickjacking), MIME-sniffable, and any successful content injection would run
-unrestricted. Unambiguously missing, on the highest-value host — and
+unrestricted — unambiguously missing, on the highest-value host, and
 `status.minimed.com` proves the vendor does this properly elsewhere. Severity
 low-moderate.
 
@@ -132,8 +128,8 @@ was fetched live) [source: ARCHIVE-URLS §7]:
   — `sessionData` is an **encrypted** JWE, so the payload is not readable, but
   the `sessionID` is a live-looking UUID in a public URL. 401 captures,
   2021-09-17 → 2025-12-09.
-- `mdtlogin-ocl.medtronic.com/mmcl/…/authorize/login?…&sessionID=<uuid>&sessionData=<JWS>…`
-  — `sessionData` is an HS256 JWS whose payload is **plaintext base64url** and
+- `mdtlogin-ocl.medtronic.com/mmcl/…/authorize/login?…&sessionData=<JWS>…` —
+  `sessionData` is an HS256 JWS whose payload is **plaintext base64url** and
   decodes to the whole authorization request (`sessionID`, `exp`,
   `current_username`, `client_name`, `scope_verified`, `client_id`,
   `redirect_uri`, `id_token_hint`, `nonce`, `acr_values`). 2 captures,
@@ -162,8 +158,7 @@ infrastructure names — `grafana.<internal>.minimed.com`,
 dev/stage/test names [source: SECURITY-FINDINGS S5]. Names are redacted to
 `<service>.<internal>` per README rule 2; the finding — that a vendor's CT logs
 leak internal infrastructure names — survives the redaction, the names do not.
-
-**Impact.** Every one returns `HTTP 000` from a public network — the correct
+**Impact:** every one returns `HTTP 000` from a public network — the correct
 posture; zero of 260 focus names resolved to an RFC1918/CGNAT address [source:
 SECURITY-FINDINGS S5; RECON-SUBDOMAINS §8]. The exposure is informational: the
 names are permanent public information, a free target list. ⚠ Standing caveat:
@@ -276,23 +271,21 @@ ARCHIVE-URLS §8; CLAIM-AUDIT]:
 | Common Crawl coverage of the API surface | zero captures — a clean negative, not a gap in the sweep [COMMONCRAWL §1] |
 | Cardiac CareLink CVE cluster (CVE-2025-12994/995/996/977, ICSMA-25-205-01) | **not applicable** — Medtronic's own bulletin states it does not affect diabetes CareLink Personal; do not cite as a vulnerability of this surface [POSTURE-0721 R8] |
 
-## The one thing that could not be tested
+## Untested, and the client side
 
-Whether any host would accept a token minted by one of the **shadow** Auth0
-tenants. Separate issuers plus completely disjoint JWKS kids across all four
-tenants say it should not — so the exposure, if any, is a verifier bug (accepting
-an arbitrary `kid` and skipping issuer/audience checks), not a key leak
-[source: SECURITY-FINDINGS closing; AUTH-TENANT §8]. The archive adds eight more
-named non-prod shadow login hosts whose JWKS kids remain unknown — **12
-candidate hostnames, 4 with known key material** [source: COMMONCRAWL §4e].
-Blocked on a token; not attempted.
+**Untested:** whether any host would accept a token minted by one of the
+**shadow** Auth0 tenants. Separate issuers plus completely disjoint JWKS kids
+across all four tenants say it should not — so the exposure, if any, is a
+verifier bug (accepting an arbitrary `kid` and skipping issuer/audience checks),
+not a key leak [source: SECURITY-FINDINGS closing; AUTH-TENANT §8]. The archive
+adds eight more named non-prod shadow login hosts whose JWKS kids remain
+unknown — **12 candidate hostnames, 4 with known key material** [source:
+COMMONCRAWL §4e]. Blocked on a token; not attempted.
 
-## The client side (this project's own bridge)
-
-The research's client is not part of the vendor surface, but its posture belongs
-in the picture and was reviewed 2026-07-21 [source: POSTURE-0721]: plaintext
-`logindata.json` holding full OAuth tokens (R1), `.env` carrying both the
-CareLink password and the Nightscout `API_SECRET` (R2), verbose-mode logging of
-full CGM upload bodies to journald (R9), and no signed tags or SLSA provenance
-(R6). All are fork-side hardening items, not vendor findings — recorded here so
-the two sides are never conflated in a report.
+**The client side** is not part of the vendor surface but belongs in the
+picture, reviewed 2026-07-21 [source: POSTURE-0721]: plaintext `logindata.json`
+holding full OAuth tokens (R1), `.env` carrying both the CareLink password and
+the Nightscout `API_SECRET` (R2), verbose-mode logging of full CGM upload bodies
+to journald (R9), and no signed tags or SLSA provenance (R6). All are fork-side
+hardening items, not vendor findings — recorded so the two sides are never
+conflated in a report.
