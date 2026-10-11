@@ -1,5 +1,5 @@
 name: stale-claim-reaper
-description: Nudge claimed research areas that have gone quiet. Never closes an issue, never edits one. Zero vendor requests.
+description: Nudge claimed research areas that have gone quiet, and clear the flag when they come back. Never closes an issue, never edits a body. Zero vendor requests.
 on:
   schedule:
     - cron: '7 7 * * *'    # daily 07:07 UTC — daily is safe: the job itself
@@ -51,5 +51,11 @@ jobs:
           stops the next nudge. State lives in the issue, not in someone's head.
           EOF
           )"
+              elif [ "$age_days" -lt 14 ]; then
+                # Claim is active again — clear a stale flag a prior run left.
+                has_stale=$(echo "$row" | base64 -d | jq -r '.labels | map(.name) | index("stale-claim") // empty')
+                if [ -n "$has_stale" ]; then
+                  gh issue edit "$n" --repo "$GITHUB_REPOSITORY" --remove-label stale-claim
+                fi
               fi
             done

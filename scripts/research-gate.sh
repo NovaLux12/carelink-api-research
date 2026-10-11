@@ -16,16 +16,24 @@
 #   3. no machine-specific paths
 #   4. no live session values from archive captures
 #   5. every [source: …] citation resolves to a real file
-#   6. the vendor assertion suite still exits 0
+#   6. the 05-public-config vendor suite still exits 0 (PR gate runs 05 only
+#      by design; the full five-suite probe is the weekly drift sweep)
 #   7. every hand-maintained number matches its recomputed value
-#      (counting rule is the header of scripts/research-checks.py)
+#      (counting rule is the header of scripts/research-checks.py; the
+#      counts-branch comparison is warning-only so pin-adding PRs don't deadlock)
 #   8. every dated findings-log pass carries its accounting, and no raw
 #      archive capture is committed
 #   9. no findings-log closure leaves docs/11 listing the area as open
+#  10. the loop report contract agrees across prompts and shell (parity check)
+#  11. findings-log/ stays append-only: no deletions, no rewrites without a
+#      dated Correction section
 #
 # The CI suite is 05-public-config.check.sh — the one suite whose checks run
-# on every PR. regression/hurl/run.sh runs all five; it is what the weekly
-# drift sweep re-probes (scripts/…, .github/workflows/drift-sweep.yml).
+# on every PR, by design: cheap, no vendor storm per PR. regression/hurl/run.sh
+# runs all five; it is what the weekly drift sweep re-probes
+# (scripts/…, .github/workflows/drift-sweep.yml). The full suite on every PR
+# would be ~62 vendor requests per push; the drift sweep is where drift is
+# caught.
 #
 # Deliberately NOT enforced: whether a claim is TRUE. That needs a human or a
 # second pass. This gate stops the irreversible mistakes, not the subtle ones.
@@ -58,7 +66,15 @@ note() { printf '  %-4s %s\n' "$1" "$2"; }
 
 if [ "$SUITE_ONLY" -eq 0 ]; then
   echo "--- leak scan (mode: $MODE) ---"
-  BASE=$(git rev-parse --verify origin/main 2>/dev/null || echo HEAD)
+  # Fail closed: if origin/main is unavailable (fork PR, shallow clone), scan
+  # everything rather than scanning nothing and passing.
+  if BASE=$(git rev-parse --verify origin/main 2>/dev/null); then
+    :
+  else
+    echo "  .. origin/main unavailable — falling back to --all (fail closed)"
+    MODE="all"
+    BASE=HEAD
+  fi
 
   case "$MODE" in
     all)

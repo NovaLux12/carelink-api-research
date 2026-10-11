@@ -396,7 +396,9 @@ needs a human or a second pass. **[OBSERVED]** — `CONTRIBUTING-research.md`
 > [!CAUTION]
 > **Never commit a credential.** Record *that* one is published and *where* — never
 > the value. A vendor `x-api-key` and a reCAPTCHA site key are known-published and
-> are redacted throughout, findings left intact.
+> are redacted throughout, findings left intact. A **live** secret is not a
+> finding — report it privately per [`SECURITY.md`](SECURITY.md), never through
+> a public issue.
 
 > [!WARNING]
 > **`*.carelink.eu`, `*.carelink.com`, `*.clcloud.eu` are wildcard DNS on a parking
@@ -423,7 +425,7 @@ Full list: [`AGENTS.md`](AGENTS.md) §7.
 | **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps, the loop prompts. |
 | **[`AGENTS.md`](AGENTS.md)** | The operating rules — evidence classes, the scrub list, the four ways this project has been wrong, what automation may do. |
 | **[`scripts/research-gate.sh`](scripts/research-gate.sh)** | The gate. CI runs the identical script on every PR. |
-| **[`.github/`](.github/)** | 4 issue forms, a PR template, 6 agent prompts, and 3 scheduled workflows (drift sweep, priorities alarm, stale-claim reaper). |
+| **[`.github/`](.github/)** | 4 issue forms, a PR template, 6 agent prompts, 1 PR gate plus 3 scheduled workflows (research-gate; drift sweep, priorities alarm, stale-claim reaper). |
 
 ---
 

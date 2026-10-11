@@ -307,7 +307,9 @@ landing on alphabetical neighbours).
 
 ## How to claim one
 
-1. Open an issue using the **New research area** form, title `research: <area>`.
+1. Open an issue using the **Claim a research area** form (labels
+   `research-area,claimed`). State the area letter and title from this page —
+   if it is not on this page, it is not claimable here.
 2. Say what you will probe, the request cap, and what "closed" means for that area.
 3. When you have a result — positive **or negative** — open a PR with the finding
    and, if it pins something that must not rot, a regression entry.

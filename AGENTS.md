@@ -100,13 +100,17 @@ A PR is mergeable when **all** of these hold:
 **Run the gate before pushing:**
 
 ```bash
-cd regression/hurl && ./run.sh          # exit 0 = no drift
-grep -rIE '<forbidden string>' .        # must be zero — see §7
+./scripts/research-gate.sh        # must exit 0 — CI runs the same script
 ```
+
+The PR gate runs the 05-public-config suite plus all static checks (leak
+scan, citations, numbers, hygiene, parity, append-only). The full five-suite
+probe runs in the weekly drift sweep, not on every PR — ~62 vendor requests
+per push would be a storm, not a gate.
 
 ---
 
-## 6. The four ways this project has been wrong
+## 6. The seven ways this project has been wrong
 
 Reviewers: check for these. They are the recurring failure modes here, and each
 produced a real correction.
@@ -123,6 +127,15 @@ produced a real correction.
    went to the wrong repo, exited 0, and the read-back from the correct repo looked
    like "it didn't apply". → *Verify the target you wrote to, and name both repos
    in the command.*
+5. **Derived prose that contradicted its own source table**, then propagated
+   faithfully into five pages — including one claiming MG_DL vs MMOL_L
+   mis-scales glucose in the wrong countries. → *Re-derive prose from the table,
+   never from another prose summary.*
+6. **A citation pointing at a file that doesn't exist.** → *The gate fails any
+   `[source: findings-log/…]` path that does not resolve; never cite from memory.*
+7. **A count generalised from a subset** (44 published as 93), with no counting
+   rule recorded. → *The counting rule lives in `scripts/measure_assertions.py`;
+   prose states the measured static count, nothing else.*
 
 ---
 
@@ -145,7 +158,10 @@ produced a real correction.
 > `index.commoncrawl.org` is unreachable from some hosts (TLS `unexpected eof`).
 > Use the `cluster.idx` bulk path instead.
 
-Scrub list — grep for these and the count must be **zero** in any diff:
+Scrub list — grep for these and the count must be **zero** in any diff.
+Keep each entry on ONE line: the gate scans per line, and the placeholders
+(`<...>` — never a literal) are what keep this block itself from matching.
+A wrapped entry reads differently to the scanner than the same text unwrapped.
 
 ```
 <VENDOR-API-KEY>          # known-published, redacted on purpose
@@ -153,7 +169,7 @@ Scrub list — grep for these and the count must be **zero** in any diff:
 grafana.<internal>        k8s.<internal>      gitlab.<internal>
 db.<internal>            prometheus.<internal>
 *.corp hostnames
-/home/<user>              /home/jack
+/home/<user>              /home/<your-username>
 jsessionid_               sessionData
 ```
 
@@ -211,8 +227,8 @@ Scheduled and CI jobs are guests here. They exist to **notice** drift, never to
 
 | A scheduled/CI job MAY | A scheduled/CI job MAY NEVER |
 |---|---|
-| Run `regression/hurl/` exactly as the PR gate runs it — same suites, same runner, same pinned hurl version. Budget: ~62 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
-| Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
+| Run the pinned suite exactly as the PR gate runs it where applicable — the drift sweep runs all five suites with the same pinned hurl version (8.0.1); the PR gate runs 05 plus static checks. Budget: ~62 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
+| Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`, `correction`, `finding`, `research-area`, `claimed`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
 | Read anything; run any read-only local check (grep, python, the assertion inventory). | POST, authenticate, or exchange a token against any vendor host. The single standing exception is the two POSTs already pinned and documented in `04-deep-surface.hurl` — public client_ids, rejected 403 server-side, asserted as failures. No automation may extend that exception; no third POST may be added. |
 | Probe only patterns already in `regression/hurl/`. A new host, path, or candidate list enters a workflow **only** after a human added it to the suite (§8: bounded, justified lists). | Close an issue, or edit an issue's body. A stale claim gets a comment and a `stale-claim` label; the claimant closes it. |
 | Generate vendor traffic only by re-running the existing suites. No new targets, ever. | Delete or rewrite anything in `findings-log/`. Append-only is deliberate (§3) — the retraction history *is* the evidence. |
@@ -221,6 +237,17 @@ Scheduled and CI jobs are guests here. They exist to **notice** drift, never to
 Every automated issue and comment carries the `automation` label so bot output
 filters to one click. An automated issue that fails a scrub check (§7) is
 dropped unsent — the sweep would rather stay silent than leak.
+
+**Branch protection (required settings, `main`).** The human-merge rule above
+is convention until GitHub enforces it. Required state:
+
+- Require status check `research-gate` to pass before merging.
+- Require pull request review (≥1 approver); dismiss stale reviews on push.
+- Restrict pushes to `main` — no direct pushes, no force-pushes. The only
+  writer outside PRs is `github-actions[bot]` on the `counts` branch.
+- No automation may hold write access to `main`.
+
+Verify with: `gh api repos/{owner}/{repo}/branches/main/protection --jq .`
 
 Rationale: the gate stops the irreversible mistakes and review catches the
 subtle ones (`CONTRIBUTING-research.md` §What the gate checks). Automation

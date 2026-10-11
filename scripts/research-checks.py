@@ -31,13 +31,22 @@ What it enforces:
      prose must state; runtime is stated in the README and checked when the
      suite log is available. Values the assertion suite itself protects (69
      keys, 16 families, 29 countries) are deliberately NOT re-checked here —
-     they are pinned by assertion, per AGENTS.md section 3.
+     they are pinned by assertion, per AGENTS.md section 3. The counts-branch
+     comparison is warning-only: a PR that adds pins legitimately moves the
+     count before the next sweep republishes it.
   2. FINDINGS-LOG HYGIENE — every dated log dir carries its accounting
      (requests/cap/delay/method), its machine log is no longer than the
      accounting claims, and no raw archive capture is committed.
   3. PRIORITIES SYNC — no findings-log doc may declare an area closed while
      docs/11 still lists it open. This is the check whose first failure is
      the repo's own Area C desync (2026-10-11).
+  4. PROMPT PARITY — every .github/prompts/*.md cites AGENTS.md, and the
+     loop report contract (ITERATION / REQUESTS_USED / AREAS_OPEN / STOP /
+     NOTES) agrees across loop-close-areas.prompt.md, research-loop.sh, and
+     CONTRIBUTING Prompt B. Interface-based, not verbatim: prompts for
+     different tasks carry different rules by design.
+  5. APPEND-ONLY — findings-log/ deletions fail; modifications without a
+     dated `## Correction (YYYY-MM-DD)` section fail. Additions are free.
 
 Deliberately NOT enforced: whether a claim is true. That is the human's, or a
 second pass'. (scripts/research-gate.sh header.)
@@ -68,6 +77,10 @@ def fail(msg):
 
 def ok(msg):
     print(f'  ok {msg}')
+
+
+def warn(msg):
+    print(f'  warn {msg}')
 
 
 def read(path):
@@ -164,6 +177,9 @@ def check_numbers(suite_log):
     ok(f'{areas} open areas listed in docs/11; config.yml agrees')
 
     # The sweep's own data file, when the counts branch exists.
+    # Warning-only, not a failure: any PR that adds a pin legitimately moves
+    # the count before the next Monday sweep republishes counts.json. Failing
+    # here would deadlock every assertion-adding PR until the sweep runs.
     try:
         raw = subprocess.run(['git', 'show', 'counts:counts.json'],
                              capture_output=True, text=True, timeout=10)
@@ -171,8 +187,9 @@ def check_numbers(suite_log):
             data = json.loads(raw.stdout)['assertions']
             for key, measured in (('static', static), ('runtime', runtime)):
                 if data.get(key) != measured:
-                    fail(f'counts:counts.json states {key}={data.get(key)}, measured {measured}')
-            ok('counts:counts.json agrees with the measurement')
+                    warn(f'counts:counts.json states {key}={data.get(key)}, measured {measured} '
+                         f'— expected if this PR adds pins; the sweep republishes Monday')
+            ok('counts:counts.json checked (warning-only)')
     except Exception:
         pass  # pre-first-sweep state: the branch does not exist yet
 
@@ -247,6 +264,95 @@ def check_priorities_sync():
         ok('no findings-log closure contradicts docs/11')
 
 
+def check_prompt_parity():
+    """The session rules live in several places; the wiring between them must
+    not silently drift. This check is interface-based, not verbatim: prompts
+    for different tasks (verify, drift, regenerate, submit) carry different
+    rules by design, so demanding identical invariants in each would either
+    fail or bloat every prompt with rules that don't apply to it.
+
+    What is enforced:
+    1. Every .github/prompts/*.md cites AGENTS.md (the canonical rules) —
+       no prompt may send an agent probing without the house rules.
+    2. The loop contract agrees: loop-close-areas.prompt.md and
+       research-loop.sh build_prompt() must carry the same Loop report keys
+       (ITERATION / REQUESTS_USED / AREAS_OPEN / STOP / NOTES) — the shell
+       parses those keys out of the report, so a renamed key silently breaks
+       budget accounting. CONTRIBUTING Prompt B's report block is held to the
+       same keys.
+    """
+    print('--- prompt parity ---')
+    report_keys = ['ITERATION:', 'REQUESTS_USED:', 'AREAS_OPEN:', 'STOP:', 'NOTES:']
+    loop_parties = ['.github/prompts/loop-close-areas.prompt.md',
+                    'scripts/research-loop.sh']
+    for src in sorted(glob.glob('.github/prompts/*.md')):
+        text = read(src)
+        if 'AGENTS.md' not in text:
+            fail(f'{src}: does not cite AGENTS.md — every prompt must point at the house rules')
+    for src in loop_parties:
+        if not os.path.exists(src):
+            fail(f'{src}: loop contract party missing')
+            continue
+        text = read(src)
+        for key in report_keys:
+            if key not in text:
+                fail(f'{src}: Loop report contract missing {key!r} — '
+                     f'the shell parses these keys (research-loop.sh)')
+    # CONTRIBUTING Prompt B carries the same report block; check its keys too.
+    contrib = read('CONTRIBUTING-research.md')
+    idx = contrib.find('### Prompt B')
+    if idx >= 0:
+        nxt = contrib.find('### Prompt C', idx)
+        block = contrib[idx:nxt if nxt >= 0 else len(contrib)]
+        for key in report_keys:
+            if key not in block:
+                fail(f'CONTRIBUTING-research.md Prompt B: report block missing {key!r} — '
+                     f'must match research-loop.sh')
+    else:
+        fail('CONTRIBUTING-research.md: ### Prompt B missing — the loop prompt has no canonical source')
+    ok('prompt wiring agrees (AGENTS cites + loop report contract)')
+
+
+def check_append_only():
+    """findings-log/ is append-only: additions free, deletions forbidden,
+    modifications require a Correction section. AGENTS.md §3 allows appending
+    a `## Correction (YYYY-MM-DD)` section inside an existing doc; anything
+    else rewritten in place destroys the audit trail.
+    """
+    print('--- findings-log append-only ---')
+    try:
+        base = subprocess.run(['git', 'rev-parse', '--verify', 'origin/main'],
+                              capture_output=True, text=True, timeout=10)
+        if base.returncode != 0:
+            ok('no origin/main — append-only check skipped (fail-closed gate scans --all)')
+            return
+        diff = subprocess.run(['git', 'diff', '--name-status', 'origin/main...HEAD',
+                               '--', 'findings-log/'],
+                              capture_output=True, text=True, timeout=10)
+        if diff.returncode != 0 or not diff.stdout.strip():
+            ok('no findings-log changes in this diff')
+            return
+        violations = 0
+        for line in diff.stdout.splitlines():
+            parts = line.split('\t', 1)
+            if len(parts) != 2:
+                continue
+            status, path = parts
+            if status.startswith('D'):
+                fail(f'{path}: deleted — findings-log/ is append-only (AGENTS.md §3)')
+                violations += 1
+            elif status.startswith('M'):
+                text = read(path) if os.path.exists(path) else ''
+                if not re.search(r'^## Correction \(\d{4}-\d{2}-\d{2}\)', text, re.M):
+                    fail(f'{path}: modified without a `## Correction (YYYY-MM-DD)` '
+                         f'section — append a correction, do not rewrite in place')
+                    violations += 1
+        if not violations:
+            ok('findings-log changes are append-only (additions + dated corrections)')
+    except Exception as e:
+        warn(f'append-only check skipped: {e}')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--suite-log', default=None,
@@ -256,12 +362,14 @@ def main():
     check_numbers(args.suite_log)
     check_log_hygiene()
     check_priorities_sync()
+    check_prompt_parity()
+    check_append_only()
 
     print()
     if FAILED:
         print('CHECKS FAIL — see above. The counting rule is in this file\'s header.')
         return 1
-    print('CHECKS PASS — numbers, log hygiene, and priorities all agree.')
+    print('CHECKS PASS — numbers, log hygiene, priorities, prompts, and append-only all agree.')
     return 0
 
 

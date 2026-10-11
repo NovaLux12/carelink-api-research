@@ -7,9 +7,10 @@ body:
       value: |
         ## Corrections are first-class contributions here.
 
-        This project has published four distinct wrong claims and kept every one of
-        them in `findings-log/` with the correction attached. Naming the fifth is
-        a good day, not an embarrassing one.
+        This project has been wrong fourteen times on the record — seven while
+        writing, seven more found by an independent audit — and kept every one
+        of them in `findings-log/` with the correction attached. Naming the
+        fifteenth is a good day, not an embarrassing one.
 
         Please point at the exact line you believe is wrong.
 
@@ -40,6 +41,9 @@ body:
         - A grep or check that hit without proving
         - A comparison over a lookup that returned null
         - A verification that read back the wrong target
+        - Derived prose contradicted its own source table
+        - Citation pointed at a file that doesn't exist
+        - Count generalised from a subset
         - Source superseded by a newer source
         - Something else
     validations:

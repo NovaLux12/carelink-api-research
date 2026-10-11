@@ -14,6 +14,7 @@ permissions:
 
 concurrency:
   group: drift-sweep  # a manual dispatch during a scheduled run must not double-probe
+  cancel-in-progress: true
 
 jobs:
   sweep:
@@ -24,12 +25,16 @@ jobs:
       - name: Install hurl (same pin as the PR gate — research-gate.yml)
         run: |
           curl -sSL -o /tmp/hurl.tar.gz \
-            https://github.com/Orange-OpenSource/hurl/releases/download/7.0.0/hurl-7.0.0-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf /tmp/hurl.tar.gz -C /usr/local/bin hurl
+            https://github.com/Orange-OpenSource/hurl/releases/download/8.0.1/hurl-8.0.1-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf /tmp/hurl.tar.gz -C /tmp
+          SRC="/tmp/hurl-8.0.1-x86_64-unknown-linux-gnu"
+          [ -d "$SRC/bin" ] && SRC="$SRC/bin"
+          sudo install -m755 "$SRC/hurl" /usr/local/bin/hurl
           hurl --version
 
-      # ---- the probe. Identical suites, identical runner, identical hurl pin
-      # ---- as CI on PRs. No new targets, no new discipline: ~62 requests
+      # ---- the probe. Full five-suite sweep — the PR gate runs 05 only
+      # ---- (cheap, no vendor storm per PR); this is the one place all five
+      # ---- run together. No new targets, no new discipline: ~62 requests
       # ---- (56 hurl + ~6 in 05), GET+OPTIONS only except the two POSTs
       # ---- already pinned and documented in 04-deep-surface.hurl, >=2s
       # ---- between requests to the same host, no credentials of any kind.
@@ -78,7 +83,7 @@ jobs:
           {
             echo "The weekly drift sweep re-ran \`regression/hurl/run.sh\` on \`main\` and it went red twice in a row."
             echo
-            echo "**Probe provenance (identical to the PR gate):** ~62 requests across 7 hosts;"
+            echo "**Probe provenance (full five-suite sweep — the PR gate runs 05 only):** ~62 requests across 7 hosts;"
             echo "GET + OPTIONS only, except the two POSTs already pinned and documented in"
             echo "\`04-deep-surface.hurl\` (public client_ids, rejected 403 server-side);"
             echo ">=2s between requests to the same host; no credentials, no cookies, no token exchange."
@@ -124,11 +129,12 @@ jobs:
               --label correction,drift,automation --body-file .drift/issue.md
           fi
 
-      # ---- Success path: the auto-verification hook. Only runs when the suite
-      # ---- is green, and generates no vendor requests — it reads the run that
-      # ---- already happened.
+      # ---- Success path: the auto-verification hook. Only runs when the
+      # ---- FIRST sweep run is green — a red-then-green flake stays silent.
+      # ---- Generates no vendor requests — it reads the run that already
+      # ---- happened.
       - name: Verify findings whose assertions passed
-        if: steps.second.outputs.verdict == 'green' || steps.first.outputs.verdict == 'green'
+        if: steps.first.outputs.verdict == 'green'
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         run: python3 scripts/verify-findings.py --suite-green
 
@@ -158,7 +164,8 @@ jobs:
           cat counts.json
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch --force-create counts
+          git fetch origin counts:refs/remotes/origin/counts || true
+          git switch counts 2>/dev/null || git switch --force-create counts origin/counts 2>/dev/null || git switch --force-create counts
           git add counts.json
           git commit -m "counts: sweep $(date -u +%Y-%m-%d)" >/dev/null || { echo "no change"; exit 0; }
-          git push --force origin counts
+          git push --force-with-lease origin counts

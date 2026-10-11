@@ -12,7 +12,7 @@ Every claim has an evidence class and a source cite:
 
 ## Requests used
 
-- [ ] GET only — no POST, no token exchange, no authentication attempted
+- [ ] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted
 - [ ] Slept ≥2s between requests to the same host
 - [ ] Stated cap respected: ____ requests of a ____ cap
 
@@ -22,20 +22,20 @@ Every claim has an evidence class and a source cite:
 - [ ] Any internal hostname redacted to `<service>.<internal>`
 - [ ] Corrections and retractions in the sources are preserved, not smoothed over
 - [ ] Any claim the regression suite pins has been updated in this PR, and
-      `regression/hurl/run.sh` still exits 0
+      `./scripts/research-gate.sh` still exits 0 (PR gate = 05-public-config
+      suite + static checks; the full five-suite probe runs in the weekly
+      drift sweep)
 
 ## Gate
 
 ```bash
-cd regression/hurl && ./run.sh        # exit 0 = no drift
-grep -rIE '<forbidden string>' .      # zero
+./scripts/research-gate.sh        # must exit 0 — CI runs the same script
 ```
 
-Paste the exit codes here:
+Paste the exit code here:
 
 ```
-run.sh exit: __
-scrub hits: __
+research-gate.sh exit: __
 ```
 
 ## If this changes what a newcomer needs to know first

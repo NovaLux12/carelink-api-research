@@ -168,7 +168,7 @@ Then:
 
 ## Loop report
 ITERATION: $iter
-REQUESTS_USED: <cumulative requests you made this run>
+REQUESTS_USED: <requests you made this iteration, not the running total>
 AREAS_OPEN: <number of \`- [ ]\` lines left in $WORKLIST>
 STOP: no-unclaimed-areas | budget-exhausted | needs-human | none
 NOTES: <one line>

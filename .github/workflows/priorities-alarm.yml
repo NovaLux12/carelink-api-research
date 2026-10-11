@@ -32,7 +32,7 @@ jobs:
           echo "floor=${{ github.event.inputs.floor || '3' }}" >> "$GITHUB_OUTPUT"
 
       - name: File the alarm (once)
-        if: steps.count.outputs.n < steps.count.outputs.floor
+        if: ${{ fromJSON(steps.count.outputs.n) < fromJSON(steps.count.outputs.floor) }}
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         run: |
           gh label create automation    --description "Opened by a scheduled workflow, not a human" --color ededed --force

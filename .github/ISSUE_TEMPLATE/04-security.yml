@@ -7,6 +7,10 @@ body:
       value: |
         ## For security findings, describe the exposure — never the secret.
 
+        **If the secret is live (not already published by the vendor), stop
+        here and report privately per `SECURITY.md` — do not file this form.**
+        This form is for already-published exposures only.
+
         This is a defensive research artefact. Report **that** a credential is
         published and **where**, plus the impact. Do not paste the credential, the
         session value, or a ready-to-run reproduction.

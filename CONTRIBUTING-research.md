@@ -102,9 +102,12 @@ to `regression/hurl/`. Unpinned claims have quietly gone stale here repeatedly.
 ```
 
 **Do not open a PR until this exits 0.** It scans the diff for credentials and
-internal hostnames, validates every citation path, and re-runs the vendor
-assertion suite. CI runs the identical script, so a red gate blocks the merge
-regardless. If it fails, fix it — don't work around it.
+internal hostnames, validates every citation path, checks numbers / hygiene /
+priorities / prompt parity / append-only, and re-runs the 05-public-config
+vendor suite (the PR gate runs 05 only by design — cheap, no vendor storm per
+PR; the full five-suite probe runs in the weekly drift sweep). CI runs the
+identical script, so a red gate blocks the merge regardless. If it fails, fix
+it — don't work around it.
 
 ### 6. Open the PR
 
@@ -534,7 +537,7 @@ re-deriving anything:
 | Could it be wrong, and how would I know? | stated limits, plus the control that bounds it |
 
 A missing one means it isn't ready. This bar exists because the repo published
-five wrong claims before an audit caught them — including a glucose-unit claim
+fourteen wrong claims before audits caught them — including a glucose-unit claim
 that named the wrong countries.
 
 ---
@@ -548,7 +551,12 @@ that named the wrong countries.
 | machine paths | absolute home directories and Windows user profiles |
 | live session values | `jsessionid_*`, `sessionData` JWS/JWE from archive captures |
 | citation integrity | any `[source: …]` path that does not resolve |
-| assertion suite | re-runs `regression/hurl/` — a failure means the vendor surface moved |
+| assertion suite (05 on PRs) | re-runs `05-public-config.check.sh` — a failure means the pinned config drifted; the full five-suite probe runs in the weekly drift sweep |
+| numbers | every prose count matches `scripts/measure_assertions.py`; the counts-branch comparison is warning-only so pin-adding PRs don't deadlock |
+| findings-log hygiene | missing accounting, oversized or banned captures |
+| priorities sync | a log declaring an area closed while docs/11 still lists it open |
+| prompt parity | one of the three prompt sources dropping a load-bearing rule |
+| append-only | a findings-log deletion, or a rewrite without a dated Correction section |
 
 It deliberately does **not** check whether a claim is true. That needs a human
 or a second pass. The gate stops the irreversible mistakes; review catches the

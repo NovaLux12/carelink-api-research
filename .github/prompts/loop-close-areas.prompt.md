@@ -33,7 +33,7 @@ own ordering; token-gated areas are at the bottom and are not yours to start.
 
    ## Loop report
    ITERATION: <n>
-   REQUESTS_USED: <cumulative requests this run>
+   REQUESTS_USED: <requests you made this iteration, not the running total>
    AREAS_OPEN: <count of - [ ] lines still in the worklist>
    STOP: no-unclaimed-areas | budget-exhausted | needs-human | none
    NOTES: <one line>

@@ -6,9 +6,10 @@
 #   ./run.sh 01-discovery    # run one suite
 #
 # Deliberately low-rate and read-only: discovery / SSO config / OIDC / patient
-# API are all public or unauthenticated. --delay spaces requests by 1.2s so we
-# never look like a scanner. No credentials are used and nothing is written to
-# Medtronic.
+# API are all public or unauthenticated. --delay spaces requests by 2s so we
+# never look like a scanner (AGENTS.md section 8: >=2s between requests to
+# the same host is the floor). No credentials are used and nothing is written
+# to Medtronic.
 #
 # Exit 0 = all assertions held (endpoint surface unchanged).
 # Exit 1 = something drifted. Diff against the notes in this directory.
@@ -17,9 +18,9 @@ set -uo pipefail
 cd "$(dirname "$0")"
 
 # The suite is deliberately low-rate (AGENTS.md section 8: >=2s between
-# requests to the same host is the floor). 1200ms is a courtesy floor for
-# interactive runs; the weekly drift sweep overrides it with 2000.
-DELAY_MS="${DELAY_MS:-1200}"
+# requests to the same host is the floor). 2000ms is the default for every
+# run, interactive or scheduled.
+DELAY_MS="${DELAY_MS:-2000}"
 SUITES=${*:-01-discovery-pin 02-sso-oidc 03-patient-api 04-deep-surface 05-public-config}
 FAILS=0
 
