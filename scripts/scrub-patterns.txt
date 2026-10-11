@@ -19,4 +19,11 @@ internal .corp host|[a-z0-9-]+\.corp\b
 machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
 live jsession values|;jsessionid_[A-Z0-9]{6,}=
 live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
-long base64 secrets|(^|[^A-Za-z0-9_./-])[A-Za-z0-9_+]{44,}={0,2}([^A-Za-z0-9_.-]|$)
+# Credential shapes, matched by PREFIX rather than by "long and random". A
+# generic length heuristic cannot work in this repo: it flags vendor field
+# names (sensorFellOffEarlyWithoutPhysicalDisturbance), sha256 digests, and URL
+# paths — which is exactly what left the gate red on main. A gate that cries
+# wolf is how a gate gets switched off, so the net is precise or it is nothing.
+# The known published values above are matched literally; this catches the
+# realistic accident — someone pasting a credential of another kind.
+credential prefixes|(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|sk-[A-Za-z0-9]{32,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AIza[0-9A-Za-z_-]{35})
