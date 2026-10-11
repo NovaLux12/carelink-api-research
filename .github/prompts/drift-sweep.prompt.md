@@ -35,9 +35,9 @@ docs/09-methodology-and-oracles.md · regression/hurl/ in full, including
    pins, the finding is not finished until the consumer knows.** Label the issue
    `downstream-bridge`, name the pinned constant that moved (discovery
    app-version pin, `BLE_API_VERSIONS`, device family vocabulary, error-class
-   taxonomy), and state that bridge releases are gated on this suite — so it is a
-   release blocker on their side. Do not close a `downstream-bridge` issue until a
-   bridge issue or PR is linked.
+   taxonomy), and say that the bridge runs this suite before a release — so drift
+   here can reach their release checklist. Do not close a `downstream-bridge`
+   issue until a bridge issue or PR is linked.
 
 Stop when every failing assertion is either explained as drift (with evidence)
 or explained as an artefact of the harness (with the control that proves it). Do

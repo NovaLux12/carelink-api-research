@@ -22,10 +22,13 @@ without a login · **INFERRED** = reasoned, not seen.
 >
 > So most of the 16-family vocabulary on this page carries no routing consequence
 > for that client, and a wrong token here is *not* automatically a bridge bug.
-> The consequential ones are `CC880` and the `BLE`/`SIMPLERA` prefixes.
-> Its own `docs/vendor-api/README.md` states the same thing: it matches on model
-> prefix "rather than family token, because the vendor's own published family list
-> does not contain the token their app matches on".
+> The consequential inputs are `CC880`, the `BLE`/`SIMPLERA` prefixes, and the
+> model-prefix list — model prefix is the primary axis, not a afterthought.
+>
+> **Note on that consumer's own docs.** Its `docs/vendor-api/README.md` currently
+> says it matches on model prefix "rather than family token". That is **stale** —
+> it predates the `CC880` family-token match in `src/carelink/client.ts` and
+> contradicts the code. Read the code, not that sentence.
 
 > **Provenance rule.** `recov/PATIENT-APP-VOCABULARY.md` is the **only patient-app-side**
 > artefact in this project. `JS-API-SURFACE.md` and `CHUNK-CORPUS-FINDINGS.md` are

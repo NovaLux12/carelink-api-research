@@ -326,8 +326,8 @@ Projects known to be built on findings here:
 
 | Project | Depends on this for |
 |---|---|
-| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md) carries a dated snapshot of the same surface map and points here as canonical; its [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md) is a short "what you probably want → page here" table with run instructions for the suite below. |
-| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) — releases** | bridge releases are gated on `regression/hurl/run.sh` exiting 0 (`npm run drift:check` on the bridge side). A red sweep here is a red sweep for the bridge. |
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md) carries a dated snapshot of the parts this bridge depends on — and explicitly says it is **not** the estate map, pointing here as canonical; its [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md) is a short "what you probably want → page here" table with run instructions for the suite below. |
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) — releases** | runs `regression/hurl/run.sh` before a release (`npm run drift:check`, which needs this repo cloned alongside it). A red sweep here reaches their release checklist. |
 
 If you maintain a CareLink client and something in it stops working, the first
 check worth making is whether this repo has moved: a route that was live may be

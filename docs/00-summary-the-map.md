@@ -29,8 +29,8 @@ reasoned, not seen.
 
 > **Who builds on this.** [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)
 > consumes this surface — it ships the pinned values recorded here (the discovery
-> pin, the BLE version list, the family vocabulary) to Nightscout, and gates its
-> releases on the regression suites in this repo. Bridge bugs (login, upload,
+> pin, the BLE version list, the family vocabulary) to Nightscout, and runs this
+> repo's regression suites before a release. Bridge bugs (login, upload,
 > crashes) belong in **that** repo; anything about the vendor surface itself —
 > a route moved, a version list changed, a country list grew — belongs here.
 > Bridge-side notes for contributors:
@@ -107,7 +107,7 @@ flowchart LR
 
 **`v12/display/message` is live** and was in no prior note. The downstream fork's
 `BLE_API_VERSIONS = [13, 11, 6, 5]`
-([src/login.ts](https://github.com/NovaLux12/carelink-bridge/blob/main/src/login.ts))
+([src/carelink/client.ts:741](https://github.com/NovaLux12/carelink-bridge/blob/main/src/carelink/client.ts))
 therefore contains a permanently dead `v5` and omits a live `v12` — nothing that
 changes behaviour today (v13 answers first), but the list is inaccurate.
 

@@ -23,7 +23,7 @@
 #
 # Downstream consumer: https://github.com/NovaLux12/carelink-bridge — the bridge runs this suite before a release
 # (`npm run drift:check` on the bridge side). A failure here is a bridge
-# release blocker; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
+# release checklist; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
 
 set -uo pipefail
 cd "$(dirname "$0")/.."

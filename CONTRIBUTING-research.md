@@ -231,10 +231,16 @@ belongs here. If nothing Medtronic does would fix it, it's a client bug — or a
 local one (a Nightscout outage, a bad profile, an expired token), in which case it
 belongs to whoever owns that system, not to this repo either way.
 
+**When it is both, do both.** Some problems are vendor motion *and* a client
+weakness — a new discovery version appearing that the pin silently skips is the
+standard example. File the finding here (that is the vendor half, and only this
+repo can pin it), and open a bridge issue cross-referencing it. Neither repo
+tracking it alone is how it gets lost.
+
 **If it moves a value the bridge pins**, say so explicitly and label the issue
 `downstream-bridge`: name the pinned constant (discovery pin, `BLE_API_VERSIONS`,
 family vocabulary, error taxonomy) and link the bridge issue. The bridge gates its
-releases on this repo's suite, so a drift found here is a bridge release blocker.
+runs this suite before a release, so drift found here can reach their checklist.
 
 ---
 
@@ -472,8 +478,8 @@ docs/09-methodology-and-oracles.md · regression/hurl/ in full, including
    finished until the consumer knows. Label the issue downstream-bridge, name the
    pinned constant that moved (the discovery app-version pin, BLE_API_VERSIONS,
    the device family vocabulary, an error-class taxonomy), and say plainly that
-   bridge releases are gated on this suite — so this is a release blocker on
-   their side, not a footnote. Do not close a downstream-bridge issue until a
+   the bridge runs this suite before a release, so drift here can reach their
+   checklist. Do not close a downstream-bridge issue until a
    bridge issue or PR is linked.
 
 Stop when every failing assertion is explained as drift (with evidence) or as a
