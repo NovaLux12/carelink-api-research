@@ -1,54 +1,51 @@
-# Security policy
+# Security
 
-This repo maps a live vendor surface read-only and unauthenticated. Most
-findings are safe to file publicly. Some are not — and those must **never**
-go through a public issue first.
+This repo holds a **map of Medtronic's public CareLink surface**. It contains no
+credentials, no patient data, and no working client — but research like this
+occasionally turns up an exposure that belongs in Medtronic's hands, and you
+should not have to decide alone whether something is one.
 
-## Report privately when the finding is any of
+## Report an exposure you found
 
-- a credential, key, token, or session value that is **not already published**
-  by the vendor (a live secret, not the known-published bundle key the repo
-  already redacts);
-- an internal hostname, endpoint, or infrastructure detail that is reachable
-  and non-public;
-- a data path that exposes patient or clinician data beyond what the repo
-  already documents as unauthenticated;
-- anything you would not want indexed by a search engine tomorrow.
+Use GitHub's [private vulnerability reporting][pvr] on this repo.
 
-When in doubt, report privately. A private report that turns out to be safe
-for public filing costs one email. A public filing that turns out to be
-sensitive cannot be un-published.
+**Describe it redacted. Never paste the value.** Not in the issue, not in a
+comment, not in a commit — not even a truncated or base64'd one. Say *what kind*
+of secret it is, where you saw it (host, bundle path, document), how long it has
+been there, and what it would grant. The maintainer with access can re-fetch and
+verify; you don't need to hand over the payload to point at it.
 
-## How to report
+This repo's own rules are stricter than that: a published credential, an internal
+hostname, or a machine path is a **scrub gate failure** (see `AGENTS.md`), so a
+report that includes one is also a repo bug worth telling us about.
 
-Email the maintainer privately (see the repo owner's profile for contact).
-Include:
+[pvr]: https://github.com/NovaLux12/carelink-api-research/security/advisories/new
 
-- **what** is exposed, and **by what** endpoint or artefact — no values;
-- the impact: what becomes possible, and whose data is in scope;
-- how you obtained it (must be read-only and unauthenticated — see
-  `AGENTS.md` §8; anything else is out of scope for this repo).
+## What does *not* belong here
 
-**Do not** paste the credential, key, token, session value, or a
-ready-to-run reproduction. A redacted finding is a complete finding
-(`.github/ISSUE_TEMPLATE/04-security.yml` states the same rule for the
-public form).
+- **A vulnerability in client code.** The public client is
+  [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge); report
+  it through its [private advisory channel][adv], not this repo.
+- **A login, upload, or crash failure.** That is a client bug, not a vendor
+  exposure — use its [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
+- **A route that requires authentication.** Not a finding unless you got in without
+  one; if a token is needed, it belongs in the open-questions map as a blocker.
 
-## What happens next
+[adv]: https://github.com/NovaLux12/carelink-bridge/security/advisories/new
 
-- The maintainer confirms receipt, assesses impact, and decides: file a
-  redacted public issue, hold for a disclosure decision (`CONTRIBUTING-research.md`
-  §House rules — one finding in this repo is deliberately unpublished), or
-  notify the vendor.
-- Do not open a public issue, PR, or discussion about the finding until the
-  maintainer says so.
+## Disclosure posture
 
-## Scope
+Medtronic has no published security contact this repo knows of, and no
+`security.txt` on the surface (recorded as finding F10 in
+[`docs/08-security-findings.md`](./docs/08-security-findings.md)). Some findings
+here are held back rather than published immediately — the repo labels each one
+OBSERVED / PUBLISHED / INFERRED, and an INFERRED exposure is a question, not a
+disclosure. If a finding is deliberately held, that decision is the maintainer's,
+and `docs/08` says which.
 
-- **In scope:** this repo's own content and workflows (leaked secrets in
-  `findings-log/`, overly specific error output in drift issues, overly
-  broad probes committed to `regression/hurl/`).
-- **Out of scope:** Medtronic's production systems beyond read-only
-  unauthenticated observation. No POST beyond the two pinned and documented
-  in `04-deep-surface.hurl`, no authentication, no token exchange, no
-  internal hosts — `AGENTS.md` §§8, 11.
+## Scope reminder
+
+All probing here is **unauthenticated and read-only**. Never use a real patient
+account for research without the account owner's explicit involvement, never
+brute-force, never mutate. That is not just taste — it is
+[`AGENTS.md`](./AGENTS.md) §1 and the gate enforces it.

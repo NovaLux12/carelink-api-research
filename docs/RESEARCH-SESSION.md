@@ -16,6 +16,9 @@ to be followed by a person or an agent, working from a link.
   *Run a research session*.
 - **Already have a finding?** [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md)
   → *Submit a finding*.
+- **Found a bridge bug rather than a vendor fact?** That belongs in the client, not
+  here — [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) →
+  [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
 
 ## The one-line version
 

@@ -11,6 +11,12 @@ without a login · **INFERRED** = reasoned, not seen.
 
 ## `/patient/*` — the namespace the bridge uses
 
+> "The bridge" throughout means
+> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), the
+> public client that ships these pinned values to Nightscout. Its
+> [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md)
+> carries a dated snapshot of this page.
+
 Unauthenticated → `401 {"error":{"type":"InvalidToken","group":"AUTH"}}` on every
 data-bearing route [source: findings-log/probe-2026-10-08/PROBE-FINDINGS.md].
 

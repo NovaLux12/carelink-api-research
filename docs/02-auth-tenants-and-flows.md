@@ -1,6 +1,7 @@
 # Auth tenants and flows
 
 The Auth0 tenants on the CareLink estate, the public client the bridge
+([NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge))
 impersonates, PKCE state, and the legacy Layer7 flow that is dead. All of it
 read-only and unauthenticated; reasoning and verbatim bodies are in
 `findings-log/`.

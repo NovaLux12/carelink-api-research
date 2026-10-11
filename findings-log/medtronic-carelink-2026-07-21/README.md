@@ -1,6 +1,6 @@
 # Investigation session index (2026-07-21)
 
-Session: public, no-holds-barred investigation of the Medtronic CareLink consumer surface and how it relates to the local TypeScript bridge at `~/.openclaw/workspace/projects/carelink-bridge` (NovaLux12 community fork of domien-f/carelink-bridge). All public sources; no accounts, credentials, mutations, brute force, vulnerability testing, or patient data accessed.
+Session: public, no-holds-barred investigation of the Medtronic CareLink consumer surface and how it relates to the local TypeScript bridge at `~/.openclaw/workspace/projects/novas-github/carelink-bridge` ([NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), community fork of [domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge)). All public sources; no accounts, credentials, mutations, brute force, vulnerability testing, or patient data accessed.
 
 ## Files in this folder (all evidence-linked, observation date 2026-07-21)
 

@@ -1,7 +1,10 @@
 # Discovery and versions
 
 The discovery document, the `carepartner` version axis, and which cells are actually
-live. This is the page that pins `android/3.6`. Extends
+live. This is the page that pins `android/3.6` —
+[the constant `NovaLux12/carelink-bridge`](https://github.com/NovaLux12/carelink-bridge/blob/main/src/discovery.ts)
+uses, governed by [its ADR 0002](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/adr/0002-discovery-app-version-pin.md).
+Extends
 [`00-summary-the-map.md`](00-summary-the-map.md) and agrees with it; the
 endpoint-by-endpoint patient-API tables are in
 [`06-patient-api-surface.md`](06-patient-api-surface.md), the probing method in

@@ -9,3 +9,9 @@ contact_links:
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
     about: 18 open areas, each with a stated blocker and a definition of done.
+  - name: Bridge bug? File it on carelink-bridge instead
+    url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
+    about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.
+  - name: Security exposure in a published vendor artefact
+    url: https://github.com/NovaLux12/carelink-api-research/blob/main/SECURITY.md
+    about: Redacted reporting for an exposed key, internal hostname, or auth gap. Never paste the value.

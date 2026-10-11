@@ -27,6 +27,16 @@ reasoned, not seen.
 
 ---
 
+> **Who builds on this.** [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)
+> consumes this surface — it ships the pinned values recorded here (the discovery
+> pin, the BLE version list, the family vocabulary) to Nightscout, and gates its
+> releases on the regression suites in this repo. Bridge bugs (login, upload,
+> crashes) belong in **that** repo; anything about the vendor surface itself —
+> a route moved, a version list changed, a country list grew — belongs here.
+> Bridge-side notes for contributors:
+> [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md)
+> · [architecture](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md).
+
 ## Three deployments, one product
 
 | Deployment | Patient host | Cumulus host | Auth tenant | Country default |
@@ -95,10 +105,11 @@ flowchart LR
     style E fill:#3b3b2f,stroke:#fd6
 ```
 
-**`v12/display/message` is live** and was in no prior note. Our fork's
-`BLE_API_VERSIONS = [13, 11, 6, 5]` therefore contains a permanently dead `v5`
-and omits a live `v12` — nothing that changes behaviour today (v13 answers
-first), but the list is inaccurate.
+**`v12/display/message` is live** and was in no prior note. The downstream fork's
+`BLE_API_VERSIONS = [13, 11, 6, 5]`
+([src/login.ts](https://github.com/NovaLux12/carelink-bridge/blob/main/src/login.ts))
+therefore contains a permanently dead `v5` and omits a live `v12` — nothing that
+changes behaviour today (v13 answers first), but the list is inaccurate.
 
 **`v11/discover` is host-dependent**, and this **contradicts** an earlier claim
 that the discovery document is global: `.com` serves an 18105 B legacy doc

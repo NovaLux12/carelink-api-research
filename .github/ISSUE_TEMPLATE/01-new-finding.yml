@@ -79,7 +79,15 @@ body:
     id: why
     attributes:
       label: Why it matters
-      description: What does this change for someone building a CareLink client?
+      description: |
+        What does this change for someone building a CareLink client?
+
+        If it moves a value a known client *pins* — the discovery version pin,
+        the BLE API version list, the device family vocabulary, an error-class
+        taxonomy — name the constant and say which client. The known client is
+        [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge),
+        which gates its releases on this repo's suite; such an issue is labelled
+        `downstream-bridge` and is not complete until the consumer is linked.
     validations:
       required: true
 

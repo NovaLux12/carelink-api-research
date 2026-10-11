@@ -5,10 +5,10 @@
 **Medtronic publishes no API documentation. This is what their API looks like from the outside.**
 
 [![MIT](https://img.shields.io/badge/license-MIT-8A2BE2.svg)](LICENSE)
-[![read-only](https://img.shields.io/badge/method-read--only%20%C2%B7%20unauthenticated-8A2BE2)]()
+[![read-only](https://img.shields.io/badge/method-read--only%20%C2%B7%20unauthenticated-8A2BE2)](https://github.com/NovaLux12/carelink-api-research/blob/main/docs/09-methodology-and-oracles.md)
 [![research-gate](https://github.com/NovaLux12/carelink-api-research/actions/workflows/research-gate.yml/badge.svg)](https://github.com/NovaLux12/carelink-api-research/actions/workflows/research-gate.yml)
 [![assertions](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNovaLux12%2Fcarelink-api-research%2Fcounts%2Fcounts.json&query=%24.assertions.static&label=regression&suffix=%20assertions&color=brightgreen)](https://github.com/NovaLux12/carelink-api-research/blob/counts/counts.json)
-[![loopwise.uk](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)]()
+[![loopwise.uk](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)](https://loopwise.uk)
 
 [**Start with the map →**](docs/00-summary-the-map.md) · [**Help out →**](#contribute)
 
@@ -45,7 +45,8 @@ an RFC 9110 §8.4 violation, and it breaks any client that doesn't opt in. Here
 
 ## What this is, and what it isn't
 
-Every third-party CareLink client — including the one that feeds Nightscout —
+Every third-party CareLink client — including
+[the one that feeds Nightscout](https://github.com/NovaLux12/carelink-bridge) —
 reverse-engineers this surface independently, because there's nothing to read.
 This repo is that work, done once and cited.
 
@@ -325,13 +326,21 @@ Projects known to be built on findings here:
 
 | Project | Depends on this for |
 |---|---|
-| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its `docs/ARCHITECTURE.md` carries a dated snapshot of the same surface map and points here as canonical. |
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md) carries a dated snapshot of the same surface map and points here as canonical; its [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md) records which finding each of its source comments rests on. |
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) — releases** | bridge releases are gated on `regression/hurl/run.sh` exiting 0 (`npm run drift:check` on the bridge side). A red sweep here is a red sweep for the bridge. |
 
 If you maintain a CareLink client and something in it stops working, the first
 check worth making is whether this repo has moved: a route that was live may be
 gone, a country may have rolled out a new one, or the config may have drifted.
 **Report what you find here** — a negative or a correction is as useful as a
 positive, and the regression suite is what stops a fix from quietly reverting.
+
+> **Which repo does my report belong in?**
+> Observations about **Medtronic's surface** — a route added or removed, a version
+> list changed, a country rolled out, a field renamed — belong **here**.
+> Problems with **a client implementation** — login fails, upload fails, a crash,
+> or wrong Nightscout data from a route that is still live — belong in the client,
+> e.g. [carelink-bridge's bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
 
 ---
 

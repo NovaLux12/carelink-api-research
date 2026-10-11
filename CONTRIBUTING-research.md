@@ -220,6 +220,21 @@ Already have it? Skip the session.
 If you can't classify something as OBSERVED, it's INFERRED. If you can't point
 at the line a claim came from, delete the claim.
 
+**If it's a client bug, stop — it doesn't belong here.** Login failures, upload
+failures, crashes, or wrong Nightscout data from a route that is still live are
+bugs in
+[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), not
+observations about Medtronic. File those on its
+[bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
+The test: *if Medtronic did nothing, would it still be broken?* Then it's a client
+bug. If Medtronic changing or changing nothing would fix it, it's a finding — and
+it belongs here.
+
+**If it moves a value the bridge pins**, say so explicitly and label the issue
+`downstream-bridge`: name the pinned constant (discovery pin, `BLE_API_VERSIONS`,
+family vocabulary, error taxonomy) and link the bridge issue. The bridge gates its
+releases on this repo's suite, so a drift found here is a bridge release blocker.
+
 ---
 
 ## Looping an agent
@@ -452,6 +467,13 @@ docs/09-methodology-and-oracles.md · regression/hurl/ in full, including
    right when the note was wrong.
 5. If nothing drifted, say so, with the exit code and the date. A clean sweep is
    a result.
+6. If the drift moved a value NovaLux12/carelink-bridge pins, the finding is not
+   finished until the consumer knows. Label the issue downstream-bridge, name the
+   pinned constant that moved (the discovery app-version pin, BLE_API_VERSIONS,
+   the device family vocabulary, an error-class taxonomy), and say plainly that
+   bridge releases are gated on this suite — so this is a release blocker on
+   their side, not a footnote. Do not close a downstream-bridge issue until a
+   bridge issue or PR is linked.
 
 Stop when every failing assertion is explained as drift (with evidence) or as a
 harness artefact (with the control that proves it). Do not open a PR that

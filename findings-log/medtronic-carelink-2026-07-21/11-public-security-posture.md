@@ -1,6 +1,6 @@
 # Public security posture (read-only defensive review, observed 2026-07-21)
 
-Target: the local working tree at `~/.openclaw/workspace/projects/carelink-bridge` (the NovaLux12 community fork of domien-f/carelink-bridge), a TypeScript/Node 20+ bridge that authenticates against consumer Medtronic CareLink Personal (diabetes — 7xxG / 780G / Guardian 4 / Simplera, NOT cardiac MyCareLink) and uploads to Nightscout. Every evidence link was directly fetched; nothing was asserted that wasn't read.
+Target: the local working tree at `~/.openclaw/workspace/projects/novas-github/carelink-bridge` ([NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), the NovaLux12 community fork of [domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge)), a TypeScript/Node 20+ bridge that authenticates against consumer Medtronic CareLink Personal (diabetes — 7xxG / 780G / Guardian 4 / Simplera, NOT cardiac MyCareLink) and uploads to Nightscout. Every evidence link was directly fetched; nothing was asserted that wasn't read.
 
 ## 11 evidence-linked risks
 
