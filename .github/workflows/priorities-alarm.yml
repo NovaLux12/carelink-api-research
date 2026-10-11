@@ -24,10 +24,10 @@ jobs:
         run: |
           F='docs/11-suggested-research-areas.md'
           if [ ! -f "$F" ]; then echo "n=-1" >> "$GITHUB_OUTPUT"; exit 0; fi
-          # Counts only "### A." … "### M." headings. The token-blocked table
+          # Counts every "### X." heading, whatever letter it carries. The token-blocked table
           # at the top of the page is deliberately NOT counted: those are not
           # open work.
-          N=$(grep -c '^### [A-M]\. ' "$F" || true)
+          N=$(grep -c '^### [A-Z]\. ' "$F" || true)
           echo "n=${N:-0}" >> "$GITHUB_OUTPUT"
           echo "floor=${{ github.event.inputs.floor || '3' }}" >> "$GITHUB_OUTPUT"
 
@@ -40,7 +40,7 @@ jobs:
           EXISTING=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label automation \
             --search 'automation: docs/11 open areas in:title' --json number --jq '.[0].number // empty')
           BODY="**\`docs/11-suggested-research-areas.md\` has ${{ steps.count.outputs.n }} open area(s), floor is ${{ steps.count.outputs.floor }}.**"
-          BODY="$BODY\n\nRecount with: \`grep -c '^### [A-M]\. ' docs/11-suggested-research-areas.md\`\n"
+          BODY="$BODY\n\nRecount with: \`grep -c '^### [A-Z]\. ' docs/11-suggested-research-areas.md\`\n"
           BODY="$BODY\nThe alarm is wrong if the count is wrong — fix the counter, don't dismiss the issue.\n"
           BODY="$BODY\nWhen refilling the page, follow the format the existing areas use: what is known, what is missing, what would close it. Every research session is required to leave this page fuller than it found it — see \`CONTRIBUTING-research.md\` step 7 of the session protocol, which carries the successor-area template and the quality bar (Derived / Bounded / Non-duplicate / Labelled)."
           if [ -n "$EXISTING" ]; then

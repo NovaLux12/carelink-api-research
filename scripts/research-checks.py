@@ -155,12 +155,12 @@ def check_numbers(suite_log):
             fail(f'README.md:{i} states {m.group(1)} canonical pages, measured {pages}')
 
     # Open research areas: docs/11 lettered headings vs config.yml's claim.
-    areas = len(re.findall(r'^###\s+[A-M]\.\s', read('docs/11-suggested-research-areas.md'), re.M))
+    areas = len(re.findall(r'^###\s+[A-Z]\.\s', read('docs/11-suggested-research-areas.md'), re.M))
     for i, line in enumerate(read('.github/ISSUE_TEMPLATE/config.yml').splitlines(), 1):
         m = re.search(r'about: (\d+) (?:open )?areas', line)
         if m and int(m.group(1)) != areas:
             fail(f'.github/ISSUE_TEMPLATE/config.yml:{i} states {m.group(1)} areas, '
-                 f'measured {areas} (^### [A-M]. headings in docs/11)')
+                 f'measured {areas} (^### [A-Z]. headings in docs/11)')
     ok(f'{areas} open areas listed in docs/11; config.yml agrees')
 
     # The sweep's own data file, when the counts branch exists.
@@ -221,13 +221,13 @@ def check_log_hygiene():
 
 def check_priorities_sync():
     print('--- priorities sync ---')
-    open_ = set(re.findall(r'^###\s+([A-M])\.\s',
+    open_ = set(re.findall(r'^###\s+([A-Z])\.\s',
                            read('docs/11-suggested-research-areas.md'), re.M))
     # "Closes docs/11… area C" but not "does not close area C" (the
     # negation lookbehinds are fixed-width, so both are valid regexes).
     close_re = re.compile(
         r'(?<!not )(?<!does not )\bCloses\s+`?docs/11(?:-suggested-research-areas)?'
-        r'(?:\.md)?`?\s+areas?\s+([A-M](?:\s*(?:,|and|/|&)\s*[A-M])*)')
+        r'(?:\.md)?`?\s+areas?\s+([A-Z](?:\s*(?:,|and|/|&)\s*[A-Z])*)')
     violations = 0
     for f in glob.glob('findings-log/**/*.md', recursive=True):
         for i, line in enumerate(read(f).splitlines(), 1):
