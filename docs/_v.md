@@ -1,9 +1,0 @@
-key `11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1`
-broker `0vJJl02abcdefgh123456`
-captcha `6LfbuorAAAAACJ5Y00f7B5jOe6AJAM9zDOP6kii`
-host `grafana.k8s.clcloud.minimed.com`
-corp `iis.personalking.corp`
-path `/home/someuser/x`
-sess `;jsessionid_ABCDEF123456=`
-sess2 `sessionData=eyJhbGciOiJIUzI1NiJ9eyJzdWIiOiIxMjMifQ`
-cite `findings-log/probe-2026-10-08/recon/GONE.md`
