@@ -241,7 +241,8 @@ dropped unsent — the sweep would rather stay silent than leak.
 **Branch protection (required settings, `main`).** The human-merge rule above
 is convention until GitHub enforces it. Required state:
 
-- Require status check `research-gate` to pass before merging.
+- Require status check `gate` to pass before merging. (The job id in
+  `research-gate.yml`; GitHub lists it by job name, not workflow name.)
 - Require pull request review (≥1 approver); dismiss stale reviews on push.
 - Restrict pushes to `main` — no direct pushes, no force-pushes. The only
   writer outside PRs is `github-actions[bot]` on the `counts` branch.
