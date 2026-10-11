@@ -149,7 +149,35 @@ Decisive negatives in that bundle for the patient-side `deviceFamily` question:
 | `GUARDIAN` | **0** as a token | the rest are display names (`Guardian™ Sensor 3`, …) and zxcvbn dictionary words |
 | `BLE` | **0** as a token | case-insensitive hits are `TABLE`, `ENABLED`, … |
 | `SIMPLERA` | 2 | only the enum key `SIMPLERA_SYSTEM` |
-| `deviceFamily` | 2 | only a localStorage patient-filter object — **not an API field** |
+| ~~`deviceFamily`~~ | ~~2~~ | ⚠ **that verdict was wrong — correction below** |
+
+> ### ⚠ Correction — 2026-10-11 — `deviceFamily` **is** an API field
+>
+> The row above originally read: *"`deviceFamily` — 2 hits — only a localStorage
+> patient-filter object — **not an API field**"*.
+>
+> **That inference is refuted.** Three independent client implementations, each
+> written against the live API and each read at a named commit, agree on a two-field
+> split that the vendor's bundles do not contain:
+>
+> | Payload | Field | Cite |
+> |---|---|---|
+> | `/patient/monitor/data` | **`deviceFamily`** — the routing discriminator | `nightscout-connect` `index.js:587`; xDrip `message/MonitorData.java:5`; `CarlosJPV` `src/types/carelink.ts:29-34` |
+> | Cumulus / ble data payload | **`medicalDeviceFamily`** — the reported family | `nightscout-connect` `index.js:179,194`; xDrip `message/RecentData.java:102`; `CarlosJPV` `src/types/carelink.ts:33` |
+>
+> **Why the original claim was wrong.** The corpus scan was correct *about the
+> bundles* — `deviceFamily` really does appear twice in the patient portal's own
+> JavaScript, and really does not appear as a wire field there. What it could not
+> see is a field the vendor's own client **does not send**, because the field lives
+> in a response the portal never renders. A corpus scan of a frontend is evidence
+> about the frontend, not about the API.
+>
+> **Still open:** no client reports a `deviceFamily` *value* — every value observed
+> by any of the three is a `medicalDeviceFamily` value. The casing of the routing
+> field on the wire remains unobserved, so `docs/10` #81 stays open with a much
+> narrower question than it started with.
+>
+> [source: findings-log/2026-10-11-third-party-client-sources/FINDINGS.md §1, §5.1]
 
 So the clinic bundle's vocabulary is model codes and `deviceType`; it **cannot** answer
 what `deviceFamily` looks like on the wire. The one overlap is the token `CC`, which the

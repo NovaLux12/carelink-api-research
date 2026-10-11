@@ -182,6 +182,68 @@ bundle. We never did the full three-way reconciliation.
 **Closes when:** one table of every model code, with which source(s) list it and
 which don't.
 
+### Q. The `appVersion` body gate — a second version axis our docs do not describe
+
+**Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
+axis (`android/3.6`–`3.8` → Auth0 + cumulus v13). Third-party source review found a
+**second, independent axis on the request body** that our docs do not cover:
+`POST {baseUrlCumulus}/display/message` rejects `appVersion ≤ 3.6.9` with
+**HTTP 206 `{"message":"Upgrade application"}`** and accepts `≥ 3.7`.
+(SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on PR
+#4711. The *mechanism*, that it is a **body** field, is SOURCE-OBSERVED at xDrip
+`CareLinkClient.java:664` and `CarlosJPV src/carelink/cumulus.ts:146`.)
+
+The two axes are constrained in **opposite** directions: the discovery URL must stay
+**≤ 3.8** (3.9+ falls back to a legacy no-Auth0 config), while the body `appVersion`
+has **no upper bound**. A client can be correct on one axis and broken on the other.
+
+**Why it's ours:** nobody publishes a two-axis compatibility matrix. Every client
+re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
+`discovery.ts` each found one half.
+
+**Closes when:** the two axes are documented together in `docs/03` — **or** recorded as
+community-reported-and-unverifiable, which is a legitimate close.
+
+**Assumptions (INFERRED):** that the body gate and the discovery axis could move
+independently. No client dates either change, so no drift timeline is asserted.
+
+### R. Reconcile the `deviceFamily` correction against the client consensus
+
+**Added 2026-10-11.** `docs/05` is corrected — `deviceFamily` **is** an API field on
+`/patient/monitor/data`, agreed by three independent clients at named commits. What
+is still missing is the **casing of a `deviceFamily` value**, which no client reports.
+
+**Why the correction does not close it:** a destructuring default makes an absent field
+indistinguishable from a present one, so a client that *reads* `deviceFamily` proves the
+author believed it existed — not that it does.
+
+**Closes when:** one authenticated `monitor/data` response records the key-name and its
+value's casing verbatim, **or** a note in `docs/05` records that the value casing stays
+unobserved and why. A negative retires the question honestly instead of leaving it
+apparently answered.
+
+**Assumptions (INFERRED):** that the routing field and the reported-family field stay
+distinct. If a future payload collapses them into one, the correction's shape changes.
+
+### S. Two more evidence classes for third-party source material
+
+**Added 2026-10-11.** `AGENTS.md` §2 defines three (OBSERVED / PUBLISHED / INFERRED). A
+pass that reads client source needs a **fourth** kind — someone else's code, written
+against a live API — and the 2026-10-11 pass used two more: **SOURCE-OBSERVED**
+(file:line at a named commit) and **SOURCE-PUBLISHED** (that repo's README/PR/commit
+history). Both are corroboration, never proof of vendor behaviour.
+
+**Why it matters:** evidence with no honest label gets quietly promoted to OBSERVED,
+which is the one failure this repo exists to prevent (§1, §6 item 1). The 2026-10-11
+pass hit this concretely.
+
+**Blocker:** this changes the repo's stated rules, so it is a **maintainer decision**,
+not a research task. It was deliberately **not** actioned by the pass that found it.
+
+**Closes when:** `AGENTS.md` §2 gains the classes with the "never promote to OBSERVED"
+rule attached, **or** a note records that third-party source stays under existing labels
+and must always be flagged as corroboration. Either closes it; silence does not.
+
 ### H. The `reportFileNamingSupportedPumpModels` list
 
 The public config has `personal.common.core.report.generation.reportFileNamingSupportedPumpModels`
