@@ -20,6 +20,10 @@
 # file back to .hurl without also recording why.
 #
 # Exit 0 = every claim still holds. Exit 1 = drift; diff against the notes.
+#
+# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — this suite is part of its release gate
+# (`npm run drift:check` on the bridge side). A failure here is a bridge
+# release blocker; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
 
 set -uo pipefail
 cd "$(dirname "$0")/.."

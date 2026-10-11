@@ -1,8 +1,14 @@
 # Medtronic CareLink — patient data API auth boundary
 #
-# The bridge's own endpoint table lives in src/carelink/urls.ts and covers the
-# bare /patient/* namespace. This suite pins the *unauthenticated* behaviour of
-# every one of those paths, plus two namespaces the discovery doc advertises.
+# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — this suite is part of its release gate
+# (`npm run drift:check` on the bridge side). A failure here is a bridge
+# release blocker; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
+#
+# The bridge's own endpoint table lives in
+# https://github.com/NovaLux12/carelink-bridge/blob/main/src/carelink/urls.ts
+# and covers the bare /patient/* namespace. This suite pins the
+# *unauthenticated* behaviour of every one of those paths, plus two namespaces
+# the discovery doc advertises.
 #
 # 401 + {"error":{"type":"InvalidToken","group":"AUTH"}} is the expected
 # "endpoint exists, needs a token" signature. 404 would mean the path moved.

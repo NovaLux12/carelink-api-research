@@ -1,6 +1,6 @@
 # Investigation session index (2026-07-21)
 
-Session: public, no-holds-barred investigation of the Medtronic CareLink consumer surface and how it relates to the local TypeScript bridge at `~/.openclaw/workspace/projects/novas-github/carelink-bridge` ([NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), community fork of [domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge)). All public sources; no accounts, credentials, mutations, brute force, vulnerability testing, or patient data accessed.
+Session: public, no-holds-barred investigation of the Medtronic CareLink consumer surface and how it relates to the local TypeScript bridge at `~/.openclaw/workspace/projects/carelink-bridge` (NovaLux12 community fork of domien-f/carelink-bridge). All public sources; no accounts, credentials, mutations, brute force, vulnerability testing, or patient data accessed.
 
 ## Files in this folder (all evidence-linked, observation date 2026-07-21)
 
@@ -27,3 +27,14 @@ Session: public, no-holds-barred investigation of the Medtronic CareLink consume
 - Legal/operations: cite Medtronic's own bulletin excluding CareLink Personal from CVE-2025-12994-12997. Keep the bridge strictly personal, non-commercial, single-account. Document that the bridge is not affiliated with or endorsed by Medtronic and may violate Medtronic ToS.
 - Infra: bridge depends on a single AWS CloudFront provider across all seven CareLink consumer hosts; `status.minimed.com` is the operational ground truth; add a maintenance-window probe. `carelink-connect.minimed.eu` is retired — do not use.
 - Mobile: store semantic version 3.8.1 ≠ discovery selector `android/3.6`. Public discovery proves 3.6/3.7 are the Auth0-compatible tracks. Treat 3.6 as a pinned dependency.
+
+## Correction (2026-10-11)
+
+The local path quoted in the intro above, `~/.openclaw/workspace/projects/carelink-bridge`,
+is **stale** — the working tree moved to `projects/novas-github/carelink-bridge`, so the
+`novas-github/` segment is missing from the path as written. The body text is left
+verbatim; this note is the correction, per the append-only rule in `AGENTS.md` §3.
+
+The sibling repo is **NovaLux12/carelink-bridge**
+(<https://github.com/NovaLux12/carelink-bridge>), a community fork of
+[domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge).

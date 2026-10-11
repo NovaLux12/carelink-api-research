@@ -1,6 +1,11 @@
 # Medtronic CareLink — SSO config + OpenID Connect surface
 #
-# These are public, unauthenticated. They back the login flow in src/login.ts.
+# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — this suite is part of its release gate
+# (`npm run drift:check` on the bridge side). A failure here is a bridge
+# release blocker; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
+#
+# These are public, unauthenticated. They back the login flow in
+# https://github.com/NovaLux12/carelink-bridge/blob/main/src/login.ts.
 # If any of these fail, login breaks before any patient data is touched.
 #
 # Verified live 2026-10-08. JWKS URI is /.well-known/jwks.json (NOT /jwks.json).
