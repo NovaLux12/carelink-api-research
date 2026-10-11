@@ -95,7 +95,7 @@ def check_numbers(suite_log):
 
     # Prose sites that must state the STATIC count.
     static_sites = [
-        ('README.md', r'regression-(\d+)%20assertions', 'badge'),
+        ('README.md', r'badge/dynamic/json\?[^)"]*query=%24\.assertions\.static', 'badge (machine-written from counts.json)'),
         ('README.md', r'(\d+) pinned assertions', 'the what\'s-here row'),
         ('docs/00-summary-the-map.md', r'pins (\d+) of these facts', 'the map'),
         ('docs/09-methodology-and-oracles.md', r'holds (\d+) assertions', 'methodology'),
@@ -105,9 +105,16 @@ def check_numbers(suite_log):
         if not os.path.exists(path):
             continue
         found = False
+        # The badge marker is allowed to be value-free: its number comes from
+        # the sweep's counts.json, and this check exists to catch *prose* going
+        # stale, not to police a machine-written URL.
+        value_free = 'machine-written' in label
         for i, line in enumerate(read(path).splitlines(), 1):
             for m in re.finditer(pattern, line):
                 found = True
+                if value_free:
+                    ok(f'{path} carries the machine-written count badge')
+                    continue
                 if int(m.group(1)) != static:
                     fail(f'{path}:{i} ({label}) states {m.group(1)} assertions, '
                          f'measured static={static} runtime={runtime}')
@@ -119,13 +126,25 @@ def check_numbers(suite_log):
         ok(f'static assertion count is {static} everywhere it is stated')
 
     # Prose sites that may state the RUNTIME count (checked when present).
-    for path in ('README.md',):
+    # The phrasing is matched loosely on purpose: it is the number that must
+    # agree, not the sentence around it.
+    runtime_patterns = [
+        r'(\d+)\s+execute per run',
+        r'(\d+) count what actually executes',
+        r'executes? (\d+) per (?:full )?run',
+    ]
+    for path in ('README.md', 'docs/09-methodology-and-oracles.md'):
+        if not os.path.exists(path):
+            continue
         for i, line in enumerate(read(path).splitlines(), 1):
-            m = re.search(r'(\d+) count what actually executes', line)
-            if m and int(m.group(1)) != runtime:
-                fail(f'{path}:{i} states {m.group(1)} executed per run, measured {runtime}')
-            elif m:
-                ok(f'runtime statement at {path}:{i} matches ({runtime})')
+            for pat in runtime_patterns:
+                m = re.search(pat, line)
+                if m and int(m.group(1)) != runtime:
+                    fail(f'{path}:{i} states {m.group(1)} executed per run, '
+                         f'measured {runtime} — rule in '
+                         f'scripts/measure_assertions.py')
+                elif m:
+                    ok(f'runtime statement at {path}:{i} matches ({runtime})')
 
     # Canonical page count: docs/00-11 are the numbered pages; RESEARCH-SESSION
     # is a pointer stub and is excluded.
