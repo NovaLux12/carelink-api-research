@@ -101,7 +101,6 @@ Stated as such rather than guessed at:
   `carelink-clinical-*` deep sweep — not attempted for want of request budget
   (19 requests unused) [COMMONCRAWL §7].
 
-
 ---
 
 > **Consumer note.** Findings here are consumed by

@@ -23,7 +23,7 @@ without a login · **INFERRED** = reasoned, not seen.
 > So most of the 16-family vocabulary on this page carries no routing consequence
 > for that client, and a wrong token here is *not* automatically a bridge bug.
 > The consequential inputs are `CC880`, the `BLE`/`SIMPLERA` prefixes, and the
-> model-prefix list — model prefix is the primary axis, not a afterthought.
+> model-prefix list.
 >
 > **Note on that consumer's own docs.** Its `docs/vendor-api/README.md`
 > described matching on model prefix "rather than family token" — stale, since
