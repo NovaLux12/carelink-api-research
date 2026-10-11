@@ -25,10 +25,10 @@ without a login · **INFERRED** = reasoned, not seen.
 > The consequential inputs are `CC880`, the `BLE`/`SIMPLERA` prefixes, and the
 > model-prefix list — model prefix is the primary axis, not a afterthought.
 >
-> **Note on that consumer's own docs.** Its `docs/vendor-api/README.md` currently
-> says it matches on model prefix "rather than family token". That is **stale** —
-> it predates the `CC880` family-token match in `src/carelink/client.ts` and
-> contradicts the code. Read the code, not that sentence.
+> **Note on that consumer's own docs.** Its `docs/vendor-api/README.md`
+> described matching on model prefix "rather than family token" — stale, since
+> the `CC880` family-token match in `src/carelink/client.ts` postdates it. Read
+> the code, not prose: `BLE_FAMILY_TOKENS` is the authority on what is matched.
 
 > **Provenance rule.** `recov/PATIENT-APP-VOCABULARY.md` is the **only patient-app-side**
 > artefact in this project. `JS-API-SURFACE.md` and `CHUNK-CORPUS-FINDINGS.md` are

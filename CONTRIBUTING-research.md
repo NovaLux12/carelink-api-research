@@ -239,8 +239,8 @@ tracking it alone is how it gets lost.
 
 **If it moves a value the bridge pins**, say so explicitly and label the issue
 `downstream-bridge`: name the pinned constant (discovery pin, `BLE_API_VERSIONS`,
-family vocabulary, error taxonomy) and link the bridge issue. The bridge gates its
-runs this suite before a release, so drift found here can reach their checklist.
+family vocabulary, error taxonomy) and link the bridge issue. The bridge runs
+this suite before a release, so drift found here can reach their checklist.
 
 ---
 

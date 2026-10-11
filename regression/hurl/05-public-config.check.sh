@@ -22,7 +22,7 @@
 # Exit 0 = every claim still holds. Exit 1 = drift; diff against the notes.
 #
 # Downstream consumer: https://github.com/NovaLux12/carelink-bridge — the bridge runs this suite before a release
-# (`npm run drift:check` on the bridge side). A failure here is a bridge
+# (`npm run drift:check` on the bridge side). A failure here reaches their
 # release checklist; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
 
 set -uo pipefail

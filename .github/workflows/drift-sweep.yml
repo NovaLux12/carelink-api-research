@@ -113,6 +113,9 @@ jobs:
         run: |
           gh label create drift      --description "A pinned vendor assertion failed on re-probe" --color fbca04 --force
           gh label create automation --description "Opened by a scheduled workflow, not a human" --color ededed --force
+          # A drift that moves a value carelink-bridge pins must be labelled and
+          # cross-posted there; the prompt requires the label to exist.
+          gh label create downstream-bridge --description "Changes a value NovaLux12/carelink-bridge pins; the consumer must be notified and linked" --color 1d76db --force
 
       - name: File or update the single drift issue
         if: steps.second.outputs.verdict == 'red'
