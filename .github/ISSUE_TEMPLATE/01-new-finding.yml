@@ -86,7 +86,7 @@ body:
         the BLE API version list, the device family vocabulary, an error-class
         taxonomy — name the constant and say which client. The known client is
         [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge),
-        which gates its releases on this repo's suite; such an issue is labelled
+        which runs this repo's suite before a release; such an issue is labelled
         `downstream-bridge` and is not complete until the consumer is linked.
     validations:
       required: true

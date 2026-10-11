@@ -326,7 +326,7 @@ Projects known to be built on findings here:
 
 | Project | Depends on this for |
 |---|---|
-| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md) carries a dated snapshot of the same surface map and points here as canonical; its [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md) records which finding each of its source comments rests on. |
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its [architecture doc](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/ARCHITECTURE.md) carries a dated snapshot of the same surface map and points here as canonical; its [vendor-api index](https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md) is a short "what you probably want → page here" table with run instructions for the suite below. |
 | **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) — releases** | bridge releases are gated on `regression/hurl/run.sh` exiting 0 (`npm run drift:check` on the bridge side). A red sweep here is a red sweep for the bridge. |
 
 If you maintain a CareLink client and something in it stops working, the first
@@ -341,6 +341,13 @@ positive, and the regression suite is what stops a fix from quietly reverting.
 > Problems with **a client implementation** — login fails, upload fails, a crash,
 > or wrong Nightscout data from a route that is still live — belong in the client,
 > e.g. [carelink-bridge's bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
+> A Nightscout outage or a bad profile belongs to Nightscout, not to either repo.
+>
+> **And if it moves a value the bridge pins** — the discovery pin, `BLE_API_VERSIONS`,
+> the family vocabulary, an error taxonomy — the finding is *incomplete* until the
+> consumer knows: label it `downstream-bridge`, name the constant, link the bridge
+> issue. The bridge runs this suite before a release, so drift here can reach their
+> release checklist.
 
 ---
 

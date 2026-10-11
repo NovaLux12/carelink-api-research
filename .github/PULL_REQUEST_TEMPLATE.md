@@ -47,7 +47,7 @@ research-gate.sh exit: __
 
 <!--
 [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) pins
-values from this repo and gates its releases on this repo's regression suite.
+values from this repo and runs this repo's regression suite before a release.
 -->
 
 - [ ] No pinned consumer value affected

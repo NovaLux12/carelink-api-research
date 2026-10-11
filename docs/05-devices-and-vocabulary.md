@@ -9,12 +9,23 @@ Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCA
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.
 
-> **Consumer note.** The 16-family vocabulary and the family-vs-model distinction on
-> this page are what
-> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) routes on
-> (`isBleDevice()` and its family matcher). If a family token here is wrong, that
-> bridge silently fails to classify a pump — which is why "family matching is
-> unreliable" below is load-bearing for a consumer, not just a curiosity.
+> **Consumer note.** How much of this page is *load-bearing* for a client depends
+> entirely on its matcher, so read the matcher's shape before assuming.
+> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) matches
+> on `isBleDevice()` in `src/carelink/client.ts`, and it is deliberately
+> narrow: a `BLE`/`SIMPLERA` family **prefix**, plus exactly **one** published
+> family token (`CC880`, the family the vendor's own config maps to "MiniMed™
+> Flex"), plus a loose `FLEX` substring fallback, plus model prefix. The other
+> published families — CC840, EAGLE, GST, NMX7, NMX8, GM, INSTINCT — are
+> **deliberately not matched**, because routing a non-BLE device down the BLE
+> endpoint is its own silent failure.
+>
+> So most of the 16-family vocabulary on this page carries no routing consequence
+> for that client, and a wrong token here is *not* automatically a bridge bug.
+> The consequential ones are `CC880` and the `BLE`/`SIMPLERA` prefixes.
+> Its own `docs/vendor-api/README.md` states the same thing: it matches on model
+> prefix "rather than family token, because the vendor's own published family list
+> does not contain the token their app matches on".
 
 > **Provenance rule.** `recov/PATIENT-APP-VOCABULARY.md` is the **only patient-app-side**
 > artefact in this project. `JS-API-SURFACE.md` and `CHUNK-CORPUS-FINDINGS.md` are

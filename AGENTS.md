@@ -63,15 +63,20 @@ system, not about CareLink.
 |---|---|
 | A route added/removed, a version list changed, a country rolled out, a field renamed, a status code that changed | **Here** — file a finding |
 | Login fails, upload fails, a crash, wrong Nightscout data from a route that is still live | **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** → [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml) |
+| A Nightscout outage, a bad Nightscout profile, a local config or account problem | Whoever owns that system — not this repo |
 | A credential or internal hostname published in **this** repo | **Here**, via [`SECURITY.md`](./SECURITY.md) — redacted, never the value |
 | A vulnerability in client code | **[carelink-bridge's private advisory](https://github.com/NovaLux12/carelink-bridge/security/advisories/new)** |
+
+The test: *would Medtronic changing something fix it?* Yes → here. No → a client or
+local problem, which this repo does not own.
 
 **Notifying the downstream consumer.** When a finding changes a value the bridge
 pins — the discovery pin, `BLE_API_VERSIONS`, the family vocabulary, the error
 taxonomy — the finding is incomplete until the consumer knows. Label the issue
 `downstream-bridge`, link the bridge issue, and state which pinned constant moved.
-The bridge treats this repo's suite as a release gate, so drift here *is* a bridge
-problem.
+The bridge documents running this repo's suite before a release (`npm run drift:check`,
+which needs the research repo cloned alongside it), so drift here can block a bridge
+release.
 
 ---
 

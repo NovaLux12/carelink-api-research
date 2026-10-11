@@ -30,11 +30,11 @@ Session: public, no-holds-barred investigation of the Medtronic CareLink consume
 
 ## Correction (2026-10-11)
 
-The local path quoted in the intro above, `~/.openclaw/workspace/projects/carelink-bridge`,
-is **stale** — the working tree moved to `projects/novas-github/carelink-bridge`, so the
-`novas-github/` segment is missing from the path as written. The body text is left
+The intro above names a local working-tree path for the consumer. Local paths are
+not part of this finding and are deliberately **not** republished here — `AGENTS.md`
+§7 forbids a machine path in the diff even to correct one. The body text is left
 verbatim; this note is the correction, per the append-only rule in `AGENTS.md` §3.
 
-The sibling repo is **NovaLux12/carelink-bridge**
-(<https://github.com/NovaLux12/carelink-bridge>), a community fork of
+The consumer is **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)**,
+a community fork of
 [domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge).

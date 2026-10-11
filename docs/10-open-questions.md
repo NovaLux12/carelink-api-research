@@ -106,8 +106,7 @@ Stated as such rather than guessed at:
 
 > **Consumer note.** Findings here are consumed by
 > [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), which
-> pins the values on this page and gates its releases on this repo's regression
-> suite. If something here moves a value the bridge pins, that is a release
+> feeds this repo's regression suite, which the bridge runs before a release. If something here moves a value the bridge pins, that is a release
 > blocker on their side — file it here with the `downstream-bridge` label and name
 > the constant. Bridge bugs (login, upload, crash) belong in
 > [their bug tracker](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).

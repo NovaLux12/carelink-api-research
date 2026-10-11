@@ -48,10 +48,10 @@ The two recent Medtronic CareLink-adjacent advisories (CVE-2025-12994/995/996/97
 
 ## Correction (2026-10-11)
 
-The target path quoted above, `~/.openclaw/workspace/projects/carelink-bridge`, is
-**stale** — the working tree moved to `projects/novas-github/carelink-bridge`, so the
-`novas-github/` segment is missing from the path as written. The body text is left
-verbatim; this note is the correction, per the append-only rule in `AGENTS.md` §3.
+The target line above names a local working-tree path. Local paths are not part of
+this finding and are deliberately **not** republished here — `AGENTS.md` §7 forbids a
+machine path in the diff even to correct one. The body text is left verbatim; this
+note is the correction, per the append-only rule in `AGENTS.md` §3.
 
 The target repo is **NovaLux12/carelink-bridge**
 (<https://github.com/NovaLux12/carelink-bridge>), the NovaLux12 community fork of

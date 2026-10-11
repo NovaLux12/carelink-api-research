@@ -1,6 +1,6 @@
 # Medtronic CareLink — discovery endpoint pin regression suite
 #
-# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — this suite is part of its release gate
+# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — the bridge runs this suite before a release
 # (`npm run drift:check` on the bridge side). A failure here is a bridge
 # release blocker; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
 #

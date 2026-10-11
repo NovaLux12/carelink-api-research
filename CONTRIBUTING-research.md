@@ -226,9 +226,10 @@ bugs in
 [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), not
 observations about Medtronic. File those on its
 [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
-The test: *if Medtronic did nothing, would it still be broken?* Then it's a client
-bug. If Medtronic changing or changing nothing would fix it, it's a finding — and
-it belongs here.
+The test: *would Medtronic changing something fix it?* If yes, it's a finding and it
+belongs here. If nothing Medtronic does would fix it, it's a client bug — or a
+local one (a Nightscout outage, a bad profile, an expired token), in which case it
+belongs to whoever owns that system, not to this repo either way.
 
 **If it moves a value the bridge pins**, say so explicitly and label the issue
 `downstream-bridge`: name the pinned constant (discovery pin, `BLE_API_VERSIONS`,
