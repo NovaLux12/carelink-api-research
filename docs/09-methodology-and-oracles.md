@@ -189,8 +189,10 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 93 assertions; exit 0 = the public surface has not
-  drifted since 2026-10-08 [source: docs/00-summary-the-map.md;
+  `regression/hurl/` holds 96 assertions (228 execute per run, counting the
+  16-family loop expansion and hurl's status-line checks); exit 0 = the public
+  surface has not drifted *past the pinned values* since 2026-10-08
+  [source: docs/00-summary-the-map.md;
   findings-log/probe-2026-10-08/work/VALIDATION-RUNBOOK.md Tier 5]. The config
   checks deliberately pin the vendor's *current wrong* `lhpro` bound so a vendor
   fix breaks the test and updates the note [source: HURL-05].

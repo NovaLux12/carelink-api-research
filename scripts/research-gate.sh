@@ -17,6 +17,15 @@
 #   4. no live session values from archive captures
 #   5. every [source: …] citation resolves to a real file
 #   6. the vendor assertion suite still exits 0
+#   7. every hand-maintained number matches its recomputed value
+#      (counting rule is the header of scripts/research-checks.py)
+#   8. every dated findings-log pass carries its accounting, and no raw
+#      archive capture is committed
+#   9. no findings-log closure leaves docs/11 listing the area as open
+#
+# The CI suite is 05-public-config.check.sh — the one suite whose checks run
+# on every PR. regression/hurl/run.sh runs all five; it is what the weekly
+# drift sweep re-probes (scripts/…, .github/workflows/drift-sweep.yml).
 #
 # Deliberately NOT enforced: whether a claim is TRUE. That needs a human or a
 # second pass. This gate stops the irreversible mistakes, not the subtle ones.
@@ -39,6 +48,7 @@ done
 # excluded from the scan it performs. Without the exclusion the gate always
 # fails on itself, which is the fastest way to make a gate get disabled.
 SELF="scripts/research-gate.sh"
+SUITE_LOG="${SUITE_LOG:-/tmp/_gate_suite.log}"
 FAIL=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
@@ -145,16 +155,25 @@ fi
 # ---------------------------------------------------------------- 6: suite
 echo "--- vendor assertion suite ---"
 if [ -x regression/hurl/05-public-config.check.sh ]; then
-  if ( cd regression/hurl && bash ./05-public-config.check.sh ) >/tmp/_gate_suite.log 2>&1; then
-    note "ok" "$(grep -oE '[0-9]+ passed, [0-9]+ failed' /tmp/_gate_suite.log | tail -1 || echo 'suite green')"
+  if ( cd regression/hurl && bash ./05-public-config.check.sh ) >"$SUITE_LOG" 2>&1; then
+    note "ok" "$(grep -oE '[0-9]+ passed, [0-9]+ failed' "$SUITE_LOG" | tail -1 || echo 'suite green')"
   else
     note "!!" "assertion suite failed — see output below"
-    tail -8 /tmp/_gate_suite.log | sed 's/^/         /'
+    tail -8 "$SUITE_LOG" | sed 's/^/         /'
     FAIL=1
   fi
 else
   note "!!" "check suite not found at regression/hurl/"
   FAIL=1
+fi
+
+# ---------------------------------------------------------------- 7: consistency
+if [ "$SUITE_ONLY" -eq 0 ]; then
+  echo "--- numbers / findings-log / priorities ---"
+  # Whole-tree, not diff: the claims checked live in README.md and docs/,
+  # which a valid PR need not touch. Runs after the suite above so the
+  # suite's own output is the ground truth for the runtime count.
+  if python3 scripts/research-checks.py --suite-log "$SUITE_LOG"; then :; else FAIL=1; fi
 fi
 
 echo

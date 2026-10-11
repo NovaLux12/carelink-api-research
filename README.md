@@ -6,7 +6,7 @@
 
 [![MIT](https://img.shields.io/badge/license-MIT-8A2BE2.svg)](LICENSE)
 [![read-only](https://img.shields.io/badge/method-read--only%20%C2%B7%20unauthenticated-8A2BE2)]()
-[![93 assertions](https://img.shields.io/badge/regression-93%20assertions%20%C2%B7%20exit%200-brightgreen)]()
+[![96 assertions](https://img.shields.io/badge/regression-96%20assertions%20%C2%B7%20exit%200-brightgreen)]()
 [![loopwise.uk](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)]()
 
 [**Start with the map →**](docs/00-summary-the-map.md) · [**Help out →`](#contribute)
@@ -213,7 +213,7 @@ cd carelink-api-research
 |---|---|
 | **[`docs/`](docs/)** | 12 canonical pages. Synthesised, dated, every claim cites the log it came from. |
 | **[`findings-log/`](findings-log/)** | Append-only research logs, verbatim. Kept because conclusions were retracted and re-derived — that history is the evidence. |
-| **[`regression/hurl/`](regression/hurl/)** | 93 pinned assertions. **Exit 0 = the vendor surface hasn't drifted.** |
+| **[`regression/hurl/`](regression/hurl/)** | 96 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
 | **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps. |
 | **`.github/`** | 4 structured issue forms, a PR template, and the copy-paste prompts. |
 
