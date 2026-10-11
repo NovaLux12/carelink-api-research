@@ -250,5 +250,5 @@ findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md].
 | trap | detail |
 |---|---|
 | Portal 200-for-everything | `carelinkhp.minimed.eu` returns **200 + `text/html` + exactly 5518 bytes** for every unknown path. Discriminate on `Content-Type`, never on status code — filtering on status alone would have stored 225 copies of `index.html` and reported a clean chunk sweep |
-| `*.carelink.{eu,com}`, `*.clcloud.eu` | **wildcard parking DNS**: a random string resolves and all 302 to a parked page. ~50 collected names are false positives; never report one as a vendor asset |
+| `*.carelink.{eu,com}`, `*.clcloud.eu` | **wildcard parking DNS**: a random string resolves and all 302 to a parked page. 49 collected names are false positives; never report one as a vendor asset |
 | Internal hostnames in CT logs | recorded and redacted to `<service>.<internal>.minimed.<tld>` — the finding that CT logs leak internal infrastructure names survives, the names do not |

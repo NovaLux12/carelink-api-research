@@ -6,28 +6,69 @@
 
 [![MIT](https://img.shields.io/badge/license-MIT-8A2BE2.svg)](LICENSE)
 [![read-only](https://img.shields.io/badge/method-read--only%20%C2%B7%20unauthenticated-8A2BE2)]()
-[![93 assertions](https://img.shields.io/badge/regression-93%20assertions%20%C2%B7%20exit%200-brightgreen)]()
+[![research-gate](https://github.com/NovaLux12/carelink-api-research/actions/workflows/research-gate.yml/badge.svg)](https://github.com/NovaLux12/carelink-api-research/actions/workflows/research-gate.yml)
+[![assertions](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNovaLux12%2Fcarelink-api-research%2Fcounts%2Fcounts.json&query=%24.assertions.static&label=regression&suffix=%20assertions&color=brightgreen)](https://github.com/NovaLux12/carelink-api-research/blob/counts/counts.json)
 [![loopwise.uk](https://img.shields.io/badge/part%20of-loopwise.uk-8A2BE2)]()
 
-[**Start with the map →**](docs/00-summary-the-map.md) · [**Help out →`](#contribute)
+[**Start with the map →**](docs/00-summary-the-map.md) · [**Help out →**](#contribute)
 
 </div>
 
 ---
 
-## The short version
+## Try it — ten seconds, no credential
+
+The strongest fact in this repo is the one you can check yourself. This
+endpoint hands over sixty-nine configuration keys — including the vendor's
+complete sixteen-family device vocabulary — with no token, no cookie, no API
+key:
+
+```bash
+curl -s --compressed \
+     'https://carelink.minimed.eu/patient/v2/configuration/public' \
+  | jq '[(keys | length), (.["personal.device.family.to.model.mapping"] | keys | length)]'
+```
+
+```
+69
+16
+```
+
+Drop `--compressed` and the same URL hands back raw gzip: the host sends
+`Content-Encoding: gzip` unconditionally, ignoring `Accept-Encoding` entirely —
+an RFC 9110 §8.4 violation, and it breaks any client that doesn't opt in. Here
+`--compressed` isn't a nicety, it's the only way to read the body. **[OBSERVED]**
+— `regression/hurl/05-public-config.check.sh` header;
+`docs/09-methodology-and-oracles.md`.
+
+---
+
+## What this is, and what it isn't
 
 Every third-party CareLink client — including the one that feeds Nightscout —
 reverse-engineers this surface independently, because there's nothing to read.
 This repo is that work, done once and cited.
 
-The surprise is how much answers **without a credential at all**: one
-unauthenticated file names every device family Medtronic makes, another answers
-for 117 countries, and a third lets you map which routes exist without ever
-holding a token.
+The surprise is how much answers **without a credential at all**: the config
+file above, an endpoint that answers for 117 countries, and a third that lets
+you map which routes exist without ever holding a token.
 
-Gathered **read-only, unauthenticated, one request per second**. No credentials.
-No login. No authentication attempted.
+**It is** a map of Medtronic's public CareLink surface, assembled read-only and
+unauthenticated. Every claim carries an evidence label and a path to the file it
+came from. Where two sources disagree, both are given.
+
+**It isn't** an exploit, a client, or a working integration — no patient data is
+reachable without a valid token, and nothing here touches one
+(`docs/08-security-findings.md`). **It isn't** Medtronic's documentation, because
+there isn't any: eleven conventional OpenAPI paths × three hosts, all negative
+(`docs/10-open-questions.md`).
+
+Gathered **read-only and unauthenticated**, under per-pass caps never exceeded:
+≥1.2 s on probe rounds, ≥2 s per host enforced in-harness, 2.5 s measured floor
+on the gateway sweep, ≥3 s on archive calls. One credential-adjacent act is on
+the record — the published bundle key was sent once to the reports host to test
+validity, and got 403. Both that and the read-only discipline are stated rather
+than the tidy one. **[OBSERVED]** — `docs/09-methodology-and-oracles.md` §1.
 
 ---
 
@@ -47,7 +88,7 @@ flowchart LR
     B -->|"3.9 → 12.0"| E["one document<br/>no Auth0 · cumulus v2"]
     C --> F["the pin<br/>that matters"]
     E --> G["probing again<br/>re-derives this"]
-    style C fill:#2f3b2f,stroke:#6f6,stroke-width:2px
+    style C fill:#2f3b2f,stroke:#6f,stroke-width:2px
     style E fill:#3b3b2f,stroke:#fd6
 ```
 
@@ -66,17 +107,19 @@ flowchart TD
     T -->|"Unauthorized + x-ca-err 990"| L["reached the authoriser<br/>the resource EXISTS ✓"]
     T -->|"OPTIONS → CORS *<br/>but GET is 403"| Q2["POST-only<br/>invisible to GET probes"]
     style X fill:#3b2f2f,stroke:#f66
-    style L fill:#2f3b2f,stroke:#6f6
-    style Q2 fill:#2f3b2f,stroke:#6f6
+    style L fill:#2f3b2f,stroke:#6f
+    style Q2 fill:#2f3b2f,stroke:#6f
 ```
 
 ### The estate
 
-Four deployments, four auth tenants, and a shadow domain nobody documented.
+Three patient deployments, a shadow deployment nobody documented, and one file
+that needs no credential at all. There is **no fourth patient deployment** —
+every recorded `*trials*` host is a `.com`.
 
 ```mermaid
 flowchart TB
-    subgraph E[" "]
+    subgraph E["Three patient deployments — and no fourth"]
         direction LR
         e1["carelink.minimed.eu"] --> e2["clcloud.minimed.eu"]
         u1["carelink.minimed.com"] --> u2["clcloud.minimed.com"]
@@ -94,8 +137,8 @@ flowchart TB
     cfg["/patient/v2/configuration/public<br/>UNAUTHENTICATED · 69 keys"]
     e1 -.-> cfg
     style s fill:#3b2f2f,stroke:#f66
-    style cfg fill:#2f3b2f,stroke:#6f6,stroke-width:2px
-    style p fill:#2f3b2f,stroke:#6f6
+    style cfg fill:#2f3b2f,stroke:#6f,stroke-width:2px
+    style p fill:#2f3b2f,stroke:#6f
     style g fill:#3b3b2f,stroke:#fd6
 ```
 
@@ -149,17 +192,65 @@ empty — a 33-day-old payload, on a successful status code.
 `lhpro`/`lghpro` max is `4292967295`; the correct 32-bit maximum is `4294967295`.
 Wrong in both ranges — and the clinician-side config carries the right one.
 
+> **Newest, 2026-10-11 — the same oracle, run on two unexamined namespaces.**
+> `pde/v3` is dead on both GET and OPTIONS, and two further live POST-only routes
+> turned up: `connect/csr/v2/display/message` and `connect/v2/display/message`,
+> each confirmed three times. 30 of a 30 request cap, GET and OPTIONS only.
+> **[OBSERVED]** — `findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md`; pinned in
+> `regression/hurl/04-deep-surface.hurl`.
+
 </details>
+
+---
+
+## How a contribution travels
+
+```mermaid
+flowchart TD
+    Q{"What are you starting from?"}
+    Q -->|"an area to work"| CLAIM["Open an issue — **Claim a research area**<br/>state the area, the request cap, the delay,<br/>and what closed means — negatives count"]
+    Q -->|"a finding in hand"| DUP["Grep docs/ and findings-log/<br/>check it isn't already recorded"]
+    CLAIM --> PROBE["Probe — GET only · ≥2 s per host<br/>controls before any candidate:<br/>one plausible path, one certainly-absent path"]
+    DUP --> LOG["Append to findings-log/&lt;date&gt;-&lt;area&gt;/<br/>verbatim · request count · cap · negatives"]
+    PROBE --> LOG
+    LOG --> LBL{"Every claim labelled<br/>OBSERVED / PUBLISHED / INFERRED?"}
+    LBL -->|"not yet"| LOG
+    LBL -->|"labelled"| SYNTH["Synthesise into docs/<br/>citing the log path it came from"]
+    SYNTH --> PIN{"A value someone<br/>will rely on later?"}
+    PIN -->|"yes"| REG["Add an assertion to regression/hurl/<br/>unpinned claims have quietly gone stale here"]
+    PIN -->|"no"| GATE
+    REG --> GATE
+    GATE["**./scripts/research-gate.sh**<br/>leak scan · citation integrity · vendor suite"]
+    GATE -->|"exit 1"| FIX["Fix it — don't work around it"]
+    FIX --> GATE
+    GATE -->|"exit 0"| PR["Open the PR<br/>fill the evidence table · state the request count"]
+    PR --> CI{"GitHub Actions — research-gate<br/>the same script, plus the mermaid gate"}
+    CI -->|"red"| FIX
+    CI -->|"green"| HUMAN["**Human merge**<br/>the gate cannot judge whether a claim is true"]
+    style HUMAN fill:#2f3b2f,stroke:#6f,stroke-width:2px
+    style GATE fill:#3b3b2f,stroke:#fd6
+```
+
+Automation owns everything up to the merge: the citation paths, the scrub scan,
+the assertion suite, the mermaid gate, the numbers in this README, and — every
+Monday — a full re-probe of the pinned surface that files its own drift issue if
+anything moved. The gate deliberately does **not** check whether a claim is
+*true*; that needs a human or a second pass, which is why the last arrow is the
+only one that isn't automatic. **[OBSERVED]** —
+`scripts/research-gate.sh` header; `CONTRIBUTING-research.md`;
+`.github/workflows/drift-sweep.yml`; `AGENTS.md` §11.
 
 ---
 
 ## Contribute
 
-Copy one of these into your agent's chat and hit go. Each tells it to read the
-instructions and follow them.
+Three genuinely different situations. One gate: `./scripts/research-gate.sh`
+must exit 0.
 
-<details open>
-<summary><b>I want to help reverse-engineer the CareLink API</b> — copy this</summary>
+### 1 · You're a human reader
+
+Copy this into your agent's chat and hit go. It tells the agent to read the
+instructions and follow them:
 
 ```
 I want to help with https://github.com/NovaLux12/carelink-api-research
@@ -168,25 +259,38 @@ Read the instructions here and follow them:
 https://github.com/NovaLux12/carelink-api-research/blob/main/CONTRIBUTING-research.md
 ```
 
-</details>
+Already holding a finding? The prompt is different on purpose — it skips the
+session and helps you write up what you have, with the evidence class and source
+cite it needs. Both prompts live in [`.github/prompts/`](.github/prompts/), and
+four more sit beside them (loop, refill, verify, sweep).
 
-<details>
-<summary><b>I already have a finding to submit</b> — copy this</summary>
+### 2 · You're a coding agent, one session
 
+`CONTRIBUTING-research.md` is the whole instruction set, written to be fetched
+over HTTPS rather than assumed present on disk:
+
+```bash
+gh api repos/NovaLux12/carelink-api-research/contents/AGENTS.md --jq .content | base64 -d
+# or, to get the whole repo:
+git clone https://github.com/NovaLux12/carelink-api-research
 ```
-I have a finding for https://github.com/NovaLux12/carelink-api-research
 
-Read the instructions here and follow them:
-https://github.com/NovaLux12/carelink-api-research/blob/main/CONTRIBUTING-research.md
-```
+Claim the area first — claiming is what stops two agents probing the same
+afternoon. One session lands one log entry, and leaves `docs/11` fuller than it
+found it (step 7 of the session protocol).
 
-</details>
+### 3 · You're running an agent loop
 
-The same two live in GitHub's **prompts dropdown** (the `▾` beside *Write a
-comment* on any issue or PR) — but that only appears once you're already opening
-an issue, which is why they're copied out here.
+Run the lifecycle above once per iteration — **claim → probe → log → label →
+refill → pin** — and stop when the open areas run out or your request budget
+does. The full loop is spelled out in
+[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) §*Looping an agent*, with a
+reference controller in `scripts/research-loop.sh` that works with opencode,
+Claude Code and Codex. Two things the loop may not do: assign its own evidence
+label (OBSERVED needs a response head, and a loop can't see one), and merge its
+own PR.
 
-Before you open a PR:
+### Before you open the PR
 
 ```bash
 git clone https://github.com/NovaLux12/carelink-api-research
@@ -196,26 +300,69 @@ cd carelink-api-research
 
 > **A negative result counts.** Issue #84 was closed by proving something does
 > *not* exist — 73 paths, 28 key names, four corpora. Proving an absence is one of
-> the most useful things you can do here.
+> the most useful things you can do here. **[OBSERVED]** —
+> `CONTRIBUTING-research.md`; `docs/11-suggested-research-areas.md`.
 
 | Looking for | Go to |
 |---|---|
 | What's already known | [`docs/00-summary-the-map.md`](docs/00-summary-the-map.md) |
 | Something to work on | [`docs/11-suggested-research-areas.md`](docs/11-suggested-research-areas.md) |
+| A loop or an agent prompt | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) §Looping an agent |
 | The rules before probing | [`AGENTS.md`](AGENTS.md) §7 · [`docs/09`](docs/09-methodology-and-oracles.md) |
 | Submit a finding, or run a session | [`CONTRIBUTING-research.md`](CONTRIBUTING-research.md) |
 
 ---
 
-## What's here
+## Why trust this
 
-| | |
-|---|---|
-| **[`docs/`](docs/)** | 12 canonical pages. Synthesised, dated, every claim cites the log it came from. |
-| **[`findings-log/`](findings-log/)** | Append-only research logs, verbatim. Kept because conclusions were retracted and re-derived — that history is the evidence. |
-| **[`regression/hurl/`](regression/hurl/)** | 93 pinned assertions. **Exit 0 = the vendor surface hasn't drifted.** |
-| **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps. |
-| **`.github/`** | 4 structured issue forms, a PR template, and the copy-paste prompts. |
+**Every claim is labelled.** **OBSERVED** — seen in a live response.
+**PUBLISHED** — in a vendor document served without a login. **INFERRED** —
+reasoned, not seen. An INFERRED claim that reads as OBSERVED is the worst thing
+you can do here, because it destroys the one property that makes this repo
+useful: a stranger can tell which claims are still guesses. **[OBSERVED]** —
+`AGENTS.md` §2.
+
+**The history of being wrong is kept, and counted.** We have been wrong here
+fourteen times on the record — seven while writing, seven more found by an
+independent audit of all twelve pages — and the recurring shapes are worth
+naming, because each one produced a mechanism rather than an apology:
+
+- a claim stated **without evidence** — nothing to point at
+- a grep that **hit without proving** what it was said to prove
+- a hash comparison over a lookup that **silently returned null**, manufacturing
+  agreement between two different values
+- a verification that **read back the wrong target**
+- derived prose that **contradicted its own source table**, then propagated
+  faithfully into five pages — including one claiming MG_DL vs MMOL_L
+  mis-scales glucose in the wrong countries
+- a citation pointing at a **file that doesn't exist**
+- a count generalised from a **subset** (44 published as 93), with no counting
+  rule recorded
+
+Every correction stays in `findings-log/` rather than being quietly fixed — a
+research note that only records its successes isn't one. **[OBSERVED]** —
+`AGENTS.md` §6; `docs/09-methodology-and-oracles.md`.
+
+**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **96
+pinned assertions** — 228 execute per run, once the 16-family loop in the config
+suite is expanded and hurl's status-line checks are counted. Exit 0 = the vendor
+surface hasn't drifted past the pinned values. The suite has caught a page
+asserting a hash its own log had already retracted. **[OBSERVED]** —
+`docs/09-methodology-and-oracles.md`; `scripts/measure_assertions.py`.
+
+**The numbers on this page are CI-enforced.** The assertion count isn't typed by
+a hand — a weekly job re-measures it and the badge reads the result, and the
+gate fails any PR whose prose count disagrees with the measurement. That
+machinery exists because the badge used to say 93 long after the suite had grown
+past it, twice, and because a count generalised from a subset is how that
+happened.
+
+**What the gate does not do.** It stops the irreversible mistakes — credential
+material, internal hostnames, machine paths, live session values from archive
+captures, any citation that doesn't resolve, any count that doesn't match its
+measurement. It deliberately does not check whether a claim is *true*. That
+needs a human or a second pass. **[OBSERVED]** — `CONTRIBUTING-research.md`
+§What the gate checks.
 
 ---
 
@@ -231,7 +378,7 @@ cd carelink-api-research
 
 > [!WARNING]
 > **`*.carelink.eu`, `*.carelink.com`, `*.clcloud.eu` are wildcard DNS on a parking
-> operator.** A random unregistered string resolves. ~50 names in the collection are
+> operator.** A random unregistered string resolves. 49 names in the collection are
 > false positives. Never report one as a vendor asset — that's how a false
 > positive reaches a disclosure.
 
@@ -240,34 +387,21 @@ cd carelink-api-research
 > contain live `jsessionid_*` values and pre-Auth0 authorize URLs whose
 > `sessionData` is a plaintext-base64 JWS. Facts only.
 
+Full list: [`AGENTS.md`](AGENTS.md) §7.
+
 ---
 
-## Confidence, and how we got it wrong
+## What's here
 
-Claims are labelled **OBSERVED** (seen in a live response), **PUBLISHED** (in a
-vendor document served without a login) or **INFERRED** (reasoned, not seen). Four
-repo issues stay open *on purpose*, because they need a token.
-
-**We have been wrong here fourteen times, on the record.** Seven while writing,
-seven more found by an independent audit of all twelve pages. The recurring
-shapes:
-
-- a claim stated **without evidence** — nothing to point at
-- a grep that **hit without proving** what it was said to prove
-- a hash comparison over a lookup that **silently returned null**, manufacturing
-  agreement between two different values
-- a verification that **read back the wrong target**
-- derived prose that **contradicted its own source table**, then propagated
-  faithfully into five pages — including one claiming MG_DL vs MMOL_L
-  mis-scales glucose in the wrong countries
-- a citation pointing at a **file that doesn't exist**
-- a count generalised from a **subset** (44 published as 93), with no counting
-  rule recorded
-
-Every correction stays in `findings-log/` rather than being quietly fixed. A
-research note that only records its successes isn't one. And the assertion suite
-exists because prose drifts: it caught a page asserting a hash its own log had
-already retracted.
+| | |
+|---|---|
+| **[`docs/`](docs/)** | 12 canonical pages. Synthesised, dated, every claim cites the log it came from. |
+| **[`findings-log/`](findings-log/)** | Append-only research logs, verbatim. Kept because conclusions were retracted and re-derived — that history is the evidence. |
+| **[`regression/hurl/`](regression/hurl/)** | 96 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
+| **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps, the loop prompts. |
+| **[`AGENTS.md`](AGENTS.md)** | The operating rules — evidence classes, the scrub list, the four ways this project has been wrong, what automation may do. |
+| **[`scripts/research-gate.sh`](scripts/research-gate.sh)** | The gate. CI runs the identical script on every PR. |
+| **[`.github/`](.github/)** | 4 issue forms, a PR template, 6 agent prompts, and 3 scheduled workflows (drift sweep, priorities alarm, stale-claim reaper). |
 
 ---
 

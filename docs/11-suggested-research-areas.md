@@ -52,21 +52,6 @@ same account. Blocked on a token for the *body*, but the **routing** picture is
 already open — check which cells are reachable, whether v12 has an `OPTIONS` route
 where v13 doesn't, and whether the `x-ca-err` code differs between them.
 
-### C. Extend the oracle set to the `pde/v3` and `csr` namespaces
-
-Both were probed at root and returned the router's no-route 403. But "403" on
-`clcloud` means *no route*, not *no resource* — and **no `OPTIONS` probe was ever
-run**. A resource that exists but only defines POST returns exactly this.
-
-The `carepartner` axis gave us a clean discriminator (`MissingAuthenticationToken`
-vs `UnauthorizedException` + `x-ca-err: 990`) and an `OPTIONS` CORS probe found a
-POST-only route that a GET-only probe called dead.
-
-**Closes when:** `OPTIONS` + the error-type oracle have been run across
-`pde/v3/`, `csr/`, and the bare `connect/carepartner/` family. This is ~30 GETs
-and some OPTIONs, all unauthenticated, and it either finds routes nobody knew
-existed or closes the space properly.
-
 ### D. The 18-country sweep, completed
 
 `/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
@@ -81,6 +66,48 @@ country response, not for differences between countries. Unit fields
 flags are where an inconsistency would actually mislead a client.
 
 **Closes when:** the sweep is either complete or the contradictions are enumerated.
+
+### N. Do the two new POST-only routes exist on the other two cumulus hosts?
+
+`connect/csr/v2/display/message` and `connect/v2/display/message` are the only
+routes found live-and-POST-only in the CSR and bare-cumulus namespaces, each
+confirmed three times on `clcloud.minimed.eu` (OBSERVED,
+[findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md]). That pass was single-host
+by design, so both routes are currently **one host's** finding.
+
+**Blocker:** four OPTIONS requests, never sent — the 30-request cap was
+exhausted (OBSERVED, [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] §Limits).
+
+**Closes when:** the same two paths are OPTIONS-probed on
+`clcloud.minimed.com` and `clcloud-trials.minimed.com`; either both return the
+same CORS signature, or a region split is documented. A negative — 403 +
+MissingAuthenticationTokenException on either host — closes it just as firmly.
+
+**Assumptions (INFERRED):** that the carepartner region-identity result transfers
+to the `csr`/bare-`v2` legs. It is an inference from a different leg of the same
+API, not an observation of these paths.
+
+### O. Is `/patient/reports/*` on `carelink.*` the reports surface for every region?
+
+The 2026-10-10 sweep found `/patient/reports/*` live on `carelink.minimed.eu`,
+gated 401/405, while `commoncore`'s broker paths 502 at the origin — so the
+reports namespace is not where this repo had recorded it (OBSERVED,
+[findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md] §2–3). That
+observation is **one host**, and the sibling `.com` and `-trials` deployments
+have never been checked for it.
+
+**Blocker:** no token needed to establish existence — but the candidate list must
+come from the *recorded* paths on the EU host, not from guessing (the `401`/`405`
+split is the discriminator: 405 means POST-only and live, 401 means live and
+token-gated).
+
+**Closes when:** the same recorded report paths are probed on `carelink.minimed.com`
+and `carelink-trials.minimed.com` with the 200/401/405 discriminator, and the
+result either matches the EU host or documents the split. A negative — 404 on both
+siblings — closes it and narrows #76's host list.
+
+**Assumptions (INFERRED):** that the three patient deployments expose the same
+namespace; the sweep observed only `.eu`, so this is an assumption until probed.
 
 ### E. Config-key archaeology on `/patient/configuration/system/*`
 
@@ -114,6 +141,36 @@ reach these services at all.
 ---
 
 ## Tier 2 — cheap, moderate value
+
+### P. Recover the request schema from the vendor's own app, statically
+
+Half of `docs/10`'s open questions — the `markers[]` per-entry field names, the
+`deviceFamily` casing, the NGP alarm vocabulary — are blocked on *one
+authenticated response each*. The request side of those shapes is compiled into
+the CareLink app itself, and no pass has ever decompiled it: the mobile-artifact
+note is store metadata only, and the 2026-10-08 app-emulation pass worked from
+the public JS bundle and third-party clients
+([findings-log/medtronic-carelink-2026-07-21/09-mobile-artifacts.md];
+[findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md]).
+
+**Blocker:** the artefact is not in the repo and no static-analysis tooling has
+been run against it. Provenance of a store download is a decision to record, not
+an assumption to make (the APKPure mirror is already recorded as
+medium-confidence), and `docs/09`'s no-source-maps finding means the JS path
+yields little.
+
+**Closes when:** the logbook/marker entry payload and the family-matching
+predicate are recovered verbatim from the app artefact with a named static
+tool, written to a dated findings-log with the tool, version and evidence class
+recorded — enough to answer the *shape* half of at least one token-blocked row in
+`docs/10`, even though the response half stays token-gated. A negative — the
+shape is not recoverable from the artefact — is equally a result.
+
+**Assumptions (INFERRED):** that a static pass recovers schema the live surface
+gates; the bridge's own notes show the app's family-matcher is five tokens wide
+while the vendor ships a device it cannot match, which is the shape of a schema
+that static analysis *would* settle — but no one has tried, so the recovery rate
+is unknown.
 
 ### G. Cross-check the three model tables against each other
 
@@ -195,3 +252,18 @@ landing on alphabetical neighbours).
 4. **Negative results are first-class.** This repo's #84 was closed by proving
    something doesn't exist across 73 paths, 28 key names, and four corpora. That is
    a good contribution.
+5. **Your PR must leave this page fuller than it found it.** Close the area into
+   the Closed table with its evidence, and add at least one successor area with a
+   blocker and a definition of done — see
+   [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 for the
+   template and the quality bar. A weekly job files an issue if this page drops
+   below three open areas.
+
+## Closed areas
+
+Dated, with the verdict and the evidence. An area leaves this table only by
+being superseded — never silently. Letters are not reused.
+
+| Area | Closed | Verdict | Evidence | Closed by |
+|---|---|---|---|---|
+| C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |

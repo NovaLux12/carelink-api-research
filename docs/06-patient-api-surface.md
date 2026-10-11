@@ -2,9 +2,9 @@
 
 > **Navigation** — the map: [`00-summary-the-map.md`](00-summary-the-map.md) · ← prev: [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) · → next: [`07-admin-portal-and-reporting.md`](07-admin-portal-and-reporting.md)
 
-Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recon/VERSION-AXIS.md`,
+Dated 2026-10-11 (Area C). Sources: `findings-log/probe-2026-10-08/recon/VERSION-AXIS.md`,
 `recon/CONFIG-NAMESPACE-DEEP.md`, `PROBE-FINDINGS.md`,
-`CHUNK-CORPUS-FINDINGS.md`.
+`CHUNK-CORPUS-FINDINGS.md`, `findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md`.
 
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.

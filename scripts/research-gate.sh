@@ -17,6 +17,15 @@
 #   4. no live session values from archive captures
 #   5. every [source: …] citation resolves to a real file
 #   6. the vendor assertion suite still exits 0
+#   7. every hand-maintained number matches its recomputed value
+#      (counting rule is the header of scripts/research-checks.py)
+#   8. every dated findings-log pass carries its accounting, and no raw
+#      archive capture is committed
+#   9. no findings-log closure leaves docs/11 listing the area as open
+#
+# The CI suite is 05-public-config.check.sh — the one suite whose checks run
+# on every PR. regression/hurl/run.sh runs all five; it is what the weekly
+# drift sweep re-probes (scripts/…, .github/workflows/drift-sweep.yml).
 #
 # Deliberately NOT enforced: whether a claim is TRUE. That needs a human or a
 # second pass. This gate stops the irreversible mistakes, not the subtle ones.
@@ -38,7 +47,12 @@ done
 # This file necessarily CONTAINS the literal secrets it searches for, so it is
 # excluded from the scan it performs. Without the exclusion the gate always
 # fails on itself, which is the fastest way to make a gate get disabled.
+# These two files necessarily contain the literals they search for: the gate
+# prints them, the pattern list IS them. Both are excluded from the scan they
+# feed; nothing else may contain these strings.
 SELF="scripts/research-gate.sh"
+SELF_PATTERNS="scripts/scrub-patterns.txt"
+SUITE_LOG="${SUITE_LOG:-/tmp/_gate_suite.log}"
 FAIL=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
@@ -48,13 +62,13 @@ if [ "$SUITE_ONLY" -eq 0 ]; then
 
   case "$MODE" in
     all)
-      SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null | grep -vxF "$SELF" || true)
+      SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
     staged)
-      SUBJECT=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      SUBJECT=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
     *)
-      SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
   esac
 
@@ -78,6 +92,10 @@ EOF
 
     while IFS='|' read -r name pat; do
       [ -z "$name" ] && continue
+      # A line with no "|" is a comment, not a pattern — an empty regex
+      # matches every line, which is how a documented pattern list turns
+      # into 1,398 false hits.
+      [ -z "$pat" ] && continue
       # AGENTS.md documents the machine-path rule and therefore contains the
       # example it warns about ("/home/<user>"). Exclude that one line so the
       # rule can be stated without the gate flagging its own documentation.
@@ -94,17 +112,7 @@ EOF
       else
         note ok "$name"
       fi
-    done <<'PATTERNS'
-vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
-long base64 secrets|(^|[^A-Za-z0-9_./-])(?=[A-Za-z0-9+_-]*[A-Z])(?=[A-Za-z0-9+_-]*[a-z])[A-Za-z0-9+_-]{40,}={0,2}([^A-Za-z0-9_.-]|$)
-reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
-internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
-internal .corp host|[a-z0-9-]+\.corp\b
-machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
-live jsession values|;jsessionid_[A-Z0-9]{6,}=
-live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
-long base64 secrets|(^|[^A-Za-z0-9_./-])[A-Za-z0-9_+]{44,}={0,2}([^A-Za-z0-9_.-]|$)
-PATTERNS
+    done < <(grep -v '^[[:space:]]*#' scripts/scrub-patterns.txt)
   fi
 fi
 
@@ -145,16 +153,25 @@ fi
 # ---------------------------------------------------------------- 6: suite
 echo "--- vendor assertion suite ---"
 if [ -x regression/hurl/05-public-config.check.sh ]; then
-  if ( cd regression/hurl && bash ./05-public-config.check.sh ) >/tmp/_gate_suite.log 2>&1; then
-    note "ok" "$(grep -oE '[0-9]+ passed, [0-9]+ failed' /tmp/_gate_suite.log | tail -1 || echo 'suite green')"
+  if ( cd regression/hurl && bash ./05-public-config.check.sh ) >"$SUITE_LOG" 2>&1; then
+    note "ok" "$(grep -oE '[0-9]+ passed, [0-9]+ failed' "$SUITE_LOG" | tail -1 || echo 'suite green')"
   else
     note "!!" "assertion suite failed — see output below"
-    tail -8 /tmp/_gate_suite.log | sed 's/^/         /'
+    tail -8 "$SUITE_LOG" | sed 's/^/         /'
     FAIL=1
   fi
 else
   note "!!" "check suite not found at regression/hurl/"
   FAIL=1
+fi
+
+# ---------------------------------------------------------------- 7: consistency
+if [ "$SUITE_ONLY" -eq 0 ]; then
+  echo "--- numbers / findings-log / priorities ---"
+  # Whole-tree, not diff: the claims checked live in README.md and docs/,
+  # which a valid PR need not touch. Runs after the suite above so the
+  # suite's own output is the ground truth for the runtime count.
+  if python3 scripts/research-checks.py --suite-log "$SUITE_LOG"; then :; else FAIL=1; fi
 fi
 
 echo

@@ -2,3 +2,4 @@ node_modules/
 *.flow
 *.har
 __pycache__/
+.loop/

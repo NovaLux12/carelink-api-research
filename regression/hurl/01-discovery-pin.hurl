@@ -41,7 +41,7 @@ jsonpath "$.CP[2].Auth0SSOConfiguration" startsWith "https://carelink-trials.min
 jsonpath "$.CP[1].baseUrlCareLink" == "https://carelink.minimed.eu/api/carepartner/v2"
 jsonpath "$.CP[1].baseUrlPde" == "https://clcloud.minimed.eu/connect/pde/v3"
 jsonpath "$.supportedCountries" count > 100
-jsonpath "$.certificates" count >= 1
+jsonpath "$.certificates" count == 8
 
 # The .com host must serve the same global document (not a US-only one).
 # If this ever changes, buildDiscoveryUrl(isUS) stops being cosmetic.

@@ -1,0 +1,55 @@
+name: stale-claim-reaper
+description: Nudge claimed research areas that have gone quiet. Never closes an issue, never edits one. Zero vendor requests.
+on:
+  schedule:
+    - cron: '7 7 * * *'    # daily 07:07 UTC — daily is safe: the job itself
+                           # only *reads* issue state and adds at most one comment
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  reap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Nudge quiet claims
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh label create stale-claim --description "A claimed research area has had no activity" --color bfd4f2 --force
+          gh label create automation   --description "Opened by a scheduled workflow, not a human" --color ededed --force
+          NOW=$(date -u +%s)
+          # research-area + claimed are the labels 03-claim-research-area.yml applies.
+          gh api "repos/$GITHUB_REPOSITORY/issues?state=open&labels=research-area,claimed&per_page=100" \
+            --jq '.[] | @base64' | while read -r row; do
+              n=$(echo "$row" | base64 -d | jq -r .number)
+              updated=$(echo "$row" | base64 -d | jq -r .updated_at)
+              age_days=$(( (NOW - $(date -u -d "$updated" +%s)) / 86400 ))
+              # Count our OWN prior nudges by marker — never edit the claimant's
+              # body, never rely on labels alone for state. The job is stateless
+              # across runs, so a dropped scheduled run costs nothing.
+              nudges=$(gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments?per_page=100" \
+                --jq '[.[] | select(.body | contains("<!-- stale-claim-nudge -->"))] | length')
+              if [ "$age_days" -ge 28 ] && [ "$nudges" -eq 0 ]; then
+                gh issue comment "$n" --repo "$GITHUB_REPOSITORY" --body "$(cat <<'EOF'
+          <!-- stale-claim-nudge -->
+          This claim has had no activity for 28 days. Options, in order of usefulness:
+          post a progress note (a partial result is fine — a negative counts,
+          CONTRIBUTING-research.md); un-claim it by closing with a one-line
+          status so someone else can pick it up; or say it is blocked and why.
+          Filing nothing is the one outcome this nudge exists to prevent.
+          EOF
+          )"
+                gh issue edit "$n" --repo "$GITHUB_REPOSITORY" --add-label stale-claim,automation
+              elif [ "$age_days" -ge 14 ] && [ "$age_days" -lt 28 ] && [ "$nudges" -eq 0 ]; then
+                gh issue comment "$n" --repo "$GITHUB_REPOSITORY" --body "$(cat <<'EOF'
+          <!-- stale-claim-nudge -->
+          Friendly 14-day nudge on this claim. If you are still on it, a
+          one-line "still working, at N of my M cap" keeps this issue useful and
+          stops the next nudge. State lives in the issue, not in someone's head.
+          EOF
+          )"
+              fi
+            done

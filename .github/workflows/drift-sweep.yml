@@ -1,0 +1,164 @@
+name: drift-sweep
+description: Weekly re-probe of the pinned vendor surface. On drift, files (or updates) a single `correction:` issue. Publishes the measured assertion count. Never writes to the repository.
+on:
+  schedule:
+    # WEEKLY — Mondays 06:37 UTC. Minute 37 is deliberately off the hour:
+    # scheduled runs queue worst at :00 and can be delayed or dropped. To go
+    # DAILY, change this one line to '37 6 * * *'.
+    - cron: '37 6 * * 1'
+  workflow_dispatch: {}   # manual: Actions → drift-sweep → Run workflow
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: drift-sweep  # a manual dispatch during a scheduled run must not double-probe
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   # default branch; scheduled workflows run
+                                    # only on the default branch
+      - name: Install hurl (same pin as the PR gate — research-gate.yml)
+        run: |
+          curl -sSL -o /tmp/hurl.tar.gz \
+            https://github.com/Orange-OpenSource/hurl/releases/download/7.0.0/hurl-7.0.0-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf /tmp/hurl.tar.gz -C /usr/local/bin hurl
+          hurl --version
+
+      # ---- the probe. Identical suites, identical runner, identical hurl pin
+      # ---- as CI on PRs. No new targets, no new discipline: ~62 requests
+      # ---- (56 hurl + ~6 in 05), GET+OPTIONS only except the two POSTs
+      # ---- already pinned and documented in 04-deep-surface.hurl, >=2s
+      # ---- between requests to the same host, no credentials of any kind.
+      - name: Run the full pinned suite (first attempt)
+        id: first
+        run: |
+          mkdir -p .drift
+          if DELAY_MS=2000 bash regression/hurl/run.sh > .drift/run1.log 2>&1; then
+            echo "verdict=green" >> "$GITHUB_OUTPUT"
+          else
+            echo "verdict=red" >> "$GITHUB_OUTPUT"
+            tail -40 .drift/run1.log > .drift/tail1.txt
+          fi
+
+      # ---- Flake guard: CI network failures look exactly like vendor drift.
+      # ---- One retry after a pause; only two consecutive reds are "drift".
+      - name: Re-run once before believing it
+        if: steps.first.outputs.verdict == 'red'
+        id: second
+        run: |
+          sleep 120
+          if DELAY_MS=2000 bash regression/hurl/run.sh > .drift/run2.log 2>&1; then
+            echo "verdict=green" >> "$GITHUB_OUTPUT"
+            echo "flake — second run green; no issue filed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "verdict=red" >> "$GITHUB_OUTPUT"
+            tail -40 .drift/run2.log > .drift/tail2.txt
+          fi
+
+      # ---- Safety: never paste anything matching the scrub list into a public
+      # ---- issue. The patterns come from scripts/scrub-patterns.txt — the same
+      # ---- file the PR gate reads — so there is one list, not two. That file is
+      # ---- the only place the literals live, and it is excluded from its own
+      # ---- scan (AGENTS.md section 7).
+      - name: Build the issue body (scrub check first)
+        if: steps.second.outputs.verdict == 'red'
+        run: |
+          LOG=.drift/tail2.txt
+          PATTERNS=$(mktemp)
+          grep -v '^#' scripts/scrub-patterns.txt | cut -d'|' -f2- > "$PATTERNS"
+          if grep -nEi -f "$PATTERNS" "$LOG" >/dev/null 2>&1; then
+            echo "refusing to file — the failing output matches a scrub-list pattern"
+            grep -nEi -f "$PATTERNS" "$LOG" | head -3 | sed 's/^/         /'
+            exit 1
+          fi
+          {
+            echo "The weekly drift sweep re-ran \`regression/hurl/run.sh\` on \`main\` and it went red twice in a row."
+            echo
+            echo "**Probe provenance (identical to the PR gate):** ~62 requests across 7 hosts;"
+            echo "GET + OPTIONS only, except the two POSTs already pinned and documented in"
+            echo "\`04-deep-surface.hurl\` (public client_ids, rejected 403 server-side);"
+            echo ">=2s between requests to the same host; no credentials, no cookies, no token exchange."
+            echo "Suites: \`01-discovery-pin 02-sso-oidc 03-patient-api 04-deep-surface 05-public-config\`."
+            echo
+            echo "**Evidence class: OBSERVED** — response captured by the runner, not inferred."
+            echo "This is a *drift report*, not a finding: it says a pinned assertion no longer"
+            echo "holds. Whether the docs or the vendor is wrong is a human call (AGENTS.md section 6)."
+            echo
+            echo "<details><summary>Failing output (last 40 lines)</summary>"
+            echo
+            echo '```'
+            cat "$LOG"
+            echo '```'
+            echo "</details>"
+            echo
+            echo "Run: $(date -u +%Y-%m-%dT%H:%M:%SZ) · workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > .drift/issue.md
+
+      # ---- Issue mechanics: GITHUB_TOKEN with issues:write. One open drift
+      # ---- issue at a time — later failures comment on it, because ten
+      # ---- near-identical issues is how one of them gets dropped (AGENTS.md
+      # ---- section 4: one finding per issue).
+      - name: Ensure labels exist (idempotent)
+        if: steps.second.outputs.verdict == 'red'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh label create drift      --description "A pinned vendor assertion failed on re-probe" --color fbca04 --force
+          gh label create automation --description "Opened by a scheduled workflow, not a human" --color ededed --force
+
+      - name: File or update the single drift issue
+        if: steps.second.outputs.verdict == 'red'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          EXISTING=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label drift \
+            --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "$GITHUB_REPOSITORY" \
+              --body "Another sweep went red ($(date -u +%Y-%m-%d)): $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "correction: vendor drift — pinned assertions failing $(date -u +%Y-%m-%d)" \
+              --label correction,drift,automation --body-file .drift/issue.md
+          fi
+
+      # ---- Success path: the auto-verification hook. Only runs when the suite
+      # ---- is green, and generates no vendor requests — it reads the run that
+      # ---- already happened.
+      - name: Verify findings whose assertions passed
+        if: steps.second.outputs.verdict == 'green' || steps.first.outputs.verdict == 'green'
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: python3 scripts/verify-findings.py --suite-green
+
+  # ---------------------------------------------------------------------------
+  # The badge job. Runs EVERY sweep — green or red — because the count is a
+  # measurement, not a verdict. This is the only job in the repo that writes
+  # anything: it force-writes one generated JSON to the `counts` branch, and
+  # nothing else does (AGENTS.md section 11). The README's count badge reads
+  # that branch, so the number on the front page can never be hand-edited.
+  # Cost: zero vendor requests — the count is parsed from the suite files by
+  # scripts/measure_assertions.py, the same rule the gate enforces.
+  # ---------------------------------------------------------------------------
+  badge-counts:
+    needs: sweep
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # job-scoped carve-out: the counts branch only
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Measure and publish the assertion count
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 scripts/measure_assertions.py --json > counts.json
+          cat counts.json
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --force-create counts
+          git add counts.json
+          git commit -m "counts: sweep $(date -u +%Y-%m-%d)" >/dev/null || { echo "no change"; exit 0; }
+          git push --force origin counts
