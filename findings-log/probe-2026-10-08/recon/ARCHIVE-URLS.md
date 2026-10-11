@@ -98,7 +98,7 @@ leaks infrastructure that is invisible to every `*.minimed.*` enumeration.
 | `csr.cumulus.periodic.data.endpoints.periodic_packet` | `https://vpce-<eu-id>.execute-api.eu-central-1.vpce.amazonaws.com/dev/connect/csr/v2/periodic/packet` | **AWS VPC-endpoint ID + account-region + `/dev/` path published to the public internet.** An infrastructure-identifier disclosure, not just a URL disclosure. |
 | `csr.cumulus.periodic.data.endpoints.display_message` | `https://clcloud.minimed.eu/connect/csr/v2/display/message` | **NEW Cumulus namespace: `csr/v2`** — distinct from `/connect/pde/v3`, `/connect/carepartner/v13`, and the archived `/connect/v2/display/message` |
 | `mmm.data.api.url` | `https://0ptoikank6.execute-api.eu-central-1.amazonaws.com/prodous/dialog-lite/v1/` | public AWS API-Gateway id (Nuance "dialog-lite", bot/captcha) |
-| `praas.uri.path.reports.ping` | `https://iis.personalace.corp:443/api/report/v2/ping` | **internal corporate hostname (`.corp` TLD, PersonalACE intranet) leaked into a public config** |
+| `praas.uri.path.reports.ping` | `https://iis.<internal>.corp:443/api/report/v2/ping` | **internal corporate hostname (`.corp` TLD, PersonalACE intranet) leaked into a public config** |
 | `personal.retina.endpoint.config.target_url` | `https://clcloud.minimed.eu` | ties the `retina` remote-monitoring feature to Cumulus |
 | `csr.crm.settings.base.uri` | `https://carelink-support.minimed.eu/crm` | the CSR (Care-Solutions-Rep) CRM — a **second** CRM base distinct from the patient `crm` |
 
@@ -207,7 +207,7 @@ Identity facts extracted (previously unrecorded):
 |---|---|---|
 | `commoncore.medtronic.eu` | named inside the public 2026-02-04 config | **`medtronic.eu`**, so invisible to `*.minimed.*`. **Zero archive captures** (r33) despite being referenced in a live config — an unarchived live dependency. |
 | `mdts-ocl.medtronic.com` | `resource_uri` in the archived mmcl authorize URL | the mag resource server behind the legacy OAuth flow |
-| `iis.personalace.corp` | inside the public config | internal `.corp` hostname |
+| `iis.<internal>.corp` | inside the public config | internal `.corp` hostname |
 | `vpce-<eu-id>.execute-api.eu-central-1.vpce.amazonaws.com` | inside the public config | AWS VPC-endpoint id |
 | `0ptoikank6.execute-api.eu-central-1.amazonaws.com` | inside the public config | AWS API-Gateway id |
 | `carelink-3po-dev.minimed.eu` | redirect-scheme whitelist | "3PO" = third-party-organisation dev |

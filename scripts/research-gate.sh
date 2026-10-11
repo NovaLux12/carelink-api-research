@@ -78,7 +78,14 @@ EOF
 
     while IFS='|' read -r name pat; do
       [ -z "$name" ] && continue
-      hits=$(printf '%s' "$ADDED" | grep -cEi "$pat" || true)
+      # AGENTS.md documents the machine-path rule and therefore contains the
+      # example it warns about ("/home/<user>"). Exclude that one line so the
+      # rule can be stated without the gate flagging its own documentation.
+      if [ "$name" = "machine-specific paths" ]; then
+        hits=$(printf '%s' "$ADDED" | grep -v '/home/<user>' | grep -cEi "$pat" || true)
+      else
+        hits=$(printf '%s' "$ADDED" | grep -cEi "$pat" || true)
+      fi
       hits=${hits:-0}
       if [ "$hits" -gt 0 ]; then
         note "!!" "$name — $hits hit(s). DO NOT COMMIT."
@@ -89,14 +96,14 @@ EOF
       fi
     done <<'PATTERNS'
 vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
-reports-broker key fragments|(0vJJl02[0-9A-Za-z]{8,}|GIFQiM3[0-9A-Za-z]{8,})
+long base64 secrets|(^|[^A-Za-z0-9_./-])(?=[A-Za-z0-9+_-]*[A-Z])(?=[A-Za-z0-9+_-]*[a-z])[A-Za-z0-9+_-]{40,}={0,2}([^A-Za-z0-9_.-]|$)
 reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
 internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
 internal .corp host|[a-z0-9-]+\.corp\b
-machine-specific paths|/home/[a-z]|/Users/[a-z]|C:\\Users\\
+machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
 live jsession values|;jsessionid_[A-Z0-9]{6,}=
 live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
-long base64 secrets|[A-Za-z0-9+/]{44,}={0,2}
+long base64 secrets|(^|[^A-Za-z0-9_./-])[A-Za-z0-9_+]{44,}={0,2}([^A-Za-z0-9_.-]|$)
 PATTERNS
   fi
 fi

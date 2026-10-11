@@ -321,11 +321,11 @@ host, wrong path), `medtronicdiabetes.medtronic.com` (147.154.54.172),
 
 `kubernetes.carelink.medtronic.com`, `vpn.carelink.medtronic.com`,
 `internal.carelink.medtronic.com`, `analytics.carelink.medtronic.com`,
-`carelink-clp01-ext.corp.medtronic.com`, `apiapp-alb-dr.carelink2.medtronic.com`,
+`<internal-ext>.corp.medtronic.com`, `apiapp-alb-dr.carelink2.medtronic.com`,
 `apiapp-alb.sit7.carelink9.medtronic.com`, `md.sit8.carelink9.medtronic.com`,
 `oneapp.sit8.carelink9.medtronic.com`. None of these resolve to anything outside
 144.15.x.x except the two `carelink2`/`carelink9` names (144.15.0.11,
-144.15.20.105) and `carelink-clp01-ext.corp` (144.15.170.55) — all internal.
+144.15.20.105) and `<internal-ext>.corp` (144.15.170.55) — all internal.
 Zero of the 260 focus names resolved to an RFC1918 / CGNAT address.
 
 ### 4.6 Cert SAN recursion: **nothing gained**
