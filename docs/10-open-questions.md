@@ -100,3 +100,13 @@ Stated as such rather than guessed at:
 - The `n…z` tail of the `medtronic.com` Wayback sweep and a dedicated
   `carelink-clinical-*` deep sweep — not attempted for want of request budget
   (19 requests unused) [COMMONCRAWL §7].
+
+---
+
+> **Consumer note.** Findings here are consumed by
+> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), which
+> feeds this repo's regression suite, which the bridge runs before a release.
+> If something here moves a value the bridge pins, it reaches their release
+> checklist — file it here with the `downstream-bridge` label and name
+> the constant. Bridge bugs (login, upload, crash) belong in
+> [their bug tracker](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).

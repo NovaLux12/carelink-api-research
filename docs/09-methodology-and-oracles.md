@@ -168,7 +168,8 @@ excludes `test/` — which is how a TS2322 in a test went unnoticed. **Fix:**
 `tsconfig.test.json`, which has to restate both `include` and `exclude` (the
 base excludes `test/`) and set `rootDir: "."` (the base sets `rootDir: "src"`);
 verified by injecting a type error and watching CI's new step fail. Recorded
-outside this repo: [source: ../carelink-bridge/CHANGELOG.md #87].
+downstream in the consumer repo:
+[source: [NovaLux12/carelink-bridge CHANGELOG #87](https://github.com/NovaLux12/carelink-bridge/blob/main/CHANGELOG.md)].
 
 The generalisation behind all four: a check that *looks* like it ran is worse
 than no check, because it converts a gap into a green tick.

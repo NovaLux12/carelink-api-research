@@ -45,3 +45,16 @@ The bridge is a TypeScript / Node 20+ consumer-medical-data bridge. It authentic
 The local working tree (NovaLux12/carelink-bridge fork) materially hardened the upstream (domien-f/carelink-bridge): dropped `https-proxy-agent` + `socks-proxy-agent` + `https.txt` + `USE_PROXY`; added SECURITY.md with a private-advisory intake; added Dependabot (weekly, no auto-merge); added CI on Node 20/22 with `enforce_admins` branch protection; added CODEOWNERS; dropped Node 18; bumped vitest 2→4; added an `npm run doctor` pre-flight check; added a `deploy/` directory with a hardened user-level systemd unit. The fork retains the disclaimers: not FDA-approved, not affiliated with Medtronic, may violate Medtronic ToS.
 
 The two recent Medtronic CareLink-adjacent advisories (CVE-2025-12994/995/996/977, published 2025-12-04) target the cardiac CareLink Network and are explicitly excluded from the diabetes CareLink Personal surface per Medtronic's own bulletin — they are not applicable to this bridge.
+
+## Correction (2026-10-11)
+
+The target line above names a local working-tree path. Local paths are not part of
+this finding and are deliberately **not** republished here — `AGENTS.md` §7 forbids a
+machine path in the diff even to correct one. The body text is left verbatim; this
+note is the correction, per the append-only rule in `AGENTS.md` §3.
+
+The target repo is **NovaLux12/carelink-bridge**
+(<https://github.com/NovaLux12/carelink-bridge>), the NovaLux12 community fork of
+[domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge). No finding,
+risk rating, or evidence link in this document changes — only the path and the
+attribution link.

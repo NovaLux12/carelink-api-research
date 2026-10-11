@@ -53,6 +53,31 @@ regression/hurl/                   the pinned assertion suite
 - **A claim that should never silently rot** → add it to
   `regression/hurl/05-public-config.check.sh` as a `check`. See §5.
 
+### What does *not* go here
+
+This repo records facts about **Medtronic's surface**. It is not a client bug
+tracker, and a client bug filed here is a finding about *this repo's* filing
+system, not about CareLink.
+
+| What you found | Where it belongs |
+|---|---|
+| A route added/removed, a version list changed, a country rolled out, a field renamed, a status code that changed | **Here** — file a finding |
+| Login fails, upload fails, a crash, wrong Nightscout data from a route that is still live | **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** → [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml) |
+| A Nightscout outage, a bad Nightscout profile, a local config or account problem | Whoever owns that system — not this repo |
+| A credential or internal hostname published in **this** repo | **Here**, via [`SECURITY.md`](./SECURITY.md) — redacted, never the value |
+| A vulnerability in client code | **[carelink-bridge's private advisory](https://github.com/NovaLux12/carelink-bridge/security/advisories/new)** |
+
+The test: *would Medtronic changing something fix it?* Yes → here. No → a client or
+local problem, which this repo does not own.
+
+**Notifying the downstream consumer.** When a finding changes a value the bridge
+pins — the discovery pin, `BLE_API_VERSIONS`, the family vocabulary, the error
+taxonomy — the finding is incomplete until the consumer knows. Label the issue
+`downstream-bridge`, link the bridge issue, and state which pinned constant moved.
+The bridge documents running this repo's suite before a release (`npm run drift:check`,
+which needs the research repo cloned alongside it), so drift here can block a bridge
+release.
+
 ---
 
 ## 4. Structured issue logging
@@ -228,7 +253,7 @@ Scheduled and CI jobs are guests here. They exist to **notice** drift, never to
 | A scheduled/CI job MAY | A scheduled/CI job MAY NEVER |
 |---|---|
 | Run the pinned suite exactly as the PR gate runs it where applicable — the drift sweep runs all five suites with the same pinned hurl version (8.0.1); the PR gate runs 05 plus static checks. Budget: ~62 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
-| Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`, `correction`, `finding`, `research-area`, `claimed`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
+| Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`, `correction`, `finding`, `research-area`, `claimed`, `downstream-bridge`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
 | Read anything; run any read-only local check (grep, python, the assertion inventory). | POST, authenticate, or exchange a token against any vendor host. The single standing exception is the two POSTs already pinned and documented in `04-deep-surface.hurl` — public client_ids, rejected 403 server-side, asserted as failures. No automation may extend that exception; no third POST may be added. |
 | Probe only patterns already in `regression/hurl/`. A new host, path, or candidate list enters a workflow **only** after a human added it to the suite (§8: bounded, justified lists). | Close an issue, or edit an issue's body. A stale claim gets a comment and a `stale-claim` label; the claimant closes it. |
 | Generate vendor traffic only by re-running the existing suites. No new targets, ever. | Delete or rewrite anything in `findings-log/`. Append-only is deliberate (§3) — the retraction history *is* the evidence. |

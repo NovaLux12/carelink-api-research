@@ -220,6 +220,28 @@ Already have it? Skip the session.
 If you can't classify something as OBSERVED, it's INFERRED. If you can't point
 at the line a claim came from, delete the claim.
 
+**If it's a client bug, stop — it doesn't belong here.** Login failures, upload
+failures, crashes, or wrong Nightscout data from a route that is still live are
+bugs in
+[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge), not
+observations about Medtronic. File those on its
+[bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
+The test: *would Medtronic changing something fix it?* If yes, it's a finding and it
+belongs here. If nothing Medtronic does would fix it, it's a client bug — or a
+local one (a Nightscout outage, a bad profile, an expired token), in which case it
+belongs to whoever owns that system, not to this repo either way.
+
+**When it is both, do both.** Some problems are vendor motion *and* a client
+weakness — a new discovery version appearing that the pin silently skips is the
+standard example. File the finding here (that is the vendor half, and only this
+repo can pin it), and open a bridge issue cross-referencing it. Neither repo
+tracking it alone is how it gets lost.
+
+**If it moves a value the bridge pins**, say so explicitly and label the issue
+`downstream-bridge`: name the pinned constant (discovery pin, `BLE_API_VERSIONS`,
+family vocabulary, error taxonomy) and link the bridge issue. The bridge runs
+this suite before a release, so drift found here can reach their checklist.
+
 ---
 
 ## Looping an agent
@@ -452,6 +474,13 @@ docs/09-methodology-and-oracles.md · regression/hurl/ in full, including
    right when the note was wrong.
 5. If nothing drifted, say so, with the exit code and the date. A clean sweep is
    a result.
+6. If the drift moved a value NovaLux12/carelink-bridge pins, the finding is not
+   finished until the consumer knows. Label the issue downstream-bridge, name the
+   pinned constant that moved (the discovery app-version pin, BLE_API_VERSIONS,
+   the device family vocabulary, an error-class taxonomy), and say plainly that
+   the bridge runs this suite before a release, so drift here can reach their
+   checklist. Do not close a downstream-bridge issue until a
+   bridge issue or PR is linked.
 
 Stop when every failing assertion is explained as drift (with evidence) or as a
 harness artefact (with the control that proves it). Do not open a PR that

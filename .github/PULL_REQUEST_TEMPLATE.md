@@ -43,6 +43,16 @@ research-gate.sh exit: __
 - [ ] `README.md` updated
 - [ ] `docs/00-summary-the-map.md` updated
 
+## Downstream consumer impact
+
+<!--
+[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) pins
+values from this repo and runs this repo's regression suite before a release.
+-->
+
+- [ ] No pinned consumer value affected
+- [ ] A pinned value moved (discovery pin, `BLE_API_VERSIONS`, family vocabulary, error taxonomy) — issue labelled `downstream-bridge` and linked here: ____
+
 ---
 
 <details>

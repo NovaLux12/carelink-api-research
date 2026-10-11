@@ -1,8 +1,13 @@
 # Medtronic CareLink — discovery endpoint pin regression suite
 #
+# Downstream consumer: https://github.com/NovaLux12/carelink-bridge — the bridge runs this suite before a release
+# (`npm run drift:check` on the bridge side). A failure here reaches their
+# release checklist; see https://github.com/NovaLux12/carelink-bridge/blob/main/docs/vendor-api/README.md
+#
 # Run:  hurl --test --delay 1200 hurl/*.hurl
 #
-# The load-bearing check from ADR 0002. Asserts the pinned
+# The load-bearing check from https://github.com/NovaLux12/carelink-bridge/blob/main/docs/adr/0002-discovery-app-version-pin.md.
+# Asserts the pinned
 # DISCOVERY_APP_VERSION (android/3.6) still returns:
 #   1. HTTP 200
 #   2. UseSSOConfiguration == Auth0SSOConfiguration  (the key src/login.ts reads)

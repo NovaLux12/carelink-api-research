@@ -9,6 +9,27 @@ Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCA
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.
 
+> **Consumer note.** How much of this page is *load-bearing* for a client depends
+> entirely on its matcher, so read the matcher's shape before assuming.
+> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) matches
+> on `isBleDevice()` in `src/carelink/client.ts`, and it is deliberately
+> narrow: a `BLE`/`SIMPLERA` family **prefix**, plus exactly **one** published
+> family token (`CC880`, the family the vendor's own config maps to "MiniMed™
+> Flex"), plus a loose `FLEX` substring fallback, plus model prefix. The other
+> published families — CC840, EAGLE, GST, NMX7, NMX8, GM, INSTINCT — are
+> **deliberately not matched**, because routing a non-BLE device down the BLE
+> endpoint is its own silent failure.
+>
+> So most of the 16-family vocabulary on this page carries no routing consequence
+> for that client, and a wrong token here is *not* automatically a bridge bug.
+> The consequential inputs are `CC880`, the `BLE`/`SIMPLERA` prefixes, and the
+> model-prefix list.
+>
+> **Note on that consumer's own docs.** Its `docs/vendor-api/README.md`
+> described matching on model prefix "rather than family token" — stale, since
+> the `CC880` family-token match in `src/carelink/client.ts` postdates it. Read
+> the code, not prose: `BLE_FAMILY_TOKENS` is the authority on what is matched.
+
 > **Provenance rule.** `recov/PATIENT-APP-VOCABULARY.md` is the **only patient-app-side**
 > artefact in this project. `JS-API-SURFACE.md` and `CHUNK-CORPUS-FINDINGS.md` are
 > clinic-side. Do not cite them for patient-path questions; cite them for the clinic

@@ -27,3 +27,14 @@ Session: public, no-holds-barred investigation of the Medtronic CareLink consume
 - Legal/operations: cite Medtronic's own bulletin excluding CareLink Personal from CVE-2025-12994-12997. Keep the bridge strictly personal, non-commercial, single-account. Document that the bridge is not affiliated with or endorsed by Medtronic and may violate Medtronic ToS.
 - Infra: bridge depends on a single AWS CloudFront provider across all seven CareLink consumer hosts; `status.minimed.com` is the operational ground truth; add a maintenance-window probe. `carelink-connect.minimed.eu` is retired — do not use.
 - Mobile: store semantic version 3.8.1 ≠ discovery selector `android/3.6`. Public discovery proves 3.6/3.7 are the Auth0-compatible tracks. Treat 3.6 as a pinned dependency.
+
+## Correction (2026-10-11)
+
+The intro above names a local working-tree path for the consumer. Local paths are
+not part of this finding and are deliberately **not** republished here — `AGENTS.md`
+§7 forbids a machine path in the diff even to correct one. The body text is left
+verbatim; this note is the correction, per the append-only rule in `AGENTS.md` §3.
+
+The consumer is **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)**,
+a community fork of
+[domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge).

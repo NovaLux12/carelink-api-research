@@ -30,6 +30,14 @@ docs/09-methodology-and-oracles.md · regression/hurl/ in full, including
    being right when the note was wrong.
 5. If nothing drifted, say so, with the exit code and the date. A clean sweep is
    a result.
+6. **If the drift moved a value
+   [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)
+   pins, the finding is not finished until the consumer knows.** Label the issue
+   `downstream-bridge`, name the pinned constant that moved (discovery
+   app-version pin, `BLE_API_VERSIONS`, device family vocabulary, error-class
+   taxonomy), and say that the bridge runs this suite before a release — so drift
+   here can reach their release checklist. Do not close a `downstream-bridge`
+   issue until a bridge issue or PR is linked.
 
 Stop when every failing assertion is either explained as drift (with evidence)
 or explained as an artefact of the harness (with the control that proves it). Do

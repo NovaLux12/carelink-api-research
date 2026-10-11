@@ -52,3 +52,16 @@ public form).
   unauthenticated observation. No POST beyond the two pinned and documented
   in `04-deep-surface.hurl`, no authentication, no token exchange, no
   internal hosts — `AGENTS.md` §§8, 11.
+
+## Client vulnerabilities do not belong here
+
+A vulnerability in a CareLink **client** is not a finding about Medtronic's API.
+The public client is
+[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge); report
+code vulnerabilities there through its
+[private advisory channel](https://github.com/NovaLux12/carelink-bridge/security/advisories/new),
+not here. Login, upload, or crash failures with an unchanged vendor surface are a
+plain bug — its [bug form](https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml).
+
+What *is* in scope here is anything above: a credential, an internal hostname, or an
+exposure in a vendor artefact, reported redacted.

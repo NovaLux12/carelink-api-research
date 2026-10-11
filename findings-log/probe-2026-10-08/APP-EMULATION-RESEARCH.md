@@ -483,3 +483,10 @@ Note `medicalDeviceFamily: "GUARDIAN"` in a real EU `connect/data` response
 quoted in nightscout/cgm-remote-monitor#5719 — consistent with the
 `GUARDIAN`/`NGP`/`CGM`/`CC` vocabulary from Round 3 and therefore with the
 concern in #81, though that sample predates the BLE endpoint and 780G.
+
+## Correction (2026-10-11) — attribution
+
+"the bridge" throughout means
+**[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)**. This
+document is the most-consumed file in the repo for that client's implementers, so the
+attribution is now a link rather than a bare name. No observation changes.
