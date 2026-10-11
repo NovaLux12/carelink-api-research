@@ -122,3 +122,41 @@ GET https://carelink.minimed.eu/patient/countries/settings?countryCode=US&langua
 HTTP 200
 [Asserts]
 jsonpath "$.cpMobileAppAvailable" == false
+
+# ============================================================
+# Area C (2026-10-11): PDE closed, CSR v2 + bare v2 are POST-only
+# Source: findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md
+# GET 403 + OPTIONS 403 = dead. GET 403 + OPTIONS 200 = live POST-only.
+# If any of these flip, the vendor surface moved.
+# ============================================================
+# PDE has no route on any tested method (GET and OPTIONS both 403)
+GET https://clcloud.minimed.eu/connect/pde/v3/display/message
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/pde/v3/display/message
+HTTP 403
+
+# CSR v2 is live but POST-only: GET is undefined, OPTIONS proves the resource
+OPTIONS https://clcloud.minimed.eu/connect/csr/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+
+GET https://clcloud.minimed.eu/connect/csr/v2/display/message
+HTTP 403
+
+# Bare pre-carepartner v2 is live but POST-only (same signature as v6)
+OPTIONS https://clcloud.minimed.eu/connect/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+
+GET https://clcloud.minimed.eu/connect/v2/display/message
+HTTP 403
+
+# CSR neighbours are dead on both methods (only v2 is live)
+OPTIONS https://clcloud.minimed.eu/connect/csr/v1/display/message
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/csr/v3/display/message
+HTTP 403
