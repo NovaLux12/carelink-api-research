@@ -1,0 +1,24 @@
+{
+  "generated_utc": "2026-10-11T15:33:10Z",
+  "run_url": "",
+  "commit": "",
+  "assertions": {
+    "static": 96,
+    "runtime": 228
+  },
+  "detail": {
+    "predicates": 72,
+    "http_lines": 56,
+    "check_sites": 24,
+    "loop_sites": 1,
+    "executed_05": 44,
+    "suites": {
+      "01-discovery-pin": 21,
+      "02-sso-oidc": 24,
+      "03-patient-api": 11,
+      "04-deep-surface": 16,
+      "05-public-config": 24
+    }
+  },
+  "rule": "static = predicates inside [Asserts] + check sites (family-loop site counted once); runtime = predicates + 2xHTTP + 05 executed. See scripts/measure-assertions.py."
+}
