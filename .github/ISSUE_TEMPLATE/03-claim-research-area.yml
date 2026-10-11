@@ -11,11 +11,20 @@ body:
         That last part matters — a vaguely-bounded area is how a session ends with
         forty requests spent and nothing written down.
 
+        **Your PR must leave `docs/11-suggested-research-areas.md` fuller than
+        you found it.** Close the area into the dated Closed table with its
+        evidence, and add at least one successor area with a blocker and a
+        definition of done. See `CONTRIBUTING-research.md` §"Run a research
+        session", step 7.
+
   - type: input
     id: area
     attributes:
       label: Which area
-      description: From docs/11-suggested-research-areas.md
+      description: |
+        The letter and title from docs/11-suggested-research-areas.md.
+        If it is not on that page, it is not claimable here — propose it as a
+        new area first.
       placeholder: "G — cross-check the three model tables"
     validations:
       required: true
@@ -41,18 +50,69 @@ body:
     id: done
     attributes:
       label: What "closed" means
-      description: The specific result that would let you file this as done — including whether a negative counts.
+      description: |
+        The specific result that would let you file this as done — including
+        whether a negative counts. "Negative" is a perfectly good answer here;
+        #84 was closed by proving something does not exist.
     validations:
       required: true
+
+  - type: textarea
+    id: successor
+    attributes:
+      label: Successor areas you propose
+      description: |
+        **At least one.** What you already suspect will be askable once this
+        area closes — a question, the specific blocker that stops it today, and
+        the checkable result that would close it. Mark any assumption INFERRED.
+        If you genuinely cannot name one, write why here instead.
+
+        ```
+        Blocker: an OPTIONS probe nobody has run
+        Closes when: the same two paths are probed on .com and -trials;
+                     a negative closes it.
+        Assumptions (INFERRED): …
+        ```
+      placeholder: |
+        Blocker: …
+        Closes when: … (state whether a negative counts)
+        Assumptions (INFERRED): … — or "none, everything above is OBSERVED"
+    validations:
+      required: true
+
+  - type: input
+    id: claimed-until
+    attributes:
+      label: Claim valid until
+      description: |
+        A date. Stale claims are how an area sits untouched for weeks while
+        someone else avoids duplicating it. Leave blank and a maintainer will
+        set 14 days.
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: false
 
   - type: checkboxes
     id: checks
     attributes:
       label: Confirm
       options:
-        - label: This area is not already claimed in an open issue
+        - label: This area is not already claimed in an open issue (I checked, including closed claims less than 14 days old)
           required: true
         - label: I have read the traps list in AGENTS.md §7
           required: true
         - label: A negative result is an acceptable outcome for this area
           required: false
+        - label: My PR will update `docs/11-suggested-research-areas.md` — closing this area into the Closed table with its evidence
+          required: true
+        - label: My PR will add at least one successor area, or state why none exists
+          required: true
+
+  - type: input
+    id: pr
+    attributes:
+      label: PR (fill in when you open it)
+      placeholder: "#123"
+    validations:
+      required: false
+

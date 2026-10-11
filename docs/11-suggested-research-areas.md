@@ -180,6 +180,12 @@ landing on alphabetical neighbours).
 4. **Negative results are first-class.** This repo's #84 was closed by proving
    something doesn't exist across 73 paths, 28 key names, and four corpora. That is
    a good contribution.
+5. **Your PR must leave this page fuller than it found it.** Close the area into
+   the Closed table with its evidence, and add at least one successor area with a
+   blocker and a definition of done — see
+   [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 for the
+   template and the quality bar. A weekly job files an issue if this page drops
+   below three open areas.
 
 ## Closed areas
 
