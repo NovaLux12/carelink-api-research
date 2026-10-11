@@ -103,7 +103,7 @@ itemised in any source.
 | `personal.mixpanel.analytics.settings.enabled` | true | true | **false**, empty token |
 | `personal.username.as.email.settings.enabled` | true | true | **false** |
 | `personal.inpen.supported.countries.enabledGlobally` | false | **true** | false |
-| `personal.common.core.reporting.enabled.countries` | 17 countries | `["US","PR"]` | 21 |
+| `personal.common.core.reporting.enabled.countries` | **29 countries** (17 before the 2026-10-09→10 rollout) | `["US","PR"]` | 21 |
 
 `personal.safety.notices.enabled` is the medically relevant one: it is **true on the US
 deployment only**, and safety notices are how Medtronic communicates device advisories to

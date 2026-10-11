@@ -69,7 +69,7 @@ full are in [`04-configuration.md`](04-configuration.md).
 | `/api/carepartner/v2/*` | What the app's `baseUrlCareLink` declares, but no client actually uses it. |
 | `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
 | `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
-| `/connect/pde/v3/*` | 403 on every route probed. Never touched. Untested whether any route exists. |
+| `/connect/pde/v3/*` | **Closed 2026-10-11 — no route on any tested method.** GET 403 + OPTIONS 403 with `MissingAuthenticationTokenException` across `pde/v{1,2,3}/display/message` and `pde/v3/discover/android/3.6`; the same pass found `csr/v2` and bare `connect/v2` **live, POST-only** [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] |
 | `/patient/reports/*` **on `carelink.minimed.eu`** | **Live, gated 401/405.** Previously mapped only to `commoncore` and recorded unreachable — this supersedes that. The reports namespace is not where we thought it was. |
 | `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | Still live at path but **CloudFront 502 "could not resolve the origin domain name"** — an origin-side DNS failure, not an absence. Never archived in any crawl. |
 
@@ -230,7 +230,7 @@ Read the full list, with the fix for each, in
 
 | Trap | Detail |
 |---|---|
-| `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. ~50 collected names are false positives. |
+| `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. 49 collected names are false positives. |
 | Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. |
 | Unconditional gzip | `carelink.minimed.eu` ignores `Accept-Encoding`. |
 | Raw archive captures | Common Crawl/Wayback contain live `jsessionid_*` and plaintext-base64 OAuth `sessionData`. Facts only. |
@@ -247,7 +247,6 @@ Every open question, with what would settle it, is in
 | The NGP alarm-code vocabulary | an authenticated `application` config — 73 `hcp/configuration/*` paths probed, all closed |
 | `relativeOffset` semantics for pump-offset rounding | a real token |
 | Report bodies from `commoncore` | an authenticated request — **never archived in any crawl** |
-| Whether any PDE v3 route exists | OPTIONS probes beyond the current budget |
 
 ### Drift, 2026-10-10
 

@@ -52,21 +52,6 @@ same account. Blocked on a token for the *body*, but the **routing** picture is
 already open — check which cells are reachable, whether v12 has an `OPTIONS` route
 where v13 doesn't, and whether the `x-ca-err` code differs between them.
 
-### C. Extend the oracle set to the `pde/v3` and `csr` namespaces
-
-Both were probed at root and returned the router's no-route 403. But "403" on
-`clcloud` means *no route*, not *no resource* — and **no `OPTIONS` probe was ever
-run**. A resource that exists but only defines POST returns exactly this.
-
-The `carepartner` axis gave us a clean discriminator (`MissingAuthenticationToken`
-vs `UnauthorizedException` + `x-ca-err: 990`) and an `OPTIONS` CORS probe found a
-POST-only route that a GET-only probe called dead.
-
-**Closes when:** `OPTIONS` + the error-type oracle have been run across
-`pde/v3/`, `csr/`, and the bare `connect/carepartner/` family. This is ~30 GETs
-and some OPTIONs, all unauthenticated, and it either finds routes nobody knew
-existed or closes the space properly.
-
 ### D. The 18-country sweep, completed
 
 `/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
@@ -195,3 +180,12 @@ landing on alphabetical neighbours).
 4. **Negative results are first-class.** This repo's #84 was closed by proving
    something doesn't exist across 73 paths, 28 key names, and four corpora. That is
    a good contribution.
+
+## Closed areas
+
+Dated, with the verdict and the evidence. An area leaves this table only by
+being superseded — never silently. Letters are not reused.
+
+| Area | Closed | Verdict | Evidence | Closed by |
+|---|---|---|---|---|
+| C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |

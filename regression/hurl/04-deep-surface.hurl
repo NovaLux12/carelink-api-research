@@ -160,3 +160,43 @@ HTTP 403
 
 OPTIONS https://clcloud.minimed.eu/connect/csr/v3/display/message
 HTTP 403
+
+# The remaining negatives from the same pass, pinned here so the space stays
+# closed: PDE v1/v2, the v3 discovery cell, and the bare carepartner prefixes
+# (the router answers at leaves, not at prefix parents). All GET+OPTIONS 403
+# with MissingAuthenticationTokenException and no CORS.
+GET https://clcloud.minimed.eu/connect/pde/v1/display/message
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/pde/v1/display/message
+HTTP 403
+
+GET https://clcloud.minimed.eu/connect/pde/v2/display/message
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/pde/v2/display/message
+HTTP 403
+
+GET https://clcloud.minimed.eu/connect/pde/v3/discover/android/3.6
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/pde/v3/discover/android/3.6
+HTTP 403
+
+GET https://clcloud.minimed.eu/connect/carepartner/
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/
+HTTP 403
+
+GET https://clcloud.minimed.eu/connect/carepartner/v13
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13
+HTTP 403
+
+GET https://clcloud.minimed.eu/connect/carepartner/v13/discover
+HTTP 403
+
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover
+HTTP 403

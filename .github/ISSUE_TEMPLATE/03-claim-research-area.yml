@@ -16,7 +16,7 @@ body:
     attributes:
       label: Which area
       description: From docs/11-suggested-research-areas.md
-      placeholder: "C — extend the oracle set to pde/v3 and csr"
+      placeholder: "G — cross-check the three model tables"
     validations:
       required: true
 
