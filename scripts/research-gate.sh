@@ -47,7 +47,11 @@ done
 # This file necessarily CONTAINS the literal secrets it searches for, so it is
 # excluded from the scan it performs. Without the exclusion the gate always
 # fails on itself, which is the fastest way to make a gate get disabled.
+# These two files necessarily contain the literals they search for: the gate
+# prints them, the pattern list IS them. Both are excluded from the scan they
+# feed; nothing else may contain these strings.
 SELF="scripts/research-gate.sh"
+SELF_PATTERNS="scripts/scrub-patterns.txt"
 SUITE_LOG="${SUITE_LOG:-/tmp/_gate_suite.log}"
 FAIL=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
@@ -58,13 +62,13 @@ if [ "$SUITE_ONLY" -eq 0 ]; then
 
   case "$MODE" in
     all)
-      SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null | grep -vxF "$SELF" || true)
+      SUBJECT=$(git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl' 2>/dev/null | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
     staged)
-      SUBJECT=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      SUBJECT=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
     *)
-      SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" || true)
+      SUBJECT=$(git diff --name-only --diff-filter=ACM "$BASE" 2>/dev/null | grep -E '\.(md|yml|yaml|sh|hurl)$' | grep -vxF "$SELF" | grep -vxF "$SELF_PATTERNS" || true)
       ;;
   esac
 
@@ -88,6 +92,10 @@ EOF
 
     while IFS='|' read -r name pat; do
       [ -z "$name" ] && continue
+      # A line with no "|" is a comment, not a pattern — an empty regex
+      # matches every line, which is how a documented pattern list turns
+      # into 1,398 false hits.
+      [ -z "$pat" ] && continue
       # AGENTS.md documents the machine-path rule and therefore contains the
       # example it warns about ("/home/<user>"). Exclude that one line so the
       # rule can be stated without the gate flagging its own documentation.
@@ -104,17 +112,7 @@ EOF
       else
         note ok "$name"
       fi
-    done <<'PATTERNS'
-vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
-long base64 secrets|(^|[^A-Za-z0-9_./-])(?=[A-Za-z0-9+_-]*[A-Z])(?=[A-Za-z0-9+_-]*[a-z])[A-Za-z0-9+_-]{40,}={0,2}([^A-Za-z0-9_.-]|$)
-reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
-internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
-internal .corp host|[a-z0-9-]+\.corp\b
-machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
-live jsession values|;jsessionid_[A-Z0-9]{6,}=
-live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
-long base64 secrets|(^|[^A-Za-z0-9_./-])[A-Za-z0-9_+]{44,}={0,2}([^A-Za-z0-9_.-]|$)
-PATTERNS
+    done < <(grep -v '^[[:space:]]*#' scripts/scrub-patterns.txt)
   fi
 fi
 

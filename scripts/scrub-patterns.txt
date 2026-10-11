@@ -1,0 +1,22 @@
+# Scrub patterns — the ONE list of strings that must never enter the repo.
+#
+# Format:  <name>|<extended regex>
+#
+# This file necessarily CONTAINS the literal secrets it searches for, so it is
+# the second file excluded from the scan it feeds (with scripts/research-gate.sh).
+# Without that exclusion the gate always fails on itself, which is the fastest
+# way to get a gate get disabled. The exclusion is the point of the note in
+# AGENTS.md §7, not a loophole: nothing else may contain these strings, and
+# .github/workflows/drift-sweep.yml greps its own output through this same file
+# rather than copying the patterns.
+#
+# Edit a pattern here and both the PR gate and the drift sweep change together.
+vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
+reports-broker key fragments|(0vJJl02[0-9A-Za-z]{8,}|GIFQiM3[0-9A-Za-z]{8,})
+reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
+internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
+internal .corp host|[a-z0-9-]+\.corp\b
+machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
+live jsession values|;jsessionid_[A-Z0-9]{6,}=
+live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
+long base64 secrets|(^|[^A-Za-z0-9_./-])[A-Za-z0-9_+]{44,}={0,2}([^A-Za-z0-9_.-]|$)

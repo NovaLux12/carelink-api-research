@@ -59,16 +59,21 @@ jobs:
             tail -40 .drift/run2.log > .drift/tail2.txt
           fi
 
-      # ---- Safety: never paste anything matching the scrub list (AGENTS.md
-      # ---- section 7, the same pattern list as scripts/research-gate.sh)
-      # ---- into a public issue. The suite is unauthenticated, but assert on
-      # ---- it anyway.
+      # ---- Safety: never paste anything matching the scrub list into a public
+      # ---- issue. The patterns come from scripts/scrub-patterns.txt — the same
+      # ---- file the PR gate reads — so there is one list, not two. That file is
+      # ---- the only place the literals live, and it is excluded from its own
+      # ---- scan (AGENTS.md section 7).
       - name: Build the issue body (scrub check first)
         if: steps.second.outputs.verdict == 'red'
         run: |
           LOG=.drift/tail2.txt
-          if grep -nEi '11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1|0vJJl02[0-9A-Za-z]{8,}|jsessionid_[A-Z0-9]{6,}|sessionData=[A-Za-z0-9_-]{12,}|/home/[a-z]' "$LOG" >/dev/null; then
-            echo "refusing to file — output matches a scrub-list pattern"; exit 1
+          PATTERNS=$(mktemp)
+          grep -v '^#' scripts/scrub-patterns.txt | cut -d'|' -f2- > "$PATTERNS"
+          if grep -nEi -f "$PATTERNS" "$LOG" >/dev/null 2>&1; then
+            echo "refusing to file — the failing output matches a scrub-list pattern"
+            grep -nEi -f "$PATTERNS" "$LOG" | head -3 | sed 's/^/         /'
+            exit 1
           fi
           {
             echo "The weekly drift sweep re-ran \`regression/hurl/run.sh\` on \`main\` and it went red twice in a row."
