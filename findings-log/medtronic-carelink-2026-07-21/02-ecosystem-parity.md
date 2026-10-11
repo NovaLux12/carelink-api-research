@@ -73,3 +73,12 @@
 - Does the 20-minute global stale cutoff hide useful connection/alarm status?
 
 No accounts, credentials, private data, authentication, POSTs to live services, or intrusive scans were used.
+
+## Correction (2026-10-11) — attribution
+
+"The local bridge" throughout means
+**[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)**
+(`NovaLux12/carelink-bridge`, community fork of
+[domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge)), which was
+at `0.1.6` when observed. No parity claim in this document changes — only the
+attribution.

@@ -110,3 +110,13 @@ This is an entire parallel deployment (trials/clinical studies) the bridge doesn
 ### 4. Conclusion
 
 Core pinned surface unchanged and healthy → the bridge's login/data path is not at risk. Only genuinely new info is the 3.8/4.1 tracks and the confirmed trials third-tenant. No code action required; optionally note 3.8 as a verified fallback in the `DISCOVERY_APP_VERSION` comment (keeps the "keep it verified" rule intact).
+
+## Correction (2026-10-11) — attribution
+
+The file paths named above (`src/carelink/urls.ts`, `src/login.ts:17-23`,
+`src/doctor.ts:69-72`) refer to the consumer client
+**[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)**,
+the community fork of [domien-f/carelink-bridge](https://github.com/domien-f/carelink-bridge).
+No status code, row, or conclusion in this document changes — only the attribution,
+which was previously unlinked. The "Compatibility implications for the bridge"
+section above is that client's reading of this matrix.

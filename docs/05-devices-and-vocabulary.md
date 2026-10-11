@@ -9,6 +9,13 @@ Dated 2026-10-10. Sources: `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCA
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = vendor document served
 without a login · **INFERRED** = reasoned, not seen.
 
+> **Consumer note.** The 16-family vocabulary and the family-vs-model distinction on
+> this page are what
+> [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge) routes on
+> (`isBleDevice()` and its family matcher). If a family token here is wrong, that
+> bridge silently fails to classify a pump — which is why "family matching is
+> unreliable" below is load-bearing for a consumer, not just a curiosity.
+
 > **Provenance rule.** `recov/PATIENT-APP-VOCABULARY.md` is the **only patient-app-side**
 > artefact in this project. `JS-API-SURFACE.md` and `CHUNK-CORPUS-FINDINGS.md` are
 > clinic-side. Do not cite them for patient-path questions; cite them for the clinic

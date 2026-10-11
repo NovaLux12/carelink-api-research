@@ -8,6 +8,14 @@ passes: no exploitation, no data retrieval, no writes, no credential guessing
 source describes an attack surface this page records the **observation and the
 impact**, never a recipe. Extends [`00-summary-the-map.md`](00-summary-the-map.md).
 
+> **To report an exposure, or a vulnerability in a client.** An exposure in
+> Medtronic's own surface belongs here, reported **redacted** — never the value —
+> via this repo's [`SECURITY.md`](../SECURITY.md). A vulnerability in client code is
+> a different repo: [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge/security/advisories/new),
+> whose own [`SECURITY.md`](https://github.com/NovaLux12/carelink-bridge/blob/main/SECURITY.md)
+> is its private-advisory channel. The findings below are the vendor-side posture a
+> client inherits; the client's own hardening is that repo's business.
+
 Legend — **OBSERVED** = seen in a live response · **PUBLISHED** = in a vendor
 document served without a login (live, or recovered from a public archive) ·
 **INFERRED** = reasoned, not seen. Citations are `[source: findings-log/<file> §n]`;
@@ -180,7 +188,7 @@ authorize endpoint: `S256` → 302 (accepted), **`plain` → 302 (accepted)**,
 redirect is `com.medtronic.carepartner:/sso`, a custom URI scheme; on Android
 any app can register the same scheme, and PKCE is the mitigation for a malicious
 app intercepting that redirect — here it is **client-enforced only** [source:
-SECURITY-FINDINGS S2]. The bridge's client does send S256 [AUTH-TENANT §2]; the
+SECURITY-FINDINGS S2]. The bridge's client ([NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)) does send S256 [AUTH-TENANT §2]; the
 platform default is weak.
 
 ## F9 — Vendor data bugs and the unconditional-gzip protocol violation
