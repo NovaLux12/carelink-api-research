@@ -313,6 +313,28 @@ cd carelink-api-research
 
 ---
 
+## Who builds on this
+
+Medtronic publishes no API, so every third-party CareLink client — Nightscout
+bridges, xDrip, Home Assistant integrations, Python and Java libraries —
+reverse-engineers the same surface independently, and each one is only as
+correct as the assumptions its author happened to test. This repo is that work
+done once and cited.
+
+Projects known to be built on findings here:
+
+| Project | Depends on this for |
+|---|---|
+| **[NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)** | the discovery version pin, the host/namespace split, the unauthenticated status-code oracles, and the error taxonomy behind `login-errors.ts`. Its `docs/ARCHITECTURE.md` carries a dated snapshot of the same surface map and points here as canonical. |
+
+If you maintain a CareLink client and something in it stops working, the first
+check worth making is whether this repo has moved: a route that was live may be
+gone, a country may have rolled out a new one, or the config may have drifted.
+**Report what you find here** — a negative or a correction is as useful as a
+positive, and the regression suite is what stops a fix from quietly reverting.
+
+---
+
 ## Why trust this
 
 **Every claim is labelled.** **OBSERVED** — seen in a live response.
