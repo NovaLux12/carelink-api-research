@@ -16,7 +16,10 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
-DELAY_MS=1200
+# The suite is deliberately low-rate (AGENTS.md section 8: >=2s between
+# requests to the same host is the floor). 1200ms is a courtesy floor for
+# interactive runs; the weekly drift sweep overrides it with 2000.
+DELAY_MS="${DELAY_MS:-1200}"
 SUITES=${*:-01-discovery-pin 02-sso-oidc 03-patient-api 04-deep-surface 05-public-config}
 FAILS=0
 

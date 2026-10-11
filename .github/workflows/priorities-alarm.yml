@@ -1,0 +1,52 @@
+name: priorities-alarm
+description: Keep docs/11 from silently emptying. Files one issue when open areas drop below the floor. Zero vendor requests.
+on:
+  schedule:
+    - cron: '43 6 * * 1'        # Mondays 06:43 UTC (after the drift sweep)
+  workflow_dispatch:
+    inputs:
+      floor:
+        description: "Minimum open areas before the alarm fires"
+        default: "3"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  alarm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count open areas in docs/11
+        id: count
+        run: |
+          F='docs/11-suggested-research-areas.md'
+          if [ ! -f "$F" ]; then echo "n=-1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          # Counts only "### A." … "### M." headings. The token-blocked table
+          # at the top of the page is deliberately NOT counted: those are not
+          # open work.
+          N=$(grep -c '^### [A-M]\. ' "$F" || true)
+          echo "n=${N:-0}" >> "$GITHUB_OUTPUT"
+          echo "floor=${{ github.event.inputs.floor || '3' }}" >> "$GITHUB_OUTPUT"
+
+      - name: File the alarm (once)
+        if: steps.count.outputs.n < steps.count.outputs.floor
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh label create automation    --description "Opened by a scheduled workflow, not a human" --color ededed --force
+          gh label create research-area --description "An area from docs/11 is claimed and being worked" --color 1d76db --force
+          EXISTING=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label automation \
+            --search 'automation: docs/11 open areas in:title' --json number --jq '.[0].number // empty')
+          BODY="**\`docs/11-suggested-research-areas.md\` has ${{ steps.count.outputs.n }} open area(s), floor is ${{ steps.count.outputs.floor }}.**"
+          BODY="$BODY\n\nRecount with: \`grep -c '^### [A-M]\. ' docs/11-suggested-research-areas.md\`\n"
+          BODY="$BODY\nThe alarm is wrong if the count is wrong — fix the counter, don't dismiss the issue.\n"
+          BODY="$BODY\nWhen refilling the page, follow the format the existing areas use: what is known, what is missing, what would close it. Every research session is required to leave this page fuller than it found it — see \`CONTRIBUTING-research.md\` step 7 of the session protocol, which carries the successor-area template and the quality bar (Derived / Bounded / Non-duplicate / Labelled)."
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "automation: docs/11 open areas at ${{ steps.count.outputs.n }} (floor ${{ steps.count.outputs.floor }})" \
+              --label automation,research-area --body "$BODY"
+          fi

@@ -14,3 +14,6 @@ or let the issue forms apply the defaults above.
 | `pinned` | `5319e7` | Covered by a regression-suite assertion |
 | `docs` | `c5def5` | Documentation only |
 | `blocked-on-token` | `bfd4f2` | Cannot proceed without an authenticated response |
+| `automation` | `ededed` | Opened by a scheduled workflow, not a human |
+| `drift` | `fbca04` | A pinned vendor assertion failed on re-probe |
+| `stale-claim` | `bfd4f2` | A claimed research area has had no activity |

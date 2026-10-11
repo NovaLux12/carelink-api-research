@@ -201,3 +201,29 @@ read the page, tell exactly which claims are confirmed and which are guesses, an
 re-run your probe from what you wrote down.
 
 If a paragraph doesn't carry information, delete it. This repo has no filler.
+
+---
+
+## 11. What automation may and may not do
+
+Scheduled and CI jobs are guests here. They exist to **notice** drift, never to
+**decide** truth, and never to write to the record.
+
+| A scheduled/CI job MAY | A scheduled/CI job MAY NEVER |
+|---|---|
+| Run `regression/hurl/` exactly as the PR gate runs it — same suites, same runner, same pinned hurl version. Budget: ~62 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
+| Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
+| Read anything; run any read-only local check (grep, python, the assertion inventory). | POST, authenticate, or exchange a token against any vendor host. The single standing exception is the two POSTs already pinned and documented in `04-deep-surface.hurl` — public client_ids, rejected 403 server-side, asserted as failures. No automation may extend that exception; no third POST may be added. |
+| Probe only patterns already in `regression/hurl/`. A new host, path, or candidate list enters a workflow **only** after a human added it to the suite (§8: bounded, justified lists). | Close an issue, or edit an issue's body. A stale claim gets a comment and a `stale-claim` label; the claimant closes it. |
+| Generate vendor traffic only by re-running the existing suites. No new targets, ever. | Delete or rewrite anything in `findings-log/`. Append-only is deliberate (§3) — the retraction history *is* the evidence. |
+| Publish exactly one generated artefact: `counts.json` on the `counts` branch, written by the drift sweep's badge-counts job after each sweep, from `scripts/measure_assertions.py`. That branch is generated data — never hand-edit it. | Any other push. If a badge, a count, or a page is wrong, the fix is a human PR. |
+
+Every automated issue and comment carries the `automation` label so bot output
+filters to one click. An automated issue that fails a scrub check (§7) is
+dropped unsent — the sweep would rather stay silent than leak.
+
+Rationale: the gate stops the irreversible mistakes and review catches the
+subtle ones (`CONTRIBUTING-research.md` §What the gate checks). Automation
+extends the first half of that sentence to the calendar — drift, silence, and
+rot are noticed weekly instead of never — and leaves the second half exactly
+where it is.

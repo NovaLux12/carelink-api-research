@@ -45,10 +45,17 @@ second pass'. (scripts/research-gate.sh header.)
 
 import argparse
 import glob
+import json
 import os
 import re
 import subprocess
 import sys
+
+# The counting rule lives in one file so the gate, the badge job and anyone
+# re-deriving the number cannot disagree. (An undocumented counting rule is
+# itself an unverifiable claim — this repo's cardinal sin.)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from measure_assertions import measure  # noqa: E402
 
 FAILED = False
 
@@ -68,44 +75,23 @@ def read(path):
         return fh.read()
 
 
-def measure():
-    """Return (static, runtime, detail) measured from the tree."""
-    pred = http = 0
-    for f in sorted(glob.glob('regression/hurl/*.hurl')):
-        in_asserts = False
-        for line in read(f).splitlines():
-            s = line.strip()
-            if re.match(r'^\[[A-Za-z]+\]$', s):
-                in_asserts = (s == '[Asserts]')
-                continue
-            if in_asserts and (s.startswith('jsonpath ') or s.startswith('header ')):
-                pred += 1
-            if s.startswith('HTTP '):
-                http += 1
-    sites = loop = 0
-    for line in read('regression/hurl/05-public-config.check.sh').splitlines():
-        if re.match(r'^\s*check\s+"', line):
-            sites += 1
-            if line[0] in ' \t':
-                loop += 1
-    executed_05 = (sites - loop) + 16 * loop + 5   # 39 checks + 5 inline
-    detail = (f'{pred} predicates + {sites} check sites (static); '
-              f'{http} HTTP lines; 05 executes {executed_05}')
-    return pred + sites, (pred + 2 * http) + executed_05, detail
-
-
-def check_numbers(suite_log):
-    static, runtime, detail = measure()
-    print(f'--- numbers (rule: {detail}) ---')
-
+def measure_for_check(suite_log):
+    """Static and runtime counts, from the one rule (measure_assertions.py)."""
+    observed = None
     if suite_log and os.path.exists(suite_log):
         m = re.search(r'(\d+) passed, \d+ failed', read(suite_log))
         if m:
             observed = int(m.group(1))
-            # The suite log covers 05 only; subtract the derived 05 part.
-            runtime05_derived = 44
-            runtime = (runtime - runtime05_derived) + observed
-            ok(f'runtime uses the live suite log: 05 contributed {observed}')
+    m = measure(observed_05=observed)
+    detail = (f'{m["predicates"]} predicates + {m["check_sites"]} check sites '
+              f'(static); {m["http_lines"]} HTTP lines; 05 executes '
+              f'{m["executed_05"]}')
+    return m['static'], m['runtime'], detail
+
+
+def check_numbers(suite_log):
+    static, runtime, detail = measure_for_check(suite_log)
+    print(f'--- numbers (rule: {detail}) ---')
 
     # Prose sites that must state the STATIC count.
     static_sites = [
