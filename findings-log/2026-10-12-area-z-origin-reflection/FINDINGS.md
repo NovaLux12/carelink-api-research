@@ -285,3 +285,38 @@ Recorded so a reader does not over-read the grid.
    the values are constant. Whether the gateway emits `*` from route
    configuration, from a stage default, or from CloudFront is not addressed by
    any request here.
+
+---
+
+## Correction (2026-10-12, after independent review)
+
+A fresh-context verifier that did not watch this pass being built returned **NOT CLEAN**
+twice, across two SHAs. Eight defects were raised. All are fixed; the retraction history is
+kept here rather than edited away, because §1 of this file was itself corrected in place and
+`findings-log/` is append-only by rule (`AGENTS.md` §3).
+
+| # | Defect | Raised at | Disposition |
+|---|---|---|---|
+| 1 | `docs/11` read "20 open plus 6 closed" while the page held **19** open headings and **7** closed rows — self-refuting, in the paragraph whose own thesis is that the page's count must not disagree with its contents | `fbe5d9b` | **Fixed** to 19 and 7. Both re-derived from the page itself; the gate never reads this prose, which is why a green gate did not catch it |
+| 2 | `docs/10` claimed the trials `200` on a `discover` path was "the **only** such case". Three rows qualify (36, 38, 70) | `fbe5d9b` | **Fixed.** The anomaly is `v6`-specific, not `-trials`-specific: `v11/discover/android/3.6` is `200` on all three hosts (rows 29, 37, 38) |
+| 3 | **§1 of this file** claimed `run.log` ends `DONE n=51 (cap 60)`. **No such line exists** — `probe.sh` echoes that banner to stdout, never into `run.log` | `fbe5d9b` | **Fixed in place, and recorded here because that is where the retraction belongs.** §1 now states the same guarantee from what *is* on disk: `run.log` holds exactly 51 request lines, `seq` contiguous 1..51, no gaps and no extras. **The original sentence was wrong and is withdrawn** |
+| 4 | The `docs/11` addendum cited `FINDINGS.md §6` for the 2-vs-12 example. Section 6 does not contain it and it appears nowhere in this file — **it is deliberately not here**, because this file is scoped to what came off the wire and that result is an offline property of the corpus | `fbe5d9b` | **Fixed.** Repointed to `docs/06` and issue #17, with the reason stated |
+| 5 | `results.jsonl` rows 52–60 carried `curl_exit: 0`. **curl did not make those nine requests** — hurl did — so the field asserted a fact about a program never involved, and contradicted §8's "only three established values each" | `fbe5d9b` | **Fixed.** All 9 rows now read `(not captured by hurl --test)`, and §8's table lists `curl_exit` first among the not-captured fields |
+| 6 | `docs/10` stated a counting rule and then a **figure that rule does not yield**: rule said status exactly `200`, figure said **7**. The rule yields **6**; **7** is the 2xx count, which silently adds row 28's **204** for `v10/discover/android/3.6` | `bb3127c` | **Fixed.** Rule and figure now agree at **6**, with the 2xx trap named so the next reader does not re-introduce it |
+| 7 | `docs/10` said `v6` did what "its two siblings" do not — but `v11` answers `200` on all three hosts and `v12` answers `401` on all three, so no sibling version "serves nothing". As written the clause contradicted the sentence before it | `bb3127c` | **Fixed.** Restated as: for `v6` alone, `-trials` serves a document while `.eu` and `.com` serve nothing **for that same version** |
+| 8 | The §1 correction (defect 3) was made by **rewriting this file in place with no Correction section**, against `AGENTS.md` §3 and against the same commit's handling of defect 2 | `bb3127c` | **This section.** The text is correct; what was missing was the trace that it had once been wrong |
+
+### Why the gate caught none of the three blocking `docs/` defects
+
+Worth recording, because the next pass will assume a green gate means the prose is sound.
+
+- The gate counts open areas by matching `^### [A-Z]. ` **headings** against the number in
+  `config.yml`. Defect 1 was in **prose inside the same file**, describing the split between open
+  and closed. Heading count and `config.yml` agreed throughout; only the sentence did not.
+- `check_append_only()` diffs `origin/main...HEAD`. Every area-Z file is status `A` against
+  `origin/main`, so an in-place rewrite of a file that has never been published is **invisible to
+  it** — correctly, in my view, but it means defect 8 could not have been caught mechanically.
+
+**No conclusion in this pass changes.** The load-bearing claim — `ACAO` constant `*`, 45 of 45,
+0 echoed — was independently re-derived from the raw `headers/*.hdr` and `headers/*.body`
+captures rather than from this file's own tables, in both review rounds, and held each time.
