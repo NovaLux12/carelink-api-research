@@ -35,15 +35,25 @@ SELF = "2026-10-12-area-z-origin-reflection"   # excluded; see SCOPE below
 # like it has two ledgers when it has one.
 EXCLUDE = {SELF}
 
-SHORT_KEYS = ("acao", "acam")
-LONG_KEYS = ("access_control_allow_origin", "access_control_allow_methods")
+# Classification is on the ORIGIN key only. An earlier version also accepted
+# the allow-methods key as evidence of the full-name convention, which would
+# misfile a ledger that captured allow-methods but never allow-origin. No such
+# ledger exists today, so it changed no figure here -- but a guard that is
+# wrong only in a case that has not happened yet is not a guard.
+ORIGIN_LONG = "access_control_allow_origin"
+ORIGIN_SHORT = "acao"
 
 
 def convention(keys):
-    """Which of the three storage conventions does this ledger use?"""
-    if any(k in keys for k in LONG_KEYS):
+    """Which of the three storage conventions does this ledger use?
+
+    Decided by the allow-ORIGIN key alone. `allow-methods` is deliberately not
+    consulted: it can be present without origin, and its presence does not
+    establish that this ledger stores the origin the way this audit reads it.
+    """
+    if ORIGIN_LONG in keys:
         return "full-name key"
-    if any(k in keys for k in SHORT_KEYS):
+    if ORIGIN_SHORT in keys:
         return "short keys"
     if "ctype" in keys:
         return "embedded in the ctype string"
@@ -52,7 +62,7 @@ def convention(keys):
 
 def acao_of(row):
     """Read ACAO under whichever convention this ledger uses."""
-    for k in LONG_KEYS[:1] + SHORT_KEYS[:1]:          # long key first, then short
+    for k in (ORIGIN_LONG, ORIGIN_SHORT):              # long key first, then short
         v = row.get(k)
         if v and v != "(none)":
             return v
