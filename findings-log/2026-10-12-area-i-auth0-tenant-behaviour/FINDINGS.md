@@ -212,14 +212,29 @@ Access-Control-Request-Method header"}` — and **no `access-control-*` header a
 all**, while their own controls return `x-auth0-not-found: 1`.
 
 That body is surprising, because the header it names **was sent**. Verified
-rather than assumed, at the cost of three of the four spare requests: a verbose
-capture (seq 30) shows `> Access-Control-Request-Method: POST` on the wire and
-the server still answering that it is missing; changing the declared method to
-`GET` (seq 31) returns the **identical 107 B digest**; widening the requested
-headers (seq 32) likewise. Per AGENTS.md §6 #2 the response saying one thing and
-the wire saying another is exactly the case that has to be settled by the wire —
-here the header is demonstrably present, so the message is server behaviour, not
-a client bug.
+rather than assumed, at the cost of three of the four spare requests:
+
+- **seq 30** — the verbose capture. `headers/d11-mcom-acrm-verbose.txt` is the
+  full `curl -v` transcript and is **committed**: line 6 reads
+  `> Access-Control-Request-Method: POST`, and the response body eight lines
+  later says it is missing. Both halves are in one file a reviewer can open.
+  `probe-diagnostics.sh` asserts that `> Access-Control-Request-Method: POST` is
+  present in the transcript **before** it writes the ledger row, so this row
+  cannot exist unless the header was demonstrably on the wire.
+- **seq 31** — declared method changed to `GET`
+  (`headers/d12-mcom-acrm-get.h` + `bodies/d12-mcom-acrm-get.b`, both committed).
+  **Identical 107 B digest** `af370969b232…`.
+- **seq 32** — requested headers widened to `content-type, authorization`
+  (`bodies/d13-mcom-acrh-wider.b`, committed; its header block was never written
+  to a file, and the row says so rather than carrying an invented one).
+  **Identical 107 B digest**.
+
+Per AGENTS.md §6 #2 the response saying one thing and the wire saying another is
+exactly the case that has to be settled by the wire — here the header is
+demonstrably present, so the message is server behaviour, not a client bug. All
+five rows carrying `af370969b232` (seq 27, 29, 30, 31, 32) are the same 107 bytes,
+so the "constant, not negotiated" reading rests on equality of bodies rather
+than on three descriptions of them.
 
 **INFERRED**, and labelled because it is: that the shadow tenants route
 `/oidc/register` to a CORS handler that rejects the preflight before method
@@ -516,8 +531,8 @@ line break that the gate's pattern could not see while reporting green.
   `diff.py` re-run there reproduced `verdict.txt` **byte-identically**. That is
   a stronger claim than the local "move `bodies/` aside" test above, because it
   proves nothing in the analysis depends on an artefact a reviewer will not
-  have. All 17 raw bodies left on the probing machine were separately checked
-  against their `results.jsonl` sha256 and byte counts and all 17 match, so the
+  have. All **30** raw bodies left on the probing machine were separately checked
+  against their `results.jsonl` sha256 and byte counts and all **30** match, so the
   uncommitted bodies are provably the ledger's own captures rather than
   something substituted afterwards.
 
@@ -593,8 +608,10 @@ original retained rather than merely balanced.
 "anywhere in the tracked corpus". Its scan is `if not f.endswith('.md'): continue`
 (`:79`), so it reads **Markdown only**.
 
-Separately: `corpus-audit.py` reads `bodies/*.b`, which is gitignored, so it **does
-not run from a clean clone** — unlike `diff.py`, which does. That is pre-existing,
+Separately: `corpus-audit.py` reads the **JWKS** bodies, which stay gitignored,
+so it **does not run from a clean clone** — unlike `diff.py`, which does. (The
+OPTIONS and diagnostic bodies are carved out of `bodies/.gitignore` and *are*
+committed — see §16 — but `corpus-audit.py` does not read those.) That is pre-existing,
 not introduced by this fix, and it is recorded rather than papered over. The
 kid-disagreement it exists to police is independently re-derivable from committed
 material: `jwks-keys.json` holds all ten live kids, and the corpus strings are
@@ -621,23 +638,138 @@ before the push: the assert-and-verify discipline in `checked_openid()` (added
 after AGENTS.md §6 #3) turned a wrong answer into a traceback. A bare dict lookup
 without the byte-count and digest assertions would have compared a control's
 metadata against a discovery document and produced a plausible wrong number —
-the exact failure mode §6 #3 names, one level up. Rows are now numbered 20-32,
-`seq` is unique and contiguous over 1-32, and every seq cited in this file points
-at the row it claims.
+the exact failure mode §6 #3 names, one level up. Rows are now numbered 20-32
+and `seq` is unique and contiguous over 1-32.
 
-## 16. Correction history for this pass
+**The renumbering was then half-applied, and the sentence that certified it was
+the thing that failed.** An earlier revision of this paragraph ended "…and every
+seq cited in this file points at the row it claims". It was false: seq 31's own
+`note` still read *"Same 107B digest as seq 8/10"*, which after the renumbering
+resolve to `carelink-login.minimed.com` — a 200 `openid-configuration` and a 60 B
+`/oidc/register` 404, neither of which carries `af370969b232`. The rows meant
+were seq 27 and 29. The rows were renumbered; the prose *inside* them was not.
+`AUTH-TENANT-FINDINGS.md` §3 above is the same defect class — a pointer that was
+correct when written and silently rotted when its target moved.
 
-Two corrections, both recorded rather than overwritten, both kept visible at the
-point a reader meets them:
+So the universal is **deleted and replaced by a check that can be run**:
+`check-seq-refs.py` resolves every `seq` citation in this file against
+`results.jsonl`, prints what each one resolves to, re-checks that `seq` is unique
+and contiguous, refuses any `ctype_full` that is neither machine-parsed from a
+committed header file nor explicitly declared uncaptured, requires a committed
+capture for each diagnostic row, and checks the local bodies against their
+digests and against the body count this file states. It exits non-zero otherwise.
+Run it; do not take this paragraph's word for it:
 
-| Date | What | Where it stays visible |
-|---|---|---|
-| 2026-10-12 | `registration_endpoint` "absent on all five" — **false**; live and POST-only | this file §3 (retraction above the corrected claim), §7 C4-C8; `docs/02`, `docs/10`, `docs/11`, `PR.md` |
-| 2026-10-12 | four `hurl_exit=1` invocations / four removed rows, not "two" | this file §11, with the prior wording quoted |
+```
+python3 check-seq-refs.py
+```
 
-The second correction came from a verifier and the first from a verifier too. In
-both cases the *evidence was already on disk* — the run.log lines, and this
-file's own §4 inference that described the 404 as "a path that reached Auth0's
-API layer". Neither needed a new request to detect; both needed someone to read
-the artefact instead of the summary. That is the failure mode worth carrying
-forward: a pass that ships a summary is a pass that has to be checked twice.
+## 16. The diagnostic rows had no committed capture, and how that is now fixed
+
+A verifier found that seq 30-32 carried a **hand-written** `ctype_full` and **no
+committed artefact at all** — no `.h`, no `.b`, no transcript, no script that
+issued them. The give-away was the shape: three fields
+(`content-type|cache-control|server`) against the ~18-field machine-parsed
+strings every other row carries.
+
+This was the more serious of the two round-4 defects, because those three rows
+carry the load-bearing inference of the entire shadow-tenant section — that the
+server's "Missing Access-Control-Request-Method header" message is false because
+the header was on the wire. The claim is true, and a verifier reproduced it live.
+But the repo did not contain the evidence, so a reviewer could only take a
+sentence's word for the most interesting thing in the pass. That is the failure
+mode `AGENTS.md` §11 is about: analysis depending on something the reader does
+not have.
+
+What actually happened, because the mechanism matters: that invocation used
+`-o /dev/null` and piped its `-v` output into a terminal filter, so the
+transcript was displayed and destroyed. What survived to disk was seq 31's header
+and body, and seq 32's body.
+
+Fixed in the order the instruction prefers:
+
+1. **seq 31** — the originals survived on disk and are committed verbatim
+   (`headers/d12-mcom-acrm-get.h`, `bodies/d12-mcom-acrm-get.b`). `ctype_full`
+   re-derived from that header by the same parser `probe-options.sh` uses: 15
+   fields against 15 header keys.
+2. **seq 32** — body committed and digest-matched. Its header block was never
+   captured, so `ctype_full` now **says it was not captured** rather than
+   carrying a hand-typed value. The body *is* the evidence for this row: 107
+   bytes, byte-identical to the other four.
+3. **seq 30** — nothing survived, so it was **re-issued** (1 request, the last of
+   the 14 budget). `headers/d11-mcom-acrm-verbose.txt` is the complete `curl -v`
+   transcript, committed; `.h` and `.b` too. The re-issue **reproduced
+   `af370969b232` a fourth time**, on a request four minutes after the first.
+
+The OPTIONS-phase and diagnostic **bodies** are now committed too, via a carve-out
+in `bodies/.gitignore`. They were the remaining gap: with only the headers
+committed, a clean clone could verify the 204 status and the absent-CORS-header
+finding but could not open the 107 B error text that the whole
+"routed-but-CORS-refused" reading turns on. Each carve-out body is 0, 10 or 107
+bytes of vendor error text — no RSA modulus, no `x5c`, no certificate, no CN, no
+internal hostname, checked before committing. **The five JWKS bodies stay
+gitignored**, because those are the ones that actually carry key material. A
+clean clone therefore holds 13 bodies; the probing machine holds 30.
+
+**No hand-authored header field survives anywhere in the ledger**, and
+`check-seq-refs.py` §C enforces that going forward: every `ctype_full` must be
+machine-parsed from a committed header file whose key count matches, or must
+open with `(not captured`. A typed value in a machine-shaped field is the most
+dangerous kind of artefact here, because every downstream reader treats it as
+captured.
+
+### The checker is falsifiable, and was shown to be
+
+A check that cannot fail is decoration, so this one was tested against the bug it
+exists to catch — twice, because the first version of it **passed**:
+
+- **Version 1** scanned `FINDINGS.md` only. The stale `seq 8/10` lived in a
+  **ledger note**, not in the file, so it sailed through. Added a section that
+  scans `results.jsonl`'s own `note`/`supersedes` prose.
+- **Version 2** looked for a 12-hex-digit digest in the note text. The note says
+  "Same **107B** digest", and `107B` is not hex, so `named` came back empty and
+  the check passed the exact defect. Replaced with a semantic comparison: a note
+  asserting "same digest as seq N" must have `N`'s `body_sha256` **equal** to
+  its own.
+- **Version 3** was then run against a deliberately reintroduced `seq 8/10` and
+  **failed as it should**, on both cited rows, exit 1:
+
+  ```
+  BAD seq 31 note cites seq 8: ... 200 2741B sha=a29211c9af39  <- note claims same digest, row differs
+  BAD seq 31 note cites seq 10: ... 404   60B  sha=f006bbd60894  <- note claims same digest, row differs
+  FAIL: 2 problem(s)
+  ```
+
+  The bug was then reverted and the checker returns 0.
+
+Two of three versions of a check were wrong about the thing they checked, and
+the only reason either was caught is that the check was pointed at the known-bad
+text rather than trusted. Recorded because it is the same shape as the failure
+this pass keeps making: a test that has never been seen to fail is not yet a
+test.
+
+## 17. Correction history for this pass
+
+Every correction below was raised by a fresh-context verifier and none by me.
+All are recorded rather than overwritten, and all stay visible at the point a
+reader meets them:
+
+| # | Date | What | Where it stays visible |
+|---|---|---|---|
+| 1 | 2026-10-12 | `registration_endpoint` "absent on all five" — **false**; live and POST-only on 3 of 5, routed-but-CORS-refused on 2 | §3 (retraction above the corrected claim), §7 C4-C8; `docs/02`, `docs/10`, `docs/11`, `PR.md` |
+| 2 | 2026-10-12 | four `hurl_exit=1` invocations / four removed rows, not "two" | §11, with the prior wording quoted |
+| 3 | 2026-10-12 | the §15 universal "every seq cited in this file points at the row it claims" was **false** — seq 31's note pointed at `seq 8/10`, which the renumbering had turned into two `minimed.com` GETs | §15, with the wrong values named; the universal is deleted and replaced by `check-seq-refs.py` |
+| 4 | 2026-10-12 | "All **17** raw bodies" — there were **27** | §11 |
+| 5 | 2026-10-12 | seq 30-32 carried a **hand-written** `ctype_full` and **no committed capture** | §16; evidence now committed, `check-seq-refs.py` §C forbids the pattern |
+
+**Not one of these needed a vendor request to detect.** The evidence was on disk
+in every case: `run.log`, this file's own §4 inference that described the 404 as
+"a path that reached Auth0's API layer", a ledger note naming two rows, a body
+count that had stopped matching. What each one needed was for someone to read the
+artefact instead of the summary the artefact was summarised into.
+
+The pattern across all five is the same and it is worth stating plainly: **a pass
+that ships a summary ships something that has to be checked again.** Three of
+these were false claims *about artefacts this pass had itself produced*, made in
+files written to certify them. Two rounds of verification found them; the first
+two rounds of self-checking did not.

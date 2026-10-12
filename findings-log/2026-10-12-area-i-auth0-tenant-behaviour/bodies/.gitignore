@@ -1,0 +1,19 @@
+# Raw response bodies are deliberately NOT committed.
+# The five openid-configuration documents and the seven small control/404 bodies are the
+# pass's evidence and are copied verbatim into ../openid/. The JWKS bodies are summarised in
+# ../jwks-keys.json (kid/kty/alg/use) because each carries an RSA modulus and an x5c chain
+# naming a vendor Auth0 custom domain. Raw bytes stay here so diff.py can re-derive
+# ../verdict.txt on this machine; every byte is pinned by the sha256 in ../results.jsonl.
+*
+# CARVE-OUT (added 2026-10-12, round 4). The OPTIONS-phase and diagnostic bodies ARE
+# committed, because they carry the load-bearing evidence of the /oidc/register
+# retraction and none of them contains key material. Each is 0, 10 or 107 bytes of
+# vendor error text: the empty bodies of the three 204 preflights, "Not found." from
+# the absent-path controls, and the shadow tenants' "CORS error: Missing
+# Access-Control-Request-Method header" JSON. No RSA modulus, no x5c, no certificate,
+# no CN, no internal hostname -- verified before carving them out. Without these, the
+# three-way 404 result and the wire-presence argument are not inspectable from a clean
+# clone at all, which is the defect this carve-out exists to close.
+!o01-*.b
+!o02-*.b
+!d1*.b
