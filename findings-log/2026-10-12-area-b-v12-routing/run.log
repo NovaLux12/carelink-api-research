@@ -1,0 +1,20 @@
+=== clcloud.minimed.eu (cap 24) ===
+[2026-10-12T14:14:48.917Z] [1] eu-01 GET https://clcloud.minimed.eu/connect/carepartner/v13/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | CONTROL-live
+[2026-10-12T14:14:51.566Z] [2] eu-02 GET https://clcloud.minimed.eu/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c -> 403 curl_exit=0 | MissingAuthenticationTokenException | 42B | CONTROL-dead-fabricated-uuid
+[2026-10-12T14:14:54.189Z] [3] eu-03 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/display/message -> 200 curl_exit=0 | acao=* | acam=OPTIONS | 0B | CONTROL-live-preflight
+[2026-10-12T14:14:56.827Z] [4] eu-04 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v99/display/message -> 403 curl_exit=0 | MissingAuthenticationTokenException | 42B | CONTROL-dead-preflight-fabricated-version
+[2026-10-12T14:14:59.435Z] [5] eu-05 GET https://clcloud.minimed.eu/connect/carepartner/v11/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v11-GET
+[2026-10-12T14:15:02.643Z] [6] eu-06 GET https://clcloud.minimed.eu/connect/carepartner/v12/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v12-GET
+[2026-10-12T14:15:04.676Z] [7] eu-07 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v11/display/message -> 200 curl_exit=0 | acao=* | acam=OPTIONS | 0B | data-v11-OPTIONS
+[2026-10-12T14:15:07.306Z] [8] eu-08 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v12/display/message -> 200 curl_exit=0 | acao=* | acam=OPTIONS | 0B | data-v12-OPTIONS
+[2026-10-12T14:15:09.911Z] [9] eu-09 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6 -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v13-discover-OPTIONS
+[2026-10-12T14:15:12.520Z] [10] eu-10 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v11/discover/android/3.6 -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v11-discover-OPTIONS
+[2026-10-12T14:15:15.168Z] [11] eu-11 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v12/discover/android/3.6 -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v12-discover-OPTIONS
+=== clcloud.minimed.com (cap 24) ===
+[2026-10-12T14:15:17.783Z] [12] com-12 GET https://clcloud.minimed.com/connect/carepartner/v13/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | CONTROL-live
+[2026-10-12T14:15:20.729Z] [13] com-13 GET https://clcloud.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c -> 403 curl_exit=0 | MissingAuthenticationTokenException | 42B | CONTROL-dead-fabricated-uuid
+[2026-10-12T14:15:23.653Z] [14] com-14 GET https://clcloud.minimed.com/connect/carepartner/v12/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v12-GET
+=== clcloud-trials.minimed.com (cap 24) ===
+[2026-10-12T14:15:26.484Z] [15] trials-15 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | CONTROL-live
+[2026-10-12T14:15:29.425Z] [16] trials-16 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c -> 403 curl_exit=0 | MissingAuthenticationTokenException | 42B | CONTROL-dead-fabricated-uuid
+[2026-10-12T14:15:32.982Z] [17] trials-17 GET https://clcloud-trials.minimed.com/connect/carepartner/v12/display/message -> 401 curl_exit=0 | UnauthorizedException | 990 | 36B | data-v12-GET

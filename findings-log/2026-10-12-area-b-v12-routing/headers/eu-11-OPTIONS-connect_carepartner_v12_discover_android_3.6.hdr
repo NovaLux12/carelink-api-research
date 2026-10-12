@@ -1,0 +1,14 @@
+HTTP/2 401 
+content-type: application/json
+content-length: 36
+date: Mon, 12 Oct 2026 14:15:15 GMT
+x-amz-apigw-id: FIm6FFUoliAFgHg=
+x-amzn-requestid: 43ea31c6-1c3e-4b06-8f01-6ccd326803be
+x-amzn-errortype: UnauthorizedException
+x-ca-err: 990
+x-cache: Error from cloudfront
+via: 1.1 1a6cd18714da9809fa8cb07ad66fd4f6.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR50-P3
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: 7V5ZHuvLzO9GiDX37cYjFdI_VvtuifJuoewzUgj783j2NS3cEa0z2w==
+

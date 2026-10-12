@@ -1,0 +1,69 @@
+requests in corpus: 17
+
+== transport health: a non-zero curl_exit is a hole, not an answer ==
+  rows: 17  curl_exit=0: 17  non-zero: 0
+
+== controls (these gate whether the data cells below may be believed) ==
+  ok  eu      GET     expect=live-401         status=401 errortype=UnauthorizedException x-ca-err=990 acao=(none)
+  ok  eu      GET     expect=no-route         status=403 errortype=MissingAuthenticationTokenException x-ca-err=(none) acao=(none)
+  ok  eu      OPTIONS expect=live-preflight   status=200 errortype=(none) x-ca-err=(none) acao=*
+  ok  eu      OPTIONS expect=no-route         status=403 errortype=MissingAuthenticationTokenException x-ca-err=(none) acao=(none)
+  ok  com     GET     expect=live-401         status=401 errortype=UnauthorizedException x-ca-err=990 acao=(none)
+  ok  com     GET     expect=no-route         status=403 errortype=MissingAuthenticationTokenException x-ca-err=(none) acao=(none)
+  ok  trials  GET     expect=live-401         status=401 errortype=UnauthorizedException x-ca-err=990 acao=(none)
+  ok  trials  GET     expect=no-route         status=403 errortype=MissingAuthenticationTokenException x-ca-err=(none) acao=(none)
+
+ORACLE: established before any data cell was judged
+
+== data cells ==
+tag     method  path                                       st   x-amzn-errortype                 x-ca-err acao   acam      verdict
+eu      GET     connect/carepartner/v11/display/message    401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+eu      GET     connect/carepartner/v12/display/message    401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+eu      OPTIONS connect/carepartner/v11/display/message    200  (none)                           (none)   *      OPTIONS   LIVE - public
+eu      OPTIONS connect/carepartner/v12/display/message    200  (none)                           (none)   *      OPTIONS   LIVE - public
+eu      OPTIONS connect/carepartner/v13/discover/android/3.6 401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+eu      OPTIONS connect/carepartner/v11/discover/android/3.6 401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+eu      OPTIONS connect/carepartner/v12/discover/android/3.6 401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+com     GET     connect/carepartner/v12/display/message    401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+trials  GET     connect/carepartner/v12/display/message    401  UnauthorizedException            990      (none) (none)    LIVE - token-gated
+
+== is v12/display/message 401 on all three hosts? ==
+  clcloud.minimed.eu               seq= 6 status=401 errortype=UnauthorizedException x-ca-err=990 -> LIVE - token-gated
+  clcloud.minimed.com              seq=14 status=401 errortype=UnauthorizedException x-ca-err=990 -> LIVE - token-gated
+  clcloud-trials.minimed.com       seq=17 status=401 errortype=UnauthorizedException x-ca-err=990 -> LIVE - token-gated
+  hosts with direct evidence: 3/3 -> ['eu', 'com', 'trials']
+
+== body digests, type asserted before hashing ==
+  seq  1 eu      GET      36 B  sha256:d551247201fc
+  seq  2 eu      GET      42 B  sha256:f249b63cb2fc
+  seq  3 eu      OPTIONS 0 B  -> EMPTY (sha e3b0c44298fc, the empty-string digest)
+  seq  4 eu      OPTIONS  42 B  sha256:f249b63cb2fc
+  seq  5 eu      GET      36 B  sha256:d551247201fc
+  seq  6 eu      GET      36 B  sha256:d551247201fc
+  seq  7 eu      OPTIONS 0 B  -> EMPTY (sha e3b0c44298fc, the empty-string digest)
+  seq  8 eu      OPTIONS 0 B  -> EMPTY (sha e3b0c44298fc, the empty-string digest)
+  seq  9 eu      OPTIONS  36 B  sha256:d551247201fc
+  seq 10 eu      OPTIONS  36 B  sha256:d551247201fc
+  seq 11 eu      OPTIONS  36 B  sha256:d551247201fc
+  seq 12 com     GET      36 B  sha256:d551247201fc
+  seq 13 com     GET      42 B  sha256:f249b63cb2fc
+  seq 14 com     GET      36 B  sha256:d551247201fc
+  seq 15 trials  GET      36 B  sha256:d551247201fc
+  seq 16 trials  GET      42 B  sha256:f249b63cb2fc
+  seq 17 trials  GET      36 B  sha256:d551247201fc
+
+  grouping:
+    sha256:d551247201fc -> 10 bodies, seq [1, 5, 6, 9, 10, 11, 12, 14, 15, 17]
+    sha256:f249b63cb2fc -> 4 bodies, seq [2, 4, 13, 16]
+
+== measured spacing from run.log (not the value the harness was written with) ==
+  eu      11 requests, measured floor 2.033s
+  com      3 requests, measured floor 2.924s
+  trials   3 requests, measured floor 2.941s
+
+  repo rule (AGENTS.md section 8, >=2s per host): PASS (worst floor 2.033s)
+  harness's own stated spacing (>=2.5s per host): FAIL
+  gaps below the harness's 2.5s, listed rather than summarised:
+    eu -> request 7: 2.033s
+
+requests used: 17 / cap 24

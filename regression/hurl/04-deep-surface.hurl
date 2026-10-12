@@ -328,3 +328,59 @@ OPTIONS https://clcloud-trials.minimed.com/connect/pde/v3/display/message
 HTTP 403
 [Asserts]
 header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+# ============================================================
+# Area B (2026-10-12): v12/display/message is live and token-gated
+# on all three hosts, and the CORS preflight is a per-ROUTE property.
+# Source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md
+#
+# Why these four cells and no more. Before this pass, docs/03 §6 and docs/06
+# both asserted "v12/display/message is 401 on all three hosts" on the strength
+# of ONE raw row (ORACLE-PROBE-MATRIX row 52, clcloud.minimed.eu only) — a claim
+# stated without evidence (AGENTS.md §6 item 1). The Area N block above pins
+# v13 on all three hosts; it never pinned v12 anywhere. So the two cells below
+# are the only places the "all three hosts" claim can now fail.
+#
+# The preflight pair is the structural result: same host, same method, same
+# session, one path apart — display/message answers 200 with
+# access-control-allow-origin: *, discover answers 401 with no Access-Control-*
+# header at all. Pinning only the first would leave "the gateway adds CORS" as
+# an unfalsifiable rule in the notes.
+#
+# NOT pinned here, deliberately: v12 GET on .eu, and v11/v13 OPTIONS on .eu. They
+# were probed (results.jsonl seq 6, 7, 3) and are recorded in the log, but
+# pinning them would add three requests per drift sweep for cells the docs do
+# not make a load-bearing claim about. The coverage claimed here is the four
+# cells below and nothing more.
+#
+# `access-control-allow-methods` is still NOT read as a method register
+# (docs/09 §2): v12 is GET-capable, proven by the 401 + x-ca-err: 990 below,
+# while its preflight advertises only OPTIONS. And a passing preflight does not
+# make the route browser-callable — the 401 itself carries no Access-Control-*
+# header, which is the open question in docs/10 §1.
+# ============================================================
+
+# v12/display/message on the two hosts where it had never been probed.
+GET https://clcloud.minimed.com/connect/carepartner/v12/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
+GET https://clcloud-trials.minimed.com/connect/carepartner/v12/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
+# The route that carries a CORS preflight...
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v12/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+
+# ...and the route one path-family away that does not. If Medtronic ever adds
+# CORS to the discovery leg, the second assertion fails and docs/09 §2's
+# per-route framing is rewritten.
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"

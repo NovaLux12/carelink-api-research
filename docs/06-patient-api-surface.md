@@ -118,13 +118,30 @@ which cumulus the returned document references.
 | v1 – v5 | 403 | not probed | no GET route |
 | **v6** | 403 | **200 + CORS** | **exists, POST-only** — the version the vendor's own country config hands out as `blePereodicDataEndpoint` |
 | v7 – v10 | 403 | not probed | no GET route |
-| **v11** | **401** | not probed | live, GET-capable, token-gated |
-| **v12** | **401** | not probed | **live, GET-capable, token-gated — newly found** |
-| **v13** | **401** | not probed | live, GET-capable, token-gated |
+| **v11** | **401** | **200 + CORS** | live, GET-capable, token-gated |
+| **v12** | **401** | **200 + CORS** | **live, GET-capable, token-gated — newly found** |
+| **v13** | **401** | **200 + CORS** | live, GET-capable, token-gated |
 | v14 – v16 | 403 | not probed | no GET route |
 
 `display/message` at v6/v11/v13 is byte-identical on all three hosts (v6 403, v11 401,
 v13 401); `v12/discover` is 401 on all three. **There is no region split on the data leg.**
+
+**The `v11`/`v12`/`v13` OPTIONS column was filled in on 2026-10-12** — all three answer
+`200` + `access-control-allow-origin: *`, so `v12` does **not** differ from `v13` on
+preflight presence (OBSERVED on `.eu`,
+[source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 2]). `v12`'s GET
+was also re-probed on the two hosts where it had never been tested and returns **401 +
+`UnauthorizedException` + `x-ca-err: 990` on all three**, so this page's "same shape on all
+three hosts" claim is now 3-host evidenced instead of resting on the single `.eu` row
+(§Finding 1). The `v14–v16` OPTIONS cell is **still unprobed** and is not claimed.
+
+**Preflight presence is per-route, not per-version.** `OPTIONS
+v{11,12,13}/discover/android/3.6` returns **`401`** + `x-ca-err: 990` with **no
+`Access-Control-*` header at all**, on the same host and in the same session in which
+`…/display/message` returns `200` + CORS — so the gateway does **not** add CORS uniformly
+and "the gateway adds CORS" is **false as a rule** (OBSERVED, a 3 × 2 on `.eu`, §Finding 3).
+Method registration is still read from the **GET** probe, never from
+`access-control-allow-methods` ([`docs/09`](09-methodology-and-oracles.md) §2).
 
 ### App-version axis — it serves exactly two documents
 
@@ -350,7 +367,7 @@ POSTs to) measures like this:
 |---|---|---|
 | v13 | live, GET-capable | yes |
 | v11 | live, GET-capable | yes |
-| v12 | **live** — same shape as v11/v13 on all three hosts | **omitted** |
+| v12 | **live** — same shape as v11/v13, re-evidenced 2026-10-12 as **401 + `x-ca-err: 990` on all three hosts** (it was `.eu`-only before) | **omitted** |
 | v6 | exists, **POST-only** (no GET) — the version the vendor's own config hands out | yes (harmless, the bridge POSTs) |
 | v5 | **no route at all — permanently dead, not auth-gated** | **dead weight** |
 
