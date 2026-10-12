@@ -280,3 +280,47 @@ subtle ones (`CONTRIBUTING-research.md` §What the gate checks). Automation
 extends the first half of that sentence to the calendar — drift, silence, and
 rot are noticed weekly instead of never — and leaves the second half exactly
 where it is.
+
+---
+
+### The one carve-out: an owner-invoked interactive run
+
+§11 governs *scheduled and CI automation*. It does not govern a run the
+repository owner started in their own session and is watching. Such a run may
+open and comment on issues, push to its feature branch, merge once
+`./scripts/research-gate.sh` exits 0 locally **and** CI's `gate` has concluded
+green **and** an independent verifier has returned no unresolved finding, and
+close the claim issue it opened — carrying the merge URL, the evidence table and
+the request accounting in the closing comment.
+
+It hands the run back rather than merging, on a disclosure decision, on a
+`downstream-bridge` issue with no linked consumer issue, on a verifier verdict of
+CONTRADICTS or INCONCLUSIVE, on a gate that stays red, or the moment the owner
+asks for review.
+
+**Record this honestly.** Branch protection requires the `gate` check and
+currently requires **zero** approving reviews, so "a human merged it" was a
+convention, not a control. The substitute is a fresh-context verifier that never
+saw the claim being built, plus CI — and that is weaker than a human reviewer.
+Every autonomous merge therefore carries the verifier's verdict in the closing
+comment, so the substitute is auditable rather than invisible. **Anyone reading
+a merged PR should assume no human read it.**
+
+**Known deviation, stated rather than smoothed over.** The required-state list
+above asks for ≥1 approving review, and that is not currently enforced — because
+enforcing it would block every autonomous merge, which is the point of the
+carve-out. Enabling it is a deliberate choice with a real cost, and it belongs to
+the owner, not to a run:
+
+```
+gh api -X PATCH repos/{owner}/{repo}/branches/main/protection \
+  -F required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true}' --jq .
+```
+
+Turn it on and the loop stops at READY TO MERGE. That is a completed run.
+
+**A run scripts only what a machine can check** — the request method, the cap,
+the delay — and decides the rest itself: which area, whether a finding is true,
+whether a verification objection is real, whether to merge at all. A future
+change must not quietly move one of those decisions into a script, because a
+script cannot tell a disclosure decision from a routine negative result.
