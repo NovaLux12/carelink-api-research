@@ -333,15 +333,48 @@ line break that the gate's pattern could not see while reporting green.
   `bodies/` is gitignored and `jwks-keys.json` carries `kid`/`kty`/`alg`/`use`
   only, with the reason recorded in the file. One Auth0 custom-domain hostname
   appears in those chains; it stays out of this repo's history.
-- **A failed tool call cost two ledger rows and no requests.** `hurl --test`
-  is a boolean flag in 8.0.1, not a name selector; two invocations exited 1 on
-  a local selector error having opened no socket. Those two rows were written,
-  caught as false, and **removed** rather than left standing — a ledger row that
-  claims a fetch which never happened is the same defect class as a claim with
-  no source. The real run used one file per case.
+- **A failed tool call cost four ledger rows and no requests.** `hurl --test`
+  is a boolean flag in 8.0.1, not a name selector. `run.log:22-25` records
+  **four** invocations exiting 1 — two script runs × two test cases, at
+  18:03:34/18:03:36 and 18:03:52/18:03:54 — every one on a local selector
+  error, `Cannot access '<name>': No such file or directory`, having opened no
+  socket. That error string is reproducible offline against a non-existent
+  filename on hurl 8.0.1, so "opened no socket" is a property of the failure
+  mode, not an assumption. Each failing run wrote **two** rows; all **four**
+  were caught as false and **removed** rather than left standing — a ledger row
+  that claims a fetch which never happened is the same defect class as a claim
+  with no source. Removing them was the right call, and `run.log` keeps the
+  failed attempts visible instead of tidying them away: a reader can see four
+  attempts, zero surviving rows, and reconcile that against the 19-of-20
+  accounting at the top of this file, whose 19 rows are the 17 `curl` rows plus
+  the 2 that stand from the succeeding run.
+  The row count is re-derivable from the log rather than taken on trust — every
+  `run.log` line carries the `seq` and `host_seq` that `validate-pins.sh:33,46,48`
+  computed from the file as it stood, and both restart at 18/5 for each run,
+  which is what 17 rows at the start of a run implies. The real run used one
+  file per case.
+
+  Corrected 2026-10-12. An earlier revision of this bullet said "two
+  invocations" and "two ledger rows". `run.log:22-25` shows four `hurl_exit=1`
+  lines, not two; the row count follows from the seq arithmetic above. The
+  defect was an **under**count in the honest direction — it made the discard
+  look smaller than it was, and it did not inflate the 19-of-20 cap, which is
+  unchanged either way because these invocations opened no socket. Recorded
+  rather than silently overwritten, per AGENTS.md §3.
 - **`verdict.txt` re-derives from committed artefacts alone.** Verified by
   moving `bodies/` aside and re-running `diff.py`: byte-identical output. The
   five discovery documents and both controls are committed verbatim under
   `openid/`; `diff.py` re-checks every document against its ledger row's byte
   count and sha256 *before* comparing anything, because AGENTS.md §6 #3 is a
   comparison over a lookup that silently returned nothing.
+
+  Re-checked 2026-10-12 in the **stricter** form: `git archive <this commit>`
+  extracted into a clean tree containing only tracked files — `bodies/`
+  therefore entirely absent, as it is for anyone who clones the repo — and
+  `diff.py` re-run there reproduced `verdict.txt` **byte-identically**. That is
+  a stronger claim than the local "move `bodies/` aside" test above, because it
+  proves nothing in the analysis depends on an artefact a reviewer will not
+  have. All 17 raw bodies left on the probing machine were separately checked
+  against their `results.jsonl` sha256 and byte counts and all 17 match, so the
+  uncommitted bodies are provably the ledger's own captures rather than
+  something substituted afterwards.
