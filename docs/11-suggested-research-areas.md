@@ -93,57 +93,11 @@ and is the likelier of the two outcomes given the namespace 403s before applicat
 They were captured 2026-10-08 and **never re-fetched**, so a bundle version bump would
 invalidate the negative — state the capture date with the result, always.
 
-### Z. Does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`?
-
-Added 2026-10-12. **Derived from area X**, and it could not have been written before that
-pass ran: area X is the first pass in this repository to send an `Origin` header on any
-`clcloud.*` request, so until 2026-10-12 nothing in the corpus could distinguish a gateway
-that *reflects* the request origin from one that emits a constant.
-
-What area X established (OBSERVED, [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md]
-§4): across **25 requests**, the only responses carrying any `Access-Control-*` header were
-**three `OPTIONS` 200s on `clcloud.minimed.eu`**, and on all three the values were
-`access-control-allow-origin: *` and `access-control-allow-methods: OPTIONS` — **unchanged**
-whether or not an `Origin` was sent, and unchanged when sent with
-`Access-Control-Request-Method: GET` **or** `: POST`. `access-control-max-age` and
-`access-control-allow-credentials` were absent on all three; `vary` was absent. Sending
-`Origin` changed **none** of the **6** paired bare/`Origin` cells — 6 being the route×method groups in that pass's `results.jsonl` that carry both a bare and an `Origin`-bearing request, **controls excluded** since they are not part of the comparison. A reader who pairs including the controls gets 7, which is why the rule is written down here rather than left implicit (`AGENTS.md` §6 item 7).
-
-**What is missing, and why it matters.** A fixed `*` and a reflected origin differ in a way
-that matters to anyone reading a CORS header: `*` is a literal in the config, while an echo
-means the response is origin-dependent and a non-matching origin gets something else
-entirely. **No recorded cell in the corpus can tell the two apart**, because every capture
-that carried `ACAO` also sent no `Origin`. The one route family where the question could be
-asked cheaply — `OPTIONS …/display/message`, already pinned as `200` + `*` on all three
-hosts — was only asked bare. The same is true of `connect/csr/v2/display/message`, the bare
-`connect/v2/display/message`, and `v6/display/message`, whose `OPTIONS` cells return `200` +
-`ACAO` on all three hosts and have **never** been sent with an `Origin`.
-
-**Blocker:** none. Every candidate is a path already recorded in
-`findings-log/2026-10-12-csr-cross-host/results.jsonl` and
-`findings-log/2026-10-11-pde-csr-oracle/results.jsonl`, so the list is closed and on disk —
-no wordlist, no invented version neighbours. The method is area X's: send each preflight
-route's `OPTIONS` twice with **two different** `Origin` values and compare, because a single
-`Origin` cannot distinguish an echo from a constant. Controls first per host, `Origin` set to
-RFC 2606 reserved names.
-
-**Closes when:** for every recorded `clcloud.*` route whose `OPTIONS` answers `200` +
-`access-control-allow-origin`, it is recorded whether the value is a constant across two
-distinct `Origin` values, **and** whether `access-control-allow-methods` ever differs from
-the literal `OPTIONS`. **A negative counts and is the likelier outcome**: a constant `*` plus
-a constant `OPTIONS` on all of them is a complete answer, and it would also mean the
-`access-control-allow-methods` values differ only by route configuration and never by
-request — which this repo already records as "not a register of the route's methods"
-([`docs/09`](09-methodology-and-oracles.md) §2), and would then also be **not a register of
-the requested method**.
-
-**Assumptions (INFERRED):** that the `Origin` value actually reaches AWS API Gateway's CORS
-layer rather than being consumed by CloudFront first — no mechanism for this has been
-established, and area X's finding is consistent with either. That `clcloud.minimed.com` and
-`clcloud-trials.minimed.com` behave like `.eu` for this question: area X tested the
-discovery route on all three and found no split, but never tested a *preflight-bearing* route
-cross-host with `Origin`. And that the recorded preflight-bearing set is complete enough for
-a negative over it to mean something — a route never recorded is not covered.
+> **Area Z is CLOSED** — see the Closed table at the foot of this page and
+[findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md]. `ACAO` is a constant `*`, not an
+echo: **45 of 45** cells, 3 hosts × 5 route families × 3 `Origin` conditions. It is left here
+rather than deleted so the reasoning survives; a closed area never leaves the page silently
+([How to claim one](#how-to-claim-one), rule 5).
 
 ### Y. How many "all three hosts" claims in `docs/` rest on a single row?
 
@@ -172,6 +126,62 @@ correctly evidenced is a real result and retires the audit.
 three hosts" and does not hide in per-host tables, which are harder to over-claim. A claim
 may also legitimately cite a cross-host pass instead of per-host rows; the audit must follow
 the citation rather than demand a row per host.
+
+#### Addendum (2026-10-12, from area Z): the corpus Y would audit cannot be queried reliably
+
+Found while building area Z's candidate list, and **in scope for Y rather than a new area** —
+see [Why there is no area AA](#why-there-is-no-area-aa). Same blocker class: **zero requests**,
+corpus only.
+
+**The `findings-log/` ledger stores the same header three different ways across the five
+pre-existing files, and the failure mode is silent.**
+
+**Counting rule, so the figures can be reproduced:** *ACAO-bearing rows* = rows whose response
+carried `access-control-allow-origin`, read under whichever convention that ledger uses. Those
+rows are then **deduplicated to (host, method, route)** to get *cells*. A query filtering on the
+short key `r.acao` alone finds **2 cells**. Re-parsed across all three conventions the same
+five-ledger corpus holds **17 rows → 12 cells**. **Say which unit you mean**: a reader who counts
+rows gets 17, and 12 is not wrong, it is a different denominator.
+
+There is no error and no warning — the parser simply returns fewer rows, and *fewer rows reads as a
+finding*. Any audit that counts, like Y, is working from a corpus whose shape is not uniform.
+
+| ledger | ACAO rows | `host` key | where the CORS value lives |
+|---|---|---|---|
+| `2026-10-11-pde-csr-oracle` | 3 | **absent** | embedded inside the `ctype` string |
+| `2026-10-12-csr-cross-host` | 6 | present | embedded inside the `ctype` string |
+| `2026-10-12-area-b-v12-routing` | 3 | present | full-name key `access_control_allow_origin` (`.eu` v11/v12/v13) |
+| `2026-10-12-area-x-cors-separation` | 3 | present | full-name key `access_control_allow_origin` (`.eu` v13 ×3) |
+| `2026-10-12-pde-csr-cross-host` | 2 | present | short keys `acao` / `acam` |
+
+The missing `host` column is not cosmetic: it is why `docs/11` §Z's claim that `csr/v2` and bare
+`v2` return `ACAO` "on all three hosts" was **unsourced for `.eu`** — the only `.eu`-era rows for
+those two routes are the three unattributable rows in `pde-csr-oracle`. **The `host`-less ledger is
+the whole problem; the other two conventions are merely awkward.** Row totals here sum to 17, and
+deduplicating to (host, method, route) gives the 12 above.
+
+⚠ **An earlier draft of this addendum said `area-b-v12-routing` captures "no CORS value at all" and
+put the convention count at "four". Both were wrong**, and both came from querying only the short
+key — the very error this addendum is about. Area B carries `access_control_allow_origin` in 3
+rows and has a `host` column, and the corpus uses **three conventions across five ledgers — two,
+two and one**, not an even split. Every figure in this paragraph is derived, not asserted: run
+[`corpus-audit.py`](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.py)
+([output](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.txt)), which exits
+non-zero if the corpus shape moves. The 2-vs-12 figures were re-derived and **hold**; the
+characterisation of *why* did not, and neither did the first attempt at the distribution.
+
+**Blocker:** none, **zero requests**.
+**Closes when:** every `results.jsonl` carries an explicit `host` key and one explicit key per
+CORS header, `(none)` when absent — **or** a `docs/` note records the convention per ledger and
+warns that a single-convention query under-reports. Either close is acceptable; the 2-vs-12
+worked example is recorded in
+[#17](https://github.com/NovaLux12/carelink-api-research/issues/17) and written up in
+[`docs/06`](06-patient-api-surface.md). It is deliberately **not** in area Z's
+`FINDINGS.md`: that file is scoped to what came off the wire, and this result is an
+offline property of the corpus, not a response. Area Z's own ledger is
+written to the uniform shape, so the fix is already demonstrated once.
+**Assumptions (INFERRED):** that a uniform schema is wanted over documented heterogeneity. If
+the maintainers prefer the latter, only the `docs/` note is owed.
 
 ### W. Is the per-key projection a complete enumeration path for the 69-key document?
 
@@ -439,6 +449,23 @@ landing on alphabetical neighbours).
    template and the quality bar. A weekly job files an issue if this page drops
    below three open areas.
 
+### Why there is no area AA
+
+**Every letter A–Z is now in use** — 19 open plus 7 closed — and the priorities page's own gate
+counts open areas by matching `^### [A-Z]. ` headings against the number stated in
+`.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
+at once: it is invisible to the pattern, and the page's stated count would then disagree with its
+own contents. This was already recorded for the sub-declared-gap question in
+[`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
+
+**So a pass that discovers a successor cannot mint a letter.** The options are: attach it to an
+existing open area as a dated addendum (what area Z did — see area Y), or record it in
+[`docs/10`](10-open-questions.md) §1 as an open question rather than a claimable area. **Neither
+is as good as a real area, and the honest reading is that this repository has exhausted its
+area namespace.** Extending the gate's area pattern to `AA`-style headings is a maintainer
+decision, not a side effect of a research pass — same reasoning as the gate's own pattern in
+[`docs/09`](09-methodology-and-oracles.md) §4.
+
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
@@ -452,6 +479,7 @@ being superseded — never silently. Letters are not reused.
 | T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
 | B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** — which assumes a monotonic clock, and `docs/09` declines to assert that cause — and is recorded as a provenance problem, not smoothed over. The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact. ⚠ **Its CORS corpus premise was superseded by area X the same day** — the 10 CORS-less `200`s are not all on "a different host surface"; four are `clcloud.*` discovery documents. The observation stands; the inference did not ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] §Correction) | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
 | X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells (6 route×method pairs, controls excluded), which **excludes** the "ACAO only when an `Origin` is present" mechanism. **It does not exclude area B's reading (b)** — "the route demands a token on `OPTIONS`" — nor reading (a), nor "emitted only on `OPTIONS`": a first draft of this row claimed (b) was refuted, and that was withdrawn, because the reason assumed a configured route would carry `ACAO` on its own `200` `GET`, which is the thing in dispute. **The cause is not established and this row does not establish it** — all three readings fit 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. The four archive heads are **gitignored**, so the 24/14/10 split is not re-derivable from a clean clone. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** (it assumes a monotonic clock, which `docs/09` declines to assume elsewhere) and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
+| Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See also the **ledger is not machine-uniform** note under area Y | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
 ---
 
 > **Consumer note.** Findings here are consumed by

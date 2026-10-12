@@ -1,0 +1,42 @@
+CORPUS AUDIT — the shape of findings-log/results.jsonl
+Derived by corpus-audit.py. No request is issued by this script.
+Scope: the 5 ledgers that pre-date area Z. 1 ledger(s) excluded by name: ['2026-10-12-area-z-origin-reflection']
+
+1. STORAGE CONVENTIONS FOR access-control-allow-origin
+   convention                    ledgers  which
+   embedded in the ctype string  2        2026-10-11-pde-csr-oracle, 2026-10-12-csr-cross-host
+   full-name key                 2        2026-10-12-area-b-v12-routing, 2026-10-12-area-x-cors-separation
+   short keys                    1        2026-10-12-pde-csr-cross-host
+
+   conventions = 3   ledgers = 5   distribution = [2, 2, 1]
+   -> state it as "3 conventions across 5 ledgers — 2 and 2 and 1".
+   -> DO NOT write "N ledgers each": the distribution is NOT uniform.
+
+2. ACAO-BEARING ROWS per ledger
+   2026-10-11-pde-csr-oracle         3
+   2026-10-12-area-b-v12-routing     3
+   2026-10-12-area-x-cors-separation 3
+   2026-10-12-csr-cross-host         6
+   2026-10-12-pde-csr-cross-host     2
+   TOTAL                             17
+
+3. ROWS -> CELLS (deduplicate to host + method + route)
+   ACAO-bearing rows                       17
+   distinct cells where host IS recorded   9
+   distinct cells with NO host column      3
+   CELLS                                    12
+   -> the host-less rows each count as a cell; that is why the
+      subtraction is smaller than the row count suggests.
+
+4. WHAT A SINGLE-CONVENTION QUERY RETURNS
+   filtering on the short key `r.acao` alone -> 2 cells
+   all three conventions                    -> 12 cells
+   -> the under-count factor is 12/2 = 6x, and it is SILENT.
+
+5. WHICH ROUTES LOSE THEIR .eu EVIDENCE (the cost, not just the count)
+   ledgers with no `host` column: ['2026-10-11-pde-csr-oracle']
+   ACAO-bearing rows that cannot be attributed to any host: 3
+      unattributable: connect/carepartner/v13/display/message
+      unattributable: connect/csr/v2/display/message
+      unattributable: connect/v2/display/message
+
