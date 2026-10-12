@@ -50,7 +50,15 @@ hosts; the **OPTIONS** axis has **2** attributable hosts plus **1** row in the h
 Restated in `docs/03` with both axes named.
 
 **Counting rule for this table.** A line is in scope if it matches the seven multi-host phrases
-above. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **27 confirmed-by-row,
-2 corrected** (Y-3 withdrawn, so its line rejoins the clean set). No claim was marked defective on the strength of the index alone —
+above. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **28 confirmed-by-row,
+1 corrected (Y-1)**.
+
+**A1–A3 are counted separately and are NOT part of the 29.** They live in `docs/08` and
+`docs/02`, outside the area's stated scope, so folding them into the in-scope total does not
+reproduce this table. Two earlier drafts did exactly that — one reported "26 of 29" against a
+table holding a single defect row, the next "27 confirmed, 2 corrected". **29 lines, 28 clean, 1
+corrected is the only split this table supports.**
+
+No claim was marked defective on the strength of the index alone —
 each was checked against the page's own cited source. **Coverage is per claim cell, not per
 line**: several lines bundle more than one cell, and each cell was resolved separately.

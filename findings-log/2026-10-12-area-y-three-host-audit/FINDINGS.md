@@ -87,13 +87,21 @@ matrix-only cell and exits non-zero unless the lookup reports three hosts.
 **29 claims in scope** (`docs/03` and `docs/06`, the area's stated scope) plus **3 added by dated
 addendum** (`docs/02`, `docs/08`, and the gitignored-captures note).
 
-**26 of 29 are confirmed by row.** The `clcloud.*` route claims in `docs/06` are three-host
-evidenced for every cell they name — v6/v11/v13 `display/message`, `csr/v2`, bare `v2`, v12,
-`v13/discover/android/3.6` — because areas B, X, N, U and Z each swept all three hosts on
-2026-10-12. **This is the negative result the area allows, and it is the likelier one.**
+**28 of the 29 in-scope claims are confirmed by row; 1 is not.** The `clcloud.*` route claims
+in `docs/06` are three-host evidenced for every cell they name — v6/v11/v13 `display/message`,
+`csr/v2`, bare `v2`, v12, `v13/discover/android/3.6` — because areas B, X, N, U and Z each swept
+all three hosts on 2026-10-12. **This is the negative result the area allows, and it is the
+likelier one.**
 
-**Three claims are not evidenced as written.** None is a *false* claim; two are count/label
-defects and one is a presentation risk.
+**Counting rule, so the split can be reproduced:** in scope means the area's stated scope,
+`docs/03` + `docs/06`, matched against the seven multi-host phrases → **29 lines**. One of them
+(`docs/03:38`) is Y-1. The other **28 are confirmed-by-row**. Y-2 and Y-3 live in `docs/08` and
+`docs/02`, which are **outside that scope**, and are carried as **addendum rows A1–A3** and
+counted separately. **Folding them into the 29 would not reproduce the table** — an earlier draft
+of this file did exactly that and reported "26 of 29" against a table holding one defect.
+
+**One in-scope claim is not evidenced as written** (Y-1), and three addendum rows are recorded
+outside it. None of the three findings is a *false* claim.
 
 ### Y-1 · `docs/03:38` — "All three hosts return the same document"
 
@@ -146,8 +154,11 @@ host is named. Both are evidence defects, and the second is the more serious.
 > contradicting the sources it cites. The retraction is recorded rather than deleted.
 >
 > **What survives for `:91`, and is weaker than what this pass first claimed:** the drift file
-> *asserts* five and **enumerates no five-host list**; only three host names are recoverable from
-> its text. The count is unverified rather than wrong — which is what the paragraph already said.
+> *asserts* five and **enumerates no five-host list anywhere in the corpus** — the
+> "Five hosts, not two" section names two hosts and the file as a whole contains nine distinct
+> names, neither of which is a five-host list. The count is unverified rather than wrong, which is
+> what the paragraph already said. *(An earlier draft put a precise "three host names" figure
+> here. It could not be reproduced and is withdrawn.)*
 
 ### Y-3 · `docs/02` — **WITHDRAWN. There is no defect here.**
 
@@ -207,6 +218,6 @@ maintainer decision whether those bodies can be committed scrubbed.
 ## 6. What "closed" would mean
 
 Every one of the 29 claims marked **confirmed-by-row** or restated with its actual coverage, and
-Y-1/Y-2/Y-3 carried into `docs/` as corrections with their retractions preserved. The 26 clean
-claims **are** that result — proving the rest are correctly evidenced retires the audit, and
-that is the outcome here.
+**Y-1** and **A1** carried into `docs/` as corrections with their retractions preserved. **A2 is
+withdrawn and changes nothing.** The 28 clean claims **are** that result — proving the rest are
+correctly evidenced retires the audit, and that is the outcome here.

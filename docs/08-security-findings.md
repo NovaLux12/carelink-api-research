@@ -112,9 +112,6 @@ key material and the same dev-host bug, so the finding spans **five hosts** —
 recorded as reported; the sweep's own caveat is that its evidence table was
 never written to disk and must be re-verified before being treated as OBSERVED
 [source: DRIFT-AND-NEW; docs/00-summary-the-map.md].
-recorded as reported; the sweep's own caveat is that its evidence table was
-never written to disk and must be re-verified before being treated as OBSERVED
-[source: DRIFT-AND-NEW; docs/00-summary-the-map.md].
 
 ## F3 — Zero security headers on the health-data portal
 
