@@ -96,9 +96,34 @@ rate and neither changes what any endpoint accepts, so **no client behaviour
 depends on the reading**.
 
 **OBSERVED:** `registration_endpoint` is advertised by **all five** tenants and
-absent on **all five** — `/oidc/register` returns 404 `application/json`, 60 B,
-one identical digest on every host. A published capability that does not exist,
-identically, everywhere [source: findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §3].
+**returns 404 to `GET` on all five** — `/oidc/register` gives 404
+`application/json`, 60 B, one identical digest on every host [source:
+findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §3].
+
+> ⚠ **Retracted 2026-10-12.** The original wording here was "absent on **all five**
+> … A published capability that does not exist, identically, everywhere." **That is
+> false**, and it is kept visible rather than deleted (AGENTS.md §3). The endpoint is
+> **live and POST-only** — a GET-only sweep cannot see it, which is a method error and
+> not a reading error; `PULL_REQUEST_TEMPLATE.md:15` permits OPTIONS for exactly this
+> and `PROBE-FINDINGS.md` §5 is titled *"Endpoints that are POST-only (a GET-only probe
+> reads them as dead)"*. The pass's own supplementary OPTIONS sweep, with a
+> certainly-absent control on **every** tenant, shows:
+>
+> | Tenant | `OPTIONS /oidc/register` | verdict |
+> |---|---|---|
+> | `carelink-login-trials.minimed.com` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.minimed.eu` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.minimed.com` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.medtronic.eu` | 404, 107 B, `"CORS error: Missing Access-Control-Request-Method header"`, **no** `access-control-*` | routed; preflight refused by a CORS handler |
+> | `carelink-login.medtronic.com` | 404, 107 B, same digest | routed; preflight refused by a CORS handler |
+>
+> The three patient tenants therefore **honour** the advertisement; on the two
+> shadow tenants the route exists but a browser preflight is refused. The controls
+> (`/oidc/registerx`, one character different, same host and headers) return 404 +
+> `x-auth0-not-found: 1` + `text/plain` 10 B on all five, so the positive cells are
+> an oracle and not an inference. Whether the shadow tenants would serve a
+> conforming **POST** is **not established** and needs a POST — area J's subject
+> [FINDINGS.md §3–§4].
 
 **OBSERVED** advertisement-vs-reality [source: PROBE-FINDINGS §4 and deep §1, §5;
 AUTH-TENANT §1]:

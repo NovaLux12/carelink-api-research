@@ -4,15 +4,31 @@ Claim issue **#23**. Unauthenticated, **GET only**, no token exchange, no
 authentication, no POST. Nothing here needed a credential; nothing produced
 one.
 
-**19 of a 20 cap** — 17 via `curl` (probe pass) + 2 via `hurl 8.0.1`
-(live validation of the two new pins). Declared delay **2.5 s between requests
-to the same host**, enforced as a `sleep` *inside* the per-host `flock` in
-`probe.sh` — outside the lock, four concurrent pool workers would fire
+**32 of a 34 cap, in two budgets, and no POST among any of the 32.** The
+original budget was **19 of a 20 cap** — 17 via `curl` (probe pass) + 2 via
+`hurl 8.0.1` (live validation of the two new pins). The **supplementary budget
+of 14** was authorised by the repository owner after a verifier refuted this
+pass's `registration_endpoint` claim, specifically to complete it, and **13 of
+those 14 were used** (10 planned OPTIONS probes + 3 diagnostics; 1 left unused).
+The two are kept separate because they were authorised separately and spent for
+different reasons; they are added into one total only because the ledger is one
+file, and its 32 rows have to be accounted for as one number.
+
+Declared delay **2.5 s between requests to the same host**, enforced as a
+`sleep` *inside* the per-host `flock` in both `probe.sh` and
+`probe-options.sh` — outside the lock, four concurrent pool workers would fire
 simultaneously on one host, which is worse than not serialising at all.
 `--compressed` on every request.
 
-**Measured spacing floor: 2.000 s**, from the 12 same-host gaps in
-`results.jsonl`. Read that number carefully: `ts_utc` is recorded at
+The supplementary phase is **OPTIONS with an empty body**, which
+`PULL_REQUEST_TEMPLATE.md:15` permits for exactly the purpose of finding
+POST-only routes. The method sent is OPTIONS on all 13 rows;
+`Access-Control-Request-Method: POST` is a preflight *declaration* of what a
+browser would send, not a POST, and no request body was sent.
+
+**Measured spacing floor: 2.000 s**, from the same-host gaps in
+`results.jsonl` — 12 in the original GET phase and 5 more in the supplementary
+OPTIONS phase, none below 2 s. Read that number carefully: `ts_utc` is recorded at
 **1-second resolution**, so this ledger **cannot resolve a 2.5 s sleep** — 2.000
 and 3.000 are the only values it can produce, and the gaps quantise onto them.
 The floor is therefore a **lower bound**, not a measurement of the declared
@@ -46,7 +62,10 @@ which is why `docs/02` §9 still carried its kids as *"Unknown — not in any
 source"*.
 
 **This pass compared all five.** `corpus-audit.py` §F enumerates every
-`carelink-login*` host named anywhere in the tracked corpus: **five, and this
+`carelink-login*` host named anywhere in the **tracked Markdown** (its scan is
+`.md`-only; see §14 — the wording here said "tracked corpus" before that was
+tightened, and the conclusion is unaffected because the tenant set comes from the
+captured documents, not from the prose scan): **five, and this
 pass covered five.** Nothing was left out by choice. (The eight
 `carelink-login-{dev,stage1-next,test1,clinical-*}` hosts the Wayback sweep
 found are dev/stage/test by name and are enumerated-not-probed by policy —
@@ -134,13 +153,92 @@ tenants on record.
   depends on this reading**: both values are far above any realistic unauthenticated
   client rate, and the difference does not change what any endpoint accepts.
 
-**OBSERVED — `/oidc/register`, the `registration_endpoint` every tenant
-advertises, is absent on every tenant.** 5 of 5 rows return
-`404 application/json; charset=utf-8`, 60 B,
-`{"statusCode":404,"error":"Not Found","message":"Not Found"}`,
-**one digest `f006bbd60894…` across all five hosts** (seq 4, 7, 10, 13, 17).
-One artefact, five tenants. A published capability that does not exist,
-identically, everywhere.
+**OBSERVED — `/oidc/register` returns `404` to GET on all five tenants.** 5 of 5
+rows return `404 application/json; charset=utf-8`, 60 B,
+`{"statusCode":404,"error":"Not Found","message":"Not Found"}`, **one digest
+`f006bbd60894…` across all five hosts** (seq 4, 7, 10, 13, 17). That GET
+observation stands.
+
+**RETRACTED 2026-10-12 — the inference layered on it was wrong, and so was the
+method that produced it.** This pass reported the endpoint as *"absent on every
+tenant… A published capability that does not exist, identically, everywhere."*
+**That claim is false.** The endpoint is live. A verifier refuted it with an
+OPTIONS preflight, and the supplementary run below confirms the refutation on
+this pass's own evidence.
+
+The error was the **method**, not the reading. A GET-only probe cannot see a
+POST-only route, and this repo said so before the pass began:
+`PULL_REQUEST_TEMPLATE.md:15` ("GET only, **except OPTIONS with an empty body to
+find POST-only routes**"), `docs/09:64-71` (`GET 403 + OPTIONS 200 → live,
+POST-only`; "the cleanest proof that a resource exists with no GET method"),
+`docs/00` and `docs/06:310,443`. `PROBE-FINDINGS.md:247` is titled *"Endpoints
+that are POST-only (a GET-only probe reads them as dead)"* and opens "I
+initially recorded `/oauth/revoke` as 404" — the identical error, already made
+and already written down. Its `/oidc/register` row (`:258`) carries a `—` in the
+POST column: the earlier pass **declined to assert absence**, and this pass read
+that silence as a finding. A `—` is not a 404.
+
+The retraction is kept visible rather than deleted, per AGENTS.md §3. What
+survives from the original claim is the GET capture; what does not is "absent".
+
+### The corrected claim, established on all five tenants
+
+**OBSERVED — supplementary budget of 14, 13 used.** OPTIONS with an empty body,
+`Origin: https://probe.invalid` (a non-routable placeholder, so the preflight
+cannot look like a real referrer), `Access-Control-Request-Method: POST`,
+`Access-Control-Request-Headers: content-type`. **A certainly-absent control per
+tenant**, `/oidc/registerx`, sent *first* on every host (seq 20, 22, 24, 26, 28) —
+one host's 404 says nothing about the next host's front door.
+
+| Tenant | `/oidc/register` OPTIONS | `allow-methods` | `x-auth0-not-found` | control `/oidc/registerx` |
+|---|---|---|---|---|
+| `carelink-login-trials.minimed.com` | **204**, 0 B | **`POST`** | absent | 404, 10 B, `x-auth0-not-found: 1` |
+| `carelink-login.minimed.eu` | **204**, 0 B | **`POST`** | absent | 404, 10 B, `x-auth0-not-found: 1` |
+| `carelink-login.minimed.com` | **204**, 0 B | **`POST`** | absent | 404, 10 B, `x-auth0-not-found: 1` |
+| `carelink-login.medtronic.eu` | 404, 107 B | absent | absent | 404, 10 B, `x-auth0-not-found: 1` |
+| `carelink-login.medtronic.com` | 404, 107 B | absent | absent | 404, 10 B, `x-auth0-not-found: 1` |
+
+**The three patient tenants are live and POST-only**, on the repo's own oracle
+(`docs/09:65`): 204 + `access-control-allow-origin` +
+`access-control-allow-methods: POST` on the advertised path, against 404 +
+`x-auth0-not-found: 1` + `text/plain` on the one-character-different control,
+same host, same method, same headers. An advertisement that is honoured rather
+than dangling.
+
+**The two shadow tenants answer differently, and the difference is real.** Both
+return `404 application/json`, 107 B, **one digest `af370969b232…`**, body
+`{"statusCode":404,"error":"Not Found","message":"CORS error: Missing
+Access-Control-Request-Method header"}` — and **no `access-control-*` header at
+all**, while their own controls return `x-auth0-not-found: 1`.
+
+That body is surprising, because the header it names **was sent**. Verified
+rather than assumed, at the cost of three of the four spare requests: a verbose
+capture (seq 30) shows `> Access-Control-Request-Method: POST` on the wire and
+the server still answering that it is missing; changing the declared method to
+`GET` (seq 31) returns the **identical 107 B digest**; widening the requested
+headers (seq 32) likewise. Per AGENTS.md §6 #2 the response saying one thing and
+the wire saying another is exactly the case that has to be settled by the wire —
+here the header is demonstrably present, so the message is server behaviour, not
+a client bug.
+
+**INFERRED**, and labelled because it is: that the shadow tenants route
+`/oidc/register` to a CORS handler that rejects the preflight before method
+negotiation, which is why they return no `access-control-*` headers and a
+method-invariant body. The observed facts are the two digests, the absent ACAO,
+and the invariance; the handler's internal reason is not observed and nothing
+here needs it. **What is established either way is that `/oidc/register` is not
+an unrouted path on the shadow tenants either** — their front door marks the
+control with `x-auth0-not-found: 1` and does not mark this one, so the request
+reached a handler. Whether the shadow tenants would answer a conforming POST is
+**not established** and needs a POST, which is area J's subject and remains out
+of scope.
+
+So the corrected claim is narrower and more useful than the retraction: three
+of five tenants serve the advertised capability and are proven POST-only; on the
+other two the route exists and answers, but with a CORS-layer 404 that a client
+cannot distinguish from absence by status alone. A client implementing dynamic
+client registration against CareLink must implement the trial/EU/US tenant and
+treat the shadow tenants as unusable for it.
 
 **OBSERVED — the rest of the behavioural surface is uniform.** On all five
 tenants the discovery document and the JWKS both return `200` with
@@ -157,7 +255,7 @@ compared for it.
 The controls (§6) were not decoration; they produced the pass's most reusable
 artefact. On `carelink-login.*`, a `404` is **not one thing**:
 
-| | certainly-absent `/.well-known/*` | absent advertised `/oidc/register` |
+| | certainly-absent `/.well-known/*` | advertised `/oidc/register`, GET 404 |
 |---|---|---|
 | `content-type` | `text/plain; charset=utf-8` | `application/json; charset=utf-8` |
 | body | 10 B | 60 B, `{"statusCode":404,…}` |
@@ -165,16 +263,32 @@ artefact. On `carelink-login.*`, a `404` is **not one thing**:
 | **`x-auth0-not-found`** | **`1`** | **absent** |
 | `cache-control` | `public, max-age=60` | `no-cache` |
 
-**OBSERVED:** `x-auth0-not-found: 1` appears on the well-known miss and on
-nothing else in 19 responses. It is a better oracle than status code on this
-host family — it says *the tenant's front door does not know this path*
-specifically, which a status code alone cannot.
+**OBSERVED:** `x-auth0-not-found: 1` appears on the well-known miss and on the
+absent-path controls, and on nothing else — 7 of the 32 responses this pass
+recorded (seq 1, 14 in the GET phase; the five `/oidc/registerx` controls in the
+supplementary phase), each of them a path the front door does not know. It is a
+better oracle than status code on this host family — it says *the tenant's front
+door does not know this path* specifically, which a status code alone cannot.
+Note what it is **not** on: the GET 404 from `/oidc/register` on any tenant, and
+the 107 B CORS 404 from the two shadow tenants. Both reached a handler; neither
+is an unrouted path.
 
 **INFERRED**, with its assumption: that the two signatures correspond to two
 different routing states — an unrouted path versus a path that reached Auth0's
 API layer and was answered by a handler with nothing to return. The two
 signatures are observed; the *meaning* assigned to them is not, and nothing
 here needs it to be. Recorded so the next pass does not have to re-derive it.
+
+**This paragraph was right, and it was in the same file as the claim it
+contradicts.** The inference recorded here — that the `/oidc/register` 404 was
+"a path that reached Auth0's API layer" — is precisely what makes it NOT an
+absence. §3 nevertheless reported the endpoint as absent. The pass held a correct
+reading and a false summary of it in one document, and shipped the summary.
+Correcting it is a matter of taking the INFERRED paragraph at face value, not of
+gathering new evidence: the evidence needed to reject "absent" was already in
+this file, and this is the same defect class as AGENTS.md §6 #5, derived prose
+contradicting its own source table. The OPTIONS run settled it empirically, but
+the tell was here.
 
 **Controls first, on two hosts, both passed.** The absent-path control was sent
 as seq 1, *before* any candidate on that host, precisely so that a front door
@@ -255,15 +369,40 @@ what settles each; the length check would not have been sufficient on its own.
 
 Both absent-path controls returned 404, so **no stop condition fired**.
 
+### The supplementary phase added five more controls, one per tenant
+
+The GET-phase controls above were one per host on **two** hosts. The
+supplementary OPTIONS phase repeats the discipline on **every** tenant, because
+the question it answers — is this path routed? — is per-host:
+
+| # | seq | Request | Result | What it proved |
+|---|---|---|---|---|
+| C4-C8 | 20, 22, 24, 26, 28 | `/oidc/registerx` (OPTIONS) on each of the five tenants | `404` `text/plain` 10 B, `x-auth0-not-found: 1`, **one digest `0802559db137…` across all five** | The front door marks an unrouted path identically on every tenant, and `/oidc/register` does **not** carry that mark on any of them. This is what makes the 204/404 pair an oracle rather than an observation: same host, same method, same preflight headers, one character of path apart. Sent *first* on each host, before that host's candidate. |
+
+These five controls are also what exposed the original error: had the pass run
+the OPTIONS control on `medtronic.eu`, it would have seen `x-auth0-not-found: 1`
+on `/oidc/registerx` and its absence on `/oidc/register` in the same run, and the
+"absent" claim would not have survived its own evidence.
+
 ## 8. Every negative result, stated
 
-- `registration_endpoint` advertised on all five tenants, **absent on all five**
-  (§3). Not one of them serves it.
+- `registration_endpoint` advertised on all five tenants, **`404` to GET on all
+  five** (§3). **RETRACTED and superseded: this is no longer a statement about
+  absence.** It is live and POST-only on `trials.minimed.com`, `minimed.eu` and
+  `minimed.com` (204 + `allow-methods: POST`, per-tenant controls at 404 +
+  `x-auth0-not-found: 1`), and on `medtronic.{eu,com}` it reaches a CORS handler
+  that answers 404 with no `access-control-*` headers. The GET capture is still
+  true; "not one of them serves it" was not, and never could have been, from a
+  GET-only probe.
 - `kids shared by >1 tenant: 0`. The five key sets stay disjoint (§5).
 - `fields absent from at least one document: 0` (§2).
-- `x-auth0-not-found` appears on 2 of 19 responses and on **no** live document.
+- `x-auth0-not-found` appears on 7 of 32 responses and on **no** live document
+  (§4).
 - No `x-ratelimit-*` header on any `404`, and no `access-control-allow-origin`
-  on any `404` — only the `200`s carry CORS here (§3).
+  on any GET `404` — only the `200`s carry CORS there. **Superseded for the
+  OPTIONS phase:** `/oidc/register` on the three patient tenants returns
+  `access-control-allow-origin` *on a 204*, which is the whole point of it
+  (§3).
 - The trials tenant has **no** field the other four lack. There is no
   trials-specific OAuth surface to implement.
 
@@ -282,7 +421,10 @@ Recorded as blocked rather than attempted, per the area's hard scope limit.
   read-only rule. Left open.
 - **`/mfa/challenge`** is advertised on all five and has no probe result in any
   source (`docs/02` §9 still carries it as Unknown). It would have cost 5 more
-  requests; the cap is committed. Named in the successor instead.
+  requests; the cap is committed. Named in the successor instead — **with the
+  method corrected**, see §11: it is POST-only by specification (`mfa_challenge`
+  takes an MFA token and returns a challenge), so a GET-only successor would
+  repeat this pass's error on a second endpoint.
 
 ## 10. What is now pinned
 
@@ -378,3 +520,124 @@ line break that the gate's pattern could not see while reporting green.
   against their `results.jsonl` sha256 and byte counts and all 17 match, so the
   uncommitted bodies are provably the ledger's own captures rather than
   something substituted afterwards.
+
+
+## 12. The successor, re-tested against its own quality bar
+
+`docs/11`'s area J addendum was written by this pass, so it inherits this pass's
+mistakes unless it is checked. It is checked here, on the four tests the repo
+applies to a proposed area.
+
+**Derived — PASS.** The advertisement-versus-reality question is real and is not
+answered by anything else open: the three siblings are recorded on the EU tenant
+only, and `/mfa/challenge` has no probe result in any source. Derivation does
+**not** rest on the retracted claim any more — it now rests on the fact that the
+retraction *itself* established a route-reachability question this pass could not
+answer with GET.
+
+**Bounded — PASS, and the bound is now per-tenant rather than per-pass.** 3 paths
+× 5 tenants + a control per host, all path names taken from a discovery document
+this repo already holds. No wordlist, no enumeration.
+
+**Non-duplicate — PASS.** Distinct from area J's blocked half (that one needs a
+token; this needs none) and from `/oidc/register`, which this pass has now closed
+on all five tenants.
+
+**Labelled — the criterion that caught the original error, so it is stated
+explicitly.** The addendum's *premise* was labelled OBSERVED and was true; its
+*inference* was unlabelled and was false. That is the same asymmetry the verifier
+flagged on `x-ratelimit-limit`, where this pass labelled correctly. A successor
+inherits its author's labelling habits, which is why the addendum now carries the
+inference as INFERRED and names the observed facts it rests on.
+
+**What changed in it, and why it was not dropped.** The addendum previously read
+*GET only*, justified by this pass's "absent on all five". All three endpoints are
+**POST-only by specification** — `bc-authorize` takes an `auth_req_id`, `mfa_challenge`
+takes an MFA token, `global-token-revocation` takes a connection name — so the
+original method would have returned "absent" on every tenant and been false every
+time. It would have repeated this pass's error three more times. It is therefore
+**rewritten, not dropped**: the question it poses is unchanged and still open,
+only the verb is corrected. Dropping it would have deleted a real question because
+the pass that wrote it up got the method wrong.
+
+## 13. Discharging one leg of issue #23 inside this PR, and why
+
+The claim issue's proposed successor had more than one leg. This pass closed one
+of them **in the PR** rather than leaving it for a follow-up: `docs/02` §9's
+"JWKS kids for `carelink-login-trials.minimed.com` — Unknown — not in any
+source" (§5). The reasoning, stated because a partial discharge is the kind of
+thing that goes unexamined:
+
+- It was **already paid for**. The trials JWKS fetch (seq 3) was inside the
+  original 20-cap and was requested on its own merits. Closing the leg cost
+  **zero** additional requests; leaving it open would have meant re-fetching a
+  document this pass had already read.
+- It was **bounded and self-contained** — 2 kids, 0 shared, verifiable from
+  `jwks-keys.json` and reproducible from a clean clone.
+- It was **not a substitute for the rest of the issue.** Area J's token-minting
+  question, the `device_code` rejection, and the sibling-endpoint sweep all remain
+  open and are named in §9 and §12.
+
+So the discharge is one leg of a multi-leg successor, completed because it was
+free and bounded, and **not** a claim that #23 is done. It sits consistently with
+`docs/10:46`, which is this repo's prior art for a source disagreeing with itself
+(COMMONCRAWL §4e's 12-vs-7): both readings are given, the superseded one stays
+visible, and nothing is quietly dropped. The difference is the one that matters —
+§4e is a *counting* disagreement settled by leaving both numbers standing, while
+this is a *method* error settled by new evidence, so it is corrected **and** the
+original retained rather than merely balanced.
+
+## 14. One overstatement in this pass's own tooling
+
+`corpus-audit.py` §F is described as enumerating every `carelink-login*` host
+"anywhere in the tracked corpus". Its scan is `if not f.endswith('.md'): continue`
+(`:79`), so it reads **Markdown only**.
+
+Separately: `corpus-audit.py` reads `bodies/*.b`, which is gitignored, so it **does
+not run from a clean clone** — unlike `diff.py`, which does. That is pre-existing,
+not introduced by this fix, and it is recorded rather than papered over. The
+kid-disagreement it exists to police is independently re-derivable from committed
+material: `jwks-keys.json` holds all ten live kids, and the corpus strings are
+`AUTH-TENANT-FINDINGS.md:280,282`, `docs/02:34` and `RECON-SUBDOMAINS.md:244`, all
+tracked. What is **not** re-derivable from a clean clone is a check that a live
+`kid` string is still live — which needs the network, as it should. Harmless today — no host name lives
+outside `.md` in a way that changed the answer — but the conclusion is only as
+strong as the scan behind it, so the wording is corrected to say what the code
+does. The finding it supports (five tenants, and the union that exposed the two
+gaps) is unaffected: the tenant set came from the discovery documents and JWKS
+captures, which are `.md` and `.json` in the *results*, not from the `.md` scan.
+
+## 15. A defect this fix introduced and caught: duplicated ledger keys
+
+The supplementary rows were first written with `seq` 1-13, colliding with the
+original GET phase. `seq` is `diff.py`'s primary key (`by_seq = {r['seq']: r
+for r in rows}`), so the later rows silently shadowed the earlier ones and the
+clean-clone re-derivation stopped working — `checked_openid()` looked up `seq 2`,
+got an OPTIONS row for `/oidc/registerx`, and died on a filename that did not
+exist.
+
+It failed **loudly** rather than silently, which is the only reason it was caught
+before the push: the assert-and-verify discipline in `checked_openid()` (added
+after AGENTS.md §6 #3) turned a wrong answer into a traceback. A bare dict lookup
+without the byte-count and digest assertions would have compared a control's
+metadata against a discovery document and produced a plausible wrong number —
+the exact failure mode §6 #3 names, one level up. Rows are now numbered 20-32,
+`seq` is unique and contiguous over 1-32, and every seq cited in this file points
+at the row it claims.
+
+## 16. Correction history for this pass
+
+Two corrections, both recorded rather than overwritten, both kept visible at the
+point a reader meets them:
+
+| Date | What | Where it stays visible |
+|---|---|---|
+| 2026-10-12 | `registration_endpoint` "absent on all five" — **false**; live and POST-only | this file §3 (retraction above the corrected claim), §7 C4-C8; `docs/02`, `docs/10`, `docs/11`, `PR.md` |
+| 2026-10-12 | four `hurl_exit=1` invocations / four removed rows, not "two" | this file §11, with the prior wording quoted |
+
+The second correction came from a verifier and the first from a verifier too. In
+both cases the *evidence was already on disk* — the run.log lines, and this
+file's own §4 inference that described the 404 as "a path that reached Auth0's
+API layer". Neither needed a new request to detect; both needed someone to read
+the artefact instead of the summary. That is the failure mode worth carrying
+forward: a pass that ships a summary is a pass that has to be checked twice.

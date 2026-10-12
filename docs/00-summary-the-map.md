@@ -327,6 +327,12 @@ Also confirmed held: the discovery document is still byte-identical, all four
 tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
 — finding F6 in [`08-security-findings.md`](08-security-findings.md).
 
+> **Read "all four" above as of the sweep date only.** The sentence is left as
+> the 2026-10-11 sweep recorded it (AGENTS.md §3 — a dated record is not
+> rewritten), but the estate is **five** tenants now and disjointness is a
+> five-tenant statement: 10 keys, 0 shared. Marked here, at the sentence a reader
+> actually stops on, rather than only in the extended note below.
+
 > **Extended 2026-10-12 (area I, #23).** The four-tenant disjointness claim
 > above is left as it stood on 2026-10-11, when it was true of everything then
 > known. `carelink-login-trials.minimed.com` has since been fetched: it holds

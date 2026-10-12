@@ -74,9 +74,16 @@ print('=' * 78)
 print('F. host sets')
 print('=' * 78)
 HOSTRE = re.compile(r'carelink-login(?:-trials)?\.[a-z]+\.[a-z]+')
+# Scope is TRACKED MARKDOWN ONLY (see the f.endswith('.md') filter below), not
+# "the tracked corpus" as an earlier revision of this file's own summary claimed.
+# Tightened 2026-10-12: a conclusion is only as strong as the scan behind it.
+# No host name in this repo's conclusions is sourced from a non-.md file -- the
+# tenant set comes from the captured discovery documents and JWKS bodies, which
+# are ledger rows, not prose -- so the finding is unaffected.
+SCAN_EXTS = ('.md',)
 corpus_hosts = {}
 for f in corpus:
-    if not f.endswith('.md'): continue
+    if not f.endswith(SCAN_EXTS): continue
     try:
         txt = open(os.path.join(ROOT, f), errors='replace').read()
     except OSError:
