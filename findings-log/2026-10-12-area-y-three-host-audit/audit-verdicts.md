@@ -46,7 +46,7 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 given by **content**, not line number: the corrections in this PR shift line numbers in the very
 files they cite.
 
-| A1 (= FINDINGS **Y-2**, second site) | `docs/08-security-findings.md`, the paragraph reading *"so the finding spans **five hosts** — recorded as reported"* | **NOT A DEFECT — reverted.** `:91` cites `DRIFT-AND-NEW`, which has a *"Five hosts, not two"* section, and the paragraph already carries the re-verification caveat. `origin/main` restored byte-identically |
+| A1 (= FINDINGS **Y-2**, second site) | `docs/08-security-findings.md`, the paragraph reading *"so the finding spans **five hosts** — recorded as reported"* | **NOT A DEFECT — reverted.** That paragraph cites `DRIFT-AND-NEW`, which has a *"Five hosts, not two"* section, and the paragraph already carries the re-verification caveat. `origin/main` restored byte-identically |
 | A2 (= FINDINGS **Y-3**) | `docs/02-auth-tenants-and-flows.md`, the `subgraph POL[...]` title | five tenants inside a "compared field-by-field" subgraph | **Y-3 WITHDRAWN — no defect.** `AUTH-TENANT-FINDINGS.md` §1's three tenants *include trials*; §8's four is the JWKS-`kid` comparison, which correctly excludes it. `origin/main` restored byte-identically |
 | A3 (= FINDINGS **Y-4**) | `findings-log/2026-10-12-published-pointers/.gitignore` | the discovery / country / config bodies these pages rest on | **NOT RE-DERIVABLE from a clean clone** (Y-4) — 10 tracked files in that directory, none a `docs/*.json`. Maintainer decision, recorded not fixed |
 
