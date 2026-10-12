@@ -232,11 +232,13 @@ told to use has now been shown preflight-bearing cross-host rather than inferred
 **The one that costs evidence is `pde-csr-oracle`: it has no `host` column at all**, so its three
 ACAO rows — the only `.eu`-era ones for `csr/v2` and bare `v2` — **cannot be attributed to any
 host**. That is why `docs/11` §Z's "`ACAO` on all three hosts" was unsourced for those two routes.
-A query filtering on the short key `r.acao` alone returns **2** distinct ACAO cells; re-parsed
-across all three conventions the same pre-existing corpus holds **12**. **The error is silent** —
-it returns fewer rows, which reads as a finding rather than as a parser mistake
-([#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). Area Z's own ledger writes
-`host` plus an explicit key per CORS header, `(none)` when absent, so its rows parse without
+**Counting rule:** *rows* = rows whose response carried `access-control-allow-origin`, read
+under whichever convention that ledger uses; *cells* = those rows deduplicated to
+(host, method, route). A query filtering on the short key `r.acao` alone finds **2 cells**;
+re-parsed across all three conventions the same five-ledger corpus holds **17 rows → 12 cells**.
+**The error is silent** — it returns fewer rows, which reads as a finding rather than as a parser
+mistake ([#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). Area Z's own ledger
+writes `host` plus an explicit key per CORS header, `(none)` when absent, so its rows parse without
 `ctype` archaeology.
 
 ⚠ **An earlier draft of this section said `area-b-v12-routing` captured "no CORS value at all" and
