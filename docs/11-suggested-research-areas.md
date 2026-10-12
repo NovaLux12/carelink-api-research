@@ -259,11 +259,37 @@ bundle. We never did the full three-way reconciliation.
 which don't.
 
 
+
+
 > **Addendum 2026-10-12 (from area A) — the premise is now well-posed, and it is an
 > N-way reconciliation, not a three-way one.** This area was blocked on an unanswered
 > question: the "clinic bundle's device table" was a single table read off one host, and
 > nobody knew whether the other portal hosts served the same bytes. Area A settled it by
 > sha256 and the answer is **two distinct builds**, so "the clinic bundle" is not one
+> thing:
+>
+> | Build | Hosts | Entry document (5518 B) sha256 |
+> |---|---|---|
+> | clinic `pow` | `carelinkhp.minimed.eu`, `carelink.medtronic.eu`, `carelink.medtronic.com` | `0f2c5f6257a6fc6a…` |
+> | support `cua` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` | `f637c8d0cd4ec6bc…` |
+>
+> Both rows and both asset sizes are **OBSERVED** in area A's ledger, not inferred
+> from the host names [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2;
+> `results.jsonl` seq 4, 8, 15, 19, 20].
+>
+> **Blocker:** the device table must be extracted from **each build separately** — the
+> two main assets are 3,397,615 B and 3,410,666 B, so they are **not** the same file, and
+> assuming otherwise is the exact defect that let a portal deployment be recorded as a
+> false positive. **Closes when** G states which source(s) list each model code **per
+> build**, where "build" is the sha256 set above. **A negative closes it**: if both
+> builds' device tables are identical, G's premise is unchanged, the addendum records
+> that, and the reconciliation stays three-way.
+>
+> **Assumptions (INFERRED):** that the shipped portal's device table lives in the main
+> asset and not in a lazy chunk, and that the two builds share a device-table format.
+> Neither is established — the chunk corpus was mined against the clinic build only.
+> The asset-level digests are in the area A log; its asset bodies were not committed
+> (3.4 MB each), so re-extraction costs 2 fetches.
 
 ### Q. The `appVersion` body gate — a second version axis our docs do not describe
 
@@ -434,7 +460,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 16 open plus 10 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 15 open plus 11 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
