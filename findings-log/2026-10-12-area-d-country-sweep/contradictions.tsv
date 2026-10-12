@@ -1,0 +1,250 @@
+cc	tier	class	rule	keys	left	right
+BE	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+BE	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Belgium	België
+BE	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YYYY
+BE	-	FLAG-INFERRED	techHours clock shape	techHours	08:30-17:00	H:MM - H:MM, no trailing token
+CH	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Switzerland	Schweiz
+CH	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD.MM.YYYY
+CH	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	10/18/2017	.
+CH	-	FLAG-INFERRED	techHours clock shape	techHours	08:30-17:00	H:MM - H:MM, no trailing token
+AD	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+AD	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:30	H:MM - H:MM, no trailing token
+AE	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+AE	1	CONTRADICTION	carbohydrate-unit disagreement	carbDefaultUnit|carbohydrateUnitsDefault	grams	GRAMS
+AE	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	United Arab Emirates	دولة الإمارات العربية المتحدة
+AE	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD.MM.YYYY
+AE	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	10/18/2017	.
+AE	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+AL	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+AL	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-16:00	H:MM - H:MM, no trailing token
+AM	1	CONTRADICTION	carbohydrate-unit disagreement	carbDefaultUnit|carbohydrateUnitsDefault	EXCHANGES	GRAMS
+AR	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+AR	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YY
+AT	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Austria	Österreich
+AT	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD.MM.YYYY
+AT	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	10/18/2017	.
+AT	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+AU	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	D/MM/YYYY
+AW	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+AZ	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD.MM.YYYY
+AZ	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	10/18/2017	.
+AZ	-	FLAG-INFERRED	techHours clock shape	techHours	7:00-16:00	H:MM - H:MM, no trailing token
+BA	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Bosnia and Herzegovina	Bosna i Hercegovina
+BA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+BA	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+BD	-	FLAG-INFERRED	techHours clock shape	techHours	9:30-21:30	H:MM - H:MM, no trailing token
+BG	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Bulgaria	България
+BG	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YYYY
+BG	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+BH	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Bahrain	‏البحرين
+BH	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+BM	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YYYY
+BO	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+BO	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	-
+BR	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+BR	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Brazil	Brasil
+BR	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YY
+BW	1	CONTRADICTION	HR_12 with a pattern carrying no meridiem	timeFormat|shortTimeFormat	HR_12	h:mm
+BW	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+BW	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00	H:MM - H:MM, no trailing token
+BY	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+BY	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+CA	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	DD/MM/YYYY
+CL	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	-
+CO	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+CO	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	10/18/2017	D/MM/YY
+CW	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+CW	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/02/2019	MM/DD/YYYY
+CY	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Cyprus	Κύπρος
+CY	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+CY	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+CZ	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Czech Republic	Česká republika
+CZ	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+CZ	-	FLAG-INFERRED	techHours clock shape	techHours	07:00-19:00	H:MM - H:MM, no trailing token
+DE	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Germany	Deutschland
+DE	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+DE	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+DK	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Denmark	Danmark
+DK	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	-
+DK	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-16:30	H:MM - H:MM, no trailing token
+DO	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	MM/DD/YYYY
+DO	1	CONTRADICTION	duplicate report entry	supportedReports	BOLUS_WIZARD_FOOD_BOLUS x2	2,4
+DZ	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Algeria	الجزائر
+DZ	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+DZ	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+EC	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+EE	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Estonia	Eesti
+EE	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+EE	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+EG	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+EG	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Egypt	مصر‎
+EG	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00	H:MM - H:MM, no trailing token
+ES	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+ES	1	CONTRADICTION	carbohydrate-unit disagreement	carbDefaultUnit|carbohydrateUnitsDefault	EXCHANGES	GRAMS
+ES	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Spain	España
+ES	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:30	H:MM - H:MM, no trailing token
+FI	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Finland	Suomi
+FI	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+FI	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:30	H:MM - H:MM, no trailing token
+FR	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+GE	1	CONTRADICTION	carbohydrate-unit disagreement	carbDefaultUnit|carbohydrateUnitsDefault	EXCHANGES	GRAMS
+GE	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+GR	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+GR	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Greece	Ελλάδα
+GR	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+GR	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+HK	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-18:00	H:MM - H:MM, no trailing token
+HN	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	MM-DD-YYYY
+HN	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	-
+HR	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Croatia	Hrvatska
+HR	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YYYY.MM.DD
+HR	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+HR	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-18:00	H:MM - H:MM, no trailing token
+HU	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Hungary	Magyarország
+HU	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YYYY.MM.DD
+HU	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+HU	-	FLAG-INFERRED	techHours clock shape	techHours	07:00-20:00	H:MM - H:MM, no trailing token
+IL	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+IL	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Israel	יִשְׂרָאֵל
+IL	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+IN	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+IN	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	India	भारत
+IN	-	FLAG-INFERRED	techHours clock shape	techHours	9:30-21:30	H:MM - H:MM, no trailing token
+IQ	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+IS	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Iceland	Ísland
+IS	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+IS	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+IT	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+IT	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Italy	Italia
+IT	-	FLAG-INFERRED	techHours clock shape	techHours	08:30-17:30	H:MM - H:MM, no trailing token
+JM	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+JO	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+JP	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+JP	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Japan	日本
+JP	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YYYY/M/D
+KE	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-20:00	H:MM - H:MM, no trailing token
+KR	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+KR	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YYYY/MM/DD
+KW	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Kuwait	الكويت
+KW	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+KW	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+KZ	1	CONTRADICTION	carbohydrate-unit disagreement	carbDefaultUnit|carbohydrateUnitsDefault	EXCHANGES	GRAMS
+KZ	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+KZ	1	CONTRADICTION	postal format rejected by its own regex	postal.postalFormat|postal.regExpStr	999999	16-char expression
+KZ	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-18:00	H:MM - H:MM, no trailing token
+LB	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+LB	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Lebanon	لبنان
+LB	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+LI	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+LI	-	FLAG-INFERRED	techHours clock shape	techHours	08:30 - 17:00	H:MM - H:MM, no trailing token
+LT	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Lithuania	Lietuva
+LT	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+LT	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+LU	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Luxembourg	Lëtzebuerg
+LU	-	FLAG-INFERRED	techHours clock shape	techHours	08:30-17:00	H:MM - H:MM, no trailing token
+LV	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Latvia	Latvija
+LV	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+LV	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+LY	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00	H:MM - H:MM, no trailing token
+MA	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Morocco	المغرب
+MA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+MA	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+MD	1	CONTRADICTION	HR_12 with a pattern carrying no meridiem	timeFormat|shortTimeFormat	HR_12	h:mm
+MD	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+MD	1	CONTRADICTION	24/7 hours on a days list that omits a day	techHours|techDays	24/7	Mo-Fr
+ME	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+ME	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00, 07:00 - 20:00	H:MM - H:MM, no trailing token
+MK	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	North Macedonia	Северна Македонија
+MK	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+MK	-	FLAG-INFERRED	techHours clock shape	techHours	08:00 - 16:00	H:MM - H:MM, no trailing token
+MO	1	CONTRADICTION	legal-document path names a language the document does not list	pathDocs|languages	en	ddms.faqPdf
+MO	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-18:00	H:MM - H:MM, no trailing token
+MT	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00	H:MM - H:MM, no trailing token
+MU	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+MV	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+MV	-	FLAG-INFERRED	techHours clock shape	techHours	9:30-21:30	H:MM - H:MM, no trailing token
+MX	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+MX	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Mexico	México
+MY	1	CONTRADICTION	legal-document path names a language the document does not list	pathDocs|languages	ms	ddms.cookieNoticePdf,ddms.privacyStatementPdf,ddms.smsNoticePdf,ddms.termsOfUsePdf
+MY	-	FLAG-INFERRED	techHours clock shape	techHours	08:30-17:30	H:MM - H:MM, no trailing token
+NA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+NC	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+NC	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	New Caledonia	Nouvelle-Calédonie
+NC	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+NL	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Netherlands	Nederland
+NL	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	03/01/2019	-
+NL	-	FLAG-INFERRED	techHours clock shape	techHours	8.30 - 17.00	H:MM - H:MM, no trailing token
+NO	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Norway	Norge
+NO	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	06/10/2018	.
+NO	1	CONTRADICTION	MFA REQUIRED with gracePeriod 0	mfa.status|mfa.gracePeriod	REQUIRED	0
+NO	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-16:30	H:MM - H:MM, no trailing token
+OM	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Oman	عمان
+OM	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+PE	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+PF	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+PH	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	M/D/YY
+PK	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+PK	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+PL	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Poland	Polska
+PL	-	FLAG-INFERRED	techHours clock shape	techHours	07:00-20:00	H:MM - H:MM, no trailing token
+PR	1	CONTRADICTION	US region with no subdivision list	region|stateCodes	US	ABSENT
+PR	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	M/D/YYYY
+PR	1	CONTRADICTION	postal format rejected by its own regex	postal.postalFormat|postal.regExpStr	99999-9999	24-char expression
+PR	1	CONTRADICTION	postal format rejected by its own regex	postal.postalFormat|postal.regExpStr	99999	24-char expression
+PT	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+PT	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:30	H:MM - H:MM, no trailing token
+QA	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Qatar	قطر
+QA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+QA	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+RO	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Romania	România
+RO	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+RO	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-20:00	H:MM - H:MM, no trailing token
+RS	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Serbia	Србија
+RS	1	CONTRADICTION	date separator differs between the two date fields	shortDateFormat|reportDateFormat.dateSeparator	YY.M.D	/
+RS	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YY.M.D
+RS	-	FLAG-INFERRED	techHours clock shape	techHours	09:00 - 17:00	H:MM - H:MM, no trailing token
+RU	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Russia	Россия
+RU	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+SA	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+SA	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Saudi Arabia	العربية السعودية
+SA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+SA	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-17:00	H:MM - H:MM, no trailing token
+SD	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+SD	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+SE	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Sweden	Sverige
+SE	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	YYYY-MM-DD
+SE	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	-
+SE	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-16:30	H:MM - H:MM, no trailing token
+SI	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Slovenia	Slovenija
+SI	1	CONTRADICTION	legal-document path names a language the document does not list	pathDocs|languages	sv	ddms.faqPdf
+SI	-	FLAG-INFERRED	techHours clock shape	techHours	07:00-15:00	H:MM - H:MM, no trailing token
+SK	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Slovakia	Slovensko
+SK	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+TH	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+TH	1	CONTRADICTION	legal-document path names a language the document does not list	pathDocs|languages	th	ddms.cookieNoticePdf,ddms.privacyStatementPdf,ddms.smsNoticePdf,ddms.termsOfUsePdf
+TH	-	FLAG-INFERRED	techHours clock shape	techHours	08:30 - 17:30	H:MM - H:MM, no trailing token
+TN	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Tunisia	تونس
+TN	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+TN	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+TR	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Turkey	Türkiye
+TR	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+TR	-	FLAG-INFERRED	techHours clock shape	techHours	07:00-16:00	H:MM - H:MM, no trailing token
+TT	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+TW	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Taiwan	台湾地区
+TW	-	FLAG-INFERRED	techHours clock shape	techHours	08:00-20:00	H:MM - H:MM, no trailing token
+UA	2	CONTRADICTION	name and defaultCountryName disagree	name|defaultCountryName	Ukraine	Україна
+UA	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+US	2	CONTRADICTION	mfa.fromDate ordered against the document date format	mfa.fromDate|shortDateFormat	05/10/2019	MM-DD-YYYY
+US	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	-
+US	-	FLAG-INFERRED	techHours clock shape	techHours	7:00 am - 7:00 pm CST	H:MM - H:MM, no trailing token
+UY	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+UZ	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+UZ	1	CONTRADICTION	24/7 hours on a days list that omits a day	techHours|techDays	24/7	Mo-Fr
+VE	1	CONTRADICTION	glucose-unit disagreement	bgUnits|glucoseUnitsDefault	MG_DL	MMOL_L
+VE	-	FLAG-INFERRED	techHours clock shape	techHours	24 hr	H:MM - H:MM, no trailing token
+VN	1	CONTRADICTION	legal-document path names a language the document does not list	pathDocs|languages	vi	ddms.cookieNoticePdf,ddms.privacyStatementPdf,ddms.smsNoticePdf,ddms.termsOfUsePdf
+XK	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/02/2019	.
+XK	-	FLAG-INFERRED	techHours clock shape	techHours	08:00 - 16:00	H:MM - H:MM, no trailing token
+YT	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-17:00	H:MM - H:MM, no trailing token
+ZA	2	CONTRADICTION	mfa.fromDate separator against the document date format	mfa.fromDate|reportDateFormat.dateSeparator	05/10/2019	.
+ZA	-	FLAG-INFERRED	techHours clock shape	techHours	09:00-18:00	H:MM - H:MM, no trailing token

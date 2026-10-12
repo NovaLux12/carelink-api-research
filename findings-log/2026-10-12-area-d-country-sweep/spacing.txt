@@ -1,0 +1,56 @@
+# Measured same-host gaps on carelink.minimed.eu (the only host this
+# pass contacted).
+#
+# THE CANONICAL MEASUREMENT IS THE MTIME ONE, NOT THE `date` ONE.
+#
+# ORACLE: body-file mtimes. probe.sh writes each response body
+# with `-o bodies/cc-XX.json`, so the kernel sets that mtime when
+# the write completes. It is independent of the harness's own
+# `date` calls, which is what makes it the one series here that
+# does not depend on the thing under suspicion.
+#
+# LIMIT OF THIS ORACLE — read before reusing it. Git does NOT
+# preserve mtimes: on a fresh clone or `git archive` the body
+# files all carry the checkout time and the spread collapses to
+# 0.0 s. Valid only on the machine that ran the probe, so the
+# NUMBERS get committed. Verify the series is real before
+# trusting it: the mtime span should equal the harness span.
+#
+# The `date` series follow, reported because they disagree with
+# the canonical one and the disagreement is itself the finding.
+# No cause is asserted for any gap below the declared 2.5 s.
+CANONICAL — bodies/ mtime (kernel-set at write time)
+  counting rule: one gap per consecutive pair in run.log REQUEST ORDER,
+  (mtime[n+1]) - (mtime[n]); 119 bodies, 118 gaps; the two 400
+  envelopes (ZZ, ID) are included. min 2.575s  max 2.636s  <2.5s: 0  <2.0s: 0
+  span: 304.9s
+  cross-check vs t_sent span 304.9s: AGREES - these are the run files
+
+NON-CANONICAL — harness `date` series (see FINDINGS.md §1;
+they cannot all be faithful: negative durations are present. No cause asserted.)
+t_sent: gaps=118 >=2.5s=104 <2.5s=14 <2.0s=8 min=1.642s max=3.515s
+  1.642s  seq 69 -> 70
+  1.733s  seq 64 -> 65
+  1.792s  seq 52 -> 53
+  1.793s  seq 76 -> 77
+  1.873s  seq 40 -> 41
+  1.907s  seq 81 -> 82
+  1.964s  seq 28 -> 29
+  1.970s  seq 4 -> 5
+  2.011s  seq 105 -> 106
+  2.013s  seq 93 -> 94
+  2.179s  seq 16 -> 17
+  2.225s  seq 45 -> 46
+  2.295s  seq 117 -> 118
+  2.302s  seq 57 -> 58
+t_queued: gaps=118 >=2.5s=108 <2.5s=10 <2.0s=2 min=1.792s max=3.377s
+  1.792s  seq 58 -> 59
+  1.828s  seq 70 -> 71
+  2.045s  seq 99 -> 100
+  2.065s  seq 34 -> 35
+  2.074s  seq 10 -> 11
+  2.100s  seq 87 -> 88
+  2.111s  seq 111 -> 112
+  2.126s  seq 22 -> 23
+  2.318s  seq 51 -> 52
+  2.406s  seq 63 -> 64
