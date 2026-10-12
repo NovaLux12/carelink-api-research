@@ -5,7 +5,7 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 
 | # | Location | Claim (abridged) | Hosts found | Verdict |
 |---|---|---|---|---|
-| 1 | `03-discovery-and-versions.md:38` | **OBSERVED** and hash-verified. All three hosts return the **same document** — sh… | — | **DEFECT Y-1** — 2-host evidenced, claims 3 |
+| 1 | `03-discovery-and-versions.md:38` | “All three hosts return the **same document** — sha256 `f8488626…`” | 3 | **confirmed-by-row** — area X's tracked ledger hashes all three at `f84886265667…`, 20256 B each. Y-1 withdrawn |
 | 2 | `03-discovery-and-versions.md:131` | \| `*/v13/discover/android/3.6` (all 3 hosts) \| yes \| **v13** \| yes \| patient… | 3 | **confirmed-by-row** |
 | 3 | `03-discovery-and-versions.md:135` | \| `*/v12/discover/android/3.6` (all 3 hosts) \| ? (401, unreadable) \| ? \| ? \|… | 3 | **confirmed-by-row** |
 | 4 | `03-discovery-and-versions.md:138` | three hosts, and `v11` on `.eu` and `-trials`. Both were already known; **no new | 3 | **confirmed-by-row** |
@@ -14,7 +14,7 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 | 7 | `03-discovery-and-versions.md:167` | The sentence above asserted "401 on all three hosts" on the strength of **one** r… | 3 | **confirmed-by-row** |
 | 8 | `03-discovery-and-versions.md:172` | `clcloud-trials.minimed.com` — **3 of 3**, every one a request that reached Medtr… | 3 | **confirmed-by-row** |
 | 9 | `03-discovery-and-versions.md:256` | **403 on GET** and **200 with CORS on OPTIONS** on all three hosts: the resource … | 3 | **confirmed-by-row** |
-| 10 † | `03-discovery-and-versions.md:316` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
+| 10 † | `03-discovery-and-versions.md:330` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
 | 11 | `03-discovery-and-versions.md:347` | in two independent keys, on all three deployments: | 3 | **confirmed-by-row** |
 | 12 | `03-discovery-and-versions.md:400` | \| What `*/v12/discover/android/*` returns \| token-gated on all three hosts — 40… | 3 | **confirmed-by-row** |
 | 13 | `06-patient-api-surface.md:126` | `display/message` at v6/v11/v13 is byte-identical on all three hosts (v6 403, v11… | 3 | **confirmed-by-row** |
@@ -49,8 +49,14 @@ hosts; the **OPTIONS** axis has **2** attributable hosts plus **1** row in the h
 `pde-csr-oracle` ledger. The table's "3" is therefore right for GET and optimistic for OPTIONS.
 Restated in `docs/03` with both axes named.
 
-**Counting rule for this table.** A line is in scope if it matches the seven multi-host phrases
-above. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **28 confirmed-by-row,
+**Counting rule for this table.** A line is in scope if it matches any of these **seven**
+multi-host phrases, case-insensitively:
+
+```
+all three hosts | on all three | three hosts | all 3 hosts | 3 of 3 | five hosts | spans five
+```
+
+Applied to `docs/03` + `docs/06` this yields **29** lines. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **28 confirmed-by-row,
 1 corrected (Y-1)**.
 
 **A1–A3 are counted separately and are NOT part of the 29.** They live in `docs/08` and

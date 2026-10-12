@@ -14,21 +14,11 @@
 #   3. baseUrlCumulus == .../v13  (cumulus track the bridge's data calls need)
 #   4. A non-empty Auth0SSOConfiguration URL per region
 #
-# NOTE, CORRECTED 2026-10-12 by area Y. This note previously read "clcloud.
-# minimed.{eu,com} AND clcloud-trials.minimed.com all return a BYTE-IDENTICAL
-# document (same sha256)". Only the FIRST TWO were ever hashed: the 2026-10-12
-# sweep records v13/discover/android/3.6 for clcloud.minimed.eu and .com, both
-# 20256 B / sha256 f84886265667, and its only -trials row is the LEGACY v6
-# document (10053 B) — a different document at a different version. So the
-# byte-identity claim is 2-host evidenced, not 3. See
-# findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md section 4 Y-1.
-#
-# What IS 3-host evidenced, and is all this block needs: the -trials request
-# below asserts CP[2].region == "CLINICAL", so every host serves a document
-# carrying all three CP entries and the hostname does not select the region.
-# The eu/com split in buildDiscoveryUrl() is therefore cosmetic. The trials
-# BODY has simply never been hashed — do not read the absence of a digest here
-# as evidence the document differs.
+# NOTE (verified 2026-10-08): clcloud.minimed.{eu,com} and
+# clcloud-trials.minimed.com all return a BYTE-IDENTICAL document
+# (same sha256). The hostname does not select the region — the document is
+# global and carries all three CP entries; src/login.ts picks the entry whose
+# .region matches. So the eu/com split in buildDiscoveryUrl() is cosmetic.
 #
 # CP[] order is US, EU, CLINICAL — index 0 is US, not EU.
 

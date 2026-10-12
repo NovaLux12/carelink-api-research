@@ -46,7 +46,7 @@ gaps**, ranked below in disclosure order.
 >    *"**Provenance:** this file is a **reconstruction from the agent's report** … Re-verify
 >    before treating any row as **OBSERVED**"*.
 >
-> **This paragraph at `:91` is separately correct and is NOT changed.** It cites
+> **The later paragraph in this section, which carries the same count, is separately correct and is NOT changed.** It cites
 > `DRIFT-AND-NEW`, which has a section headed *"Five hosts, not two"*, and it already carries
 > the caveat *"recorded as reported; the sweep's own caveat is that its evidence table was never
 > written to disk and must be re-verified before being treated as OBSERVED"*. An earlier draft of

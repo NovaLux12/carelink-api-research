@@ -87,42 +87,55 @@ matrix-only cell and exits non-zero unless the lookup reports three hosts.
 **29 claims in scope** (`docs/03` and `docs/06`, the area's stated scope) plus **3 added by dated
 addendum** (`docs/02`, `docs/08`, and the gitignored-captures note).
 
-**28 of the 29 in-scope claims are confirmed by row; 1 is not.** The `clcloud.*` route claims
-in `docs/06` are three-host evidenced for every cell they name — v6/v11/v13 `display/message`,
-`csr/v2`, bare `v2`, v12, `v13/discover/android/3.6` — because areas B, X, N, U and Z each swept
-all three hosts on 2026-10-12. **This is the negative result the area allows, and it is the
-likelier one.**
+**All 29 in-scope claims are confirmed by row. None is defective.**
 
 **Counting rule, so the split can be reproduced:** in scope means the area's stated scope,
-`docs/03` + `docs/06`, matched against the seven multi-host phrases → **29 lines**. One of them
-(`docs/03:38`) is Y-1. The other **28 are confirmed-by-row**. Y-2 and Y-3 live in `docs/08` and
-`docs/02`, which are **outside that scope**, and are carried as **addendum rows A1–A3** and
-counted separately. **Folding them into the 29 would not reproduce the table** — an earlier draft
-of this file did exactly that and reported "26 of 29" against a table holding one defect.
+`docs/03` + `docs/06`, matched against the seven multi-host phrases (enumerated in
+`audit-verdicts.md` § Counting rule) → **29 lines**. **All 29 are confirmed-by-row.** The
+`clcloud.*` route claims in `docs/06` are three-host evidenced for every cell they name — v6/v11/v13
+`display/message`, `csr/v2`, bare `v2`, v12, `v13/discover/android/3.6` — because areas B, X, N, U
+and Z each swept all three hosts on 2026-10-12.
 
-**One in-scope claim is not evidenced as written** (Y-1), and three addendum rows are recorded
-outside it. None of the three findings is a *false* claim.
+**This is the negative result the area allows, and it is the likelier one.** It is also, on the
+evidence, the whole in-scope result: the audit's three candidate findings are one correction
+(A1, outside scope), one withdrawal (A2, outside scope) and one withdrawal (Y-1, **inside** scope,
+which returned the line it had marked defective to the clean set).
 
-### Y-1 · `docs/03:38` — "All three hosts return the same document"
+**Three addendum rows, outside that scope, are counted separately**: A1 corrected, A2 withdrawn,
+A3 recorded-not-fixed. **Folding them into the 29 would not reproduce the table.** Two earlier
+drafts of this file did exactly that and reported "26 of 29" and then "27 and 2" — both wrong,
+and both repaired without first checking whether the premise they were repairing was true.
 
-> **OBSERVED** and hash-verified. All three hosts return the **same document** — sha256
-> `f8488626…`, md5 `403220ced1a7837372b777fa97ecbb2b` — re-verified byte-identical to the
-> on-disk capture `disc-eu.json`
+### Y-1 · `docs/03:38` — **WITHDRAWN. The claim was correct and three-host evidenced.**
 
-The cited evidence is the 2026-10-12 discovery sweep, and its own table
-([`2026-10-12-published-pointers/FINDINGS.md` §2a](../2026-10-12-published-pointers/FINDINGS.md))
-carries **two** `v13/discover/android/3.6` rows — `clcloud.minimed.eu` and `clcloud.minimed.com`,
-both 20256 B / `f84886265667`. That pass's **only** `-trials` row is the **legacy** `v6` document
-(10053 B, `1aab9bb1e721`). `requests.tsv` confirms it: one `-trials` line, and it is `v6`.
+This pass claimed `docs/03:38` ("All three hosts return the same document — sha256 `f8488626…`")
+was only two-host evidenced, edited the page to say "2 of 3", and — because `01-discovery-pin.hurl`
+carried the same claim — edited that pin file too.
 
-That pass's own prose says "the **two** `v13` documents are byte-identical" — two.
+**All of that was wrong, and both edits have been reverted byte-identically to `origin/main`.**
 
-**So the document-identity claim is two-host evidenced and says three.** The *route* is
-three-host evidenced (`v13/discover/android/3.6` returns 200 on all three, areas B and X), which
-is a different and weaker fact than "the same document".
+The refutation is a **tracked** ledger this audit was citing: area X's
+[`results.jsonl`](../2026-10-12-area-x-cors-separation/results.jsonl) records
+`GET connect/carepartner/v13/discover/android/3.6` on **all three** cumulus hosts as
+`data-public-200-GET-bare`, each **20256 B**, each **sha256
+`f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609`** — one distinct digest across
+three hosts. Area X's own prose says it: *"The 36-byte, 42-byte and 20256-byte bodies each
+returned a byte-identical payload on all three hosts"*
+([`FINDINGS.md` §5](../2026-10-12-area-x-cors-separation/FINDINGS.md)).
 
-This is `AGENTS.md` §6 item 1 in its purest form: the claim is very likely **true**, and it was
-still not evidenced.
+**How the error happened, because it is the same error as §2.1.** The 2026-10-12 discovery sweep
+(`published-pointers`) genuinely does carry only **two** `v13` rows, and its only `-trials` row is
+the legacy `v6` document. That part of the reasoning was correct — and I then treated **one
+pass's ledger as the whole corpus**. This is precisely what area Z's addendum warns about
+(*"any audit that counts, like Y, is working from a corpus whose shape is not uniform"*), written
+by the pass immediately before this one, about this very mistake.
+
+**Three rounds went into repairing the arithmetic built on that premise** before anyone checked
+the premise. `§6 item 1`: a claim asserted instead of searched for. The audit's own subject was
+the shape of the corpus, and it read one file.
+
+**No correction is carried for Y-1, and `docs/03:38` and `01-discovery-pin.hurl` are unchanged
+from `origin/main`.**
 
 ### Y-2 · `docs/08:37` — "replicated across five hosts", labelled OBSERVED
 

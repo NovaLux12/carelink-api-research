@@ -35,24 +35,10 @@ GET https://clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}/connec
 → 200 application/json, 20256 B, unauthenticated, no x-api-key required
 ```
 
-**OBSERVED** and hash-verified on **two** hosts — `clcloud.minimed.eu` and
-`clcloud.minimed.com` — which return the **same document**: sha256 `f8488626…`, md5
-`403220ced1a7837372b777fa97ecbb2b`, 20256 B each, re-verified byte-identical to the
-on-disk capture `disc-eu.json` [source: PROBE-FINDINGS §3; VERSION-AXIS §3a;
-CONFIG-NAMESPACE TARGET 1; audit/CLAIM-AUDIT-2026-10-09.md;
-[findings-log/2026-10-12-published-pointers/FINDINGS.md §1]].
-
-**⚠ Corrected 2026-10-12 by area Y.** This sentence previously read *"All three hosts
-return the same document"*. **It is two-host evidenced.** The 2026-10-12 discovery sweep
-carries exactly two `v13/discover/android/3.6` rows, and its own prose says *"the **two**
-`v13` documents are byte-identical"*; its only `-trials` row is the **legacy** `v6`
-document (10053 B, `1aab9bb1e721`), which is a different document at a different version.
-The document-identity claim is therefore **2 of 3**. The *route* is separately
-three-host evidenced — `v13/discover/android/3.6` answers `200` on all three
-([findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md §4 Y-1]) — but
-"the same document" is a stronger claim than "the route answers 200", and only two
-hosts have had their body hashed. **The original wording is preserved above rather than
-deleted**; the retraction history is the evidence.
+**OBSERVED** and hash-verified. All three hosts return the **same document** — sha256
+`f8488626…`, md5 `403220ced1a7837372b777fa97ecbb2b` — re-verified byte-identical to
+the on-disk capture `disc-eu.json` [source: PROBE-FINDINGS §3; VERSION-AXIS §3a;
+CONFIG-NAMESPACE TARGET 1; audit/CLAIM-AUDIT-2026-10-09.md].
 
 It carries `CP[]` in the order **`US, EU, CLINICAL`** and, per region, the keys
 `SSOConfiguration`, `Layer7SSOConfiguration`, `Auth0SSOConfiguration`,
@@ -327,7 +313,7 @@ route. Every region of every document read on 2026-10-12 publishes one:
 
 | document | regions | `baseUrlPde` | the route it names |
 |---|---|---|---|
-| `clcloud.minimed.eu` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route on either method.** GET: 3 attributable hosts. OPTIONS: **2** attributable hosts + 1 row in a ledger with no `host` column — area Y, so "all 3 hosts" held for the GET axis only |
+| `clcloud.minimed.eu` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route on either method** (area Y). GET: **3** attributable hosts. OPTIONS: **2** attributable hosts + 1 row in a ledger with no `host` column — so "all 3 hosts" held for the GET axis only |
 | `clcloud.minimed.com` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route, any method, any host** |
 | `clcloud.minimed.com` `v11/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
 | `clcloud-trials.minimed.com` `v6/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
