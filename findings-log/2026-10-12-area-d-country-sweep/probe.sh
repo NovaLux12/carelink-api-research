@@ -54,7 +54,23 @@ set -uo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 BODY="$DIR/bodies"
 HDR="$DIR/headers"
-LOCK=/home/jack/.openclaw/workspace/projects/novas-github/carelink-api-research/.loop/host-carelink.minimed.eu.lock
+# The per-host lock lives in the MAIN clone, not in this worktree — all four
+# pool workers take the same lock for this host, and the lock files are
+# .gitignored beside the main checkout.
+#
+# This file is committed, so it must carry NO machine-specific absolute path
+# (AGENTS.md §7; the gate greps for one and fails the PR). `git rev-parse
+# --git-common-dir` is the one form that resolves correctly in BOTH layouts: in
+# a plain clone it returns `.git` (relative, so the lock lands in ./.loop) and
+# in a linked worktree it returns the MAIN clone's .git directory, whose parent
+# is where the locks are. POOL_LOCK_DIR overrides both, for a re-run anywhere.
+_gitdir="$(git -C "$DIR" rev-parse --git-common-dir 2>/dev/null)"
+if [ -n "$_gitdir" ]; then
+  POOL_LOCK_DIR="${POOL_LOCK_DIR:-$(dirname "$_gitdir")/.loop}"
+else
+  POOL_LOCK_DIR="${POOL_LOCK_DIR:-$DIR/../../../.loop}"
+fi
+LOCK="$POOL_LOCK_DIR/host-carelink.minimed.eu.lock"
 CAP=130
 UA="carelink-bridge-research/1.0 (area D, research)"
 BASE="https://carelink.minimed.eu/patient/countries/settings"

@@ -252,13 +252,19 @@ CC="https://carelink.minimed.eu/patient/countries/settings?countryCode=BE"
 BODY_CC="$(mktemp -u /tmp/clb-cc-XXXXXX.json)"
 sleep 2.5
 curl -s --compressed --max-time 30 -A "$UA" "$CC" -o "$BODY_CC"
+# `check()` reads $BODY, so $BODY must point at the document under test for the
+# duration of these four assertions. An earlier version of this block left
+# $BODY pointing at the 69-key config, so every country assertion silently
+# evaluated the CONFIG document: `glucoseUnitsDefault` came back `null` and
+# `keys | length` came back 69. The gate caught it — which is the whole point
+# of running it, and the reason the "it passed" reading is never enough.
+BODY="$BODY_CC"
 if [ ! -s "$BODY_CC" ] || [ "$(head -c1 "$BODY_CC")" != "{" ]; then
   echo "  FAIL could not read the BE country document as JSON"
   rm -f "$BODY_CC"
-  PASS=$((PASS + 1)); FAIL=$((FAIL + 1))
+  FAIL=$((FAIL + 1))
 else
-  rm -f "$BODY_CC"
-  check "BE bgUnits (KNOWN DISAGREEMENT: MG_DL)"            '.bgUnits'             'MG_DL'
+  check "BE bgUnits (KNOWN DISAGREEMENT: MG_DL)"             '.bgUnits'             'MG_DL'
   check "BE glucoseUnitsDefault (KNOWN DISAGREEMENT: MMOL_L)" '.glucoseUnitsDefault' 'MMOL_L'
   # The absent-vs-null distinction docs/09 §4 warns about, asserted as a state
   # rather than a falsiness: `has()` cannot be satisfied by a null value, and a
@@ -267,6 +273,7 @@ else
   check "BE carries no stateCodes key (absent, not null)"    'has("stateCodes")'    'false'
   check "BE has exactly 34 keys"                             'keys | length'        '34'
 fi
+BODY="$SCRATCH"
 
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
