@@ -32,7 +32,7 @@
 # on every PR, by design: cheap, no vendor storm per PR. regression/hurl/run.sh
 # runs all five; it is what the weekly drift sweep re-probes
 # (scripts/…, .github/workflows/drift-sweep.yml). The full suite on every PR
-# would be ~62 vendor requests per push; the drift sweep is where drift is
+# would be ~72 vendor requests per push; the drift sweep is where drift is
 # caught.
 #
 # Deliberately NOT enforced: whether a claim is TRUE. That needs a human or a

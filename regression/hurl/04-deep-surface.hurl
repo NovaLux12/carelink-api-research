@@ -200,3 +200,71 @@ HTTP 403
 
 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover
 HTTP 403
+
+# ============================================================
+# Area N (2026-10-12): both POST-only routes are NOT region-split —
+# they are live on .com and -trials too, with byte-identical CORS config.
+# Source: findings-log/2026-10-12-csr-cross-host/FINDINGS.md
+#
+# Method registration is read from the GET probe, never from
+# access-control-allow-methods. The carepartner/v13 preflight advertises
+# `allow-methods: OPTIONS` on a route that IS GET-capable (GET -> 401
+# UnauthorizedException + x-ca-err: 990), so that header is not a register
+# of the route's methods. `contains "POST"` below is corroboration that
+# POST is advertised, not the proof that GET is absent — the GET 403 with
+# MissingAuthenticationTokenException is that proof.
+# ============================================================
+
+OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud.minimed.com/connect/csr/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" contains "POST"
+
+GET https://clcloud.minimed.com/connect/csr/v2/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+OPTIONS https://clcloud.minimed.com/connect/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" contains "POST"
+
+GET https://clcloud.minimed.com/connect/v2/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/csr/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" contains "POST"
+
+GET https://clcloud-trials.minimed.com/connect/csr/v2/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/v2/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" contains "POST"
+
+GET https://clcloud-trials.minimed.com/connect/v2/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"

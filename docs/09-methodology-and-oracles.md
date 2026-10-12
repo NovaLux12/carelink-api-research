@@ -69,8 +69,14 @@ GET 200/204          → public
 
 `access-control-allow-origin: *` on an OPTIONS request is the cleanest proof that
 a resource exists with no GET method — that is how POST-only
-`v6/display/message` was found [source: VERSION-AXIS §1]. The one positive
-direction on the bare gateways: on `dialog-lite`, `500
+`v6/display/message` was found [source: VERSION-AXIS §1]. **But
+`access-control-allow-methods` is not a register of the route's methods:**
+`carepartner/v13/display/message` advertises `OPTIONS` on its preflight and is
+GET-capable (`GET` → 401 `UnauthorizedException` + `x-ca-err: 990`) on all three
+hosts (OBSERVED,
+[findings-log/2026-10-12-csr-cross-host/FINDINGS.md]). Settle method
+registration from the GET probe; treat the CORS method list as corroboration
+only. The one positive direction on the bare gateways: on `dialog-lite`, `500
 InternalServerErrorException` proves a path **is** matched (the Lambda raised),
 which is how the stage-wide catch-all was identified; on `patient-timeline` 403
 positively confirms *no* GET/OPTIONS route [source: AWS-GATEWAYS §2, §11].
@@ -114,7 +120,8 @@ AUTH-TENANT-FINDINGS §6].
 | 5518-byte SPA fallback | `carelinkhp.minimed.eu` returns 200 `text/html`, exactly 5518 B, for **every** unknown path — including fabricated chunk names. Nearly stored 225 copies of `index.html` in the chunk sweep | discriminate on `Content-Type`, never on status; `carelink.medtronic.eu` serves the same page gzipped, so compare sizes after decompression [CHUNK-CORPUS; CONFIG-DEEP TARGET 5] |
 | Unconditional gzip | `carelink.minimed.eu` serves gzip ignoring `Accept-Encoding` (RFC 9110 §8.4); hurl's jsonpath returns `none` because hurl only decodes what it asked for — which is why the config regression is a shell script, not a `.hurl` file | `curl --compressed`, or decompress locally; do not re-request [HURL-05 header; README rule 6] |
 | `index.commoncrawl.org` unreachable | both attempts failed (`curl (56)` / `(52)`) while `data.commoncrawl.org` over the identical TLS path worked — a host-level failure, not rate limiting | used the bulk path (binary-search `cluster.idx`, ranged `cdx-NNNNN.gz` fetches); coverage capped to two crawls instead of ~100, and that cap is stated rather than papered over [COMMONCRAWL §0–§1] |
-| `curl -d` forcing POST | an earlier "GET vs POST" matrix was wrong because `-d` forces POST — cases labelled "GET with body" were actually POSTs | take the `Allow` header from OPTIONS as the authority [METHOD-FACTS §Correction] |
+| `curl -d` forcing POST | an earlier "GET vs POST" matrix was wrong because `-d` forces POST — cases labelled "GET with body" were actually POSTs | re-probe with a clean GET and discriminate on `x-amzn-errortype`, **not** the status. There is no `Allow` header to fall back on: across all 42 captured `clcloud.*` responses on disk (26 from 2026-10-11, 16 from 2026-10-12) **not one carried `Allow`**, so the GET probe is the only method authority this host family offers [METHOD-FACTS §Correction] |
+| CORS `allow-methods` read as a method register | `access-control-allow-methods` is gateway CORS configuration, not the route's registered methods. `carepartner/v13/display/message` advertises `OPTIONS` and is GET-capable (`GET` → 401 `UnauthorizedException` + `x-ca-err: 990`) on all three hosts | settle method registration from the **GET probe**; treat `allow-methods` as corroboration. The header is also not canonicalised: two routes that are *both* GET-403 and OPTIONS-200 advertise different lists, in different orders, with different allow-headers (OBSERVED: `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS` + three extra allow-headers) [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] |
 | jq `//` swallowing `false` | a country sweep conflated "key absent" with "value false" | re-derive with `has()` [PROBE-FINDINGS deep §8] |
 | Mis-offset CDX fetches | an earlier pass's computed byte ranges landed on alphabetical neighbours; the `raw-*.cdx` artefacts look like results and are not | corrected fetches kept; wrong artefacts labelled misleading on disk [COMMONCRAWL §1] |
 | Self-measurement artefact | `deep-matrix.jsonl`'s `x-api-key: "len=10"` is the length of the scrubber's own `[REDACTED]` placeholder — the pass measured itself | length column ignored; further scrubbing added [CONFIG-DEEP §Measurement artifact] |
@@ -190,7 +197,7 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 96 assertions (228 execute per run, counting the
+  `regression/hurl/` holds 110 assertions (262 execute per run, counting the
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;

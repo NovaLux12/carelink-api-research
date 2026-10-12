@@ -219,6 +219,19 @@ PDE v3 could equally be a POST-only route, and OPTIONS was not run on the PDE na
 before "does not exist" can be said**; until then the honest phrasing is **"no GET
 route", not "absent"** [source: VERSION-AXIS §5].
 
+**Update 2026-10-11 (area C):** that caveat is discharged on `clcloud.minimed.eu`.
+GET **and** OPTIONS both return 403 `MissingAuthenticationTokenException` on every PDE
+cell, so PDE has **no route on any tested method**. The same pass found `csr/v2` and
+bare `connect/v2` **live and POST-only**
+[findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md].
+
+**Update 2026-10-12 (area N):** **no region split.** Both POST-only routes are live on
+`clcloud.minimed.com` and `clcloud-trials.minimed.com` as well, byte-identical,
+16 of a 16 cap with controls run first on each host
+[findings-log/2026-10-12-csr-cross-host/FINDINGS.md]. PDE was **not** re-probed on those
+two hosts — dead on `.eu` is not evidence of dead elsewhere, and that is a named
+successor area rather than an assumption.
+
 ### 10. Post-2026-10-10 version-axis work
 
 `recon/VERSION-AXIS.md` (2026-10-10) is the pass behind §2–§8: 70 requests, hard cap

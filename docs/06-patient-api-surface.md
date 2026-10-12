@@ -185,13 +185,68 @@ be observed, so "POST-only" means "registered with a non-GET method", not
 "POST returns data". Which of {csr/v2, bare v2, v6, v11, v12, v13} returns data
 with a real token remains token-gated.
 
+### ⚠ Not region-split — confirmed on all three cumulus hosts (2026-10-12)
+
+**OBSERVED** [source: findings-log/2026-10-12-csr-cross-host/FINDINGS.md] —
+16 of a 16 cap, GET + OPTIONS only, controls first on each host. **Both routes
+are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com`
+as well as `clcloud.minimed.eu`**, every cell byte-identical, including the CORS
+header *ordering* (`csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`).
+
+That discharges the Area C limits inference, which was explicitly an inference
+from the carepartner leg rather than an observation of these routes. The 2026-10-11
+log keeps its original wording; this is the superseding note. Pinned for both
+new hosts in `regression/hurl/04-deep-surface.hurl`.
+
+Three routes on this family carry three distinct CORS configurations — `csr/v2`
+and bare `v2` differ in method-list order, and bare `v2` additionally allows
+`x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id`. INFERRED, assumption stated:
+that is the shape of two separately-declared routes rather than one route
+answering twice. No vendor document states it and the gateway configuration has
+never been read.
+
+## ⚠ `access-control-allow-methods` is not a register of a route's methods
+
+**Corrected 2026-10-12. The original wording is kept visible above.**
+
+> **Original claim (now known to be wrong as a general rule):** "`access-control-allow-origin: *` + `access-control-allow-methods: OPTIONS` on an **OPTIONS** request proves the resource exists even when GET is undefined."
+
+The first half stands and is what found POST-only `v6`. **The second half does
+not.** `connect/carepartner/v13/display/message` returns exactly that signature —
+`OPTIONS` → 200, `allow-origin: *`, `allow-methods: OPTIONS` — on all three
+hosts, and its `GET` returns **401 `UnauthorizedException` + `x-ca-err: 990`**, the
+signature this repo defines as *reached Medtronic's Layer7 authorizer*. The route
+is GET-capable and its preflight advertises only `OPTIONS`.
+
+**OBSERVED** [source: findings-log/2026-10-12-csr-cross-host/FINDINGS.md]. So
+method registration is settled by the **GET probe alone**:
+
+| signal | proves | does **not** prove |
+|---|---|---|
+| `OPTIONS` → 200 + `allow-origin: *` | the resource exists, even with no GET method | which methods are registered |
+| `GET` → 403 + `MissingAuthenticationTokenException` | no GET route | that nothing is registered — `v6`, `csr/v2` and bare `v2` are all 403 and all real |
+| `GET` → 401 + `UnauthorizedException` + `x-ca-err: 990` | a GET route exists and reached the authoriser | — |
+
+The regression suite asserts the `x-amzn-errortype` on each 403 cell rather than
+reading the CORS header, for this reason. This is `AGENTS.md` §6 item 2 in a new
+costume: a header read as meaning something it does not mean.
+
+**INFERRED, assumption stated:** a cross-origin browser request bearing an
+`Authorization` header triggers a preflight, and the `v13` preflight advertises no
+`GET`, so a browser-based third-party client may be unable to GET
+`v13/display/message` at all. Assumption: browsers enforce `allow-methods` on
+preflight (specified Fetch behaviour) **and** no third-party client is
+same-origin with `clcloud.*` — the second half is not observed or tested here.
+Server-side clients do not preflight and are unaffected. Recorded as a question,
+not a finding.
+
 ## Existence oracles — how to probe this host family without a token
 
 Established with positive controls; this is the reusable method.
 
 | Host family | signal |
 |---|---|
-| `clcloud.*` | `x-amzn-errortype: MissingAuthenticationTokenException` = **no route** (every fabricated control). `UnauthorizedException` + `x-ca-err: 990` = **the request reached Medtronic's Layer7 authorizer** — route exists, token-gated. `access-control-allow-origin: *` + `access-control-allow-methods: OPTIONS` on an **OPTIONS** request proves the resource exists even when GET is undefined (this is how POST-only `v6` was found). The plain 403 status line is uniform and carries no signal |
+| `clcloud.*` | `x-amzn-errortype: MissingAuthenticationTokenException` = **no route** (every fabricated control). `UnauthorizedException` + `x-ca-err: 990` = **the request reached Medtronic's Layer7 authorizer** — route exists, token-gated. `access-control-allow-origin: *` on an **OPTIONS** request proves the resource exists even when GET is undefined (this is how POST-only `v6` was found). **Do not read `access-control-allow-methods` as a register of the route's methods** — `v13/display/message` advertises `OPTIONS` while being GET-capable (see §"`access-control-allow-methods` is not a register" below). The plain 403 status line is uniform and carries no signal |
 | `carelink.minimed.*` | `401 {"error":{"type":"InvalidToken","group":"AUTH"}}` = exists, token-gated · `405` = POST-only · `404` = absent · `200 application/json` = public |
 | `carelinkhp.*` (portal) | `200 JSON` published · `412` precondition (missing client header) · `401` exists but gated · `404` absent · `405` POST-only. Namespace is **case-sensitive**. Full table in `07-admin-portal-and-reporting.md` |
 

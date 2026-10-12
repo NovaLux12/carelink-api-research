@@ -34,7 +34,7 @@ jobs:
 
       # ---- the probe. Full five-suite sweep — the PR gate runs 05 only
       # ---- (cheap, no vendor storm per PR); this is the one place all five
-      # ---- run together. No new targets, no new discipline: ~62 requests
+      # ---- run together. No new targets, no new discipline: ~72 requests
       # ---- (56 hurl + ~6 in 05), GET+OPTIONS only except the two POSTs
       # ---- already pinned and documented in 04-deep-surface.hurl, >=2s
       # ---- between requests to the same host, no credentials of any kind.
@@ -83,7 +83,7 @@ jobs:
           {
             echo "The weekly drift sweep re-ran \`regression/hurl/run.sh\` on \`main\` and it went red twice in a row."
             echo
-            echo "**Probe provenance (full five-suite sweep — the PR gate runs 05 only):** ~62 requests across 7 hosts;"
+            echo "**Probe provenance (full five-suite sweep — the PR gate runs 05 only):** ~72 requests across 7 hosts;"
             echo "GET + OPTIONS only, except the two POSTs already pinned and documented in"
             echo "\`04-deep-surface.hurl\` (public client_ids, rejected 403 server-side);"
             echo ">=2s between requests to the same host; no credentials, no cookies, no token exchange."
