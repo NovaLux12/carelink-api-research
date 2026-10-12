@@ -135,11 +135,21 @@ was also re-probed on the two hosts where it had never been tested and returns *
 three hosts" claim is now 3-host evidenced instead of resting on the single `.eu` row
 (§Finding 1). The `v14–v16` OPTIONS cell is **still unprobed** and is not claimed.
 
-**Preflight presence is per-route, not per-version.** `OPTIONS
+**The two route families differ observably in their CORS headers.** `OPTIONS
 v{11,12,13}/discover/android/3.6` returns **`401`** + `x-ca-err: 990` with **no
 `Access-Control-*` header at all**, on the same host and in the same session in which
 `…/display/message` returns `200` + CORS — so the gateway does **not** add CORS uniformly
-and "the gateway adds CORS" is **false as a rule** (OBSERVED, a 3 × 2 on `.eu`, §Finding 3).
+and "the gateway adds CORS to `clcloud.*`" is **false as a rule** (OBSERVED, a 3 × 2 on
+`.eu`, §Finding 3).
+
+**But do not read that as "the discovery route has no preflight configured."** Across **all
+101 captured response heads in `findings-log/`**, every response carrying
+`access-control-allow-origin` is a **`200`** — **zero non-2xx carries it** anywhere. On
+`clcloud.*`, "carries a preflight" and "answers 200" are therefore **the same observation in
+this corpus**, and the `401`-without-CORS on the discovery leg is equally consistent with
+that route demanding a token on `OPTIONS`. **The two readings are not separated by any cell
+on disk.** Whether preflight presence is configured per route is successor area **X** in
+[`11-suggested-research-areas.md`](11-suggested-research-areas.md), not a claim made here.
 Method registration is still read from the **GET** probe, never from
 `access-control-allow-methods` ([`docs/09`](09-methodology-and-oracles.md) §2).
 

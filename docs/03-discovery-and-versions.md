@@ -181,12 +181,18 @@ v{11,12,13}/display/message` all return `200` with `access-control-allow-origin:
 settles the area's open question: `v12` does **not** differ from `v13` on preflight
 presence.
 
-**But preflight presence is decided per route, not per version.** On the same host, in the
-same session, `OPTIONS v{11,12,13}/discover/android/3.6` returns **`401`** +
-`x-ca-err: 990` with **no `Access-Control-*` header at all**, while `…/display/message` one
-path-family away returns `200` + CORS. So "the gateway adds CORS to `clcloud.*`" is **false
-as a rule** (OBSERVED, a 3 × 2 on `.eu`, same source §Finding 3). The rule is stated from
-6 cells on one host; the mechanism is not established.
+**But the gateway does not add CORS uniformly.** On the same host, in the same session,
+`OPTIONS v{11,12,13}/discover/android/3.6` returns **`401`** + `x-ca-err: 990` with **no
+`Access-Control-*` header at all**, while `…/display/message` one path-family away returns
+`200` + CORS. So "the gateway adds CORS to `clcloud.*`" is **false as a rule** (OBSERVED, a
+3 × 2 on `.eu`, same source §Finding 3).
+
+**This is an observation, not a cause.** Across all 101 captured response heads in
+`findings-log/`, every response carrying `access-control-allow-origin` is a `200` — **zero
+non-2xx carries it**. So on `clcloud.*` "carries a preflight" and "answers 200" are the same
+observation in this corpus, and a `401` without CORS is equally consistent with the route
+demanding a token on `OPTIONS`. **Whether preflight presence is configured per route is not
+established** — it is successor area X in [`11-suggested-research-areas.md`](11-suggested-research-areas.md).
 
 **None of the above makes `v12` browser-callable.** The `401` itself carries no
 `Access-Control-*` header, which is the recorded `MissingAllowOriginHeader` failure — still
