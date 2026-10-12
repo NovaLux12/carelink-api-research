@@ -28,19 +28,53 @@ everything else on this page moves.
 
 ## Tier 1 — no token needed, high value
 
-### A. Is `carelinkhp` really the clinician portal for every region?
+> **Area A is CLOSED — 2026-10-12, negative on the premise and corrective on the map.**
+> See the Closed table at the foot of this page and
+> [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md]. The area asked
+> whether a `carelinkhp*.minimed.com` clinic bundle exists. **It does not, and never
+> did** — all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are
+> **NXDOMAIN**, including `carelinkhp-prod.minimed.eu`, the only one the corpus had named
+> without ever probing. The portal is deployed on five hosts across two TLDs in **two
+> builds**, split by **product role** (clinic `pow` vs support `cua`) and **not** by
+> region: every `.eu`/`.com` pair measured serves the same build. Closing it also
+> **refuted two published claims** — `carelink.medtronic.eu` is a portal deployment, not
+> the "false positive" `docs/01` and `docs/10` §2 called it, and
+> `carelink-support.medtronic.com` serves the *support* build, not "the same document".
+> Left here rather than deleted so the reasoning survives; a closed area never leaves the
+> page silently ([How to claim one](#how-to-claim-one), rule 5).
 
-`carelinkhp.minimed.eu` and `carelink.medtronic.com` serve byte-identical bundles
-of the *clinic* portal. `carelink.medtronic.eu` returns the 5518-byte SPA fallback
-— a false positive. But the **`.com` clinic variant beyond `carelink.medtronic.com`
-has never been found.**
+### G. Cross-check the three model tables against each other
 
-Worth checking: whether any `carelinkhp*.minimed.com` style host serves a
-*different* bundle (a US clinic app rather than a mirrored EU one), and whether
-that one contains patient-namespace paths the EU one doesn't.
+We hold three partial device tables — the patient config's family→model map, the
+clinic bundle's device table, and the HCP report config — and they **disagree with
+each other**. `MMT-8600`/`8601` are in the patient map but absent from the clinic
+bundle. We never did the full three-way reconciliation.
 
-**Closes when:** you can name the clinic-portal hosts and show which bundle each
-serves, by sha256.
+> **Addendum 2026-10-12 (from area A) — the premise is now well-posed, and it is an
+> N-way reconciliation, not a three-way one.** This area was blocked on an unanswered
+> question: the "clinic bundle's device table" was a single table read off one host, and
+> nobody knew whether the other portal hosts served the same bytes. Area A settled it by
+> sha256 and the answer is **two distinct builds**, so "the clinic bundle" is not one
+> thing:
+>
+> | Build | Hosts | Entry document (5518 B) sha256 |
+> |---|---|---|
+> | clinic `pow` | `carelinkhp.minimed.eu`, `carelink.medtronic.eu`, `carelink.medtronic.com` | `0f2c5f6257a6fc6a…` |
+> | support `cua` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` | `f637c8d0cd4ec6bc…` |
+>
+> **Blocker:** the device table must be extracted from **each build separately** — the
+> two main assets are 3,397,615 B and 3,410,666 B, so they are **not** the same file, and
+> assuming otherwise is the exact defect that let a portal deployment be recorded as a
+> false positive. **Closes when** G states which source(s) list each model code **per
+> build**, where "build" is the sha256 set above. **A negative closes it**: if both
+> builds' device tables are identical, G's premise is unchanged, the addendum records
+> that, and the reconciliation stays three-way.
+>
+> **Assumptions (INFERRED):** that the shipped portal's device table lives in the main
+> asset and not in a lazy chunk, and that the two builds share a device-table format.
+> Neither is established — the chunk corpus was mined against the clinic build only.
+> The asset-level digests are in the area A log; its asset bodies were not committed
+> (3.4 MB each), so re-extraction costs 2 fetches.
 
 ### D. The 18-country sweep, completed
 
@@ -215,16 +249,6 @@ while the vendor ships a device it cannot match, which is the shape of a schema
 that static analysis *would* settle — but no one has tried, so the recovery rate
 is unknown.
 
-### G. Cross-check the three model tables against each other
-
-We hold three partial device tables — the patient config's family→model map, the
-clinic bundle's device table, and the HCP report config — and they **disagree with
-each other**. `MMT-8600`/`8601` are in the patient map but absent from the clinic
-bundle. We never did the full three-way reconciliation.
-
-**Closes when:** one table of every model code, with which source(s) list it and
-which don't.
-
 ### Q. The `appVersion` body gate — a second version axis our docs do not describe
 
 **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
@@ -394,7 +418,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 18 open plus 8 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 17 open plus 9 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -416,6 +440,7 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| A — is `carelinkhp` really the clinician portal for every region? | 2026-10-12 | **Negative on the area's premise, and it corrected two published claims.** There is **no `.com` `carelinkhp` variant**: all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are **NXDOMAIN**, including `carelinkhp-prod.minimed.eu` — the only one the corpus had named and never probed. The portal is on **five hosts, two TLDs, two builds**, and the split is **product role** (clinic `pow` vs support `cua`), **not region**: every `.eu`/`.com` pair serves the same build. **Two refutations:** `carelink.medtronic.eu` **is** a portal deployment serving the byte-identical clinic bundle (3,397,615 B, sha256 `2a7fa8e7af519c2b`) — `docs/01:69` and `docs/10` §2 called it a false positive, which was caused by a document-path probe on a host family where **the catch-all *is* the entry document**; and `carelink-support.medtronic.com` serves the **support** build, not "the same document" as `docs/07:24`, `docs/01:68` and SECURITY-FINDINGS §S3 had it. A third correction: `docs/08`'s `sha256 f637c8d0…` is the **entry document**, not `main.759cddab23085086.js` (which is `a054555a0f22176e…`). **20 of a 20 cap**, GET only, controls first per host, 8 DNS lookups recorded outside the cap, measured minimum consecutive same-host gap **2 s over 14 gaps** (all ≥ the 2 s floor; 1-second log resolution against a 2.5 s declared delay, so 2.5 s was *not* measured and is not claimed) | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] | #21 |
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |
 | N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
 | U — are the `csr/v1`, `csr/v3` and PDE cells dead on `.com`/`-trials` too, or only on `.eu`? | 2026-10-12 | **Negative, 3 hosts wide.** All six cells dead on **both** methods on both remaining hosts — 24 of 24 cells `403 MissingAuthenticationTokenException`, controls first on each host, 32 of a 32 cap. All 28 no-route bodies byte-identical (42 B, `sha256:f249b63cb2fc`), and that digest matches the `.eu` capture, so the router's no-route response is one artefact shared by three hosts. `docs/00`'s "Not re-probed on `.com`/`-trials`" caveat is **discharged**; nothing flipped to live | [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] | #11 |

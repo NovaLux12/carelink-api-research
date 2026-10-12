@@ -50,12 +50,19 @@ Each host sends a given country to **its own** `clcloud` sibling — `.eu → .e
 `EU`. Host-by-host detail, including the shadow deployment, is in
 [`01-hosts-and-estate.md`](01-hosts-and-estate.md).
 
-⚠ **Correction:** `carelink.medtronic.com` serves a byte-identical copy of the
-*clinician* portal bundle, but **`carelink.medtronic.eu` does not** — it returns
-the same 5518-byte SPA fallback as the `carelinkhp` trap (md5-identical), so it is
-a **false positive** on any status-based check. Do not treat the `.medtronic.eu`
-shadow as a second portal deployment. There is also **no fourth patient
-deployment**: all 16 recorded `*trials*` hosts are `.com`.
+⚠ **Correction — and a second correction to this correction (2026-10-12).**
+`carelink.medtronic.com` serves a byte-identical copy of the *clinician* portal
+bundle. This page then said **`carelink.medtronic.eu` does not** — it returns the
+same 5518-byte SPA fallback as the `carelinkhp` trap (md5-identical), so it is a
+**false positive** on any status-based check. **That second claim was wrong.** The md5
+was right and still reproduces (`6aedf6c4004fbb29a298bc62128480be`); the conclusion was
+not. Asked for the chunk **its own entry document names**,
+`carelink.medtronic.eu` serves `main.fb5f8cb7eb60c4d5.js` at 3,397,615 B, sha256
+`2a7fa8e7af519c2b` — **byte-identical to the other two clinic hosts, so it is a portal
+deployment.** It was mis-classified because on this host family **the catch-all *is* the
+entry document**, so a document-only probe cannot tell a portal from a fallback. There
+is also **no fourth patient deployment**: all 16 recorded `*trials*` hosts are `.com`
+[source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1].
 
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
 (OIDC live, different JWKS kids). **All four tenants have completely disjoint
@@ -277,8 +284,13 @@ the logbook/marker fields (`removalType`, `removalReason`,
 **No source maps exist** on any bundle (verified for all 224 chunks offline,
 plus a stratified `.js.map` sample).
 
-`carelink.medtronic.com` serves a **byte-identical** copy of the portal bundle —
-the hardcoded-key finding spans two hosts, not one.
+The clinician portal is deployed in **two builds across five hosts**, and the split is
+**product role**, not region — `carelinkhp.minimed.eu`, `carelink.medtronic.eu` and
+`carelink.medtronic.com` serve the clinic build byte-identically, and
+`carelink-support.medtronic.eu` and `.com` serve a different one. The hardcoded-key
+finding therefore spans **five hosts**, and **there is no `.com` `carelinkhp` host at
+all** — every `carelinkhp*.minimed.{eu,com}` name outside the baseline is NXDOMAIN
+[source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2].
 
 ## Traps
 
@@ -288,7 +300,7 @@ Read the full list, with the fix for each, in
 | Trap | Detail |
 |---|---|
 | `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. 49 collected names are false positives. |
-| Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. |
+| Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. **And that 5518 B *is* the entry document** — so no document-path probe can tell a portal from a fallback, and 5518 B maps to ≥2 digests. Ask for a content-hashed chunk instead. |
 | Unconditional gzip | `carelink.minimed.eu` ignores `Accept-Encoding`. |
 | Raw archive captures | Common Crawl/Wayback contain live `jsessionid_*` and plaintext-base64 OAuth `sessionData`. Facts only. |
 

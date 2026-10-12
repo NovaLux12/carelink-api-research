@@ -65,17 +65,31 @@ surfaced these names is finding F5 in
 | `carelink-login.medtronic.com` | live OIDC document, size not recorded in any source — **fourth Auth tenant** | OBSERVED |
 | `clcloud.medtronic.com` | cumulus host, **gateway-gated** — 403 on the discovery path, unlike `clcloud.minimed.*` | OBSERVED |
 | `carelink.medtronic.com` | **byte-identical** copy of the clinician portal bundle (sha256 `2a7fa8e7af519c2b` on both hosts) | OBSERVED |
-| `carelink-support.medtronic.com` | serves the same 5518-byte SPA document | OBSERVED |
-| `carelink.medtronic.eu` | **does not** serve that bundle — it returns the 5518-byte SPA fallback, md5-identical to the `carelinkhp` trap page | OBSERVED |
+| `carelink-support.medtronic.eu` | serves a **different** build of the portal — `main.759cddab23085086.js` (support/`cua`), not the clinic one | OBSERVED |
+| `carelink-support.medtronic.com` | serves the **same different build** as `carelink-support.medtronic.eu` — it does **not** serve "the same document" as `carelinkhp`. **Corrected 2026-10-12** | OBSERVED |
+| `carelink.medtronic.eu` | **does** serve the clinic bundle — byte-identical to `carelinkhp.minimed.eu`. **Corrected 2026-10-12; the "false positive" verdict below was wrong** | OBSERVED |
 | `commoncore.medtronic.{eu,com}` | the reports backend (`/reports-broker`, `/reports-metadata`) | OBSERVED |
 
 > ⚠ **Correction carried forward from the summary page:**
-> `carelink.medtronic.com` is a second copy of the portal bundle, but
-> `carelink.medtronic.eu` is **not** — it is a false positive on any
-> status-based check, because it answers 200 with the trap page. Do not treat the
-> `.medtronic.eu` shadow as a second portal deployment
+> `carelink.medtronic.com` is a second copy of the portal bundle.
 > [source: docs/00-summary-the-map.md; recon/CONFIG-NAMESPACE-DEEP.md TARGET 5].
-> That host also serves its fallback **gzipped** (2125 B on the wire for a 5518 B
+
+> ⚠ **CORRECTION — 2026-10-12 (area A), reversing the line above.** This page
+> previously read: *"`carelink.medtronic.eu` is **not** — it is a false positive on any
+> status-based check, because it answers 200 with the trap page. Do not treat the
+> `.medtronic.eu` shadow as a second portal deployment."*
+> **That verdict was wrong, and the md5 it rested on was right.** `carelink.medtronic.eu`
+> serves an entry document byte-identical to `carelinkhp.minimed.eu`'s — md5
+> `6aedf6c4004fbb29a298bc62128480be`, sha256 `0f2c5f6257a6fc6a…`, the value this repo
+> has recorded since 2026-10-08 — and when asked for the chunk **its own document names**
+> it returned `main.fb5f8cb7eb60c4d5.js` at **3,397,615 B, sha256
+> `2a7fa8e7af519c2b`**: byte-identical to both other clinic-bundle hosts. **It is a
+> portal deployment.** The host was called a false positive because only the *document*
+> was ever measured, and on this family the document **is** the catch-all, so it cannot
+> answer the question. The discriminator that works is an **asset path**
+> (`Content-Type` + size + digest), not a document path
+> [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1;
+> §Methodology correction]. That host also serves its fallback **gzipped** (2125 B on the wire for a 5518 B
 > body), so a byte-size discriminator must be applied after decompression
 > [source: recon/CONFIG-NAMESPACE-DEEP.md].
 
@@ -156,6 +170,15 @@ recon/CONFIG-NAMESPACE-DEEP.md TARGET 1].
 - **NXDOMAIN, cert-only names:** `carelinkhp.minimed.com`,
   `carelinkhp-prod.minimed.com`, `clcloud-clinical.minimed.com`
   [source: PROBE-FINDINGS §1].
+  **Re-confirmed NXDOMAIN 2026-10-12 (area A), and extended:** the resolver returns
+  `NXDOMAIN` — not a timeout, not an empty NOERROR — for `carelinkhp.minimed.com`,
+  `carelinkhp-prod.minimed.com`, `carelinkhp-trials.minimed.com` and
+  `carelinkhp-prod.minimed.eu`. The last is the only `carelinkhp*` name the corpus
+  named without ever probing; `carelinkhp-trials.minimed.com`'s recorded
+  `000 / TCP connect failed` improves on this — there was never an address to connect
+  to. **`carelinkhp` is therefore a single-deployment name**: no `.com` variant exists
+  [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §What was
+  searched and found empty; `dns.jsonl`].
 - **Medtronic-internal IPs that hang on TLS:** `carelink-prod.minimed.com`
   (144.15.206.166), `carelink-clinical.minimed.com` (144.15.206.180),
   `carelink-support-prod` (.165), `origin.carelink.minimed.eu` and
@@ -221,6 +244,25 @@ near-misses in one session and nearly stored 225 copies of `index.html` during
 the chunk sweep.
 [source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md;
 recon/JSMAP-HUNT.md §2; recon/CONFIG-NAMESPACE-DEEP.md TARGET 5; README rule 5]
+
+> ⚠ **Correction — 2026-10-12 (area A): the discriminator above is wrong for document
+> paths, and the wrongness produced a refuted claim.** Two measurements, both
+> byte-level:
+>
+> 1. **The catch-all *is* the entry document.** On all five responding hosts the body
+>    for a fabricated path and the body for `/` are the **same bytes**. So a
+>    document-path probe cannot distinguish "real portal" from "fallback", and
+>    `Content-Type` cannot rescue it — both are `text/html`.
+> 2. **5518 B is not one document.** The size maps to **at least two digests**:
+>    `0f2c5f6257a6fc6a…` (clinic hosts) and `f637c8d0cd4ec6bc…`
+>    (`carelink-support.medtronic.{eu,com}`, a different build).
+>
+> **The fix that works: ask for a content-hashed chunk the host's own document names,
+> and discriminate on `Content-Type` + size + digest together.** Measured both ways on
+> one host: its own build's chunk → `application/javascript`, 3,397,615 B; the other
+> build's chunk name → `text/html`, 5518 B. Naming a chunk in HTML is not serving it.
+> [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §Methodology
+> correction; `results.jsonl` seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17, 3 vs 11, 18 vs 19]
 
 ### Other traps
 

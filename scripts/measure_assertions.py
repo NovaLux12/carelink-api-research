@@ -40,10 +40,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HURL_DIR = os.path.join(ROOT, 'regression/hurl')
 CONFIG_SUITE = os.path.join(HURL_DIR, '05-public-config.check.sh')
 
-# The one inline assertion family in 05 that is not a `check "` call: the shadow
-# grep, the two sibling 412 checks, and the two family-map hash comparisons
-# (05-public-config.check.sh — see its own PASS/FAIL branches).
-INLINE_05 = 5
+# The inline assertion families in 05 that are not a `check "` call: the shadow
+# grep, the two sibling 412 checks, the two family-map hash comparisons, and the
+# two portal-build markers added by area A on 2026-10-12 (05-public-config.check.sh
+# — see its own PASS/FAIL branches). Count the EXECUTED total, not the site
+# count: the family-map and build-marker loops each run twice.
+INLINE_05 = 7
 LOOP_FAMILY_SITES = 16
 
 

@@ -1,0 +1,8 @@
+{"host": "carelinkhp.minimed.eu", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
+{"host": "carelinkhp-prod.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
+{"host": "carelink.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
+{"host": "carelink-support.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
+{"host": "carelinkhp.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
+{"host": "carelinkhp-prod.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
+{"host": "carelinkhp-trials.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
+{"host": "carelinkhp-test.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - test host, recorded only"}

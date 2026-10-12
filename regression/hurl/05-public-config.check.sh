@@ -229,6 +229,41 @@ check "captcha subkeys are the documented four" '.captcha | keys | sort | join("
 # `//`-swallows-false trap). Assert the state that is actually claimed.
 check "captcha.testKey is present and empty" '.captcha | has("testKey") and (.testKey == "")' 'true'
 
+# --- AREA A (2026-10-12): which portal BUILD each host serves ----------------
+# Source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md
+#
+# There are TWO builds of the clinician portal in production, and the split is
+# PRODUCT ROLE, not region:
+#   clinic  (pow) -> main.fb5f8cb7eb60c4d5.js   carelinkhp.minimed.eu,
+#                                               carelink.medtronic.{eu,com}
+#   support (cua) -> main.759cddab23085086.js   carelink-support.medtronic.{eu,com}
+# Every .eu/.com pair measured serves the SAME build, so a client pinned to one
+# region's host works against the other region's host -- and a client that only
+# ever fetched the entry document could not tell the two builds apart at all,
+# because both are 5518 B of text/html.
+#
+# WHY THIS FETCHES THE DOCUMENT AND NOT THE ASSET: the asset is 3.4 MB per host.
+# The entry document is 5.5 KB and NAMES its own content-hashed chunk, so the
+# build identity is readable for 0.2% of the bandwidth. The cost of this choice
+# is that it asserts the document's claim about its chunk, not the chunk itself:
+# the asset-level proof lives in the findings log (seq 4, 8, 15, 19, 20).
+#
+# Pinned at the CURRENT build on purpose, the same convention as the lhpro
+# bounds above: if Medtronic ships a new build this fails and the note gets
+# updated, rather than a host quietly changing build under a stale claim.
+for spec in "carelinkhp.minimed.eu:main.fb5f8cb7eb60c4d5.js" \
+            "carelink-support.medtronic.eu:main.759cddab23085086.js"; do
+  hp_host="${spec%%:*}"
+  hp_chunk="${spec##*:}"
+  hp_body=$(curl -s --max-time 25 -A "$UA" "https://$hp_host/")
+  if printf '%s' "$hp_body" | grep -q "$hp_chunk"; then
+    PASS=$((PASS + 1)); printf '  ok   %s serves build %s\n' "$hp_host" "$hp_chunk"
+  else
+    FAIL=$((FAIL + 1)); printf '  FAIL %s no longer names %s (build changed?)\n' "$hp_host" "$hp_chunk"
+  fi
+  sleep 2
+done
+
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "$FAIL" -eq 0 ]
