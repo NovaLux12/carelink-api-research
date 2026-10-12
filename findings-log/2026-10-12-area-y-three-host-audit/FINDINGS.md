@@ -154,19 +154,21 @@ Two defects, each sufficient alone:
 Neither is a disclosure risk — the key is redacted, the finding is "verified not live", and no new
 host is named. Both are evidence defects, and the second is the more serious.
 
-> **⚠ Corrected after review round 1: `docs/08:91` is NOT part of this finding, and this pass
-> originally said it was.** `:91` carries the same "five hosts" count but **cites a different
+> **⚠ Corrected after review round 1: the `docs/08` paragraph carrying the same count — the one
+> beginning *"so the finding spans **five hosts** — recorded as reported"* — is NOT part of this
+> finding, and this pass originally said it was.** It carries the same "five hosts" count but **cites a different
 > source** — `[source: DRIFT-AND-NEW; docs/00-summary-the-map.md]` — and `DRIFT-AND-NEW` has a
-> section headed *"Five hosts, not two — the leaked bundle replicates wider"*. So `:91`'s count
+> section headed *"Five hosts, not two — the leaked bundle replicates wider"*. So that paragraph's count
 > came from its own citation, and the paragraph **already carried the caveat**: *"recorded as
 > reported; the sweep's own caveat is that its evidence table was never written to disk and must
 > be re-verified before being treated as OBSERVED"*.
 >
-> **`:91` was correct as written and has been reverted to byte-identical with `origin/main`.**
+> **That paragraph was correct as written and has been reverted to byte-identical with
+> `origin/main`.**
 > This pass conflated two lines with different citations, which is §6 item 5 — derived prose
 > contradicting the sources it cites. The retraction is recorded rather than deleted.
 >
-> **What survives for `:91`, and is weaker than what this pass first claimed:** the drift file
+> **What survives for that paragraph, and is weaker than what this pass first claimed:** the drift file
 > *asserts* five and **enumerates no five-host list anywhere in the corpus** — the
 > "Five hosts, not two" section names two hosts and the file as a whole contains nine distinct
 > names, neither of which is a five-host list. The count is unverified rather than wrong, which is

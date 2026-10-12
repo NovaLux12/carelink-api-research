@@ -50,8 +50,8 @@ gaps**, ranked below in disclosure order.
 > `DRIFT-AND-NEW`, which has a section headed *"Five hosts, not two"*, and it already carries
 > the caveat *"recorded as reported; the sweep's own caveat is that its evidence table was never
 > written to disk and must be re-verified before being treated as OBSERVED"*. An earlier draft of
-> this correction wrongly extended to `:91` on the strength of `:37`'s citation; the two lines
-> cite **different sources** and the retraction is preserved here rather than deleted.
+> this correction wrongly extended to it on the strength of this row's citation; the two cite
+> **different sources**, and the retraction is preserved here rather than deleted.
 >
 > **Not a disclosure change.** The key is redacted, the finding is "verified not live", and no
 > new host is named.
