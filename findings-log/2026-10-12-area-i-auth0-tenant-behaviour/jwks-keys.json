@@ -1,0 +1,95 @@
+{
+  "_note": "Derived from results.jsonl rows seq 3, 6, 9, 12, 16. Each key's `n` (RSA modulus), `e`, `x5t` and `x5c` are deliberately NOT reproduced: the vendor serves them unauthenticated so they are public by construction, but committing ~1.6 KB of base64 per tenant adds no analytical value and would put a vendor Auth0 custom-domain hostname in this repo's history. The digests in results.jsonl are what make the raw artefacts checkable against live.",
+  "tenants": {
+    "carelink-login-trials.minimed.com": [
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "kCezLNMQV0tlc3hZinEly",
+        "kty": "RSA",
+        "use": "sig"
+      },
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "pNzjt7ruOaWE4rlDCBPoP",
+        "kty": "RSA",
+        "use": "sig"
+      }
+    ],
+    "carelink-login.medtronic.com": [
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "cEgK74cyc5LzAVI9VxEz9",
+        "kty": "RSA",
+        "use": "sig"
+      },
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "80YhF8vW25gJ1_rR_lOOJ",
+        "kty": "RSA",
+        "use": "sig"
+      }
+    ],
+    "carelink-login.medtronic.eu": [
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "jd0EOLxJ8XduYx4lLy3ig",
+        "kty": "RSA",
+        "use": "sig"
+      },
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "gZMBCJcl_t25Es4U_g_ow",
+        "kty": "RSA",
+        "use": "sig"
+      }
+    ],
+    "carelink-login.minimed.com": [
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "jpv2d2IuydtvKtefd5M8J",
+        "kty": "RSA",
+        "use": "sig"
+      },
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "qjHNmcQOpW_gQvHz6zaD8",
+        "kty": "RSA",
+        "use": "sig"
+      }
+    ],
+    "carelink-login.minimed.eu": [
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "8RqxnMm8vg2Go_y1LAVh9",
+        "kty": "RSA",
+        "use": "sig"
+      },
+      {
+        "alg": "RS256",
+        "has_x5c": true,
+        "has_x5t": true,
+        "kid": "vnTNpK5RvkqVEfQgHRsqv",
+        "kty": "RSA",
+        "use": "sig"
+      }
+    ]
+  }
+}

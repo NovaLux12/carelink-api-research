@@ -58,3 +58,41 @@ HTTP 200
 [Asserts]
 jsonpath "$.issuer" == "https://carelink-login.minimed.com/"
 jsonpath "$.code_challenge_methods_supported" contains "S256"
+
+# Clinical / trials tenant — the fifth carelink-login.* issuer, and the one the
+# four-way comparison never covered. Added 2026-10-12 (area I, #23); until then
+# docs/02 recorded its JWKS kids as "Unknown — not in any source".
+# Source: findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §2, §3.
+#
+# Policy parity is NOT asserted here. It is a property of all five documents
+# compared together (one digest after the hostname is substituted out), which no
+# single-request pin can express. What is pinned is that this tenant does not
+# diverge on the fields a client branches on.
+#
+# A KEY ROTATION HERE IS EXPECTED DRIFT, NOT A DEFECT — re-record the kids from
+# the live jwks.json and update docs/02 §1 rather than treating a red suite as
+# an outage.
+GET https://carelink-login-trials.minimed.com/.well-known/openid-configuration
+HTTP 200
+[Asserts]
+jsonpath "$.issuer" == "https://carelink-login-trials.minimed.com/"
+jsonpath "$.authorization_endpoint" == "https://carelink-login-trials.minimed.com/authorize"
+jsonpath "$.token_endpoint" == "https://carelink-login-trials.minimed.com/oauth/token"
+jsonpath "$.jwks_uri" == "https://carelink-login-trials.minimed.com/.well-known/jwks.json"
+jsonpath "$.registration_endpoint" == "https://carelink-login-trials.minimed.com/oidc/register"
+jsonpath "$.grant_types_supported" contains "authorization_code"
+jsonpath "$.grant_types_supported" contains "refresh_token"
+jsonpath "$.code_challenge_methods_supported" contains "S256"
+jsonpath "$.code_challenge_methods_supported" contains "plain"
+jsonpath "$.token_endpoint_auth_methods_supported" contains "none"
+header "Access-Control-Allow-Origin" == "*"
+header "Access-Control-Allow-Credentials" == "false"
+
+GET https://carelink-login-trials.minimed.com/.well-known/jwks.json
+HTTP 200
+[Asserts]
+jsonpath "$.keys" count == 2
+jsonpath "$.keys[0].kty" == "RSA"
+jsonpath "$.keys[0].alg" == "RS256"
+jsonpath "$.keys[0].kid" == "kCezLNMQV0tlc3hZinEly"
+jsonpath "$.keys[1].kid" == "pNzjt7ruOaWE4rlDCBPoP"

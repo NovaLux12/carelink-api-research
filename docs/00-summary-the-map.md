@@ -58,10 +58,13 @@ shadow as a second portal deployment. There is also **no fourth patient
 deployment**: all 16 recorded `*trials*` hosts are `.com`.
 
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
-(OIDC live, different JWKS kids). **All four tenants have completely disjoint
-signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
-shadow token is not a key-reuse risk. Tenant-by-tenant comparison and the PKCE
-posture are in [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
+(OIDC live, different JWKS kids), and with `carelink-login-trials.minimed.com`
+the estate is **five** tenants. **All five have completely disjoint signing
+keys** — 10 keys, none shared — so the shadow deployment shares OAuth *policy*
+but not keys, and a shadow token is not a key-reuse risk. Their discovery
+documents are in fact **byte-identical** once each tenant's own hostname is
+substituted out. Tenant-by-tenant comparison and the PKCE posture are in
+[`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
 
 ## API namespaces
 
@@ -324,6 +327,15 @@ Also confirmed held: the discovery document is still byte-identical, all four
 tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
 — finding F6 in [`08-security-findings.md`](08-security-findings.md).
 
+> **Extended 2026-10-12 (area I, #23).** The four-tenant disjointness claim
+> above is left as it stood on 2026-10-11, when it was true of everything then
+> known. `carelink-login-trials.minimed.com` has since been fetched: it holds
+> two further keys, `kCezLNMQV0tlc3hZinEly` and `pNzjt7ruOaWE4rlDCBPoP`, neither
+> shared with any other tenant. Disjointness is a **five**-tenant statement —
+> 10 keys, 0 shared. Two `kid` strings in the older corpus were also transcribed
+> wrongly; both corrections are in
+> [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) §8.
+
 ### Frontends — there are two apps, not one
 
 The clinician bundle in detail is in
@@ -333,7 +345,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 167 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 184 of these facts so they fail loudly rather than rot.
 
 ---
 

@@ -1,0 +1,41 @@
+==============================================================================
+E. observed kids vs the corpus
+==============================================================================
+
+carelink-login-trials.minimed.com
+  OBSERVED, NOT IN CORPUS  kCezLNMQV0tlc3hZinEly   <-- new
+      corpus-only token 'openid-configuration' at findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:370 (len 20 vs 21, 1/20 leading chars equal)
+  OBSERVED, NOT IN CORPUS  pNzjt7ruOaWE4rlDCBPoP   <-- new
+      corpus-only token 'openid-configuration' at findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:370 (len 20 vs 21, 0/20 leading chars equal)
+
+carelink-login.minimed.eu
+  OBSERVED + IN CORPUS  8RqxnMm8vg2Go_y1LAVh9   at docs/02-auth-tenants-and-flows.md:33, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:279, findings-log/probe-2026-10-08/recon/RECON-SUBDOMAINS.md:242
+  OBSERVED + IN CORPUS  vnTNpK5RvkqVEfQgHRsqv   at docs/02-auth-tenants-and-flows.md:33, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:279, findings-log/probe-2026-10-08/recon/RECON-SUBDOMAINS.md:242
+
+carelink-login.minimed.com
+  OBSERVED + IN CORPUS  jpv2d2IuydtvKtefd5M8J   at docs/02-auth-tenants-and-flows.md:34, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:280
+  OBSERVED, NOT IN CORPUS  qjHNmcQOpW_gQvHz6zaD8   <-- new
+      corpus-only token 'qjHNmcQOpW_gvHz6zaD8' at docs/02-auth-tenants-and-flows.md:34 (len 20 vs 21, 12/20 leading chars equal)
+      corpus-only token 'qjHNmcQOpW_gvHz6zaD8' at findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:280 (len 20 vs 21, 12/20 leading chars equal)
+
+carelink-login.medtronic.eu
+  OBSERVED + IN CORPUS  jd0EOLxJ8XduYx4lLy3ig   at docs/02-auth-tenants-and-flows.md:35, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:281, findings-log/probe-2026-10-08/recon/RECON-SUBDOMAINS.md:243
+  OBSERVED + IN CORPUS  gZMBCJcl_t25Es4U_g_ow   at docs/02-auth-tenants-and-flows.md:35, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:281, findings-log/probe-2026-10-08/recon/RECON-SUBDOMAINS.md:243
+
+carelink-login.medtronic.com
+  OBSERVED + IN CORPUS  cEgK74cyc5LzAVI9VxEz9   at docs/02-auth-tenants-and-flows.md:36, docs/02-auth-tenants-and-flows.md:328, docs/02-auth-tenants-and-flows.md:329, findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:282
+  OBSERVED + IN CORPUS  80YhF8vW25gJ1_rR_lOOJ   at docs/02-auth-tenants-and-flows.md:329, findings-log/probe-2026-10-08/recon/RECON-SUBDOMAINS.md:244
+
+==============================================================================
+F. host sets
+==============================================================================
+hosts this pass compared (5):
+  carelink-login-trials.minimed.com
+  carelink-login.medtronic.com
+  carelink-login.medtronic.eu
+  carelink-login.minimed.com
+  carelink-login.minimed.eu
+
+corpus names 5 distinct carelink-login.* hosts; 5 of mine are in it
+
+corpus hosts NOT in this pass:

@@ -177,8 +177,10 @@ says `MMOL_L`.** That's roughly 18×, on a diabetes bridge.
 `Accept-Encoding` entirely. An RFC 9110 violation, and it breaks any client that
 doesn't opt in.
 
-**6. Four auth tenants, four completely disjoint signing keys.** A shadow-domain
-tenant nobody had enumerated shares OAuth *policy* but no keys with the others.
+**6. Five auth tenants, ten completely disjoint signing keys.** A shadow-domain
+tenant nobody had enumerated shares OAuth *policy* — in fact its discovery
+document is byte-identical to the patient's once the hostname is substituted
+out — but shares no keys with any of them.
 
 **7. The vendor's own patient app can't match its own newest pump.** Its matcher is
 five tokens via `startsWith()`; the new device's family isn't among them. The six
@@ -381,8 +383,8 @@ Every correction stays in `findings-log/` rather than being quietly fixed — a
 research note that only records its successes isn't one. **[OBSERVED]** —
 `AGENTS.md` §6; `docs/09-methodology-and-oracles.md`.
 
-**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **167
-pinned assertions** — 359 execute per run, once the 16-family loop in the config
+**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **184
+pinned assertions** — 380 execute per run, once the 16-family loop in the config
 suite is expanded and hurl's status-line checks are counted. Exit 0 = the vendor
 surface hasn't drifted past the pinned values. The suite has caught a page
 asserting a hash its own log had already retracted. **[OBSERVED]** —
@@ -437,7 +439,7 @@ Full list: [`AGENTS.md`](AGENTS.md) §7.
 |---|---|
 | **[`docs/`](docs/)** | 12 canonical pages. Synthesised, dated, every claim cites the log it came from. |
 | **[`findings-log/`](findings-log/)** | Append-only research logs, verbatim. Kept because conclusions were retracted and re-derived — that history is the evidence. |
-| **[`regression/hurl/`](regression/hurl/)** | 167 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
+| **[`regression/hurl/`](regression/hurl/)** | 184 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
 | **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps, the loop prompts. |
 | **[`AGENTS.md`](AGENTS.md)** | The operating rules — evidence classes, the scrub list, the four ways this project has been wrong, what automation may do. |
 | **[`scripts/research-gate.sh`](scripts/research-gate.sh)** | The gate. CI runs the identical script on every PR. |

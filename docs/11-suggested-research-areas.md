@@ -294,16 +294,6 @@ The public config has `personal.common.core.report.generation.reportFileNamingSu
 interpreted. It's a small, closed list worth extracting and matching against the
 family map.
 
-### I. Auth0 tenant behavioural differences
-
-All four tenants share the same OAuth *policy* but have disjoint keys. Does any
-tenant differ in a way that matters — a `code_challenge_methods` difference, a
-redirect-registration difference, a scope difference? Only the policy surface was
-compared, not the behaviours.
-
-**Closes when:** the four tenants' `/.well-known/openid-configuration` documents are
-diffed field by field, behaviour not just policy.
-
 ### J. `login-errors.ts` against the live error surface
 
 The bridge classifies Auth0 failure modes into named errors with operator-facing
@@ -314,6 +304,29 @@ enumerates every one it can receive.
 
 **Closes when:** every reachable Auth0 error is either handled or explicitly listed
 as unhandled.
+
+> **Addendum 2026-10-12 (area I, #23) — an adjacent, cheaper pass with a ready oracle.**
+> Area I swept `registration_endpoint` reachability across all five `carelink-login.*`
+> tenants and found it **absent on all five** with one identical 404 digest. Its three
+> advertised siblings — `/bc-authorize`, `/mfa/challenge`,
+> `/oauth/global-token-revocation/connection/*` — were recorded on the EU tenant only,
+> and `/mfa/challenge` has no probe result in any source. That matters to *this* area,
+> not just to J's parent: a client coding against an advertised endpoint that 404s
+> produces a failure mode `login-errors.ts` does not enumerate, and "the vendor
+> documents a capability that does not exist" is a finding in its own right.
+>
+> - **Blocker:** none. GET only, bounded candidate list (3 paths × 5 tenants, all
+>   named inside a discovery document this project already holds).
+> - **Closes when:** each of the three has a verdict on all five tenants, controls
+>   first per host. **A negative closes it** — "advertised everywhere, absent
+>   everywhere" is the expected shape and a clean result.
+> - **Oracle ready (OBSERVED, area I §4):** discriminate on `Content-Type`, not
+>   status. `x-auth0-not-found: 1` appears on an unrecognised path and on nothing
+>   else observed; the two `404` bodies are `text/plain` 10 B (front door does not
+>   know the path) versus `application/json` 60 B (routed, nothing to return).
+> - **INFERRED:** that those two signatures mean different routing states. Observed
+>   is the separation, not the meaning; the sweep does not depend on it.
+> - **Not a token question**, and therefore distinct from J's blocked half.
 
 ---
 
@@ -424,6 +437,33 @@ being superseded — never silently. Letters are not reused.
 | X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells (6 route×method pairs, controls excluded), which **excludes** the "ACAO only when an `Origin` is present" mechanism. **It does not exclude area B's reading (b)** — "the route demands a token on `OPTIONS`" — nor reading (a), nor "emitted only on `OPTIONS`": a first draft of this row claimed (b) was refuted, and that was withdrawn, because the reason assumed a configured route would carry `ACAO` on its own `200` `GET`, which is the thing in dispute. **The cause is not established and this row does not establish it** — all three readings fit 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. The four archive heads are **gitignored**, so the 24/14/10 split is not re-derivable from a clean clone. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** (it assumes a monotonic clock, which `docs/09` declines to assume elsewhere) and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
 | Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See the "corpus is two sources, not one" note under **Why there is no area AA** | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
 | Y — how many "all three hosts" claims rest on a single row? | 2026-10-12 | **All 29 in-scope claims confirmed by row — the negative result, and it closes the audit.** Every multi-host claim in the area's stated scope (**`docs/03` + `docs/06`**, 29 lines) resolves to a row per host. The `clcloud.*` route claims are three-host evidenced because areas B, X, N, U and Z each swept all three hosts on 2026-10-12. **Four candidate findings — none of them in scope, and two of them withdrawn**, and they are the more useful half of the record: **Y-1 WITHDRAWN** — `docs/03:38`'s "all three hosts return the same document" was alleged to be two-host evidenced on the strength of one pass's ledger, and **area X's tracked ledger refutes that**: all three hosts at 20256 B, one digest. **`docs/03:38`** and `01-discovery-pin.hurl` are unchanged from main — `docs/03` does carry **one** other edit from this pass, the claim-#10 method-axis correction, which is unrelated to Y-1. **Y-2 corrected** — `docs/08:37` claimed five hosts while citing `SECURITY-FINDINGS §S3`, which says **"at least twice"**, and labelled it OBSERVED from a file that forbids that label. **Y-3 WITHDRAWN** — `docs/02` was alleged to over-claim a five-tenant comparison; `AUTH-TENANT-FINDINGS §1`'s three tenants *include* trials, and `docs/02` is unchanged. **Y-4** the 2026-10-12 captures are gitignored, so some pages are not re-derivable from a clean clone — recorded, not fixed. **0 requests, 0 cap.** **The lesson the record carries:** two of the four candidate findings (Y-1 and Y-3) were produced by reading **one file as the corpus** — the exact defect area Z's addendum names, written by the pass immediately before this one. It took **three verification rounds** to repair the arithmetic built on the false premise before anyone checked the premise. `audit-index.py --selftest` now asserts its two views read one corpus | [findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md] | #19 |
+| I — Auth0 tenant behavioural differences | 2026-10-12 | **Negative on the difference the area hunted; positive on one it did not name; and it corrected two `kid` strings already published.** The estate is **five** tenants, not four — reconciling "three" (`AUTH-TENANT` §1, a policy axis) against "four" (`docs/11`/`docs/10`, a key-material axis) was part of the pass, and **neither number was an error**: they counted two different sets over the same five hosts, and the union revealed that **`carelink-login.minimed.com` was in nobody's policy comparison** and **`-trials` was in nobody's key set**. **The negative, in its strongest form:** substituting each tenant's own hostname out of its discovery document leaves **one digest across all five** (`sha256:0c0db635f5e9b08b…`, 2640 B) — the same *bytes*, not merely the same fields; **30 field names, 0 absent from any document**, and exactly **12 of 30** differing raw, every one a URL containing that tenant's hostname. That **corrects** `AUTH-TENANT` §1: `registration_endpoint` is **not** a separate difference, it differs only by hostname like the other eleven. **The positive:** `x-ratelimit-limit` is **500 on both `.eu` tenants and 100 on the other three** — 10 observations, 2 per tenant, constant within a tenant, and invisible in byte-identical documents (INFERRED as tenant configuration, on the stated assumption Auth0 treats it as static). **Also:** `registration_endpoint` is advertised by all five and **absent on all five** (`/oidc/register` → 404 `application/json`, 60 B, one digest `f006bbd60894…` across five hosts); the trials tenant's key set is fetched for the first time (2 further disjoint kids → **10 keys, 0 shared**, discharging `docs/02` §9's "Unknown"); and **two corpus transcription defects settled against the corpus** — `AUTH-TENANT` §8's `medtronic.com` kid (`…_lLOJ`) is wrong in favour of `RECON-SUBDOMAINS`' (`…_lOOJ`), which **resolves `docs/02` §8's unresolved disagreement against the very spelling it recommended**, and `minimed.com`'s second kid is the live string **minus one `Q`** (a *deletion*, so no second reading existed to compare — invisible to §8's method by construction). **19 of a 20 cap** (17 curl + 2 hurl), **GET only**, controls first per host, **both certainly-absent controls returned 404** (`x-auth0-not-found: 1`, one digest across two hosts) so the oracle held and **no stop condition fired**; measured spacing floor **2.000 s**, which this ledger's **1-second timestamps cannot resolve** against the declared 2.5 s — a lower bound, not a measurement, recorded rather than smoothed over (4th pass in a row). New pins on the trials tenant validated live. Successor: the three remaining advertised-but-absent endpoints, added under area J | [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md] | #23 |
+
+### Closed area I — original wording, kept readable
+
+Removed from the open list above so the gate's area count and this table agree,
+but its text is preserved rather than deleted (AGENTS.md §3: corrections stay
+visible):
+
+> **I. Auth0 tenant behavioural differences**
+>
+> All four tenants share the same OAuth *policy* but have disjoint keys. Does any
+> tenant differ in a way that matters — a `code_challenge_methods` difference, a
+> redirect-registration difference, a scope difference? Only the policy surface was
+> compared, not the behaviours.
+>
+> **Closes when:** the four tenants' `/.well-known/openid-configuration` documents are
+> diffed field by field, behaviour not just policy.
+
+**How the closure actually landed, against that text.** "Four" was the count of
+tenants with *known key material*; the estate holds **five**, and the pass
+compared all five. The *policy* clause is met and then some — the documents are
+byte-identical after hostname substitution, so a field-by-field diff is a weaker
+form of the same statement. The *behaviour* clause is met: the two cells it names
+(`code_challenge_methods` difference, redirect-registration difference) are both
+negative across all five, `redirect-registration` having been tested by GET on
+every tenant for the first time. **The difference the area went looking for was
+not in either document at all** — it was in a response header.
 ---
 
 > **Consumer note.** Findings here are consumed by

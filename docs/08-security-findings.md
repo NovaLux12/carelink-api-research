@@ -258,9 +258,11 @@ Recorded so a future pass does not redo them [source: SECURITY-FINDINGS
 
 **Untested:** whether any host would accept a token minted by one of the
 **shadow** Auth0 tenants. Separate issuers plus completely disjoint JWKS kids
-across all four tenants say it should not; the exposure, if any, is a verifier
-bug (arbitrary `kid`, skipped issuer/audience checks), not a key leak [source:
-SECURITY-FINDINGS closing; AUTH-TENANT §8]. Blocked on a token.
+across all **five** tenants say it should not; the exposure, if any, is a
+verifier bug (arbitrary `kid`, skipped issuer/audience checks), not a key leak
+[source: SECURITY-FINDINGS closing; AUTH-TENANT §8;
+findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §5]. Blocked
+on a token.
 
 **The client side** is not part of the vendor surface but belongs in the
 picture, reviewed 2026-07-21 [source: POSTURE-0721]: plaintext `logindata.json`

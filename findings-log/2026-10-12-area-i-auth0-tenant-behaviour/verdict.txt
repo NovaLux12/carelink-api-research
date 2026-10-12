@@ -1,0 +1,157 @@
+==============================================================================
+A. JWKS key sets
+==============================================================================
+carelink-login-trials.minimed.com  kid=kCezLNMQV0tlc3hZinEly  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+carelink-login-trials.minimed.com  kid=pNzjt7ruOaWE4rlDCBPoP  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+                                   row seq=3  3180B sha256:4070922b8d16
+carelink-login.minimed.eu          kid=8RqxnMm8vg2Go_y1LAVh9  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+carelink-login.minimed.eu          kid=vnTNpK5RvkqVEfQgHRsqv  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+                                   row seq=6  3148B sha256:a68b69ca68ce
+carelink-login.minimed.com         kid=jpv2d2IuydtvKtefd5M8J  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+carelink-login.minimed.com         kid=qjHNmcQOpW_gQvHz6zaD8  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+                                   row seq=9  3148B sha256:cd030f97985c
+carelink-login.medtronic.eu        kid=jd0EOLxJ8XduYx4lLy3ig  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+carelink-login.medtronic.eu        kid=gZMBCJcl_t25Es4U_g_ow  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+                                   row seq=12  3164B sha256:afccce1fd5a8
+carelink-login.medtronic.com       kid=cEgK74cyc5LzAVI9VxEz9  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+carelink-login.medtronic.com       kid=80YhF8vW25gJ1_rR_lOOJ  kty=RSA  alg=RS256  use=sig  x5c=True  x5t=True
+                                   row seq=16  3164B sha256:0b8b4f1abb06
+
+tenants: 5   distinct kids: 10 of 10 entries
+kids shared by >1 tenant: 0  (none)
+every tenant holds exactly 2 keys: True
+every key RSA/RS256/use=sig: True
+every kid 21 chars: True   distinct lengths: [21]
+
+==============================================================================
+B0. strongest form — whole document, tenant hostname substituted out
+==============================================================================
+  carelink-login-trials.minimed.com  normalised  2640B sha256:0c0db635f5e9b08b
+  carelink-login.minimed.eu          normalised  2640B sha256:0c0db635f5e9b08b
+  carelink-login.minimed.com         normalised  2640B sha256:0c0db635f5e9b08b
+  carelink-login.medtronic.eu        normalised  2640B sha256:0c0db635f5e9b08b
+  carelink-login.medtronic.com       normalised  2640B sha256:0c0db635f5e9b08b
+  distinct normalised digests: 1 of 5
+  -> the five documents are BYTE-IDENTICAL once the tenant hostname is
+     substituted out. Not 'the same fields' — the same bytes.
+
+==============================================================================
+B. openid-configuration — field-by-field, INCLUDING presence/absence
+==============================================================================
+union of field names across the five documents: 30
+
+field                                                    trials.minimed.com  carelink-login.minimed.eu carelink-login.minimed.com carelink-login.medtronic.e carelink-login.medtronic.c
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+authorization_endpoint                                            IDENTICAL
+authorization_grant_profiles_supported                            IDENTICAL
+backchannel_authentication_endpoint                               IDENTICAL
+backchannel_logout_session_supported                              IDENTICAL
+backchannel_logout_supported                                      IDENTICAL
+backchannel_token_delivery_modes_supported                        IDENTICAL
+claims_supported                                                  IDENTICAL
+code_challenge_methods_supported                                  IDENTICAL
+device_authorization_endpoint                                     IDENTICAL
+dpop_signing_alg_values_supported                                 IDENTICAL
+end_session_endpoint                                              IDENTICAL
+global_token_revocation_endpoint                                  IDENTICAL
+global_token_revocation_endpoint_auth_methods_supported                  IDENTICAL
+grant_types_supported                                             IDENTICAL
+id_token_signing_alg_values_supported                             IDENTICAL
+issuer                                                            IDENTICAL
+jwks_uri                                                          IDENTICAL
+mfa_challenge_endpoint                                            IDENTICAL
+registration_endpoint                                             IDENTICAL
+request_parameter_supported                                       IDENTICAL
+request_uri_parameter_supported                                   IDENTICAL
+response_modes_supported                                          IDENTICAL
+response_types_supported                                          IDENTICAL
+revocation_endpoint                                               IDENTICAL
+scopes_supported                                                  IDENTICAL
+subject_types_supported                                           IDENTICAL
+token_endpoint                                                    IDENTICAL
+token_endpoint_auth_methods_supported                             IDENTICAL
+token_endpoint_auth_signing_alg_values_supported                  IDENTICAL
+userinfo_endpoint                                                 IDENTICAL
+
+--- fields ABSENT from at least one document (the stronger comparison) ---
+NONE — all five documents carry the identical set of 30 field names.
+
+--- fields present on all five but value-differing after normalising the
+    tenant hostname out of the value ---
+
+identical on all five: 30  |  differ: 0  |  absent somewhere: 0
+
+==============================================================================
+C. raw (un-normalised) value difference per field
+==============================================================================
+  authorization_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/authorize"
+  authorization_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/authorize"
+  authorization_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/authorize"
+  authorization_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/authorize"
+  authorization_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/authorize"
+  backchannel_authentication_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/bc-authorize"
+  backchannel_authentication_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/bc-authorize"
+  backchannel_authentication_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/bc-authorize"
+  backchannel_authentication_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/bc-authorize"
+  backchannel_authentication_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/bc-authorize"
+  device_authorization_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oauth/device/code"
+  device_authorization_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oauth/device/code"
+  device_authorization_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oauth/device/code"
+  device_authorization_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oauth/device/code"
+  device_authorization_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oauth/device/code"
+  end_session_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oidc/logout"
+  end_session_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oidc/logout"
+  end_session_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oidc/logout"
+  end_session_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oidc/logout"
+  end_session_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oidc/logout"
+  global_token_revocation_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oauth/global-token-revocation/connection/{connectionName}"
+  global_token_revocation_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oauth/global-token-revocation/connection/{connectionName}"
+  global_token_revocation_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oauth/global-token-revocation/connection/{connectionName}"
+  global_token_revocation_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oauth/global-token-revocation/connection/{connectionName}"
+  global_token_revocation_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oauth/global-token-revocation/connection/{connectionName}"
+  issuer @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/"
+  issuer @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/"
+  issuer @ carelink-login.minimed.com = "https://carelink-login.minimed.com/"
+  issuer @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/"
+  issuer @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/"
+  jwks_uri @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/.well-known/jwks.json"
+  jwks_uri @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/.well-known/jwks.json"
+  jwks_uri @ carelink-login.minimed.com = "https://carelink-login.minimed.com/.well-known/jwks.json"
+  jwks_uri @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/.well-known/jwks.json"
+  jwks_uri @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/.well-known/jwks.json"
+  mfa_challenge_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/mfa/challenge"
+  mfa_challenge_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/mfa/challenge"
+  mfa_challenge_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/mfa/challenge"
+  mfa_challenge_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/mfa/challenge"
+  mfa_challenge_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/mfa/challenge"
+  registration_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oidc/register"
+  registration_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oidc/register"
+  registration_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oidc/register"
+  registration_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oidc/register"
+  registration_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oidc/register"
+  revocation_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oauth/revoke"
+  revocation_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oauth/revoke"
+  revocation_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oauth/revoke"
+  revocation_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oauth/revoke"
+  revocation_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oauth/revoke"
+  token_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/oauth/token"
+  token_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/oauth/token"
+  token_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/oauth/token"
+  token_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/oauth/token"
+  token_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/oauth/token"
+  userinfo_endpoint @ carelink-login-trials.minimed.com = "https://carelink-login-trials.minimed.com/userinfo"
+  userinfo_endpoint @ carelink-login.minimed.eu = "https://carelink-login.minimed.eu/userinfo"
+  userinfo_endpoint @ carelink-login.minimed.com = "https://carelink-login.minimed.com/userinfo"
+  userinfo_endpoint @ carelink-login.medtronic.eu = "https://carelink-login.medtronic.eu/userinfo"
+  userinfo_endpoint @ carelink-login.medtronic.com = "https://carelink-login.medtronic.com/userinfo"
+
+raw value-differing fields: 12 of 30
+
+==============================================================================
+D. behavioural cells reachable by unauthenticated GET
+==============================================================================
+carelink-login-trials.minimed.com  /oidc/register seq=4 404 application/json; charset=utf-8 60B sha256:f006bbd60894 body='{"statusCode":404,"error":"Not Found","message":"Not Found"}'
+carelink-login.minimed.eu          /oidc/register seq=7 404 application/json; charset=utf-8 60B sha256:f006bbd60894 body='{"statusCode":404,"error":"Not Found","message":"Not Found"}'
+carelink-login.minimed.com         /oidc/register seq=10 404 application/json; charset=utf-8 60B sha256:f006bbd60894 body='{"statusCode":404,"error":"Not Found","message":"Not Found"}'
+carelink-login.medtronic.eu        /oidc/register seq=13 404 application/json; charset=utf-8 60B sha256:f006bbd60894 body='{"statusCode":404,"error":"Not Found","message":"Not Found"}'
+carelink-login.medtronic.com       /oidc/register seq=17 404 application/json; charset=utf-8 60B sha256:f006bbd60894 body='{"statusCode":404,"error":"Not Found","message":"Not Found"}'

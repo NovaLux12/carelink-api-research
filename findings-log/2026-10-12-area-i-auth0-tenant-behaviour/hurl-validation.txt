@@ -1,0 +1,29 @@
+Area I — live validation of the two new pinned test cases (2026-10-12)
+
+hurl 8.0.1, --compressed, one file per test case, one request each.
+Re-fetched through a DIFFERENT client from the curl pass, so a pin that
+does not actually hold fails here rather than in the weekly drift sweep.
+
+--- trials-oidc  (/.well-known/openid-configuration) ---
+  hurl exit            0   (every assert in hurl-trials-oidc.hurl held)
+  status asserted      HTTP 200
+  fields in document   30
+  body digest          sha256:57aca4f8d72ab874  (2825B)
+
+--- trials-jwks  (/.well-known/jwks.json) ---
+  hurl exit            0   (every assert in hurl-trials-jwks.hurl held)
+  status asserted      HTTP 200
+  keys                 2
+    kid=kCezLNMQV0tlc3hZinEly  kty=RSA  alg=RS256  use=sig  x5c=present  x5t=present
+    kid=pNzjt7ruOaWE4rlDCBPoP  kty=RSA  alg=RS256  use=sig  x5c=present  x5t=present
+
+Both cases exited 0. 19 of a 20 request cap used.
+
+NOT REPRODUCED HERE, ON PURPOSE: hurl prints the full response body, which
+for the JWKS means the RSA modulus `n` and a base64 `x5c` certificate chain
+whose leaf CN names the tenant's own Auth0 custom domain. The keys are public
+by construction — the vendor serves them unauthenticated at a published URI —
+but reproducing 3 KB of base64 DER adds nothing to this finding and puts a
+vendor infrastructure hostname in this repo's history for no analytical gain.
+Recorded as a shape (`x5c present, x5t present`), not a value. The digests
+above and in results.jsonl are what make the artefacts checkable.
