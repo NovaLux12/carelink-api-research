@@ -38,7 +38,7 @@ is the same file: `AUTH-TENANT` = `findings-log/probe-2026-10-08/AUTH-TENANT-FIN
 
 ```mermaid
 flowchart LR
-    subgraph POL["OAuth policy compared field-by-field — identical but for `issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"]
+    subgraph POL["OAuth policy compared field-by-field — FOUR of the five tenants below (trials excluded, dashed): identical but for `issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"]
         A["carelink-login.minimed.eu<br/>patient · EU"]
         B["carelink-login.minimed.com<br/>patient · US"]
         C["carelink-login.medtronic.eu<br/>shadow"]

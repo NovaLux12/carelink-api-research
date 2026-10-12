@@ -34,7 +34,7 @@ gaps**, ranked below in disclosure order.
 | # | Finding | Class | Severity (per source) |
 |---|---|---|---|
 | F1 | Reports-broker API keys published **unauthenticated** on the US and trials patient hosts — EU ships a placeholder | OBSERVED | unrated; "same class as S3, but worse in two ways" [CROSS-REGION] |
-| F2 | Hardcoded `x-api-key` in a public bundle, replicated across five hosts (drift-swept); prod API base points at a `dev.` host | OBSERVED | low — verified not live [SECURITY-FINDINGS S3] |
+| F2 | Hardcoded `x-api-key` in a public bundle, replicated across **at least two** hosts — the `.eu` patient portal and the `.medtronic.com` shadow; prod API base points at a `dev.` host | OBSERVED on **two** hosts; the wider host count is SOURCE-REPORTED, see the correction below | low — verified not live [SECURITY-FINDINGS §S3 "replicated across a second host"] |
 | F3 | Health-data portal ships **zero security headers** | OBSERVED | low-moderate [SECURITY-FINDINGS S1] |
 | F4 | Pre-Auth0 authorize URLs in public archives carrying session material — one in plaintext | PUBLISHED | unrated [ARCHIVE-URLS §7] |
 | F5 | Internal hostnames disclosed via certificate-transparency logs | OBSERVED | informational [SECURITY-FINDINGS S5] |
@@ -88,7 +88,24 @@ file to the byte — 3397615 B, sha256 `2a7fa8e7af519c2b`, `cmp` identical — s
 addendum; RECON-SUBDOMAINS §4.2]. The 2026-10-10 drift sweep then found
 `carelink-support.medtronic.eu` serving the same document in a **different
 build** (`main.759cddab23085086.js`, sha256 `f637c8d0…`) carrying the identical
-key material and the same dev-host bug, so the finding spans **five hosts** —
+key material and the same dev-host bug, so the finding spans **at least two hosts**, both
+carrying the bundle —
+
+> **⚠ Corrected 2026-10-12 by area Y.** This paragraph previously read *"the finding spans
+> **five hosts**"*. Two defects, either sufficient on its own:
+>
+> 1. **The count was inflated.** The cited source
+>    ([`SECURITY-FINDINGS.md` §S3](../findings-log/probe-2026-10-08/SECURITY-FINDINGS.md))
+>    is titled *"S3 is replicated across a second host"* and says the bundle is deployed
+>    **"at least twice" — including on the `.medtronic.com` shadow**. Two, not five.
+> 2. **The evidence class was the one the source forbids.** The corroborating drift file
+>    opens *"**Provenance:** this file is a **reconstruction from the agent's report** …
+>    Re-verify before treating any row as **OBSERVED**"*, and `docs/08:37` labelled the row
+>    **OBSERVED** on that basis.
+>
+> **This is not a disclosure change.** The key is redacted, the finding is "verified not
+> live", and no new host is being named. It is an evidence defect: a count that outran its
+> source, and a label its source forbids.
 recorded as reported; the sweep's own caveat is that its evidence table was
 never written to disk and must be re-verified before being treated as OBSERVED
 [source: DRIFT-AND-NEW; docs/00-summary-the-map.md].

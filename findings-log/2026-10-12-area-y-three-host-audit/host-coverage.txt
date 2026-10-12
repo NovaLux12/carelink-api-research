@@ -1,0 +1,75 @@
+HOST-COVERAGE INDEX — findings-log/**/results.jsonl + ORACLE-PROBE-MATRIX
+ledgers read: 6   matrix rows: 71   distinct (method, path) cells: 69
+
+Legend: N = distinct REAL hosts with a row. 'no-host' = rows whose ledger
+has no host column, so they cannot be attributed at all.
+
+  N=3  GET     connect/carepartner/v11/discover/android/3.6         [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v11/display/message              [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v12/discover/android/3.6         [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v12/display/message              [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  OPTIONS connect/carepartner/v12/display/message              [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  OPTIONS connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/carepartner/v13/be-periodic-data             [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v13/discover/android/3.6         [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  OPTIONS connect/carepartner/v13/discover/android/3.6         [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v13/display/message              [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  OPTIONS connect/carepartner/v13/display/message              [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/carepartner/v6/discover/android/3.6          [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  OPTIONS connect/carepartner/v6/display/message               [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  GET     connect/carepartner/v6/display/message               [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]
+  N=3  OPTIONS connect/csr/v2/display/message                       [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/csr/v2/display/message                       [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/pde/v1/display/message                       [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/pde/v2/display/message                       [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/pde/v3/discover/android/3.6                  [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/pde/v3/display/message                       [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  OPTIONS connect/v2/display/message                           [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=3  GET     connect/v2/display/message                           [cc-trials.minimed.com cc.minimed.com cc.minimed.eu]  no-host:1
+  N=2  GET     connect/csr/v1/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/csr/v1/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  GET     connect/csr/v3/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/csr/v3/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/pde/v1/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/pde/v2/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/pde/v3/discover/android/3.6                  [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=2  OPTIONS connect/pde/v3/display/message                       [cc-trials.minimed.com cc.minimed.com]  no-host:1
+  N=1  GET     connect/carepartner/v1/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v1/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v10/discover/android/3.6         [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v10/display/message              [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v11/discover/android/3.6         [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v11/display/message              [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v12/discover/android/3.6         [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v13/be-periodic-data             [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v14/discover/android/3.6         [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v14/display/message              [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v15/discover/android/3.6         [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v15/display/message              [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v16/discover/android/3.6         [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v16/display/message              [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v2/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v2/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v3/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v3/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v4/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v4/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v5/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v5/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v6/discover/android/3.8          [cc-trials.minimed.com]
+  N=1  GET     connect/carepartner/v7/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v7/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v8/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v8/display/message               [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v9/discover/android/3.6          [cc.minimed.eu]
+  N=1  GET     connect/carepartner/v9/display/message               [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v99/discover/android/3.6         [cc.minimed.eu]
+  N=1  OPTIONS connect/carepartner/v99/display/message              [cc.minimed.eu]
+  N=1  GET     connect/v2/v2/display/message                        [cc.minimed.eu]
+  N=0  GET     connect/carepartner/                                 [-]  no-host:1
+  N=0  OPTIONS connect/carepartner/                                 [-]  no-host:1
+  N=0  GET     connect/carepartner/v13                              [-]  no-host:1
+  N=0  OPTIONS connect/carepartner/v13                              [-]  no-host:1
+  N=0  GET     connect/carepartner/v13/discover                     [-]  no-host:1
+  N=0  OPTIONS connect/carepartner/v13/discover                     [-]  no-host:1
