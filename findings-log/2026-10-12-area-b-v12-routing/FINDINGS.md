@@ -20,7 +20,11 @@
   added `access-control-allow-origin not exists` + `access-control-allow-methods not
   exists` to it. Those two assertions had never been executed, and shipping an unexecuted
   assertion is a failure this repo keeps recording, so the changed cell was re-run rather
-  than trusted: `Success ... (1 request(s) in 2075 ms)`, `Failed files: 0`, exit 0.
+  than trusted. **hurl's version, command and verbatim output are in
+  [`hurl-validation.txt`](hurl-validation.txt)**, which also carries the 4-cell batch
+  **transcribed rather than captured** — re-issuing those 4 would breach the 24 cap, so the
+  artefact says so instead of implying a log exists. That is the provenance discipline
+  [`docs/09`](../../docs/09-methodology-and-oracles.md) §6 applies to the 2026-10-10 sweep.
 - **22 of a 24 cap in total.** GET + OPTIONS with empty bodies only; no POST, no token
   exchange, no authentication, no auth headers.
 - **Spacing.** The harness declares `sleep 2.5` between requests to the same host. Of the
@@ -201,7 +205,7 @@ built. All five are fixed here; the retraction history is kept rather than edite
 | 2 | "Preflight presence is a per-route property" **over-claimed** — confounded with `status == 200` across all 101 captured heads | **Claim withdrawn.** Finding 3 rewritten as an observation with the confound stated. The rule it falsified ("the gateway adds CORS uniformly") survives |
 | 3 | The 2.033 s gap was described as an "open discrepancy"; it is arithmetically impossible under the committed harness | **Re-characterised** as a provenance problem with a clock-step explanation derived from the cancelling errors. Cause still not proven; stated as far as the evidence goes |
 | 4 | "15 of 16 same-host gaps" — there are **14** same-host gaps (16 counts all gaps incl. 2 cross-host) | **Fixed.** Corrected in place with the miscount named |
-| 5 | The 4 hurl pin-validation requests appeared only in the PR body, not in the log, so "21 of 24" was unsourced | **Fixed.** Now recorded in the Method section with hurl's own output; a 5th request re-validated the changed `discover` cell, making it 22 of 24 |
+| 5 | The 4 hurl pin-validation requests appeared only in the PR body, not in the log, so "21 of 24" was unsourced; round 2 found the count was then recorded in prose but still had **no committed artefact** beside it | **Fixed twice.** Now recorded in the Method section, a 5th request re-validated the changed `discover` cell (22 of 24), and [`hurl-validation.txt`](hurl-validation.txt) carries hurl's version, command and verbatim output — **captured** for the re-validated cell, **explicitly transcribed** for the 4-cell batch, because re-issuing those 4 would breach the 24 cap. The artefact says which is which instead of implying a log exists for all five |
 
 ## The one spacing anomaly — a clock artefact, established to the limit the evidence allows
 
@@ -230,7 +234,7 @@ lost. That is the signature of an NTP correction, not of a short or skipped `sle
 produce the same arithmetic, and the mtime evidence rules out a later edit to `probe.sh`
 but says nothing about `run.log`. **The pass does not claim to know which**, only that the
 harness and the log cannot both be exactly right. Either way the **measured floor stands at
-2.033 s**, the repo's ≥2 s floor is met, and **21 of 24 requests is unaffected**.
+2.033 s**, the repo's ≥2 s floor is met, and **22 of 24 requests is unaffected**.
 
 ## Reproduction
 
