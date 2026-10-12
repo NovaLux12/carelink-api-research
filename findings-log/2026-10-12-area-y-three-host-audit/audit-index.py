@@ -172,10 +172,18 @@ def main():
     # report printed beside it, and a comment saying "they agree" would not have
     # caught that a second time.
     if "--selftest" in sys.argv:
-        probe = "connect/carepartner/v6/display/message"   # matrix-only cell
-        n = len(coverage(idx, probe))
-        print(f"selftest: {probe} -> {n} hosts (expect 3, matrix-only)")
-        return 0 if n == 3 else 1
+        # MUST be method-scoped. `coverage()` unions across methods when given no
+        # method, and area Z's ledger already carries 12 OPTIONS rows for this path
+        # on the same three hosts -- so a method-agnostic probe returns 3 whether or
+        # not the matrix was merged, and the guard cannot fail. The GET row for this
+        # cell exists ONLY in ORACLE-PROBE-MATRIX.md (zero GET rows in any ledger),
+        # so scoping to GET makes the merge the only thing that can satisfy it.
+        probe = "connect/carepartner/v6/display/message"
+        n = len(coverage(idx, probe, "GET"))
+        ok = (n == 3)
+        print(f"selftest: GET {probe} -> {n} hosts (expect 3; matrix-only cell)")
+        print(f"selftest: {'PASS' if ok else 'FAIL — the matrix merge is not reaching the lookup'}")
+        return 0 if ok else 1
 
     if len(sys.argv) > 2 and sys.argv[1] == "--coverage":
         target = sys.argv[2]

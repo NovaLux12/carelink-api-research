@@ -42,8 +42,10 @@ first attempt. All three are recorded because the failures are the point.
 On that basis `connect/carepartner/v6/display/message` has **zero** `GET` rows on any host — so
 `docs/03:256` ("**403 on GET** … on all three hosts") looked like an unevidenced claim.
 
-It is not. `ORACLE-PROBE-MATRIX.md` carries that cell on three hosts and no `results.jsonl`
-carries it at all. **An audit that read only the machine-readable ledgers would have marked a
+It is not. `ORACLE-PROBE-MATRIX.md` carries that **GET** cell on three hosts and **no ledger carries
+that GET row at all** (area Z's ledger does carry 12 `OPTIONS` rows for the same path, on the
+same three hosts — which is why the `--selftest` guard is method-scoped: a method-agnostic
+probe cannot tell a merged index from an unmerged one). **An audit that read only the machine-readable ledgers would have marked a
 correctly-evidenced claim false.** The index now merges both sources, and the source is named
 on every row.
 
@@ -97,9 +99,21 @@ addendum** (`docs/02`, `docs/08`, and the gitignored-captures note).
 and Z each swept all three hosts on 2026-10-12.
 
 **This is the negative result the area allows, and it is the likelier one.** It is also, on the
-evidence, the whole in-scope result: the audit's three candidate findings are one correction
-(A1, outside scope), one withdrawal (A2, outside scope) and one withdrawal (Y-1, **inside** scope,
-which returned the line it had marked defective to the clean set).
+evidence, the whole in-scope result. **The audit raised FOUR candidate findings**, and this
+file previously said three because it dropped Y-4 from the count while still listing it —
+`docs/11` said four and this file said three, with no reconciliation, which is `AGENTS.md` §2
+("where sources disagree, give both; never pick one silently"). The four:
+
+| | finding | disposition | in scope? |
+|---|---|---|---|
+| Y-1 | `docs/03:38` alleged two-host evidenced | **WITHDRAWN** — area X's ledger refutes it | **in** scope; returned to the clean set |
+| Y-2 / A1 | `docs/08:37` five hosts, OBSERVED label | **corrected** | outside (`docs/08`) |
+| Y-3 / A2 | `docs/02` five-tenant over-claim | **WITHDRAWN** — §1's three include trials | outside (`docs/02`) |
+| Y-4 / A3 | gitignored 2026-10-12 captures | **recorded, not fixed** | outside (corpus) |
+
+**Y-4 is a re-derivability note rather than a defect candidate**, and an earlier draft of this
+file dropped it from the count for that reason — which is defensible, but then the count and
+the list had to agree. Both readings are given above; `docs/11` uses the four-count.
 
 **Three addendum rows, outside that scope, are counted separately**: A1 corrected, A2 withdrawn,
 A3 recorded-not-fixed. **Folding them into the 29 would not reproduce the table.** Two earlier
