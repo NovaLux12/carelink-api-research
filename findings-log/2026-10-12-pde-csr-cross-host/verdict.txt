@@ -1,0 +1,34 @@
+requests in corpus: 32
+
+== controls (these gate whether the data cells below may be believed) ==
+  ok  clcloud.minimed.com              GET     expect=live   status=401 errortype=x-amzn-errortype: UnauthorizedException acao=(none)
+  ok  clcloud.minimed.com              OPTIONS expect=live   status=200 errortype=(none) acao=access-control-allow-origin: *
+  ok  clcloud.minimed.com              GET     expect=absent status=403 errortype=x-amzn-errortype: MissingAuthenticationTokenException acao=(none)
+  ok  clcloud.minimed.com              OPTIONS expect=absent status=403 errortype=x-amzn-errortype: MissingAuthenticationTokenException acao=(none)
+  ok  clcloud-trials.minimed.com       GET     expect=live   status=401 errortype=x-amzn-errortype: UnauthorizedException acao=(none)
+  ok  clcloud-trials.minimed.com       OPTIONS expect=live   status=200 errortype=(none) acao=access-control-allow-origin: *
+  ok  clcloud-trials.minimed.com       GET     expect=absent status=403 errortype=x-amzn-errortype: MissingAuthenticationTokenException acao=(none)
+  ok  clcloud-trials.minimed.com       OPTIONS expect=absent status=403 errortype=x-amzn-errortype: MissingAuthenticationTokenException acao=(none)
+
+ORACLE: established on both hosts
+
+== data cells: verdict needs GET + OPTIONS together ==
+host                           path                                     GET                          OPTIONS                      verdict
+clcloud.minimed.com            connect/pde/v1/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud.minimed.com            connect/pde/v2/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud.minimed.com            connect/pde/v3/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud.minimed.com            connect/pde/v3/discover/android/3.6      403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud.minimed.com            connect/csr/v1/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud.minimed.com            connect/csr/v3/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/pde/v1/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/pde/v2/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/pde/v3/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/pde/v3/discover/android/3.6      403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/csr/v1/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+clcloud-trials.minimed.com     connect/csr/v3/display/message           403 MissingAuthenticationTokenException cors=N 403 MissingAuthenticationTokenException cors=N DEAD - no route on either method
+
+== 403 body equality: is the 'dead' response identical to a fabricated path? ==
+  clcloud.minimed.com            control body 42B sha256:f249b63cb2fc
+    12/12 dead-cell bodies byte-identical to the fabricated control
+  clcloud-trials.minimed.com     control body 42B sha256:f249b63cb2fc
+    12/12 dead-cell bodies byte-identical to the fabricated control

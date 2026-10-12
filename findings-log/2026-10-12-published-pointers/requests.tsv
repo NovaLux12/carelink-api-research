@@ -1,0 +1,10 @@
+1	clcloud.minimed.eu	connect/carepartner/v13/discover/android/3.6	200	20256	content-type: application/json;charset=utf-8	parses:dict
+2	clcloud.minimed.com	connect/carepartner/v13/discover/android/3.6	200	20256	content-type: application/json;charset=utf-8	parses:dict
+3	clcloud.minimed.com	connect/carepartner/v11/discover/android/3.6	200	18105	content-type: application/json;charset=utf-8	parses:dict
+4	clcloud-trials.minimed.com	connect/carepartner/v6/discover/android/3.6	200	10053	content-type: application/json;charset=utf-8	parses:dict
+5	carelink.minimed.eu	patient/v2/configuration/public	200	26992	content-type: application/json	parses:dict
+6	carelink.minimed.com	patient/v2/configuration/public	200	24479	content-type: application/json	parses:dict
+7	carelink-trials.minimed.com	patient/v2/configuration/public	200	31698	content-type: application/json	parses:dict
+8	carelink.minimed.eu	patient/countries/settings?countryCode=GB	200	2618	content-type: application/json	parses:dict
+9	carelink.minimed.com	patient/countries/settings?countryCode=US	200	3126	content-type: application/json	parses:dict
+10	carelink-trials.minimed.com	patient/countries/settings?countryCode=US	200	3188	content-type: application/json	parses:dict

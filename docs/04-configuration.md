@@ -49,7 +49,8 @@ in any source.
 | device vocabulary | `personal.device.family.to.model.mapping`, `system.settings.transfer.feature.config.device.mapping` | 16 families; `{"BLE780":"780G","CC880":"MiniMed™ Flex"}` — see `05-devices-and-vocabulary.md` |
 | logbook | `logbook.supported.entry.types` (12 types), `logbook.enabled`, `logbook.entries.page.size` (= 30), `system.logbook.entry.validation.config` | validation config is `null` on both patient regions, full schema on trials |
 | device control codes | `csr.control.codes.settings` | `dpml`/`tup`/`lhpro`/`lghpro`/`vex`/`ssd`/`tcc`/`gstpro`/`gstrc` with ranges. **Not** the NGP alarm set — no N-codes |
-| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed |
+| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed. **`csr.cumulus.periodic.data.endpoints` now has its value read for the first time — see [The published pointer set](#the-published-pointer-set)** |
+| **the vendor's own migration switchboard** | **`system.gc.gz.transition.flags`** | **Added 2026-10-12.** Absent from every key list this repo recorded before that date. `displayMessage.useCumulusUrls` = **`true` on all three deployments**, beside a three-way plane dispatch table; five sibling capability booleans are **all `true`**. See [The published pointer set](#the-published-pointer-set) |
 | regional feature flags | `personal.clinical.environment`, `personal.safety.notices.enabled`, `personal.data.csv.export.enable`, `personal.cookie.consent.policy.enabledGlobally`, `personal.dob.validation.enabled`, `personal.mixpanel.analytics.settings.{enabled,token}`, `personal.username.as.email.settings.enabled`, `personal.inpen.supported.countries.enabledGlobally` | see the regional table below |
 | country lists | `personal.common.core.reporting.enabled.countries`, `personal.countries.certification.enabled`, `personal.inpen.supported.countries` | grow over time — see the drift note |
 | auth / redirect | `personal.integrations.redirect.scheme.whitelist`, `system.auth0.url.whitelist`, `captcha.key`, `personal.session.timeout` (= 30) | [NovaLux12/carelink-bridge](https://github.com/NovaLux12/carelink-bridge)'s `com.medtronic.carepartner:/sso` redirect is **not** in the integrations whitelist — that whitelist governs deep links, not the OAuth callback, so this is context, not a contradiction |
@@ -87,6 +88,150 @@ is pinned by `hurl/05-public-config.check.sh`.
 > lookup that can silently return `null` will manufacture consensus.**
 > [source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]
 
+## The published pointer set
+
+**Added 2026-10-12** (area T). Until this pass, two of the keys in the table above were
+recorded **by name and never read**. Both are endpoint-bearing, so the omission was
+load-bearing: this repo knew a `csr`-prefixed "endpoints" key existed and did not know
+what it pointed at
+[source: findings-log/2026-10-12-published-pointers/FINDINGS.md].
+
+**OBSERVED, 3 of 3 deployments, unauthenticated.** `csr.cumulus.periodic.data.endpoints`
+is a two-key object:
+
+| key | value (EU host) |
+|---|---|
+| `display_message` | `https://clcloud.minimed.eu/connect/csr/v2/display/message` — **the same route the 2026-10-11 pass found live and POST-only** |
+| `periodic_packet` | an **AWS VPC-endpoint service name** carrying `/dev/connect/csr/v2/periodic/packet` — internal, **recorded not probed**; the endpoint identifier is redacted in this repo |
+
+So the `csr/v2` namespace has **at least two members**, and "the `csr/v2` route" is
+already an undercount. The `/dev/` stage prefix in the second one is also published.
+
+### `system.gc.gz.transition.flags` — the client is told to use `csr/v2`
+
+**OBSERVED**, identical on all three deployments. A six-key subtree that **no file in
+this repository recorded before 2026-10-12**:
+
+| key | value (3 of 3) |
+|---|---|
+| `displayMessage.useCumulusUrls` | **`true`** |
+| `displayMessage.personalDisplayMessageUrl` | `…/patient/connect/data` |
+| `displayMessage.csrDisplayMessageUrl` | **`…/connect/csr/v2/display/message`** |
+| `displayMessage.carepartnerDisplayMessageUrl` | `…/patient/m2m/connect/data/gc/patients/{patientUsername}` |
+| `pullGMInfoFromCumulus` | `true` |
+| `pullSMSHistoryFromCumulus` | `true` |
+| `sendDiagnosticLogsToCumulus` | `true` |
+| `sendPeriodicToCumulus` | `true` |
+| `sendSMSFromCumulus` | `true` |
+
+`csrDisplayMessageUrl` is not a stray key — it is one arm of a **three-way plane
+dispatch table** (`personal` / `csr` / `carepartner`), with `useCumulusUrls` as the
+master switch, already `true` everywhere. **So the vendor's own client is instructed by
+public config to address `csr/v2`, on every deployment, today.** That is a stronger
+claim than "`csr/v2` is live", and it is the opposite of what area T set out to test.
+
+The five sibling booleans say five capabilities — GM info, SMS history, diagnostic logs,
+**periodic data**, SMS sending — are already on the Cumulus plane. `sendPeriodicToCumulus`
+is what makes `csr.cumulus.periodic.data.endpoints` necessary in the first place; the two
+facts corroborate each other. **INFERRED:** that `gc` → `gz` names a service migration
+and these are its completion switches — the key names support it, no document on any
+surface states it. The *values* are OBSERVED; the reading is not.
+
+### The route that config cannot address
+
+`/connect/v2` — the **bare**, pre-`carepartner` route that the 2026-10-12 area-N pass
+confirmed live and POST-only — is named by **no published document**: zero hits for
+`/connect/v2` across all ten documents read. So of the two POST-only routes, `csr/v2`
+is config-addressable and the bare one is not. That asymmetry is the durable negative
+from this pass, and it is recorded with the searched set so it is auditable rather than
+merely asserted.
+
+### ⚠ Correction 1 — `personal.data.csv.export.enable` is an object, not a boolean
+
+**Corrected 2026-10-12.** The regional table in this page recorded this key as a scalar
+(`true` / `true` / `false`). **It is an object keyed by plane**, and the scalar reading
+silently hides half the value:
+
+| deployment | `personal` | `csr` |
+|---|---|---|
+| EU | `{aggregatedData: true, rawData: false}` | `{aggregatedData: true, rawData: false}` |
+| US | `{aggregatedData: true, rawData: false}` | `{aggregatedData: true, rawData: false}` |
+| trials | `{aggregatedData: false, rawData: false}` | `{aggregatedData: true, **rawData: true**}` |
+
+Two consequences. A scalar reader misses `rawData` and the whole `csr` plane — and
+**trials `csr.rawData` is `true` where every `personal` value is `false`**, so CSV-export
+capability differs by plane in a way the scalar reading cannot express. And this is the
+*same* silent-failure class documented above for the per-key projection's string
+booleans — a `=== true` check against an object never fires — but in the **bulk**
+document this time.
+
+The old scalars happened to agree with `personal.aggregatedData` on all three
+deployments, which is exactly why the error survived: **the note was right about the
+numbers and wrong about the type.** Pinned on *type* in `hurl/05` so the shape cannot
+silently revert.
+
+### ⚠ Correction 2 — the document is 68 flat dotted keys and exactly one nested object
+
+`docs/04` describes the document as "69 **top-level** keys". True, but a consumer cannot
+assume a uniform shape:
+
+- **68 of 69** are *literal top-level key names that contain dots* —
+  `personal.device.family.to.model.mapping`, `system.gc.gz.transition.flags`,
+  `outages.nextupdateat`. Their **values** are a mix of scalars, arrays and objects:
+  **28 of the 69 hold objects** on EU and US, **30 on trials**.
+- **Exactly 1** — `captcha` — has **no dot in its key**. That is the whole of its
+  distinction: it is the only key whose *name* is a bare segment, not the only
+  nested *value*. Its shape is `{enabled, key, testKey, type}`.
+
+So the `captcha.key` / `captcha.testKey` names used elsewhere in this page are **not**
+top-level keys; they are subkeys of `captcha`. A walker that splits every key on `.`
+and does a dotted lookup — precisely the bug in
+[`09-methodology-and-oracles.md`](09-methodology-and-oracles.md) §5 item 3 — will miss
+`captcha` entirely, while finding `outages.nextupdateat` as a literal on the same
+document. **Both shapes are in one document**, so the flattening must be checked, not
+assumed.
+
+**Also new, minor:** `captcha.testKey` is an **empty string on all three**
+deployments — a published key that exists and carries nothing. A client that switches on
+"testKey is present" rather than "non-empty" would enable test mode.
+
+**A correction that was *not* needed.** `outages.nextupdateat` **is** populated on
+trials only, exactly as this page states — a first reading of the 2026-10-12 pass
+appeared to contradict it and does not. Recorded because the near-miss is the kind of
+thing that otherwise gets written up as a correction of a correct claim.
+
+### Credential-shaped values — structure only, comparison held
+
+**The config publishes credential-shaped values.** Recorded here with **no value
+printed, hashed, or compared**, preserving the hold-back stated at the top of this page:
+
+| key | EU | US | trials |
+|---|---|---|---|
+| `nutrino.cc.broker.service.config.security_headers["x-api-key"]` | 17 chars, non-alphanumeric placeholder | **40 chars, alphanumeric** | **40 chars, alphanumeric** |
+| `nutrino.cc.metadata.service.config.security_headers["x-api-key"]` | 17 chars, non-alphanumeric placeholder | **40 chars, alphanumeric** | **40 chars, alphanumeric** |
+| `captcha.key` (reCAPTCHA **site** key, public by design) | 40 chars | 40 chars | 40 chars |
+| `personal.mixpanel.analytics.settings.token` | 44 chars | 44 chars | **`""`** |
+
+**What is new and structural:** the two `nutrino.cc.*` keys carry a **40-character
+alphanumeric** value on the other two deployments — the credential class this repo's own
+gate scrubs by prefix. So the EU placeholder is not merely *different*, it is the
+**only** deployment where the published value is not credential-shaped.
+
+**The cross-deployment comparison stays held.** Whether those 40-character values are
+equal to each other is **not tested, not hashed, not inferred** here. The pass's
+`credential-shapes.py` has no code path that could answer it — a scrubber that could
+would be doing the thing the hold-back exists to prevent
+[source: findings-log/2026-10-12-published-pointers/FINDINGS.md §5].
+
+### Why the raw captures are not committed
+
+The document this section is derived from is unauthenticated and contains the values
+above, so the pass ships **the redaction, not the capture**: a re-runnable enumerator, a
+scrubber that reads its patterns from `scripts/scrub-patterns.txt` rather than embedding
+a credential in a second file, and a value-free structural report. The pass directory's
+`.gitignore` covers the raw JSON. Re-deriving it is three commands
+[source: findings-log/2026-10-12-published-pointers/FINDINGS.md].
+
 ## The 34 regional keys
 
 Ten differing keys are documented. The remaining differing key names are **Unknown** — not
@@ -114,9 +259,19 @@ schema ships `null` there and populated only on trials.
 
 Also regional: `personal.countries.certification.enabled` is `["FR","YT","NC","PF"]` on EU
 (an EU MDR certification rollout in progress) and empty elsewhere;
-`personal.third.party.apps` is `DS_EMEA_1_GLOOKOXT` on EU and `DS_AMERICANS` on US, with
-no equivalent on trials; `outages.nextupdateat` is populated on trials only; each
-deployment has its own reCAPTCHA site key and Mixpanel token.
+**⚠ `personal.third.party.apps` is an ARRAY, not a string, and the count is 4 on EU,
+1 on US, `null` on trials** (corrected 2026-10-12; this page recorded a single value per
+deployment). Each entry is an object, and **the two planes' entries differ in shape**: EU
+entries carry 7 subkeys, the single US entry carries those plus `consentDate` and
+`expiresInDays` (9), so a client requiring `consentDate` sees it on one deployment only.
+The four EU integrations and their three Auth0 clients were already recorded on 2026-10-08
+[source: findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md §1]; what is new is that
+**US has one and trials has none**. Same class as Correction 1 above: a scalar reading
+of an array [source: findings-log/2026-10-12-published-pointers/FINDINGS.md §6].
+
+Separately, and unaffected by the correction above: `outages.nextupdateat` is populated
+on trials only (re-verified 2026-10-12), and each deployment has its own reCAPTCHA site
+key and Mixpanel token.
 
 **Live drift, recorded 2026-10-09 → 2026-10-10:**
 `personal.common.core.reporting.enabled.countries` grew **17 → 29** (AU, HR, CZ, EG, GE,

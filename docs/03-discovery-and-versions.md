@@ -232,6 +232,78 @@ bare `connect/v2` **live and POST-only**
 two hosts — dead on `.eu` is not evidence of dead elsewhere, and that is a named
 successor area rather than an assumption.
 
+**Update 2026-10-12 (area U):** that caveat is **discharged**. The same six cells —
+`pde/v{1,2,3}/display/message`, `pde/v3/discover/android/3.6`, `csr/v1`, `csr/v3` —
+are **dead on both methods on both remaining hosts**: 24 of 24 cells
+`403 MissingAuthenticationTokenException`, no CORS, controls run first on each host,
+32 of a 32 cap. All 28 no-route bodies in the pass are byte-identical (42 B,
+`sha256:f249b63cb2fc`), and that digest is **also** the `.eu` no-route digest recorded
+by Area C — so the router's no-route response is one artefact shared by all three
+hosts, not three lookalikes [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md].
+
+### 9a. ⚠ The published PDE base URL cannot answer, anywhere it is published
+
+**OBSERVED**, and this is the load-bearing consequence of the three preceding updates.
+
+`baseUrlPde` is the **only** base URL in the discovery document whose target has no
+route. Every region of every document read on 2026-10-12 publishes one:
+
+| document | regions | `baseUrlPde` | the route it names |
+|---|---|---|---|
+| `clcloud.minimed.eu` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no GET or OPTIONS route**, either recorded path, all 3 hosts |
+| `clcloud.minimed.com` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route, any method, any host** |
+| `clcloud.minimed.com` `v11/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
+| `clcloud-trials.minimed.com` `v6/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
+
+**A dead route behind a published base URL is a different fact from "the vendor has a
+dead route."** The discovery document exists so that a client can resolve its
+endpoints from the vendor's own published configuration — that is its entire purpose,
+and it is the mechanism this repo's consumer uses. A key that is always present and
+never resolvable is a trap published by the vendor's own contract surface, and it is
+pinned on both sides: `01-discovery-pin.hurl` asserts the promise, `04-deep-surface.hurl`
+asserts the route is absent.
+
+**INFERRED — and this is the one inference in this section, so its assumption is
+stated:** that this is a **retired service left in the document** rather than a
+deliberate "ignore this key" contract. The reasoning: the same document's
+`baseUrlCumulus` is load-bearing, so a published base URL is meant to be used, and a
+uniformly dead one is more consistent with an oversight than with a contract. **The
+assumption is that publishing a base URL implies intending it to be called, and
+nothing observed here settles that** — the namespace 403s *before any application code
+runs*, so a client can never reach the point of deciding to ignore it, and no
+client-side evidence of intent exists to be gathered. Both readings are given rather
+than one picked [findings-log/2026-10-12-published-pointers/FINDINGS.md §2b].
+
+### 9b. ⚠ The discovery document publishes **no** CSR base URL — and it does not need to
+
+**OBSERVED.** `baseUrlCsr` does not exist in any region of any of the four discovery
+documents; the discovery document is not where `csr/v2` is addressed (Pinned as a
+negative assertion in `01-discovery-pin.hurl`.)
+
+That is **not** the same as "`csr/v2` is unaddressable". The **public config** names it,
+in two independent keys, on all three deployments:
+
+| key | value (EU) |
+|---|---|
+| `system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl` | `https://clcloud.minimed.eu/connect/csr/v2/display/message` |
+| `csr.cumulus.periodic.data.endpoints.display_message` | `https://clcloud.minimed.eu/connect/csr/v2/display/message` |
+
+Both carry the same URL, and the host is always the deployment's own sibling. So the
+two planes are addressed by **different documents**: `baseUrlPde` from discovery, and
+`csr/v2` from config. "No key of that name exists" was never the question — see
+[`docs/04`](04-configuration.md) §The published pointer set, which also records that the
+**bare** `/connect/v2` is named by no published document at all, making the asymmetry
+between the two POST-only routes durable [findings-log/2026-10-12-published-pointers/FINDINGS.md §1, §4].
+
+> **⚠ Correction to a claim this repository made about itself.** `docs/11` area T was
+> opened on the premise that no `/connect/csr/v2` string was recorded anywhere — and it
+> already was, on 2026-10-08, with its value, in
+> `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md` §1 line 99. It never reached
+> `docs/`, and a derived note (`docs/04`, key listed with no value) then let a successor
+> area assert a negative its own log contradicted. **The finding was never lost; it was
+> lost between the log and the docs.** Grepping this repo's own logs before writing an
+> area costs nothing and would have caught it.
+
 ### 10. Post-2026-10-10 version-axis work
 
 `recon/VERSION-AXIS.md` (2026-10-10) is the pass behind §2–§8: 70 requests, hard cap

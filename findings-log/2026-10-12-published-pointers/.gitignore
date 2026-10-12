@@ -1,0 +1,24 @@
+# Raw captures from this pass — deliberately NOT committed.
+#
+# The 69-key public config is unauthenticated and carries credential-shaped values
+# (a reCAPTCHA site key, and an x-api-key under each of the two `nutrino.cc.*`
+# service keys). docs/04-configuration.md holds the cross-deployment comparison of
+# those back for a disclosure decision, so this repo publishes none of the values.
+#
+# Committing docs/*.json would therefore put credentials in the diff. The
+# committable form of this pass is the REDACTION, not the capture:
+#
+#   probe.sh            what was requested, one line per request (no bodies)
+#   requests.tsv        method / host / path / status / bytes / content-type
+#   enumerate.py        the enumeration itself — re-runnable, so the searched
+#                       key list is auditable without the raw bytes
+#   scrub.py            redacts a capture into a committable extract
+#   enumeration-scrubbed.txt   the full enumeration, values replaced by typed
+#                       placeholders and self-checked against scrub-patterns.txt
+#   credential-shapes.py / .txt   key paths, lengths and character-class shapes
+#                       only; no value is printed, hashed or compared
+#
+# To re-derive: bash probe.sh && python3 enumerate.py > enumeration.txt \
+#               && python3 scrub.py enumeration.txt enumeration-scrubbed.txt
+docs/
+enumeration.txt

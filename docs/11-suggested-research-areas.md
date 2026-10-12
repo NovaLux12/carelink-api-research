@@ -68,62 +68,71 @@ flags are where an inconsistency would actually mislead a client.
 
 **Closes when:** the sweep is either complete or the contradictions are enumerated.
 
-### T. Does any published document point a client at `csr/v2`, or is it a namespace no config can address?
+### V. Given that `baseUrlPde` names a dead namespace, does any vendor client follow it?
 
-`connect/csr/v2/display/message` is live and POST-only on **all three** cumulus
-hosts (OBSERVED, [findings-log/2026-10-12-csr-cross-host/FINDINGS.md]). It sits one
-namespace above the `carepartner` legs, and **no recorded document names it** —
-the discovery documents declare `baseUrlPde` and the carepartner base URLs, and the
-69-key public config declares `csr.control.codes.settings` and
-`csr.cumulus.periodic.data.endpoints`, but no `baseUrlCsr` and no
-`/connect/csr/v2` string is recorded anywhere.
+Added 2026-10-12. **Derived from area T + area U** — this could not have been written
+before 2026-10-12, because until then the published base URL set had never been
+enumerated and nobody knew `baseUrlPde` was the one unroutable pointer in the corpus.
 
-That matters more than it looks: a route that exists but that **no config-driven
-client is pointed at** is unreachable by the entire class of clients that read
-their endpoints from the vendor's own documents — a different fact from "live",
-and the difference decides whether anyone can use it.
+`baseUrlPde` is published on **every region of every discovery document** and resolves
+to `/connect/pde/v3`, which has **no GET or OPTIONS route for either recorded path
+under it**, on all three cumulus hosts (OBSERVED,
+[findings-log/2026-10-12-published-pointers/FINDINGS.md §2b];
+[findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md]). The same day, a different
+key — `system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl` — turned out to
+be live, load-bearing and already switched on.
 
-**Blocker:** none for the offline half. Enumerating the discovery documents and
-the public config for `csr`-shaped keys is a grep over documents already on disk,
-zero requests. The live half is one unauthenticated config read per host.
+**What is missing:** whether the vendor's own frontends act on the published flags.
+`system.gc.gz.transition.flags` has **five sibling capability booleans, all `true`**
+(`pullGMInfoFromCumulus`, `pullSMSHistoryFromCumulus`, `sendDiagnosticLogsToCumulus`,
+`sendPeriodicToCumulus`, `sendSMSFromCumulus`), which says five capabilities already
+moved to Cumulus — so the flag mechanism is demonstrably in use. Nobody has ever looked
+for a `pde`-shaped token in a frontend bundle, because nobody knew the key existed.
 
-**Closes when:** every recorded discovery document and the 69-key public config are
-enumerated for `csr`-shaped base-URL keys, and either a base URL is named with its
-source, or the negative "csr/v2 exists but no published document points at it" is
-recorded **with the key list that was searched** so the negative is auditable
-rather than merely asserted. A negative counts and closes it.
+**Blocker:** one offline grep pass over the patient and clinician bundle captures for
+`pde` / `baseUrlPde` / `transition.flags` tokens — **zero requests** if those captures
+are still on disk. If they are not, this becomes a token- and artefact-blocked row and
+belongs in the table at the top of this page instead.
 
-**Assumptions (INFERRED):** that `csr/v2` is an internal or deprecated route
-rather than a client-addressable one — inferred from the *absence* of a recorded
-base URL, which is not the same as having searched every document for one. If the
-grep finds nothing, the inference has become an observation and this area's real
-output is the key list.
+**Closes when:** the bundles are searched for `pde`-shaped tokens and the result is
+**either** a call site that uses the published `baseUrlPde` value, **or** a recorded
+negative that no client in the corpus addresses PDE at all — in which case the vendor
+publishes a base URL that nothing follows, which is the finding. **A negative counts**,
+and is the likelier of the two outcomes given the namespace 403s before application code.
 
-### U. Are the `csr/v1`, `csr/v3` and PDE cells dead on `.com` and `-trials` too, or only on `.eu`?
+**Assumptions (INFERRED):** that the bundles on disk are the ones the shipped apps load.
+They were captured 2026-10-08 and **never re-fetched**, so a bundle version bump would
+invalidate the negative — state the capture date with the result, always.
 
-Area N confirmed the **positive** cells are global and said nothing about the
-negative ones. `docs/10-open-questions.md` §2 records "no route on any tested
-method" for `csr/v1`, `csr/v3` and the PDE set — but that verdict rests on
-`clcloud.minimed.eu` alone (OBSERVED,
-[findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md]). A dead namespace on one
-region is not evidence of a dead namespace on another, and this repo has already
-been bitten once by a single-host row propagating into a three-host claim
-(`AGENTS.md` §6 item 1).
+### W. Is the per-key projection a complete enumeration path for the 69-key document?
 
-**Blocker:** none. Six recorded paths × two hosts × GET + OPTIONS = 24 requests,
-plus the four control cells per host. Every candidate is a path already recorded
-in the Area C harness — no wordlist, no version neighbours added beyond the set.
+Added 2026-10-12. **Derived from area T**, which produced the full 69-key name list for
+the first time and showed the document's shape is **not** uniform.
 
-**Closes when:** each of the six paths has a GET + OPTIONS verdict on
-`clcloud.minimed.com` and `clcloud-trials.minimed.com` with controls first on each
-host, and `docs/10` §2's row is either confirmed everywhere or restated with its
-actual host coverage. **A negative counts in both directions:** finding one of them
-live on another host is as valuable as confirming all dead.
+The per-key form at `/patient/configuration/system/<key>` returned **21/21**
+byte-identical subtrees for non-null keys, and null-valued keys 404 — so the form cannot
+tell "absent" from "null", and `docs/04` rejected it under `/patient/v2/`. But it has
+never been run in the **reverse** direction: from a name the bulk document does not
+carry to the per-key form. Nobody knows whether that namespace has keys the bulk
+document does not.
 
-**Assumptions (INFERRED):** that route registration is uniform across the three
-cumulus stages. Area N's three positive cells all agreed, which is suggestive and
-not conclusive — three agreeing samples do not establish uniformity, and the
-negative cells are a different namespace.
+**What is missing:** whether the two key sets are identical. Area T also found the
+document's **68 of 69 key *names* are literal dotted strings and exactly one is a bare
+segment** (`captcha`), while 28–30 of the keys hold object *values*. A reverse probe
+therefore has to decide what "name" means before it can be bounded: a naive splitter on
+`.` misses `captcha`, and a type-blind walker misses every object-valued key.
+
+**Blocker:** none, and the candidate list is finally closed: 69 flat names plus
+`captcha`'s four subkeys, all derived from documents on disk. Only the null-valued ones
+(5 per patient deployment, 6 on trials) need the 404-means-absent-or-null rule stated.
+
+**Closes when:** every key the bulk document carries has a per-key verdict on one
+deployment, **and** any per-key name outside the bulk document is recorded. **A negative
+— identical key sets — closes it**, and would retire the "69-request enumeration path"
+framing in `docs/04`.
+
+**Assumptions (INFERRED):** that the per-key grammar is keyed off the same flat-name
+form on all three deployments. Only one deployment has ever been swept.
 
 ### O. Is `/patient/reports/*` on `carelink.*` the reports surface for every region?
 
@@ -370,7 +379,9 @@ being superseded — never silently. Letters are not reused.
 |---|---|---|---|---|
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |
 | N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
-
+| N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
+| U — are the `csr/v1`, `csr/v3` and PDE cells dead on `.com`/`-trials` too, or only on `.eu`? | 2026-10-12 | **Negative, 3 hosts wide.** All six cells dead on **both** methods on both remaining hosts — 24 of 24 cells `403 MissingAuthenticationTokenException`, controls first on each host, 32 of a 32 cap. All 28 no-route bodies byte-identical (42 B, `sha256:f249b63cb2fc`), and that digest matches the `.eu` capture, so the router's no-route response is one artefact shared by three hosts. `docs/00`'s "Not re-probed on `.com`/`-trials`" caveat is **discharged**; nothing flipped to live | [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] | #11 |
+| T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
 ---
 
 > **Consumer note.** Findings here are consumed by

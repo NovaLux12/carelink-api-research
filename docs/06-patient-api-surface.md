@@ -209,6 +209,31 @@ per request — so it cannot be settled from outside (OBSERVED negative,
 [findings-log/2026-10-12-csr-cross-host/FINDINGS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-csr-cross-host/FINDINGS.md)
 §Correction).
 
+### ⚠ Which of the two POST-only routes a client can actually address (2026-10-12)
+
+**OBSERVED** [source: findings-log/2026-10-12-published-pointers/FINDINGS.md §1, §4] —
+10 of a 12 cap, GET only. **The two routes are not equally reachable, and the
+difference is not "live vs dead":**
+
+| route | published by | reachable by a config-driven client |
+|---|---|---|
+| `connect/csr/v2/display/message` | the **public config**, twice — `system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, both carrying the same URL, on all three deployments | **yes** |
+| bare `connect/v2/display/message` | **nothing** — zero hits for `/connect/v2` across all ten documents read | **no** |
+
+Both are live and POST-only on all three hosts. Only one is *addressable*, because only
+one is named by a document a client reads. **INFERRED, assumption stated:** that a
+client which resolves its endpoints from the vendor's own published configuration can
+therefore reach `csr/v2` but has no way to learn the bare route's URL — the assumption
+is that clients derive endpoints from these documents rather than hardcoding them, which
+is the documented intent of the discovery/config mechanism and this repo's own consumer
+does exactly that. A client that hardcodes the bare route would not be affected.
+
+`baseUrlCsr` does **not** exist in the discovery document — so the two planes are
+addressed by **different documents**, and the negative is pinned in
+`regression/hurl/01-discovery-pin.hurl`. The `csr/v2` namespace also has at least a
+**second** member the config publishes, `…/periodic/packet`, on an internal
+VPC-endpoint host: **recorded, not probed**.
+
 ## ⚠ `access-control-allow-methods` is not a register of a route's methods
 
 **Corrected 2026-10-12. The original wording is kept visible above.**
