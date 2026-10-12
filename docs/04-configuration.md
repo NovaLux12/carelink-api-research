@@ -406,6 +406,11 @@ findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md §5].
 values as **two separate checks**, because one check asserting "they differ"
 would keep passing after a vendor fix.
 
+**Downstream:** the 2 → 30 correction changes a value a client pins, so it is
+tracked for the consumer at
+[#29](https://github.com/NovaLux12/carelink-api-research/issues/29)
+(`downstream-bridge`).
+
 ### Other country-dependent keys
 
 | key | varies |

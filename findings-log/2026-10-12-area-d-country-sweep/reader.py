@@ -203,10 +203,14 @@ def r_region_cumulus_host(doc, cc):
     NOTE ON WHAT THIS DOES NOT CLAIM. A first version of this rule asserted
     that every endpoint host must match the region's TLD, and fired on US and PR
     (region US, ble endpoint clcloud.minimed.eu). That assertion is REFUTED by
-    the repo's own record: docs/04-configuration.md:376 records
-    `blePereodicDataEndpoint` as CONSTANT at clcloud.minimed.eu across all 18
-    swept countries, US among them. So the .eu value is a recorded constant, not
-    a contradiction, and the rule as written would have manufactured a finding.
+    the repo's own record: `blePereodicDataEndpoint` is recorded as a CONSTANT
+    at clcloud.minimed.eu across all 18 swept countries, US among them
+    (docs/04-configuration.md, "Constant across all 18 countries" block — cite
+    by the claim, not by a line number, because this file's own branch edits
+    docs/04 and a line cite would silently rot; the underlying observation is
+    findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:189). So the
+    .eu value is a recorded constant, not a contradiction, and the rule as
+    written would have manufactured a finding.
     What survives is the weaker and defensible statement below: the two endpoint
     keys disagree with EACH OTHER inside one document. No claim is made here
     about which of the two is right."""
@@ -253,7 +257,7 @@ def r_state_codes_vs_region(doc, cc):
     requested, and the prefix rule above already checks exactly that. The rule
     would have reported Canada's provinces as a vendor defect.
 
-    What remains: US and PR both carry region "US", US carries 51 subdivision
+    What remains: US and PR both carry region "US", US carries 50 subdivision
     codes and PR carries none. That is a real asymmetry between two documents
     the same endpoint returns for the same region, and it is the only statement
     this pass makes about it — PR genuinely has no subdivisions of its own, so
@@ -628,7 +632,11 @@ def r_tech_247(doc, cc):
 def r_tech_clock_shape(doc, cc):
     """FLAG-INFERRED, not a contradiction: an assumption about parsers, not
     about the document. Recorded because the repo already carries one parser
-    break here (docs/04-configuration.md:238, NL's dotted clock)."""
+    break here — NL's dotted clock, in
+    findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:239. It is NOT
+    in docs/04: an earlier version of this docstring cited docs/04:238 for it,
+    which was already wrong at the base commit — that line reads "itemised in any
+    source". docs/04:419 summarises techHours without the dotted-clock detail."""
     out = []
     th = typed(doc, 'techHours', 'str')
     if isinstance(th, str) and not th.startswith('24/7'):
@@ -746,12 +754,49 @@ def analyse(cc, body_path):
 
 
 def main():
+    """Shipped invocation: `python3 reader.py bodies`.
+
+    The country code is derived from the filename by stripping the `cc-` PREFIX
+    as well as the `.json` suffix. An earlier version stripped 5 characters
+    (`name[:-5]`) and so produced `cc-CA` from `cc-CA.json`; `r_state_codes_prefix`
+    then tested codes against the literal prefix `cc-CA-`, which nothing matches,
+    emitting two spurious tier-1 findings for CA and US — re-running the shipped
+    reader gave 53 tier-1 against the 51 in the committed `verdicts.jsonl`.
+
+    The committed artefact was never wrong: `report.py` passes the code from
+    `run.log`, not from the filename. The defect was that the shipped entry point
+    could not reproduce it, which fails AGENTS.md §10's re-run bar. Found by
+    re-running the shipped command, which is why it is checked below.
+
+    ROW ORDER matters and is taken from `run.log` when it is present, because
+    that is the order `report.py` used to write `verdicts.jsonl` — the order the
+    controls come first. Sorting the filenames instead sorts `cc-AD` ahead of
+    `cc-GB`, which reorders every row and makes the output differ from the
+    committed artefact byte-for-byte even when every record is identical.
+    """
     bodies, out = sys.argv[1], sys.stdout
-    for name in sorted(os.listdir(bodies)):
+    runlog = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'run.log')
+    order = []
+    if os.path.exists(runlog):
+        with open(runlog, encoding='utf-8') as fh:
+            for line in fh:
+                if line.startswith('#') or not line.strip():
+                    continue
+                parts = line.rstrip('\n').split('\t')
+                if len(parts) >= 2:
+                    order.append(parts[1])
+    names = [f'cc-{cc}.json' for cc in order]
+    names += [n for n in sorted(os.listdir(bodies))
+              if n.endswith('.json') and n not in names]
+    for name in names:
         if not name.endswith('.json'):
             continue
-        cc = name[:-5]
-        rec = analyse(cc, os.path.join(bodies, name))
+        path = os.path.join(bodies, name)
+        if not os.path.exists(path):
+            continue
+        base = name[:-len('.json')]
+        cc = base[len('cc-'):] if base.startswith('cc-') else base
+        rec = analyse(cc, path)
         out.write(json.dumps(rec, sort_keys=True) + '\n')
 
 

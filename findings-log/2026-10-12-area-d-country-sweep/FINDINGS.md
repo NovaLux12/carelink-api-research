@@ -37,31 +37,44 @@ a value was absent, the literal `(none)` stands in place of the value.
 ### Delay between requests
 
 `probe.sh` sleeps **2.5 s between requests to the same host**, inside the
-per-host lock `.loop/host-carelink.minimed.eu.lock` (three other pool workers
-share this machine and this host). Measured from `run.log`, over the 118
-consecutive same-host gaps:
+per-host lock (three other pool workers share this machine and this host).
+
+**The canonical measurement is the body-file mtime series, not the harness's own
+`date` series.** `curl` wrote each body with `-o bodies/cc-XX.json`, so the
+**kernel** set that mtime when the write completed — a series independent of the
+`date` calls that are themselves under suspicion.
+
+**Counting rule**, so this number cannot be re-derived differently: one gap per
+consecutive pair **in request order** taken from `run.log` (4 controls first,
+then the sweep in `candidates.txt` order), measured as `mtime[n+1] − mtime[n]`;
+**119 bodies, 118 gaps**; the two 400 envelopes (`ZZ`, `ID`) included, since
+they were requested like any other and carry the same mtimes.
 
 | Series | gaps | >=2.5 s | **<2.5 s** | **<2.0 s** | min | max |
 |---|---|---|---|---|---|---|
-| `t_sent` (in-lock, after the sleep) | 118 | 104 | **14** | **8** | **1.642 s** | 3.515 s |
-| `t_queued` (before the lock is taken) | 118 | 108 | **10** | **2** | **1.792 s** | 3.377 s |
+| **`bodies/` mtime (kernel-set) — canonical** | 118 | **118** | **0** | **0** | **2.575 s** | 2.636 s |
+| `t_sent` (harness `date`, in-lock) | 118 | 104 | 14 | 8 | 1.642 s | 3.515 s |
+| `t_queued` (harness `date`, pre-lock) | 118 | 108 | 10 | 2 | 1.792 s | 3.377 s |
 
-**Both series are reported because this is the fourth pass in a row to record
-one, and this one is materially worse than the last three.** Stated rather than
-rounded away: the `t_sent` series has **14 gaps below the declared 2.5 s and 8
-below the repository's own `>=2 s` floor, with a minimum of 1.642 s**, against
-one occurrence each in areas B (2.033 s), X (2.291 s) and Z (5 of 48, min
-2.042 s).
+**The `>= 2 s` repository floor was never breached: 0 of 118 gaps below it.**
 
-**What this pass can add that the previous three could not**, because the
-harness recorded a third timestamp (`t_done`) as well as the two others:
+The mtime span is **304.9 s**, which equals both harness spans (304.9 s) to the
+tenth of a second — the cross-check `ledger.py` now emits, and the reason the
+series can be trusted as the run's own files rather than a checkout artefact.
 
-**11 of 119 requests have a NEGATIVE duration** — `t_done` earlier than
-`t_sent`. A request cannot end before it starts, so on those 11 the two
-timestamps disagree about their own request. **10 of the 14 sub-2.5 s gaps sit
-immediately after such a request**, and each is predicted to within **0.020 s**
-by `2.5 + duration(n)` — the declared sleep plus the previous request's own
-(negative) measured duration:
+**Limit of this oracle, stated because it bounds its reuse.** Git does **not**
+preserve mtimes: on a fresh clone or `git archive` the 119 body files all carry
+the checkout time and the spread collapses to **0.0 s** (verified). So this
+measurement is valid **only on the machine that ran the probe**, and what gets
+committed is the **number**, not the ability to re-derive it. `ledger.py`
+re-checks the span on every run and says so either way.
+
+**Why the two `date` series are reported at all, given the above.** They are the
+fourth pass in a row to record a same-host gap below its own declared sleep, and
+this pass added the evidence that the series is not to be trusted: **11 of 119
+requests carry a NEGATIVE duration** (`t_done` earlier than `t_sent`), which is
+impossible, and **10 of the 14 sub-2.5 s gaps are predicted to within 0.020 s**
+by `2.5 + duration(n)`:
 
 | pair | observed sent-gap | predicted `2.5 + dur(n)` | residual | dur(n) |
 |---|---|---|---|---|
@@ -77,21 +90,14 @@ by `2.5 + duration(n)` — the declared sleep plus the previous request's own
 | 105 → 106 | 2.011 s | 1.992 s | +0.019 s | −0.508 s |
 
 **Four gaps are NOT explained this way** — 45→46, 57→58, 69→70 and 117→118.
-Three of them (45→46, 57→58, 117→118) follow a request with a *positive*
-duration and a residual of −0.65 to −0.86 s, so the shortfall sits in the
-`t_done → t_sent` interval, which is not the interval the sleep occupies.
-69→70 straddles a negative-duration request and does not fit the arithmetic
-cleanly either.
+Three follow a request with a *positive* duration and a residual of −0.65 to
+−0.86 s, so the shortfall sits in the `t_done → t_sent` interval, which is not
+the interval the sleep occupies. 69→70 straddles a negative-duration request
+and does not fit cleanly either.
 
-**No cause is asserted.** The negative durations are consistent with a wall
-clock that does not advance uniformly across these `date` invocations; that is
-an INFERRED reading of the timestamps, not an established fact, and
-`docs/09` §4 declines to assert that cause anywhere either. What is established
-is narrower and is stated as such: **the timestamps on this run cannot all be
-faithful simultaneously**, so the measured spacing floor above is a property of
-the clock reading, not a demonstrated request rate. `probe.sh` declared
-`>= 2.5 s` between requests to one host inside a lock, and the lock is what
-actually serialises it.
+**No cause is asserted** for the `date` series' behaviour, consistent with
+`docs/09` §4. What is established, and is the operationally relevant fact:
+**the `>= 2 s` rule was met**, by the one series not produced by the suspect.
 
 ---
 
@@ -134,8 +140,8 @@ list is committed in `candidates.txt` so the sweep can be repeated without it.
 | seq | code | role | status | what it proved |
 |---|---|---|---|---|
 | 1 | `GB` | CONTROL-live | **200** | The endpoint serves and the reader parses: **33 keys**, all 33 reference keys resolved, **zero** contradictions, zero flags. The two unit keys agree (`MMOL_L`/`MMOL_L`). A known-live positive control on the recorded shape (OBSERVED, `docs/04-configuration.md:340`). |
-| 2 | `BE` | CONTROL-contradiction | **200** | **The detector reproduces the repo's only positive contradiction evidence.** `bgUnits = MG_DL`, `glucoseUnitsDefault = MMOL_L`, exactly as `docs/04:353` records. The reader is validated against a known contradiction before 115 further requests are spent on it. |
-| 3 | `CH` | CONTROL-contradiction | **200** | Served, but **did not reproduce** — `docs/04:353` records CH as the second contradicting country and **CH is coherent today** (§4). Reported as a **correction**, not smoothed over. |
+| 2 | `BE` | CONTROL-contradiction | **200** | **The detector reproduces the repo's only positive contradiction evidence.** `bgUnits = MG_DL`, `glucoseUnitsDefault = MMOL_L`, exactly as `docs/04:379` records. The reader is validated against a known contradiction before 115 further requests are spent on it. |
+| 3 | `CH` | CONTROL-contradiction | **200** | Served, but **did not reproduce** — `docs/04:379` records CH as the second contradicting country and **CH is coherent today** (§4). Reported as a **correction**, not smoothed over. |
 | 4 | `ZZ` | CONTROL-absent | **400** | `{"field":null,"message":"Error! Country:ZZ Not Supported","params":{}}`, 87 B. A missing country is a **3-key error envelope, not a short document** — which is what makes "key absent" and "value null" distinguishable at all, and matches `docs/04:337`. |
 
 **The BE/CH control did what it was sent for, including by failing.** Had CH
@@ -156,7 +162,7 @@ country endpoint. `ID` is the **only** one of the 118 refused.
 
 ## 4. The headline finding — the recorded contradiction is not a two-country quirk
 
-`docs/04:346-356` records exactly two contradicting countries, BE and CH. Swept
+`docs/04:364-383` records exactly two contradicting countries, BE and CH. Swept
 across every country the vendor's own config lists, the shape is far larger:
 
 | `bgUnits` | `glucoseUnitsDefault` | countries | client consequence |
@@ -173,7 +179,7 @@ the first 30 rows of [`contradictions.tsv`](contradictions.tsv).
 AE AR AW BE BO BR CO CW EC EG ES GR IL IN IT JM JP KR LB MV MX NC PE PK SA SD TH TT UY VE
 ```
 
-> ⚠ **Correction to a published claim.** `docs/04:353` — "**BE and CH report
+> ⚠ **Correction to a published claim.** `docs/04:379` — "**BE and CH report
 > `MG_DL` for `bgUnits` but `MMOL_L` for `glucoseUnitsDefault`**" — is
 > **incomplete and, for CH, no longer true.**
 >
@@ -191,7 +197,7 @@ AE AR AW BE BO BR CO CW EC EG ES GR IL IN IT JM JP KR LB MV MX NC PE PK SA SD TH
 > 119 requests, 117 country documents, 2 error envelopes (`ZZ`, `ID`) excluded.
 > The three drifted countries are computed by comparing each live value against
 > the value recorded at
-> [`docs/04-configuration.md:350-351`](https://github.com/NovaLux12/carelink-api-research/blob/main/docs/04-configuration.md);
+> [`docs/04-configuration.md:376-377`](https://github.com/NovaLux12/carelink-api-research/blob/main/docs/04-configuration.md);
 > the other 15 of the 18 reproduce exactly.
 
 **This is the finding that changes what a client must do**, and it is the reason
@@ -272,7 +278,7 @@ faults.
 ### Flags — 74, INFERRED rules, reported and not counted
 
 `techHours` outside a strict `H:MM - H:MM` shape in **74** countries. This
-extends the repo's recorded NL finding (`docs/04:238`) to 74 countries, and the
+extends the repo's recorded NL finding (`findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:239`) to 74 countries, and the
 shape varies (`08:30-17:00`, `8.30 - 17.00`, `7:00 am - 7:00 pm CST`). The rule
 is an assumption about parsers, not a claim about the vendor, so it is a flag.
 
@@ -289,7 +295,7 @@ container-type assertion at each step — never `//`, never a bare dotted
 > ⚠ **Two corrections to `docs/04`, both from the `absent`-vs-`null` confusion
 > this repo has already been bitten by twice.**
 >
-> - **`cpMobileAppAvailable`** — `docs/04:377` says it "is `false` for 16
+> - **`cpMobileAppAvailable`** — `docs/04:428` says it "is `false` for 16
 >   countries and **`null` for GB and IE only**". Measured across 117 live
 >   documents: **ABSENT in 41**, `false` in **75**, `true` in **1** (AU), and
 >   **`null` in zero of 117**. So the key is **never null**, it is **absent in
@@ -298,7 +304,7 @@ container-type assertion at each step — never `//`, never a bare dotted
 >   pins `jsonpath "$.cpMobileAppAvailable" not exists` for GB, with the
 >   comment "**GB does not even carry the flag — the key is absent, not
 >   false**". **`docs/04` was contradicting the repo's own pinned assertion.**
-> - **`stateCodes`** — `docs/04:367` says it is "`null` for all 17 others".
+> - **`stateCodes`** — `docs/04:418` says it is "`null` for all 17 others".
 >   Measured: **ABSENT in 115 of 117**, present in exactly **CA** and **US**,
 >   and `null` in **none**.
 
@@ -329,7 +335,7 @@ Recorded because a reader that cannot fail is worse than no reader
    contradiction that does not exist. Fixed to a case-insensitive pattern.
 2. **Two rules asserted things the repo's own record refutes.** A rule firing on
    *any* endpoint host not matching the region flagged **US and PR** — but
-   `docs/04:376` records `blePereodicDataEndpoint` as **constant** at
+   `docs/04:427` records `blePereodicDataEndpoint` as **constant** at
    `clcloud.minimed.eu` across all 18 swept countries, US included, so the `.eu`
    value is a recorded constant and the rule would have invented a finding.
    A second rule flagged **CA** for carrying subdivisions on a non-US region —
@@ -374,7 +380,8 @@ The `bgUnits` / `glucoseUnitsDefault` split is exactly the class AGENTS.md §3
 calls out: a finding that changes a value a client pins. **A bridge reading one
 unit key mis-scales glucose in 30 countries, not the 2 `docs/04` records.**
 That is a `downstream-bridge` matter and is filed as such, separate from this
-PR, naming the pinned constant.
+PR, naming the pinned constant:
+[#29](https://github.com/NovaLux12/carelink-api-research/issues/29).
 
 ---
 

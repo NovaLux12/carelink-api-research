@@ -20,7 +20,7 @@
 # Order is load-bearing: the four controls go FIRST, before any sweep.
 #   1. GB  CONTROL-live        a country the repo records as served (docs/04:340)
 #   2. BE  CONTROL-contradiction  the only internal contradiction the repo has
-#   3. CH  CONTROL-contradiction  evidence for (docs/04:353). If these two come
+#   3. CH  CONTROL-contradiction  evidence for (docs/04:379). If these two come
 #      back clean, the reader is wrong OR the drift was fixed, and either way
 #      that has to be known at control time rather than after 114 requests.
 #   4. ZZ  CONTROL-absent      the repo's recorded bogus code (docs/04:337) —

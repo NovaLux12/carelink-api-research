@@ -1,9 +1,33 @@
 # Measured same-host gaps on carelink.minimed.eu (the only host this
-# pass contacted). Both timestamp conventions are reported: the
-# declared-sleep series (t_sent, in-lock after the sleep) and the
-# queue series (t_queued, before the lock is taken). The repo rule
-# is >= 2 s on the same host. No cause is asserted for any gap
-# below the harness's declared 2.5 s.
+# pass contacted).
+#
+# THE CANONICAL MEASUREMENT IS THE MTIME ONE, NOT THE `date` ONE.
+#
+# ORACLE: body-file mtimes. probe.sh writes each response body
+# with `-o bodies/cc-XX.json`, so the kernel sets that mtime when
+# the write completes. It is independent of the harness's own
+# `date` calls, which is what makes it the one series here that
+# does not depend on the thing under suspicion.
+#
+# LIMIT OF THIS ORACLE — read before reusing it. Git does NOT
+# preserve mtimes: on a fresh clone or `git archive` the body
+# files all carry the checkout time and the spread collapses to
+# 0.0 s. Valid only on the machine that ran the probe, so the
+# NUMBERS get committed. Verify the series is real before
+# trusting it: the mtime span should equal the harness span.
+#
+# The `date` series follow, reported because they disagree with
+# the canonical one and the disagreement is itself the finding.
+# No cause is asserted for any gap below the declared 2.5 s.
+CANONICAL — bodies/ mtime (kernel-set at write time)
+  counting rule: one gap per consecutive pair in run.log REQUEST ORDER,
+  (mtime[n+1]) - (mtime[n]); 119 bodies, 118 gaps; the two 400
+  envelopes (ZZ, ID) are included. min 2.575s  max 2.636s  <2.5s: 0  <2.0s: 0
+  span: 304.9s
+  cross-check vs t_sent span 304.9s: AGREES - these are the run files
+
+NON-CANONICAL — harness `date` series (see FINDINGS.md §1;
+they cannot all be faithful: negative durations are present. No cause asserted.)
 t_sent: gaps=118 >=2.5s=104 <2.5s=14 <2.0s=8 min=1.642s max=3.515s
   1.642s  seq 69 -> 70
   1.733s  seq 64 -> 65

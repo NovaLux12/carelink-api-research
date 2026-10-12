@@ -99,7 +99,50 @@ def main():
             fh.write(json.dumps(r, sort_keys=True) + '\n')
 
     # --- spacing ------------------------------------------------------------
+    # The CANONICAL series is the body-file mtime, not the harness `date`.
+    # curl wrote each body with -o bodies/cc-XX.json, so the kernel set that
+    # mtime when the write completed — a series independent of the harness's
+    # own clock, which is the thing under suspicion. Reported first and labelled
+    # canonical; the `date` series follow, labelled non-canonical, because they
+    # disagree with it and the disagreement is the finding.
+    #
+    # LIMIT, stated in the output: git does not preserve mtimes, so on a fresh
+    # clone or `git archive` this series collapses to a 0.0 s spread. It is valid
+    # on the machine that ran the probe, and the numbers are what get committed.
     lines = []
+    mt = []
+    for r in rows:
+        cc = r['path'].split('countryCode=')[1]
+        p = os.path.join(DIR, 'bodies', f'cc-{cc}.json')
+        if os.path.exists(p):
+            mt.append((r['seq'], cc, os.stat(p).st_mtime))
+    mt.sort(key=lambda x: x[0])
+    mg = [(mt[i + 1][1], mt[i][1], mt[i + 1][2] - mt[i][2])
+          for i in range(len(mt) - 1)]
+    if mg:
+        span = mt[-1][2] - mt[0][2]
+        lines.append('CANONICAL — bodies/ mtime (kernel-set at write time)')
+        lines.append(f'  counting rule: one gap per consecutive pair in run.log '
+                     f'REQUEST ORDER,')
+        lines.append(f'  (mtime[n+1]) - (mtime[n]); {len(mt)} bodies, {len(mg)} '
+                     f'gaps; the two 400')
+        lines.append('  envelopes (ZZ, ID) are included. min %.3fs  max %.3fs  '
+                     '<2.5s: %d  <2.0s: %d'
+                     % (min(x[2] for x in mg), max(x[2] for x in mg),
+                        sum(1 for x in mg if x[2] < 2.5),
+                        sum(1 for x in mg if x[2] < 2.0)))
+        lines.append(f'  span: {span:.1f}s')
+        # Guard against reading an oracle that is really a checkout artefact:
+        # the mtime span must equal the harness span, or the series is not the
+        # run's own. Reported either way, never silently.
+        hspan = (ts(rows[-1]['t_sent']) - ts(rows[0]['t_sent'])).total_seconds()
+        agree = abs(span - hspan) < 1.0
+        lines.append(f'  cross-check vs t_sent span {hspan:.1f}s: '
+                     f'{"AGREES - these are the run files" if agree else "DISAGREES - series is NOT the run"}')
+        lines.append('')
+        lines.append('NON-CANONICAL — harness `date` series (see FINDINGS.md §1;')
+        lines.append('they cannot all be faithful: negative durations are present. '
+                     'No cause asserted.)')
     for series, key in (('t_sent', 't_sent'), ('t_queued', 't_queued')):
         times = [(r['seq'], ts(r[key])) for r in rows if ts(r[key])]
         gaps = []
@@ -117,11 +160,26 @@ def main():
             lines.append(f'  {v:.3f}s  seq {s1} -> {s2}')
     with open(os.path.join(DIR, 'spacing.txt'), 'w', encoding='utf-8') as fh:
         fh.write('# Measured same-host gaps on ' + HOST + ' (the only host this\n')
-        fh.write('# pass contacted). Both timestamp conventions are reported: the\n')
-        fh.write('# declared-sleep series (t_sent, in-lock after the sleep) and the\n')
-        fh.write('# queue series (t_queued, before the lock is taken). The repo rule\n')
-        fh.write('# is >= 2 s on the same host. No cause is asserted for any gap\n')
-        fh.write('# below the harness\'s declared 2.5 s.\n')
+        fh.write('# pass contacted).\n')
+        fh.write('#\n')
+        fh.write('# THE CANONICAL MEASUREMENT IS THE MTIME ONE, NOT THE `date` ONE.\n')
+        fh.write('#\n')
+        fh.write('# ORACLE: body-file mtimes. probe.sh writes each response body\n')
+        fh.write('# with `-o bodies/cc-XX.json`, so the kernel sets that mtime when\n')
+        fh.write('# the write completes. It is independent of the harness\'s own\n')
+        fh.write('# `date` calls, which is what makes it the one series here that\n')
+        fh.write('# does not depend on the thing under suspicion.\n')
+        fh.write('#\n')
+        fh.write('# LIMIT OF THIS ORACLE — read before reusing it. Git does NOT\n')
+        fh.write('# preserve mtimes: on a fresh clone or `git archive` the body\n')
+        fh.write('# files all carry the checkout time and the spread collapses to\n')
+        fh.write('# 0.0 s. Valid only on the machine that ran the probe, so the\n')
+        fh.write('# NUMBERS get committed. Verify the series is real before\n')
+        fh.write('# trusting it: the mtime span should equal the harness span.\n')
+        fh.write('#\n')
+        fh.write('# The `date` series follow, reported because they disagree with\n')
+        fh.write('# the canonical one and the disagreement is itself the finding.\n')
+        fh.write('# No cause is asserted for any gap below the declared 2.5 s.\n')
         fh.write('\n'.join(lines) + '\n')
     print('\n'.join(lines))
     print(f'\nrows={len(rows)}')
