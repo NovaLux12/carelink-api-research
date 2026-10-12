@@ -8,7 +8,7 @@
 **Negative on the region's existence, and positive on what actually splits the family.**
 There is no `.com` variant of `carelinkhp`. Every `carelinkhp*.minimed.{eu,com}` name
 outside the baseline is **NXDOMAIN**. The clinician-portal bundle is deployed on
-**six hosts across two TLDs**, and the split is **product role (clinic vs support),
+**five hosts across two TLDs**, and the split is **product role (clinic vs support),
 not region** — every `.eu`/`.com` pair measured serves the *same* build.
 
 Two builds exist:
@@ -36,16 +36,40 @@ bundle [serve] from `carelinkhp-prod.minimed.eu`") has no host to answer on.
 authentication, no port scan, no DNS brute force. 8 DNS lookups are recorded in
 `dns.jsonl` and are **not** counted against the cap: they are resolver traffic, not
 requests to a vendor host, and no HTTP request was issued to any host that failed to
-resolve.
+resolve. **Limitation:** that boundary is stated rather than machine-checkable —
+`dns.jsonl` records only `{host, resolver_status, a_records, probed, has_http_row}`,
+with no resolver identity, no TTL and no timestamp of its own, so a reader cannot
+re-derive from the artefact alone that eight separate lookups occurred. The count is
+auditable only by reading `probe.sh`. **The two ledgers are also not symmetric, and
+that is recorded rather than tidied away:** `dns.jsonl` holds **8 rows** covering
+batch 1's host set plus the test host, while `results.jsonl` covers **5** hosts. Two
+hosts that *were* probed over HTTP — `carelink-support.medtronic.eu` and
+`carelink.medtronic.eu`, both added in batches 2 and 3 — have **no DNS row**, because
+the resolver loop runs only in `probe.sh` and was not repeated. They resolved in
+practice; the resolver status for them is simply unrecorded.
 
 **Declared delay: 2.5 s, sleep inside the per-host `flock`.** Measured from
 `run.log`: **minimum consecutive same-host gap 2 s over 14 gaps; all 14 are ≥ the
-BRIEF's 2 s hard floor, 10 of 14 are ≥ 2.5 s.** The four short readings are a
-**logging-resolution artefact, not a short interval** — `run.log` timestamps have
-one-second resolution against a 2.5 s declared delay, so a compliant 2.5 s sleep plus
-a fast request lands anywhere in 2.4–2.9 s and truncates to 2 or 3. I did not capture
-sub-second resolution, so I am not claiming 2.5 s was measured — I am claiming the log
-**cannot resolve finer than 1 s** and never recorded a gap below the 2 s floor.
+BRIEF's 2 s hard floor, 10 of 14 are ≥ 2.5 s.** Four gaps fall below the declared
+2.5 s. **No cause is asserted for them**, per `docs/09` §4, which records this exact
+signature as an open question and instructs that a pass report the floor and the
+sub-declared gap *without* explaining it.
+
+**INFERRED, and not resolvable from the artefacts on disk.** `run.log` carries
+whole-second timestamps only — no sub-second field, no monotonic clock — and the
+timestamp is written by `log()` **after** the response returns, so it marks completion
+rather than send. Nothing on disk distinguishes **three** candidates:
+
+- whole-second truncation of a compliant 2.5 s sleep plus a fast request (which would
+  read as either 2 or 3 depending on where the interval falls within the second);
+- a transient backwards clock step of the kind area B suspected, which appears in one
+  gap and then cancels against its neighbour;
+- a post-hoc edit to `run.log`, which produces identical arithmetic.
+
+All three fit the 14 recorded gaps. I am claiming the **counts**, which are
+reproducible from `run.log` as committed, and **not** the explanation. What can be
+said without inference: no gap fell below the 2 s floor, so the rule this repo
+actually enforces was not breached.
 
 ## Controls, in the order they were sent
 
@@ -55,7 +79,7 @@ Controls were sent **first on every host**, before any candidate.
    *The same fabricated string was used on all five responding hosts, deliberately:*
    the fallback body is the question, so the fallback bodies have to be
    byte-comparable to each other and to each host's own root. A per-host nonce would
-   have produced three incomparable rows.
+   have produced five incomparable rows.
    **What it proved:** the SPA catch-all is live on all five hosts, and — the result
    that changed the pass — **the catch-all is byte-identical to the host's own entry
    document** (seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17). So a document-path probe cannot
@@ -181,10 +205,24 @@ exact 5518-byte size". **That advice is wrong in two ways this pass measured, an
 error is what produced Finding 1.**
 
 1. **There is no document-path discriminator at all.** The catch-all *is* the entry
-   document — seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17, all seven pairs byte-identical. The
+   document — seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17, all five pairs byte-identical. The
    fallback and the real portal root are the same 5518 bytes. Any probe that measures
    only a document path cannot distinguish them, and `Content-Type` cannot help because
    both are `text/html`.
+
+   > **Counting rule, so "5 of 5" is reproducible rather than asserted.** One
+   > comparison is counted per **responding host**: that host's certainly-absent-path
+   > row against that host's own `/` row, compared by sha256 of the decompressed body.
+   > The absent-path rows are `[1, 5, 9, 13, 16]` and the root rows are
+   > `[3, 7, 11, 14, 17]`, paired in order — each pair verified to be the same host
+   > before its digests were compared, so the ordering is not taken on trust. The
+   > denominator is the **five** hosts with an HTTP row. It is explicitly **not** the
+   > 8 rows in `dns.jsonl`: that file covers 3 hosts that answered HTTP, 5 that are
+   > NXDOMAIN and could not be probed, and 1 test host. And it is **not per request** —
+   > a host with three document paths would still contribute one pair.
+   > *(An earlier draft of this line said "seven pairs", which was wrong in the way
+   > `AGENTS.md` §6.7 forbids: the ledger contains five such pairs and no seventh.)*
+
 2. **Size is not a discriminator either.** 5518 B maps to **at least two distinct
    digests** — `0f2c5f6257a6fc6a…` (builds A hosts) and `f637c8d0cd4ec6bc…`
    (build B hosts). A host serving build B satisfies "5518 bytes" and is not the
@@ -213,7 +251,11 @@ HTML is not serving it — which is why seq 20 exists, to verify the build B `.c
   returns **NXDOMAIN**, so there was never an address to connect to.
 - **`carelinkhp-test.minimed.eu`** — a `test` deployment (`docs/01:103`). **Recorded
   and not probed**, per `docs/09` §1's bar on dev/stage/test contact. Resolver lookup
-  only.
+  only, and it returned **NXDOMAIN** — so the archived test deployment
+  (`docs/01:103`, PUBLISHED from Wayback) has no DNS entry today. That is an
+  observation about a name this pass deliberately never contacted; **no inference is
+  drawn about whether the deployment still runs behind a name that is not in this
+  corpus.**
 
 No `.minimed.{eu,com}` host was probed that is not named in this repository before this
 pass. No wordlist, no enumeration, no DNS brute force.
@@ -244,7 +286,7 @@ are recorded; only the log append failed, and the row was appended by hand.
 | **Build A served by `carelink.medtronic.eu`** — refutes `docs/01:69`, `docs/10` §2 | OBSERVED | `results.jsonl` seq 19 |
 | Build B served by `carelink-support.medtronic.eu` | OBSERVED | `results.jsonl` seq 15 |
 | Build B served by `carelink-support.medtronic.com` — refutes `docs/07:24`, `docs/01:68`, SECURITY-FINDINGS §S3 | OBSERVED | `results.jsonl` seq 20 |
-| Catch-all ≡ host's own entry document, 7 of 7 host-pairs | OBSERVED | `results.jsonl` seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17 |
+| Catch-all ≡ host's own entry document, **5 of 5** host-pairs (counting rule below) | OBSERVED | `results.jsonl` seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17 |
 | 5518 B maps to ≥ 2 distinct digests | OBSERVED | `results.jsonl` seq 3 vs seq 11 |
 | `docs/08`'s `f637c8d0…` is the document, not the asset (`a054555a…` is the asset) | OBSERVED | `results.jsonl` seq 14 vs seq 15 |
 | Build A asset digest `2a7fa8e7af519c2b` reproduces the value recorded 2026-10-08 | OBSERVED | `results.jsonl` seq 4; `AUTH-TENANT-FINDINGS.md:248` |

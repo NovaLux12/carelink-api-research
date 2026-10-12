@@ -1,8 +1,8 @@
-{"host": "carelinkhp.minimed.eu", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
-{"host": "carelinkhp-prod.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
-{"host": "carelink.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
-{"host": "carelink-support.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "see results.jsonl"}
-{"host": "carelinkhp.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
-{"host": "carelinkhp-prod.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
-{"host": "carelinkhp-trials.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "see results.jsonl"}
-{"host": "carelinkhp-test.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - test host, recorded only"}
+{"host": "carelinkhp.minimed.eu", "resolver_status": "NOERROR", "a_records": 4, "probed": "yes - see results.jsonl", "has_http_row": true}
+{"host": "carelinkhp-prod.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - NXDOMAIN, no HTTP request possible or sent", "has_http_row": false}
+{"host": "carelink.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "yes - see results.jsonl", "has_http_row": true}
+{"host": "carelink-support.medtronic.com", "resolver_status": "NOERROR", "a_records": 4, "probed": "yes - see results.jsonl", "has_http_row": true}
+{"host": "carelinkhp.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - NXDOMAIN, no HTTP request possible or sent", "has_http_row": false}
+{"host": "carelinkhp-prod.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - NXDOMAIN, no HTTP request possible or sent", "has_http_row": false}
+{"host": "carelinkhp-trials.minimed.com", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - NXDOMAIN, no HTTP request possible or sent", "has_http_row": false}
+{"host": "carelinkhp-test.minimed.eu", "resolver_status": "NXDOMAIN", "a_records": 0, "probed": "no - test host (docs/09 s1), DNS only", "has_http_row": false}

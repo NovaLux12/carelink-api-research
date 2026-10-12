@@ -24,9 +24,16 @@ number, and nothing else.
   runtime = hurl part + 2 x `HTTP` lines
               (hurl counts each status line as two asserts: version + code)
           + 05's executed assertions: non-loop check sites + the loop site x16
-            + the 5 inline PASS branches
+            + the INLINE_05 inline PASS branches
             (the live suite prints this as "<n> passed"; pass --observed-05
              with that number to use the measured value instead of the rule's)
+
+  The inline-branch total is the INLINE_05 constant and ONLY that constant. It is
+  deliberately not restated as a literal in this docstring: an earlier revision
+  said "5" here while the constant read 7, so the one file AGENTS.md section 6.7
+  designates as the counting rule disagreed with itself, telling a reader 5 and
+  showing 7. Naming the constant keeps the two consistent whatever the constant
+  is later set to.
 """
 
 import argparse
