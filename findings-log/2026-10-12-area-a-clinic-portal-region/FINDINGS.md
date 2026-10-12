@@ -49,11 +49,21 @@ the resolver loop runs only in `probe.sh` and was not repeated. They resolved in
 practice; the resolver status for them is simply unrecorded.
 
 **Declared delay: 2.5 s, sleep inside the per-host `flock`.** Measured from
-`run.log`: **minimum consecutive same-host gap 2 s over 14 gaps; all 14 are ≥ the
-BRIEF's 2 s hard floor, 10 of 14 are ≥ 2.5 s.** Four gaps fall below the declared
+`run.log`: **minimum consecutive same-host gap 2 s over 15 gaps; all 15 are ≥ the
+BRIEF's 2 s hard floor, 11 of 15 are ≥ 2.5 s.** Four gaps fall below the declared
 2.5 s. **No cause is asserted for them**, per `docs/09` §4, which records this exact
 signature as an open question and instructs that a pass report the floor and the
 sub-declared gap *without* explaining it.
+
+> **Denominator, stated so it is reproducible (`AGENTS.md` §6.7).** **15** = one gap per
+> consecutive pair of requests to the same host, across all 5 responding hosts:
+> `carelinkhp.minimed.eu` 3, `carelink.medtronic.com` 3,
+> `carelink-support.medtronic.com` **4**, `carelink-support.medtronic.eu` 2,
+> `carelink.medtronic.eu` 3. *(An earlier draft of this line said **14** — computed
+> before `probe4.sh` added seq 20, which opens a fourth
+> `carelink-support.medtronic.com` gap. The substantive figures are unaffected: that
+> gap is 84 s, so the minimum, the "4 below 2.5 s" count and the "0 below 2 s" count
+> are identical either way. The denominator was wrong.)*
 
 **INFERRED, and not resolvable from the artefacts on disk.** `run.log` carries
 whole-second timestamps only — no sub-second field, no monotonic clock — and the
@@ -71,15 +81,60 @@ reproducible from `run.log` as committed, and **not** the explanation. What can 
 said without inference: no gap fell below the 2 s floor, so the rule this repo
 actually enforces was not breached.
 
-> **Known-pending, deliberately not fixed here.** This pass's four sub-2.5 s gaps are
-> the **same signature** as the open question in `docs/09` §4, whose row currently
-> reads **n = 3 passes, 7 occurrences**. Adding this pass makes the true figure
-> **n = 4 passes, 11 occurrences**, so that row will read wrong once this merges.
-> **It is left uncorrected on purpose:** sibling branches edit that same row from the
-> same base with their own numbers, and reconciling a shared row is the merge queue's
-> job, not a per-PR one. Editing it here would have this PR race two other branches
-> and be overwritten. Recorded so the discrepancy is a known open item rather than a
-> silent drift. **The count in `docs/09` is not this pass's to change.**
+### Cross-checked with a second oracle (area O's, 2026-10-12) — zero requests
+
+Area O shipped a better timing oracle than a `run.log` timestamp: **prefer the
+body-file mtime and cross-check it against `t0`**, because a `date` read before
+`curl` can return later than the body curl then wrote, which makes `mtime - t0`
+negative and manufactures a gap that never happened ([source: docs/09 §4,
+sub-declared-gap row]).
+
+Applied to **this pass's own committed artefacts** by `mtime.py` (offline, zero
+requests; output in `mtime.txt`):
+
+| Measure | Result |
+|---|---|
+| negative `mtime - t0` gaps (area O's corrupt-`t0` signature) | **0** |
+| same-host gaps checkable | **10 of 15** |
+| minimum `mtime` gap | **2.637 s** |
+| `mtime` gaps ≥ the declared 2.5 s | **10 of 10** |
+| the 4 pairs `run.log` logged as 2 s | **all 4 measure ≥ 2.5 s by mtime** — 2.637 / 2.841 / 2.839 / 2.652 s |
+
+**This is OBSERVED for this pass and it is stronger than "no cause asserted":** an
+oracle independent of `run.log`, at **sub-second** resolution, finds that **none of the
+four short readings was actually a short interval** — all four real intervals exceed
+the declared 2.5 s. What remains unestablished is *why `run.log` truncated them*, and
+`docs/09`'s open question — which is about areas **B, X and Z**, whose artefacts this
+pass does not touch — is **not** answered here.
+
+**Three limits, stated rather than assumed:**
+
+1. **Not reproducible from a clean clone.** **git does not preserve mtimes.** The bodies'
+   *content* is committed; their filesystem timestamps are not. `mtime.py` re-run
+   elsewhere yields different numbers or none. This is a property of the machine that
+   ran the pass, not of the repository.
+2. **10 of 15, not 15.** The five uncheckable gaps are those whose later request was a
+   3.3–3.4 MB asset, whose bodies were deliberately not committed.
+3. **A sub-2.5 s mtime gap would not have been conclusive on its own**, because an
+   mtime marks body-write completion, so `gap = 2.5 s sleep + overhead +
+   dur[n+1] − dur[n]` and a faster later request can shrink it. The finding above rests
+   on gaps that came out *above* the threshold, which is the direction that is safe.
+
+**I am in this class.** Area O excluded itself because its harness declared `DELAY=2.5`
+but never emitted the `sleep`, so its sub-floor gaps are a rule breach rather than a
+timing artefact. Mine are the opposite: `probe.sh:49-50`, `probe2.sh`, `probe3.sh` and
+`probe4.sh` each run `sleep 2.5` **inside** the per-host `flock` and before `curl`.
+
+> **Known-pending, deliberately not fixed here — and the base moved under round 2.**
+> This pass contributes **1 pass and 4 occurrences** to the open question in `docs/09`
+> §4. **On `main` as of `b6909d9` that row already reads `n = 4 passes, 9
+> occurrences`** — area O rewrote it after this pass's round-1 note was written, which
+> had quoted the older `3 passes / 7 occurrences`. Reconciling both branches' inputs is
+> the merge queue's arithmetic, not this pass's, so **the row is left untouched**:
+> sibling branches edit it from the same base with their own figures, and writing it
+> here would race them and be overwritten. Recorded so the discrepancy is a known open
+> item rather than silent drift. **The count in `docs/09` is not this pass's to
+> change.**
 
 ## Controls, in the order they were sent
 

@@ -1,0 +1,41 @@
+rows: 20   with a usable committed body: 15
+declared sleep: 2.5s   repo floor: 2.0s
+
+pair       host                              run.log      mtime  verdict
+    1->2    carelinkhp.minimed.eu                 2s     2.637s  
+    2->3    carelinkhp.minimed.eu                 3s     2.707s  
+    3->4    carelinkhp.minimed.eu                 3s        n/a  asset body not committed
+    5->6    carelink.medtronic.com                3s     2.681s  
+    6->7    carelink.medtronic.com                2s     2.841s  
+    7->8    carelink.medtronic.com                4s        n/a  asset body not committed
+    9->10   carelink-support.medtronic.com        3s     3.014s  
+   10->11   carelink-support.medtronic.com        3s     2.825s  
+   11->12   carelink-support.medtronic.com        2s     2.839s  
+   12->20   carelink-support.medtronic.com       84s        n/a  asset body not committed
+   13->14   carelink-support.medtronic.eu         3s     2.650s  
+   14->15   carelink-support.medtronic.eu         3s        n/a  asset body not committed
+   16->17   carelink.medtronic.eu                 2s     2.652s  
+   17->18   carelink.medtronic.eu                 3s     2.642s  
+   18->19   carelink.medtronic.eu                20s        n/a  asset body not committed
+
+same-host gaps:            15
+checkable (mtime oracle):  10 of 15
+negative mtime gaps:       0
+run.log gaps below 2.5s:   4 of 15
+run.log gaps below 2.0s:  0 of 15
+mtime gaps >= 2.5s:      10 of 10
+minimum mtime gap:          2.637s
+
+of the 4 pairs run.log logged below 2.5s, all 4 measure >= 2.5s by mtime:
+  seq 1->2 (2s logged) -> 2.637s measured
+  seq 6->7 (2s logged) -> 2.841s measured
+  seq 11->12 (2s logged) -> 2.839s measured
+  seq 16->17 (2s logged) -> 2.652s measured
+
+CONCLUSION (bounded, this pass only): an oracle independent of run.log, at
+sub-second resolution, finds 0 corrupt-t0 signatures and no gap below the
+declared 2.5s among the 10 checkable pairs. The remaining
+5 gaps cannot be checked because those bodies were not committed.
+This does NOT establish a cause for docs/09's open question, which concerns
+areas B, X and Z, and it is NOT re-derivable from a clean clone: git does not
+preserve mtimes. See this file's docstring.
