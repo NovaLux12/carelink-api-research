@@ -168,6 +168,67 @@ fi
 # --- Shape -----------------------------------------------------------------
 check "config key count (was 69)"           'keys | length' '69'
 
+# =====================================================================
+# AREA T (2026-10-12) — the published-pointer set.
+# Source: findings-log/2026-10-12-published-pointers/FINDINGS.md
+#
+# Every check below runs against the $BODY already fetched at the top of this
+# file, so the whole block costs ZERO additional vendor requests. That is the
+# only reason it lives here rather than in a new suite: the weekly drift sweep
+# has a request budget (AGENTS.md §11) and a config assertion that needs no
+# request is worth more than a new suite that needs four.
+# =====================================================================
+
+# csr/v2 IS published, twice, by the public config. Area T was opened to test
+# the opposite and the opposite is false — which matters because a route that no
+# document names is unreachable by every config-driven client.
+check "csrDisplayMessageUrl names csr/v2"   '.["system.gc.gz.transition.flags"]["displayMessage"].csrDisplayMessageUrl | endswith("/connect/csr/v2/display/message")' 'true'
+check "csr periodic endpoints name csr/v2"  '.["csr.cumulus.periodic.data.endpoints"].display_message | endswith("/connect/csr/v2/display/message")' 'true'
+# Both keys carry the SAME URL — the client is handed the same endpoint twice,
+# from two unrelated config subtrees.
+check "the two csr keys agree"              '.["system.gc.gz.transition.flags"]["displayMessage"].csrDisplayMessageUrl == .["csr.cumulus.periodic.data.endpoints"].display_message' 'true'
+# NEGATIVE pin: no baseUrlCsr-shaped key anywhere in the 69. This is how the
+# route stays addressable from the CONFIG rather than from DISCOVERY — the
+# discovery document is asserted to carry no baseUrlCsr in 01-discovery-pin.hurl.
+check "no baseUrlCsr-shaped key exists"     '[keys[] | select(test("baseUrlCsr"))] | length' '0'
+
+# The three-way plane dispatch table, and the master switch already ON.
+# useCumulusUrls=true means the vendor's own client is instructed to address the
+# csr/v2 URL above on this deployment, today.
+check "useCumulusUrls is true"              '.["system.gc.gz.transition.flags"]["displayMessage"].useCumulusUrls' 'true'
+check "csr plane dispatch table present"    '.["system.gc.gz.transition.flags"]["displayMessage"] | has("personalDisplayMessageUrl") and has("csrDisplayMessageUrl") and has("carepartnerDisplayMessageUrl")' 'true'
+check "sendPeriodicToCumulus is true"       '.["system.gc.gz.transition.flags"].sendPeriodicToCumulus' 'true'
+check "sendDiagnosticLogsToCumulus is true" '.["system.gc.gz.transition.flags"].sendDiagnosticLogsToCumulus' 'true'
+# csr carries a retina endpoint the personal plane does NOT: a path in no prior
+# note (recorded, unprobed — retina's host is runtime-composed).
+check "csr retina transfer_settings path"   '.["retina.endpoints.config"].csr.transfer_settings.base_uri' '/connect/retina/v1/settings/audit'
+check "personal retina has no transfer_settings" '.["retina.endpoints.config"].personal | has("transfer_settings")' 'false'
+
+# CORRECTION pinned (area T §3a): personal.data.csv.export.enable is an OBJECT
+# keyed by plane, not a boolean. docs/04 recorded true/true/false — which matched
+# personal.aggregatedData by coincidence and hid the csr plane entirely. A scalar
+# reader misses trials csr.rawData=true, the one value in this key that differs
+# from every personal value. Asserted on TYPE so the shape cannot silently revert.
+check "csv export enable is an object"      '.["personal.data.csv.export.enable"] | type' 'object'
+check "csv export enable is per-plane"      '.["personal.data.csv.export.enable"] | has("personal") and has("csr")' 'true'
+check "csv export personal rawData is false" '.["personal.data.csv.export.enable"].personal.rawData' 'false'
+
+# PARSING TRAP (area T §3b): 68 of the 69 keys are literal dotted names; exactly
+# one — captcha — is a real nested object. A walker that splits every key on "."
+# misses captcha entirely. Pinned so a future flattening is visible.
+check "captcha is a nested object, not a dotted key" '.captcha | type' 'object'
+check "the dotted key captcha.key does NOT exist at top level" 'has("captcha.key")' 'false'
+check "captcha subkeys are the documented four" '.captcha | keys | sort | join(",")' 'enabled,key,testKey,type'
+# testKey is PRESENT but EMPTY on every deployment: a client switching on
+# "testKey is present" rather than "non-empty" would enable test mode.
+#
+# Pinned as has() AND == "", not as `| length == 0`. `length` returns 0 for an
+# ABSENT key and for `null` as well as for "", so that assertion was satisfied by
+# three different states and could not tell them apart -- the exact
+# present-vs-absent confusion this repo keeps getting bitten by (docs/09 §4, the
+# `//`-swallows-false trap). Assert the state that is actually claimed.
+check "captcha.testKey is present and empty" '.captcha | has("testKey") and (.testKey == "")' 'true'
+
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "$FAIL" -eq 0 ]

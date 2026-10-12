@@ -130,7 +130,7 @@ A PR is mergeable when **all** of these hold:
 
 The PR gate runs the 05-public-config suite plus all static checks (leak
 scan, citations, numbers, hygiene, parity, append-only). The full five-suite
-probe runs in the weekly drift sweep, not on every PR — ~75 vendor requests
+probe runs in the weekly drift sweep, not on every PR — ~80 vendor requests
 per push would be a storm, not a gate.
 
 ---
@@ -252,7 +252,7 @@ Scheduled and CI jobs are guests here. They exist to **notice** drift, never to
 
 | A scheduled/CI job MAY | A scheduled/CI job MAY NEVER |
 |---|---|
-| Run the pinned suite exactly as the PR gate runs it where applicable — the drift sweep runs all five suites with the same pinned hurl version (8.0.1); the PR gate runs 05 plus static checks. Budget: ~75 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
+| Run the pinned suite exactly as the PR gate runs it where applicable — the drift sweep runs all five suites with the same pinned hurl version (8.0.1); the PR gate runs 05 plus static checks. Budget: ~80 requests per sweep. | Push to any branch, or open a PR. Merges and pushes are the human's job. The single exception is the badge-counts job below: it writes nothing but one generated JSON to the `counts` branch. |
 | Open issues (`correction:`/`finding:` titles per §4), comment on issues, and add or remove the labels `drift`, `automation`, `stale-claim`, `verified`, `needs-verification`, `pinned`, `correction`, `finding`, `research-area`, `claimed`, `downstream-bridge`. | Edit any file — `docs/`, `README.md`, `findings-log/`, `regression/`, this file. If a claim needs changing, a human PR changes it. |
 | Read anything; run any read-only local check (grep, python, the assertion inventory). | POST, authenticate, or exchange a token against any vendor host. The single standing exception is the two POSTs already pinned and documented in `04-deep-surface.hurl` — public client_ids, rejected 403 server-side, asserted as failures. No automation may extend that exception; no third POST may be added. |
 | Probe only patterns already in `regression/hurl/`. A new host, path, or candidate list enters a workflow **only** after a human added it to the suite (§8: bounded, justified lists). | Close an issue, or edit an issue's body. A stale claim gets a comment and a `stale-claim` label; the claimant closes it. |

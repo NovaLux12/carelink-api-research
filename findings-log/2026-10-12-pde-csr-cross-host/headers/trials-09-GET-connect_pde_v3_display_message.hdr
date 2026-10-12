@@ -1,0 +1,13 @@
+HTTP/2 403 
+content-type: application/json
+content-length: 42
+date: Mon, 12 Oct 2026 13:26:22 GMT
+x-amz-apigw-id: FIfv4F2DIAMFYbA=
+x-amzn-requestid: 03ede4e0-ac1f-4a30-bc94-3623c171b25d
+x-amzn-errortype: MissingAuthenticationTokenException
+x-cache: Error from cloudfront
+via: 1.1 d8d6dab3a4131e4dbeec4922c44161d6.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR95-P2
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: QSHj8G2_tzXMFUV_Rcux-9LfJbg016hF7x692SkB1XdMoSLgVpYBtg==
+

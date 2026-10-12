@@ -289,3 +289,42 @@ GET https://clcloud-trials.minimed.com/connect/v2/display/message
 HTTP 403
 [Asserts]
 header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+# ============================================================
+# Area U (2026-10-12): the PDE / CSR-negative cells are dead on
+# .com and -trials too — the single-host verdict is now 3-of-3.
+# Source: findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md
+#
+# 32 of a 32 cap, controls first on each host, all six cells dead on both
+# methods on both hosts. This block pins only the load-bearing cell — the one
+# the vendor's OWN discovery document points at (baseUrlPde = .../pde/v3) — on the
+# two hosts where it was previously untested. The full 24-cell matrix is in the
+# findings log; the log is the evidence, this is the tripwire. Four requests is
+# the whole cost, and it is what makes the claim "the published PDE base URL is
+# unroutable on every host it is published on" falsifiable by the suite.
+#
+# If Medtronic ever routes PDE, these 403s become 401 UnauthorizedException and
+# the note in docs/03 §9 is rewritten.
+# ============================================================
+
+# The published base URL's path, on the US host — previously untested.
+GET https://clcloud.minimed.com/connect/pde/v3/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+OPTIONS https://clcloud.minimed.com/connect/pde/v3/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+# ...and on the trials host.
+GET https://clcloud-trials.minimed.com/connect/pde/v3/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/pde/v3/display/message
+HTTP 403
+[Asserts]
+header "x-amzn-errortype" contains "MissingAuthenticationTokenException"

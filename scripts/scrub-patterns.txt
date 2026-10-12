@@ -13,7 +13,35 @@
 # Edit a pattern here and both the PR gate and the drift sweep change together.
 vendor API key literal|11IQOmW1Yr4z8T4kkeZJD5YbN4FSaWAQ4J5JpWi1
 reports-broker key fragments|(0vJJl02[0-9A-Za-z]{8,}|GIFQiM3[0-9A-Za-z]{8,})
-reCAPTCHA site keys|6Lf?buorAAAA[0-9A-Za-z_-]{10,}
+# reCAPTCHA v2 site key. CORRECTED 2026-10-12: the previous pattern
+# `6Lf?buorAAAA[0-9A-Za-z_-]{10,}` matched ZERO of the three keys the vendor
+# actually publishes. It required lowercase `buor` immediately after an optional
+# `f`, but EU and US both carry a capital U in that run and trials carries a
+# different three-character run again, so the net had been dead since it was
+# written -- and nothing noticed, because a pattern that never fires is silent.
+# The replacement is anchored, matches all three observed keys, and was checked
+# against every tracked file in the repo plus a battery of known false-positive
+# controls (both sha256 digests recorded in this file, a vendor field name, a URL
+# path): zero hits on every control. A dead net is worse than no net, because the
+# gate is the arbiter and an arbiter that silently passes is AGENTS.md section 6
+# item 1. Verified by re-deriving it, not by trusting the note that said it worked.
+reCAPTCHA site keys|^6L[A-Za-z0-9_-]{2}buor[A-Za-z]{4}[0-9A-Za-z_-]{10,}$
+# AWS VPC-endpoint service name, i.e. a private-internal endpoint published in
+# the public config. Added 2026-10-12 after the area-T pass found three of these
+# committed to a findings log by a redactor whose own rule was wrong: it assumed
+# a 16-hex / 9-alphanumeric shape, the real IDs are 17 / 8, so it matched nothing
+# while reporting a clean self-check -- because the self-check only covered the
+# patterns in THIS file and not the local extras. The identifier names a private
+# endpoint inside the vendor's account: infrastructure, not a URL. Zero hits across
+# all tracked files today, because the 2026-10-08 archive pass redacted it by hand.
+#
+# ORDER OF WORKING, recorded because getting it wrong is how this happened: the
+# pattern was validated by (a) matching the three real identifiers and (b) not
+# matching a battery of controls -- and only THEN run over the tracked tree. The
+# first attempt did (b) and (c) without (a), and scored "0 hits across all
+# tracked files" for a pattern that could not match its own target. A zero-hit
+# scan proves nothing about a pattern until the pattern has been shown to fire.
+AWS VPC endpoint service name|vpce-[0-9a-f]{17}-[A-Za-z0-9]{8}\.execute-api\.[a-z0-9-]+\.vpce\.amazonaws\.com
 internal Grafana/K8s/GitLab/DB/Prometheus host|(grafana|k8s|gitlab|prometheus|db)\.[a-z0-9-]+\.(minimed|medtronic)\.
 internal .corp host|[a-z0-9-]+\.corp\b
 machine-specific paths|(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)
@@ -27,3 +55,11 @@ live sessionData values|sessionData=[A-Za-z0-9_-]{12,}
 # The known published values above are matched literally; this catches the
 # realistic accident — someone pasting a credential of another kind.
 credential prefixes|(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|sk-[A-Za-z0-9]{32,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|AIza[0-9A-Za-z_-]{35})
+
+# DELIBERATELY NOT A PATTERN: a bare API-Gateway id, i.e.
+# \b[0-9a-z]{10}\.execute-api\.<region>\.amazonaws\.com
+# Evaluated on 2026-10-12 and REJECTED: it fires on 8 values that are already
+# published on purpose in probe-2026-10-08/recon/{ARCHIVE-URLS,AWS-GATEWAYS}.md,
+# so adding it would turn the gate red on main -- and a gate that cries wolf is how
+# a gate gets switched off, which is the failure the comment above exists to stop.
+# Recorded so the next person does not re-derive the decision and add it anyway.

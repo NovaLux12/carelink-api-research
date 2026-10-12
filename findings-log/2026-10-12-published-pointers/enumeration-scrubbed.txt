@@ -1,0 +1,361 @@
+==============================================================================
+PART 1 — every baseUrl* key in every discovery document served today
+==============================================================================
+
+--- clcloud.minimed.eu          v13/android/3.6  (disc-eu-v13) ---
+  top-level keys: ['CP', 'certificates', 'config', 'supportedCountries']
+  CP[] regions: ['US', 'EU', 'CLINICAL']
+    US         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    US         baseUrlCareLink    https://carelink.minimed.com/api/carepartner/v2
+    US         baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    US         baseUrlCumulus     https://clcloud.minimed.com/connect/carepartner/v13
+    US         baseUrlPde         https://clcloud.minimed.com/connect/pde/v3
+    EU         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    EU         baseUrlCareLink    https://carelink.minimed.eu/api/carepartner/v2
+    EU         baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    EU         baseUrlCumulus     https://clcloud.minimed.eu/connect/carepartner/v13
+    EU         baseUrlPde         https://clcloud.minimed.eu/connect/pde/v3
+    CLINICAL   baseUrlAem         https://www.medtronic.com/content/dam/emc
+    CLINICAL   baseUrlCareLink    https://carelink-trials.minimed.com/api/carepartner/v2
+    CLINICAL   baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    CLINICAL   baseUrlCumulus     https://clcloud-trials.minimed.com/connect/carepartner/v13
+    CLINICAL   baseUrlPde         https://clcloud-trials.minimed.com/connect/pde/v3
+
+--- clcloud.minimed.com         v13/android/3.6  (disc-com-v13) ---
+  top-level keys: ['CP', 'certificates', 'config', 'supportedCountries']
+  CP[] regions: ['US', 'EU', 'CLINICAL']
+    US         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    US         baseUrlCareLink    https://carelink.minimed.com/api/carepartner/v2
+    US         baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    US         baseUrlCumulus     https://clcloud.minimed.com/connect/carepartner/v13
+    US         baseUrlPde         https://clcloud.minimed.com/connect/pde/v3
+    EU         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    EU         baseUrlCareLink    https://carelink.minimed.eu/api/carepartner/v2
+    EU         baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    EU         baseUrlCumulus     https://clcloud.minimed.eu/connect/carepartner/v13
+    EU         baseUrlPde         https://clcloud.minimed.eu/connect/pde/v3
+    CLINICAL   baseUrlAem         https://www.medtronic.com/content/dam/emc
+    CLINICAL   baseUrlCareLink    https://carelink-trials.minimed.com/api/carepartner/v2
+    CLINICAL   baseUrlCms         https://carelink-content.medtronic.com/carepartner
+    CLINICAL   baseUrlCumulus     https://clcloud-trials.minimed.com/connect/carepartner/v13
+    CLINICAL   baseUrlPde         https://clcloud-trials.minimed.com/connect/pde/v3
+
+--- clcloud.minimed.com         v11/android/3.6  (disc-com-v11-legacy) ---
+  top-level keys: ['CP', 'certificates', 'config', 'supportedCountries']
+  CP[] regions: ['US', 'EU']
+    US         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    US         baseUrlCareLink    https://carelink.minimed.com/api/carepartner/v1
+    US         baseUrlCumulus     https://clcloud.minimed.com/connect/carepartner/v2
+    US         baseUrlPde         https://clcloud.minimed.com/connect/pde/v1
+    EU         baseUrlAem         https://www.medtronic.com/content/dam/emc
+    EU         baseUrlCareLink    https://carelink.minimed.eu/api/carepartner/v1
+    EU         baseUrlCumulus     https://clcloud.minimed.eu/connect/carepartner/v2
+    EU         baseUrlPde         https://clcloud.minimed.eu/connect/pde/v1
+
+--- clcloud-trials.minimed.com  v6/android/3.6  (disc-trials-v6-legacy) ---
+  top-level keys: ['CP', 'certificates', 'config', 'supportedCountries']
+  CP[] regions: ['US', 'EU']
+    US         baseUrlCareLink    https://carelink-trials.minimed.com/api/carepartner/v1
+    US         baseUrlCumulus     https://clcloud-trials.minimed.com/connect/carepartner/v2
+    US         baseUrlPde         https://clcloud-trials.minimed.com/connect/pde/v1
+    EU         baseUrlCareLink    https://carelink-trials.minimed.com/api/carepartner/v1
+    EU         baseUrlCumulus     https://clcloud-trials.minimed.com/connect/carepartner/v2
+    EU         baseUrlPde         https://clcloud-trials.minimed.com/connect/pde/v1
+
+==============================================================================
+PART 2 — the 69-key public config: every value that LOOKS like an endpoint
+==============================================================================
+
+--- carelink.minimed.eu (config-eu) — 69 top-level keys ---
+  system.gc.gz.transition.flags.displayMessage.personalDisplayMessageUrl
+      https://clcloud.minimed.eu/patient/connect/data
+  system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl
+      https://clcloud.minimed.eu/connect/csr/v2/display/message
+  system.gc.gz.transition.flags.displayMessage.carepartnerDisplayMessageUrl
+      https://clcloud.minimed.eu/patient/m2m/connect/data/gc/patients/{patientUsername}
+  csr.cumulus.periodic.data.endpoints.periodic_packet
+      https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet
+  csr.cumulus.periodic.data.endpoints.display_message
+      https://clcloud.minimed.eu/connect/csr/v2/display/message
+  praas.uri.path.reports.ping
+      https://iis.<service>.<internal>:443/api/report/v2/ping
+  mmm.data.api.url
+      https://0ptoikank6.execute-api.eu-central-1.amazonaws.com/prodous/dialog-lite/v1/
+  personal.integrations.redirect.scheme.whitelist[8]
+      https://carelink-3po-dev.minimed.eu/
+  personal.integrations.redirect.scheme.whitelist[9]
+      https://fr.ccm.glooko.com/
+  personal.integrations.redirect.scheme.whitelist[10]
+      https://xtqa-fr.ccm.glooko.com/
+  nutrino.cc.broker.service.config.host
+      https://commoncore.medtronic.eu/reports-broker/v1
+  safety.notice.domain.whitelist[0]
+      https://info.medtronicdiabetes.com
+  safety.notice.domain.whitelist[1]
+      https://www.medtronicdiabetes.com
+  safety.notice.domain.whitelist[2]
+      https://www.fda.gov
+  personal.link.carepartner.app.download.GooglePlay
+      https://play.google.com/store/apps/details?id=com.medtronic.diabetes.carepartner&hl=en_US&gl=US
+  personal.link.carepartner.app.download.AppStore
+      https://apps.apple.com/au/app/carelink-connect/id1467892577
+  personal.input.validation.params.prohibitedValues[0]
+      http://
+  personal.input.validation.params.prohibitedValues[1]
+      https://
+  retina.endpoints.config.personal.target_url
+      https://clcloud.minimed.eu
+  retina.endpoints.config.personal.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.target_url
+      https://clcloud.minimed.eu
+  retina.endpoints.config.csr.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.transfer_settings.base_uri
+      /connect/retina/v1/settings/audit
+  personal.mixpanel.analytics.settings.host
+      https://api-eu.mixpanel.com
+  personal.link.help.system
+      https://carelink.minimed.eu/help/$lang/index.html
+  personal.patient.timeline.config.host
+      https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline
+  nutrino.cc.metadata.service.config.host
+      https://commoncore.medtronic.eu/reports-metadata/v1
+  csr.crm.settings.base.uri
+      https://carelink-support.minimed.eu/crm
+  personal.crm.settings.base.uri
+      https://carelink.minimed.eu/crm
+  [csr-prefixed key] csr.application.browser.check.configuration  type=dict
+      {"resolution": {"minWidth": "800", "minHeight": "600", "message": "800x600"}, "config": [{"Windows": {"supported": [{"compareMinorVersion": true, "osVersions": ["10", "11"], "message": "Windows", "browsers": {"Chrome": {"minVersion": "67", "message": "Chrome"}, "Edge": {"minVersion": "87", "message": "Edge"}}}], "unsupported": {"osVersions": ["95"], "browserVersions": [{"Internet Explorer": {"vers
+  [csr-prefixed key] csr.control.codes.settings  type=dict
+      {"predefined_control_codes": ["dpml", "tup", "lhpro", "lghpro", "vex", "ssd", "tcc"], "predefined_control_codes_regexp": "(dpml:[0-3])|(tup:((?i)TUP|LTU|DTU|BGM|GST|NOGSTU|NONE))|(lhpro:\\d+)|(lghpro:\\d+)|(vex:\\d+)|(ssd:(t|f))|(tcc:[1-7])", "custom_control_codes_regexp": "(gstpro:\\d+)|(gstrc:(t|f))", "ranges": {"lhpro": {"min": 0, "max": 4292967295}, "lghpro": {"min": 0, "max": 4292967295}, "ve
+  [csr-prefixed key] csr.crm.settings  type=dict
+      {"base.uri": "https://carelink-support.minimed.eu/crm", "product": "ocl", "version": "15.5"}
+  [csr-prefixed key] csr.cumulus.periodic.data.endpoints  type=dict
+      {"periodic_packet": "https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet", "display_message": "https://clcloud.minimed.eu/connect/csr/v2/display/message"}
+
+--- carelink.minimed.com (config-com) — 69 top-level keys ---
+  personal.third.party.apps[0].customFormFields.prohibitedValues[0]
+      http://
+  personal.third.party.apps[0].customFormFields.prohibitedValues[1]
+      https://
+  system.gc.gz.transition.flags.displayMessage.personalDisplayMessageUrl
+      https://clcloud.minimed.com/patient/connect/data
+  system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl
+      https://clcloud.minimed.com/connect/csr/v2/display/message
+  system.gc.gz.transition.flags.displayMessage.carepartnerDisplayMessageUrl
+      https://clcloud.minimed.com/patient/m2m/connect/data/gc/patients/{patientUsername}
+  csr.cumulus.periodic.data.endpoints.periodic_packet
+      https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet
+  csr.cumulus.periodic.data.endpoints.display_message
+      https://clcloud.minimed.com/connect/csr/v2/display/message
+  praas.uri.path.reports.ping
+      https://iis.<service>.<internal>:443/api/report/v2/ping
+  mmm.data.api.url
+      https://r5djbmetbb.execute-api.us-east-1.amazonaws.com/prod/dialog-lite/v1/
+  nutrino.cc.broker.service.config.host
+      https://commoncore.medtronic.com/reports-broker/v1
+  safety.notice.domain.whitelist[0]
+      https://info.medtronicdiabetes.com
+  safety.notice.domain.whitelist[1]
+      https://www.medtronicdiabetes.com
+  safety.notice.domain.whitelist[2]
+      https://www.fda.gov
+  personal.link.carepartner.app.download.GooglePlay
+      https://play.google.com/store/apps/details?id=com.medtronic.diabetes.carepartner.us&hl=en_US&gl=US
+  personal.link.carepartner.app.download.AppStore
+      https://apps.apple.com/us/app/carelink-connect-us/id1535972481
+  personal.input.validation.params.prohibitedValues[0]
+      http://
+  personal.input.validation.params.prohibitedValues[1]
+      https://
+  retina.endpoints.config.personal.target_url
+      https://clcloud.minimed.com
+  retina.endpoints.config.personal.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.target_url
+      https://clcloud.minimed.com
+  retina.endpoints.config.csr.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.transfer_settings.base_uri
+      /connect/retina/v1/settings/audit
+  personal.mixpanel.analytics.settings.host
+      https://api-js.mixpanel.com
+  personal.link.help.system
+      https://carelink.minimed.com/help/$lang/index.html
+  personal.patient.timeline.config.host
+      https://7r9xxd72kk.execute-api.us-east-1.amazonaws.com/prod/patient-timeline
+  nutrino.cc.metadata.service.config.host
+      https://commoncore.medtronic.com/reports-metadata/v1
+  csr.crm.settings.base.uri
+      https://carelink-support.minimed.com/crm
+  personal.crm.settings.base.uri
+      https://carelink.minimed.com/crm
+  [csr-prefixed key] csr.application.browser.check.configuration  type=dict
+      {"resolution": {"minWidth": "800", "minHeight": "600", "message": "800x600"}, "config": [{"Windows": {"supported": [{"compareMinorVersion": true, "osVersions": ["10", "11"], "message": "Windows", "browsers": {"Chrome": {"minVersion": "67", "message": "Chrome"}, "Edge": {"minVersion": "87", "message": "Edge"}}}], "unsupported": {"osVersions": ["95"], "browserVersions": [{"Internet Explorer": {"vers
+  [csr-prefixed key] csr.control.codes.settings  type=dict
+      {"predefined_control_codes": ["dpml", "tup", "lhpro", "lghpro", "vex", "ssd", "tcc"], "predefined_control_codes_regexp": "(dpml:[0-3])|(tup:((?i)TUP|LTU|DTU|BGM|GST|NOGSTU|NONE))|(lhpro:\\d+)|(lghpro:\\d+)|(vex:\\d+)|(ssd:(t|f))|(tcc:[1-7])", "custom_control_codes_regexp": "(gstpro:\\d+)|(gstrc:(t|f))", "ranges": {"lhpro": {"min": 0, "max": 4292967295}, "lghpro": {"min": 0, "max": 4292967295}, "ve
+  [csr-prefixed key] csr.crm.settings  type=dict
+      {"base.uri": "https://carelink-support.minimed.com/crm", "product": "ocl", "version": "15.5"}
+  [csr-prefixed key] csr.cumulus.periodic.data.endpoints  type=dict
+      {"periodic_packet": "https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet", "display_message": "https://clcloud.minimed.com/connect/csr/v2/display/message"}
+
+--- carelink-trials.minimed.com (config-trials) — 69 top-level keys ---
+  system.gc.gz.transition.flags.displayMessage.personalDisplayMessageUrl
+      https://clcloud-trials.minimed.com/patient/connect/data
+  system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl
+      https://clcloud-trials.minimed.com/connect/csr/v2/display/message
+  system.gc.gz.transition.flags.displayMessage.carepartnerDisplayMessageUrl
+      https://clcloud-trials.minimed.com/patient/m2m/connect/data/gc/patients/{patientUsername}
+  csr.cumulus.periodic.data.endpoints.periodic_packet
+      https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet
+  csr.cumulus.periodic.data.endpoints.display_message
+      https://clcloud-trials.minimed.com/connect/csr/v2/display/message
+  praas.uri.path.reports.ping
+      https://iis.<service>.<internal>:443/api/report/v2/ping
+  nutrino.cc.broker.service.config.host
+      https://commoncore-trials.minimed.com/reports-broker/v1
+  safety.notice.domain.whitelist[0]
+      https://info.medtronicdiabetes.com
+  safety.notice.domain.whitelist[1]
+      https://www.medtronicdiabetes.com
+  safety.notice.domain.whitelist[2]
+      https://www.fda.gov
+  personal.link.carepartner.app.download.GooglePlay
+      https://play.google.com/store/apps/details?id=com.medtronic.diabetes.carelinkclinical&hl=en_US&gl=US
+  personal.link.carepartner.app.download.AppStore
+      https://apps.apple.com/us/app/carelink-clinical/id1547848155
+  personal.input.validation.params.prohibitedValues[0]
+      http://
+  personal.input.validation.params.prohibitedValues[1]
+      https://
+  retina.endpoints.config.personal.target_url
+      https://clcloud-trials.minimed.com
+  retina.endpoints.config.personal.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.target_url
+      https://clcloud-trials.minimed.com
+  retina.endpoints.config.csr.dashboard.base_uri
+      /connect/retina/v1/personalWebView
+  retina.endpoints.config.csr.transfer_settings.base_uri
+      /connect/retina/v1/settings/audit
+  personal.link.help.system
+      https://carelink-trials.minimed.com/help/$lang/index.html
+  personal.patient.timeline.config.host
+      https://oflhmnvbe6.execute-api.us-east-1.amazonaws.com/prod/patient-timeline
+  nutrino.cc.metadata.service.config.host
+      https://commoncore-trials.minimed.com/reports-metadata/v1
+  csr.crm.settings.base.uri
+      https://carelink-trials-support.minimed.com/crm
+  personal.crm.settings.base.uri
+      https://carelink-trials.minimed.com/crm
+  [csr-prefixed key] csr.application.browser.check.configuration  type=dict
+      {"resolution": {"minWidth": "800", "minHeight": "600", "message": "800x600"}, "config": [{"Windows": {"supported": [{"compareMinorVersion": true, "osVersions": ["10", "11"], "message": "Windows", "browsers": {"Chrome": {"minVersion": "67", "message": "Chrome"}, "Edge": {"minVersion": "87", "message": "Edge"}}}], "unsupported": {"osVersions": ["95"], "browserVersions": [{"Internet Explorer": {"vers
+  [csr-prefixed key] csr.control.codes.settings  type=dict
+      {"predefined_control_codes": ["dpml", "tup", "lhpro", "lghpro", "vex", "ssd", "tcc"], "predefined_control_codes_regexp": "(dpml:[0-3])|(tup:((?i)TUP|LTU|DTU|BGM|GST|NOGSTU|NONE))|(lhpro:\\d+)|(lghpro:\\d+)|(vex:\\d+)|(ssd:(t|f))|(tcc:[1-7])", "custom_control_codes_regexp": "(gstpro:\\d+)|(gstrc:(t|f))", "ranges": {"lhpro": {"min": 0, "max": 4292967295}, "lghpro": {"min": 0, "max": 4292967295}, "ve
+  [csr-prefixed key] csr.crm.settings  type=dict
+      {"base.uri": "https://carelink-trials-support.minimed.com/crm", "product": "ocl", "version": "15.5"}
+  [csr-prefixed key] csr.cumulus.periodic.data.endpoints  type=dict
+      {"periodic_packet": "https://<REDACTED:aws-vpc-endpoint-id>/dev/connect/csr/v2/periodic/packet", "display_message": "https://clcloud-trials.minimed.com/connect/csr/v2/display/message"}
+
+==============================================================================
+PART 3 — the country document's published pointer, per deployment
+==============================================================================
+  carelink.minimed.eu            countryCode=GB  33 keys
+      blePereodicDataEndpoint = https://clcloud.minimed.eu/connect/carepartner/v6/display/message
+  carelink.minimed.com           countryCode=US  35 keys
+      blePereodicDataEndpoint = https://clcloud.minimed.com/connect/carepartner/v6/display/message
+  carelink-trials.minimed.com    countryCode=US  35 keys
+      blePereodicDataEndpoint = https://clcloud-trials.minimed.com/connect/carepartner/v6/display/message
+
+==============================================================================
+PART 4 — THE ANSWER: does any published document name csr/v2 or bare v2?
+==============================================================================
+
+  needle 'csr/v2':
+      config-eu              3 hit(s)
+      config-com             3 hit(s)
+      config-trials          3 hit(s)
+
+  needle '/connect/v2':
+      ZERO hits in all 10 documents
+
+  needle 'baseUrlCsr':
+      ZERO hits in all 10 documents
+
+  needle 'csr':
+      config-eu              12 hit(s)
+      config-com             12 hit(s)
+      config-trials          12 hit(s)
+
+  needle 'pde':
+      disc-eu-v13            3 hit(s)
+      disc-com-v13           3 hit(s)
+      disc-com-v11-legacy    2 hit(s)
+      disc-trials-v6-legacy  2 hit(s)
+
+  Every distinct value published that points into /connect/:
+    https://carelink-content.medtronic.com/carepartner
+        <- clcloud.minimed.eu          v13/android/3.6:US:baseUrlCms
+        <- clcloud.minimed.eu          v13/android/3.6:EU:baseUrlCms
+        <- clcloud.minimed.eu          v13/android/3.6:CLINICAL:baseUrlCms
+        <- clcloud.minimed.com         v13/android/3.6:US:baseUrlCms
+        <- clcloud.minimed.com         v13/android/3.6:EU:baseUrlCms
+        <- clcloud.minimed.com         v13/android/3.6:CLINICAL:baseUrlCms
+    https://carelink-trials.minimed.com/api/carepartner/v1
+        <- clcloud-trials.minimed.com  v6/android/3.6:US:baseUrlCareLink
+        <- clcloud-trials.minimed.com  v6/android/3.6:EU:baseUrlCareLink
+    https://carelink-trials.minimed.com/api/carepartner/v2
+        <- clcloud.minimed.eu          v13/android/3.6:CLINICAL:baseUrlCareLink
+        <- clcloud.minimed.com         v13/android/3.6:CLINICAL:baseUrlCareLink
+    https://carelink.minimed.com/api/carepartner/v1
+        <- clcloud.minimed.com         v11/android/3.6:US:baseUrlCareLink
+    https://carelink.minimed.com/api/carepartner/v2
+        <- clcloud.minimed.eu          v13/android/3.6:US:baseUrlCareLink
+        <- clcloud.minimed.com         v13/android/3.6:US:baseUrlCareLink
+    https://carelink.minimed.eu/api/carepartner/v1
+        <- clcloud.minimed.com         v11/android/3.6:EU:baseUrlCareLink
+    https://carelink.minimed.eu/api/carepartner/v2
+        <- clcloud.minimed.eu          v13/android/3.6:EU:baseUrlCareLink
+        <- clcloud.minimed.com         v13/android/3.6:EU:baseUrlCareLink
+    https://clcloud-trials.minimed.com/connect/carepartner/v13
+        <- clcloud.minimed.eu          v13/android/3.6:CLINICAL:baseUrlCumulus
+        <- clcloud.minimed.com         v13/android/3.6:CLINICAL:baseUrlCumulus
+    https://clcloud-trials.minimed.com/connect/carepartner/v2
+        <- clcloud-trials.minimed.com  v6/android/3.6:US:baseUrlCumulus
+        <- clcloud-trials.minimed.com  v6/android/3.6:EU:baseUrlCumulus
+    https://clcloud-trials.minimed.com/connect/pde/v1
+        <- clcloud-trials.minimed.com  v6/android/3.6:US:baseUrlPde
+        <- clcloud-trials.minimed.com  v6/android/3.6:EU:baseUrlPde
+    https://clcloud-trials.minimed.com/connect/pde/v3
+        <- clcloud.minimed.eu          v13/android/3.6:CLINICAL:baseUrlPde
+        <- clcloud.minimed.com         v13/android/3.6:CLINICAL:baseUrlPde
+    https://clcloud.minimed.com/connect/carepartner/v13
+        <- clcloud.minimed.eu          v13/android/3.6:US:baseUrlCumulus
+        <- clcloud.minimed.com         v13/android/3.6:US:baseUrlCumulus
+    https://clcloud.minimed.com/connect/carepartner/v2
+        <- clcloud.minimed.com         v11/android/3.6:US:baseUrlCumulus
+    https://clcloud.minimed.com/connect/pde/v1
+        <- clcloud.minimed.com         v11/android/3.6:US:baseUrlPde
+    https://clcloud.minimed.com/connect/pde/v3
+        <- clcloud.minimed.eu          v13/android/3.6:US:baseUrlPde
+        <- clcloud.minimed.com         v13/android/3.6:US:baseUrlPde
+    https://clcloud.minimed.eu/connect/carepartner/v13
+        <- clcloud.minimed.eu          v13/android/3.6:EU:baseUrlCumulus
+        <- clcloud.minimed.com         v13/android/3.6:EU:baseUrlCumulus
+    https://clcloud.minimed.eu/connect/carepartner/v2
+        <- clcloud.minimed.com         v11/android/3.6:EU:baseUrlCumulus
+    https://clcloud.minimed.eu/connect/pde/v1
+        <- clcloud.minimed.com         v11/android/3.6:EU:baseUrlPde
+    https://clcloud.minimed.eu/connect/pde/v3
+        <- clcloud.minimed.eu          v13/android/3.6:EU:baseUrlPde
+        <- clcloud.minimed.com         v13/android/3.6:EU:baseUrlPde
+    https://www.medtronic.com/content/dam/emc
+        <- clcloud.minimed.eu          v13/android/3.6:US:baseUrlAem
+        <- clcloud.minimed.eu          v13/android/3.6:EU:baseUrlAem
+        <- clcloud.minimed.eu          v13/android/3.6:CLINICAL:baseUrlAem
+        <- clcloud.minimed.com         v13/android/3.6:US:baseUrlAem
+        <- clcloud.minimed.com         v13/android/3.6:EU:baseUrlAem
+        <- clcloud.minimed.com         v13/android/3.6:CLINICAL:baseUrlAem
+        <- clcloud.minimed.com         v11/android/3.6:US:baseUrlAem
+        <- clcloud.minimed.com         v11/android/3.6:EU:baseUrlAem

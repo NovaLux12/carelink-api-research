@@ -1,0 +1,21 @@
+[1] GET https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
+    200 | content-type: application/json;charset=utf-8 | content-encoding: br | 20256B | parses:dict
+[2] GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/3.6
+    200 | content-type: application/json;charset=utf-8 | content-encoding: br | 20256B | parses:dict
+[3] GET https://clcloud.minimed.com/connect/carepartner/v11/discover/android/3.6
+    200 | content-type: application/json;charset=utf-8 | content-encoding: br | 18105B | parses:dict
+[4] GET https://clcloud-trials.minimed.com/connect/carepartner/v6/discover/android/3.6
+    200 | content-type: application/json;charset=utf-8 | content-encoding: br | 10053B | parses:dict
+[5] GET https://carelink.minimed.eu/patient/v2/configuration/public
+    200 | content-type: application/json | content-encoding: gzip | 26992B | parses:dict
+[6] GET https://carelink.minimed.com/patient/v2/configuration/public
+    200 | content-type: application/json | content-encoding: gzip | 24479B | parses:dict
+[7] GET https://carelink-trials.minimed.com/patient/v2/configuration/public
+    200 | content-type: application/json | content-encoding: gzip | 31698B | parses:dict
+[8] GET https://carelink.minimed.eu/patient/countries/settings?countryCode=GB
+    200 | content-type: application/json | content-encoding: gzip | 2618B | parses:dict
+[9] GET https://carelink.minimed.com/patient/countries/settings?countryCode=US
+    200 | content-type: application/json | content-encoding: gzip | 3126B | parses:dict
+[10] GET https://carelink-trials.minimed.com/patient/countries/settings?countryCode=US
+    200 | content-type: application/json | content-encoding: gzip | 3188B | parses:dict
+DONE n=10 (cap 12)

@@ -1,0 +1,67 @@
+=== clcloud.minimed.com ===
+[1] GET https://clcloud.minimed.com/connect/carepartner/v13/display/message
+    HTTP/2 401  | content-type: application/json | x-amzn-errortype: UnauthorizedException | acao: (none) | 36B
+[2] GET https://clcloud.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[3] OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/display/message
+    HTTP/2 200  | content-type: application/json | x-amzn-errortype: (none) | access-control-allow-origin: * | 0B
+[4] OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[5] GET https://clcloud.minimed.com/connect/pde/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[6] OPTIONS https://clcloud.minimed.com/connect/pde/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[7] GET https://clcloud.minimed.com/connect/pde/v2/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[8] OPTIONS https://clcloud.minimed.com/connect/pde/v2/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[9] GET https://clcloud.minimed.com/connect/pde/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[10] OPTIONS https://clcloud.minimed.com/connect/pde/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[11] GET https://clcloud.minimed.com/connect/pde/v3/discover/android/3.6
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[12] OPTIONS https://clcloud.minimed.com/connect/pde/v3/discover/android/3.6
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[13] GET https://clcloud.minimed.com/connect/csr/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[14] OPTIONS https://clcloud.minimed.com/connect/csr/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[15] GET https://clcloud.minimed.com/connect/csr/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[16] OPTIONS https://clcloud.minimed.com/connect/csr/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+=== clcloud-trials.minimed.com ===
+[17] GET https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+    HTTP/2 401  | content-type: application/json | x-amzn-errortype: UnauthorizedException | acao: (none) | 36B
+[18] GET https://clcloud-trials.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[19] OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+    HTTP/2 200  | content-type: application/json | x-amzn-errortype: (none) | access-control-allow-origin: * | 0B
+[20] OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[21] GET https://clcloud-trials.minimed.com/connect/pde/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[22] OPTIONS https://clcloud-trials.minimed.com/connect/pde/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[23] GET https://clcloud-trials.minimed.com/connect/pde/v2/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[24] OPTIONS https://clcloud-trials.minimed.com/connect/pde/v2/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[25] GET https://clcloud-trials.minimed.com/connect/pde/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[26] OPTIONS https://clcloud-trials.minimed.com/connect/pde/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[27] GET https://clcloud-trials.minimed.com/connect/pde/v3/discover/android/3.6
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[28] OPTIONS https://clcloud-trials.minimed.com/connect/pde/v3/discover/android/3.6
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[29] GET https://clcloud-trials.minimed.com/connect/csr/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[30] OPTIONS https://clcloud-trials.minimed.com/connect/csr/v1/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[31] GET https://clcloud-trials.minimed.com/connect/csr/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+[32] OPTIONS https://clcloud-trials.minimed.com/connect/csr/v3/display/message
+    HTTP/2 403  | content-type: application/json | x-amzn-errortype: MissingAuthenticationTokenException | acao: (none) | 42B
+DONE n=32 (cap 32)

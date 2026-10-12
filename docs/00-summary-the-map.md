@@ -79,8 +79,10 @@ full are in [`04-configuration.md`](04-configuration.md).
 | `/api/carepartner/v2/*` | What the app's `baseUrlCareLink` declares, but no client actually uses it. |
 | `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
 | `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
-| `/connect/pde/v3/*` | **Closed 2026-10-11 — no route on any tested method** on `clcloud.minimed.eu`. GET 403 + OPTIONS 403 with `MissingAuthenticationTokenException` across `pde/v{1,2,3}/display/message` and `pde/v3/discover/android/3.6`. **Not re-probed on `.com`/`-trials`** [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] |
+| `/connect/pde/v3/*` | **Closed 2026-10-11, widened to all three hosts 2026-10-12 — no route on any tested method.** GET 403 + OPTIONS 403 with `MissingAuthenticationTokenException` across `pde/v{1,2,3}/display/message`, `pde/v3/discover/android/3.6`, `csr/v1` and `csr/v3`, on **all three** cumulus hosts. The no-route body is byte-identical across all three (42 B) [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] |
+| **`baseUrlPde` — published, and unroutable** | The discovery document publishes `baseUrlPde = …/connect/pde/v3` on **every region of every document**, and that namespace has **no GET or OPTIONS route for either recorded path under it** — `display/message` and `discover/android/3.6` — **on all three cumulus hosts**. The vendor's one published PDE base URL cannot answer, everywhere it is published. (Two paths were probed, not the namespace: the bare `/connect/pde/v3` prefix itself was never requested, so "the namespace is unroutable" is a statement about the two recorded paths.) **INFERRED** that this is a retired service left in the document rather than an "ignore this key" contract — the route 403s before any application code runs, so no client-side evidence of intent exists either way [findings-log/2026-10-12-published-pointers/FINDINGS.md §2b] |
 | `/connect/csr/v2/display/message` · bare `/connect/v2/display/message` | **Live, POST-only, on all three cumulus hosts** (verified 2026-10-12, byte-identical, no region split). In no prior note before 2026-10-11. GET 403 `MissingAuthenticationTokenException` + OPTIONS 200 `access-control-allow-origin: *` [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] |
+| **which of those two a config-driven client can address** | **`csr/v2` yes, bare `/connect/v2` no** — and the asymmetry is the point. The public config names `csr/v2` in two keys on all three deployments; **no published document names the bare `/connect/v2`** [findings-log/2026-10-12-published-pointers/FINDINGS.md §1, §4] |
 | `/patient/reports/*` **on `carelink.minimed.eu`** | **Live, gated 401/405.** Previously mapped only to `commoncore` and recorded unreachable — this supersedes that. The reports namespace is not where we thought it was. |
 | `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | Still live at path but **CloudFront 502 "could not resolve the origin domain name"** — an origin-side DNS failure, not an absence. Never archived in any crawl. |
 
@@ -135,6 +137,7 @@ keys are regional. It contains:
 | `system.logbook.entry.validation.config` | **`null` on both patient regions, full schema on trials** — 12 sensor locations, 5 clinical removal reasons, 8 dose units. |
 | `csr.control.codes.settings` | Device **control** codes (`dpml`/`tup`/`vex`/`tcc`). **Not** the NGP alarm set. |
 | `mmm.data.api.url`, `personal.patient.timeline.config.host` | Undocumented AWS API Gateways. |
+| **`system.gc.gz.transition.flags`** | **The vendor's own migration switchboard, in no prior note until 2026-10-12.** `displayMessage.useCumulusUrls` is **`true` on all three deployments**, beside a three-way plane dispatch table `personalDisplayMessageUrl` / **`csrDisplayMessageUrl`** / `carepartnerDisplayMessageUrl`. Five sibling booleans — `pullGMInfoFromCumulus`, `pullSMSHistoryFromCumulus`, `sendDiagnosticLogsToCumulus`, `sendPeriodicToCumulus`, `sendSMSFromCumulus` — are **all `true`**, so five capabilities are already on the Cumulus plane [findings-log/2026-10-12-published-pointers/FINDINGS.md §2c] |
 
 Hash-verified **global, not regional**: the family map, the Flex naming, the
 logbook entry types and the control codes are byte-identical across all three
@@ -156,6 +159,16 @@ Two caveats that matter for anyone parsing this:
 
 - The endpoint **serves gzip unconditionally**, ignoring `Accept-Encoding`
   (RFC 9110 §8.4 violation).
+- **68 of the 69 key *names* are literal dotted strings; exactly one — `captcha` —
+  is a bare segment.** A walker that splits every key name on `.` misses `captcha`
+  entirely. Note the distinction: 28–30 of the 69 keys hold **object values**, so
+  "nested" describes a value's type and does not single `captcha` out.
+- **`personal.data.csv.export.enable` is an object, not a boolean.** It is keyed by
+  plane (`personal` / `csr`), each with `aggregatedData` and `rawData`. **⚠ Corrected
+  2026-10-12** — the table above recorded it as a scalar `true`/`true`/`false`, which
+  happened to match `personal.aggregatedData` and hid the `csr` plane, including
+  trials' `csr.rawData = true`, the one value in that key that differs from every
+  personal value [findings-log/2026-10-12-published-pointers/FINDINGS.md §3a].
 - The `SIMPLERA` model list contains **trailing-whitespace padding**
   (`"MMT-5100       "`). An exact-match parser silently misses them.
 
@@ -288,7 +301,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 113 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 139 of these facts so they fail loudly rather than rot.
 
 ---
 
