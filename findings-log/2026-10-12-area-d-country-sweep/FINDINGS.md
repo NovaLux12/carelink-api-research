@@ -530,3 +530,27 @@ is "the header of scripts/research-checks.py", while this PR makes
 `scripts/measure_assertions.py` authoritative. **That disagreement pre-exists on
 `origin/main` and is not this PR's** — noted only so the next person editing a
 count does not read the wrong file for the rule.
+
+### Round 3 — CI status on this branch, stated precisely
+
+Round 2 reported that "CI has never run on this branch". **That was partly
+wrong and the correction matters**, so it is recorded rather than left to the
+next reader:
+
+- **Runs DID fire, and earlier ones are green.** `research/d-country-sweep` has
+  `pull_request` runs at `2b204470` and `7eae09f9`, both **concluded success**
+  (run 38289617486 and run 38290532203). So the gate has passed on this branch
+  on CI, twice, before this round.
+- **The final push `8c24042d` has NOT produced a run.** `gh pr checks 28`
+  reports "no checks reported", the newest run on this branch is `7eae09f9`,
+  and a repo-wide query finds **zero** runs at `8c24042` and **zero** runs in a
+  non-terminal state — so it is not queued, it is absent. The push is on origin
+  (ref API confirms `8c24042d`) and `research-gate.yml` declares
+  `on: pull_request` with no path, branch or concurrency filters that could
+  suppress it.
+
+**Not diagnosed, and not guessed at.** The local gate passes on this exact tree
+(`GATE EXIT: 0`, 65 passed / 0 failed), so this is a question about GitHub's
+event delivery, not about the commit. It is reported as observed: **the tree is
+gate-verified locally and green on CI at `7eae09f9`; the run for the final
+commit has not appeared.**
