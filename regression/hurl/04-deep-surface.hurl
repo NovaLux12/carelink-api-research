@@ -460,7 +460,11 @@ header "access-control-allow-methods" not exists
 # lock a cause. Whether `*` comes from route configuration, a stage
 # default, or CloudFront is not established by anything asserted here.
 #
-# These 6 assertions are the only ones in the suite that send an Origin.
+# These 6 request BLOCKS are the only ones in the suite that send an Origin.
+# Under the repo's own counting rule (scripts/measure_assertions.py: static =
+# predicates inside [Asserts]) those 6 blocks carry **12 predicates**, 2 each --
+# the "6" is a block count, not an assertion count, and the two must not be
+# conflated. 6 of 67 blocks; no other block sends an Origin.
 # All other CORS assertions read bare responses, where "no Origin sent"
 # and "Origin ignored" are the same observation.
 # ============================================================

@@ -221,16 +221,29 @@ as `blePereodicDataEndpoint` ([`docs/04`](04-configuration.md)), so the route th
 told to use has now been shown preflight-bearing cross-host rather than inferred from one row.
 
 **The corpus is not machine-uniform, and that silently under-reports.** The same header is stored
-**four** different ways across five ledgers: `pde-csr-oracle` has neither a `host` nor an `acao`
-column and buries CORS inside the `ctype` string; `area-b-v12-routing` captures **no CORS value
-at all**; `area-x-cors-separation` uses full-name keys (`access_control_allow_origin`);
-`csr-cross-host` buries it in `ctype`; `pde-csr-cross-host` uses short keys (`acao`/`acam`).
-A first query filtering on `r.acao` alone returned **2** ACAO-bearing cells; re-parsed across all
-four conventions the same corpus holds **12**. **The error is silent** — it returns fewer rows,
-which reads as a finding rather than as a parser mistake ([§6] of the claim,
-[#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). Area Z's own ledger writes
+**three** different ways across the five pre-existing ledgers:
+
+| convention | ledgers | `host` key |
+|---|---|---|
+| full-name key `access_control_allow_origin` | `area-b-v12-routing` (3 rows, `.eu` v11/v12/v13), `area-x-cors-separation` | present |
+| buried in the `ctype` string | `csr-cross-host`, **`pde-csr-oracle`** | present / **absent** |
+| short keys `acao`/`acam` | `pde-csr-cross-host` | present |
+
+**The one that costs evidence is `pde-csr-oracle`: it has no `host` column at all**, so its three
+ACAO rows — the only `.eu`-era ones for `csr/v2` and bare `v2` — **cannot be attributed to any
+host**. That is why `docs/11` §Z's "`ACAO` on all three hosts" was unsourced for those two routes.
+A query filtering on the short key `r.acao` alone returns **2** distinct ACAO cells; re-parsed
+across all three conventions the same pre-existing corpus holds **12**. **The error is silent** —
+it returns fewer rows, which reads as a finding rather than as a parser mistake
+([#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). Area Z's own ledger writes
 `host` plus an explicit key per CORS header, `(none)` when absent, so its rows parse without
 `ctype` archaeology.
+
+⚠ **An earlier draft of this section said `area-b-v12-routing` captured "no CORS value at all" and
+called the total "four" conventions. Both were wrong**, and both came from querying only the short
+key — the exact error the paragraph is about. It captures `access_control_allow_origin` in 3 rows
+and has a `host` column; the count is **three** conventions. The 2-vs-12 figures were re-derived
+and hold.
 
 **A method note, because three passes have now hit it.** The harness slept 2.5 s between requests;
 the measured minimum same-host gap was **2.042 s**, and **5 of 48** same-host gaps fell below

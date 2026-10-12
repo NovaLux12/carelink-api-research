@@ -133,8 +133,8 @@ Found while building area Z's candidate list, and **in scope for Y rather than a
 see [Why there is no area AA](#why-there-is-no-area-aa). Same blocker class: **zero requests**,
 corpus only.
 
-**The `findings-log/` ledger stores the same header four different ways across five files, and
-the failure mode is silent.** A query filtering on the short key `r.acao` returned **2**
+**The `findings-log/` ledger stores the same header three different ways across the five
+pre-existing files, and the failure mode is silent.** A query filtering on the short key `r.acao` returned **2**
 ACAO-bearing cells; re-parsed across all four conventions the same corpus holds **12**. There is
 no error and no warning — the parser simply returns fewer rows, and *fewer rows reads as a
 finding*. Any audit that counts, like Y, is working from a corpus whose shape is not uniform.
@@ -142,14 +142,21 @@ finding*. Any audit that counts, like Y, is working from a corpus whose shape is
 | ledger | `host` key | where the CORS value lives |
 |---|---|---|
 | `2026-10-11-pde-csr-oracle` | **absent** | embedded inside the `ctype` string |
-| `2026-10-12-area-b-v12-routing` | present | **nowhere — no CORS value captured at all** |
+| `2026-10-12-area-b-v12-routing` | present | full-name key `access_control_allow_origin` (3 rows, `.eu` v11/v12/v13) |
 | `2026-10-12-area-x-cors-separation` | present | full-name key `access_control_allow_origin` |
 | `2026-10-12-csr-cross-host` | present | embedded inside the `ctype` string |
 | `2026-10-12-pde-csr-cross-host` | present | short keys `acao` / `acam` |
 
 The missing `host` column is not cosmetic: it is why `docs/11` §Z's claim that `csr/v2` and bare
 `v2` return `ACAO` "on all three hosts" was **unsourced for `.eu`** — the only `.eu`-era rows for
-those two routes are the three unattributable rows in `pde-csr-oracle`.
+those two routes are the three unattributable rows in `pde-csr-oracle`. **The `host`-less ledger is
+the whole problem; the other two conventions are merely awkward.**
+
+⚠ **An earlier draft of this addendum said `area-b-v12-routing` captures "no CORS value at all",
+and that was wrong** — it carries `access_control_allow_origin` in 3 rows under the full-name key,
+and it has a `host` column. That sentence came from a query that read only the **short** key, which
+is the very error this addendum is about. The count beside it (2 vs 12) was re-derived and **holds**;
+the characterisation of *why* did not, and there are **three** conventions, not four.
 
 **Blocker:** none, **zero requests**.
 **Closes when:** every `results.jsonl` carries an explicit `host` key and one explicit key per

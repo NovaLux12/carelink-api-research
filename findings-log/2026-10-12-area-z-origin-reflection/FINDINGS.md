@@ -52,7 +52,7 @@ to the same host:
 | gaps >= 2.5 s | 43 |
 | gaps < 2.5 s | **5** |
 | gaps < 2.0 s (the repository floor) | **0** |
-| single measured minimum same-host gap | **2.042 s** (`clcloud.minimed.eu`, seq 4 -> 5) |
+| single measured minimum same-host gap | **2.042 s** (`clcloud.minimed.eu`, **seq 15 -> 16**) |
 | maximum same-host gap | 3.229 s |
 
 The five sub-2.5 s gaps, stated rather than rounded away:
@@ -305,6 +305,10 @@ kept here rather than edited away, because §1 of this file was itself corrected
 | 6 | `docs/10` stated a counting rule and then a **figure that rule does not yield**: rule said status exactly `200`, figure said **7**. The rule yields **6**; **7** is the 2xx count, which silently adds row 28's **204** for `v10/discover/android/3.6` | `bb3127c` | **Fixed.** Rule and figure now agree at **6**, with the 2xx trap named so the next reader does not re-introduce it |
 | 7 | `docs/10` said `v6` did what "its two siblings" do not — but `v11` answers `200` on all three hosts and `v12` answers `401` on all three, so no sibling version "serves nothing". As written the clause contradicted the sentence before it | `bb3127c` | **Fixed.** Restated as: for `v6` alone, `-trials` serves a document while `.eu` and `.com` serve nothing **for that same version** |
 | 8 | The §1 correction (defect 3) was made by **rewriting this file in place with no Correction section**, against `AGENTS.md` §3 and against the same commit's handling of defect 2 | `bb3127c` | **This section.** The text is correct; what was missing was the trace that it had once been wrong |
+| 9 | §1's minimum-gap cell read **2.042 s at seq 4 -> 5**. That gap is **2.044 s**; **2.042 s is at seq 15 -> 16** — the file's own table nine lines below said so. The value was right, the pointer wrong | `65efeff` | **Fixed.** Pointer corrected to `seq 15 -> 16`. Pre-existing since `fbe5d9b`; missed by two rounds because it sat in a cell nobody re-derived against its own table |
+| 10 | The new hurl block comment called itself "**These 6 assertions** are the only ones in the suite that send an `Origin`". Under the repo's own counting rule (`static` = predicates inside `[Asserts]`) those 6 blocks carry **12 predicates**, 2 each (runtime 24 with status lines). A block count wearing the word "assertion" | `65efeff` | **Fixed.** Comment now says 6 request **blocks**, names the 12 predicates and the rule, and records 6-of-67. The substantive uniqueness claim is true and unchanged |
+| 11 | `docs/06` and the `docs/11` addendum both said `area-b-v12-routing` captures **"no CORS value at all"** and that there are **four** conventions. **Both wrong**: area B carries `access_control_allow_origin` in **3** rows (`.eu` v11/v12/v13) and has a `host` column, and the pre-existing corpus uses **three** conventions. I wrote the false row *in the paragraph about querying ledgers carelessly* — from a query that read only the short key, which is the exact error the paragraph describes | `65efeff` | **Fixed, twice, in both files.** Per-ledger table replaced with one derived from the keys actually present; the wrong row and the "four" are named as retracted inline. The 2-vs-12 figures were re-derived and **hold** (2 short-key cells vs 12 across three conventions, area Z excluded) |
+| 12 | `docs/10` called the split "`v6`-specific". Only **3 of 16** versions were probed on `discover/android/3.6` across all three hosts (`v6`, `v11`, `v12`); the other **13** were `.eu`-only, so a split is **undeterminable** for them, not excluded | `65efeff` | **Fixed.** Restated as "among the versions with three-host coverage", with the 13-version blind spot named and an explicit warning not to read it as "only `v6` splits" |
 
 ### Why the gate caught none of the three blocking `docs/` defects
 
