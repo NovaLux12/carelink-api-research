@@ -76,10 +76,27 @@ rather than send. Nothing on disk distinguishes **three** candidates:
   gap and then cancels against its neighbour;
 - a post-hoc edit to `run.log`, which produces identical arithmetic.
 
-All three fit the 14 recorded gaps. I am claiming the **counts**, which are
+All three fit the **15** recorded gaps. I am claiming the **counts**, which are
 reproducible from `run.log` as committed, and **not** the explanation. What can be
 said without inference: no gap fell below the 2 s floor, so the rule this repo
 actually enforces was not breached.
+
+> **How 15 is derived, and a definitional trap worth not repeating.** Per host, the
+> gaps are the requests to that host **minus one**: 20 requests across 5 hosts gives
+> **20 − 5 = 15**. Broken down: `carelinkhp.minimed.eu` **3**, `carelink.medtronic.com`
+> **3**, `carelink-support.medtronic.com` **4**, `carelink-support.medtronic.eu` **2**,
+> `carelink.medtronic.eu` **3**.
+>
+> The 4 matters because seqs **12 and 20 both go to `carelink-support.medtronic.com`**
+> but seqs 13–19 sit between them. So **per-host grouping gives 15 and
+> adjacent-in-time pairing gives 14** — two different quantities, and only the first
+> answers "were any two requests to the same host closer than 2 s", which is the rule
+> in question. `mtime.py`'s V3 test initially compared those two and reported a
+> spurious cross-ledger disagreement; the test was wrong, not the ledgers, which agree
+> on all 20 `(seq, host)` pairs.
+>
+> *(Two earlier drafts of this line said **14** — computed before `probe4.sh` added
+> seq 20. The substantive figures were unaffected; the denominator was not.)*
 
 ### Cross-checked with a second oracle (area O's, 2026-10-12) — zero requests
 
@@ -119,6 +136,33 @@ pass does not touch — is **not** answered here.
    mtime marks body-write completion, so `gap = 2.5 s sleep + overhead +
    dur[n+1] − dur[n]` and a faster later request can shrink it. The finding above rests
    on gaps that came out *above* the threshold, which is the direction that is safe.
+
+**A cross-check is only worth what its failure modes are worth, so two defects in
+this file's first version are recorded rather than quietly repaired:**
+
+1. **It printed a conclusion its own table falsified.** The CONCLUSION was a string
+   literal that never read the measured values. On a `git archive` extract — where git
+   collapses every body to one mtime — it printed *"no gap below the declared 2.5 s"*
+   and *"all 4 measure ≥ 2.5 s by mtime"* directly above a table reading
+   `mtime gaps >= 2.5s: 0 of 10` / `minimum 0.000s`, and **exited 0**. That is
+   `AGENTS.md` §1 (a sentence that cannot be traced to a source) in the §6.5 shape
+   (prose contradicting its own table), and the surrounding prose here does *not*
+   over-claim, so the script was the counterweight to an otherwise-earned exoneration.
+   **Fixed:** every reported figure is now computed, three validity tests (V1 collapse,
+   V2 span agreement with `run.log`, V3 per-host denominator derived independently from
+   `run.log`) gate the result, and an invalid series prints **NO RESULT** and exits 1.
+   **A clean clone is now EXPECTED to exit 1**, because git does not preserve mtimes —
+   which is the honest answer, not a broken check.
+2. **It compared UTC logs against local mtimes.** `run.log` is written by `date -u`;
+   `fromtimestamp()` renders an mtime in local time. The offset is constant across a
+   run so it cancels out of every *difference*, which is why it stayed invisible here
+   and would surface on a machine in another timezone or across a DST boundary.
+   **Fixed:** mtimes are now converted to UTC explicitly before comparison.
+   A third defect — the V3 denominator test as first written was a **tautology**
+   (it compared the enumerated total to `len(rows) - n_hosts`, which is algebraically
+   equal by construction) — was caught by deliberately dropping a ledger row and
+   watching the test pass anyway. It now derives the denominator from `run.log`'s own
+   `(seq, host)` stream, which is a genuinely separate record.
 
 **I am in this class.** Area O excluded itself because its harness declared `DELAY=2.5`
 but never emitted the `sleep`, so its sub-floor gaps are a rule breach rather than a
@@ -383,6 +427,36 @@ are recorded; only the log append failed, and the row was appended by hand.
 | `pow.crm.settings` is unauthenticated on all three | OBSERVED | `results.jsonl` seq 2, 6, 10 |
 | Region is not a variable on this host family | INFERRED from the two pairs above | assumption: nothing is injected per-region at the edge; a `Content-Length`/`Vary` split would falsify it, and none was seen |
 | The CRM base tracks deployment rather than product | INFERRED | one key, three hosts, no `cua.crm.settings` probed |
+
+## Correction to another pass's claim about this branch (area D, 2026-10-12)
+
+Area D's counting-rule fix documents a KNOWN LIMIT that **names this branch**: it
+states that my `for spec in ...` loop in `05-public-config.check.sh` would be
+identified as a loop site and multiplied by 16, making `executed_05` **14 too high**.
+
+**That is wrong, and this pass verified it by experiment rather than by argument.**
+My loop contains **zero `check "` sites** — it is an inline `PASS=$((PASS + 1))`
+branch — so `measure_assertions.py`'s `_loop_sites` counter, which is driven by
+`^\s*check\s+"` with leading whitespace allowed, never sees it and never multiplies
+it. Running that counter over this tree gives **41 check sites of which exactly 1 is
+indented** — the pre-existing 16-family loop, not mine — so:
+
+| `INLINE_05` | `executed_05` | runtime |
+|---|---|---|
+| 5 | 61 | **167 359** |
+| 7 | 63 | **167 361** |
+
+and the live suite prints `63 passed`, matching `INLINE_05 = 7`. The whole −2 versus
+my `167 361` is `INLINE_05` 5 versus 7, nothing else; no ×16 multiplier is involved
+and none could be.
+
+Two consequences, stated so the next pass does not "fix" a correct number:
+
+- **My `167 / 361` is correct and is not endangered by D's rule.** Do not restructure
+  this addition to avoid a loop for D's benefit; there is nothing to avoid.
+- **The misstatement is D's to correct, in D's script header.** Recorded here so the
+  claim does not travel further unchallenged, and stated as a correction to another
+  pass's *claim about my code* rather than as a change to their work.
 
 **Not established, and deliberately not claimed:** whether build B's `hcp/*` surface
 differs from build A's (not probed — the area is bundle identity, not route parity);
