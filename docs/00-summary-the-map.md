@@ -336,7 +336,7 @@ believing a feature is unavailable.
 > This is the eighth recorded instance of a derived note disagreeing with a
 > primary observation — which is why the assertion is pinned rather than the prose.
 
-Also confirmed held: the discovery document is still byte-identical, all four
+Also confirmed held: the discovery document is still byte-identical, all five
 tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
 — finding F6 in [`08-security-findings.md`](08-security-findings.md).
 
@@ -358,7 +358,7 @@ clinician bundle replicates across **five** hosts, not two.
 | | |
 |---|---|
 | [`01-hosts-and-estate.md`](01-hosts-and-estate.md) | Host families, deployments, what each is for |
-| [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) | The four auth tenants, the code+PKCE flow, the redirect single-point-of-failure |
+| [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) | The five auth tenants, the code+PKCE flow, the redirect single-point-of-failure |
 | [`03-discovery-and-versions.md`](03-discovery-and-versions.md) | The app-version axis — why only `android/3.6`–`3.8` matter |
 | [`04-configuration.md`](04-configuration.md) | The unauthenticated 69-key config file and the country axis |
 | [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) | 16 device families; why model-matching beats family-matching |
