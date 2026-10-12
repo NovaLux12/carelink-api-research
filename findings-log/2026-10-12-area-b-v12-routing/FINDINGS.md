@@ -20,12 +20,18 @@
   added `access-control-allow-origin not exists` + `access-control-allow-methods not
   exists` to it. Those two assertions had never been executed, and shipping an unexecuted
   assertion is a failure this repo keeps recording, so the changed cell was re-run rather
-  than trusted. **hurl's version, command and verbatim output are in
+  than trusted (`Success ... (1 request(s) in 2075 ms)`, `Failed files: 0`, exit 0).
+- **Plus 1 further request, to 23 of 24**, running that same `discover` cell a second time
+  **with its output teed to disk**, so the claim has a committed artefact beside it rather
+  than prose quoting a transcript. This is a real request against the vendor and is counted
+  as one, even though it re-probes a cell already counted twice. **hurl's version, the
+  exact command and the verbatim output are in
   [`hurl-validation.txt`](hurl-validation.txt)**, which also carries the 4-cell batch
   **transcribed rather than captured** — re-issuing those 4 would breach the 24 cap, so the
-  artefact says so instead of implying a log exists. That is the provenance discipline
-  [`docs/09`](../../docs/09-methodology-and-oracles.md) §6 applies to the 2026-10-10 sweep.
-- **22 of a 24 cap in total.** GET + OPTIONS with empty bodies only; no POST, no token
+  artefact says so instead of implying a log exists for all of them. That is the provenance
+  discipline [`docs/09`](../../docs/09-methodology-and-oracles.md) §6 applies to the
+  2026-10-10 sweep.
+- **23 of a 24 cap in total.** GET + OPTIONS with empty bodies only; no POST, no token
   exchange, no authentication, no auth headers.
 - **Spacing.** The harness declares `sleep 2.5` between requests to the same host. Of the
   **14 same-host gaps** in `run.log`, **13 are ≥2.5 s** and one (`eu` → request 7) is
@@ -234,7 +240,7 @@ lost. That is the signature of an NTP correction, not of a short or skipped `sle
 produce the same arithmetic, and the mtime evidence rules out a later edit to `probe.sh`
 but says nothing about `run.log`. **The pass does not claim to know which**, only that the
 harness and the log cannot both be exactly right. Either way the **measured floor stands at
-2.033 s**, the repo's ≥2 s floor is met, and **22 of 24 requests is unaffected**.
+2.033 s**, the repo's ≥2 s floor is met, and **23 of 24 requests is unaffected**.
 
 ## Reproduction
 
