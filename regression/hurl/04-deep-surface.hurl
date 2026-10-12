@@ -464,7 +464,8 @@ header "access-control-allow-methods" not exists
 # Under the repo's own counting rule (scripts/measure_assertions.py: static =
 # predicates inside [Asserts]) those 6 blocks carry **12 predicates**, 2 each --
 # the "6" is a block count, not an assertion count, and the two must not be
-# conflated. 6 of 67 blocks; no other block sends an Origin.
+# conflated. 6 of the **67 blocks in this file**; across all four .hurl files
+# (86 blocks) these 6 are still the only ones that send an Origin.
 # All other CORS assertions read bare responses, where "no Origin sent"
 # and "Origin ignored" are the same observation.
 # ============================================================
