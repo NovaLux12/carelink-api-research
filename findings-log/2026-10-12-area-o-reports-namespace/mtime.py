@@ -68,6 +68,25 @@ def runlog_t0():
     return t0
 
 
+def server_dates(rows):
+    """The vendor's own clock: the `Date:` header in each captured head.
+
+    This is a genuinely THIRD and fully independent oracle -- it is not this
+    machine's clock at all, it is Medtronic's, recorded by their server in a
+    header we captured for an unrelated reason. It has 1-second granularity, so
+    it cannot measure sub-second gaps; what it can do is decide ORDER.
+    """
+    import re
+    from email.utils import parsedate_to_datetime
+    out = []
+    for r in rows:
+        h = open(os.path.join("headers", r["host_tag"] + ".h"), encoding="utf-8",
+                 errors="replace").read()
+        m = re.search(r"(?im)^date:\s*(.+?)\r?$", h)
+        out.append(parsedate_to_datetime(m.group(1)).timestamp() if m else None)
+    return out
+
+
 def main():
     rows = load()
     t0 = runlog_t0()
@@ -133,7 +152,22 @@ def main():
           "The negative gaps in `run.log` are an artefact of two corrupt `date` reads, not\n"
           "evidence of concurrent requests.\n")
 
-    print("## 4. Correction to this pass's own reported figure\n")
+    print("## 4. A third clock, and it is not ours\n")
+    sd = server_dates(rows)
+    inv = sum(1 for a, b in zip(sd, sd[1:]) if b is not None and a is not None and b < a)
+    print("| Clock | Whose | Granularity | Inversions across the 24 rows |")
+    print("|---|---|---|---|")
+    print(f"| `Date:` response header | **Medtronic's server** | 1 s | **{inv}** |")
+    print("| body-file mtime | this machine's kernel | ns | **0** |")
+    print(f"| `t0` in `run.log` | this machine's `date` | ms | **{sum(1 for s in range(2,25) if t0[s] < t0[s-1])}** (seq 9, seq 20) |")
+    print(f"\nSpan of the server clock: {datetime.datetime.fromtimestamp(sd[0], UTC):%H:%M:%S}"
+          f" -> {datetime.datetime.fromtimestamp(sd[-1], UTC):%H:%M:%S} UTC.\n")
+    print("The response header is a record we captured for no timing purpose, written by\n"
+          "the far end, and it orders all 24 requests consistently with the local kernel\n"
+          "mtimes. Two clocks on two machines agree; only `run.log`'s `t0` dissents, and\n"
+          "only on the two rows that manufacture the negative gaps.\n")
+
+    print("## 5. Correction to this pass's own reported figure\n")
     print("| Figure | first reported | corrected | direction |")
     print("|---|---|---|---|")
     print(f"| minimum same-host gap | {min(gr):+.3f} s | **{min(gm):+.3f} s** | **understated the breach** |")

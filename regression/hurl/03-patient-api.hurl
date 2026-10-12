@@ -85,9 +85,13 @@ HTTP 404
 # Source: findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md
 #
 # The claim this replaces said "live, gated 401/405" on
-# carelink.minimed.eu, sourced to a 2026-10-10 JS-bundle scan. The
-# bundle inventory in JS-API-SURFACE.md carries none of the camelCase
-# names, and the only committed file naming `snapshotTimelinesRange`
+# carelink.minimed.eu, sourced to a 2026-10-10 sweep. That sweep's
+# committed artefact disclaims itself: DRIFT-AND-NEW-2026-10-10.md:9
+# calls it "a reconstruction from the agent's report", with the
+# command-level evidence "not reproduced" and the instruction "re-verify
+# before treating any row as OBSERVED". The bundle inventory it produced
+# carries none of the camelCase names, and the only committed file
+# naming `snapshotTimelinesRange`
 # was ARCHIVE-URLS.md:162 — whose own header (line 302) says the codes
 # are "as archived, NOT as measured live today", window 2020-09-29 to
 # 2021-03-31. So there was no live probe behind the claim. These are

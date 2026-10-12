@@ -115,6 +115,7 @@ same 24 requests. It is rendered by [`mtime.py`](mtime.py) into
 `t0` is read **before** curl, so `mtime - t0` cannot be negative. On those two
 rows it is. Whatever the mechanism, **those two `t0` reads are wrong**, and
 they are precisely the two rows that produce the negative gaps in `run.log`.
+
 #### Same-host gaps, measured two ways
 
 | Measure | body mtimes (**authoritative**) | `run.log` `t0` (**superseded**) |
@@ -131,6 +132,7 @@ they are precisely the two rows that produce the negative gaps in `run.log`.
 increasing, so the 24 requests were issued sequentially and never concurrently.
 The negative gaps in `run.log` are an artefact of two corrupt `date` reads, not
 evidence of concurrent requests.
+
 #### Correction to this pass's own reported figure
 
 | Figure | first reported | corrected | direction |
@@ -150,10 +152,16 @@ minimum. They disagree about *how bad*, and the disagreement matters:
 
 1. **The pass understated its own breach.** It reported a minimum of **−0.538 s**
    — which read like requests overlapping. They did not. The physical minimum is
-   **+0.092 s**, and the true maximum is **+0.387 s**, so the real failure mode
-   was "every request paced ~20× too fast", not "requests were concurrent". A
-   negative number in that column invited the reader to conclude concurrency and
-   to discount the politeness question; the number that should have carried that
+   **+0.092 s**, and the true maximum is **+0.387 s**. The cleanest derivation of
+   how far short the run fell needs no per-gap statistic: 24 requests at the
+   declared 2.5 s is a **60 s** budget, and the capture spans **4.728 s**, so the
+   run was **12.7× short of its own declared pacing** (60 ÷ 4.728). Per-gap, the
+   mean gap is 0.184 s (**13.6×** fast) and the median 0.166 s (**15.1×**). An
+   earlier draft of this line said "~20×", which no derivation here supports —
+   only the single fastest gap (2.5 ÷ 0.092 = 27.2×) reaches that figure — so the
+   number is replaced by the derivations above rather than rounded. A negative
+   number in that column invited the reader to conclude concurrency and to
+   discount the politeness question; the number that should have carried that
    weight was the *positive floor*, not a spurious negative.
 2. **There was no overlap, and that is now established rather than assumed.** The
    24 body mtimes are **distinct and strictly increasing by `seq`**, so the 24
@@ -166,6 +174,13 @@ minimum. They disagree about *how bad*, and the disagreement matters:
    read `t0`, and precisely the two rows that manufacture the negative gaps in
    `run.log`. **No cause is asserted**, per `docs/09` §4's own instruction not to
    theorise about this artefact.
+4. **A third clock agrees, and it is not ours.** The `Date:` response header in
+   each captured head is written by **Medtronic's server**, for no timing purpose,
+   at 1-second granularity — too coarse to measure sub-second gaps, but enough to
+   decide **order**. It is **strictly monotonic across all 24 rows**
+   (18:01:49 → 18:01:54 UTC, **zero inversions**), and it orders the requests the
+   same way the local kernel mtimes do. Two clocks, on two different machines,
+   agree; only `run.log`'s `t0` dissents, and only on seq 9 and seq 20.
 
 **This is a breach of AGENTS.md §8, and it is not smoothed over.** Areas B, X and
 Z each recorded same-host gaps a few hundredths under their declared 2.5 s, and
@@ -513,20 +528,40 @@ pattern that cannot match is worse than no pattern (the reasoning the
 `AKIA…`-shaped control was confirmed to match. `results.jsonl` is valid JSON on
 all 24 lines with `seq` contiguous 1..24, re-asserted by `verdict.py`.
 
-**Two citation errors survived that gate and were caught only on review**, which
-is worth recording because it is the shape of the failure:
+**Two citation errors survived that gate and were caught only on review** — and
+an earlier draft of this section flattered the gate while doing it, so the
+corrected account is below.
 
 | Was | Is | Kind |
 |---|---|---|
 | "see **§8** for where the pins were validated" | **§10** | wrong section in this file |
 | "`docs/06:26`" for `/patient/monitor/data`'s `Allow` | **`docs/06:27`** | off-by-one line number |
 
-**The gate's citation check verifies that citation *paths* resolve, not that
-their *line numbers* are right.** Both errors passed it. A citation that looks
-checkable and is not is more dangerous than one that looks loose, because the
-gate's green tells a reader the reference was verified. Every line-numbered
-citation in this log was therefore re-derived with `grep -n` in the follow-up
-round rather than trusted because the gate was happy.
+**Correction — the gate verified *nothing* about either.** An earlier draft said
+the check "verifies that citation *paths* resolve, not that their *line numbers*
+are right", which is still too generous: it implies the check examined these two
+citations and passed them. It never saw them. Reading
+`scripts/research-gate.sh:138-157` and running its two regexes over this file:
+
+- **It only opens `docs/*.md`, `README.md` and `AGENTS.md` as pages** — 15 files.
+  `findings-log/**` is read **only as the set of valid targets**; a findings-log
+  file is never scanned *as a citation source*. Both errors are inside this file,
+  so neither was in scope at all.
+- **Its `findings-log/…\.md` regex stops at `.md`**, so a `:NN` suffix is outside
+  the match. Line numbers can never be validated by it.
+- **It has no `docs/…` pattern**, so a `docs/06:26` citation is invisible to it
+  wherever it appears.
+- **Its `recon/…` regex carries a `(?<![\w./-])` lookbehind**, and `/` is in
+  that class, so a relative link `](../probe-2026-10-08/recon/X.md)` can never
+  match. Only a bare `recon/X.md` is checked.
+
+So the accurate statement is: the check is a **path-existence test over three
+page locations**, and for citations written inside a findings-log log it is
+**structurally blind**. The practical rule follows: a citation that *looks*
+checkable and is not is worse than one that looks loose, because a green gate
+tells a reader it was verified. Every line-numbered citation in this log was
+re-derived with `grep -n` in the follow-up round rather than trusted because the
+gate was happy.
 
 **The same round re-derived the timing from a second source and found the first
 one wrong** (§1a) — which is the argument for the general habit rather than for
@@ -539,8 +574,13 @@ in this file were broken.** They pointed at sibling findings-log directories wit
 **repository root**, where no such directory exists; the correct prefix is `../`.
 (`../../docs/…` and `../../scripts/…` are correct, because those targets really
 are at the root — which is exactly why the error survived a read-through.) Every
-relative link in this file is now resolved by the same script that re-derived the
-citations above, and all of them land.
+relative link in this file is now resolved by [`citations.py`](citations.py)
+(report: [`citations.txt`](citations.txt)), which also prints the **target line**
+of every line-numbered citation so a reader can confirm it says what the sentence
+claims rather than merely that something is there. That checker has a
+`--selftest` that plants three defects — a link to nowhere, an out-of-range line
+and a blank line — and asserts all three are caught, so its zero can be trusted
+rather than merely observed.
 
 ---
 

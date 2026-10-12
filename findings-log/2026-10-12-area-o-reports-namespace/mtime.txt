@@ -67,7 +67,22 @@ increasing, so the 24 requests were issued sequentially and never concurrently.
 The negative gaps in `run.log` are an artefact of two corrupt `date` reads, not
 evidence of concurrent requests.
 
-## 4. Correction to this pass's own reported figure
+## 4. A third clock, and it is not ours
+
+| Clock | Whose | Granularity | Inversions across the 24 rows |
+|---|---|---|---|
+| `Date:` response header | **Medtronic's server** | 1 s | **0** |
+| body-file mtime | this machine's kernel | ns | **0** |
+| `t0` in `run.log` | this machine's `date` | ms | **2** (seq 9, seq 20) |
+
+Span of the server clock: 18:01:49 -> 18:01:54 UTC.
+
+The response header is a record we captured for no timing purpose, written by
+the far end, and it orders all 24 requests consistently with the local kernel
+mtimes. Two clocks on two machines agree; only `run.log`'s `t0` dissents, and
+only on the two rows that manufacture the negative gaps.
+
+## 5. Correction to this pass's own reported figure
 
 | Figure | first reported | corrected | direction |
 |---|---|---|---|
