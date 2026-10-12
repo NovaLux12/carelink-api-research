@@ -239,7 +239,9 @@ Practical consequences, all visible in this repo:
   leaked something: never commit a credential, never publish internal hostnames,
   never publish raw archive captures, never report a parked-namespace name,
   discriminate on content-type not status, use `curl --compressed`
-  [source: README §Rules].## 7. Reproducing
+  [source: README §Rules].
+
+## 7. Reproducing
 
 The pass harnesses and machine logs are named in each source file and are the
 authoritative artefacts: `vaxis-probe.sh` / `vaxis.jsonl` (oracle + 70-cell
