@@ -42,20 +42,15 @@ that one contains patient-namespace paths the EU one doesn't.
 **Closes when:** you can name the clinic-portal hosts and show which bundle each
 serves, by sha256.
 
-### D. The 18-country sweep, completed
-
-`/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
-countries exist in the config's own lists. The interesting ones are the ones where
-two keys disagree — we already found `bgUnits` vs `glucoseUnitsDefault`
-contradicting each other in BE and CH.
-
-**Attack that specifically:** sweep for *internal contradictions* in a single
-country response, not for differences between countries. Unit fields
-(`bgUnits`, `glucoseUnitsDefault`, `carbohydrateUnitsDefault`), date fields
-(`shortDateFormat`, `reportDateFormat`), and the `mfa.status` / report-availability
-flags are where an inconsistency would actually mislead a client.
-
-**Closes when:** the sweep is either complete or the contradictions are enumerated.
+> **Area D is CLOSED** — see the Closed table at the foot of this page and
+> [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md]. **The sweep is
+> complete and the contradictions are enumerated**: 118 codes requested, 117
+> documents served, **51 internal contradictions across 10 classes**. The
+> recorded two-country `bgUnits`/`glucoseUnitsDefault` anomaly is **30
+> countries**, not 2, and `docs/04` is corrected in place. The per-country ×
+> per-key ABSENT/NULL/VALUED matrix is on disk. It is left here rather than
+> deleted so the reasoning survives; a closed area never leaves the page
+> silently ([How to claim one](#how-to-claim-one), rule 5).
 
 ### V. Given that `baseUrlPde` names a dead namespace, does any vendor client follow it?
 
@@ -129,6 +124,47 @@ framing in `docs/04`.
 
 **Assumptions (INFERRED):** that the per-key grammar is keyed off the same flat-name
 form on all three deployments. Only one deployment has ever been swept.
+
+#### Addendum (2026-10-12, from area D): the per-key matrix now exists
+
+Area D produced the artefact this area was missing — a **country × key matrix
+over 118 codes** in which every one of the 35 country-document keys has an
+explicit ABSENT / NULL / VALUED verdict
+([findings-log/2026-10-12-area-d-country-sweep/matrix.tsv](../../findings-log/2026-10-12-area-d-country-sweep/matrix.tsv)).
+It is a **state** matrix and deliberately carries no per-key value comparison,
+because differences between countries are area W's subject to derive, not a
+by-product of D's contradiction hunt.
+
+**What D established that W did not have, and why it bears on W's question:**
+
+- **The country document is not uniform in shape**: **35 keys** for CA and US,
+  **34** for 74 countries, **33** for 41. The 33-key documents are missing
+  `stateCodes` **and** `cpMobileAppAvailable`; the 34-key ones are missing
+  `stateCodes`. So "what does this document carry" is itself country-dependent,
+  and an enumeration that assumes one shape will mis-read two thirds of them.
+- **Absent and null are different states and neither is rare here.**
+  `cpMobileAppAvailable` is **absent in 41 of 117** documents and `null` in
+  **none**; `stateCodes` is absent in 115. The 2026-10-08 pass recorded both as
+  `null`, which `docs/09` §4 names as the `//`-swallows-`false` trap. Any
+  per-key projection that reads a missing key as a null value inherits exactly
+  that error, so **W's `404`-means-absent-or-null rule now has a second,
+  independent instance to be consistent with.**
+- **One key outside the 35 is impossible to confirm absent on this axis**: the
+  matrix only says "not present in any of the 118 documents".
+
+**Closes when:** W can state, from that matrix plus its own per-key probes,
+whether the 35 country keys and the 69 bulk-config keys are the same names or two
+disjoint sets — **and can say so against a matrix in which absent, null and
+valued are three distinct cells rather than one falsy one**. A negative closes
+it: disjoint sets, and W's "69-request enumeration path" framing is retired
+rather than extended.
+
+**Assumptions (INFERRED):** that the matrix's key vocabulary — the union of
+top-level names across three documents captured 2026-10-12 — is the complete
+vocabulary of the endpoint. **118 country codes were requested and none produced
+a 36th key**, which is evidence for completeness on this list and **not** proof
+that the endpoint cannot serve a key for a country the config does not list
+(§6 of D's log records `ID` as one such gap already).
 
 ### O. Is `/patient/reports/*` on `carelink.*` the reports surface for every region?
 
@@ -394,7 +430,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 18 open plus 8 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 17 open plus 9 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -424,6 +460,8 @@ being superseded — never silently. Letters are not reused.
 | X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells (6 route×method pairs, controls excluded), which **excludes** the "ACAO only when an `Origin` is present" mechanism. **It does not exclude area B's reading (b)** — "the route demands a token on `OPTIONS`" — nor reading (a), nor "emitted only on `OPTIONS`": a first draft of this row claimed (b) was refuted, and that was withdrawn, because the reason assumed a configured route would carry `ACAO` on its own `200` `GET`, which is the thing in dispute. **The cause is not established and this row does not establish it** — all three readings fit 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. The four archive heads are **gitignored**, so the 24/14/10 split is not re-derivable from a clean clone. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** (it assumes a monotonic clock, which `docs/09` declines to assume elsewhere) and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
 | Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See the "corpus is two sources, not one" note under **Why there is no area AA** | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
 | Y — how many "all three hosts" claims rest on a single row? | 2026-10-12 | **All 29 in-scope claims confirmed by row — the negative result, and it closes the audit.** Every multi-host claim in the area's stated scope (**`docs/03` + `docs/06`**, 29 lines) resolves to a row per host. The `clcloud.*` route claims are three-host evidenced because areas B, X, N, U and Z each swept all three hosts on 2026-10-12. **Four candidate findings — none of them in scope, and two of them withdrawn**, and they are the more useful half of the record: **Y-1 WITHDRAWN** — `docs/03:38`'s "all three hosts return the same document" was alleged to be two-host evidenced on the strength of one pass's ledger, and **area X's tracked ledger refutes that**: all three hosts at 20256 B, one digest. **`docs/03:38`** and `01-discovery-pin.hurl` are unchanged from main — `docs/03` does carry **one** other edit from this pass, the claim-#10 method-axis correction, which is unrelated to Y-1. **Y-2 corrected** — `docs/08:37` claimed five hosts while citing `SECURITY-FINDINGS §S3`, which says **"at least twice"**, and labelled it OBSERVED from a file that forbids that label. **Y-3 WITHDRAWN** — `docs/02` was alleged to over-claim a five-tenant comparison; `AUTH-TENANT-FINDINGS §1`'s three tenants *include* trials, and `docs/02` is unchanged. **Y-4** the 2026-10-12 captures are gitignored, so some pages are not re-derivable from a clean clone — recorded, not fixed. **0 requests, 0 cap.** **The lesson the record carries:** two of the four candidate findings (Y-1 and Y-3) were produced by reading **one file as the corpus** — the exact defect area Z's addendum names, written by the pass immediately before this one. It took **three verification rounds** to repair the arithmetic built on the false premise before anyone checked the premise. `audit-index.py --selftest` now asserts its two views read one corpus | [findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md] | #19 |
+| D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no key outside the 35-key vocabulary**, no report-vocabulary delta. **51 internal contradictions across 10 classes**, the headline being that the recorded two-country `bgUnits` vs `glucoseUnitsDefault` anomaly is **30 of 117** documents (BE reproduces; **CH no longer contradicts**; **IT and ES have drifted into it** since 2026-10-08), so `docs/04` is corrected in place with the original claim left readable. Also: three keys recorded as `null` are **absent** (41 of 117 for `cpMobileAppAvailable`, 115 for `stateCodes`) — `docs/04:377` had been contradicting the repo's own pinned assertion; **`ID` is enumerated by all three configs and refused by the endpoint**; KZ and PR publish a postal regex that rejects the document's own example. **119 of a 130 cap**, GET only, controls first, measured spacing floor **1.642 s with 14 of 118 gaps under the declared 2.5 s and 8 under the `>=2 s` floor** — and, unlike the three prior passes, this one shows **11 negative request durations**, which proves the timestamps cannot all be faithful, so the floor is a clock reading and not a demonstrated request rate. **No cause asserted.** Three defects found in the reader itself are recorded, two of which would have manufactured findings | [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md] | #22 |
+
 ---
 
 > **Consumer note.** Findings here are consumed by

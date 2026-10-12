@@ -1,0 +1,75 @@
+countries requested        119
+parsed as a JSON object   119
+not a JSON object         0  (none)
+tier-1 contradictions     51
+tier-2 disagreements      124
+flag-inferred findings    74
+
+tier-1 by rule:
+    30  glucose-unit disagreement
+     5  carbohydrate-unit disagreement
+     5  legal-document path names a language the document does not list
+     3  postal format rejected by its own regex
+     2  HR_12 with a pattern carrying no meridiem
+     2  24/7 hours on a days list that omits a day
+     1  duplicate report entry
+     1  MFA REQUIRED with gracePeriod 0
+     1  US region with no subdivision list
+     1  date separator differs between the two date fields
+
+tier-2 by rule:
+    50  name and defaultCountryName disagree
+    50  mfa.fromDate separator against the document date format
+    24  mfa.fromDate ordered against the document date format
+
+flags by rule:
+    74  techHours clock shape
+
+key-count distribution:
+  3 keys: 2 countries
+  33 keys: 41 countries
+  34 keys: 74 countries
+  35 keys: 2 countries
+
+keys ABSENT in at least one country (never null):
+  bgUnits                      ABSENT    2  NULL    0  VALUED  117
+  blePereodicDataEndpoint      ABSENT    2  NULL    0  VALUED  117
+  carbDefaultUnit              ABSENT    2  NULL    0  VALUED  117
+  carbExchangeRatioDefault     ABSENT    2  NULL    0  VALUED  117
+  carbohydrateUnitsDefault     ABSENT    2  NULL    0  VALUED  117
+  cpMobileAppAvailable         ABSENT   43  NULL    0  VALUED   76
+  dateOfBirthRequired          ABSENT    2  NULL    0  VALUED  117
+  defaultCountryName           ABSENT    2  NULL    0  VALUED  117
+  defaultDevice                ABSENT    2  NULL    0  VALUED  117
+  defaultLanguage              ABSENT    2  NULL    0  VALUED  117
+  dialCode                     ABSENT    2  NULL    0  VALUED  117
+  firstDayOfWeek               ABSENT    2  NULL    0  VALUED  117
+  glucoseUnitsDefault          ABSENT    2  NULL    0  VALUED  117
+  languages                    ABSENT    2  NULL    0  VALUED  117
+  legalAge                     ABSENT    2  NULL    0  VALUED  117
+  mediaHost                    ABSENT    2  NULL    0  VALUED  117
+  mfa                          ABSENT    2  NULL    0  VALUED  117
+  name                         ABSENT    2  NULL    0  VALUED  117
+  numberFormat                 ABSENT    2  NULL    0  VALUED  117
+  pathDocs                     ABSENT    2  NULL    0  VALUED  117
+  postal                       ABSENT    2  NULL    0  VALUED  117
+  recordSeparator              ABSENT    2  NULL    0  VALUED  117
+  region                       ABSENT    2  NULL    0  VALUED  117
+  reportDateFormat             ABSENT    2  NULL    0  VALUED  117
+  shortDateFormat              ABSENT    2  NULL    0  VALUED  117
+  shortTimeFormat              ABSENT    2  NULL    0  VALUED  117
+  smsSendingAllowed            ABSENT    2  NULL    0  VALUED  117
+  stateCodes                   ABSENT  117  NULL    0  VALUED    2
+  supportedReports             ABSENT    2  NULL    0  VALUED  117
+  techDays                     ABSENT    2  NULL    0  VALUED  117
+  techHours                    ABSENT    2  NULL    0  VALUED  117
+  techSupport                  ABSENT    2  NULL    0  VALUED  117
+  timeFormat                   ABSENT    2  NULL    0  VALUED  117
+  timeUnitsDefault             ABSENT    2  NULL    0  VALUED  117
+  uploaderAllowed              ABSENT    2  NULL    0  VALUED  117
+
+keys not in the reference vocabulary:
+  field, message, params
+
+report-name vocabulary deltas:
+  (none)
