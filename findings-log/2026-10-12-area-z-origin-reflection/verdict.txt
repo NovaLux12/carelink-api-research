@@ -1,0 +1,128 @@
+AREA Z VERDICT — is access-control-allow-origin a CONSTANT or an ECHO?
+Rendered from results.jsonl by verdict.py. No request was issued by this script.
+
+1. CONTROLS (2 per host, sent FIRST and bare on every host)
+ seq  host                           role                           status  x-amzn-errortype                   x-ca-err  B    sha256(body)[:12]
+   1  clcloud.minimed.eu             CONTROL-live-token-gated       401     UnauthorizedException              990       36   d551247201fc
+   2  clcloud.minimed.eu             CONTROL-dead-fabricated-uuid   403     MissingAuthenticationTokenException (none)    42   f249b63cb2fc
+  18  clcloud.minimed.com            CONTROL-live-token-gated       401     UnauthorizedException              990       36   d551247201fc
+  19  clcloud.minimed.com            CONTROL-dead-fabricated-uuid   403     MissingAuthenticationTokenException (none)    42   f249b63cb2fc
+  35  clcloud-trials.minimed.com     CONTROL-live-token-gated       401     UnauthorizedException              990       36   d551247201fc
+  36  clcloud-trials.minimed.com     CONTROL-dead-fabricated-uuid   403     MissingAuthenticationTokenException (none)    42   f249b63cb2fc
+
+  C1 CONTROL-live-token-gated    -> 401 UnauthorizedException + x-ca-err 990 = route exists, authorizer reachable
+  C2 CONTROL-dead-fabricated-uuid -> 403 MissingAuthenticationTokenException = no matching route
+  controls passed: 6/6   C2 body digest == the corpus no-route constant f249b63cb2fc: True
+
+2. THE GRID — every data cell, ACAO and ACAM
+host                           path                                         condition  st    acao   acam
+clcloud-trials.minimed.com     connect/carepartner/v12/display/message      bare       200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v12/display/message      OriginA    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v12/display/message      OriginB    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v13/display/message      bare       200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v13/display/message      OriginA    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v13/display/message      OriginB    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v6/display/message       bare       200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v6/display/message       OriginA    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/carepartner/v6/display/message       OriginB    200   *      OPTIONS
+clcloud-trials.minimed.com     connect/csr/v2/display/message               bare       200   *      OPTIONS,POST
+clcloud-trials.minimed.com     connect/csr/v2/display/message               OriginA    200   *      OPTIONS,POST
+clcloud-trials.minimed.com     connect/csr/v2/display/message               OriginB    200   *      OPTIONS,POST
+clcloud-trials.minimed.com     connect/v2/display/message                   bare       200   *      POST,OPTIONS
+clcloud-trials.minimed.com     connect/v2/display/message                   OriginA    200   *      POST,OPTIONS
+clcloud-trials.minimed.com     connect/v2/display/message                   OriginB    200   *      POST,OPTIONS
+clcloud.minimed.com            connect/carepartner/v12/display/message      bare       200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v12/display/message      OriginA    200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v12/display/message      OriginB    200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v13/display/message      bare       200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v13/display/message      OriginA    200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v13/display/message      OriginB    200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v6/display/message       bare       200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v6/display/message       OriginA    200   *      OPTIONS
+clcloud.minimed.com            connect/carepartner/v6/display/message       OriginB    200   *      OPTIONS
+clcloud.minimed.com            connect/csr/v2/display/message               bare       200   *      OPTIONS,POST
+clcloud.minimed.com            connect/csr/v2/display/message               OriginA    200   *      OPTIONS,POST
+clcloud.minimed.com            connect/csr/v2/display/message               OriginB    200   *      OPTIONS,POST
+clcloud.minimed.com            connect/v2/display/message                   bare       200   *      POST,OPTIONS
+clcloud.minimed.com            connect/v2/display/message                   OriginA    200   *      POST,OPTIONS
+clcloud.minimed.com            connect/v2/display/message                   OriginB    200   *      POST,OPTIONS
+clcloud.minimed.eu             connect/carepartner/v12/display/message      bare       200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v12/display/message      OriginA    200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v12/display/message      OriginB    200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v13/display/message      bare       200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v13/display/message      OriginA    200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v13/display/message      OriginB    200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v6/display/message       bare       200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v6/display/message       OriginA    200   *      OPTIONS
+clcloud.minimed.eu             connect/carepartner/v6/display/message       OriginB    200   *      OPTIONS
+clcloud.minimed.eu             connect/csr/v2/display/message               bare       200   *      OPTIONS,POST
+clcloud.minimed.eu             connect/csr/v2/display/message               OriginA    200   *      OPTIONS,POST
+clcloud.minimed.eu             connect/csr/v2/display/message               OriginB    200   *      OPTIONS,POST
+clcloud.minimed.eu             connect/v2/display/message                   bare       200   *      POST,OPTIONS
+clcloud.minimed.eu             connect/v2/display/message                   OriginA    200   *      POST,OPTIONS
+clcloud.minimed.eu             connect/v2/display/message                   OriginB    200   *      POST,OPTIONS
+
+3. THE QUESTION — does ACAO depend on the Origin sent?
+   One Origin cannot tell an echo from a constant. Two distinct ones can.
+
+host                           path                                         bare   OriginA   OriginB   constant? 
+clcloud-trials.minimed.com     connect/carepartner/v12/display/message      *      *         *         YES       
+clcloud-trials.minimed.com     connect/carepartner/v13/display/message      *      *         *         YES       
+clcloud-trials.minimed.com     connect/carepartner/v6/display/message       *      *         *         YES       
+clcloud-trials.minimed.com     connect/csr/v2/display/message               *      *         *         YES       
+clcloud-trials.minimed.com     connect/v2/display/message                   *      *         *         YES       
+clcloud.minimed.com            connect/carepartner/v12/display/message      *      *         *         YES       
+clcloud.minimed.com            connect/carepartner/v13/display/message      *      *         *         YES       
+clcloud.minimed.com            connect/carepartner/v6/display/message       *      *         *         YES       
+clcloud.minimed.com            connect/csr/v2/display/message               *      *         *         YES       
+clcloud.minimed.com            connect/v2/display/message                   *      *         *         YES       
+clcloud.minimed.eu             connect/carepartner/v12/display/message      *      *         *         YES       
+clcloud.minimed.eu             connect/carepartner/v13/display/message      *      *         *         YES       
+clcloud.minimed.eu             connect/carepartner/v6/display/message       *      *         *         YES       
+clcloud.minimed.eu             connect/csr/v2/display/message               *      *         *         YES       
+clcloud.minimed.eu             connect/v2/display/message                   *      *         *         YES       
+
+   distinct ACAO values across ALL 45 data cells: ['*']
+   VERDICT: ACAO is a CONSTANT "*" — not an echo. 45/45 cells agree.
+
+4. access-control-allow-methods — per route, across 3 hosts x 3 conditions
+path                                         acam           cells  cells agreeing 
+connect/carepartner/v12/display/message      OPTIONS        9      9              
+connect/carepartner/v13/display/message      OPTIONS        9      9              
+connect/carepartner/v6/display/message       OPTIONS        9      9              
+connect/csr/v2/display/message               OPTIONS,POST   9      9              
+connect/v2/display/message                   POST,OPTIONS   9      9              
+
+   Differs from the literal 'OPTIONS' on: connect/csr/v2 (OPTIONS,POST) and
+   bare connect/v2 (POST,OPTIONS) — same method SET, different declared ORDER.
+
+5. ARE THE RESPONSES ACTUALLY THE SAME RESPONSE?
+   Per-request-volatile headers (date, request ids, cf ids, via, x-cache) stripped.
+path                                         cells  distinct non-volatile heads    body sha256[:12]  
+connect/carepartner/v12/display/message      9      1                              ['e3b0c44298fc']
+connect/carepartner/v13/display/message      9      1                              ['e3b0c44298fc']
+connect/carepartner/v6/display/message       9      1                              ['e3b0c44298fc']
+connect/csr/v2/display/message               9      1                              ['e3b0c44298fc']
+connect/v2/display/message                   9      1                              ['e3b0c44298fc']
+
+   ALL 5 ROUTES IDENTICAL ACROSS 3 HOSTS x 3 CONDITIONS: True
+   i.e. host, bare/OriginA/OriginB, and route all change the response; Origin does not.
+
+6. THE REST OF THE CORS FAMILY — presence across all 51 responses
+   acao     present in 45/51 responses
+   acam     present in 45/51 responses
+   acah     present in 45/51 responses
+   acac     present in 0/51 responses
+   acamx    present in 0/51 responses
+   vary     present in 0/51 responses
+
+   access-control-allow-credentials and access-control-max-age are ABSENT everywhere,
+   and `vary` is absent — so the gateway does not even vary on Origin.
+
+7. access-control-allow-headers — per route
+path                                         cells  value
+connect/carepartner/v12/display/message      9      Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+connect/carepartner/v13/display/message      9      Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+connect/carepartner/v6/display/message       9      Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+connect/csr/v2/display/message               9      Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+connect/v2/display/message                   9      Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id

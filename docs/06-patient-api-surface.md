@@ -176,6 +176,69 @@ recorded on any of the three hosts**. Successor area in
 Method registration is still read from the **GET** probe, never from
 `access-control-allow-methods` ([`docs/09`](09-methodology-and-oracles.md) §2).
 
+#### `access-control-allow-origin` is a constant `*`, not an echo — settled 2026-10-12
+
+Area Z closed the question `docs/11` §Z was opened for. A fixed `*` and a reflected origin are
+**indistinguishable under one `Origin` value**, which is why the archive could not settle it and
+why area X's single-`Origin` result could not either. The grid sent each preflight route's
+`OPTIONS` under **three** conditions — bare, `Origin: https://example.invalid`, and
+`Origin: https://probe-two.invalid` — across all three cumulus hosts.
+
+| claim | class | evidence |
+|---|---|---|
+| `access-control-allow-origin` is the literal `*` in **45 of 45** cells: 3 hosts × 5 route families × 3 conditions. **No cell echoed an `Origin` back.** | OBSERVED | [source: findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md §3–§4] |
+| All 6 controls passed, **first on every host**: `401` + `UnauthorizedException` + `x-ca-err: 990` on the live path, `403` + `MissingAuthenticationTokenException` at the corpus no-route digest `f249b63cb2fc` — byte-identical on all three hosts | OBSERVED | [§2] |
+| `access-control-allow-methods` is a **per-route constant**: unchanged across 3 hosts and all 3 conditions, 9 of 9 cells per route. `v13`, `v12`, `v6` → `OPTIONS`; `csr/v2` → `OPTIONS,POST`; bare `v2` → `POST,OPTIONS` | OBSERVED | [§5] |
+| So `ACAM` **does** differ from the literal `OPTIONS` on two of the five routes, and those two hold the **same method set in a different declared order** — a value no `contains` assertion would catch | OBSERVED | [§5] |
+| `access-control-allow-headers` is likewise a per-route constant. Four routes → `Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token`; **bare `v2` alone carries three extra** (`x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id`) | OBSERVED | [§6] |
+| `access-control-allow-credentials`, `access-control-max-age` and **`vary`** are **absent on all 51 responses** — the gateway does not even declare that it varies on `Origin` | OBSERVED | [§6] |
+| After stripping per-request-volatile headers (`date`, request ids, cf ids, `via`, `x-cache`), each route's response head is **identical across all 9 of its cells**, body `0` B throughout. Cross-host and cross-origin constancy is not an artefact of comparing one header | OBSERVED | [§7] |
+
+**What this does not establish.** No **cause**. Whether the constant `*` comes from route
+configuration, an API Gateway stage default, or CloudFront is not addressed by any of these
+requests — area X's open question about *why* the discovery route carries no preflight is
+untouched, and all three of its surviving readings still fit. Also untested here: the
+`Access-Control-Request-Method` × `Origin` **interaction** (`probe.sh` deliberately sends
+`Origin` alone so `Origin` is the only variable), and any route outside the five probed
+([§9](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md)).
+
+**Two corrections this pass carries, one of them to `docs/11` §Z itself.**
+
+`docs/11` §Z asserted that `connect/csr/v2/display/message`, the bare `connect/v2/display/message`
+and `v6/display/message` return `200` + **`ACAO` on all three hosts**. **`ACAO` on all three
+hosts was not evidenced for any of the three.** For the first two it was recorded on `.com` and
+`-trials` only — the only `.eu`-era rows carry **no `host` column and no `ACAO` column at all**.
+For `v6` **no `ACAO` value exists anywhere in this repository**: its sole preflight evidence was a
+yes/no `CORS` flag in `ORACLE-PROBE-MATRIX` row 14 (`.eu`, bare), and `.com`/`-trials` had never
+been `OPTIONS`-probed for `v6` at all. This is `AGENTS.md` §6 item 1 in a repeatable form and is
+the defect class area **Y** exists to audit.
+
+Area Z closes that gap by observation, not by restatement: **`v6/display/message` answers
+`200` + `ACAO: *` + `ACAM: OPTIONS` on all three hosts**, 9 of 9 cells, which also establishes
+`v6` as preflight-bearing on `.com`/`-trials` for the first time ([§3], [§7]). That matters
+slightly beyond bookkeeping: `v6` is the version the vendor's **own** country config hands out
+as `blePereodicDataEndpoint` ([`docs/04`](04-configuration.md)), so the route their client is
+told to use has now been shown preflight-bearing cross-host rather than inferred from one row.
+
+**The corpus is not machine-uniform, and that silently under-reports.** The same header is stored
+**four** different ways across five ledgers: `pde-csr-oracle` has neither a `host` nor an `acao`
+column and buries CORS inside the `ctype` string; `area-b-v12-routing` captures **no CORS value
+at all**; `area-x-cors-separation` uses full-name keys (`access_control_allow_origin`);
+`csr-cross-host` buries it in `ctype`; `pde-csr-cross-host` uses short keys (`acao`/`acam`).
+A first query filtering on `r.acao` alone returned **2** ACAO-bearing cells; re-parsed across all
+four conventions the same corpus holds **12**. **The error is silent** — it returns fewer rows,
+which reads as a finding rather than as a parser mistake ([§6] of the claim,
+[#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). Area Z's own ledger writes
+`host` plus an explicit key per CORS header, `(none)` when absent, so its rows parse without
+`ctype` archaeology.
+
+**A method note, because three passes have now hit it.** The harness slept 2.5 s between requests;
+the measured minimum same-host gap was **2.042 s**, and **5 of 48** same-host gaps fell below
+2.5 s. **None breached the `>=2 s` floor** ([source: …-area-z…/FINDINGS.md §1]). Areas B and X each
+recorded one sub-2.5 s gap before it. The stated spacing and the measured spacing are not the
+same number, and this repo should not keep writing down the stated one as though it were the
+measured one.
+
 ### App-version axis — it serves exactly two documents
 
 ```

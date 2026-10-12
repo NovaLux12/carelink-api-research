@@ -141,6 +141,14 @@ OPTIONS https://clcloud.minimed.eu/connect/csr/v2/display/message
 HTTP 200
 [Asserts]
 header "access-control-allow-origin" == "*"
+# Area Z (2026-10-12) adds the EXACT allow-methods value. Area C pinned
+# presence-of-ACAO only; area N used `contains "POST"`, which a reordering
+# would not catch. These two routes hold the SAME method set in a DIFFERENT
+# declared order (`OPTIONS,POST` vs `POST,OPTIONS`), so the exact string is
+# the thing worth locking. Constant across 3 hosts x 3 Origin conditions,
+# 9 of 9 cells. Source: findings-log/2026-10-12-area-z-origin-reflection/
+# FINDINGS.md section 5.
+header "access-control-allow-methods" == "OPTIONS,POST"
 
 GET https://clcloud.minimed.eu/connect/csr/v2/display/message
 HTTP 403
@@ -150,6 +158,13 @@ OPTIONS https://clcloud.minimed.eu/connect/v2/display/message
 HTTP 200
 [Asserts]
 header "access-control-allow-origin" == "*"
+# Area Z (2026-10-12): exact value, and note the ORDER differs from `csr/v2`
+# above (`POST,OPTIONS` vs `OPTIONS,POST`) for the same method set. Bare `v2`
+# is also the only route of the five whose allow-headers carries three extra
+# tokens (`x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id`) — also constant
+# across 3 hosts x 3 Origin conditions. Source:
+# findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md sections 5, 6.
+header "access-control-allow-methods" == "POST,OPTIONS"
 
 GET https://clcloud.minimed.eu/connect/v2/display/message
 HTTP 403
@@ -428,3 +443,100 @@ HTTP 401
 header "x-ca-err" == "990"
 header "access-control-allow-origin" not exists
 header "access-control-allow-methods" not exists
+
+# ============================================================
+# Area Z (2026-10-12): `access-control-allow-origin` is a CONSTANT `*`,
+# not an echo of the request Origin. 45 of 45 cells, 3 hosts.
+# Source: findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md
+#
+# WHY TWO ORIGINS PER HOST. A fixed `*` and a reflected origin are
+# indistinguishable under ONE Origin value — that is exactly why area X
+# (which sent one) could not settle this, and why docs/11 §Z said so.
+# Two DISTINCT origins are the minimum that separates them. The two
+# literals are RFC 2606 reserved and never resolve; they are request
+# headers, not credentials.
+#
+# WHAT THIS LOCKS, precisely: that the gateway does NOT echo. It does NOT
+# lock a cause. Whether `*` comes from route configuration, a stage
+# default, or CloudFront is not established by anything asserted here.
+#
+# These 6 assertions are the only ones in the suite that send an Origin.
+# All other CORS assertions read bare responses, where "no Origin sent"
+# and "Origin ignored" are the same observation.
+# ============================================================
+
+# --- The two-origin discriminating test, on all three cumulus hosts. ---
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/display/message
+Origin: https://example.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/display/message
+Origin: https://probe-two.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/display/message
+Origin: https://example.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/display/message
+Origin: https://probe-two.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+Origin: https://example.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+Origin: https://probe-two.invalid
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+# --- v6: the vendor's OWN published `blePereodicDataEndpoint`
+# (docs/04). Its preflight presence was previously recorded ONLY as a
+# yes/no `CORS` flag in ORACLE-PROBE-MATRIX row 14 (.eu, bare) — no header
+# value, and .com/-trials were never OPTIONS-probed for v6 at all. Area Z
+# recorded 200 + ACAO `*` + ACAM `OPTIONS` on all three, 9 cells, constant
+# across 3 hosts x 3 conditions. These three assertions close that gap.
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v6/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud.minimed.com/connect/carepartner/v6/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v6/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "OPTIONS"
+
+# --- ACAM is a PER-ROUTE constant, and the two routes that differ from the
+# literal `OPTIONS` differ from each other in ORDER, not in method set.
+# Area N above pins these with `contains "POST"`, which a flip to any
+# order would NOT catch. These pin the exact value. Zero extra requests:
+# these are added to request blocks that already existed.
+# ============================================================
+# (`csr/v2` and bare `v2` exact-value pins are attached to their existing
+# area C blocks above — see FINDINGS.md section 5.)

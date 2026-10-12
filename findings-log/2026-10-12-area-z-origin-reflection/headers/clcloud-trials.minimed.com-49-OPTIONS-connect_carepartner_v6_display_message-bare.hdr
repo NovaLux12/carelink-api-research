@@ -1,0 +1,15 @@
+HTTP/2 200 
+content-type: application/json
+content-length: 0
+date: Mon, 12 Oct 2026 15:32:02 GMT
+access-control-allow-methods: OPTIONS
+x-amzn-requestid: 65040edc-c0d4-4a80-b680-2ca5b759c166
+access-control-allow-origin: *
+access-control-allow-headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+x-amz-apigw-id: FIyJ7HaHoAMFaNA=
+x-cache: Miss from cloudfront
+via: 1.1 56f3da228975806497e2c0e04e10d7ce.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR95-P2
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: IE3y47wU3friUCfuWmRFu98oK3q8xE8-74DQe0trs-JlaR_uAsCI1g==
+
