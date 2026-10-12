@@ -1,0 +1,94 @@
+rows read: 24
+
+== 1. transport health (a non-zero curl_exit is a hole, never an answer) ==
+  rows: 24   curl_exit == 0: 24   curl_exit != 0: 0
+  rows whose http_status is not a digit string: 0
+
+== 2. every row, every field as received ==
+seq host_tag   method  path                                           sent_headers                                                   st   errortype-token                  x-ca-err acao   acam   access_control_family_seen                                                                       bytes sha256
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 eu         GET     connect/carepartner/v13/display/message        ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+  2 eu         GET     connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c ABSENT                                                         403  MissingAuthenticationTokenException ABSENT   ABSENT ABSENT ABSENT                                                                                              42 f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16
+  3 eu         OPTIONS connect/carepartner/v99/display/message        ABSENT                                                         403  MissingAuthenticationTokenException ABSENT   ABSENT ABSENT ABSENT                                                                                              42 f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16
+  4 eu         GET     connect/carepartner/v13/discover/android/3.6   ABSENT                                                         200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+  5 eu         GET     connect/carepartner/v13/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+  6 eu         GET     connect/carepartner/v13/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+  7 eu         OPTIONS connect/carepartner/v13/discover/android/3.6   ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+  8 eu         OPTIONS connect/carepartner/v13/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+  9 eu         OPTIONS connect/carepartner/v13/display/message        ABSENT                                                         200  ABSENT                           ABSENT   *      OPTIONS access-control-allow-headers,access-control-allow-methods,access-control-allow-origin                0 e3b0c44298fc1c14..(EMPTY-BODY)
+ 10 eu         OPTIONS connect/carepartner/v13/display/message        Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   *      OPTIONS access-control-allow-headers,access-control-allow-methods,access-control-allow-origin                0 e3b0c44298fc1c14..(EMPTY-BODY)
+ 11 eu         OPTIONS connect/carepartner/v13/display/message        Origin:https://example.invalid|Access-Control-Request-Method:POST 200  ABSENT                           ABSENT   *      OPTIONS access-control-allow-headers,access-control-allow-methods,access-control-allow-origin                0 e3b0c44298fc1c14..(EMPTY-BODY)
+ 12 eu         GET     connect/carepartner/v13/display/message        Origin:https://example.invalid|Access-Control-Request-Method:GET 401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+ 13 eu         GET     connect/carepartner/v11/discover/android/3.6   ABSENT                                                         200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20345 94b739dda4784c7b49564cc059b6760b24d60822e87d34a0d3dfa676a6420615
+ 14 eu         GET     connect/carepartner/v11/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20345 94b739dda4784c7b49564cc059b6760b24d60822e87d34a0d3dfa676a6420615
+ 15 com        GET     connect/carepartner/v13/display/message        ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+ 16 com        GET     connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c ABSENT                                                         403  MissingAuthenticationTokenException ABSENT   ABSENT ABSENT ABSENT                                                                                              42 f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16
+ 17 com        GET     connect/carepartner/v13/discover/android/3.6   ABSENT                                                         200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+ 18 com        GET     connect/carepartner/v13/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+ 19 com        OPTIONS connect/carepartner/v13/discover/android/3.6   ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+ 20 trials     GET     connect/carepartner/v13/display/message        ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+ 21 trials     GET     connect/carepartner/v13/3f8a1c2e-9b7d-4e5a-8c6b-1d2e3f4a5b6c ABSENT                                                         403  MissingAuthenticationTokenException ABSENT   ABSENT ABSENT ABSENT                                                                                              42 f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16
+ 22 trials     GET     connect/carepartner/v13/discover/android/3.6   ABSENT                                                         200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+ 23 trials     GET     connect/carepartner/v13/discover/android/3.6   Origin:https://example.invalid|Access-Control-Request-Method:GET 200  ABSENT                           ABSENT   ABSENT ABSENT ABSENT                                                                                           20256 f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+ 24 trials     OPTIONS connect/carepartner/v13/discover/android/3.6   ABSENT                                                         401  UnauthorizedException            990      ABSENT ABSENT ABSENT                                                                                              36 d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+
+== 3. one question: for every row whose http_status is 200, does it carry ACAO? ==
+   grouped by whether an Origin was sent on that request
+   (the Origin literal is https://example.invalid -- RFC 2606 reserved, never resolved)
+
+  Origin NOT SENT: 5 rows with http_status 200
+    carries ACAO:        1  seq [9]
+    carries no ACAO:     4  seq [4, 13, 17, 22]
+      seq  4 eu         GET     no ACAO  acao=ABSENT
+      seq  9 eu         OPTIONS ACAO     acao=*
+      seq 13 eu         GET     no ACAO  acao=ABSENT
+      seq 17 com        GET     no ACAO  acao=ABSENT
+      seq 22 trials     GET     no ACAO  acao=ABSENT
+
+  Origin SENT: 7 rows with http_status 200
+    carries ACAO:        2  seq [10, 11]
+    carries no ACAO:     5  seq [5, 6, 14, 18, 23]
+      seq  5 eu         GET     no ACAO  acao=ABSENT
+      seq  6 eu         GET     no ACAO  acao=ABSENT
+      seq 10 eu         OPTIONS ACAO     acao=*
+      seq 11 eu         OPTIONS ACAO     acao=*
+      seq 14 eu         GET     no ACAO  acao=ABSENT
+      seq 18 com        GET     no ACAO  acao=ABSENT
+      seq 23 trials     GET     no ACAO  acao=ABSENT
+
+
+== 4. rows where ACAO and http_status 200 DISAGREE ==
+  total disagreements: 9
+    seq  4 eu         GET     200 but NO ACAO                    acao=ABSENT
+    seq  5 eu         GET     200 but NO ACAO                    acao=ABSENT
+    seq  6 eu         GET     200 but NO ACAO                    acao=ABSENT
+    seq 13 eu         GET     200 but NO ACAO                    acao=ABSENT
+    seq 14 eu         GET     200 but NO ACAO                    acao=ABSENT
+    seq 17 com        GET     200 but NO ACAO                    acao=ABSENT
+    seq 18 com        GET     200 but NO ACAO                    acao=ABSENT
+    seq 22 trials     GET     200 but NO ACAO                    acao=ABSENT
+    seq 23 trials     GET     200 but NO ACAO                    acao=ABSENT
+
+== 5. body digests grouped (the all-zero digest is an EMPTY-BODY marker) ==
+  zero-byte bodies (marker, not a value): 3 seq [9, 10, 11]
+  distinct non-empty body digests: 4
+    d551247201fc8fc27dee1ae62538455ea04258855f1880443176930399875a7a
+      count 8  seq [1, 7, 8, 12, 15, 19, 20, 24]  bytes [36]  hosts ['clcloud-trials.minimed.com', 'clcloud.minimed.com', 'clcloud.minimed.eu']
+    f84886265667b1b685ad0d362793c0478354f2ec30d7c81e30a52ca86a3b1609
+      count 7  seq [4, 5, 6, 17, 18, 22, 23]  bytes [20256]  hosts ['clcloud-trials.minimed.com', 'clcloud.minimed.com', 'clcloud.minimed.eu']
+    f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16
+      count 4  seq [2, 3, 16, 21]  bytes [42]  hosts ['clcloud-trials.minimed.com', 'clcloud.minimed.com', 'clcloud.minimed.eu']
+    94b739dda4784c7b49564cc059b6760b24d60822e87d34a0d3dfa676a6420615
+      count 2  seq [13, 14]  bytes [20345]  hosts ['clcloud.minimed.eu']
+
+== 6. same-host spacing, measured from run.log (not the harness's stated value) ==
+  timestamped requests parsed from run.log: 24
+  same-host gaps measured: 21
+  gaps >= 2.5s: 20
+  gaps <  2.5s: 1
+  single measured MINIMUM same-host gap: 2.291s
+    at eu -> request 13: 2.291s
+  GAPS BELOW 2.5s, listed and not rounded away:
+    eu -> request 13: 2.291s
+
+requests issued: 24   cap: 26

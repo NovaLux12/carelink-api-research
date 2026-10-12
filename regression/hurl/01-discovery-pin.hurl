@@ -71,6 +71,33 @@ jsonpath "$.CP[0].baseUrlCsr" not exists
 jsonpath "$.CP[1].baseUrlCsr" not exists
 jsonpath "$.CP[2].baseUrlCsr" not exists
 
+# NEGATIVE CORS pin, added 2026-10-12 by area X — this is the cell whose absence
+# let a wrong claim through two review rounds. It costs ZERO extra requests: the
+# GET above already fetches this exact URL, so these two assertions ride on a
+# request the suite was making anyway.
+#
+# WHY IT MATTERS. The discovery document is one of the few things on clcloud.* that
+# answers 200 unauthenticated. It answers 200 and carries NO Access-Control-* header
+# at all. Until area X, 04-deep-surface.hurl pinned only the OPTIONS side (a 401
+# carrying no CORS), which is the wrong method to catch this: a one-directional pin
+# on the 401 still passes if Medtronic later adds CORS to the 200 GET. Asserting the
+# ABSENCE on the 200 is what makes "a 200 on clcloud.* does not imply a preflight"
+# falsifiable by drift.
+#
+# This is the assertion that makes docs/03 §6 and docs/06 checkable. Before it,
+# "on clcloud.*, carries-a-preflight and answers-200 are the same observation in this
+# corpus" was repeated across five pages and was FALSE: this very URL is the
+# counterexample, and it was sitting in the suite unpinned the whole time.
+#
+# Still NOT established, and deliberately not asserted here: whether preflight
+# presence is configured per route, or whether ACAO is only ever emitted on OPTIONS
+# responses. Both readings fit every cell on disk, and no recorded clcloud.* route is
+# both CORS-configured and GET-public, so the question cannot be settled from a GET
+# at all. Successor area in docs/11, not a claim made here.
+# Source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4
+header "access-control-allow-origin" not exists
+header "access-control-allow-methods" not exists
+
 # The .com host must serve the same global document (not a US-only one).
 # If this ever changes, buildDiscoveryUrl(isUS) stops being cosmetic.
 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/3.6

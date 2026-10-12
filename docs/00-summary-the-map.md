@@ -120,10 +120,31 @@ of the three `clcloud.*` hosts, so there is no region split (OBSERVED,
 [source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 1]). `v12` also
 carries a CORS preflight exactly like `v11`/`v13`, while `discover/android/3.6` returns a
 `401` with **no** `Access-Control-*` header at any version. So the gateway does **not** add
-CORS uniformly — but **do not read that as "the discovery route has no preflight
-configured"**: across all 101 captured heads, every CORS-carrying response is a `200`, so
-the two readings are confounded with status code in this corpus. §Finding 2, §Finding 3,
-and successor area X.
+CORS uniformly.
+
+**⚠ Corrected 2026-10-12 (area X).** This page previously carried the caution that the
+discovery route's `401`-without-CORS could not be read as "no preflight configured",
+because across the captured heads every CORS-carrying response is a `200`. **The count was
+right; the host scoping was not** — four of the ten CORS-less `200`s are on `clcloud.*`
+itself — four across the three cumulus hosts, **two of them on `.com`**, so **a `200` carrying no
+preflight does exist there** and
+status was never standing in for CORS presence. Area X re-derived the cell on all three
+hosts: **9 `200`-without-CORS responses, every one a `GET` of a discovery payload, and 0
+non-2xx carrying CORS anywhere**
+([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
+
+**The false premise does not close the question, and an earlier draft of this note claimed it
+did — that claim is withdrawn.** "Demands a token on `OPTIONS`, non-2xx never carries CORS" is
+**not excluded**; the draft's reason (a configured route would carry `ACAO` on its own `200`
+`GET`) assumes the very thing in dispute, since `ACAO` may be emitted only on `OPTIONS`.
+Neither is "configured per route" nor "emitted only on `OPTIONS`" excluded, and no
+CORS-configured `clcloud.*` route is recorded that also answers `200` on `GET`. **The cause is
+still unestablished.**
+
+**What area X did exclude:** the mechanism "`ACAO` appears only when an `Origin` request header
+is sent" — across the **6** route×method pairs where both a bare and an `Origin`-bearing
+request were sent (controls excluded), status and the full `access-control-*` set were
+**identical in all 6**. No earlier pass could test it; none sent an `Origin` at all.
 
 **`v11/discover` is host-dependent**, and this **contradicts** an earlier claim
 that the discovery document is global: `.com` serves an 18105 B legacy doc
@@ -312,7 +333,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 145 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 147 of these facts so they fail loudly rather than rot.
 
 ---
 

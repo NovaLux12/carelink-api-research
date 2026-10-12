@@ -389,12 +389,39 @@ header "access-control-allow-origin" == "*"
 # a restatement, not a guard.
 #
 # Honest scope: this pins the OBSERVATION (a 401 carrying no CORS headers), not
-# a cause. Across all 101 captured heads in findings-log/, every response
-# carrying access-control-allow-origin is a 200 — zero non-2xx carries it — so on
-# clcloud.* "has a preflight" and "answers 200" are the same observation in this
-# corpus. These assertions cannot separate "no CORS configured on this route"
-# from "this route demands a token on OPTIONS and non-2xx never carries CORS".
-# That separation is successor area X in docs/11, not a claim made here.
+# a cause. And as of 2026-10-12 the "not a cause" caveat below was itself
+# MIS-STATED — corrected here by area X, because a correction that leaves the
+# pinned suite asserting a withdrawn claim is not a correction.
+#
+# WHAT THIS BLOCK PREVIOUSLY SAID, AND WHY IT WAS WRONG. It said: "Across all
+# 101 captured heads in findings-log/, every response carrying
+# access-control-allow-origin is a 200 — zero non-2xx carries it — so on
+# clcloud.* 'has a preflight' and 'answers 200' are the same observation in this
+# corpus." The count was right; the SCOPE was not. Of the 10 captured 200-status
+# heads carrying no ACAO, FOUR are on clcloud.* — the discovery documents at
+# findings-log/2026-10-12-published-pointers/probe.sh:81-84 — not on "a
+# different host surface". So on clcloud.* a 200 that carries NO preflight does
+# exist, and status was never standing in for CORS presence. That claim is
+# withdrawn.
+#
+# WHAT IS ACTUALLY UNRESOLVED, restated 2026-10-12. Three readings fit every cell
+# on disk and this block does not separate them: (a) no preflight configured on
+# the discovery route; (b) the route demands a token on OPTIONS while non-2xx
+# never carries CORS; (c) ACAO is emitted only on OPTIONS responses regardless of
+# route, which would make a GET incapable of revealing a route's configuration at
+# all. A first draft of the area-X correction claimed (b) was REFUTED — it is not.
+# Separating these needs a clcloud.* route that is both CORS-configured and
+# answers 200 on GET, and no such route is recorded on any host.
+#
+# The one mechanism that IS excluded, and no earlier pass could test it because
+# none sent an Origin header to clcloud.* at all: "ACAO appears only when an
+# Origin is sent" is dead. See
+# findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md section 4.
+# Area X is CLOSED (docs/11 Closed table, issue #15) — it is not an open
+# successor. Its successor is area Z.
+#
+# The assertions below still pin only what this block claims to pin: the
+# OBSERVATION, a 401 carrying no CORS headers.
 OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
 HTTP 401
 [Asserts]
