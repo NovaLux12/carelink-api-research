@@ -99,89 +99,6 @@ echo: **45 of 45** cells, 3 hosts × 5 route families × 3 `Origin` conditions. 
 rather than deleted so the reasoning survives; a closed area never leaves the page silently
 ([How to claim one](#how-to-claim-one), rule 5).
 
-### Y. How many "all three hosts" claims in `docs/` rest on a single row?
-
-Added 2026-10-12. **Derived from area B.** That pass had to grep the whole `findings-log/`
-corpus before it could write anything, to settle one fact: the "401 on all three hosts"
-claim about `v12/display/message` had exactly **one** raw row behind it, on `.eu`,
-duplicated across two files (`ORACLE-PROBE-MATRIX` row 52 and `VERSION-AXIS` row 52 — the
-same probe). It happened to be true, but it was unsourced for two of its three hosts. That
-surfaced by accident, while checking a single cell.
-
-**What is missing:** nobody knows how many *other* multi-host claims in `docs/03` and
-`docs/06` rest the same way. A claim of the form "X on all three hosts" that was only ever
-probed on `.eu` is invisible on the page — it reads exactly like a verified one. This is
-`AGENTS.md` §6 item 1 in a repeatable form, and it is checkable **offline**.
-
-**Blocker:** none, and **zero requests**. For every "all three hosts" claim in `docs/03`
-and `docs/06`, resolve the claim to its raw row(s) and record the host coverage actually
-present. The area B method — grep the corpus for the path, read the host column — is a few
-minutes per claim and needs no network.
-
-**Closes when:** every such claim in `docs/03` and `docs/06` is marked confirmed-by-row or
-restated with its actual host coverage. **A negative closes it too**: proving the rest are
-correctly evidenced is a real result and retires the audit.
-
-**Assumptions (INFERRED):** that this defect class lives in claims of the form "same on all
-three hosts" and does not hide in per-host tables, which are harder to over-claim. A claim
-may also legitimately cite a cross-host pass instead of per-host rows; the audit must follow
-the citation rather than demand a row per host.
-
-#### Addendum (2026-10-12, from area Z): the corpus Y would audit cannot be queried reliably
-
-Found while building area Z's candidate list, and **in scope for Y rather than a new area** —
-see [Why there is no area AA](#why-there-is-no-area-aa). Same blocker class: **zero requests**,
-corpus only.
-
-**The `findings-log/` ledger stores the same header three different ways across the five
-pre-existing files, and the failure mode is silent.**
-
-**Counting rule, so the figures can be reproduced:** *ACAO-bearing rows* = rows whose response
-carried `access-control-allow-origin`, read under whichever convention that ledger uses. Those
-rows are then **deduplicated to (host, method, route)** to get *cells*. A query filtering on the
-short key `r.acao` alone finds **2 cells**. Re-parsed across all three conventions the same
-five-ledger corpus holds **17 rows → 12 cells**. **Say which unit you mean**: a reader who counts
-rows gets 17, and 12 is not wrong, it is a different denominator.
-
-There is no error and no warning — the parser simply returns fewer rows, and *fewer rows reads as a
-finding*. Any audit that counts, like Y, is working from a corpus whose shape is not uniform.
-
-| ledger | ACAO rows | `host` key | where the CORS value lives |
-|---|---|---|---|
-| `2026-10-11-pde-csr-oracle` | 3 | **absent** | embedded inside the `ctype` string |
-| `2026-10-12-csr-cross-host` | 6 | present | embedded inside the `ctype` string |
-| `2026-10-12-area-b-v12-routing` | 3 | present | full-name key `access_control_allow_origin` (`.eu` v11/v12/v13) |
-| `2026-10-12-area-x-cors-separation` | 3 | present | full-name key `access_control_allow_origin` (`.eu` v13 ×3) |
-| `2026-10-12-pde-csr-cross-host` | 2 | present | short keys `acao` / `acam` |
-
-The missing `host` column is not cosmetic: it is why `docs/11` §Z's claim that `csr/v2` and bare
-`v2` return `ACAO` "on all three hosts" was **unsourced for `.eu`** — the only `.eu`-era rows for
-those two routes are the three unattributable rows in `pde-csr-oracle`. **The `host`-less ledger is
-the whole problem; the other two conventions are merely awkward.** Row totals here sum to 17, and
-deduplicating to (host, method, route) gives the 12 above.
-
-⚠ **An earlier draft of this addendum said `area-b-v12-routing` captures "no CORS value at all" and
-put the convention count at "four". Both were wrong**, and both came from querying only the short
-key — the very error this addendum is about. Area B carries `access_control_allow_origin` in 3
-rows and has a `host` column, and the corpus uses **three conventions across five ledgers — two,
-two and one**, not an even split. Every figure in this paragraph is derived, not asserted: run
-[`corpus-audit.py`](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.py)
-([output](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.txt)), which exits
-non-zero if the corpus shape moves. The 2-vs-12 figures were re-derived and **hold**; the
-characterisation of *why* did not, and neither did the first attempt at the distribution.
-
-**Blocker:** none, **zero requests**.
-**Closes when:** every `results.jsonl` carries an explicit `host` key and one explicit key per
-CORS header, `(none)` when absent — **or** a `docs/` note records the convention per ledger and
-warns that a single-convention query under-reports. Either close is acceptable; the 2-vs-12
-worked example is recorded in
-[#17](https://github.com/NovaLux12/carelink-api-research/issues/17) and written up in
-[`docs/06`](06-patient-api-surface.md). It is deliberately **not** in area Z's
-`FINDINGS.md`: that file is scoped to what came off the wire, and this result is an
-offline property of the corpus, not a response. Area Z's own ledger is
-written to the uniform shape, so the fix is already demonstrated once.
-**Assumptions (INFERRED):** that a uniform schema is wanted over documented heterogeneity. If
-the maintainers prefer the latter, only the `docs/` note is owed.
 
 ### W. Is the per-key projection a complete enumeration path for the 69-key document?
 
@@ -450,8 +367,34 @@ landing on alphabetical neighbours).
    below three open areas.
 
 ### Why there is no area AA
+#### Addendum (2026-10-12, from area Y): the corpus is two sources, not one
 
-**Every letter A–Z is now in use** — 19 open plus 7 closed — and the priorities page's own gate
+Found while building area Y's index, and **the correction the rest of this page depends on** —
+see [Why there is no area AA](#why-there-is-no-area-aa). Zero requests.
+
+**`results.jsonl` is not the whole corpus.** Host evidence also lives in
+`findings-log/probe-2026-10-08/recon/ORACLE-PROBE-MATRIX.md`, the repo's own "one-request-per-row
+log". Area Y read the machine-readable ledgers first and found
+`connect/carepartner/v6/display/message` `GET` on **zero** hosts — which would have marked a
+correctly-evidenced three-host claim **false**. The matrix carries all three.
+
+Two more traps in reading it: the `namespace` column **already includes `connect/`** (prefixing it
+again yields `connect/connect/…`), and some rows carry the version in the path tail while others
+leave it to the `ver` column. And the index's `--coverage` lookup originally returned **before**
+the matrix was merged, so it answered from a smaller corpus than the report printed beside it —
+**the same "check that cannot fail" shape this page already warns about**.
+
+**Blocker:** none, zero requests. `audit-index.py` (in the area Y log) merges both sources and
+emits both readings where a matrix row is ambiguous, so a claim can never be marked unevidenced
+because a parser guessed.
+**Closes when:** the two sources are documented as the corpus on this page, and any host-coverage
+query reads both.
+**Assumptions (INFERRED):** that `results.jsonl` + `ORACLE-PROBE-MATRIX` is sufficient. Other
+markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no claim was marked
+defective on the index alone.
+
+
+**Every letter A–Z is now in use** — 18 open plus 8 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -479,7 +422,8 @@ being superseded — never silently. Letters are not reused.
 | T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
 | B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** — which assumes a monotonic clock, and `docs/09` declines to assert that cause — and is recorded as a provenance problem, not smoothed over. The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact. ⚠ **Its CORS corpus premise was superseded by area X the same day** — the 10 CORS-less `200`s are not all on "a different host surface"; four are `clcloud.*` discovery documents. The observation stands; the inference did not ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] §Correction) | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
 | X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells (6 route×method pairs, controls excluded), which **excludes** the "ACAO only when an `Origin` is present" mechanism. **It does not exclude area B's reading (b)** — "the route demands a token on `OPTIONS`" — nor reading (a), nor "emitted only on `OPTIONS`": a first draft of this row claimed (b) was refuted, and that was withdrawn, because the reason assumed a configured route would carry `ACAO` on its own `200` `GET`, which is the thing in dispute. **The cause is not established and this row does not establish it** — all three readings fit 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. The four archive heads are **gitignored**, so the 24/14/10 split is not re-derivable from a clean clone. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** (it assumes a monotonic clock, which `docs/09` declines to assume elsewhere) and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
-| Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See also the **ledger is not machine-uniform** note under area Y | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
+| Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See the "corpus is two sources, not one" note under **Why there is no area AA** | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
+| Y — how many "all three hosts" claims rest on a single row? | 2026-10-12 | **All 29 in-scope claims confirmed by row — the negative result, and it closes the audit.** Every multi-host claim in the area's stated scope (**`docs/03` + `docs/06`**, 29 lines) resolves to a row per host. The `clcloud.*` route claims are three-host evidenced because areas B, X, N, U and Z each swept all three hosts on 2026-10-12. **Four candidate findings — none of them in scope, and two of them withdrawn**, and they are the more useful half of the record: **Y-1 WITHDRAWN** — `docs/03:38`'s "all three hosts return the same document" was alleged to be two-host evidenced on the strength of one pass's ledger, and **area X's tracked ledger refutes that**: all three hosts at 20256 B, one digest. **`docs/03:38`** and `01-discovery-pin.hurl` are unchanged from main — `docs/03` does carry **one** other edit from this pass, the claim-#10 method-axis correction, which is unrelated to Y-1. **Y-2 corrected** — `docs/08:37` claimed five hosts while citing `SECURITY-FINDINGS §S3`, which says **"at least twice"**, and labelled it OBSERVED from a file that forbids that label. **Y-3 WITHDRAWN** — `docs/02` was alleged to over-claim a five-tenant comparison; `AUTH-TENANT-FINDINGS §1`'s three tenants *include* trials, and `docs/02` is unchanged. **Y-4** the 2026-10-12 captures are gitignored, so some pages are not re-derivable from a clean clone — recorded, not fixed. **0 requests, 0 cap.** **The lesson the record carries:** two of the four candidate findings (Y-1 and Y-3) were produced by reading **one file as the corpus** — the exact defect area Z's addendum names, written by the pass immediately before this one. It took **three verification rounds** to repair the arithmetic built on the false premise before anyone checked the premise. `audit-index.py --selftest` now asserts its two views read one corpus | [findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md] | #19 |
 ---
 
 > **Consumer note.** Findings here are consumed by

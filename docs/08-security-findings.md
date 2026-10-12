@@ -34,7 +34,27 @@ gaps**, ranked below in disclosure order.
 | # | Finding | Class | Severity (per source) |
 |---|---|---|---|
 | F1 | Reports-broker API keys published **unauthenticated** on the US and trials patient hosts — EU ships a placeholder | OBSERVED | unrated; "same class as S3, but worse in two ways" [CROSS-REGION] |
-| F2 | Hardcoded `x-api-key` in a public bundle, replicated across five hosts (drift-swept); prod API base points at a `dev.` host | OBSERVED | low — verified not live [SECURITY-FINDINGS S3] |
+| F2 | Hardcoded `x-api-key` in a public bundle, replicated beyond one host; prod API base points at a `dev.` host | **see correction below** — the host count and evidence class are corrected | low — verified not live [SECURITY-FINDINGS §S3] |
+
+> **⚠ Corrected 2026-10-12 by area Y.** This row previously read *"replicated across **five
+> hosts** (drift-swept)"* and was labelled **OBSERVED**. Two defects, either sufficient alone:
+>
+> 1. **The count outran its own citation.** This row cites `SECURITY-FINDINGS.md` §S3, whose
+>    section is titled *"S3 is replicated across a second host"* and which says the bundle is
+>    deployed **"at least twice" — including on the `.medtronic.com` shadow**. Two, not five.
+> 2. **The evidence class is the one the source forbids.** The corroborating drift file opens
+>    *"**Provenance:** this file is a **reconstruction from the agent's report** … Re-verify
+>    before treating any row as **OBSERVED**"*.
+>
+> **The later paragraph in this section, which carries the same count, is separately correct and is NOT changed.** It cites
+> `DRIFT-AND-NEW`, which has a section headed *"Five hosts, not two"*, and it already carries
+> the caveat *"recorded as reported; the sweep's own caveat is that its evidence table was never
+> written to disk and must be re-verified before being treated as OBSERVED"*. An earlier draft of
+> this correction wrongly extended to it on the strength of this row's citation; the two cite
+> **different sources**, and the retraction is preserved here rather than deleted.
+>
+> **Not a disclosure change.** The key is redacted, the finding is "verified not live", and no
+> new host is named.
 | F3 | Health-data portal ships **zero security headers** | OBSERVED | low-moderate [SECURITY-FINDINGS S1] |
 | F4 | Pre-Auth0 authorize URLs in public archives carrying session material — one in plaintext | PUBLISHED | unrated [ARCHIVE-URLS §7] |
 | F5 | Internal hostnames disclosed via certificate-transparency logs | OBSERVED | informational [SECURITY-FINDINGS S5] |
