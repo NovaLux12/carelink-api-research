@@ -71,6 +71,16 @@ reproducible from `run.log` as committed, and **not** the explanation. What can 
 said without inference: no gap fell below the 2 s floor, so the rule this repo
 actually enforces was not breached.
 
+> **Known-pending, deliberately not fixed here.** This pass's four sub-2.5 s gaps are
+> the **same signature** as the open question in `docs/09` §4, whose row currently
+> reads **n = 3 passes, 7 occurrences**. Adding this pass makes the true figure
+> **n = 4 passes, 11 occurrences**, so that row will read wrong once this merges.
+> **It is left uncorrected on purpose:** sibling branches edit that same row from the
+> same base with their own numbers, and reconciling a shared row is the merge queue's
+> job, not a per-PR one. Editing it here would have this PR race two other branches
+> and be overwritten. Recorded so the discrepancy is a known open item rather than a
+> silent drift. **The count in `docs/09` is not this pass's to change.**
+
 ## Controls, in the order they were sent
 
 Controls were sent **first on every host**, before any candidate.
@@ -99,7 +109,20 @@ identifier appeared in any response.
 
 ## Findings
 
-### 1. `carelink.medtronic.eu` **does** serve the bundle — `docs/01` and `docs/10` say it does not
+### 1. `carelink.medtronic.eu` **does** serve the bundle — `docs/01` and `docs/10` said it did not
+
+> **Correction (2026-10-12, applied in this same PR).** The two quotes below are
+> quoted **as recorded on `main` before this pass's correction**, and they are how a
+> reader of the *pre-merge* tree finds them — `docs/01-hosts-and-estate.md:69` and
+> `docs/10-open-questions.md` §2. **This PR rewrote both sites in the same diff**, so
+> on the merged tree the line numbers have moved and the sentences now read as
+> corrections: `docs/01`'s `carelink.medtronic.eu` row says "**does** serve the clinic
+> bundle … **Corrected 2026-10-12**", and `docs/10` §2 says "Was 'No — false
+> positive.' That is now REFUTED." `docs/01` keeps the original sentence verbatim
+> inside a dated `⚠ CORRECTION — 2026-10-12 (area A)` block, so the retraction history
+> stays readable. **A line number in this log therefore points at `main`, not at the
+> post-merge tree** — `AGENTS.md` §3's append-only rule for `findings-log/` versus the
+> same-PR rewrite of `docs/`.
 
 `docs/01-hosts-and-estate.md:69` records `carelink.medtronic.eu` as "**does not**
 serve that bundle — it returns the 5518-byte SPA fallback, md5-identical to the
@@ -125,6 +148,13 @@ that cleared `carelink.medtronic.com` existed on disk; the same test was never r
 `.eu`.
 
 ### 2. `carelink-support.medtronic.com` serves a **different build**, not "the same document"
+
+> **Correction (2026-10-12, applied in this same PR).** Same marker as §1: the quotes
+> below are **as recorded on `main` before this pass's correction**. This PR rewrote
+> `docs/07-admin-portal-and-reporting.md`, `docs/01-hosts-and-estate.md` and
+> `docs/08-security-findings.md` in the same diff, so on the merged tree the cited line
+> numbers have moved and the sentences now carry dated correction blocks. The original
+> wording is preserved verbatim inside those blocks rather than deleted.
 
 `docs/07-admin-portal-and-reporting.md:24`, `docs/01-hosts-and-estate.md:68` and
 `findings-log/probe-2026-10-08/SECURITY-FINDINGS.md` §S3 all record that
@@ -217,8 +247,10 @@ error is what produced Finding 1.**
    > `[3, 7, 11, 14, 17]`, paired in order — each pair verified to be the same host
    > before its digests were compared, so the ordering is not taken on trust. The
    > denominator is the **five** hosts with an HTTP row. It is explicitly **not** the
-   > 8 rows in `dns.jsonl`: that file covers 3 hosts that answered HTTP, 5 that are
-   > NXDOMAIN and could not be probed, and 1 test host. And it is **not per request** —
+   > 8 rows in `dns.jsonl`: **3** of those rows are hosts that answered HTTP, the other
+   > **5** are NXDOMAIN — and the test host `carelinkhp-test.minimed.eu` is *one of
+   > those five*, not a sixth category, so the 8 rows partition as 3 + 5 with no row
+   > counted twice. And it is **not per request** —
    > a host with three document paths would still contribute one pair.
    > *(An earlier draft of this line said "seven pairs", which was wrong in the way
    > `AGENTS.md` §6.7 forbids: the ledger contains five such pairs and no seventh.)*
@@ -283,12 +315,12 @@ are recorded; only the log append failed, and the row was appended by hand.
 |---|---|---|
 | Build A served by `carelinkhp.minimed.eu` | OBSERVED | `results.jsonl` seq 4 |
 | Build A served by `carelink.medtronic.com` | OBSERVED | `results.jsonl` seq 8 |
-| **Build A served by `carelink.medtronic.eu`** — refutes `docs/01:69`, `docs/10` §2 | OBSERVED | `results.jsonl` seq 19 |
+| **Build A served by `carelink.medtronic.eu`** — refutes `docs/01:69`, `docs/10` §2 (as recorded on `main`; both sites corrected in this same PR — see §1) | OBSERVED | `results.jsonl` seq 19 |
 | Build B served by `carelink-support.medtronic.eu` | OBSERVED | `results.jsonl` seq 15 |
-| Build B served by `carelink-support.medtronic.com` — refutes `docs/07:24`, `docs/01:68`, SECURITY-FINDINGS §S3 | OBSERVED | `results.jsonl` seq 20 |
+| Build B served by `carelink-support.medtronic.com` — refutes `docs/07:24`, `docs/01:68`, SECURITY-FINDINGS §S3 (as recorded on `main`; all corrected in this same PR — see §2) | OBSERVED | `results.jsonl` seq 20 |
 | Catch-all ≡ host's own entry document, **5 of 5** host-pairs (counting rule below) | OBSERVED | `results.jsonl` seq 1≡3, 5≡7, 9≡11, 13≡14, 16≡17 |
 | 5518 B maps to ≥ 2 distinct digests | OBSERVED | `results.jsonl` seq 3 vs seq 11 |
-| `docs/08`'s `f637c8d0…` is the document, not the asset (`a054555a…` is the asset) | OBSERVED | `results.jsonl` seq 14 vs seq 15 |
+| `docs/08`'s `f637c8d0…` is the document, not the asset (`a054555a…` is the asset) — as recorded on `main`; `docs/08` corrected in this same PR (§3) | OBSERVED | `results.jsonl` seq 14 vs seq 15 |
 | Build A asset digest `2a7fa8e7af519c2b` reproduces the value recorded 2026-10-08 | OBSERVED | `results.jsonl` seq 4; `AUTH-TENANT-FINDINGS.md:248` |
 | `carelinkhp` entry doc md5 `6aedf6c4004fbb29a298bc62128480be` reproduces the recorded value | OBSERVED | `headers/carelinkhp-minimed-eu-root.b`; `CONFIG-NAMESPACE-DEEP.md:264` |
 | 5 × `carelinkhp*.minimed.{eu,com}` names NXDOMAIN | OBSERVED (DNS) | `dns.jsonl` |
