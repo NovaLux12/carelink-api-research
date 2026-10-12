@@ -4,9 +4,15 @@ Run date: **2026-10-12**. Claim issue:
 [#24](https://github.com/NovaLux12/carelink-api-research/issues/24).
 Harness: [`probe.sh`](probe.sh). Corpus: [`results.jsonl`](results.jsonl) — one
 row per request. Request ledger: [`run.log`](run.log). Every table below is
-rendered from the ledger by [`verdict.py`](verdict.py) (output saved as
-[`verdict.txt`](verdict.txt), spacing as [`verdict-spacing.txt`](verdict-spacing.txt)),
+rendered from the ledger by [`verdict.py`](verdict.py) (output
+[`verdict.txt`](verdict.txt), spacing [`verdict-spacing.txt`](verdict-spacing.txt)),
 which issues no requests.
+
+**Timing has a second, better oracle**: [`mtime.py`](mtime.py) →
+[`mtime.txt`](mtime.txt), built from the kernel mtimes of the capture files that
+curl itself wrote. It **supersedes** `run.log` for timing, because `run.log`'s
+`t0` is provably corrupt on two rows. `verdict-spacing.txt` is kept and labelled
+as the superseded reading so the retraction history stays visible.
 
 This file records **what came back off the wire** and what it does and does not
 license anyone to conclude. It assigns evidence classes and marks the one place
@@ -29,7 +35,7 @@ says*, which needs a token.
 
 **24 of a 30 cap.** The cap is the one declared in issue #24. Used: **24**,
 all from the harness. Zero hurl pin-validation requests were counted separately
-— see §8 for where the five new pins were validated and why they are not
+— see **§10** for where the five new pins were validated and why they are not
 double-counted here. `wc -l results.jsonl` = **24**; `run.log` holds exactly
 **24** request lines with `seq` contiguous 1..24, no gaps and no extras; both
 counters were asserted, not eyeballed (`verdict.py` re-checks contiguity).
@@ -63,33 +69,115 @@ counters were asserted, not eyeballed (`verdict.py` re-checks contiguity).
 `DELAY=2.5` in `probe.sh` sets and what the repository requires as a minimum of
 2 s. **It was not applied.** `probe.sh` declares `DELAY=2.5` and the lock section
 is commented "sleep + curl" — but **`sleep` was never emitted into `req()`**. All
-24 requests therefore went out spaced only by curl's own round trip, and the
-table below is the measurement of what actually happened.
+24 requests therefore went out spaced only by curl's own round trip.
 
-| Measure | Value |
-|---|---|
-| requests in `run.log` | 24 |
-| same-host gaps measured | 21 |
-| gaps >= 2.5 s (the declared delay) | 0 |
-| gaps >= 2.0 s (**the repository floor, AGENTS.md §8**) | **0** |
-| gaps < 2.0 s — **a rule breach** | **21** |
-| minimum same-host gap | **-0.538 s** (seq 20 -> 21, `carelink-trials.minimed.com`) |
-| maximum same-host gap | 1.097 s |
+**The pass originally measured that from `run.log`. It should not have: `run.log`
+is wrong.** A second oracle exists and is better — the **kernel mtimes of the
+`headers/*.b` and `headers/*.h` files**, which curl itself wrote, spanning the
+same 24 requests. It is rendered by [`mtime.py`](mtime.py) into
+[`mtime.txt`](mtime.txt); it issues no requests.
 
-**This is a breach of AGENTS.md §8, not a rounding artefact, and it is not
-smoothed over.** Areas B, X and Z each recorded same-host gaps a few
-hundredths under their declared 2.5 s and all of those stayed **above** the 2 s
-floor; this run is a different and worse class, because no gap here reaches the
-floor at all. The cause is not a clock artefact: it is the missing `sleep`.
+**The measurement, both ways. The body-mtime column is authoritative; the
+`run.log` column is retained so the retraction history stays visible.**
 
-Two consequences, kept separate:
+#### `mtime - t0` per row — the arithmetic that convicts `run.log`
 
-1. **The negative gap (seq 20 -> 21) is a backwards clock step**, which is the
-   signature `docs/09` §4 already records from areas B, X and Z. It is recorded
-   as a provenance problem and no cause is asserted, per that row's own
-   instruction. This pass does **not** establish why it happens; it adds one
-   more occurrence to an open, zero-request question.
-2. **The sub-2 s gaps are this pass's own defect** and are not that artefact.
+| seq | `t0` (run.log, UTC) | body mtime (UTC) | `mtime - t0` | verdict |
+|---|---|---|---|---|
+| 1 | 18:01:49.22 | 18:01:49.37 | **+0.153 s** | ok |
+| 2 | 18:01:49.42 | 18:01:49.47 | **+0.048 s** | ok |
+| 3 | 18:01:49.51 | 18:01:49.56 | **+0.049 s** | ok |
+| 4 | 18:01:49.61 | 18:01:49.66 | **+0.047 s** | ok |
+| 5 | 18:01:49.70 | 18:01:49.75 | **+0.047 s** | ok |
+| 6 | 18:01:49.80 | 18:01:49.84 | **+0.046 s** | ok |
+| 7 | 18:01:49.89 | 18:01:49.94 | **+0.049 s** | ok |
+| 8 | 18:01:49.99 | 18:01:50.03 | **+0.046 s** | ok |
+| 9 | 18:01:50.93 | 18:01:50.46 | **-0.463 s** | **IMPOSSIBLE — `t0` is corrupt** |
+| 10 | 18:01:50.51 | 18:01:50.63 | **+0.122 s** | ok |
+| 11 | 18:01:50.68 | 18:01:50.79 | **+0.114 s** | ok |
+| 12 | 18:01:50.84 | 18:01:51.11 | **+0.265 s** | ok |
+| 13 | 18:01:51.16 | 18:01:51.42 | **+0.261 s** | ok |
+| 14 | 18:01:51.47 | 18:01:51.58 | **+0.112 s** | ok |
+| 15 | 18:01:51.63 | 18:01:51.74 | **+0.118 s** | ok |
+| 16 | 18:01:51.79 | 18:01:51.94 | **+0.149 s** | ok |
+| 17 | 18:01:52.14 | 18:01:52.38 | **+0.239 s** | ok |
+| 18 | 18:01:52.46 | 18:01:52.57 | **+0.116 s** | ok |
+| 19 | 18:01:52.69 | 18:01:52.96 | **+0.274 s** | ok |
+| 20 | 18:01:53.78 | 18:01:53.20 | **-0.587 s** | **IMPOSSIBLE — `t0` is corrupt** |
+| 21 | 18:01:53.25 | 18:01:53.51 | **+0.267 s** | ok |
+| 22 | 18:01:53.56 | 18:01:53.68 | **+0.114 s** | ok |
+| 23 | 18:01:53.74 | 18:01:53.86 | **+0.122 s** | ok |
+| 24 | 18:01:53.98 | 18:01:54.10 | **+0.119 s** | ok |
+
+**22 of 24 rows** fall in a tight **+0.046…+0.274 s** band — exactly what
+`t0`-then-`curl` predicts. The only rows outside it are **seq 9** (-0.463 s), **seq 20** (-0.587 s).
+
+`t0` is read **before** curl, so `mtime - t0` cannot be negative. On those two
+rows it is. Whatever the mechanism, **those two `t0` reads are wrong**, and
+they are precisely the two rows that produce the negative gaps in `run.log`.
+#### Same-host gaps, measured two ways
+
+| Measure | body mtimes (**authoritative**) | `run.log` `t0` (**superseded**) |
+|---|---|---|
+| same-host gaps measured | 21 | 21 |
+| minimum gap | **+0.092 s** | -0.538 s |
+| maximum gap | **+0.387 s** | +1.097 s |
+| negative gaps | **0** | 2 |
+| gaps >= 2.5 s (declared) | 0 | 0 |
+| gaps >= 2.0 s (**AGENTS.md section 8 floor**) | **0** | 0 |
+| gaps < 2.0 s — **rule breach** | **21** of 21 | 21 of 21 |
+
+**No overlap.** Every mtime delta is positive and the 24 mtimes are strictly
+increasing, so the 24 requests were issued sequentially and never concurrently.
+The negative gaps in `run.log` are an artefact of two corrupt `date` reads, not
+evidence of concurrent requests.
+#### Correction to this pass's own reported figure
+
+| Figure | first reported | corrected | direction |
+|---|---|---|---|
+| minimum same-host gap | -0.538 s | **+0.092 s** | **understated the breach** |
+| maximum same-host gap | +1.097 s | **+0.387 s** | overstated the spread |
+| negative gaps | 1 reported | **2** | undercounted |
+
+The corrected minimum is **higher** than the reported one, so the pass
+**understated how badly it breached the floor**: no gap here was negative, and
+no gap came within 1.6 s of the 2 s requirement.
+
+
+**Read the two tables together.** They agree that the floor was breached on
+**21 of 21** same-host gaps and that **not one** reached either 2.5 s or the 2 s
+minimum. They disagree about *how bad*, and the disagreement matters:
+
+1. **The pass understated its own breach.** It reported a minimum of **−0.538 s**
+   — which read like requests overlapping. They did not. The physical minimum is
+   **+0.092 s**, and the true maximum is **+0.387 s**, so the real failure mode
+   was "every request paced ~20× too fast", not "requests were concurrent". A
+   negative number in that column invited the reader to conclude concurrency and
+   to discount the politeness question; the number that should have carried that
+   weight was the *positive floor*, not a spurious negative.
+2. **There was no overlap, and that is now established rather than assumed.** The
+   24 body mtimes are **distinct and strictly increasing by `seq`**, so the 24
+   requests were issued sequentially and never concurrently.
+3. **The negative gaps are two corrupt `date` reads, not a clock signature worth
+   theorising about.** `t0` is taken *before* curl, so `mtime - t0` must be
+   positive. On **22 of 24** rows it is, in a tight **+0.046…+0.274 s** band that
+   is exactly what `t0`-then-`curl` predicts. On **seq 9** it is **−0.463 s** and
+   on **seq 20** it is **−0.587 s** — arithmetically impossible for a correctly
+   read `t0`, and precisely the two rows that manufacture the negative gaps in
+   `run.log`. **No cause is asserted**, per `docs/09` §4's own instruction not to
+   theorise about this artefact.
+
+**This is a breach of AGENTS.md §8, and it is not smoothed over.** Areas B, X and
+Z each recorded same-host gaps a few hundredths under their declared 2.5 s, and
+all of those stayed **above** the 2 s floor; this run is a different and worse
+class, because no gap here comes within 1.6 s of the floor. The cause is not a
+clock artefact and not a measurement artefact: it is the missing `sleep`.
+
+**The negative-gap count was undercounted at one; it is two.** `run.log` contains
+**two** backwards steps — **seq 9 → 10 (−0.415 s)** and **seq 20 → 21
+(−0.538 s)** — and this section originally reported only the second. That is one
+more occurrence of the `docs/09` §4 artefact, which is updated to **4 passes / 9
+occurrences** in this PR.
 
 **The run was not repeated.** A clean re-run is 24 further requests on top of the
 24 already sent, which would exceed the 30-request cap committed in #24 — fixing
@@ -101,10 +189,10 @@ unspent.
 observations — a status code, a `Content-Type`, a body digest, a header's
 presence. None of those is a function of request rate, and no response here
 varied within a path across the three hosts (§5), which is itself weak evidence
-against rate-dependent behaviour. What the breach does affect is **the conduct
-of the probe against a third party's servers**, and that is the part being
-reported, not excused. A reader weighting this pass should discount the
-politeness of it entirely and not discount the rows.
+against rate-dependent behaviour. What the breach does affect is **the conduct of
+the probe against a third party's servers**, and that is the part being reported,
+not excused. A reader weighting this pass should discount the politeness of it
+entirely and not discount the rows.
 
 ### 1b. Post-run edit to `probe.sh` — declared, with the diff
 
@@ -131,14 +219,14 @@ preserved byte-for-byte and were not regenerated.
 ## 2. The candidate list, and a provenance correction
 
 The seven paths are taken **verbatim** from
-[`findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:162`](../../probe-2026-10-08/recon/ARCHIVE-URLS.md).
+[`findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:162`](../probe-2026-10-08/recon/ARCHIVE-URLS.md).
 The list was not re-derived per host, not expanded, and not guessed.
 
 **Correction — the recorded verdicts are ARCHIVE verdicts, not live ones.** The
 same file states the rule at
-[`ARCHIVE-URLS.md:302`](../../probe-2026-10-08/recon/ARCHIVE-URLS.md):
+[`ARCHIVE-URLS.md:302`](../probe-2026-10-08/recon/ARCHIVE-URLS.md):
 "status codes as archived, **not** as measured live today", and the family table
-at [`ARCHIVE-URLS.md:329`](../../probe-2026-10-08/recon/ARCHIVE-URLS.md) gives
+at [`ARCHIVE-URLS.md:329`](../probe-2026-10-08/recon/ARCHIVE-URLS.md) gives
 the window as **first 2020-09-29, last 2021-03-31**. So the `(401)`, `(405)`,
 `(400)`, `(404)` on line 162 are codes from Wayback captures ending **more than
 five years ago**.
@@ -147,10 +235,20 @@ This matters because the repo presented those codes as a live observation.
 [`docs/00-summary-the-map.md`](../../docs/00-summary-the-map.md) — **as it stood
 before this pass's edit**, quoted here so the citation stays checkable — read
 "`/patient/reports/*` **on `carelink.minimed.eu`** — **Live, gated 401/405**",
-citing the 2026-10-10 sweep; that sweep's committed artefact
-([`DRIFT-AND-NEW-2026-10-10.md` §2](../../probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md))
-is a **JS-bundle scan**, and the bundle inventory it produced
-([`JS-API-SURFACE.md`](../../probe-2026-10-08/recon/JS-API-SURFACE.md)) carries
+citing the 2026-10-10 sweep.
+
+**The 2026-10-10 artefact's own provenance is weaker than a "JS-bundle scan".**
+[`DRIFT-AND-NEW-2026-10-10.md:9`](../probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md)
+opens with: *"this file is a **reconstruction from the agent's report**, because
+the agent's own file was never written to disk… the command-level evidence table
+is **not reproduced here**… **Re-verify before treating any row as OBSERVED**."*
+So the row `docs/00` leaned on was never an OBSERVED capture by its own account;
+it is a secondhand report with no command-level evidence committed. **An earlier
+draft of this section called it "a JS-bundle scan" — that understated how weak
+the provenance is, and is corrected here.**
+
+On top of that, the bundle inventory the 2026-10-10 sweep produced
+([`JS-API-SURFACE.md`](../probe-2026-10-08/recon/JS-API-SURFACE.md)) carries
 **none** of the camelCase names: `snapshotTimelinesRange` and `favoriteReports`
 appear nowhere in it, and its `generateReport` / `reportStatus` hits are the
 `hcp/reports/*` and `commoncore /reports/*` namespaces, which are different
@@ -282,7 +380,7 @@ exactly with the `405`.
 patient-plane table already records `Allow: HEAD, GET, OPTIONS` on
 `/patient/monitor/data` and `Allow: POST, OPTIONS` on
 `/patient/dataUpload/recentUploads`
-([`docs/06:26,32`](../../docs/06-patient-api-surface.md)), and — recorded in the
+([`docs/06:27,32`](../../docs/06-patient-api-surface.md)), and — recorded in the
 same table — **`/patient/connect/data` carries no `Allow` header at all**
 ([`docs/06:28`](../../docs/06-patient-api-surface.md)). Those are `.eu` rows
 from the 2026-10-08 pass on different paths.
@@ -332,7 +430,7 @@ than of one status:
 
 **`commoncore-trials.medtronic.com` appears in no prior note in this repository.**
 The other five are recorded ([`docs/01:70,93`](../../docs/01-hosts-and-estate.md),
-[`CONFIG-NAMESPACE-DEEP.md:252`](../../probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md),
+[`CONFIG-NAMESPACE-DEEP.md:252`](../probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md),
 which has `commoncore-trials.minimed.com` at 502). The **`.medtronic.com` half of
 the trials pair is missing from the corpus** while `docs/07:174` writes the
 non-trials pair as `commoncore.medtronic.{eu,com}` — a brace that silently
@@ -414,6 +512,35 @@ pattern that cannot match is worse than no pattern (the reasoning the
 `reCAPTCHA` entry in that file records from 2026-10-12): a known
 `AKIA…`-shaped control was confirmed to match. `results.jsonl` is valid JSON on
 all 24 lines with `seq` contiguous 1..24, re-asserted by `verdict.py`.
+
+**Two citation errors survived that gate and were caught only on review**, which
+is worth recording because it is the shape of the failure:
+
+| Was | Is | Kind |
+|---|---|---|
+| "see **§8** for where the pins were validated" | **§10** | wrong section in this file |
+| "`docs/06:26`" for `/patient/monitor/data`'s `Allow` | **`docs/06:27`** | off-by-one line number |
+
+**The gate's citation check verifies that citation *paths* resolve, not that
+their *line numbers* are right.** Both errors passed it. A citation that looks
+checkable and is not is more dangerous than one that looks loose, because the
+gate's green tells a reader the reference was verified. Every line-numbered
+citation in this log was therefore re-derived with `grep -n` in the follow-up
+round rather than trusted because the gate was happy.
+
+**The same round re-derived the timing from a second source and found the first
+one wrong** (§1a) — which is the argument for the general habit rather than for
+this one file: `run.log` was the only timing record, it was internally
+implausible, and nothing in the pipeline was watching for that.
+
+**A third defect of the same family, found by the same sweep: six relative links
+in this file were broken.** They pointed at sibling findings-log directories with
+`../../probe-2026-10-08/…`, which from `findings-log/<this-dir>/` resolves to the
+**repository root**, where no such directory exists; the correct prefix is `../`.
+(`../../docs/…` and `../../scripts/…` are correct, because those targets really
+are at the root — which is exactly why the error survived a read-through.) Every
+relative link in this file is now resolved by the same script that re-derived the
+citations above, and all of them land.
 
 ---
 

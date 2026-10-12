@@ -159,6 +159,12 @@ def spacing():
         if a[2] == b[2]
     ]
     out = [
+        "> **SUPERSEDED — this is the `run.log`-derived reading, kept for the record.**",
+        "> `run.log`'s `t0` is corrupt on seq 9 and seq 20, so the negative gaps below",
+        "> are an artefact of two bad `date` reads, not concurrent requests. The",
+        "> **authoritative** timing measurement is `mtime.txt`, produced by `mtime.py`",
+        "> from the body-file mtimes curl wrote. See FINDINGS.md section 1a.",
+        "",
         "| Measure | Value |",
         "|---|---|",
         f"| requests in `run.log` | {len(rows)} |",
@@ -168,6 +174,7 @@ def spacing():
         f"| gaps < 2.0 s — **a rule breach** | **{sum(1 for g in gaps if g[0] < 2.0)}** |",
         f"| minimum same-host gap | **{min(gaps)[0]:.3f} s** (seq {min(gaps)[1]} -> {min(gaps)[2]}, `{min(gaps)[3]}`) |",
         f"| maximum same-host gap | {max(gaps)[0]:.3f} s |",
+        f"| negative gaps (**both from corrupt `t0` reads**) | {sum(1 for g in gaps if g[0] < 0)} |",
     ]
     return "\n".join(out)
 

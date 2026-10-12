@@ -1,0 +1,81 @@
+## 1. Is the mtime a run artefact, or a checkout artefact?
+
+| Measure | Value |
+|---|---|
+| body (`.b`) mtimes, distinct | 24 of 24 |
+| header (`.h`) mtimes, distinct | 24 of 24 |
+| strictly increasing by seq (`.b`) | **yes** |
+| span of the capture window | **4.728 s** |
+| window (UTC) | 18:01:49.378230 .. 18:01:54.106193 |
+| `results.jsonl` / `run.log` stamped | 18:01:54.162 — immediately after the last curl |
+| files this pass edited afterwards | `probe.sh` 18:02:49, `verdict.py` 18:03:06, `FINDINGS.md` 18:06:24 — clearly later |
+
+A checkout writes every file in one instant; these span 4.728 s with distinct
+nanosecond values, and the three files edited during review carry minutes-later
+times. The mtimes are curl artefacts.
+
+## 2. `mtime - t0` per row — the arithmetic that convicts `run.log`
+
+| seq | `t0` (run.log, UTC) | body mtime (UTC) | `mtime - t0` | verdict |
+|---|---|---|---|---|
+| 1 | 18:01:49.22 | 18:01:49.37 | **+0.153 s** | ok |
+| 2 | 18:01:49.42 | 18:01:49.47 | **+0.048 s** | ok |
+| 3 | 18:01:49.51 | 18:01:49.56 | **+0.049 s** | ok |
+| 4 | 18:01:49.61 | 18:01:49.66 | **+0.047 s** | ok |
+| 5 | 18:01:49.70 | 18:01:49.75 | **+0.047 s** | ok |
+| 6 | 18:01:49.80 | 18:01:49.84 | **+0.046 s** | ok |
+| 7 | 18:01:49.89 | 18:01:49.94 | **+0.049 s** | ok |
+| 8 | 18:01:49.99 | 18:01:50.03 | **+0.046 s** | ok |
+| 9 | 18:01:50.93 | 18:01:50.46 | **-0.463 s** | **IMPOSSIBLE — `t0` is corrupt** |
+| 10 | 18:01:50.51 | 18:01:50.63 | **+0.122 s** | ok |
+| 11 | 18:01:50.68 | 18:01:50.79 | **+0.114 s** | ok |
+| 12 | 18:01:50.84 | 18:01:51.11 | **+0.265 s** | ok |
+| 13 | 18:01:51.16 | 18:01:51.42 | **+0.261 s** | ok |
+| 14 | 18:01:51.47 | 18:01:51.58 | **+0.112 s** | ok |
+| 15 | 18:01:51.63 | 18:01:51.74 | **+0.118 s** | ok |
+| 16 | 18:01:51.79 | 18:01:51.94 | **+0.149 s** | ok |
+| 17 | 18:01:52.14 | 18:01:52.38 | **+0.239 s** | ok |
+| 18 | 18:01:52.46 | 18:01:52.57 | **+0.116 s** | ok |
+| 19 | 18:01:52.69 | 18:01:52.96 | **+0.274 s** | ok |
+| 20 | 18:01:53.78 | 18:01:53.20 | **-0.587 s** | **IMPOSSIBLE — `t0` is corrupt** |
+| 21 | 18:01:53.25 | 18:01:53.51 | **+0.267 s** | ok |
+| 22 | 18:01:53.56 | 18:01:53.68 | **+0.114 s** | ok |
+| 23 | 18:01:53.74 | 18:01:53.86 | **+0.122 s** | ok |
+| 24 | 18:01:53.98 | 18:01:54.10 | **+0.119 s** | ok |
+
+**22 of 24 rows** fall in a tight **+0.046…+0.274 s** band — exactly what
+`t0`-then-`curl` predicts. The only rows outside it are **seq 9** (-0.463 s), **seq 20** (-0.587 s).
+
+`t0` is read **before** curl, so `mtime - t0` cannot be negative. On those two
+rows it is. Whatever the mechanism, **those two `t0` reads are wrong**, and
+they are precisely the two rows that produce the negative gaps in `run.log`.
+
+## 3. Same-host gaps, measured two ways
+
+| Measure | body mtimes (**authoritative**) | `run.log` `t0` (**superseded**) |
+|---|---|---|
+| same-host gaps measured | 21 | 21 |
+| minimum gap | **+0.092 s** | -0.538 s |
+| maximum gap | **+0.387 s** | +1.097 s |
+| negative gaps | **0** | 2 |
+| gaps >= 2.5 s (declared) | 0 | 0 |
+| gaps >= 2.0 s (**AGENTS.md section 8 floor**) | **0** | 0 |
+| gaps < 2.0 s — **rule breach** | **21** of 21 | 21 of 21 |
+
+**No overlap.** Every mtime delta is positive and the 24 mtimes are strictly
+increasing, so the 24 requests were issued sequentially and never concurrently.
+The negative gaps in `run.log` are an artefact of two corrupt `date` reads, not
+evidence of concurrent requests.
+
+## 4. Correction to this pass's own reported figure
+
+| Figure | first reported | corrected | direction |
+|---|---|---|---|
+| minimum same-host gap | -0.538 s | **+0.092 s** | **understated the breach** |
+| maximum same-host gap | +1.097 s | **+0.387 s** | overstated the spread |
+| negative gaps | 1 reported | **2** | undercounted |
+
+The corrected minimum is **higher** than the reported one, so the pass
+**understated how badly it breached the floor**: no gap here was negative, and
+no gap came within 1.6 s of the 2 s requirement.
+

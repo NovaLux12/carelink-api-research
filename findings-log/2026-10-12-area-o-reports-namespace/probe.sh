@@ -7,8 +7,16 @@
 # # `DELAY=2.5` was declared and the lock section was commented "sleep +   #
 # # curl", but the `sleep` call was never emitted into req(). So all 24    #
 # # requests went out with the host-to-host gap dictated only by curl's     #
-# # round trip: 21 same-host gaps, min -0.538 s, max 1.097 s, and NOT ONE   #
-# # of them reaching the repository's >=2 s floor (AGENTS.md section 8).    #
+# # round trip: 21 same-host gaps, and NOT ONE of them reaching the         #
+# # repository's >=2 s floor (AGENTS.md section 8).                         #
+# #                                                                         #
+# # CORRECTED MEASUREMENT: run.log's `t0` is unreliable on two rows (seq 9 #
+# # and seq 20), so the first report of "min -0.538 s" was an artefact of  #
+# # two corrupt `date` reads, not concurrent requests. Measured from the    #
+# # body-file mtimes curl wrote, the true figures are min +0.092 s, max      #
+# # +0.387 s, ZERO negative gaps and NO overlap. This file's own pass      #
+# # therefore UNDERSTATED how badly it breached the floor. See mtime.py and #
+# # FINDINGS.md section 1a.                                                #
 # #                                                                         #
 # # This is a breach of the probing rule, not a rounding artefact, and it   #
 # # is disclosed as such in FINDINGS.md section 1b. The run was NOT redone: #
