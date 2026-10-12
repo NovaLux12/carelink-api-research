@@ -230,7 +230,11 @@ maintainer decision whether those bodies can be committed scrubbed.
 
 ## 6. What "closed" would mean
 
-Every one of the 29 claims marked **confirmed-by-row** or restated with its actual coverage, and
-**Y-1** and **A1** carried into `docs/` as corrections with their retractions preserved. **A2 is
-withdrawn and changes nothing.** The 28 clean claims **are** that result — proving the rest are
-correctly evidenced retires the audit, and that is the outcome here.
+**All 29 in-scope claims are confirmed by row**, so there is nothing left to restate and no
+correction to carry from the in-scope set. Outside that scope, **Y-2** (`docs/08:37`) is carried
+into `docs/` as a correction with its retraction preserved; **Y-3** and **Y-1** are withdrawn and
+change nothing, both files byte-identical to `origin/main`; **Y-4** is recorded, not fixed.
+
+The 29 clean claims **are** that result — proving the rest are correctly evidenced retires the
+audit, and that is the outcome here. The record's most useful half is the two withdrawals: both
+were produced by reading **one file as the corpus**, and both are kept with the mechanism named.

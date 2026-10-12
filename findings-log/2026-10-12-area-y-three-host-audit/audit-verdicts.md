@@ -14,7 +14,7 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 | 7 | `03-discovery-and-versions.md:167` | The sentence above asserted "401 on all three hosts" on the strength of **one** r… | 3 | **confirmed-by-row** |
 | 8 | `03-discovery-and-versions.md:172` | `clcloud-trials.minimed.com` — **3 of 3**, every one a request that reached Medtr… | 3 | **confirmed-by-row** |
 | 9 | `03-discovery-and-versions.md:256` | **403 on GET** and **200 with CORS on OPTIONS** on all three hosts: the resource … | 3 | **confirmed-by-row** |
-| 10 † | `03-discovery-and-versions.md:330` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
+| 10 † | `03-discovery-and-versions.md:316` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
 | 11 | `03-discovery-and-versions.md:347` | in two independent keys, on all three deployments: | 3 | **confirmed-by-row** |
 | 12 | `03-discovery-and-versions.md:400` | \| What `*/v12/discover/android/*` returns \| token-gated on all three hosts — 40… | 3 | **confirmed-by-row** |
 | 13 | `06-patient-api-surface.md:126` | `display/message` at v6/v11/v13 is byte-identical on all three hosts (v6 403, v11… | 3 | **confirmed-by-row** |
@@ -39,14 +39,21 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 
 | # | Location | Claim | Verdict |
 |---|---|---|---|
-| A1 | `docs/08-security-findings.md:91` | "the finding spans **five hosts**" | **NOT A DEFECT — reverted.** `:91` cites `DRIFT-AND-NEW`, which has a *"Five hosts, not two"* section, and the paragraph already carries the re-verification caveat. `origin/main` restored byte-identically |
-| A2 | `docs/02-auth-tenants-and-flows.md:41` (mermaid) | five tenants inside a "compared field-by-field" subgraph | **Y-3 WITHDRAWN — no defect.** `AUTH-TENANT-FINDINGS.md` §1's three tenants *include trials*; §8's four is the JWKS-`kid` comparison, which correctly excludes it. `origin/main` restored byte-identically |
-| A3 | `findings-log/2026-10-12-published-pointers/.gitignore` | the discovery / country / config bodies these pages rest on | **NOT RE-DERIVABLE from a clean clone** (Y-4) — 10 tracked files in that directory, none a `docs/*.json`. Maintainer decision, recorded not fixed |
+
+**Identifier note.** `A1`/`A2`/`A3` are the addendum rows in **this** file. They correspond to
+`FINDINGS.md`'s **Y-2**/**Y-3**/**Y-4**. `Y-1` is *not* an addendum row — it was an in-scope claim
+(`docs/03:38`) and is **withdrawn**, so it no longer appears anywhere as a defect. Locations are
+given by **content**, not line number: the corrections in this PR shift line numbers in the very
+files they cite.
+
+| A1 (= FINDINGS **Y-2**, second site) | `docs/08-security-findings.md`, the paragraph reading *"so the finding spans **five hosts** — recorded as reported"* | **NOT A DEFECT — reverted.** `:91` cites `DRIFT-AND-NEW`, which has a *"Five hosts, not two"* section, and the paragraph already carries the re-verification caveat. `origin/main` restored byte-identically |
+| A2 (= FINDINGS **Y-3**) | `docs/02-auth-tenants-and-flows.md`, the `subgraph POL[...]` title | five tenants inside a "compared field-by-field" subgraph | **Y-3 WITHDRAWN — no defect.** `AUTH-TENANT-FINDINGS.md` §1's three tenants *include trials*; §8's four is the JWKS-`kid` comparison, which correctly excludes it. `origin/main` restored byte-identically |
+| A3 (= FINDINGS **Y-4**) | `findings-log/2026-10-12-published-pointers/.gitignore` | the discovery / country / config bodies these pages rest on | **NOT RE-DERIVABLE from a clean clone** (Y-4) — 10 tracked files in that directory, none a `docs/*.json`. Maintainer decision, recorded not fixed |
 
 † **Claim #10 corrected after review round 1.** The line says the cell has *"no GET or OPTIONS
 route … all 3 hosts"* without naming a method. Measured: the **GET** axis has **3** attributable
-hosts; the **OPTIONS** axis has **2** attributable hosts plus **1** row in the host-less
-`pde-csr-oracle` ledger. The table's "3" is therefore right for GET and optimistic for OPTIONS.
+hosts; the **OPTIONS** axis has **2** attributable hosts plus **one unattributable row per recorded path (2)**
+in the host-less `pde-csr-oracle` ledger, which carries 13 host-less rows per method in total. The table's "3" is therefore right for GET and optimistic for OPTIONS.
 Restated in `docs/03` with both axes named.
 
 **Counting rule for this table.** A line is in scope if it matches any of these **seven**
@@ -56,14 +63,15 @@ multi-host phrases, case-insensitively:
 all three hosts | on all three | three hosts | all 3 hosts | 3 of 3 | five hosts | spans five
 ```
 
-Applied to `docs/03` + `docs/06` this yields **29** lines. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **28 confirmed-by-row,
-1 corrected (Y-1)**.
+Applied to `docs/03` + `docs/06` this yields **29** lines: 12 in `docs/03`, 17 in `docs/06`.
+**Verdicts: 29 confirmed-by-row, 0 corrected.**
 
-**A1–A3 are counted separately and are NOT part of the 29.** They live in `docs/08` and
-`docs/02`, outside the area's stated scope, so folding them into the in-scope total does not
-reproduce this table. Two earlier drafts did exactly that — one reported "26 of 29" against a
-table holding a single defect row, the next "27 confirmed, 2 corrected". **29 lines, 28 clean, 1
-corrected is the only split this table supports.**
+**A1–A3 are counted separately and are NOT part of the 29.** They live in `docs/08` and `docs/02`,
+outside the area's stated scope, so folding them into the in-scope total does not reproduce this
+table. Two earlier drafts did exactly that — one reported "26 of 29" against a table holding a
+single defect row, the next "27 confirmed, 2 corrected" — and a third reported "28 / 1" after
+Y-1 was withdrawn without the prose being updated. **29 lines, 29 clean, 0 corrected** is the
+only split this table supports.
 
 No claim was marked defective on the strength of the index alone —
 each was checked against the page's own cited source. **Coverage is per claim cell, not per
