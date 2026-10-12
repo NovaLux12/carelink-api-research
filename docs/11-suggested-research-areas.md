@@ -163,8 +163,12 @@ deduplicating to (host, method, route) gives the 12 above.
 ⚠ **An earlier draft of this addendum said `area-b-v12-routing` captures "no CORS value at all" and
 put the convention count at "four". Both were wrong**, and both came from querying only the short
 key — the very error this addendum is about. Area B carries `access_control_allow_origin` in 3
-rows and has a `host` column, and the corpus uses **three** conventions, two ledgers each. The 2-vs-12
-figures were re-derived and **hold**; the characterisation of *why* did not.
+rows and has a `host` column, and the corpus uses **three conventions across five ledgers — two,
+two and one**, not an even split. Every figure in this paragraph is derived, not asserted: run
+[`corpus-audit.py`](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.py)
+([output](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.txt)), which exits
+non-zero if the corpus shape moves. The 2-vs-12 figures were re-derived and **hold**; the
+characterisation of *why* did not, and neither did the first attempt at the distribution.
 
 **Blocker:** none, **zero requests**.
 **Closes when:** every `results.jsonl` carries an explicit `host` key and one explicit key per

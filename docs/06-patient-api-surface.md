@@ -241,6 +241,12 @@ mistake ([#17](https://github.com/NovaLux12/carelink-api-research/issues/17)). A
 writes `host` plus an explicit key per CORS header, `(none)` when absent, so its rows parse without
 `ctype` archaeology.
 
+Every figure above is **derived, not asserted**: run
+[`corpus-audit.py`](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.py)
+([output](../findings-log/2026-10-12-area-z-origin-reflection/corpus-audit.txt)). It exits non-zero
+if the corpus shape moves, so a stale number here is a failing script rather than a claim that has
+to be re-checked by hand.
+
 ⚠ **An earlier draft of this section said `area-b-v12-routing` captured "no CORS value at all" and
 called the total "four" conventions. Both were wrong**, and both came from querying only the short
 key — the exact error the paragraph is about. It captures `access_control_allow_origin` in 3 rows
