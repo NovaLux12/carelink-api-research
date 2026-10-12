@@ -65,10 +65,13 @@ is also **no fourth patient deployment**: all 16 recorded `*trials*` hosts are `
 [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1].
 
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
-(OIDC live, different JWKS kids). **All four tenants have completely disjoint
-signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
-shadow token is not a key-reuse risk. Tenant-by-tenant comparison and the PKCE
-posture are in [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
+(OIDC live, different JWKS kids), and with `carelink-login-trials.minimed.com`
+the estate is **five** tenants. **All five have completely disjoint signing
+keys** — 10 keys, none shared — so the shadow deployment shares OAuth *policy*
+but not keys, and a shadow token is not a key-reuse risk. Their discovery
+documents are in fact **byte-identical** once each tenant's own hostname is
+substituted out. Tenant-by-tenant comparison and the PKCE posture are in
+[`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
 
 ## API namespaces
 

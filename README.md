@@ -177,8 +177,10 @@ says `MMOL_L`.** That's roughly 18×, on a diabetes bridge.
 `Accept-Encoding` entirely. An RFC 9110 violation, and it breaks any client that
 doesn't opt in.
 
-**6. Four auth tenants, four completely disjoint signing keys.** A shadow-domain
-tenant nobody had enumerated shares OAuth *policy* but no keys with the others.
+**6. Five auth tenants, ten completely disjoint signing keys.** A shadow-domain
+tenant nobody had enumerated shares OAuth *policy* — in fact its discovery
+document is byte-identical to the patient's once the hostname is substituted
+out — but shares no keys with any of them.
 
 **7. The vendor's own patient app can't match its own newest pump.** Its matcher is
 five tokens via `startsWith()`; the new device's family isn't among them. The six
