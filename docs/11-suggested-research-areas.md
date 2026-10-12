@@ -93,45 +93,57 @@ and is the likelier of the two outcomes given the namespace 403s before applicat
 They were captured 2026-10-08 and **never re-fetched**, so a bundle version bump would
 invalidate the negative — state the capture date with the result, always.
 
-### X. Why do the two `clcloud.*` route families differ in their CORS headers — configuration, or status code?
+### Z. Does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`?
 
-Added 2026-10-12. **Derived from area B**, and the question only became askable after that
-pass was reviewed: area B's first draft concluded "preflight presence is a per-route
-property", and the review found the evidence did not support the *cause*.
+Added 2026-10-12. **Derived from area X**, and it could not have been written before that
+pass ran: area X is the first pass in this repository to send an `Origin` header on any
+`clcloud.*` request, so until 2026-10-12 nothing in the corpus could distinguish a gateway
+that *reflects* the request origin from one that emits a constant.
 
-What is OBSERVED (3 × 2 on `.eu`): `OPTIONS v{11,12,13}/display/message` answer `200` +
-`access-control-allow-origin: *`; `OPTIONS v{11,12,13}/discover/android/3.6` answer `401` +
-`x-ca-err: 990` with **zero** `Access-Control-*` headers — same host, same session, same
-method ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 3]).
+What area X established (OBSERVED, [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md]
+§4): across **25 requests**, the only responses carrying any `Access-Control-*` header were
+**three `OPTIONS` 200s on `clcloud.minimed.eu`**, and on all three the values were
+`access-control-allow-origin: *` and `access-control-allow-methods: OPTIONS` — **unchanged**
+whether or not an `Origin` was sent, and unchanged when sent with
+`Access-Control-Request-Method: GET` **or** `: POST`. `access-control-max-age` and
+`access-control-allow-credentials` were absent on all three; `vary` was absent. Sending
+`Origin` changed **none** of the **6** paired bare/`Origin` cells.
 
-**The confound, which is the reason this area exists:** across **all 101 captured response
-heads in `findings-log/`**, exactly 14 carry `access-control-allow-origin` and **every one
-is a `200`** — **zero non-2xx carries it**. So on `clcloud.*`, "carries a preflight" and
-"answers 200" are **the same observation in this corpus**, and the discovery leg's `401`
-without CORS is equally consistent with (a) no preflight configured on that route, or (b)
-that route demanding a token on `OPTIONS` while non-2xx responses never carry CORS. **The
-corpus cannot separate these.**
+**What is missing, and why it matters.** A fixed `*` and a reflected origin differ in a way
+that matters to anyone reading a CORS header: `*` is a literal in the config, while an echo
+means the response is origin-dependent and a non-matching origin gets something else
+entirely. **No recorded cell in the corpus can tell the two apart**, because every capture
+that carried `ACAO` also sent no `Origin`. The one route family where the question could be
+asked cheaply — `OPTIONS …/display/message`, already pinned as `200` + `*` on all three
+hosts — was only asked bare. The same is true of `connect/csr/v2/display/message`, the bare
+`connect/v2/display/message`, and `v6/display/message`, whose `OPTIONS` cells return `200` +
+`ACAO` on all three hosts and have **never** been sent with an `Origin`.
 
-**The separating cell**, neither of which exists on disk: an `OPTIONS` on a `clcloud.*`
-route returning **`200` without** `access-control-allow-origin`, or **`401` with** it.
-Either one settles it, and both are ordinary entries in the recorded path list.
+**Blocker:** none. Every candidate is a path already recorded in
+`findings-log/2026-10-12-csr-cross-host/results.jsonl` and
+`findings-log/2026-10-11-pde-csr-oracle/results.jsonl`, so the list is closed and on disk —
+no wordlist, no invented version neighbours. The method is area X's: send each preflight
+route's `OPTIONS` twice with **two different** `Origin` values and compare, because a single
+`Origin` cannot distinguish an echo from a constant. Controls first per host, `Origin` set to
+RFC 2606 reserved names.
 
-**Blocker:** none. An OPTIONS-only sweep over paths **already recorded** in `VERSION-AXIS` §2
-and the area C/N/U logs, controls first per host, recording the full `access-control-*` set
-per cell rather than a verdict. The wider per-route map is a by-product and is worth having.
+**Closes when:** for every recorded `clcloud.*` route whose `OPTIONS` answers `200` +
+`access-control-allow-origin`, it is recorded whether the value is a constant across two
+distinct `Origin` values, **and** whether `access-control-allow-methods` ever differs from
+the literal `OPTIONS`. **A negative counts and is the likelier outcome**: a constant `*` plus
+a constant `OPTIONS` on all of them is a complete answer, and it would also mean the
+`access-control-allow-methods` values differ only by route configuration and never by
+request — which this repo already records as "not a register of the route's methods"
+([`docs/09`](09-methodology-and-oracles.md) §2), and would then also be **not a register of
+the requested method**.
 
-**Closes when:** either a separating cell above is observed, or every recorded `clcloud.*`
-path has an OPTIONS verdict that makes the two readings distinguishable, **or** the routes
-carrying a preflight are enumerated as a set and it is recorded which of (a)/(b) that set is
-consistent with. **A negative counts**: if every OPTIONS cell turns out to track status code
-exactly, then CORS on `clcloud.*` is not a per-route property at all and area B's withdrawn
-claim is confirmed withdrawn.
-
-**Assumptions (INFERRED):** that `clcloud.*` behaves uniformly enough across its three hosts
-for a finding on `.eu` to transfer — never tested for this route pair, and the only
-cross-host CORS evidence in the corpus is `v13/display/message`. Also assumed: that the
-recorded path list is broad enough that a negative over it means something; a path never
-recorded is not covered.
+**Assumptions (INFERRED):** that the `Origin` value actually reaches AWS API Gateway's CORS
+layer rather than being consumed by CloudFront first — no mechanism for this has been
+established, and area X's finding is consistent with either. That `clcloud.minimed.com` and
+`clcloud-trials.minimed.com` behave like `.eu` for this question: area X tested the
+discovery route on all three and found no split, but never tested a *preflight-bearing* route
+cross-host with `Origin`. And that the recorded preflight-bearing set is complete enough for
+a negative over it to mean something — a route never recorded is not covered.
 
 ### Y. How many "all three hosts" claims in `docs/` rest on a single row?
 
@@ -438,7 +450,8 @@ being superseded — never silently. Letters are not reused.
 | N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
 | U — are the `csr/v1`, `csr/v3` and PDE cells dead on `.com`/`-trials` too, or only on `.eu`? | 2026-10-12 | **Negative, 3 hosts wide.** All six cells dead on **both** methods on both remaining hosts — 24 of 24 cells `403 MissingAuthenticationTokenException`, controls first on each host, 32 of a 32 cap. All 28 no-route bodies byte-identical (42 B, `sha256:f249b63cb2fc`), and that digest matches the `.eu` capture, so the router's no-route response is one artefact shared by three hosts. `docs/00`'s "Not re-probed on `.com`/`-trials`" caveat is **discharged**; nothing flipped to live | [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] | #11 |
 | T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
-| B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is arithmetically impossible under the committed harness and is recorded as a provenance problem, not smoothed over). The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
+| B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is arithmetically impossible under the committed harness and is recorded as a provenance problem, not smoothed over). The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact. ⚠ **Its CORS corpus premise was superseded by area X the same day** — the 10 CORS-less `200`s are not all on "a different host surface"; four are `clcloud.*` discovery documents. The observation stands; the inference did not ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] §Correction) | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
+| X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells, which **excludes** the "ACAO only when an `Origin` is present" mechanism. Area B's reading (b) is **refuted**: a CORS-configured route would carry `ACAO` on its own `200` `GET`, and this one does not on any host. **The cause is still not established** — "configured per route" and "emitted only on `OPTIONS`" both fit all 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is arithmetically impossible under the committed harness and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
 ---
 
 > **Consumer note.** Findings here are consumed by

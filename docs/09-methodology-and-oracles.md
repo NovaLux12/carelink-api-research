@@ -128,6 +128,8 @@ AUTH-TENANT-FINDINGS §6].
 | jq `//` swallowing `false` | a country sweep conflated "key absent" with "value false" | re-derive with `has()` [PROBE-FINDINGS deep §8] |
 | Mis-offset CDX fetches | an earlier pass's computed byte ranges landed on alphabetical neighbours; the `raw-*.cdx` artefacts look like results and are not | corrected fetches kept; wrong artefacts labelled misleading on disk [COMMONCRAWL §1] |
 | Self-measurement artefact | `deep-matrix.jsonl`'s `x-api-key: "len=10"` is the length of the scrubber's own `[REDACTED]` placeholder — the pass measured itself | length column ignored; further scrubbing added [CONFIG-DEEP §Measurement artifact] |
+| A gap below the harness's own declared `sleep` | **Observed twice in two consecutive passes, same signature.** Each harness ends `req()` with an unconditional `sleep 2.5` and timestamps with `date` *before* `curl`, so a same-host gap **cannot** be under 2.5 s — yet area B measured 2.033 s and the area X pass measured **2.291 s** (`clcloud.minimed.eu`, req 12→13). Both satisfy the repo's real `>=2 s` floor, so neither is a rule breach | Record the measured floor and the sub-declared gap in the pass's own accounting, **never rounded away**, and do not assert a cause. Area B's INFERRED reading was a transient backwards clock step (the error appears then cancels against its neighbour); that is **not** established, and a post-hoc edit to `run.log` would produce the same arithmetic, so neither candidate is excluded. Open: *why does a sub-declared gap appear at all?* — **n = 2, zero requests needed, answerable entirely from `run.log` timestamps already on disk.** Not filed as a `docs/11` area because **every letter A–Z is now in use** and a two-letter heading is invisible to the gate's area checks (verified against its own regexes), so adding one would leave the priorities page's stated count disagreeing with its own contents |
+| A corpus count scoped to one host family | The CORS confound stood for two passes on a count that was right and a scope that was not: of 24 captured `200` heads, 14 carried `access-control-allow-origin` and the 10 that did not were labelled "on a different host surface" — **4 of them are `clcloud.*` discovery documents, one per cumulus host**. The false premise propagated into five pages | before scoping any corpus count to a host family, resolve each counted item to its host **from the committed harness that fetched it**, not from the filename prefix. The correction is in `2026-10-12-area-x-cors-separation/FINDINGS.md` §4; `disc-*` meant `clcloud.*`, `config-*`/`countries-*` meant `carelink.*` |
 
 ## 5. Verification discipline — the four ways this project has been wrong
 
@@ -200,7 +202,7 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 145 assertions (319 execute per run, counting the
+  `regression/hurl/` holds 147 assertions (321 execute per run, counting the
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;

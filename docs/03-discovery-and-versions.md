@@ -187,12 +187,33 @@ presence.
 `200` + CORS. So "the gateway adds CORS to `clcloud.*`" is **false as a rule** (OBSERVED, a
 3 × 2 on `.eu`, same source §Finding 3).
 
-**This is an observation, not a cause.** Across all 101 captured response heads in
-`findings-log/`, every response carrying `access-control-allow-origin` is a `200` — **zero
-non-2xx carries it**. So on `clcloud.*` "carries a preflight" and "answers 200" are the same
-observation in this corpus, and a `401` without CORS is equally consistent with the route
-demanding a token on `OPTIONS`. **Whether preflight presence is configured per route is not
-established** — it is successor area X in [`11-suggested-research-areas.md`](11-suggested-research-areas.md).
+**This is an observation, not a cause** — and as of 2026-10-12 the *reason* it could not be
+turned into a cause is itself corrected. The earlier version of this paragraph rested on a
+corpus count plus the assertion that every `200` carrying no CORS lived on "a different host
+surface". That assertion was **false**: of the ten captured `200` heads with no
+`access-control-allow-origin`, **four are on `clcloud.*`** — the discovery documents fetched
+by [findings-log/2026-10-12-published-pointers/probe.sh:81-84], one per cumulus host. So on
+`clcloud.*` **a `200` that carries no preflight exists**, and "carries a preflight" and
+"answers `200`" are **not** the same observation. Area X re-derived it live: **9 further
+`200`-without-CORS responses — every one a `GET` of a discovery payload, across all three
+hosts — and still zero non-2xx responses anywhere in the corpus carrying CORS**
+([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
+
+That **refutes** the reading this page previously offered as still-open — that the discovery
+route demands a token on `OPTIONS` while non-2xx never carries CORS. If that route were
+CORS-configured, its own `200` `GET` would carry `access-control-allow-origin`. It does not, on
+any host, with or without an `Origin` header sent (OBSERVED, 6 paired bare/`Origin` cells,
+0 of which changed).
+
+**It does not establish the opposite.** A hypothesis area B never named survives every cell
+on disk: `ACAO` may be emitted **only on `OPTIONS` responses regardless of route**, in which
+case a `GET` could never reveal a route's CORS configuration and the `200`-without-`ACAO` cell
+says nothing about it. "Configured per route" and "emitted only on `OPTIONS`" are both
+consistent with all 25 rows, so **the cause is not established**. Separating them needs a
+`clcloud.*` route that is both CORS-configured and returns `200` on `GET`; **no such route is
+recorded on any of the three hosts** — every GET-public cumulus route is a discovery document
+whose `OPTIONS` answers `401`. Successor area in
+[`11-suggested-research-areas.md`](11-suggested-research-areas.md).
 
 **None of the above makes `v12` browser-callable.** The `401` itself carries no
 `Access-Control-*` header, which is the recorded `MissingAllowOriginHeader` failure — still

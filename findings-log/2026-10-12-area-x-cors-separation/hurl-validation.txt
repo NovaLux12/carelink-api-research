@@ -1,0 +1,71 @@
+hurl pin validation — area X, 2026-10-12
+===========================================
+
+WHAT THIS IS. The artefact for the 25th request of this pass. Area B's review
+found that pin-validation requests recorded only in prose, with no committed
+artefact beside them, were the same defect as an unrecorded request; it fixed that
+by capturing hurl's verbatim output. This file is the same discipline.
+
+WHY A REQUEST WAS NEEDED AT ALL. This repo records shipping an assertion that has
+never been executed as a defect, because an unexecuted assertion is a claim about
+syntax, not about the vendor. The two assertions added to
+regression/hurl/01-discovery-pin.hurl had never run, so they were executed before
+being committed.
+
+WHAT RAN. findings-log/2026-10-12-area-x-cors-separation/hurl-single-cell.hurl --
+a copy of the one request line plus the two predicates, and nothing else. It exists
+so that validation costs ONE vendor request instead of three (running the whole
+01-discovery-pin.hurl would re-issue its three GETs). The assertions that actually
+ship live in regression/hurl/01-discovery-pin.hurl; this file is not part of the
+suite and is not run by regression/hurl/run.sh.
+
+  $ hurl --version | head -1
+  hurl 8.0.1 (x86_64-pc-linux-gnu) libcurl/8.22.0 OpenSSL/3.6.5 zlib/1.3.1.zlib-ng brotli/brotli/1.2.0 zstd/zstd/1.5.7 libidn2/2.3.8 libssh2/1.11.1 nghttp2/1.70.0 quic/ngtcp2/1.25.0 nghttp3/1.18.0
+
+  $ hurl --test findings-log/2026-10-12-area-x-cors-separation/hurl-single-cell.hurl
+  Success findings-log/2026-10-12-area-x-cors-separation/hurl-single-cell.hurl (1 request(s) in 272 ms)
+  --------------------------------------------------------------------------------
+  Executed files:    1
+  Executed requests: 1 (3.6/s)
+  Succeeded files:   1 (100.0%)
+  Failed files:      0 (0.0%)
+  Duration:          274 ms (0h:0m:0s:274ms)
+  
+
+  exit code: 0
+
+CAPTURED, NOT TRANSCRIBED. Every line in the two blocks above is the verbatim
+output of the command shown, run once, on 2026-10-12, piped from a log file rather
+than retyped. An earlier draft of this file was retyped by hand and introduced two
+errors (nghttp3 written as ngtcp3, and a duration digit); it was regenerated from
+the log so that the artefact cannot drift from what ran. Contrast area B's
+hurl-validation.txt, where the 4-cell batch had to be transcribed because
+re-issuing it would have breached its cap. This pass had spare cap, so the single
+cell was captured.
+
+WHAT IT PROVES, PRECISELY. Exactly two things, and no more:
+
+  1. GET https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
+     still answers 200.
+  2. That response carries NO access-control-allow-origin and NO
+     access-control-allow-methods.
+
+Both are assertions of ABSENCE. hurl reports `Success` for a `not exists`
+predicate when the header is absent, so a pass here is positive evidence of
+absence -- but only for those two header names. It is NOT evidence about
+access-control-allow-headers, access-control-allow-credentials, or any header the
+predicate does not name. The probe harness's unanchored family sweep
+(access_control_family_seen in results.jsonl) is what covers the whole family, and
+that ran under curl, not hurl.
+
+WHAT IT DOES NOT PROVE. It says nothing about why. Whether ACAO is absent because
+no preflight is configured on the route, or because the gateway only ever emits it
+on OPTIONS responses, is unsettled -- see FINDINGS.md section 7.
+
+TRANSPORT PROVENANCE. This request was issued by hurl 8.0.1, not by the curl
+harness in probe.sh. It is therefore the one row in results.jsonl whose
+`curl_exit` field records a non-curl transport's exit code (hurl's, 0). Its header
+fields are not populated beyond the two predicates hurl actually evaluated,
+because hurl does not dump response heads to a file; probe.sh is what captures
+headers/ on every other row. The row is recorded in results.jsonl as seq 25 so the
+ledger accounts for every request in this pass.

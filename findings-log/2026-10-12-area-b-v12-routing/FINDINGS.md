@@ -249,3 +249,68 @@ bash findings-log/2026-10-12-area-b-v12-routing/probe.sh   # refuses to run twic
 python3 findings-log/2026-10-12-area-b-v12-routing/verdict.py \
         findings-log/2026-10-12-area-b-v12-routing/results.jsonl
 ```
+
+## Correction (2026-10-12)
+
+Added by the Area X pass. The retraction history is kept: Finding 3 above stands as
+written, with this correction attached. **The observation in Finding 3 is not
+withdrawn. One of its two stated premises is false, and the inference drawn from
+that premise does not hold.**
+
+### The false premise
+
+Finding 3 reads:
+
+> Across **all 101 captured response heads in `findings-log/`**, exactly **14**
+> carry `access-control-allow-origin` and **every one of the 14 is a `200`**; **zero
+> non-2xx responses anywhere in the corpus carry it** (the 10 CORS-less `200`s are
+> document fetches on **a different host surface** — `disc-*`, `config-*`,
+> `countries-*`). On `clcloud.*`, therefore, **"carries a preflight" and "answers
+> 200" are the same observation in this corpus**.
+
+The counts are right: 24 heads carry a 200 status, 14 of them carry
+`access-control-allow-origin`, and every carrier is a 200. **The parenthetical is
+wrong.** Of the 10 CORS-less 200s, **four are on `clcloud.*`**, not on a different
+host surface:
+
+| captured head | host | status | ACAO |
+|---|---|---:|---|
+| `2026-10-12-published-pointers/docs/disc-eu-v13.hdr` | `clcloud.minimed.eu` | 200 | **absent** |
+| `…/disc-com-v13.hdr` | `clcloud.minimed.com` | 200 | **absent** |
+| `…/disc-com-v11-legacy.hdr` | `clcloud.minimed.com` | 200 | **absent** |
+| `…/disc-trials-v6-legacy.hdr` | `clcloud-trials.minimed.com` | 200 | **absent** |
+
+Host attribution is from the committed harness literals at
+`2026-10-12-published-pointers/probe.sh:81-84`, not inferred from the filenames.
+The other six (`config-*`, `countries-*`) are on `carelink.*`.
+
+### What follows, and what does not
+
+The inference "on `clcloud.*`, *carries a preflight* and *answers 200* are the same
+observation in this corpus" **does not hold.** On `clcloud.*` a 200 that carries no
+preflight exists — four of them, one per cumulus host. The confound this pass was
+right to flag is therefore dissolved: there is now a cell that distinguishes the
+two, and it was in this repository the whole time, inside the corpus the claim was
+counted from.
+
+**This does not retroactively make Finding 3's *observation* wrong.** "The gateway
+does not add CORS uniformly" is unaffected and stands — a 401 without
+`Access-Control-*` next to a 200 with it, same host, same session, is exactly that.
+
+**It does mean Finding 3's reading (b) is refuted.** Reading (b) was that the
+discovery route "demand[s] a token on `OPTIONS` while non-2xx responses never carry
+CORS" — which presupposes that route *is* CORS-configured. If it were, its own 200
+GET would carry `access-control-allow-origin`. It does not, on any of the three
+hosts.
+
+**It does not license the opposite conclusion.** "Per-route configuration" is *not*
+established by this correction. A hypothesis Finding 3 did not name survives every
+cell on disk: **ACAO may be emitted only on `OPTIONS` responses regardless of
+route**, in which case a GET could never reveal a route's CORS configuration and the
+200-GET-without-ACAO cell is uninformative about it. Separating the two needs a
+`clcloud.*` route that is both CORS-configured and returns 200 on GET; no such
+route is recorded on any of the three hosts, because every GET-public cumulus route
+is a discovery document whose `OPTIONS` answers 401. Both readings remain consistent
+and the cause stays unestablished — successor area in `docs/11`.
+
+Evidence: [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md](../2026-10-12-area-x-cors-separation/FINDINGS.md) §4.
