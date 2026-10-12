@@ -100,7 +100,8 @@ line stays in that log; this is the superseding note.
 and on **GET returns `401` `UnauthorizedException` + `x-ca-err: 990`**, which this
 repo's own oracle defines as *the request reached Medtronic's Layer7 authorizer*:
 the route exists **and GET is a registered method on it**. Observed on all three
-hosts (`.eu` Area C row 13 + this pass rows 3 and 11).
+hosts (`.eu` Area C rows 1 and 3 + this pass rows 1/3 and 9/11 — the row number in
+an earlier draft of this sentence was wrong; see §Correction).
 
 So the preflight advertises `OPTIONS` on a route that also serves GET. The
 `allow-methods` list therefore **does not enumerate the route's registered
@@ -124,21 +125,35 @@ What each signal can and cannot carry:
 | `GET` → 403 + `MissingAuthenticationTokenException` | no GET route | that nothing is registered — `v6`, `csr/v2` and bare `v2` are all 403 and all real |
 | `GET` → 401 + `UnauthorizedException` + `x-ca-err: 990` | a GET route exists and reached the Layer7 authorizer | — |
 
-Method registration is settled by the **GET probe alone**, never by the CORS
-header. This is `AGENTS.md` §6 item 2 in a new costume: a header read as meaning
-something it does not mean.
+**GET** registration is settled by the **GET probe**; the CORS header cannot
+override it. (The original wording here read "method registration is settled by
+the **GET probe alone**" — which contradicts §Limits below, since the *POST* half
+cannot be settled that way. Narrowed; see §Correction.) This is `AGENTS.md` §6
+item 2 in a new costume: a header read as meaning something it does not mean.
 
-### Browser callability (INFERRED)
+### Browser callability — ⚠ REFUTED 2026-10-12, original claim kept visible
 
-**INFERRED, with the assumption stated:** because a cross-origin request bearing
-an `Authorization` header triggers a preflight, and the `v13` preflight returns
-`allow-methods: OPTIONS` without `GET`, a browser-based client on another origin
-could not complete a GET to `v13/display/message`. Assumption: the browser
-enforces `allow-methods` on preflight, and no third-party client is
-same-origin with `clcloud.*` — the first is specified behaviour (Fetch), the
-second is not observed here and not tested. This does **not** affect server-side
-clients, which do not preflight. It is recorded as a question, not a finding;
-see successor area U.
+> **Original claim, now known to be wrong.** "INFERRED, with the assumption
+> stated: because a cross-origin request bearing an `Authorization` header
+> triggers a preflight, and the `v13` preflight returns `allow-methods: OPTIONS`
+> without `GET`, a browser-based client on another origin **could not complete a
+> GET** to `v13/display/message`."
+
+The label was honest; the **mechanism does not exist**. `GET` is a
+CORS-safelisted method, so Fetch §4.8 never applies the `allow-methods` check to
+it, and the CORS check itself (§4.10) reads only `Access-Control-Allow-Origin` and
+`Access-Control-Allow-Credentials` — it never consults
+`Access-Control-Allow-Methods`. A preflight advertising only `OPTIONS` therefore
+**cannot** block a browser GET.
+
+**Corrected statement:** a cross-origin browser GET to `v13` **passes the
+preflight and the GET is sent**. It fails afterwards, because the `401`
+`UnauthorizedException` response carries **no `Access-Control-*` header at all**
+(OBSERVED — `headers/01-GET-connect_carepartner_v13_display_message.hdr`) and the
+response is therefore unreadable by the page. Whether a **`200`** response carries
+`Access-Control-Allow-Origin` is **token-gated and unobserved**; that is the
+question now registered in `docs/10-open-questions.md` §1 and in the blocked table
+at the top of `docs/11`.
 
 ## Limits (what this does NOT prove)
 
@@ -152,8 +167,8 @@ see successor area U.
   routes *agreeing* with it, not on the header alone.
 - `csr/v1`/`v3` and the PDE namespace were **not re-probed on these two hosts**.
   They are dead on `.eu` on both methods; whether they are dead everywhere is a
-  separate, cheap sweep and is named as successor area T's sibling below rather
-  than assumed here. Bounded list, by design.
+  separate, cheap sweep — **successor area U** in `docs/11`, not assumed here.
+  Bounded list, by design.
 - No host other than the three recorded cumulus hosts was contacted.
 
 ## Requests
@@ -161,3 +176,95 @@ see successor area U.
 16 of a 16 cap, exactly as claimed in #8. ≥2.5 s spacing, same host. GET and
 OPTIONS only, empty body. No auth headers, no cookies, no POST, no token
 exchange.
+---
+
+## Correction (2026-10-12)
+
+Independent verification of this PR's two flagged claims was delegated to two
+agents running `CONTRIBUTING-research.md` Prompt D, one claim per run. Both read
+the raw `.hdr` dumps rather than this prose. **Verdicts: CONFIRMS on the
+methodology correction, CONTRADICTS on the browser-callability inference.** The
+original claims are kept above; this section records what moved and why.
+
+### 1. Refuted — browser callability (the substantive error)
+
+The §"Browser callability" inference claimed a cross-origin browser GET to `v13`
+would be blocked by the preflight advertising no `GET`. **The mechanism does not
+exist.** `GET` is a CORS-safelisted method, so Fetch §4.8 never applies the
+`allow-methods` test to it, and the CORS check (§4.10) reads only
+`Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials`.
+
+Settled three ways: the spec text (PUBLISHED, fetched 2026-10-12); a local
+headless-browser control where `allow-methods: OPTIONS` **plus** `ACAO: *` let the
+GET through, while removing `ACAO` produced `MissingAllowOriginHeader` (OBSERVED,
+local, zero vendor requests); and the vendor cell itself, where the preflight
+**passed**, the GET **went to the wire**, and the failure was byte-for-byte the
+no-`ACAO` signature (OBSERVED — 6 vendor requests, GET + its automatic preflight
+OPTIONS, empty body, no credential headers, within the 10-request Prompt D cap).
+
+**The real blocker was in a capture this pass already had:** the `401`
+response carries no `Access-Control-*` header at all
+(`headers/01-GET-connect_carepartner_v13_display_message.hdr`).
+
+Corrected statement is in §"Browser callability" above. The residual question —
+does a **200** carry `Access-Control-Allow-Origin`? — is token-gated and is now
+registered in `docs/10-open-questions.md` §1 and in the blocked table at the top
+of `docs/11`, replacing a pointer to successor area U, which was about something
+else entirely.
+
+**Why this happened.** The claim was INFERRED, labelled as such, with its
+assumption stated — and still wrong, because the assumption was half-specified
+behaviour that, checked, does not apply to the case it was applied to. A label
+limits the damage of a wrong claim; it does not make the claim right.
+
+### 2. Confirmed, with four defects around it
+
+The core correction — `access-control-allow-methods` is not a register of a
+route's methods — **holds, at the strength claimed**, with 3-of-3 host coverage
+and each host carrying a captured GET+OPTIONS pair. The verifier's framing is
+sharper than the original: the rule being corrected is *one-directional*
+("a method absent from the list is absent from the route"), and `v13` is a
+positive counterexample where absence in the list coexists with presence on the
+route. One counterexample retires a one-directional inference rule outright.
+
+It also declined to force a winner between the two readings of *why*: `v13`
+carrying a misconfigured preflight, and the header being uninformative in
+general. Both fit, nothing on disk discriminates, and the PR claims only the
+weaker of the two. Four defects fixed:
+
+1. **"settled by the GET probe alone"** contradicted §Limits 25 lines below,
+   which correctly says the POST half rests on the routes *agreeing* with the
+   header. Narrowed to **GET** registration.
+2. **`docs/09`** asserted a mechanism — that the header "is gateway CORS
+   configuration" — from n = 3 routes, two of which merely agree with it and
+   whose agreement is only as strong as the header itself. Reworded to the
+   non-overreaching form used in `docs/06` and here.
+3. **The disclaimed clause was still live** in the `docs/06` oracle summary
+   table — the one place a reader consults operationally. Flagged inline.
+4. **Wrong citation.** This log cited "Area C row 13" for the `.eu` `v13`
+   OPTIONS. Row 13 is `GET connect/csr/v1/display/message`; the `v13` OPTIONS is
+   row **3**. `AGENTS.md` §6 item 6. The error also propagated into the
+   verification brief, which repeated it — a second instance of prose errors
+   travelling through the documents that cite them.
+
+### 3. The pin was one-directional on exactly the axis of the finding
+
+The suite asserted `allow-methods == "OPTIONS"` on the `v13` preflight but
+**never pinned the GET half**. If Medtronic made `v13` POST-only, the header would
+very likely still read `OPTIONS`, **nothing would fail**, and the documented claim
+would have become false silently.
+
+Closed: `GET` → 401 + `x-ca-err == "990"` is now pinned on all three hosts. The
+suite did read CORS headers on the OPTIONS cells, so `docs/06`'s "asserts the
+`x-amzn-errortype` on each 403 cell rather than reading the CORS header" was a
+loose compression of a nuance stated correctly in the suite's own comment.
+
+### 4. Negative result worth keeping
+
+`x-amz-apigw-id` is **not** a route or API identity on this family. All 16 values
+in this pass base64-decode to opaque binary and they differ between two requests
+to the *same* route, so it cannot separate routes or APIs and cannot settle the
+§Verdict 1 inference. Recorded so no future pass spends requests on it. The
+§Verdict 1 inference about two separately-declared routes stays INFERRED and
+unsettleable from outside: it needs the API Gateway export or the Layer7 policy,
+both outside GET/OPTIONS-without-auth.

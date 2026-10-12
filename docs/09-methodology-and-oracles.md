@@ -73,10 +73,13 @@ a resource exists with no GET method — that is how POST-only
 `access-control-allow-methods` is not a register of the route's methods:**
 `carepartner/v13/display/message` advertises `OPTIONS` on its preflight and is
 GET-capable (`GET` → 401 `UnauthorizedException` + `x-ca-err: 990`) on all three
-hosts (OBSERVED,
-[findings-log/2026-10-12-csr-cross-host/FINDINGS.md]). Settle method
-registration from the GET probe; treat the CORS method list as corroboration
-only. The one positive direction on the bare gateways: on `dialog-lite`, `500
+hosts (OBSERVED, 3-of-3 with a captured GET+OPTIONS pair each,
+[findings-log/2026-10-12-csr-cross-host/FINDINGS.md]). The list therefore
+**cannot be read as evidence that a method is absent**. Settle **GET**
+registration from the GET probe and treat the CORS method list as corroboration
+only; the header's *mechanism* is not established (n = 3 routes, two of which
+merely agree with it). The one positive
+direction on the bare gateways: on `dialog-lite`, `500
 InternalServerErrorException` proves a path **is** matched (the Lambda raised),
 which is how the stage-wide catch-all was identified; on `patient-timeline` 403
 positively confirms *no* GET/OPTIONS route [source: AWS-GATEWAYS §2, §11].
@@ -197,7 +200,7 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 110 assertions (262 execute per run, counting the
+  `regression/hurl/` holds 113 assertions (271 execute per run, counting the
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;

@@ -22,6 +22,7 @@ everything else on this page moves.
 | NGP alarm-code vocabulary | an authenticated `application` config |
 | `relativeOffset` clock semantics | any real payload |
 | Report bodies from `commoncore` | a clinician-scoped token |
+| Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
 
 ---
 

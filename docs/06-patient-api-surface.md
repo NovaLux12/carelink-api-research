@@ -198,12 +198,16 @@ from the carepartner leg rather than an observation of these routes. The 2026-10
 log keeps its original wording; this is the superseding note. Pinned for both
 new hosts in `regression/hurl/04-deep-surface.hurl`.
 
-Three routes on this family carry three distinct CORS configurations — `csr/v2`
-and bare `v2` differ in method-list order, and bare `v2` additionally allows
-`x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id`. INFERRED, assumption stated:
-that is the shape of two separately-declared routes rather than one route
-answering twice. No vendor document states it and the gateway configuration has
-never been read.
+Three routes on this family carry three distinct CORS configurations. Specifically,
+`csr/v2` and bare `v2` differ from each other — in method-list order, and bare `v2`
+additionally allows `x-amz-apigw-id,x-amzn-requestid,x-amzn-trace-id` — and both
+differ from `v13`. INFERRED, assumption stated: *those two* are most likely
+separately-declared routes with different gateway configuration rather than one
+route answering twice. No vendor document states it, the gateway configuration has
+never been read, and `x-amz-apigw-id` was tested as a discriminator and is opaque
+per request — so it cannot be settled from outside (OBSERVED negative,
+[findings-log/2026-10-12-csr-cross-host/FINDINGS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-csr-cross-host/FINDINGS.md)
+§Correction).
 
 ## ⚠ `access-control-allow-methods` is not a register of a route's methods
 
@@ -219,7 +223,9 @@ signature this repo defines as *reached Medtronic's Layer7 authorizer*. The rout
 is GET-capable and its preflight advertises only `OPTIONS`.
 
 **OBSERVED** [source: findings-log/2026-10-12-csr-cross-host/FINDINGS.md]. So
-method registration is settled by the **GET probe alone**:
+**GET** registration is settled by the **GET probe**; the CORS header cannot
+override it. (It cannot settle *which* non-GET method is registered — that still
+rests on the two POST-only routes agreeing with their own headers.)
 
 | signal | proves | does **not** prove |
 |---|---|---|
@@ -227,18 +233,39 @@ method registration is settled by the **GET probe alone**:
 | `GET` → 403 + `MissingAuthenticationTokenException` | no GET route | that nothing is registered — `v6`, `csr/v2` and bare `v2` are all 403 and all real |
 | `GET` → 401 + `UnauthorizedException` + `x-ca-err: 990` | a GET route exists and reached the authoriser | — |
 
-The regression suite asserts the `x-amzn-errortype` on each 403 cell rather than
-reading the CORS header, for this reason. This is `AGENTS.md` §6 item 2 in a new
-costume: a header read as meaning something it does not mean.
+The regression suite asserts the `x-amzn-errortype` on each **403** cell rather
+than reading a CORS header there, and pins the GET half of the `v13` contradiction
+explicitly — `GET …/v13/display/message` → 401 + `x-ca-err == "990"` on all three
+hosts — so that removing GET from `v13` fails the suite instead of passing it
+quietly. (It does still read CORS headers on the **OPTIONS** cells, to pin their
+values.) This is `AGENTS.md` §6 item 2 in a new costume: a header read as meaning
+something it does not mean.
 
-**INFERRED, assumption stated:** a cross-origin browser request bearing an
-`Authorization` header triggers a preflight, and the `v13` preflight advertises no
-`GET`, so a browser-based third-party client may be unable to GET
-`v13/display/message` at all. Assumption: browsers enforce `allow-methods` on
-preflight (specified Fetch behaviour) **and** no third-party client is
-same-origin with `clcloud.*` — the second half is not observed or tested here.
-Server-side clients do not preflight and are unaffected. Recorded as a question,
-not a finding.
+**⚠ Refuted 2026-10-12 — original claim kept visible:**
+
+> *Original claim:* "a cross-origin browser request bearing an `Authorization`
+> header triggers a preflight, and the `v13` preflight advertises no `GET`, so a
+> browser-based third-party client may be unable to GET `v13/display/message` at
+> all."
+
+**The mechanism does not exist.** `GET` is a CORS-safelisted method, so Fetch §4.8
+never applies the `allow-methods` test to it, and the CORS check (§4.10) reads only
+`Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials` — it never
+consults `Access-Control-Allow-Methods`. A preflight advertising only `OPTIONS`
+**cannot** block a browser GET.
+
+**Corrected:** a cross-origin browser GET to `v13` **passes the preflight and the
+GET is sent** (OBSERVED 2026-10-12, headless-browser probe: preflight passed, GET
+went to the wire, `net::ERR_FAILED` / `MissingAllowOriginHeader`). It fails
+afterwards because the `401` response carries **no `Access-Control-*` header at
+all**. Whether a **`200`** carries `Access-Control-Allow-Origin` is token-gated and
+unobserved — tracked in [`10-open-questions.md`](10-open-questions.md) §1.
+
+The label was honest and the assumption was stated; the claim was still wrong,
+because half of the assumption was specified behaviour that, checked, does not
+apply to this case. A label limits the damage of a wrong claim; it does not make
+the claim right.
+Server-side clients do not preflight and are unaffected by any of this.
 
 ## Existence oracles — how to probe this host family without a token
 
@@ -246,7 +273,7 @@ Established with positive controls; this is the reusable method.
 
 | Host family | signal |
 |---|---|
-| `clcloud.*` | `x-amzn-errortype: MissingAuthenticationTokenException` = **no route** (every fabricated control). `UnauthorizedException` + `x-ca-err: 990` = **the request reached Medtronic's Layer7 authorizer** — route exists, token-gated. `access-control-allow-origin: *` on an **OPTIONS** request proves the resource exists even when GET is undefined (this is how POST-only `v6` was found). **Do not read `access-control-allow-methods` as a register of the route's methods** — `v13/display/message` advertises `OPTIONS` while being GET-capable (see §"`access-control-allow-methods` is not a register" below). The plain 403 status line is uniform and carries no signal |
+| `clcloud.*` | `x-amzn-errortype: MissingAuthenticationTokenException` = **no route** (every fabricated control). `UnauthorizedException` + `x-ca-err: 990` = **the request reached Medtronic's Layer7 authorizer** — route exists, token-gated. `access-control-allow-origin: *` on an **OPTIONS** request proves the resource exists **even when GET is undefined** (this is how POST-only `v6` was found) — **but the `access-control-allow-methods` half of the old phrasing was wrong and is struck here:** that list is **not** a register of the route's methods, and `v13/display/message` advertises `OPTIONS` while being GET-capable. Settle **GET** registration from the GET probe; see §"`access-control-allow-methods` is not a register" below. The plain 403 status line is uniform and carries no signal |
 | `carelink.minimed.*` | `401 {"error":{"type":"InvalidToken","group":"AUTH"}}` = exists, token-gated · `405` = POST-only · `404` = absent · `200 application/json` = public |
 | `carelinkhp.*` (portal) | `200 JSON` published · `412` precondition (missing client header) · `401` exists but gated · `404` absent · `405` POST-only. Namespace is **case-sensitive**. Full table in `07-admin-portal-and-reporting.md` |
 

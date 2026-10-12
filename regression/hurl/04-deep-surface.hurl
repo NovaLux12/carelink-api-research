@@ -215,10 +215,36 @@ HTTP 403
 # MissingAuthenticationTokenException is that proof.
 # ============================================================
 
+# The GET half of the v13 contradiction, pinned on all three hosts.
+# Without this the block above is one-directional: if Medtronic ever made
+# v13 POST-only, `allow-methods` would very likely still read OPTIONS and
+# nothing here would fail, while the claim the suite documents became
+# false. `x-ca-err: 990` is what makes 401 mean "reached the Layer7
+# authorizer" rather than "some other 401" (VERSION-AXIS section 6).
+GET https://clcloud.minimed.eu/connect/carepartner/v13/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
 OPTIONS https://clcloud.minimed.com/connect/carepartner/v13/display/message
 HTTP 200
 [Asserts]
 header "access-control-allow-methods" == "OPTIONS"
+
+GET https://clcloud.minimed.com/connect/carepartner/v13/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
+OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-methods" == "OPTIONS"
+
+GET https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
 
 OPTIONS https://clcloud.minimed.com/connect/csr/v2/display/message
 HTTP 200
@@ -241,11 +267,6 @@ GET https://clcloud.minimed.com/connect/v2/display/message
 HTTP 403
 [Asserts]
 header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
-
-OPTIONS https://clcloud-trials.minimed.com/connect/carepartner/v13/display/message
-HTTP 200
-[Asserts]
-header "access-control-allow-methods" == "OPTIONS"
 
 OPTIONS https://clcloud-trials.minimed.com/connect/csr/v2/display/message
 HTTP 200
