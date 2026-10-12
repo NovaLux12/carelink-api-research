@@ -1,0 +1,27 @@
+=== area I probe run, 2026-10-12T18:01:39Z ===
+cap=20 delay=2.5s GET-only controls-first-per-host
+2026-10-12T18:01:39Z START
+2026-10-12T18:01:42Z seq=1 host_seq=1 carelink-login-trials.minimed.com /.well-known/openid-configurationx role=CONTROL-absent-wellknown-trials status=404 ctype=text/plain; charset=utf-8 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:01:45Z seq=2 host_seq=2 carelink-login-trials.minimed.com /.well-known/openid-configuration role=CONTROL-live-oidc-trials status=200 ctype=application/json; charset=utf-8 bytes=2825 sha=57aca4f8d72ab874d8b2fda60d9eea90fbfa993b1c108f2e29f65fa73c74b4e4
+2026-10-12T18:01:48Z seq=3 host_seq=3 carelink-login-trials.minimed.com /.well-known/jwks.json role=CANDIDATE-jwks-trials status=200 ctype=application/json; charset=utf-8 bytes=3180 sha=4070922b8d16f7980df50f4dd03dabc812207ce08915fcdf218d2bea1a17ef27
+2026-10-12T18:01:51Z seq=4 host_seq=4 carelink-login-trials.minimed.com /oidc/register role=CANDIDATE-registration-reachability-trials status=404 ctype=application/json; charset=utf-8 bytes=60 sha=f006bbd60894452b80c7d19e1c832d1e30f457540dc5e52e567bc1ffe522615d
+2026-10-12T18:01:54Z seq=5 host_seq=1 carelink-login.minimed.eu /.well-known/openid-configuration role=CANDIDATE-oidc-minimed-eu status=200 ctype=application/json; charset=utf-8 bytes=2729 sha=ec2ae6ae93c1a36deb127ad511767f41638f61dcbad85e15a52ca79d6b3b158d
+2026-10-12T18:01:56Z seq=6 host_seq=2 carelink-login.minimed.eu /.well-known/jwks.json role=CANDIDATE-jwks-minimed-eu status=200 ctype=application/json; charset=utf-8 bytes=3148 sha=a68b69ca68ce5c1ea4491c12ae8e4ccbcfa55a1d653159d6534f0bcc19a1130b
+2026-10-12T18:01:59Z seq=7 host_seq=3 carelink-login.minimed.eu /oidc/register role=CANDIDATE-registration-reachability-minimed-eu status=404 ctype=application/json; charset=utf-8 bytes=60 sha=f006bbd60894452b80c7d19e1c832d1e30f457540dc5e52e567bc1ffe522615d
+2026-10-12T18:02:02Z seq=8 host_seq=1 carelink-login.minimed.com /.well-known/openid-configuration role=CANDIDATE-oidc-minimed-com status=200 ctype=application/json; charset=utf-8 bytes=2741 sha=a29211c9af396e45544386250110c6d8999abaf0bdc4c6eb2403f6b0a0dadad7
+2026-10-12T18:02:05Z seq=9 host_seq=2 carelink-login.minimed.com /.well-known/jwks.json role=CANDIDATE-jwks-minimed-com status=200 ctype=application/json; charset=utf-8 bytes=3148 sha=cd030f97985cb02b78d6aa81dd0ebcce61769640e9355932938babc3ff5b330c
+2026-10-12T18:02:08Z seq=10 host_seq=3 carelink-login.minimed.com /oidc/register role=CANDIDATE-registration-reachability-minimed-com status=404 ctype=application/json; charset=utf-8 bytes=60 sha=f006bbd60894452b80c7d19e1c832d1e30f457540dc5e52e567bc1ffe522615d
+2026-10-12T18:02:11Z seq=11 host_seq=1 carelink-login.medtronic.eu /.well-known/openid-configuration role=CANDIDATE-oidc-medtronic-eu status=200 ctype=application/json; charset=utf-8 bytes=2753 sha=9dce60f19c0d5fbcbfba964365ce030c10f05d1b8aec883640fe011eeb1ebd78
+2026-10-12T18:02:14Z seq=12 host_seq=2 carelink-login.medtronic.eu /.well-known/jwks.json role=CANDIDATE-jwks-medtronic-eu status=200 ctype=application/json; charset=utf-8 bytes=3164 sha=afccce1fd5a821afb09b72d887394dfacd77b07cb5b06189fc44de4b2cdb6f66
+2026-10-12T18:02:16Z seq=13 host_seq=3 carelink-login.medtronic.eu /oidc/register role=CANDIDATE-registration-reachability-medtronic-eu status=404 ctype=application/json; charset=utf-8 bytes=60 sha=f006bbd60894452b80c7d19e1c832d1e30f457540dc5e52e567bc1ffe522615d
+2026-10-12T18:02:19Z seq=14 host_seq=1 carelink-login.medtronic.com /.well-known/openid-configurationx role=CONTROL-absent-wellknown-medtronic-com status=404 ctype=text/plain; charset=utf-8 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:02:22Z seq=15 host_seq=2 carelink-login.medtronic.com /.well-known/openid-configuration role=CANDIDATE-oidc-medtronic-com status=200 ctype=application/json; charset=utf-8 bytes=2765 sha=5c3551fda28389f5c5761bb447480a4cd6bee0a9840a3532e9dbcb5c7bab8c88
+2026-10-12T18:02:25Z seq=16 host_seq=3 carelink-login.medtronic.com /.well-known/jwks.json role=CANDIDATE-jwks-medtronic-com status=200 ctype=application/json; charset=utf-8 bytes=3164 sha=0b8b4f1abb06fa2a888fb09b9d267fb74043f85ce83273f3b29f5a981bcaab02
+2026-10-12T18:02:28Z seq=17 host_seq=4 carelink-login.medtronic.com /oidc/register role=CANDIDATE-registration-reachability-medtronic-com status=404 ctype=application/json; charset=utf-8 bytes=60 sha=f006bbd60894452b80c7d19e1c832d1e30f457540dc5e52e567bc1ffe522615d
+2026-10-12T18:02:28Z END total=17
+2026-10-12T18:03:34Z seq=18 host_seq=5 carelink-login-trials.minimed.com /.well-known/openid-configuration role=PIN-VALIDATION-trials-oidc hurl_exit=1
+2026-10-12T18:03:36Z seq=19 host_seq=6 carelink-login-trials.minimed.com /.well-known/jwks.json role=PIN-VALIDATION-trials-jwks hurl_exit=1
+2026-10-12T18:03:52Z seq=18 host_seq=5 carelink-login-trials.minimed.com /.well-known/openid-configuration role=PIN-VALIDATION-trials-oidc hurl_exit=1
+2026-10-12T18:03:54Z seq=19 host_seq=6 carelink-login-trials.minimed.com /.well-known/jwks.json role=PIN-VALIDATION-trials-jwks hurl_exit=1
+2026-10-12T18:04:07Z seq=18 host_seq=5 carelink-login-trials.minimed.com /.well-known/openid-configuration role=PIN-VALIDATION-trials-oidc hurl_exit=0
+2026-10-12T18:04:09Z seq=19 host_seq=6 carelink-login-trials.minimed.com /.well-known/jwks.json role=PIN-VALIDATION-trials-jwks hurl_exit=0

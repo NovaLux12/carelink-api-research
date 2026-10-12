@@ -26,19 +26,19 @@ is the same file: `AUTH-TENANT` = `findings-log/probe-2026-10-08/AUTH-TENANT-FIN
 
 ---
 
-## 1. Four tenants with completely disjoint key sets
+## 1. Five tenants with completely disjoint key sets
 
 | Issuer host | Role | `client_id` | `audience` | JWKS `kid`s |
 |---|---|---|---|---|
 | `carelink-login.minimed.eu` | patient, EU | `PeAhkbhQWlQRxJiQxWfcFBiGus1lxfe9` | `carepartner.patient.ous` | `8RqxnMm8vg2Go_y1LAVh9`, `vnTNpK5RvkqVEfQgHRsqv` |
-| `carelink-login.minimed.com` | patient, US | `0FGoNwY0SP8ZmESYSfEOgMw03c58c1hk` | `carepartner.patient.us` | `jpv2d2IuydtvKtefd5M8J`, `qjHNmcQOpW_gvHz6zaD8` |
+| `carelink-login.minimed.com` | patient, US | `0FGoNwY0SP8ZmESYSfEOgMw03c58c1hk` | `carepartner.patient.us` | `jpv2d2IuydtvKtefd5M8J`, `qjHNmcQOpW_gQvHz6zaD8` — see §8 |
 | `carelink-login.medtronic.eu` | shadow | — | — | `jd0EOLxJ8XduYx4lLy3ig`, `gZMBCJcl_t25Es4U_g_ow` |
-| `carelink-login.medtronic.com` | shadow | — | — | `cEgK74cyc5LzAVI9VxEz9`, `80YhF8vW25gJ1_rR_lLOJ` — see §8 |
-| `carelink-login-trials.minimed.com` | clinical / trials | — | `carepartner.patient.cl` | **Unknown — not in any source** |
+| `carelink-login.medtronic.com` | shadow | — | — | `cEgK74cyc5LzAVI9VxEz9`, `80YhF8vW25gJ1_rR_lOOJ` — see §8 |
+| `carelink-login-trials.minimed.com` | clinical / trials | — | `carepartner.patient.cl` | `kCezLNMQV0tlc3hZinEly`, `pNzjt7ruOaWE4rlDCBPoP` — **fetched 2026-10-12** |
 
 ```mermaid
 flowchart LR
-    subgraph POL["OAuth policy compared field-by-field — identical but for `issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"]
+    subgraph POL["OAuth policy — all five documents BYTE-IDENTICAL once the tenant hostname is substituted out"]
         A["carelink-login.minimed.eu<br/>patient · EU"]
         B["carelink-login.minimed.com<br/>patient · US"]
         C["carelink-login.medtronic.eu<br/>shadow"]
@@ -49,28 +49,81 @@ flowchart LR
     B --> Z
     C --> Z
     D --> Z
-    Z["each holds 2 JWKS kids<br/>0 shared by any two of the four"]
-    E -. "never fetched —<br/>kids Unknown, not in any source" .-> KE["no kid recorded"]
+    E --> Z
+    Z["one digest 0c0db635… · 30 fields ·<br/>0 absent from any document"]
+    Z --> K["each holds 2 JWKS kids ·<br/>10 keys, 0 shared by any two of the five"]
     style D fill:#3b2f2f,stroke:#f66
     style E fill:#3b3b2f,stroke:#fd6
-    style KE fill:#3b3b2f,stroke:#fd6
 ```
-**OBSERVED.** The OAuth *policy* is identical across all of them: comparing
-`carelink-login.minimed.eu`, `carelink-login.medtronic.eu` and
-`carelink-login-trials.minimed.com` field by field, they differ only in `issuer`,
-the endpoint hostnames derived from it, and `registration_endpoint` — same grants,
-scopes, claims, PKCE methods, token-auth methods, DPoP algs and response types;
-the `.com`/`.eu` documents are likewise identical modulo host
-[source: AUTH-TENANT §1; PROBE-FINDINGS §4]. **Consequence:** the clinical/trials
-tenant needs no separate auth handling — there is no "clinical login flow" to
-implement, only a different issuer [source: AUTH-TENANT §1].
+**OBSERVED.** The OAuth *policy* is identical across all five, and the evidence is
+stronger than a field-by-field comparison: substituting each tenant's own
+hostname out and re-hashing gives **one digest across all five documents**
+(2640 B, `sha256:0c0db635f5e9b08b…`) — the same bytes, not merely the same
+fields. The union is 30 field names and **none is absent from any document**;
+exactly **12 of 30** differ raw, and every one of the 12 is a URL string
+containing that tenant's own hostname [source:
+findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §2].
 
-**The four compared key sets are completely disjoint** — no `kid` is shared by any
-two tenants, all four JWKS documents fetched and compared. This upgrades the
-earlier finding that the shadow deployment had "identical OAuth policy", which had
-left open the possibility of shared signing keys. It does not share them: the
+This **corrects** the earlier list, which read *"identical except `issuer`, the
+endpoint hostnames derived from it, and `registration_endpoint`"*
+[source: AUTH-TENANT §1; PROBE-FINDINGS §4]. `registration_endpoint` is **not**
+a separate difference — it differs only by hostname, like the other eleven. The
+difference set is *twelve host-derived URLs*, not *eleven plus a special case*.
+
+**Consequence, confirmed at five tenants:** the clinical/trials tenant needs no
+separate auth handling. There is no "clinical login flow" to implement, only a
+different issuer — and the trials tenant has no discovery field the other four
+lack [source: AUTH-TENANT §1, upgraded at findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §2].
+
+**The five key sets are completely disjoint** — no `kid` is shared by any two
+tenants, all five JWKS documents fetched and compared. This upgrades the
+earlier finding that the shadow deployment had "identical OAuth policy", which
+had left open the possibility of shared signing keys. It does not share them: the
 shadow deployment shares OAuth policy but not keys, so a shadow token is not a
-key-reuse risk [source: AUTH-TENANT §8; docs/00-summary-the-map.md].
+key-reuse risk [source: AUTH-TENANT §8; findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §5].
+
+### One behavioural difference the policy surface cannot show
+
+Identical documents do not mean identical behaviour. **OBSERVED:** on the
+discovery and JWKS responses, `x-ratelimit-limit` is **500** on both `.eu`
+tenants and **100** on `-trials.minimed.com`, `minimed.com` and
+`medtronic.com` — 10 observations, 2 per tenant, constant within a tenant
+[source: findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §3].
+**INFERRED**, on the assumption that Auth0 treats the header as a static
+per-tenant setting rather than a negotiated tier, that 500/100 is tenant
+configuration. Both values sit far above any realistic unauthenticated client
+rate and neither changes what any endpoint accepts, so **no client behaviour
+depends on the reading**.
+
+**OBSERVED:** `registration_endpoint` is advertised by **all five** tenants and
+**returns 404 to `GET` on all five** — `/oidc/register` gives 404
+`application/json`, 60 B, one identical digest on every host [source:
+findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §3].
+
+> ⚠ **Retracted 2026-10-12.** The original wording here was "absent on **all five**
+> … A published capability that does not exist, identically, everywhere." **That is
+> false**, and it is kept visible rather than deleted (AGENTS.md §3). The endpoint is
+> **live and POST-only** — a GET-only sweep cannot see it, which is a method error and
+> not a reading error; `PULL_REQUEST_TEMPLATE.md:15` permits OPTIONS for exactly this
+> and `PROBE-FINDINGS.md` §5 is titled *"Endpoints that are POST-only (a GET-only probe
+> reads them as dead)"*. The pass's own supplementary OPTIONS sweep, with a
+> certainly-absent control on **every** tenant, shows:
+>
+> | Tenant | `OPTIONS /oidc/register` | verdict |
+> |---|---|---|
+> | `carelink-login-trials.minimed.com` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.minimed.eu` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.minimed.com` | **204** + `allow-methods: POST` | **live, POST-only** |
+> | `carelink-login.medtronic.eu` | 404, 107 B, `"CORS error: Missing Access-Control-Request-Method header"`, **no** `access-control-*` | routed; preflight refused by a CORS handler |
+> | `carelink-login.medtronic.com` | 404, 107 B, same digest | routed; preflight refused by a CORS handler |
+>
+> The three patient tenants therefore **honour** the advertisement; on the two
+> shadow tenants the route exists but a browser preflight is refused. The controls
+> (`/oidc/registerx`, one character different, same host and headers) return 404 +
+> `x-auth0-not-found: 1` + `text/plain` 10 B on all five, so the positive cells are
+> an oracle and not an inference. Whether the shadow tenants would serve a
+> conforming **POST** is **not established** and needs a POST — area J's subject
+> [FINDINGS.md §3–§4].
 
 **OBSERVED** advertisement-vs-reality [source: PROBE-FINDINGS §4 and deep §1, §5;
 AUTH-TENANT §1]:
@@ -308,8 +361,9 @@ Original question: would `clcloud.minimed.eu` accept a token minted by a shadow
 tenant? Separate issuer + separate keys says it should not; token-audience/`kid`
 validation done loosely is exactly the class of bug that would make it critical.
 **Needs a valid token** [source: SECURITY; PROBE-FINDINGS deep §7]. The question
-as recorded now has **four candidate issuers** — the two patient issuers plus the
-two shadow issuers.
+as recorded had **four candidate issuers** — the two patient issuers plus the
+two shadow issuers — and now has **five**, with the clinical tenant added
+(area I, 2026-10-12). All ten `kid`s across the five are disjoint (§1).
 
 Bounded, not answered, by the JWKS comparison. The better-posed question is now:
 **does any host validate the `kid` against its own JWKS, or merely decode the
@@ -319,21 +373,44 @@ issuer/audience checking is not. The configuration is on the safe side of the
 question, and the exposure would be a verifier bug rather than a key leak
 [source: AUTH-TENANT §8; SECURITY addendum].
 
-## 8. Unresolved disagreement between sources — the shadow `.com` kid spelling
+## 8. Disagreement between sources — the shadow `.com` kid spellings (one resolved 2026-10-12, one newly found)
 
-Two files record the `carelink-login.medtronic.com` JWKS kids differently. The
-first kid agrees; the second does not:
+Two files recorded the `carelink-login.medtronic.com` JWKS kids differently. The
+first kid agreed; the second did not:
 
-- `AUTH-TENANT-FINDINGS.md` §8 — the pass that fetched and compared all four JWKS
+- `AUTH-TENANT-FINDINGS.md` §8 — the pass that fetched and compared four JWKS
   documents: `cEgK74cyc5LzAVI9VxEz9`, **`80YhF8vW25gJ1_rR_lLOJ`**
 - `recon/RECON-SUBDOMAINS.md` §4.1: `cEgK74cyc5LzAVI9VxEz9`, **`80YhF8vW25gJ1_rR_lOOJ`**
 
-The last three characters differ (`lLOJ` vs `lOOJ` — `L` against `O`). Every other
-kid agrees across files. **Unresolved.** Both are given rather than one silently
-picked: the `AUTH-TENANT` form comes from the pairwise four-way JWKS comparison, so
-treat it as the better-attested one and confirm against the live
-`/.well-known/jwks.json` before relying on either. `PROBE-FINDINGS.md` deep §7 and
-`SECURITY-FINDINGS.md` truncate the kid to `80YhF8…` and take no side.
+The last three characters differ (`lLOJ` vs `lOOJ` — `L` against `O`).
+
+> ### Correction (2026-10-12) — **RESOLVED, against `AUTH-TENANT`**
+>
+> Live `GET carelink-login.medtronic.com/.well-known/jwks.json` (area I, claim
+> #23, ledger seq 16) returns **`80YhF8vW25gJ1_rR_lOOJ`** — the `RECON-SUBDOMAINS`
+> spelling. The `AUTH-TENANT-FINDINGS.md` §8 form is a transcription transposition.
+>
+> **The recommendation this section gave was wrong in the direction it warned
+> about.** It said to "treat [the `AUTH-TENANT` form] as the better-attested one
+> and confirm against the live `/.well-known/jwks.json` before relying on either."
+> It was confirmed against live, and the other spelling won. `AUTH-TENANT` §8's
+> authority came from having done a four-way pairwise comparison; being the more
+> thorough pass did not make its transcription correct.
+> [source: findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §6]
+
+### A second transcription defect, never recorded anywhere
+
+**`carelink-login.minimed.com`, second kid.** Live (ledger seq 9) is
+**`qjHNmcQOpW_gQvHz6zaD8`**, 21 characters. Both `AUTH-TENANT-FINDINGS.md` §8
+and this page previously recorded **`qjHNmcQOpW_gvHz6zaD8`** — 20 characters,
+the live string **minus one `Q`** [source:
+findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §6].
+
+This one could not have been caught the way the one above was. The
+`medtronic.com` disagreement left two readings on disk to compare; a **deletion**
+leaves only one, so it is invisible without going to live. Supporting but not
+conclusive: all ten observed `kid`s are 21 characters, and this was the only
+one of ten that is not.
 
 ## 9. What we still do not know
 
@@ -343,6 +420,8 @@ The consolidated table — open, closed, and unknown — is in
 | Question | Status |
 |---|---|
 | Would a patient host accept a shadow-tenant token? | Blocked on a token |
-| JWKS kids for `carelink-login-trials.minimed.com` | **Unknown — not in any source.** The four-way comparison never covered the clinical tenant, so "disjoint" is established for the four compared issuers only |
-| `/mfa/challenge`, and an email address from `/userinfo` | **Unknown** — advertised but no probe result in any source; and the email scope is not obtainable for this client without a server-side change |
+| ~~JWKS kids for `carelink-login-trials.minimed.com`~~ | **CLOSED 2026-10-12** — `kCezLNMQV0tlc3hZinEly`, `pNzjt7ruOaWE4rlDCBPoP`; disjointness is now a **five**-tenant statement [area I, #23] |
+| `/mfa/challenge`, and an email address from `/userinfo` | **Unknown** — advertised on all five tenants but no probe result in any source; and the email scope is not obtainable for this client without a server-side change |
+| Is the `device_code` grant rejected for the *trials* client too? | **Unknown.** All five tenants advertise it; `docs/02` §1 has it rejected for the two *patient* clients. Re-proving it needs a POST to `/oauth/token`, which belongs to area J — deliberately not attempted here |
+| Do the other advertised-but-absent endpoints (`/bc-authorize`, `/mfa/challenge`, global-token-revocation) 404 on **all five** tenants? | **Unknown.** `registration_endpoint` was swept across all five on 2026-10-12 (404 everywhere); its three siblings were not, for want of request budget. Successor recorded under area J in `docs/11` |
 

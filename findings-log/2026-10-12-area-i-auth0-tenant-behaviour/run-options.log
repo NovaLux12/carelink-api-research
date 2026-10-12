@@ -1,0 +1,19 @@
+=== area I SUPPLEMENTARY OPTIONS run, 2026-10-12T18:17:32Z ===
+supplementary cap=14 (planned 10, 4 spare) OPTIONS-only empty-body preflight
+origin=https://probe.invalid  ACRM=POST  ACRH=content-type
+2026-10-12T18:17:32Z START
+2026-10-12T18:17:35Z seq=1 carelink-login-trials.minimed.com /oidc/registerx method=OPTIONS role=CONTROL-absent-options--trials-minimed-com status=404 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:17:38Z seq=2 carelink-login-trials.minimed.com /oidc/register method=OPTIONS role=CANDIDATE-liveness-options--trials-minimed-com status=204 bytes=0 sha=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+2026-10-12T18:17:41Z seq=3 carelink-login.minimed.eu /oidc/registerx method=OPTIONS role=CONTROL-absent-options--minimed-eu status=404 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:17:44Z seq=4 carelink-login.minimed.eu /oidc/register method=OPTIONS role=CANDIDATE-liveness-options--minimed-eu status=204 bytes=0 sha=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+2026-10-12T18:17:46Z seq=5 carelink-login.minimed.com /oidc/registerx method=OPTIONS role=CONTROL-absent-options--minimed-com status=404 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:17:49Z seq=6 carelink-login.minimed.com /oidc/register method=OPTIONS role=CANDIDATE-liveness-options--minimed-com status=204 bytes=0 sha=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+2026-10-12T18:17:52Z seq=7 carelink-login.medtronic.eu /oidc/registerx method=OPTIONS role=CONTROL-absent-options--medtronic-eu status=404 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:17:55Z seq=8 carelink-login.medtronic.eu /oidc/register method=OPTIONS role=CANDIDATE-liveness-options--medtronic-eu status=404 bytes=107 sha=af370969b23225ba8b558acafadd650dfc4c2537ef3b472dc0ef82b420dc6b14
+2026-10-12T18:17:58Z seq=9 carelink-login.medtronic.com /oidc/registerx method=OPTIONS role=CONTROL-absent-options--medtronic-com status=404 bytes=10 sha=0802559db1375af3ff5caabba71acea1d6299f1a7fc64b6a5024f19cbd33b72f
+2026-10-12T18:18:00Z seq=10 carelink-login.medtronic.com /oidc/register method=OPTIONS role=CANDIDATE-liveness-options--medtronic-com status=404 bytes=107 sha=af370969b23225ba8b558acafadd650dfc4c2537ef3b472dc0ef82b420dc6b14
+2026-10-12T18:18:01Z END supplementary total=10 of a 14 cap
+2026-10-12T18:18:15Z seq=11 carelink-login.medtronic.eu /oidc/register method=OPTIONS role=DIAGNOSTIC-acrm-on-the-wire status=404 bytes=107 (verbose; ACRM proven on the wire)
+2026-10-12T18:20:00Z seq=12 carelink-login.medtronic.eu /oidc/register method=OPTIONS role=DIAGNOSTIC-declared-method-invariance status=404 bytes=107 (ACRM=GET; identical digest)
+2026-10-12T18:21:30Z seq=13 carelink-login.medtronic.eu /oidc/register method=OPTIONS role=DIAGNOSTIC-requested-header-invariance status=404 bytes=107 (wider ACRH; identical digest)
+=== SUPPLEMENTARY END: 13 of a 14 cap (10 planned + 3 diagnostics). 1 request unused. ===

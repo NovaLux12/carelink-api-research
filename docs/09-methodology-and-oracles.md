@@ -115,6 +115,34 @@ indistinguishable from "exists but unreadable", so the honest phrasing is "no
 evidence of existence", never "confirmed absent" [source: CONFIG-NS TARGET 3;
 AUTH-TENANT-FINDINGS §6].
 
+### Oracle C — the Auth0 tenant family (two 404s, not one)
+
+Added 2026-10-12 from area I's controls. The `carelink-login.*` hosts are
+Auth0's tenant front door, and they answer a `404` in **two structurally
+different ways**. Discriminating on status alone — the advice everywhere else on
+this page — collapses both into "not found" and loses the distinction.
+
+| Signal | Meaning | Verdict |
+|---|---|---|
+| `404` + `content-type: text/plain; charset=utf-8`, 10 B, **`x-auth0-not-found: 1`** | the tenant's front door **does not know this path** | absent — unrouted |
+| `404` + `content-type: application/json; charset=utf-8`, 60 B, `cache-control: no-cache`, **no** `x-auth0-not-found` | reached Auth0's API layer and a handler had nothing to return | **routed, resource absent** — a different claim, and for an endpoint a document advertises, the one worth making |
+| `200` + `application/json` | the document exists | live, public |
+
+`x-auth0-not-found: 1` is the better oracle on this host family: it appears on
+the unrecognised path and on **nothing else** across area I's 19 responses, so
+it identifies "this path is unknown to the tenant" where a status code cannot.
+
+**INFERRED, and it matters that it is labelled:** that the two signatures
+correspond to two different *routing states*. Observed is the separation; the
+meaning assigned to it is not. Nothing in area I depends on the reading — only on
+the fact that the two shapes are distinguishable, which lets a sweep say "absent"
+and "advertised-but-absent" as different verdicts rather than one.
+
+**Establish it per host.** One host's 404 proves nothing about the next host's
+front door, which is why area I spent a second control on a differently
+configured tenant and recorded both digests rather than assuming
+[source: findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §4].
+
 ## 4. The trap list
 
 | Trap | Detail | Fix |
@@ -132,6 +160,8 @@ AUTH-TENANT-FINDINGS §6].
 | **The `date` series itself is the suspect** — use body-file mtimes instead | **Area D answered the open question above, and the answer was that the instrument is the problem.** That pass made the same finding four passes running (14 gaps under 2.5 s, min 1.642 s) **and recorded 11 of 119 requests with a NEGATIVE duration** — `t_done` earlier than `t_sent`, which is impossible — so those timestamps cannot all be faithful. **The settling evidence was on disk the whole time and nobody looked:** `curl -o bodies/cc-XX.json` makes the **kernel** set each body's mtime at write time, and that series is independent of the harness's clock. Measured: **118 gaps, min 2.575 s, max 2.636 s, 0 under 2.5 s and 0 under the `>=2 s` floor** (OBSERVED, [findings-log/2026-10-12-area-d-country-sweep/spacing.txt](../findings-log/2026-10-12-area-d-country-sweep/spacing.txt)). **So the answer is: the requests were spaced correctly and the `date` readings are what moved** — which does **not** explain the mechanism, and no cause is asserted for it | **When the harness writes response bodies, measure spacing from their mtimes, not from `date`.** **Counting rule:** one gap per consecutive pair **in request order** (from `run.log`), measured `mtime[n+1] − mtime[n]`, including error envelopes; N bodies give N−1 gaps. **Validate the series before trusting it** — git does **not** preserve mtimes, so on a fresh clone or `git archive` every body carries the checkout time and the spread collapses to 0.0 s; a trustworthy run's mtime span **equals the harness span** (area D: 304.9 s both ways). Report the `date` series alongside, never instead |
 | A count the gate's regex cannot see | `README.md` stated **two** assertion counts. Line 440 reads `147 pinned assertions` and the gate reads it. Line 384-385 reads `` `regression/hurl/` holds **147⏎pinned assertions** `` — **wrapped across a line break inside a bold span**, so the gate's pattern `(\d+) pinned assertions` does not match it, the site was already satisfied by line 440, and the numbers check reported `ok`. It was reporting green about a value it had never seen | the numbers check is **not** evidence that every count site agrees — it only sees counts on one line with a single space before the phrase. Verify counts by re-running `scripts/measure_assertions.py` and grepping for the number yourself. **Not fixed here**: changing the gate's own pattern in the same PR the gate passed is a decision for a maintainer, not a side effect of a research pass |
 | A corpus count scoped to one host family | The CORS confound stood for two passes on a count that was right and a scope that was not: of 24 captured `200` heads, 14 carried `access-control-allow-origin` and the 10 that did not were labelled "on a different host surface" — **4 of them are `clcloud.*` discovery documents, across the three cumulus hosts (two on `.com`)**. The false premise propagated into five pages | before scoping any corpus count to a host family, resolve each counted item to its host **from the committed harness that fetched it**, not from the filename prefix. `disc-*` meant `clcloud.*`; `config-*`/`countries-*` meant `carelink.*`. The 4-of-10 table is in [`2026-10-12-area-b-v12-routing/FINDINGS.md`](../findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md) §Correction — **not** in `2026-10-12-area-x-cors-separation/FINDINGS.md` §4, which covers only that pass's own 25 rows and names no capture. Separately: those four heads are **gitignored** (`published-pointers/.gitignore` lists `docs/`), so the 24/14/10 split cannot be re-derived from a clean clone |
+| A ledger that cannot resolve the delay it claims | Area I's ledger timestamps at **1-second resolution**, so the 12 same-host gaps quantise onto 2.000 s and 3.000 s and the declared 2.5 s sleep is **unmeasurable from the ledger**. The measured floor of 2.000 s is a **lower bound**, not a measurement — the same class of defect as the sub-declared gap above, but quieter: that one produced gaps *below* the declared delay and looked like a clock fault, this one produces plausible-looking numbers that simply cannot answer the question asked | state the resolution next to the number ("measured floor 2.000 s **at 1-second ledger resolution**, which cannot resolve the declared 2.5 s") and point at the harness as the authority for the delay itself. Emit **millisecond** timestamps (`date -u +%FT%T.%3NZ`) in new harnesses. Do not report a 2.000 s floor as though it evidenced 2.5 s of spacing [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §Method] |
+| A transcribed identifier mistaken for a disagreement | `carelink-login.minimed.com`'s second JWKS `kid` was recorded **20 characters long where the live string is 21** — one `Q` dropped, in two files at once. The companion defect on another tenant was a transposition, which `docs/02` §8 had already caught by holding both readings open; a **deletion** leaves only one reading, so no amount of cross-file comparison finds it | compare identifiers **in code** against a named `file:line`, never by eye — `findings-log/2026-10-12-area-i-auth0-tenant-behaviour/corpus-audit.py` prints observed-vs-corpus token matches with their locations. A recorded identifier that appears in no capture is not evidence of agreement. Both of area I's corrections were found this way, and **both were against the more thorough earlier pass** [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §6] |
 
 ## 5. Verification discipline — the four ways this project has been wrong
 
@@ -204,7 +234,7 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 176 assertions (380 execute per run, counting the
+  `regression/hurl/` holds 193 assertions (401 execute per run, counting the
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;

@@ -1,0 +1,1 @@
+{"statusCode":404,"error":"Not Found","message":"CORS error: Missing Access-Control-Request-Method header"}
