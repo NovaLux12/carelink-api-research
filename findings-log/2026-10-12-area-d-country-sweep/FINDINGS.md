@@ -295,7 +295,7 @@ container-type assertion at each step — never `//`, never a bare dotted
 > ⚠ **Two corrections to `docs/04`, both from the `absent`-vs-`null` confusion
 > this repo has already been bitten by twice.**
 >
-> - **`cpMobileAppAvailable`** — `docs/04:428` says it "is `false` for 16
+> - **`cpMobileAppAvailable`** — `docs/04:433` says it "is `false` for 16
 >   countries and **`null` for GB and IE only**". Measured across 117 live
 >   documents: **ABSENT in 41**, `false` in **75**, `true` in **1** (AU), and
 >   **`null` in zero of 117**. So the key is **never null**, it is **absent in
@@ -304,7 +304,7 @@ container-type assertion at each step — never `//`, never a bare dotted
 >   pins `jsonpath "$.cpMobileAppAvailable" not exists` for GB, with the
 >   comment "**GB does not even carry the flag — the key is absent, not
 >   false**". **`docs/04` was contradicting the repo's own pinned assertion.**
-> - **`stateCodes`** — `docs/04:418` says it is "`null` for all 17 others".
+> - **`stateCodes`** — `docs/04:423` says it is "`null` for all 17 others".
 >   Measured: **ABSENT in 115 of 117**, present in exactly **CA** and **US**,
 >   and `null` in **none**.
 
@@ -335,7 +335,7 @@ Recorded because a reader that cannot fail is worse than no reader
    contradiction that does not exist. Fixed to a case-insensitive pattern.
 2. **Two rules asserted things the repo's own record refutes.** A rule firing on
    *any* endpoint host not matching the region flagged **US and PR** — but
-   `docs/04:427` records `blePereodicDataEndpoint` as **constant** at
+   `docs/04:432` records `blePereodicDataEndpoint` as **constant** at
    `clcloud.minimed.eu` across all 18 swept countries, US included, so the `.eu`
    value is a recorded constant and the rule would have invented a finding.
    A second rule flagged **CA** for carrying subdivisions on a non-US region —
@@ -487,3 +487,46 @@ to misread — so it cannot distinguish the two trees. The corrected rule return
 (65) without being passed it. The under-count direction is covered too:
 `--self-test` asserts that a check inside an `if` **nested in a loop** is still
 a loop site, alongside 15 other shell shapes.
+
+### Round 3 — a wrong sentence in the counting rule, corrected against source
+
+Round 2 cleared the rule itself (SUPPORTED, demonstrably falsifiable) but
+returned NOT CLEAN on one thing: the `KNOWN LIMIT` block this pass added to
+`scripts/measure_assertions.py` **named the wrong constant and the wrong error
+direction**. It said area A's `for spec in ...` loop was a second loop site
+whose multiplier of 16 was "14 too high".
+
+**Both parts were wrong, and the error was mine to have checked before writing
+it.** Verified against area A's actual source:
+
+- A's loop contains **no `check "` site at all** — it asserts inline via
+  `PASS=$((PASS + 1))`, so **A adds zero check sites** (41 → 41).
+- The loop site this rule identifies on A's tree is therefore still the
+  16-family loop, whose multiplier of 16 is **correct**.
+- The constant that actually goes stale is **`INLINE_05`**, which must go
+  5 → 7 to account for A's two extra inline executions. Left at 5, the same
+  tree yields `runtime 359` against a true **361**.
+
+**And the direction is the opposite of what I wrote:** `INLINE_05` under-counts,
+so an error is *2 too low*, not 14 too high. That distinction is the whole point
+of the block — it is what tells the merge queue which constant to go fix.
+
+The corrected block states the general invariant instead of a per-branch
+prediction: **detecting that a site is in a loop is structural; the multiplier
+and the inline count are both hand-maintained constants**, so any pass adding a
+loop or an inline `PASS` branch must re-derive both. It also records that
+**treating area A correctly requires no rule change at all** — only the constant
+bump A already made.
+
+> `AGENTS.md` §6.5, verbatim: derived prose that contradicted its own source
+> table, then propagated — which is what this paragraph was. It was written from
+> a plausible reading of A's diff rather than from A's code, and it would have
+> sent the queue to edit `LOOP_FAMILY_SITES` and leave `INLINE_05` stale.
+
+**The wider disagreement this pass found**, recorded rather than left for the
+next person (`AGENTS.md` §6.7 names one counting rule; two files now disagree
+about where it lives): `scripts/research-gate.sh:22` still says the counting rule
+is "the header of scripts/research-checks.py", while this PR makes
+`scripts/measure_assertions.py` authoritative. **That disagreement pre-exists on
+`origin/main` and is not this PR's** — noted only so the next person editing a
+count does not read the wrong file for the rule.

@@ -65,26 +65,48 @@ nested loops, loops inside conditionals, conditionals inside loops, `elif`/
 after touching this function; a rule that cannot fail is worse than no rule
 (docs/09 section 5).
 
-KNOWN LIMIT, stated rather than left to be discovered (2026-10-12)
------------------------------------------------------------------
-The multiplier is STILL a constant: `LOOP_FAMILY_SITES = 16`, describing the
-one loop that exists in 05 today. Detecting that a site is *in* a loop is now
-structural; how many times that loop *iterates* is still hard-coded.
+KNOWN LIMIT — two constants remain hand-maintained (2026-10-12)
+--------------------------------------------------------------
+The STRUCTURAL fix above settles one question only: whether a `check "` site
+sits inside a `for`/`while`/`until`. Two numbers about EXECUTION are still
+hand-maintained constants, and a pass that adds either kind of construct must
+re-derive both rather than trust them:
 
-That is correct for this tree and wrong the moment a second loop with a
-different trip count is added. Area A's unmerged branch
-(`research/a-carelinkhp-region`) adds exactly that: a `for spec in ...` over
-**2** portal hosts, alongside the 16-family loop. On that tree the corrected
-rule identifies 1 loop site and multiplies it by 16 where 2 is correct, so
-`executed_05` comes out 14 too high.
+  1. `LOOP_FAMILY_SITES = 16` — the trip count of the family loop.
+  2. `INLINE_05 = 5` — how many assertions 05 runs OUTSIDE any `check "` site,
+     counting the inline `PASS=$((PASS + 1))` branches at the top of the file
+     and the shadow / sibling / family-map comparisons. At base that is 4
+     literal sites executing 5 times (the sibling and family-map branches are
+     single sites inside 2-iteration loops).
 
-This is deliberately NOT fixed here. Deriving each loop's trip count from shell
-source is a different and much harder problem than locating a site inside a
-loop, and getting it half-right would be worse than the documented constant.
-**The queue must re-measure any branch that adds a second loop to 05**, and
-`measure_assertions.py` should grow a trip-count rule when that happens. The
-`--observed-05` flag already bypasses the whole derivation by using the live
-suite's own `N passed`, which is why the gate prefers it when a log is present.
+The error direction differs and matters to whoever hits it:
+  - a stale `LOOP_FAMILY_SITES` OVER-counts (site counted 16x when it runs once);
+  - a stale `INLINE_05` UNDER-counts (new inline branches execute but are not
+    counted at all), and **under-counting is the dangerous direction** because
+    a too-small number still looks like a plausible count and nothing fails.
+
+**Area A's branch (`research/a-carelinkhp-region`) exercises (2), not (1).**
+Verified against A's actual source, not inferred: its `for spec in ...` loop over
+2 portal hosts contains **no `check "` site at all** — it asserts inline via
+`PASS=$((PASS + 1))`, so **A adds zero check sites** (41 -> 41) and the loop
+site this rule identifies on A's tree is still the 16-family loop, whose
+multiplier of 16 is correct. **Treating A's loop correctly needs no rule change
+at all**; only `INLINE_05` needs to go 5 -> 7 to account for A's two extra
+inline executions (measured: `static 167`, `runtime 361`, matching A's own
+figures — with `INLINE_05` left at 5 the same tree yields `runtime 359`).
+
+(Earlier revision of this block, 2026-10-12, said A's loop was a second loop
+site whose multiplier of 16 was "14 too high". That was wrong in both the
+constant and the direction; it was corrected after being checked against A's
+code. The verifier is not the reason — the claim was simply unverified.)
+
+This is deliberately NOT auto-derived. Deriving trip counts and inline-execution
+counts from shell source is a much harder problem than locating a site inside a
+loop, and getting it half-right would be worse than a documented constant.
+**Until it is derived, any pass that adds a loop or an inline PASS branch to
+05 must update these two constants and re-run `--self-test`.** `--observed-05`
+bypasses the whole derivation by using the live suite's own `N passed`, which
+is why the gate prefers it whenever a suite log is present.
 """
 
 import argparse

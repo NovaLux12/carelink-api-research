@@ -636,7 +636,7 @@ def r_tech_clock_shape(doc, cc):
     findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:239. It is NOT
     in docs/04: an earlier version of this docstring cited docs/04:238 for it,
     which was already wrong at the base commit — that line reads "itemised in any
-    source". docs/04:419 summarises techHours without the dotted-clock detail."""
+    source". docs/04:424 summarises techHours without the dotted-clock detail."""
     out = []
     th = typed(doc, 'techHours', 'str')
     if isinstance(th, str) and not th.startswith('24/7'):
