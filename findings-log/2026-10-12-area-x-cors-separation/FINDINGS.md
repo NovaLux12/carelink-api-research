@@ -173,7 +173,18 @@ GET requests for a `discover` payload.
 **Rows where ACAO and status 200 disagree: 9**, all of the form *200 with no
 ACAO* — seq 4, 5, 6, 13, 14, 17, 18, 22, 23. Every one is a GET for a `discover`
 payload. **No row returned a non-200 status while carrying ACAO**: the three rows
-carrying ACAO all returned 200.
+carrying ACAO all returned 200. Of the 9, **5 were sent with an `Origin`** (seq 5, 6,
+14, 18, 23) and **4 were sent bare** (seq 4, 13, 17, 22); none carried `ACAO`.
+
+**The counting rule for "paired cells", written down so the number is
+re-derivable.** 6 is the number of (host, method, path) groups in this pass's
+`results.jsonl` that carry BOTH a bare and an `Origin`-bearing request, with the
+`CONTROL` rows excluded because they are not part of the comparison — sequences
+{4/5, 7/8, 9/10, 13/14, 17/18, 22/23}. In all 6 the status and the full
+`access-control-*` set were identical across the pair; 0 changed. A reader who pairs
+the controls as well gets **7**, because `GET .../v13/display/message` then gains a
+bare counterpart at seq 1 (a control). The 6 is the defensible figure; the 7 counts a
+control as data.
 
 ---
 

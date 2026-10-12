@@ -381,7 +381,7 @@ Every correction stays in `findings-log/` rather than being quietly fixed — a
 research note that only records its successes isn't one. **[OBSERVED]** —
 `AGENTS.md` §6; `docs/09-methodology-and-oracles.md`.
 
-**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **145
+**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **147
 pinned assertions** — 321 execute per run, once the 16-family loop in the config
 suite is expanded and hurl's status-line checks are counted. Exit 0 = the vendor
 surface hasn't drifted past the pinned values. The suite has caught a page

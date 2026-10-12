@@ -20,12 +20,21 @@
 #
 #   1. It asks the CORS question of a GET that ANSWERS 200. Area B's whole
 #      confound was that "carries a preflight" and "answers 200" were the same
-#      observation in the corpus. That is false on clcloud.*: four committed
-#      200-status heads on clcloud.* carry NO access-control-allow-origin
+#      observation in the corpus. That is false on clcloud.*: four 200-status
+#      heads on clcloud.* carry NO access-control-allow-origin
 #      (2026-10-12-published-pointers/docs/disc-{eu-v13,com-v13,com-v11-legacy,
 #      trials-v6-legacy}.hdr). So a 200 GET is a real CORS cell.
 #
-#   2. It sends an Origin header. NO committed capture in this repository ever
+#      PROVENANCE WARNING -- those four heads are NOT in git.
+#      2026-10-12-published-pointers/.gitignore lists docs/, because those bodies
+#      carry credential-shaped values this repo deliberately does not publish. A
+#      fresh clone holds 91 .hdr files, not 101, so the 24/14/10 split and the
+#      4-of-10 finding CANNOT be re-derived from a clean checkout. What a clone
+#      does hold is that pass's probe.sh:81-84, which carries the host
+#      attribution -- the raw capture is not part of a walkable evidence chain.
+#      Four heads across THREE hosts; clcloud.minimed.com carries two of them.
+#
+#   2. It sends an Origin header. NO capture in this repository ever
 #      sent one (verified across every probe.sh / .hurl / .py harness), so the
 #      archive cannot distinguish "this route has no preflight configured" from
 #      "this gateway only emits ACAO when an Origin is present". That is the

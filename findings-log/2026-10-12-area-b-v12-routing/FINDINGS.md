@@ -287,30 +287,45 @@ The other six (`config-*`, `countries-*`) are on `carelink.*`.
 ### What follows, and what does not
 
 The inference "on `clcloud.*`, *carries a preflight* and *answers 200* are the same
-observation in this corpus" **does not hold.** On `clcloud.*` a 200 that carries no
-preflight exists — four of them, one per cumulus host. The confound this pass was
-right to flag is therefore dissolved: there is now a cell that distinguishes the
-two, and it was in this repository the whole time, inside the corpus the claim was
-counted from.
+observation in this corpus" **does not hold.** On `clcloud.*` a 200 that carries no preflight
+exists — four captured heads, spread across the three cumulus hosts (two of them on
+`clcloud.minimed.com`). The statement is **withdrawn as false**.
 
-**This does not retroactively make Finding 3's *observation* wrong.** "The gateway
-does not add CORS uniformly" is unaffected and stands — a 401 without
-`Access-Control-*` next to a 200 with it, same host, same session, is exactly that.
+**But this does not select between the two readings this pass offered, and an earlier draft
+of this correction claimed that it did. That claim is withdrawn too.** The first version of
+this section argued reading (b) — "the route demands a token on `OPTIONS`" — was *refuted*,
+because a CORS-configured route would carry `ACAO` on its own `200` `GET` and this one does
+not. **That argument is unsound: it assumes the thing in dispute.** If `ACAO` is emitted only
+on `OPTIONS` responses regardless of route — a hypothesis this pass did not name and did not
+exclude — then a CORS-configured route's `GET` carries nothing either, and the
+`200`-GET-without-`ACAO` cell is **uninformative** about configuration rather than evidence
+against it. Reading (b) is consistent with every cell on disk, and so is reading (a).
 
-**It does mean Finding 3's reading (b) is refuted.** Reading (b) was that the
-discovery route "demand[s] a token on `OPTIONS` while non-2xx responses never carry
-CORS" — which presupposes that route *is* CORS-configured. If it were, its own 200
-GET would carry `access-control-allow-origin`. It does not, on any of the three
-hosts.
+The net result is narrower than it first looked, and is stated exactly:
 
-**It does not license the opposite conclusion.** "Per-route configuration" is *not*
-established by this correction. A hypothesis Finding 3 did not name survives every
-cell on disk: **ACAO may be emitted only on `OPTIONS` responses regardless of
-route**, in which case a GET could never reveal a route's CORS configuration and the
-200-GET-without-ACAO cell is uninformative about it. Separating the two needs a
-`clcloud.*` route that is both CORS-configured and returns 200 on GET; no such
-route is recorded on any of the three hosts, because every GET-public cumulus route
-is a discovery document whose `OPTIONS` answers 401. Both readings remain consistent
-and the cause stays unestablished — successor area in `docs/11`.
+| | status |
+|---|---|
+| the host-scoping premise above ("a different host surface") | **false** |
+| "on `clcloud.*`, carries-a-preflight and answers-200 are the same observation" | **withdrawn — false** |
+| (a) no preflight configured on the discovery route | **not excluded** |
+| (b) demands a token on `OPTIONS`, non-2xx never carries CORS | **not excluded** |
+| "`ACAO` is emitted only on `OPTIONS` responses, regardless of route" | **not excluded** |
+| "`ACAO` appears only when an `Origin` request header is sent" | **excluded** |
+
+The last row is the only exclusion this pass achieved, and it is new: no capture anywhere in
+the corpus had ever sent an `Origin` header to `clcloud.*`. Across the **6** route×method
+pairs where both a bare and an `Origin`-bearing request were sent — controls excluded, since
+they are not part of the comparison — status and the full `access-control-*` set were
+**identical in all 6**; 0 changed. Separating the three surviving readings needs a `clcloud.*`
+route that is both CORS-configured and returns 200 on GET; no such route is recorded on any
+of the three hosts, because every GET-public cumulus route is a discovery document whose
+`OPTIONS` answers 401.
+
+**Provenance — those four heads are not in git.** `published-pointers/.gitignore` lists
+`docs/`, because those bodies carry credential-shaped values this repo deliberately does not
+publish. A fresh clone therefore holds **91** `.hdr` files, not 101, and the 24 / 14 / 10
+split **cannot be re-derived from a clean checkout**. What a clone *does* hold is
+`probe.sh:81-84`, which carries the host attribution — the raw capture is not part of the
+evidence chain a reader can walk.
 
 Evidence: [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md](../2026-10-12-area-x-cors-separation/FINDINGS.md) §4.

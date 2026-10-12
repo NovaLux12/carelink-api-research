@@ -147,23 +147,31 @@ it as the opposite either. An earlier version of this paragraph argued that the 
 be separated, because across the captured heads every response carrying
 `access-control-allow-origin` is a `200` and the `200`s carrying none were all "on a different
 host surface". **That premise was false and is corrected 2026-10-12**: of those ten
-CORS-less `200`s, **four are on `clcloud.*`**, one per cumulus host
+CORS-less `200`s, **four are on `clcloud.*`** — across the three cumulus hosts, **two of them on
+`clcloud.minimed.com`**, so 4 cells on 3 hosts
 ([findings-log/2026-10-12-published-pointers/probe.sh:81-84]). So on `clcloud.*` **a `200`
 that carries no preflight exists**, and status no longer stands in for CORS presence.
 
 Area X re-derived the cell live on all three hosts: **9 `200`-without-CORS responses, every one
-a `GET` of a discovery payload; 0 non-2xx responses carrying CORS anywhere**; and sending an
-`Origin` header changed **none** of the six paired cells
-([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]). So the reading this
-page previously left open — that the route demands a token on `OPTIONS` while non-2xx never
-carries CORS — is **refuted**: a CORS-configured route would carry `ACAO` on its own `200`
-`GET`, and this one does not.
+a `GET` of a discovery payload; 0 non-2xx responses carrying CORS anywhere**
+([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
 
-**What is still open is a different question, and it is not settled either way.** `ACAO` may be
-emitted **only on `OPTIONS` responses regardless of route**, which would make a `GET` incapable
-of revealing a route's CORS configuration. Both that and "configured per route" fit all 25
-rows. Distinguishing them needs a CORS-configured `clcloud.*` route that returns `200` on
-`GET`, and **no such route is recorded on any of the three hosts**. Successor area **X** in
+**⚠ What is still open is a wider question than this page used to put, and an earlier draft of
+this paragraph closed it wrongly.** That draft said the finding *refuted* reading (b) — the
+route demands a token on `OPTIONS` — because a CORS-configured route would carry `ACAO` on its
+own `200` `GET`. **That argument assumes the thing in dispute**: if `ACAO` is emitted only on
+`OPTIONS` responses regardless of route, a configured route's `GET` carries nothing either, so
+the cell is *uninformative* rather than evidence against. **Reading (b) is not excluded, and
+neither is "configured per route" nor "emitted only on `OPTIONS`".** The cause is not
+established.
+
+**One mechanism *is* excluded**, and no earlier pass could test it because none sent an
+`Origin` header to `clcloud.*` at all: **"`ACAO` appears only when an `Origin` is sent" is
+dead.** Across the **6** route×method pairs where both a bare and an `Origin`-bearing request
+were sent — controls excluded, they are not part of the comparison — status and the full
+`access-control-*` set were **identical in all 6**. Distinguishing the three surviving readings
+needs a CORS-configured `clcloud.*` route that returns `200` on `GET`, and **no such route is
+recorded on any of the three hosts**. Successor area in
 [`11-suggested-research-areas.md`](11-suggested-research-areas.md).
 Method registration is still read from the **GET** probe, never from
 `access-control-allow-methods` ([`docs/09`](09-methodology-and-oracles.md) §2).
