@@ -1,7 +1,8 @@
 # Area X — CORS separation, raw observations
 
 Run date: 2026-10-12. Harness: `probe.sh` (unmodified, run once).
-Corpus: `results.jsonl` (24 rows), request ledger: `run.log`, rendered table: `verdict.txt`.
+Corpus: `results.jsonl` (**25** rows — 24 from the harness plus 1 hurl validation request,
+§7), request ledger: `run.log`, rendered table: `verdict.txt`.
 
 This file records **only what came back off the wire**. It assigns no evidence
 class, states no cause, and offers no explanation for any pattern below. Where a
@@ -181,7 +182,10 @@ re-derivable.** 6 is the number of (host, method, path) groups in this pass's
 `results.jsonl` that carry BOTH a bare and an `Origin`-bearing request, with the
 `CONTROL` rows excluded because they are not part of the comparison — sequences
 {4/5, 7/8, 9/10, 13/14, 17/18, 22/23}. In all 6 the status and the full
-`access-control-*` set were identical across the pair; 0 changed. A reader who pairs
+`access-control-*` set were identical across the pair; 0 changed. Scope limit: that comparison holds for
+every row whose family was **captured** — the 24 curl rows. Seq 25's
+`access_control_family_seen` is the sentinel `"(not captured: hurl harness)"`, and a sentinel
+is not a value; for that row only ACAO and ACAM are established absent, not the whole family. A reader who pairs
 the controls as well gets **7**, because `GET .../v13/display/message` then gains a
 bare counterpart at seq 1 (a control). The 6 is the defensible figure; the 7 counts a
 control as data.
@@ -232,9 +236,10 @@ repo records shipping an unexecuted assertion as a defect.
 |---:|---|---|---|---|---:|---|---|
 | 25 | `clcloud.minimed.eu` | GET | `connect/carepartner/v13/discover/android/3.6` | hurl 8.0.1 (not curl) | 200 | **absent** | **absent** |
 
-That is the **10th** row of the form *200 with no ACAO*, and the third of them to
-be produced by a tool other than `probe.sh` — an independent confirmation of the
-same cell by a second harness, not a re-count of one measurement.
+That is the **10th** row of the form *200 with no ACAO*, and the **only** row in this ledger
+produced by a tool other than `probe.sh` — the first as well as the only, not the third. It
+is still an independent confirmation of the same cell by a second harness rather than a
+re-count of one measurement, but it adds no second and third non-curl row.
 
 Verbatim command, output, exit code and the exact limits of what the two predicates
 prove are in [`hurl-validation.txt`](hurl-validation.txt). One request, not three:

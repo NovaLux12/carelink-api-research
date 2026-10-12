@@ -323,8 +323,9 @@ of the three hosts, because every GET-public cumulus route is a discovery docume
 
 **Provenance — those four heads are not in git.** `published-pointers/.gitignore` lists
 `docs/`, because those bodies carry credential-shaped values this repo deliberately does not
-publish. A fresh clone therefore holds **91** `.hdr` files, not 101, and the 24 / 14 / 10
-split **cannot be re-derived from a clean checkout**. What a clone *does* hold is
+publish. A clone therefore holds **91** `.hdr` files on `origin/main` — **115** once the area X pass
+merges its own 24 — not the 101 that count assumed, and the 24 / 14 / 10 split
+**cannot be re-derived from a clean checkout**. What a clone *does* hold is
 `probe.sh:81-84`, which carries the host attribution — the raw capture is not part of the
 evidence chain a reader can walk.
 
