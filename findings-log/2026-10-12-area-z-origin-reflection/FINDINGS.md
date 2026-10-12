@@ -22,8 +22,10 @@ the ledger, not a re-reading of it.
   + 9 from hurl = 60.**
 - `wc -l results.jsonl` = **60**, `seq` contiguous 1..51 from the harness and
   52-60 appended by hand for the hurl requests (§8). **Every request this pass
-  made against the vendor has a row** — `run.log` ends `DONE n=51 (cap 60)` for
-  the harness part.
+  made against the vendor has a row**, and the converse: `run.log` holds exactly
+  **51** request lines with `seq` contiguous 1..51, no gaps and no extras.
+  (`probe.sh` also prints a `DONE n=…` banner, but via `echo` to stdout rather
+  than into `run.log`, so it is **not** on disk and is not cited here.)
 - All 51 harness requests were **OPTIONS** (45 data) or **GET** (6 controls),
   every one with an **empty body**. The 9 hurl requests were **OPTIONS**.
 - No POST, no token exchange, no authentication. No `Authorization`, no `Cookie`,
@@ -240,7 +242,7 @@ marked `(not captured by hurl --test)`:
 | field | why |
 |---|---|
 | `http_status` `200`, `acao` `*`, `acam` `OPTIONS` | **established** — these are exactly the values the shipped assertions test, and the file executed at 100 % |
-| everything else (`content_type`, the `x-amzn-*` headers, `acah`, `acac`, `acamx`, `vary`, `ctype_full`, `body_bytes`, `body_sha256`) | **not captured** — `hurl --test` does not dump response heads or bodies |
+| everything else (`curl_exit`, `content_type`, the `x-amzn-*` headers, `acah`, `acac`, `acamx`, `vary`, `ctype_full`, `body_bytes`, `body_sha256`) | **not captured** — `hurl --test` does not dump response heads or bodies, and **`curl_exit` is curl-specific: curl did not make these nine requests**, so any value there would be a statement about a program that was never involved |
 
 Those fields were **not** copied across from the harness rows, even where the
 request was the same host, path and `Origin` as a harness row. A row that

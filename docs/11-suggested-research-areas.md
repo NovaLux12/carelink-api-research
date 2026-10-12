@@ -155,9 +155,11 @@ those two routes are the three unattributable rows in `pde-csr-oracle`.
 **Closes when:** every `results.jsonl` carries an explicit `host` key and one explicit key per
 CORS header, `(none)` when absent — **or** a `docs/` note records the convention per ledger and
 warns that a single-convention query under-reports. Either close is acceptable; the 2-vs-12
-worked example is already recorded in
-[findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md §6] and in
-[#17](https://github.com/NovaLux12/carelink-api-research/issues/17). Area Z's own ledger is
+worked example is recorded in
+[#17](https://github.com/NovaLux12/carelink-api-research/issues/17) and written up in
+[`docs/06`](06-patient-api-surface.md). It is deliberately **not** in area Z's
+`FINDINGS.md`: that file is scoped to what came off the wire, and this result is an
+offline property of the corpus, not a response. Area Z's own ledger is
 written to the uniform shape, so the fix is already demonstrated once.
 **Assumptions (INFERRED):** that a uniform schema is wanted over documented heterogeneity. If
 the maintainers prefer the latter, only the `docs/` note is owed.
@@ -430,7 +432,7 @@ landing on alphabetical neighbours).
 
 ### Why there is no area AA
 
-**Every letter A–Z is now in use** — 20 open plus 6 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 19 open plus 7 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
