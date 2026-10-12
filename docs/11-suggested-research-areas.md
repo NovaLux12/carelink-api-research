@@ -22,6 +22,7 @@ everything else on this page moves.
 | NGP alarm-code vocabulary | an authenticated `application` config |
 | `relativeOffset` clock semantics | any real payload |
 | Report bodies from `commoncore` | a clinician-scoped token |
+| Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
 
 ---
 
@@ -67,25 +68,62 @@ flags are where an inconsistency would actually mislead a client.
 
 **Closes when:** the sweep is either complete or the contradictions are enumerated.
 
-### N. Do the two new POST-only routes exist on the other two cumulus hosts?
+### T. Does any published document point a client at `csr/v2`, or is it a namespace no config can address?
 
-`connect/csr/v2/display/message` and `connect/v2/display/message` are the only
-routes found live-and-POST-only in the CSR and bare-cumulus namespaces, each
-confirmed three times on `clcloud.minimed.eu` (OBSERVED,
-[findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md]). That pass was single-host
-by design, so both routes are currently **one host's** finding.
+`connect/csr/v2/display/message` is live and POST-only on **all three** cumulus
+hosts (OBSERVED, [findings-log/2026-10-12-csr-cross-host/FINDINGS.md]). It sits one
+namespace above the `carepartner` legs, and **no recorded document names it** —
+the discovery documents declare `baseUrlPde` and the carepartner base URLs, and the
+69-key public config declares `csr.control.codes.settings` and
+`csr.cumulus.periodic.data.endpoints`, but no `baseUrlCsr` and no
+`/connect/csr/v2` string is recorded anywhere.
 
-**Blocker:** four OPTIONS requests, never sent — the 30-request cap was
-exhausted (OBSERVED, [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] §Limits).
+That matters more than it looks: a route that exists but that **no config-driven
+client is pointed at** is unreachable by the entire class of clients that read
+their endpoints from the vendor's own documents — a different fact from "live",
+and the difference decides whether anyone can use it.
 
-**Closes when:** the same two paths are OPTIONS-probed on
-`clcloud.minimed.com` and `clcloud-trials.minimed.com`; either both return the
-same CORS signature, or a region split is documented. A negative — 403 +
-MissingAuthenticationTokenException on either host — closes it just as firmly.
+**Blocker:** none for the offline half. Enumerating the discovery documents and
+the public config for `csr`-shaped keys is a grep over documents already on disk,
+zero requests. The live half is one unauthenticated config read per host.
 
-**Assumptions (INFERRED):** that the carepartner region-identity result transfers
-to the `csr`/bare-`v2` legs. It is an inference from a different leg of the same
-API, not an observation of these paths.
+**Closes when:** every recorded discovery document and the 69-key public config are
+enumerated for `csr`-shaped base-URL keys, and either a base URL is named with its
+source, or the negative "csr/v2 exists but no published document points at it" is
+recorded **with the key list that was searched** so the negative is auditable
+rather than merely asserted. A negative counts and closes it.
+
+**Assumptions (INFERRED):** that `csr/v2` is an internal or deprecated route
+rather than a client-addressable one — inferred from the *absence* of a recorded
+base URL, which is not the same as having searched every document for one. If the
+grep finds nothing, the inference has become an observation and this area's real
+output is the key list.
+
+### U. Are the `csr/v1`, `csr/v3` and PDE cells dead on `.com` and `-trials` too, or only on `.eu`?
+
+Area N confirmed the **positive** cells are global and said nothing about the
+negative ones. `docs/10-open-questions.md` §2 records "no route on any tested
+method" for `csr/v1`, `csr/v3` and the PDE set — but that verdict rests on
+`clcloud.minimed.eu` alone (OBSERVED,
+[findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md]). A dead namespace on one
+region is not evidence of a dead namespace on another, and this repo has already
+been bitten once by a single-host row propagating into a three-host claim
+(`AGENTS.md` §6 item 1).
+
+**Blocker:** none. Six recorded paths × two hosts × GET + OPTIONS = 24 requests,
+plus the four control cells per host. Every candidate is a path already recorded
+in the Area C harness — no wordlist, no version neighbours added beyond the set.
+
+**Closes when:** each of the six paths has a GET + OPTIONS verdict on
+`clcloud.minimed.com` and `clcloud-trials.minimed.com` with controls first on each
+host, and `docs/10` §2's row is either confirmed everywhere or restated with its
+actual host coverage. **A negative counts in both directions:** finding one of them
+live on another host is as valuable as confirming all dead.
+
+**Assumptions (INFERRED):** that route registration is uniform across the three
+cumulus stages. Area N's three positive cells all agreed, which is suggestive and
+not conclusive — three agreeing samples do not establish uniformity, and the
+negative cells are a different namespace.
 
 ### O. Is `/patient/reports/*` on `carelink.*` the reports surface for every region?
 
@@ -331,6 +369,7 @@ being superseded — never silently. Letters are not reused.
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |
+| N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
 
 ---
 
