@@ -65,7 +65,8 @@ single-host when they are three-host.
 This was caught only because a spot-check disagreed with the table beside it. **A lookup path
 that silently answers from a smaller corpus than the report printed next to it is a check that
 cannot fail**, and this repository already holds corrections for that shape. The merge now
-happens before any lookup, and the two views are asserted to agree.
+happens before any lookup, and `audit-index.py --selftest` asserts it: it probes a
+matrix-only cell and exits non-zero unless the lookup reports three hosts.
 
 ## 3. Controls
 
@@ -77,8 +78,9 @@ happens before any lookup, and the two views are asserted to agree.
   12 cells, 2 short-key cells) must hold. A single-convention query sees 2 ACAO cells where the
   true figure is 12 — that is area Z's own retracted error, and re-running it here would
   reproduce it.
-- **The two views must agree.** The index's report and its `--coverage` lookup are the same
-  corpus by construction after §2.3. A disagreement between them is a bug, not a finding.
+- **The two views must agree.** The index's report and its `--coverage` lookup must read the
+  same corpus. `audit-index.py --selftest` asserts it against a cell that exists **only** in the
+  matrix, so the assertion fails if the merge ever moves after the lookup again.
 
 ## 4. What the audit found
 
@@ -100,7 +102,7 @@ defects and one is a presentation risk.
 > on-disk capture `disc-eu.json`
 
 The cited evidence is the 2026-10-12 discovery sweep, and its own table
-([`2026-10-12-published-pointers/FINDINGS.md` §1](../2026-10-12-published-pointers/FINDINGS.md))
+([`2026-10-12-published-pointers/FINDINGS.md` §2a](../2026-10-12-published-pointers/FINDINGS.md))
 carries **two** `v13/discover/android/3.6` rows — `clcloud.minimed.eu` and `clcloud.minimed.com`,
 both 20256 B / `f84886265667`. That pass's **only** `-trials` row is the **legacy** `v6` document
 (10053 B, `1aab9bb1e721`). `requests.tsv` confirms it: one `-trials` line, and it is `v6`.
@@ -118,45 +120,69 @@ still not evidenced.
 
 > | F2 | Hardcoded `x-api-key` in a public bundle, replicated across **five hosts** (drift-swept); prod API base points at a `dev.` host | **OBSERVED** | low — verified not live [SECURITY-FINDINGS S3] |
 
-Two defects, independent of each other:
+Two defects, each sufficient alone:
 
-1. **The count is inflated.** The cited `SECURITY-FINDINGS.md` §S3 says it in a section titled
-   "**S3 is replicated across a second host**": *"S3 was recorded as a property of one host. It
-   is a property of the bundle, and the bundle is deployed **at least twice** — including on the
-   `.medtronic.com` shadow."* The source says **two**; the page says **five**.
+1. **The count outruns its own citation.** This row cites `SECURITY-FINDINGS.md` §S3, a section
+   titled *"S3 is replicated across a second host"*: *"S3 was recorded as a property of one host.
+   It is a property of the bundle, and the bundle is deployed **at least twice** — including on
+   the `.medtronic.com` shadow."* **Two, not five.**
 2. **The evidence class is the one the source forbids.** The corroborating drift file opens:
    *"**Provenance:** this file is a **reconstruction from the agent's report** … Re-verify
-   before treating any row as **OBSERVED**."* `docs/08:37` labels the row **OBSERVED** and cites
-   it.
+   before treating any row as **OBSERVED**"*. `docs/08:37` labels the row **OBSERVED**.
 
-Neither is a disclosure risk — the key is redacted and the finding is "verified not live". Both
-are evidence defects, and the second is the more serious: a page tells the reader to trust a
-label that its own source forbids.
+Neither is a disclosure risk — the key is redacted, the finding is "verified not live", and no new
+host is named. Both are evidence defects, and the second is the more serious.
 
-### Y-3 · `docs/02` — the trials tenant inside a "compared field-by-field" subgraph
+> **⚠ Corrected after review round 1: `docs/08:91` is NOT part of this finding, and this pass
+> originally said it was.** `:91` carries the same "five hosts" count but **cites a different
+> source** — `[source: DRIFT-AND-NEW; docs/00-summary-the-map.md]` — and `DRIFT-AND-NEW` has a
+> section headed *"Five hosts, not two — the leaked bundle replicates wider"*. So `:91`'s count
+> came from its own citation, and the paragraph **already carried the caveat**: *"recorded as
+> reported; the sweep's own caveat is that its evidence table was never written to disk and must
+> be re-verified before being treated as OBSERVED"*.
+>
+> **`:91` was correct as written and has been reverted to byte-identical with `origin/main`.**
+> This pass conflated two lines with different citations, which is §6 item 5 — derived prose
+> contradicting the sources it cites. The retraction is recorded rather than deleted.
+>
+> **What survives for `:91`, and is weaker than what this pass first claimed:** the drift file
+> *asserts* five and **enumerates no five-host list**; only three host names are recoverable from
+> its text. The count is unverified rather than wrong — which is what the paragraph already said.
 
-The mermaid subgraph is titled *"OAuth policy compared field-by-field — identical but for
-`issuer`, the endpoint hostnames derived from it, and `registration_endpoint`"*, and contains
-**five** tenant nodes. Four are wired solid to the comparison node; the fifth
-(`carelink-login-trials.minimed.com`) is wired **dashed** to "no kid recorded" and labelled
-*"never fetched — kids Unknown, not in any source"*.
+### Y-3 · `docs/02` — **WITHDRAWN. There is no defect here.**
 
-**The fact is stated correctly.** `AUTH-TENANT-FINDINGS.md` compared **three** tenants in §1 and
-**four** in §8 — EU, US and the two shadows. The trials tenant is in neither. `docs/02` does not
-claim otherwise.
+This pass originally claimed that `docs/02`'s mermaid puts five tenants inside a subgraph titled
+"compared field-by-field" when the comparison covered **four**, and it edited the subgraph title
+to say so.
 
-**The risk is visual.** A reader scanning the diagram sees a five-node subgraph whose title says
-field-by-field comparison. The dashed edge and label are the mitigation, and they work — but a
-reader who reads titles rather than edges gets the wrong count. This is a restatement, not a
-retraction: the corrected reading is that the comparison covered **four of the five**, and the
-page already says so in words two lines away.
+**That was wrong, and the edit made the page contradict itself.** `AUTH-TENANT-FINDINGS.md` §1 is
+titled *"Three tenants, one Auth0 org"* and its own table names them:
+
+| Host | `.well-known/openid-configuration` |
+|---|---|
+| `carelink-login.minimed.eu` (patient, EU) | 200, 2729 B |
+| `carelink-login.medtronic.eu` (shadow) | 200, 2753 B |
+| **`carelink-login-trials.minimed.com` (clinical)** | 200 |
+
+**The trials tenant is in the policy comparison.** §8's *four*-tenant comparison is a different
+one — it compares **JWKS `kid` sets** across EU, US and the two shadows, and trials is correctly
+absent from *that*, which is exactly what the diagram's dashed edge and "no kid recorded" label
+already said. `docs/02:58-60` states the three-tenant policy comparison in prose, and it is right.
+
+The subgraph title has been **reverted to byte-identical with `origin/main`**. The error was
+reading "§8 compares four" as the only comparison and glossing §1's three as "EU, US and the two
+shadows" — four names for a section that calls itself three, silently dropping the tenant the
+section actually compared. §6 item 5, and §6 item 1: I asserted a characterisation instead of
+reading the table.
+
+**No correction is carried for this finding, and none should be.**
 
 ### Y-4 (addendum) — the evidence for some of this is not in a clean clone
 
 `findings-log/2026-10-12-published-pointers/.gitignore` lists `docs/`. A fresh clone therefore
 does **not** hold the discovery/country/config bodies those pages rest on, so Y-1 cannot be
-re-derived from a clean checkout — only the finding's own `FINDINGS.md` and `requests.tsv` are
-tracked. Several pages depend on untracked captures. This is recorded rather than fixed: it is a
+re-derived from a clean checkout — 10 files in that directory are tracked (`git ls-files`), none of
+them a `docs/*.json` capture. Several pages depend on untracked captures. This is recorded rather than fixed: it is a
 maintainer decision whether those bodies can be committed scrubbed.
 
 ## 5. Assumptions
@@ -168,11 +194,15 @@ maintainer decision whether those bodies can be committed scrubbed.
 2. **Host coverage is the test, not truth.** This audit asks whether a claim has a row per host.
    It does not ask whether the vendor behaves the same way on all three — that is a different
    question, and Y-1's underlying fact may well be true.
-3. **The two-source corpus is complete enough.** `results.jsonl` plus `ORACLE-PROBE-MATRIX.md`
-   cover the cells this repo has probed, but other markdown files carry host evidence too
-   (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`). A cell marked under-evidenced here may be evidenced in
-   a file this index does not read. **No claim was marked defective on the strength of this index
-   alone** — each was checked against the page's own cited source.
+3. **The two-source corpus is NOT complete, and three claims rest on files this index does not
+   read.** `audit-index.py` reads `results.jsonl` and `ORACLE-PROBE-MATRIX.md` and nothing else.
+   Verified after review round 1: claims `docs/03:347`, `docs/06:354` and `docs/06:467` resolve
+   through `2026-10-12-published-pointers/requests.tsv:5-7` (three `carelink.*/patient/v2/
+   configuration/public` rows) and `CHUNK-CORPUS-FINDINGS.md:131-141` (three named hosts).
+   `--coverage` returns nothing for those paths. **"3 hosts" in `audit-verdicts.md` therefore is
+   not re-derivable from the shipped index for those three lines**, and the table should not imply
+   it is. **No claim was marked defective on the strength of the index alone** — each was checked
+   against the page's own cited source.
 
 ## 6. What "closed" would mean
 

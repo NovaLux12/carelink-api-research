@@ -1,5 +1,5 @@
 HOST-COVERAGE INDEX — findings-log/**/results.jsonl + ORACLE-PROBE-MATRIX
-ledgers read: 6   matrix rows: 71   distinct (method, path) cells: 69
+ledgers read: 6   matrix rows: 70   distinct (method, path) cells: 68
 
 Legend: N = distinct REAL hosts with a row. 'no-host' = rows whose ledger
 has no host column, so they cannot be attributed at all.
@@ -66,7 +66,6 @@ has no host column, so they cannot be attributed at all.
   N=1  GET     connect/carepartner/v9/display/message               [cc.minimed.eu]
   N=1  OPTIONS connect/carepartner/v99/discover/android/3.6         [cc.minimed.eu]
   N=1  OPTIONS connect/carepartner/v99/display/message              [cc.minimed.eu]
-  N=1  GET     connect/v2/v2/display/message                        [cc.minimed.eu]
   N=0  GET     connect/carepartner/                                 [-]  no-host:1
   N=0  OPTIONS connect/carepartner/                                 [-]  no-host:1
   N=0  GET     connect/carepartner/v13                              [-]  no-host:1

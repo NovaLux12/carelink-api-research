@@ -14,7 +14,7 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 | 7 | `03-discovery-and-versions.md:167` | The sentence above asserted "401 on all three hosts" on the strength of **one** r… | 3 | **confirmed-by-row** |
 | 8 | `03-discovery-and-versions.md:172` | `clcloud-trials.minimed.com` — **3 of 3**, every one a request that reached Medtr… | 3 | **confirmed-by-row** |
 | 9 | `03-discovery-and-versions.md:256` | **403 on GET** and **200 with CORS on OPTIONS** on all three hosts: the resource … | 3 | **confirmed-by-row** |
-| 10 | `03-discovery-and-versions.md:316` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
+| 10 † | `03-discovery-and-versions.md:316` | \| `clcloud.minimed.eu` `v13/discover/android/3.6` \| US, EU, CLINICAL \| `…/conn… | 3 | **confirmed-by-row** |
 | 11 | `03-discovery-and-versions.md:347` | in two independent keys, on all three deployments: | 3 | **confirmed-by-row** |
 | 12 | `03-discovery-and-versions.md:400` | \| What `*/v12/discover/android/*` returns \| token-gated on all three hosts — 40… | 3 | **confirmed-by-row** |
 | 13 | `06-patient-api-surface.md:126` | `display/message` at v6/v11/v13 is byte-identical on all three hosts (v6 403, v11… | 3 | **confirmed-by-row** |
@@ -39,12 +39,18 @@ three hosts that resolves to fewer is a defect **whether or not the fact is true
 
 | # | Location | Claim | Verdict |
 |---|---|---|---|
-| A1 | `docs/08-security-findings.md:91` | "the finding spans **five hosts**" | **DEFECT Y-2** — the same claim as `:37`; inherits both defects |
-| A2 | `docs/02-auth-tenants-and-flows.md:41` (mermaid) | five tenants inside a "compared field-by-field" subgraph | **RESTATEMENT Y-3** — the comparison covered **four of five**; stated correctly in the prose, at risk in the diagram |
-| A3 | `findings-log/2026-10-12-published-pointers/.gitignore` | the discovery / country / config bodies these pages rest on | **NOT RE-DERIVABLE from a clean clone** (Y-4) — maintainer decision, recorded not fixed |
+| A1 | `docs/08-security-findings.md:91` | "the finding spans **five hosts**" | **NOT A DEFECT — reverted.** `:91` cites `DRIFT-AND-NEW`, which has a *"Five hosts, not two"* section, and the paragraph already carries the re-verification caveat. `origin/main` restored byte-identically |
+| A2 | `docs/02-auth-tenants-and-flows.md:41` (mermaid) | five tenants inside a "compared field-by-field" subgraph | **Y-3 WITHDRAWN — no defect.** `AUTH-TENANT-FINDINGS.md` §1's three tenants *include trials*; §8's four is the JWKS-`kid` comparison, which correctly excludes it. `origin/main` restored byte-identically |
+| A3 | `findings-log/2026-10-12-published-pointers/.gitignore` | the discovery / country / config bodies these pages rest on | **NOT RE-DERIVABLE from a clean clone** (Y-4) — 10 tracked files in that directory, none a `docs/*.json`. Maintainer decision, recorded not fixed |
+
+† **Claim #10 corrected after review round 1.** The line says the cell has *"no GET or OPTIONS
+route … all 3 hosts"* without naming a method. Measured: the **GET** axis has **3** attributable
+hosts; the **OPTIONS** axis has **2** attributable hosts plus **1** row in the host-less
+`pde-csr-oracle` ledger. The table's "3" is therefore right for GET and optimistic for OPTIONS.
+Restated in `docs/03` with both axes named.
 
 **Counting rule for this table.** A line is in scope if it matches the seven multi-host phrases
-above. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **26 confirmed-by-row,
-3 not evidenced as written.** No claim was marked defective on the strength of the index alone —
+above. In-scope total: **29** lines across `docs/03` + `docs/06`. Verdicts: **27 confirmed-by-row,
+2 corrected** (Y-3 withdrawn, so its line rejoins the clean set). No claim was marked defective on the strength of the index alone —
 each was checked against the page's own cited source. **Coverage is per claim cell, not per
 line**: several lines bundle more than one cell, and each cell was resolved separately.

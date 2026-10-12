@@ -73,11 +73,18 @@ def load_matrix():
                                               # look single-host on the first attempt.
             ver = cells[MATRIX_COLS["ver"]].strip("`")
             # Some rows carry the version in the path tail (`v6/display/message`),
-            # others leave it to the `ver` column (`display/message` + ver v13).
-            # Emit BOTH readings when ambiguous rather than guessing one, so a
-            # claim can never be marked unevidenced because this script guessed.
+            # others leave it to the `ver` column. The ONLY bare-tail row in the
+            # matrix is #68: ns `connect/v2`, ver `v2`, tail `display/message` --
+            # and there the namespace already encodes the version, so splicing ver
+            # in again would mint `connect/v2/v2/display/message`. Emit BOTH
+            # readings when ambiguous rather than guessing, so a claim can never be
+            # marked unevidenced because this script guessed.
             variants = [f"{ns}/{tail}"]
-            if not re.match(r"^v\d+/", tail) and re.match(r"^v\d+$", ver):
+            # Only splice `ver` in when the namespace does not ALREADY carry it.
+            # Row #68 (ns `connect/v2`, ver `v2`) otherwise mints a junk
+            # `connect/v2/v2/display/message` cell, which is not a vendor path.
+            if (not re.match(r"^v\d+/", tail) and re.match(r"^v\d+$", ver)
+                    and not ns.endswith("/" + ver)):
                 variants.append(f"{ns}/{ver}/{tail}")
             for full in variants:
                 out.append({
@@ -159,6 +166,16 @@ def main():
     for r in matrix:
         idx[(r["method"], r["path"])][r["host"]].append(
             (r["_ledger"], r["http_status"], "(matrix)"))
+
+    # Both views must read THIS index. Assert it rather than describing it: the
+    # bug this replaced was the lookup returning from a smaller corpus than the
+    # report printed beside it, and a comment saying "they agree" would not have
+    # caught that a second time.
+    if "--selftest" in sys.argv:
+        probe = "connect/carepartner/v6/display/message"   # matrix-only cell
+        n = len(coverage(idx, probe))
+        print(f"selftest: {probe} -> {n} hosts (expect 3, matrix-only)")
+        return 0 if n == 3 else 1
 
     if len(sys.argv) > 2 and sys.argv[1] == "--coverage":
         target = sys.argv[2]

@@ -327,7 +327,7 @@ route. Every region of every document read on 2026-10-12 publishes one:
 
 | document | regions | `baseUrlPde` | the route it names |
 |---|---|---|---|
-| `clcloud.minimed.eu` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no GET or OPTIONS route**, either recorded path, all 3 hosts |
+| `clcloud.minimed.eu` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route on either method.** GET: 3 attributable hosts. OPTIONS: **2** attributable hosts + 1 row in a ledger with no `host` column — area Y, so "all 3 hosts" held for the GET axis only |
 | `clcloud.minimed.com` `v13/discover/android/3.6` | US, EU, CLINICAL | `…/connect/pde/v3` | **no route, any method, any host** |
 | `clcloud.minimed.com` `v11/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
 | `clcloud-trials.minimed.com` `v6/discover/android/3.6` (legacy) | US, EU | `…/connect/pde/v1` | **no route, any method, any host** |
