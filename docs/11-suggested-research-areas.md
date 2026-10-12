@@ -441,7 +441,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 17 open plus 9 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 16 open plus 10 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
