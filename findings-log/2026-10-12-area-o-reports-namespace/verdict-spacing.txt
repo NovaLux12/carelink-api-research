@@ -1,0 +1,16 @@
+> **SUPERSEDED — this is the `run.log`-derived reading, kept for the record.**
+> `run.log`'s `t0` is corrupt on seq 9 and seq 20, so the negative gaps below
+> are an artefact of two bad `date` reads, not concurrent requests. The
+> **authoritative** timing measurement is `mtime.txt`, produced by `mtime.py`
+> from the body-file mtimes curl wrote. See FINDINGS.md section 1a.
+
+| Measure | Value |
+|---|---|
+| requests in `run.log` | 24 |
+| same-host gaps measured | 21 |
+| gaps >= 2.5 s (the harness's own declared `DELAY`) | 0 |
+| gaps >= 2.0 s (**the repository floor, AGENTS.md section 8**) | **0** |
+| gaps < 2.0 s — **a rule breach** | **21** |
+| minimum same-host gap | **-0.538 s** (seq 20 -> 21, `carelink-trials.minimed.com`) |
+| maximum same-host gap | 1.097 s |
+| negative gaps (**both from corrupt `t0` reads**) | 2 |

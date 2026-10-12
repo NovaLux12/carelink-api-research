@@ -113,6 +113,27 @@ recorded as reported; the sweep's own caveat is that its evidence table was
 never written to disk and must be re-verified before being treated as OBSERVED
 [source: DRIFT-AND-NEW; docs/00-summary-the-map.md].
 
+> ⚠ **Two corrections, 2026-10-12 (area A).** The drift sweep's evidence table was
+> re-derived live this pass, and **the host is confirmed but the digest is attached to
+> the wrong artefact** [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md
+> §2–§3; `results.jsonl` seq 13–15, seq 20]:
+>
+> 1. `carelink-support.medtronic.eu` **does** serve build B — confirmed, not
+>    re-verified-only. `carelink-support.medtronic.com` serves that **same** build B,
+>    byte-for-byte (`main.759cddab23085086.js`, 3,410,666 B, sha256
+>    `a054555a0f22176e…`).
+> 2. **`sha256 f637c8d0…` is the sha256 of the 5518-byte entry document, not of
+>    `main.759cddab23085086.js`.** The asset hashes to `a054555a0f22176e…`. The digest
+>    was carried forward without asserting which artefact was hashed
+>    ([`AGENTS.md`](../AGENTS.md) §6.3).
+>
+> **Also added to the host list: `carelink.medtronic.eu`.** It serves the *clinic*
+> bundle byte-identically (3,397,615 B, sha256 `2a7fa8e7af519c2b`) and this repo
+> previously called it a false positive — see
+> [`01-hosts-and-estate.md`](01-hosts-and-estate.md). **The "five hosts" count is
+> therefore not re-derived by this pass** and is left as the sweep reported it; only
+> the two corrections above are OBSERVED.
+
 ## F3 — Zero security headers on the health-data portal
 
 **Observed** on `carelinkhp.minimed.eu`'s HTML document and its 3.4 MB JS asset

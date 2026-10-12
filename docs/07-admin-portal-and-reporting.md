@@ -19,12 +19,27 @@ one is Medtronic's** (`dev.commoncore.medtronic.eu`); the other 12 are Pusher, M
 cdnjs, webpjs and w3.org. Source it for `hcp/*` and device tables; never for the patient
 API [source: findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md].
 
-**The bundle is deployed on more than one host.** `carelink.medtronic.com` serves a
-**byte-identical** copy (3,397,615 B, sha256 `2a7fa8e7af519c2b`, `cmp` identical to
-`carelinkhp.minimed.eu`) and `carelink-support.medtronic.com` serves the same document. So
-the hardcoded-key and build-config findings below span **two hosts**; a remediation
-conversation naming only `carelinkhp` would fix half of it [source:
-findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
+**The bundle is deployed on more than one host — and there are two builds, not one.**
+`carelink.medtronic.com` serves a **byte-identical** copy of the clinic bundle
+(3,397,615 B, sha256 `2a7fa8e7af519c2b`, `cmp` identical to `carelinkhp.minimed.eu`), as
+does `carelink.medtronic.eu`. So the hardcoded-key and build-config findings below span
+**three hosts**; a remediation conversation naming only `carelinkhp` would fix a third of
+it [source: findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
+
+> ⚠ **Corrected 2026-10-12 (area A).** This paragraph previously ended *"`and
+> `carelink-support.medtronic.com` serves the same document."* **It does not.**
+> `carelink-support.medtronic.com` serves a **different build** —
+> `main.759cddab23085086.js` (3,410,666 B, sha256 `a054555a0f22176e…`), the same build
+> `carelink-support.medtronic.eu` serves, and *not* the clinic bundle: asking that host
+> for `main.fb5f8cb7eb60c4d5.js` returns the 5518 B catch-all. The two builds differ by
+> **product role (clinic `pow` vs support `cua`), not by region** — every `.eu`/`.com`
+> pair measured serves the same build. Identity is by sha256, per host:
+> [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2].
+
+| Build | Entry document (5518 B) sha256 | Main asset | Hosts |
+|---|---|---|---|
+| **A — clinic** | `0f2c5f6257a6fc6a…` | `main.fb5f8cb7eb60c4d5.js` | `carelinkhp.minimed.eu`, `carelink.medtronic.com`, `carelink.medtronic.eu` |
+| **B — support** | `f637c8d0cd4ec6bc…` | `main.759cddab23085086.js` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` |
 
 `hp-runtime.js` holds a **225-entry lazy-chunk manifest**; all 224 chunks were fetched
 (4.4 MB) and added **0** Medtronic hosts, **3** API path literals and **3** `MMT-*` codes —
@@ -115,6 +130,26 @@ appears twice more in the same object); and the `expiration_period_settings` def
 `"DEFAULT"` vs `"default"`.
 
 ### ⚠ The one sibling that answers with no header at all
+
+**Per-host reading, 2026-10-12 (area A).** `pow.crm.settings` is the only cell in that
+table this pass measured on more than one host, and the three answers are **not**
+byte-identical — which is itself the evidence that these are two deployments rather
+than one mirror (OBSERVED, [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md
+§5]):
+
+| Host | body bytes | `base.uri` |
+|---|---|---|
+| `carelinkhp.minimed.eu` | 96 | `https://carelink.medtronic.eu/crm` |
+| `carelink.medtronic.com` | 97 | `https://carelink.medtronic.com/crm` |
+| `carelink-support.medtronic.com` | 97 | `https://carelink.medtronic.com/crm` |
+
+The single byte is `.eu` → `.com`. All three answered `200` with `X-System-ID: ProWeb`,
+so the "no header at all" property below is confirmed on the `.com` hosts too.
+`cua.crm.settings` was **not** probed, so the CUA-vs-POW split recorded above stands as
+recorded and this table neither confirms nor refutes it. What the table adds is that the
+`.com` **support** host publishes the **clinic** CRM base in `pow.crm.settings` —
+INFERRED reading: the base tracks the **deployment** (TLD) rather than the product. One
+key, three hosts, no `cua.*` reading; offered as a reading, not a finding.
 
 On the **shadow** portal `carelink.medtronic.eu` (no header, unauthenticated), the same
 family was probed. `/hcp/configuration/public/pow.crm.settings` → **200, 96 B**, while

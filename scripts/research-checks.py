@@ -23,8 +23,10 @@ static  = jsonpath/header predicates inside [Asserts] blocks across the four
 runtime = static's hurl part + 2 x `HTTP` lines (hurl counts each status
           line as two asserts: version + code)
         + 05's executed assertions: non-loop check sites + the loop site x16
-          + the 5 inline PASS branches, or the `N passed` line from the
-          suite log when the gate has just run it.
+          + the INLINE_05 inline PASS branches (see measure_assertions.py for
+            the constant — it is not restated here, because this file used to
+            say 5 in prose while the constant read 7), or the `N passed` line
+            from the suite log when the gate has just run it.
 
 What it enforces:
   1. NUMBERS — every prose count matches the measured one. Static is what

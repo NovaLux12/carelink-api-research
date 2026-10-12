@@ -27,6 +27,11 @@
 #  10. the loop report contract agrees across prompts and shell (parity check)
 #  11. findings-log/ stays append-only: no deletions, no rewrites without a
 #      dated Correction section
+#  12. the counting rule's own self-test passes — it locates loop sites by
+#      shell STRUCTURE, not indentation (see scripts/measure_assertions.py).
+#      Zero requests: pure string analysis. Enforced because the rule's first
+#      version silently multiplied four non-loop checks by 16, which made every
+#      derived count in the repo wrong while the gate stayed green.
 #
 # The CI suite is 05-public-config.check.sh — the one suite whose checks run
 # on every PR, by design: cheap, no vendor storm per PR. regression/hurl/run.sh
@@ -183,6 +188,22 @@ fi
 
 # ---------------------------------------------------------------- 7: consistency
 if [ "$SUITE_ONLY" -eq 0 ]; then
+  echo "--- counting-rule self-test ---"
+  # The counting rule is the one thing every number in this repo derives from,
+  # and until 2026-10-12 it used INDENTATION as its proxy for "inside the
+  # 16-family loop" — so four checks inside an `if`/`else` were multiplied by 16
+  # and the derived runtime came out 64 too high, against the count the live
+  # suite printed. The rule is now structural and self-testing; this makes the
+  # self-test part of the gate so it cannot rot back into the old behaviour
+  # unnoticed. Zero vendor requests — it is pure string analysis.
+  if python3 scripts/measure_assertions.py --self-test >/tmp/_ma_selftest.log 2>&1; then
+    note ok "$(tail -1 /tmp/_ma_selftest.log)"
+  else
+    note "!!" "counting-rule self-test FAILED — see /tmp/_ma_selftest.log"
+    tail -6 /tmp/_ma_selftest.log | sed 's/^/         /'
+    FAIL=1
+  fi
+
   echo "--- numbers / findings-log / priorities ---"
   # Whole-tree, not diff: the claims checked live in README.md and docs/,
   # which a valid PR need not touch. Runs after the suite above so the

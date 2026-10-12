@@ -229,6 +229,74 @@ check "captcha subkeys are the documented four" '.captcha | keys | sort | join("
 # `//`-swallows-false trap). Assert the state that is actually claimed.
 check "captcha.testKey is present and empty" '.captcha | has("testKey") and (.testKey == "")' 'true'
 
+# =====================================================================
+# AREA D (2026-10-12) — the per-country glucose-unit disagreement.
+# Source: findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md
+#
+# THE HIGHEST-CONSEQUENCE CLAIM IN THIS FILE. `/patient/countries/settings`
+# publishes TWO keys naming the same quantity, and for BE they disagree:
+# `bgUnits` = MG_DL while `glucoseUnitsDefault` = MMOL_L. A client that reads
+# one key and not the other displays a glucose value scaled wrong by a factor
+# of ~18. The area-D sweep found this is not a two-country quirk: 30 of the 117
+# country documents served return MG_DL from one key and MMOL_L from the other.
+#
+# Asserted as TWO SEPARATE checks on purpose. A single check asserting
+# "they differ" would keep passing if the vendor fixed both keys to the same
+# value — and would keep passing if it broke them into some third pair. The
+# pair of checks fails if either value moves, in either direction, which is
+# what "a fix must update the note rather than pass silently" means.
+#
+# Costs ONE extra vendor request per run of this suite.
+# =====================================================================
+CC="https://carelink.minimed.eu/patient/countries/settings?countryCode=BE"
+BODY_CC="$(mktemp -u /tmp/clb-cc-XXXXXX.json)"
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" "$CC" -o "$BODY_CC"
+# `check()` reads $BODY, so $BODY must point at the document under test for the
+# duration of these four assertions. An earlier version of this block left
+# $BODY pointing at the 69-key config, so every country assertion silently
+# evaluated the CONFIG document: `glucoseUnitsDefault` came back `null` and
+# `keys | length` came back 69. The gate caught it — which is the whole point
+# of running it, and the reason the "it passed" reading is never enough.
+BODY="$BODY_CC"
+if [ ! -s "$BODY_CC" ] || [ "$(head -c1 "$BODY_CC")" != "{" ]; then
+  echo "  FAIL could not read the BE country document as JSON"
+  rm -f "$BODY_CC"
+  FAIL=$((FAIL + 1))
+else
+  check "BE bgUnits (KNOWN DISAGREEMENT: MG_DL)"             '.bgUnits'             'MG_DL'
+  check "BE glucoseUnitsDefault (KNOWN DISAGREEMENT: MMOL_L)" '.glucoseUnitsDefault' 'MMOL_L'
+  # The absent-vs-null distinction docs/09 §4 warns about, asserted as a state
+  # rather than a falsiness: `has()` cannot be satisfied by a null value, and a
+  # `| length == 0` style check would be (docs/09 §4: `length` returns 0 for
+  # absent and for null alike).
+  check "BE carries no stateCodes key (absent, not null)"    'has("stateCodes")'    'false'
+  check "BE has exactly 34 keys"                             'keys | length'        '34'
+fi
+BODY="$SCRATCH"
+
+#
+# WHY THIS FETCHES THE DOCUMENT AND NOT THE ASSET: the asset is 3.4 MB per host.
+# The entry document is 5.5 KB and NAMES its own content-hashed chunk, so the
+# build identity is readable for 0.2% of the bandwidth. The cost of this choice
+# is that it asserts the document's claim about its chunk, not the chunk itself:
+# the asset-level proof lives in the findings log (seq 4, 8, 15, 19, 20).
+#
+# Pinned at the CURRENT build on purpose, the same convention as the lhpro
+# bounds above: if Medtronic ships a new build this fails and the note gets
+# updated, rather than a host quietly changing build under a stale claim.
+for spec in "carelinkhp.minimed.eu:main.fb5f8cb7eb60c4d5.js" \
+            "carelink-support.medtronic.eu:main.759cddab23085086.js"; do
+  hp_host="${spec%%:*}"
+  hp_chunk="${spec##*:}"
+  hp_body=$(curl -s --max-time 25 -A "$UA" "https://$hp_host/")
+  if printf '%s' "$hp_body" | grep -q "$hp_chunk"; then
+    PASS=$((PASS + 1)); printf '  ok   %s serves build %s\n' "$hp_host" "$hp_chunk"
+  else
+    FAIL=$((FAIL + 1)); printf '  FAIL %s no longer names %s (build changed?)\n' "$hp_host" "$hp_chunk"
+  fi
+  sleep 2
+done
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "$FAIL" -eq 0 ]

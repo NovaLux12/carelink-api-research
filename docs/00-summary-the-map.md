@@ -50,21 +50,25 @@ Each host sends a given country to **its own** `clcloud` sibling — `.eu → .e
 `EU`. Host-by-host detail, including the shadow deployment, is in
 [`01-hosts-and-estate.md`](01-hosts-and-estate.md).
 
-⚠ **Correction:** `carelink.medtronic.com` serves a byte-identical copy of the
-*clinician* portal bundle, but **`carelink.medtronic.eu` does not** — it returns
-the same 5518-byte SPA fallback as the `carelinkhp` trap (md5-identical), so it is
-a **false positive** on any status-based check. Do not treat the `.medtronic.eu`
-shadow as a second portal deployment. There is also **no fourth patient
-deployment**: all 16 recorded `*trials*` hosts are `.com`.
+⚠ **Correction — and a second correction to this correction (2026-10-12).**
+`carelink.medtronic.com` serves a byte-identical copy of the *clinician* portal
+bundle. This page then said **`carelink.medtronic.eu` does not** — it returns the
+same 5518-byte SPA fallback as the `carelinkhp` trap (md5-identical), so it is a
+**false positive** on any status-based check. **That second claim was wrong.** The md5
+was right and still reproduces (`6aedf6c4004fbb29a298bc62128480be`); the conclusion was
+not. Asked for the chunk **its own entry document names**,
+`carelink.medtronic.eu` serves `main.fb5f8cb7eb60c4d5.js` at 3,397,615 B, sha256
+`2a7fa8e7af519c2b` — **byte-identical to the other two clinic hosts, so it is a portal
+deployment.** It was mis-classified because on this host family **the catch-all *is* the
+entry document**, so a document-only probe cannot tell a portal from a fallback. There
+is also **no fourth patient deployment**: all 16 recorded `*trials*` hosts are `.com`
+[source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1].
 
 A **fourth Auth tenant** exists on the shadow domain: `carelink-login.medtronic.com`
-(OIDC live, different JWKS kids), and with `carelink-login-trials.minimed.com`
-the estate is **five** tenants. **All five have completely disjoint signing
-keys** — 10 keys, none shared — so the shadow deployment shares OAuth *policy*
-but not keys, and a shadow token is not a key-reuse risk. Their discovery
-documents are in fact **byte-identical** once each tenant's own hostname is
-substituted out. Tenant-by-tenant comparison and the PKCE posture are in
-[`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
+(OIDC live, different JWKS kids). **All four tenants have completely disjoint
+signing keys** — the shadow deployment shares OAuth *policy* but not keys, so a
+shadow token is not a key-reuse risk. Tenant-by-tenant comparison and the PKCE
+posture are in [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md).
 
 ## API namespaces
 
@@ -86,7 +90,8 @@ full are in [`04-configuration.md`](04-configuration.md).
 | **`baseUrlPde` — published, and unroutable** | The discovery document publishes `baseUrlPde = …/connect/pde/v3` on **every region of every document**, and that namespace has **no GET or OPTIONS route for either recorded path under it** — `display/message` and `discover/android/3.6` — **on all three cumulus hosts**. The vendor's one published PDE base URL cannot answer, everywhere it is published. (Two paths were probed, not the namespace: the bare `/connect/pde/v3` prefix itself was never requested, so "the namespace is unroutable" is a statement about the two recorded paths.) **INFERRED** that this is a retired service left in the document rather than an "ignore this key" contract — the route 403s before any application code runs, so no client-side evidence of intent exists either way [findings-log/2026-10-12-published-pointers/FINDINGS.md §2b] |
 | `/connect/csr/v2/display/message` · bare `/connect/v2/display/message` | **Live, POST-only, on all three cumulus hosts** (verified 2026-10-12, byte-identical, no region split). In no prior note before 2026-10-11. GET 403 `MissingAuthenticationTokenException` + OPTIONS 200 `access-control-allow-origin: *` [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] |
 | **which of those two a config-driven client can address** | **`csr/v2` yes, bare `/connect/v2` no** — and the asymmetry is the point. The public config names `csr/v2` in two keys on all three deployments; **no published document names the bare `/connect/v2`** [findings-log/2026-10-12-published-pointers/FINDINGS.md §1, §4] |
-| `/patient/reports/*` **on `carelink.minimed.eu`** | **Live, gated 401/405.** Previously mapped only to `commoncore` and recorded unreachable — this supersedes that. The reports namespace is not where we thought it was. |
+| `/patient/reports/*` — **on all three patient deployments** | **Live on `carelink.minimed.{eu,com}` AND `carelink-trials.minimed.com`, with no region split.** All seven recorded paths re-probed live 2026-10-12: `supported` / `snapshotTimelinesRange` **401**, `generateReport` / `favoriteReports` / `snapshotTimelinesForCalendar` **405** + `Allow: POST, OPTIONS`, `reportStatus` **400**, `report` **404**. Responses are **byte-identical across all three hosts**. The oracle is real here — a certainly-absent path returns 404 on every host, so the 404 is a true absence. This **widens** the 2026-10-10 finding rather than replacing it, and the supersession it made still stands: previously this namespace was mapped only to `commoncore` and recorded unreachable, and that was wrong — the reports surface is not where this repo had recorded it [findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md] |
+| ↳ **correction to the row above's own provenance** | It previously read "**Live**, gated 401/405" on `.eu` alone, citing the 2026-10-10 sweep. That sweep's committed artefact disclaims itself as a "**reconstruction from the agent's report**" with the command-level evidence "**not reproduced**" and the instruction "**re-verify before treating any row as OBSERVED**"; and the bundle inventory it produced names **none** of the camelCase paths. The only committed file naming `snapshotTimelinesRange` is the **archive** table, whose header states the codes are "as archived, **not** as measured live today" (window 2020-09-29 → 2021-03-31). So the *values* were right and the *evidence class* was not: there was no live probe behind "Live". The 2026-10-12 pass supplies the first live rows, and reproduces the archived codes 21/21 [findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md §2] |
 | `commoncore.medtronic.{eu,com}/reports-{broker,metadata}/v1/ocl` | Still live at path but **CloudFront 502 "could not resolve the origin domain name"** — an origin-side DNS failure, not an absence. Never archived in any crawl. |
 
 ## The version axis serves exactly two documents
@@ -280,8 +285,13 @@ the logbook/marker fields (`removalType`, `removalReason`,
 **No source maps exist** on any bundle (verified for all 224 chunks offline,
 plus a stratified `.js.map` sample).
 
-`carelink.medtronic.com` serves a **byte-identical** copy of the portal bundle —
-the hardcoded-key finding spans two hosts, not one.
+The clinician portal is deployed in **two builds across five hosts**, and the split is
+**product role**, not region — `carelinkhp.minimed.eu`, `carelink.medtronic.eu` and
+`carelink.medtronic.com` serve the clinic build byte-identically, and
+`carelink-support.medtronic.eu` and `.com` serve a different one. The hardcoded-key
+finding therefore spans **five hosts**, and **there is no `.com` `carelinkhp` host at
+all** — every `carelinkhp*.minimed.{eu,com}` name outside the baseline is NXDOMAIN
+[source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2].
 
 ## Traps
 
@@ -291,7 +301,7 @@ Read the full list, with the fix for each, in
 | Trap | Detail |
 |---|---|
 | `*.carelink.{eu,com}`, `*.clcloud.eu` | **Wildcard parking DNS.** A random string resolves; all 302 to a parked page. 49 collected names are false positives. |
-| Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. |
+| Portal 200-for-everything | `carelinkhp.minimed.eu` returns 200 + `text/html` (5518 B) for every unknown path. **And that 5518 B *is* the entry document** — so no document-path probe can tell a portal from a fallback, and 5518 B maps to ≥2 digests. Ask for a content-hashed chunk instead. |
 | Unconditional gzip | `carelink.minimed.eu` ignores `Accept-Encoding`. |
 | Raw archive captures | Common Crawl/Wayback contain live `jsessionid_*` and plaintext-base64 OAuth `sessionData`. Facts only. |
 
@@ -327,21 +337,6 @@ Also confirmed held: the discovery document is still byte-identical, all four
 tenants still carry disjoint keys, and the `lhpro` vendor bug is still unfixed
 — finding F6 in [`08-security-findings.md`](08-security-findings.md).
 
-> **Read "all four" above as of the sweep date only.** The sentence is left as
-> the 2026-10-11 sweep recorded it (AGENTS.md §3 — a dated record is not
-> rewritten), but the estate is **five** tenants now and disjointness is a
-> five-tenant statement: 10 keys, 0 shared. Marked here, at the sentence a reader
-> actually stops on, rather than only in the extended note below.
-
-> **Extended 2026-10-12 (area I, #23).** The four-tenant disjointness claim
-> above is left as it stood on 2026-10-11, when it was true of everything then
-> known. `carelink-login-trials.minimed.com` has since been fetched: it holds
-> two further keys, `kCezLNMQV0tlc3hZinEly` and `pNzjt7ruOaWE4rlDCBPoP`, neither
-> shared with any other tenant. Disjointness is a **five**-tenant statement —
-> 10 keys, 0 shared. Two `kid` strings in the older corpus were also transcribed
-> wrongly; both corrections are in
-> [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) §8.
-
 ### Frontends — there are two apps, not one
 
 The clinician bundle in detail is in
@@ -351,7 +346,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 184 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 193 of these facts so they fail loudly rather than rot.
 
 ---
 

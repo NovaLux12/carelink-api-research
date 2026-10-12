@@ -24,38 +24,52 @@ everything else on this page moves.
 | Report bodies from `commoncore` | a clinician-scoped token |
 | Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
 
+#### Addendum (2026-10-12, from area O): 24 more non-2xx responses, still zero `200`s
+
+Attached to the `Access-Control-Allow-Origin` row above, as area O's claim issue
+specified — it is the same question one gate further in, and this pass moved it
+without a token.
+
+**What was added.** Area O probed `/patient/reports/*` on all three
+`carelink.minimed.*` patient hosts. **All 24 responses carried no
+`access-control-allow-origin`** — not the 6 `401`s, not the 3 `400`s, not the
+nine `405`s, not the 6 `404`s (OBSERVED,
+[findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md] §6d). That is
+**corroboration, not continuation**: area X's "0 non-2xx responses carrying CORS
+anywhere" was measured on `clcloud.*`, and this is a different host family with
+a different origin stack (`Apache/2.4.62` behind CloudFront, not AWS API
+Gateway).
+
+**Why it does not discharge the row.** The row asks about a **`200`**, and this
+pass produced **no `200` at all** — every cell in the namespace is a 4xx. So the
+token-gated half is now *more* precisely bounded than before: for
+`/patient/reports/*` on `carelink.*`, the CORS question cannot be answered from
+the outside at all, on any host, by any amount of further unauthenticated
+probing.
+
+**Blocker (unchanged, restated from what this pass established):** the remaining
+unknown is what a successful response carries, which needs an authenticated
+cross-origin request against a route that is known to exist. Area O establishes
+*which routes exist* — 6 of the 7 on each of 3 hosts — so the token-gated half
+of this row now has a precise target list instead of a vague one.
+
+**Closes when:** one authenticated cross-origin request to any of the six live
+`/patient/reports/*` paths on any of the three hosts shows a `200`'s CORS
+headers, **or** the row is retired as unanswerable and the unauthenticated
+negative is promoted to the standing position. **A negative closes it** — and
+this pass is evidence that the negative is the likely answer, so this row should
+be expected to close by downgrade rather than by discovery.
+
+**Assumptions (INFERRED):** that `connect-src`/`frame-src` in the CSP the same
+responses carry implies the browser client *needs* cross-origin access to the
+report hosts. The CSP is host-aware and names the vendor's own data-plane hosts
+per region (§6c of the pass log), which is suggestive, but no response observed
+here demonstrates an actual cross-origin call.
+
 ---
 
 ## Tier 1 — no token needed, high value
 
-### A. Is `carelinkhp` really the clinician portal for every region?
-
-`carelinkhp.minimed.eu` and `carelink.medtronic.com` serve byte-identical bundles
-of the *clinic* portal. `carelink.medtronic.eu` returns the 5518-byte SPA fallback
-— a false positive. But the **`.com` clinic variant beyond `carelink.medtronic.com`
-has never been found.**
-
-Worth checking: whether any `carelinkhp*.minimed.com` style host serves a
-*different* bundle (a US clinic app rather than a mirrored EU one), and whether
-that one contains patient-namespace paths the EU one doesn't.
-
-**Closes when:** you can name the clinic-portal hosts and show which bundle each
-serves, by sha256.
-
-### D. The 18-country sweep, completed
-
-`/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
-countries exist in the config's own lists. The interesting ones are the ones where
-two keys disagree — we already found `bgUnits` vs `glucoseUnitsDefault`
-contradicting each other in BE and CH.
-
-**Attack that specifically:** sweep for *internal contradictions* in a single
-country response, not for differences between countries. Unit fields
-(`bgUnits`, `glucoseUnitsDefault`, `carbohydrateUnitsDefault`), date fields
-(`shortDateFormat`, `reportDateFormat`), and the `mfa.status` / report-availability
-flags are where an inconsistency would actually mislead a client.
-
-**Closes when:** the sweep is either complete or the contradictions are enumerated.
 
 ### V. Given that `baseUrlPde` names a dead namespace, does any vendor client follow it?
 
@@ -130,27 +144,46 @@ framing in `docs/04`.
 **Assumptions (INFERRED):** that the per-key grammar is keyed off the same flat-name
 form on all three deployments. Only one deployment has ever been swept.
 
-### O. Is `/patient/reports/*` on `carelink.*` the reports surface for every region?
+#### Addendum (2026-10-12, from area D): the per-key matrix now exists
 
-The 2026-10-10 sweep found `/patient/reports/*` live on `carelink.minimed.eu`,
-gated 401/405, while `commoncore`'s broker paths 502 at the origin — so the
-reports namespace is not where this repo had recorded it (OBSERVED,
-[findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md] §2–3). That
-observation is **one host**, and the sibling `.com` and `-trials` deployments
-have never been checked for it.
+Area D produced the artefact this area was missing — a **country × key matrix
+over 118 codes** in which every one of the 35 country-document keys has an
+explicit ABSENT / NULL / VALUED verdict
+([findings-log/2026-10-12-area-d-country-sweep/matrix.tsv](../../findings-log/2026-10-12-area-d-country-sweep/matrix.tsv)).
+It is a **state** matrix and deliberately carries no per-key value comparison,
+because differences between countries are area W's subject to derive, not a
+by-product of D's contradiction hunt.
 
-**Blocker:** no token needed to establish existence — but the candidate list must
-come from the *recorded* paths on the EU host, not from guessing (the `401`/`405`
-split is the discriminator: 405 means POST-only and live, 401 means live and
-token-gated).
+**What D established that W did not have, and why it bears on W's question:**
 
-**Closes when:** the same recorded report paths are probed on `carelink.minimed.com`
-and `carelink-trials.minimed.com` with the 200/401/405 discriminator, and the
-result either matches the EU host or documents the split. A negative — 404 on both
-siblings — closes it and narrows #76's host list.
+- **The country document is not uniform in shape**: **35 keys** for CA and US,
+  **34** for 74 countries, **33** for 41. The 33-key documents are missing
+  `stateCodes` **and** `cpMobileAppAvailable`; the 34-key ones are missing
+  `stateCodes`. So "what does this document carry" is itself country-dependent,
+  and an enumeration that assumes one shape will mis-read two thirds of them.
+- **Absent and null are different states and neither is rare here.**
+  `cpMobileAppAvailable` is **absent in 41 of 117** documents and `null` in
+  **none**; `stateCodes` is absent in 115. The 2026-10-08 pass recorded both as
+  `null`, which `docs/09` §4 names as the `//`-swallows-`false` trap. Any
+  per-key projection that reads a missing key as a null value inherits exactly
+  that error, so **W's `404`-means-absent-or-null rule now has a second,
+  independent instance to be consistent with.**
+- **One key outside the 35 is impossible to confirm absent on this axis**: the
+  matrix only says "not present in any of the 118 documents".
 
-**Assumptions (INFERRED):** that the three patient deployments expose the same
-namespace; the sweep observed only `.eu`, so this is an assumption until probed.
+**Closes when:** W can state, from that matrix plus its own per-key probes,
+whether the 35 country keys and the 69 bulk-config keys are the same names or two
+disjoint sets — **and can say so against a matrix in which absent, null and
+valued are three distinct cells rather than one falsy one**. A negative closes
+it: disjoint sets, and W's "69-request enumeration path" framing is retired
+rather than extended.
+
+**Assumptions (INFERRED):** that the matrix's key vocabulary — the union of
+top-level names across three documents captured 2026-10-12 — is the complete
+vocabulary of the endpoint. **118 country codes were requested and none produced
+a 36th key**, which is evidence for completeness on this list and **not** proof
+that the endpoint cannot serve a key for a country the config does not list
+(§6 of D's log records `ID` as one such gap already).
 
 ### E. Config-key archaeology on `/patient/configuration/system/*`
 
@@ -225,6 +258,39 @@ bundle. We never did the full three-way reconciliation.
 **Closes when:** one table of every model code, with which source(s) list it and
 which don't.
 
+
+
+
+> **Addendum 2026-10-12 (from area A) — the premise is now well-posed, and it is an
+> N-way reconciliation, not a three-way one.** This area was blocked on an unanswered
+> question: the "clinic bundle's device table" was a single table read off one host, and
+> nobody knew whether the other portal hosts served the same bytes. Area A settled it by
+> sha256 and the answer is **two distinct builds**, so "the clinic bundle" is not one
+> thing:
+>
+> | Build | Hosts | Entry document (5518 B) sha256 |
+> |---|---|---|
+> | clinic `pow` | `carelinkhp.minimed.eu`, `carelink.medtronic.eu`, `carelink.medtronic.com` | `0f2c5f6257a6fc6a…` |
+> | support `cua` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` | `f637c8d0cd4ec6bc…` |
+>
+> Both rows and both asset sizes are **OBSERVED** in area A's ledger, not inferred
+> from the host names [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2;
+> `results.jsonl` seq 4, 8, 15, 19, 20].
+>
+> **Blocker:** the device table must be extracted from **each build separately** — the
+> two main assets are 3,397,615 B and 3,410,666 B, so they are **not** the same file, and
+> assuming otherwise is the exact defect that let a portal deployment be recorded as a
+> false positive. **Closes when** G states which source(s) list each model code **per
+> build**, where "build" is the sha256 set above. **A negative closes it**: if both
+> builds' device tables are identical, G's premise is unchanged, the addendum records
+> that, and the reconciliation stays three-way.
+>
+> **Assumptions (INFERRED):** that the shipped portal's device table lives in the main
+> asset and not in a lazy chunk, and that the two builds share a device-table format.
+> Neither is established — the chunk corpus was mined against the clinic build only.
+> The asset-level digests are in the area A log; its asset bodies were not committed
+> (3.4 MB each), so re-extraction costs 2 fetches.
+
 ### Q. The `appVersion` body gate — a second version axis our docs do not describe
 
 **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
@@ -293,6 +359,7 @@ The public config has `personal.common.core.report.generation.reportFileNamingSu
 — a list of pump models with a specific naming behaviour. It was recorded but never
 interpreted. It's a small, closed list worth extracting and matching against the
 family map.
+
 
 ### J. `login-errors.ts` against the live error surface
 
@@ -431,7 +498,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 18 open plus 8 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 15 open plus 11 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -459,35 +526,12 @@ being superseded — never silently. Letters are not reused.
 | T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
 | B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** — which assumes a monotonic clock, and `docs/09` declines to assert that cause — and is recorded as a provenance problem, not smoothed over. The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact. ⚠ **Its CORS corpus premise was superseded by area X the same day** — the 10 CORS-less `200`s are not all on "a different host surface"; four are `clcloud.*` discovery documents. The observation stands; the inference did not ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] §Correction) | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
 | X — why the two `clcloud.*` route families differ in their CORS headers | 2026-10-12 | **Negative on the separating cell the area named, and a correction to the confound it rested on.** The area said no separating cell existed; **one was already in the corpus.** Of the 10 captured `200` heads with no `access-control-allow-origin`, **4 are on `clcloud.*`**, not on "a different host surface" — so on `clcloud.*` a `200` carrying no preflight *does* exist, and status was never standing in for CORS presence. Re-derived live on all three hosts: **25 of a 26 cap**, GET + empty-body OPTIONS only, controls first per host, **all 7 controls passed**; **9 further `200`-without-CORS responses, every one a `GET` of a discovery payload**; **0 non-2xx responses carrying CORS anywhere**; and sending `Origin` changed **none** of the **6** paired bare/`Origin` cells (6 route×method pairs, controls excluded), which **excludes** the "ACAO only when an `Origin` is present" mechanism. **It does not exclude area B's reading (b)** — "the route demands a token on `OPTIONS`" — nor reading (a), nor "emitted only on `OPTIONS`": a first draft of this row claimed (b) was refuted, and that was withdrawn, because the reason assumed a configured route would carry `ACAO` on its own `200` `GET`, which is the thing in dispute. **The cause is not established and this row does not establish it** — all three readings fit 25 rows, and separating them needs a CORS-configured `clcloud.*` route that also answers `200` on `GET`, of which **none is recorded on any host**. The four archive heads are **gitignored**, so the 24/14/10 split is not re-derivable from a clean clone. Measured spacing floor **2.291 s** (20 of 21 same-host gaps ≥2.5 s; the one short gap is **arithmetically impossible if both timestamps are faithful** (it assumes a monotonic clock, which `docs/09` declines to assume elsewhere) and is recorded as a provenance problem, **not smoothed over** — the second such gap in two passes). The separating cell is now **pinned** on the public `200` `GET`, at zero extra requests per drift sweep | [findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md] | #15 |
-| Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (`docs/09` §4, now n = 3 passes / 7 occurrences). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See the "corpus is two sources, not one" note under **Why there is no area AA** | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
+| Z — does any `clcloud.*` route reflect `Origin`, or is `ACAO` a fixed `*`? | 2026-10-12 | **Negative, as predicted: `ACAO` is a CONSTANT `*`, never an echo.** Each preflight route's `OPTIONS` was sent under **three** conditions — bare, `Origin: https://example.invalid`, `Origin: https://probe-two.invalid` — on all three cumulus hosts, because **one `Origin` cannot distinguish an echo from a constant** and that is exactly why the archive (and area X's single-`Origin` pass) could not answer it. **45 of 45 data cells returned `ACAO: *`; 0 echoed; 1 distinct value.** All 6 controls passed **first on every host** (live `401` + `x-ca-err: 990`; dead `403` at the corpus no-route digest `f249b63cb2fc`, byte-identical on all three). `ACAM` is a **per-route constant**, 9 of 9 cells each across 3 hosts × 3 conditions, and **does** differ from the literal `OPTIONS` on two routes — `csr/v2` → `OPTIONS,POST`, bare `v2` → `POST,OPTIONS`, the same method set in a **different declared order**. `ACAC`, `access-control-max-age` and **`vary`** absent on all 51 responses. 60 of a 69 cap (51 harness + 9 hurl pin-validation), GET+OPTIONS only, measured minimum same-host gap **2.042 s** with **5 of 48** gaps under the declared 2.5 s — **none below the `>=2 s` floor**, the third pass in a row to record one (running count in `docs/09` §4). **No cause established.** **Positive side-finding:** `v6/display/message` — the vendor's own published `blePereodicDataEndpoint` — answers `200` + `ACAO: *` on **all three** hosts, closing a gap where it had only a `.eu` yes/no `CORS` flag and **two hosts never `OPTIONS`-probed**. ⚠ **The area's own premise was corrected before probing**: it asserted `ACAO` on all three hosts for `csr/v2`, bare `v2` and `v6`, and that was evidenced for **none** of the three — area Y's defect class. See the "corpus is two sources, not one" note under **Why there is no area AA** | [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] | #17 |
 | Y — how many "all three hosts" claims rest on a single row? | 2026-10-12 | **All 29 in-scope claims confirmed by row — the negative result, and it closes the audit.** Every multi-host claim in the area's stated scope (**`docs/03` + `docs/06`**, 29 lines) resolves to a row per host. The `clcloud.*` route claims are three-host evidenced because areas B, X, N, U and Z each swept all three hosts on 2026-10-12. **Four candidate findings — none of them in scope, and two of them withdrawn**, and they are the more useful half of the record: **Y-1 WITHDRAWN** — `docs/03:38`'s "all three hosts return the same document" was alleged to be two-host evidenced on the strength of one pass's ledger, and **area X's tracked ledger refutes that**: all three hosts at 20256 B, one digest. **`docs/03:38`** and `01-discovery-pin.hurl` are unchanged from main — `docs/03` does carry **one** other edit from this pass, the claim-#10 method-axis correction, which is unrelated to Y-1. **Y-2 corrected** — `docs/08:37` claimed five hosts while citing `SECURITY-FINDINGS §S3`, which says **"at least twice"**, and labelled it OBSERVED from a file that forbids that label. **Y-3 WITHDRAWN** — `docs/02` was alleged to over-claim a five-tenant comparison; `AUTH-TENANT-FINDINGS §1`'s three tenants *include* trials, and `docs/02` is unchanged. **Y-4** the 2026-10-12 captures are gitignored, so some pages are not re-derivable from a clean clone — recorded, not fixed. **0 requests, 0 cap.** **The lesson the record carries:** two of the four candidate findings (Y-1 and Y-3) were produced by reading **one file as the corpus** — the exact defect area Z's addendum names, written by the pass immediately before this one. It took **three verification rounds** to repair the arithmetic built on the false premise before anyone checked the premise. `audit-index.py --selftest` now asserts its two views read one corpus | [findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md] | #19 |
+| O — is `/patient/reports/*` on `carelink.*` the reports surface for every region? | 2026-10-12 | **Positive, and the area's split does not exist.** All seven recorded paths answer on **all three** patient deployments — `carelink.minimed.eu`, `carelink.minimed.com`, `carelink-trials.minimed.com` — and the responses are **byte-identical across hosts** (one body digest per path, three hosts). 21 of 21 cells reproduce their recorded code: `supported` / `snapshotTimelinesRange` **401**, `generateReport` / `favoriteReports` / `snapshotTimelinesForCalendar` **405**, `reportStatus` **400**, `report` **404**. **24 of a 30 cap**, GET only, controls first on every host, **all 6 passed** — the certainly-absent path `404`s on each host, so the status oracle is sound here (unlike the `clcloud.*` family, where it is uniform and useless) and the `404` is a true absence. **The negative the area anticipated did not occur.** **Two INFERRED premises are now confirmed rather than carried:** the three deployments share the namespace, and the status code is a usable discriminator. **A provenance correction:** the "live, gated 401/405" this area inherited cited a 2026-10-10 sweep whose committed artefact **disclaims itself** — *"a reconstruction from the agent's report"*, evidence *"not reproduced"*, *"re-verify before treating any row as OBSERVED"* ([`DRIFT-AND-NEW-2026-10-10.md:9`](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md)); the bundle inventory it produced names **none** of the camelCase paths; the only committed file naming `snapshotTimelinesRange` is the **archive** table, whose header says the codes are "as archived, **not** as measured live today" (2020-09-29→2021-03-31). So there was no live probe behind "live" — this pass is the first, and it reproduced the archived codes exactly. **Side-findings:** **`Allow: POST, OPTIONS` on all nine `405`s and on nothing else** — 9 of 24 responses, correlating exactly with the POST-only routes. This is a **scoping clarification** of `docs/09` §4's "no `clcloud.*` response carried `Allow`", not a correction of it: that row was already scoped to `clcloud.*` and to "this host family", so a `carelink.*` response carrying the header does not falsify it — it confirms the observation is **family-specific**, and a reader must not generalise it. (`docs/06:27,28,32` already records `Allow` — and its absence — on other patient routes.) Also a **host-aware CSP** that names **`commoncore-trials.medtronic.com`, a host in no prior note**. **⚠ The pass BREACHED the `>=2 s` delay floor** — 21 of 21 same-host gaps fell below it because a declared `DELAY=2.5` was never actually called; not re-run, because a clean re-run would exceed the 30 cap. Its first report of **min −0.538 s** was measured from `run.log` and **understated the breach**: the body-file mtimes give the true **min +0.092 s / max +0.387 s**, and show **no overlap**. It also added **two** backwards-clock-step occurrences (seq 9→10, seq 20→21), not one. Disclosed in full in the log §1a | [findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md] | #24 |
+| D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no key outside the 35-key vocabulary**, no report-vocabulary delta. **51 internal contradictions across 10 classes**, the headline being that the recorded two-country `bgUnits` vs `glucoseUnitsDefault` anomaly is **30 of 117** documents (BE reproduces; **CH no longer contradicts**; **IT and ES have drifted into it** since 2026-10-08), so `docs/04` is corrected in place with the original claim left readable. Also: three keys recorded as `null` are **absent** (41 of 117 for `cpMobileAppAvailable`, 115 for `stateCodes`) — `docs/04:377` had been contradicting the repo's own pinned assertion; **`ID` is enumerated by all three configs and refused by the endpoint**; KZ and PR publish a postal regex that rejects the document's own example. **119 of a 130 cap**, GET only, controls first. **Spacing floor 2.575 s with 0 of 118 gaps under the declared 2.5 s and 0 under the `>=2 s` floor** — measured from body-file mtimes, which the kernel sets at write time and which are therefore independent of the harness's own clock (**counting rule: consecutive pairs in `run.log` request order, 119 bodies, 118 gaps**; mtime span 304.9 s equals the harness span, confirming the series is the run's own). The harness `date` series disagrees with it (**1.642 s, 14 gaps under 2.5 s, 8 under 2 s**) because that pass recorded **11 negative request durations**, which is impossible, so those timestamps cannot all be faithful; **no cause asserted**. **Caveat on reuse: git does not preserve mtimes, so this oracle is valid only on the machine that ran the probe** — see [`docs/09`](09-methodology-and-oracles.md) §4. Three defects found in the reader itself are recorded, two of which would have manufactured findings | [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md] | #22 |
+| A — is `carelinkhp` really the clinician portal for every region? | 2026-10-12 | **Negative on the area's premise, and it corrected two published claims.** There is **no `.com` `carelinkhp` variant**: all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are **NXDOMAIN**, including `carelinkhp-prod.minimed.eu` — the only one the corpus had named and never probed. The portal is on **five hosts, two TLDs, two builds**, and the split is **product role** (clinic `pow` vs support `cua`), **not region**: every `.eu`/`.com` pair serves the same build. **Two refutations:** `carelink.medtronic.eu` **is** a portal deployment serving the byte-identical clinic bundle (3,397,615 B, sha256 `2a7fa8e7af519c2b`) — `docs/01:69` and `docs/10` §2 called it a false positive, which was caused by a document-path probe on a host family where **the catch-all *is* the entry document**; and `carelink-support.medtronic.com` serves the **support** build, not "the same document" as `docs/07:24`, `docs/01:68` and SECURITY-FINDINGS §S3 had it. A third correction: `docs/08`'s `sha256 f637c8d0…` is the **entry document**, not `main.759cddab23085086.js` (which is `a054555a0f22176e…`). **20 of a 20 cap**, GET only, controls first per host, 8 DNS lookups recorded outside the cap, measured minimum consecutive same-host gap **2 s over 15 gaps**: all 15 ≥ the repo's 2 s floor, **0 below it**, 11 of 15 ≥ the declared 2.5 s, 4 below it. `run.log` cannot distinguish truncation from a clock step from a post-hoc edit, so **no cause is asserted** for those 4 (`docs/09` §4). Cross-checked with area O's body-mtime oracle, offline and zero-request, over the **10 of 15** gaps whose bodies are committed: **0 corrupt-`t0` signatures, minimum 2.637 s, and all 4 short readings measure ≥ 2.5 s at sub-second resolution** — so no gap in this pass was actually short. That is OBSERVED for this pass only, it is **not re-derivable from a clean clone** (git does not preserve mtimes), and it does **not** answer the open question, which concerns areas B, X and Z. This pass contributes **1 pass / 4 occurrences** to that row's `n`, reconciled by the merge queue, not here | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] | #21 |
 | I — Auth0 tenant behavioural differences | 2026-10-12 | **Negative on the difference the area hunted; positive on one it did not name; and it corrected two `kid` strings already published.** The estate is **five** tenants, not four — reconciling "three" (`AUTH-TENANT` §1, a policy axis) against "four" (`docs/11`/`docs/10`, a key-material axis) was part of the pass, and **neither number was an error**: they counted two different sets over the same five hosts, and the union revealed that **`carelink-login.minimed.com` was in nobody's policy comparison** and **`-trials` was in nobody's key set**. **The negative, in its strongest form:** substituting each tenant's own hostname out of its discovery document leaves **one digest across all five** (`sha256:0c0db635f5e9b08b…`, 2640 B) — the same *bytes*, not merely the same fields; **30 field names, 0 absent from any document**, and exactly **12 of 30** differing raw, every one a URL containing that tenant's hostname. That **corrects** `AUTH-TENANT` §1: `registration_endpoint` is **not** a separate difference, it differs only by hostname like the other eleven. **The positive:** `x-ratelimit-limit` is **500 on both `.eu` tenants and 100 on the other three** — 10 observations, 2 per tenant, constant within a tenant, and invisible in byte-identical documents (INFERRED as tenant configuration, on the stated assumption Auth0 treats it as static). **Also:** `registration_endpoint` is advertised by all five and **404 to GET on all five** (`/oidc/register` → 404 `application/json`, 60 B, one digest `f006bbd60894…` across five hosts) — ⚠ **this pass's `registration_endpoint` headline was REFUTED and is RETRACTED**: a verifier showed the endpoint is **live and POST-only**, which a GET-only sweep cannot see, and the pass's own supplementary OPTIONS run then confirmed it on **3 of 5** tenants (`204` + `allow-methods: POST` against a per-tenant `404` + `x-auth0-not-found: 1` control); the trials tenant's key set is fetched for the first time (2 further disjoint kids → **10 keys, 0 shared**, discharging `docs/02` §9's "Unknown"); and **two corpus transcription defects settled against the corpus** — `AUTH-TENANT` §8's `medtronic.com` kid (`…_lLOJ`) is wrong in favour of `RECON-SUBDOMAINS`' (`…_lOOJ`), which **resolves `docs/02` §8's unresolved disagreement against the very spelling it recommended**, and `minimed.com`'s second kid is the live string **minus one `Q`** (a *deletion*, so no second reading existed to compare — invisible to §8's method by construction). **19 of a 20 cap** (17 curl + 2 hurl), **GET only**, plus an owner-authorised **supplementary budget of 14 of which 13 were used** (10 OPTIONS probes + 3 diagnostics) — **32 requests total, no POST anywhere**; controls first per host, **both certainly-absent controls returned 404** (`x-auth0-not-found: 1`, one digest across two hosts) so the oracle held and **no stop condition fired**; measured spacing floor **2.000 s**, which this ledger's **1-second timestamps cannot resolve** against the declared 2.5 s — a lower bound, not a measurement, recorded rather than smoothed over (4th pass in a row). New pins on the trials tenant validated live. Successor: the three remaining advertised endpoints, added under area J **and rewritten on 2026-10-12 to use empty-body OPTIONS rather than GET**, since all three are POST-only by specification and a GET-only successor would have repeated this pass's error three more times | [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md] | #23 |
-
-### Closed area I — original wording, kept readable
-
-Removed from the open list above so the gate's area count and this table agree,
-but its text is preserved rather than deleted (AGENTS.md §3: corrections stay
-visible):
-
-> **I. Auth0 tenant behavioural differences**
->
-> All four tenants share the same OAuth *policy* but have disjoint keys. Does any
-> tenant differ in a way that matters — a `code_challenge_methods` difference, a
-> redirect-registration difference, a scope difference? Only the policy surface was
-> compared, not the behaviours.
->
-> **Closes when:** the four tenants' `/.well-known/openid-configuration` documents are
-> diffed field by field, behaviour not just policy.
-
-**How the closure actually landed, against that text.** "Four" was the count of
-tenants with *known key material*; the estate holds **five**, and the pass
-compared all five. The *policy* clause is met and then some — the documents are
-byte-identical after hostname substitution, so a field-by-field diff is a weaker
-form of the same statement. The *behaviour* clause is met: the two cells it names
-(`code_challenge_methods` difference, redirect-registration difference) are both
-negative across all five, `redirect-registration` having been tested by GET on
-every tenant for the first time. **The difference the area went looking for was
-not in either document at all** — it was in a response header.
 ---
 
 > **Consumer note.** Findings here are consumed by
