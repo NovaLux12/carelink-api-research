@@ -114,6 +114,17 @@ flowchart LR
 therefore contains a permanently dead `v5` and omits a live `v12` — nothing that
 changes behaviour today (v13 answers first), but the list is inaccurate.
 
+Re-evidenced 2026-10-12: the "live on all three hosts" half of that claim had **one**
+raw row behind it (`.eu` only) and is now **3 of 3** — `401` + `x-ca-err: 990` on each
+of the three `clcloud.*` hosts, so there is no region split (OBSERVED,
+[source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 1]). `v12` also
+carries a CORS preflight exactly like `v11`/`v13`, while `discover/android/3.6` returns a
+`401` with **no** `Access-Control-*` header at any version. So the gateway does **not** add
+CORS uniformly — but **do not read that as "the discovery route has no preflight
+configured"**: across all 101 captured heads, every CORS-carrying response is a `200`, so
+the two readings are confounded with status code in this corpus. §Finding 2, §Finding 3,
+and successor area X.
+
 **`v11/discover` is host-dependent**, and this **contradicts** an earlier claim
 that the discovery document is global: `.com` serves an 18105 B legacy doc
 (cumulus v2, no Auth0, no CLINICAL, no `baseUrlCms`); `.eu` and `-trials` serve
@@ -301,7 +312,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 139 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 145 of these facts so they fail loudly rather than rot.
 
 ---
 

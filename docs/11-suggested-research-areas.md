@@ -42,17 +42,6 @@ that one contains patient-namespace paths the EU one doesn't.
 **Closes when:** you can name the clinic-portal hosts and show which bundle each
 serves, by sha256.
 
-### B. The `v12/display/message` endpoint
-
-`v12` is live and was in no prior note. `v6` exists but is POST-only; `v11/v12/v13`
-answer GET. We don't know what v12 does that v13 doesn't, or whether any client
-uses it.
-
-**Closes when:** a documented comparison of v11/v12/v13 response shapes with the
-same account. Blocked on a token for the *body*, but the **routing** picture is
-already open — check which cells are reachable, whether v12 has an `OPTIONS` route
-where v13 doesn't, and whether the `x-ca-err` code differs between them.
-
 ### D. The 18-country sweep, completed
 
 `/patient/countries/settings` has 35 keys. 18 countries are swept. **109 recorded**
@@ -103,6 +92,74 @@ and is the likelier of the two outcomes given the namespace 403s before applicat
 **Assumptions (INFERRED):** that the bundles on disk are the ones the shipped apps load.
 They were captured 2026-10-08 and **never re-fetched**, so a bundle version bump would
 invalidate the negative — state the capture date with the result, always.
+
+### X. Why do the two `clcloud.*` route families differ in their CORS headers — configuration, or status code?
+
+Added 2026-10-12. **Derived from area B**, and the question only became askable after that
+pass was reviewed: area B's first draft concluded "preflight presence is a per-route
+property", and the review found the evidence did not support the *cause*.
+
+What is OBSERVED (3 × 2 on `.eu`): `OPTIONS v{11,12,13}/display/message` answer `200` +
+`access-control-allow-origin: *`; `OPTIONS v{11,12,13}/discover/android/3.6` answer `401` +
+`x-ca-err: 990` with **zero** `Access-Control-*` headers — same host, same session, same
+method ([findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 3]).
+
+**The confound, which is the reason this area exists:** across **all 101 captured response
+heads in `findings-log/`**, exactly 14 carry `access-control-allow-origin` and **every one
+is a `200`** — **zero non-2xx carries it**. So on `clcloud.*`, "carries a preflight" and
+"answers 200" are **the same observation in this corpus**, and the discovery leg's `401`
+without CORS is equally consistent with (a) no preflight configured on that route, or (b)
+that route demanding a token on `OPTIONS` while non-2xx responses never carry CORS. **The
+corpus cannot separate these.**
+
+**The separating cell**, neither of which exists on disk: an `OPTIONS` on a `clcloud.*`
+route returning **`200` without** `access-control-allow-origin`, or **`401` with** it.
+Either one settles it, and both are ordinary entries in the recorded path list.
+
+**Blocker:** none. An OPTIONS-only sweep over paths **already recorded** in `VERSION-AXIS` §2
+and the area C/N/U logs, controls first per host, recording the full `access-control-*` set
+per cell rather than a verdict. The wider per-route map is a by-product and is worth having.
+
+**Closes when:** either a separating cell above is observed, or every recorded `clcloud.*`
+path has an OPTIONS verdict that makes the two readings distinguishable, **or** the routes
+carrying a preflight are enumerated as a set and it is recorded which of (a)/(b) that set is
+consistent with. **A negative counts**: if every OPTIONS cell turns out to track status code
+exactly, then CORS on `clcloud.*` is not a per-route property at all and area B's withdrawn
+claim is confirmed withdrawn.
+
+**Assumptions (INFERRED):** that `clcloud.*` behaves uniformly enough across its three hosts
+for a finding on `.eu` to transfer — never tested for this route pair, and the only
+cross-host CORS evidence in the corpus is `v13/display/message`. Also assumed: that the
+recorded path list is broad enough that a negative over it means something; a path never
+recorded is not covered.
+
+### Y. How many "all three hosts" claims in `docs/` rest on a single row?
+
+Added 2026-10-12. **Derived from area B.** That pass had to grep the whole `findings-log/`
+corpus before it could write anything, to settle one fact: the "401 on all three hosts"
+claim about `v12/display/message` had exactly **one** raw row behind it, on `.eu`,
+duplicated across two files (`ORACLE-PROBE-MATRIX` row 52 and `VERSION-AXIS` row 52 — the
+same probe). It happened to be true, but it was unsourced for two of its three hosts. That
+surfaced by accident, while checking a single cell.
+
+**What is missing:** nobody knows how many *other* multi-host claims in `docs/03` and
+`docs/06` rest the same way. A claim of the form "X on all three hosts" that was only ever
+probed on `.eu` is invisible on the page — it reads exactly like a verified one. This is
+`AGENTS.md` §6 item 1 in a repeatable form, and it is checkable **offline**.
+
+**Blocker:** none, and **zero requests**. For every "all three hosts" claim in `docs/03`
+and `docs/06`, resolve the claim to its raw row(s) and record the host coverage actually
+present. The area B method — grep the corpus for the path, read the host column — is a few
+minutes per claim and needs no network.
+
+**Closes when:** every such claim in `docs/03` and `docs/06` is marked confirmed-by-row or
+restated with its actual host coverage. **A negative closes it too**: proving the rest are
+correctly evidenced is a real result and retires the audit.
+
+**Assumptions (INFERRED):** that this defect class lives in claims of the form "same on all
+three hosts" and does not hide in per-host tables, which are harder to over-claim. A claim
+may also legitimately cite a cross-host pass instead of per-host rows; the audit must follow
+the citation rather than demand a row per host.
 
 ### W. Is the per-key projection a complete enumeration path for the 69-key document?
 
@@ -381,6 +438,7 @@ being superseded — never silently. Letters are not reused.
 | N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
 | U — are the `csr/v1`, `csr/v3` and PDE cells dead on `.com`/`-trials` too, or only on `.eu`? | 2026-10-12 | **Negative, 3 hosts wide.** All six cells dead on **both** methods on both remaining hosts — 24 of 24 cells `403 MissingAuthenticationTokenException`, controls first on each host, 32 of a 32 cap. All 28 no-route bodies byte-identical (42 B, `sha256:f249b63cb2fc`), and that digest matches the `.eu` capture, so the router's no-route response is one artefact shared by three hosts. `docs/00`'s "Not re-probed on `.com`/`-trials`" caveat is **discharged**; nothing flipped to live | [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] | #11 |
 | T — does any published document point a client at `csr/v2`? | 2026-10-12 | **Positive, and the premise was wrong.** The public config names `csr/v2` in **two** keys on **all three** deployments (`…csrDisplayMessageUrl` and `csr.cumulus.periodic.data.endpoints.display_message`, same URL), with `useCumulusUrls` already `true`; `baseUrlCsr` does not exist, so the route is addressed from **config, not discovery**. 10 of a 12 cap, GET only. Also found the **`system.gc.gz.transition.flags` switchboard** (absent from every prior key list), the **only** unroutable published base URL (`baseUrlPde`), and two corrections (`personal.data.csv.export.enable` is an object not a boolean; the document is 68 flat dotted keys + 1 nested `captcha`). **The premise had already been refuted on disk** by [findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md) §1 line 99 and never reached `docs/` | [findings-log/2026-10-12-published-pointers/FINDINGS.md] | #10 |
+| B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confirmed and evidenced* rather than restated. All 8 controls passed, controls first per host. **`v12` does not differ from `v13` on preflight**: `OPTIONS v{11,12,13}/display/message` all `200` + CORS, and `x-ca-err: 990` is identical across `v11`/`v12`/`v13`. **The gateway does not add CORS uniformly:** `discover/android/3.6` returns `401` with zero `Access-Control-*` at every version, same host and session — but this is **an observation, not a cause**: across all 101 captured heads every CORS-carrying response is a `200`, so "per-route configuration" is **not established** and became successor X. 17 of a 24 cap, ****23 of 24** including hurl validation of the new pins**, GET+OPTIONS only, measured spacing floor **2.033 s** (13 of 14 same-host gaps ≥2.5 s; the one short gap is arithmetically impossible under the committed harness and is recorded as a provenance problem, not smoothed over). The 42 B no-route digest `f249b63cb2fc` independently reproduces the area U artefact | [findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md] | #4 |
 ---
 
 > **Consumer note.** Findings here are consumed by

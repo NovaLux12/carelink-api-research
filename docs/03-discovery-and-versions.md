@@ -162,6 +162,42 @@ omits a live `v12` — neither changes behaviour today (v13 is tried first and i
 but v5 should not be in a fallback list and v12 is a free extra candidate
 [source: VERSION-AXIS §3b, §6, §7; docs/00-summary-the-map.md].
 
+### Confirmed on all three hosts (2026-10-12) — the claim above was under-evidenced, not wrong
+
+The sentence above asserted "401 on all three hosts" on the strength of **one** raw row
+(`ORACLE-PROBE-MATRIX` row 52, `clcloud.minimed.eu` only) — the failure mode in
+`AGENTS.md` §6 item 1. A 2026-10-12 pass probed the two missing hosts and **confirmed the
+claim**: `GET v12/display/message` returns `401` + `x-amzn-errortype: UnauthorizedException`
++ `x-ca-err: 990` on `clcloud.minimed.eu`, `clcloud.minimed.com` and
+`clcloud-trials.minimed.com` — **3 of 3**, every one a request that reached Medtronic's
+Layer7 authorizer, so the route exists and is token-gated (OBSERVED,
+[source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md §Finding 1]). There is **no
+region split** on this cell. The claim is now 3-host evidenced and pinned in
+`regression/hurl/04-deep-surface.hurl`.
+
+**`v12` carries a CORS preflight, exactly like `v11` and `v13`.** `OPTIONS
+v{11,12,13}/display/message` all return `200` with `access-control-allow-origin: *` and
+`access-control-allow-methods: OPTIONS`, on `.eu` (OBSERVED, same source §Finding 2). This
+settles the area's open question: `v12` does **not** differ from `v13` on preflight
+presence.
+
+**But the gateway does not add CORS uniformly.** On the same host, in the same session,
+`OPTIONS v{11,12,13}/discover/android/3.6` returns **`401`** + `x-ca-err: 990` with **no
+`Access-Control-*` header at all**, while `…/display/message` one path-family away returns
+`200` + CORS. So "the gateway adds CORS to `clcloud.*`" is **false as a rule** (OBSERVED, a
+3 × 2 on `.eu`, same source §Finding 3).
+
+**This is an observation, not a cause.** Across all 101 captured response heads in
+`findings-log/`, every response carrying `access-control-allow-origin` is a `200` — **zero
+non-2xx carries it**. So on `clcloud.*` "carries a preflight" and "answers 200" are the same
+observation in this corpus, and a `401` without CORS is equally consistent with the route
+demanding a token on `OPTIONS`. **Whether preflight presence is configured per route is not
+established** — it is successor area X in [`11-suggested-research-areas.md`](11-suggested-research-areas.md).
+
+**None of the above makes `v12` browser-callable.** The `401` itself carries no
+`Access-Control-*` header, which is the recorded `MissingAllowOriginHeader` failure — still
+open in [`10-open-questions.md`](10-open-questions.md) §1, and untouched by this pass.
+
 ## 7. `v11/discover` is host-dependent — and that contradicts an earlier claim
 
 PROBE-FINDINGS §3 states "the hostname does not select the region — the doc is global

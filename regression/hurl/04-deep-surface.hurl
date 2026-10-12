@@ -328,3 +328,76 @@ OPTIONS https://clcloud-trials.minimed.com/connect/pde/v3/display/message
 HTTP 403
 [Asserts]
 header "x-amzn-errortype" contains "MissingAuthenticationTokenException"
+
+# ============================================================
+# Area B (2026-10-12): v12/display/message is live and token-gated on all
+# three hosts, and the two route families differ observably in their CORS
+# headers.
+# Source: findings-log/2026-10-12-area-b-v12-routing/FINDINGS.md
+#
+# Why these four cells and no more. Before this pass, docs/03 §6 and docs/06
+# both asserted "v12/display/message is 401 on all three hosts" on the strength
+# of ONE raw row (ORACLE-PROBE-MATRIX row 52, clcloud.minimed.eu only) — a claim
+# stated without evidence (AGENTS.md §6 item 1). The Area N block above pins
+# v13 on all three hosts; it never pinned v12 anywhere. So the two cells below
+# are the only places the "all three hosts" claim can now fail.
+#
+# The preflight pair is an OBSERVATION, not a cause, and is deliberately worded
+# as one: same host, same method, same session, one path-family apart,
+# display/message answers 200 with access-control-allow-origin: * while discover
+# answers 401 with no Access-Control-* header at all. That falsifies "the
+# gateway adds CORS uniformly" as a rule. It does NOT establish that preflight
+# presence is configured per route — see the scope note at the discover cell.
+#
+# NOT pinned here, deliberately: v12 GET on .eu, and v11/v13 OPTIONS on .eu. They
+# were probed (results.jsonl seq 6, 7, 3) and are recorded in the log, but
+# pinning them would add three requests per drift sweep for cells the docs do
+# not make a load-bearing claim about. The coverage claimed here is the four
+# cells below and nothing more.
+#
+# `access-control-allow-methods` is still NOT read as a method register
+# (docs/09 §2): v12 is GET-capable, proven by the 401 + x-ca-err: 990 below,
+# while its preflight advertises only OPTIONS. And a passing preflight does not
+# make the route browser-callable — the 401 itself carries no Access-Control-*
+# header, which is the open question in docs/10 §1.
+# ============================================================
+
+# v12/display/message on the two hosts where it had never been probed.
+GET https://clcloud.minimed.com/connect/carepartner/v12/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
+GET https://clcloud-trials.minimed.com/connect/carepartner/v12/display/message
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+
+# The route that carries a CORS preflight...
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v12/display/message
+HTTP 200
+[Asserts]
+header "access-control-allow-origin" == "*"
+
+# ...and the route one path-family away that does not.
+#
+# The `not exists` assertions are the load-bearing half and were added on
+# review: `HTTP 401` + `x-ca-err: 990` alone would still pass if Medtronic ADDED
+# CORS to the discovery leg while leaving it token-gated, which is exactly the
+# drift the note in docs/06 is about. Asserting the ABSENCE of the headers is
+# what makes "no preflight here" falsifiable by drift. A one-directional pin is
+# a restatement, not a guard.
+#
+# Honest scope: this pins the OBSERVATION (a 401 carrying no CORS headers), not
+# a cause. Across all 101 captured heads in findings-log/, every response
+# carrying access-control-allow-origin is a 200 — zero non-2xx carries it — so on
+# clcloud.* "has a preflight" and "answers 200" are the same observation in this
+# corpus. These assertions cannot separate "no CORS configured on this route"
+# from "this route demands a token on OPTIONS and non-2xx never carries CORS".
+# That separation is successor area X in docs/11, not a claim made here.
+OPTIONS https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
+HTTP 401
+[Asserts]
+header "x-ca-err" == "990"
+header "access-control-allow-origin" not exists
+header "access-control-allow-methods" not exists
