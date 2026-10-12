@@ -73,7 +73,9 @@ hand-maintained constants, and a pass that adds either kind of construct must
 re-derive both rather than trust them:
 
   1. `LOOP_FAMILY_SITES = 16` — the trip count of the family loop.
-  2. `INLINE_05 = 5` — how many assertions 05 runs OUTSIDE any `check "` site,
+  2. `INLINE_05 = 7  # 5 from the pre-area-A suite + area A's 2 build-marker branches
+               # (its `for spec in ...` loop asserts inline, so it adds 0 check
+               #  sites and 0 loop sites — see the KNOWN LIMIT note above).` — how many assertions 05 runs OUTSIDE any `check "` site,
      counting the inline `PASS=$((PASS + 1))` branches at the top of the file
      and the shadow / sibling / family-map comparisons. At base that is 4
      literal sites executing 5 times (the sibling and family-map branches are
@@ -124,7 +126,9 @@ CONFIG_SUITE = os.path.join(HURL_DIR, '05-public-config.check.sh')
 # The one inline assertion family in 05 that is not a `check "` call: the shadow
 # grep, the two sibling 412 checks, and the two family-map hash comparisons
 # (05-public-config.check.sh — see its own PASS/FAIL branches).
-INLINE_05 = 5
+INLINE_05 = 7  # 5 from the pre-area-A suite + area A's 2 build-marker branches.
+               # Its `for spec in ...` loop asserts inline, so it adds 0 check
+               # sites and 0 loop sites — see the KNOWN LIMIT note above.
 LOOP_FAMILY_SITES = 16
 
 

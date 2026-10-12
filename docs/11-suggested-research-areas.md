@@ -70,20 +70,6 @@ here demonstrates an actual cross-origin call.
 
 ## Tier 1 — no token needed, high value
 
-### A. Is `carelinkhp` really the clinician portal for every region?
-
-`carelinkhp.minimed.eu` and `carelink.medtronic.com` serve byte-identical bundles
-of the *clinic* portal. `carelink.medtronic.eu` returns the 5518-byte SPA fallback
-— a false positive. But the **`.com` clinic variant beyond `carelink.medtronic.com`
-has never been found.**
-
-Worth checking: whether any `carelinkhp*.minimed.com` style host serves a
-*different* bundle (a US clinic app rather than a mirrored EU one), and whether
-that one contains patient-namespace paths the EU one doesn't.
-
-**Closes when:** you can name the clinic-portal hosts and show which bundle each
-serves, by sha256.
-
 
 ### V. Given that `baseUrlPde` names a dead namespace, does any vendor client follow it?
 
@@ -272,6 +258,39 @@ bundle. We never did the full three-way reconciliation.
 **Closes when:** one table of every model code, with which source(s) list it and
 which don't.
 
+
+
+
+> **Addendum 2026-10-12 (from area A) — the premise is now well-posed, and it is an
+> N-way reconciliation, not a three-way one.** This area was blocked on an unanswered
+> question: the "clinic bundle's device table" was a single table read off one host, and
+> nobody knew whether the other portal hosts served the same bytes. Area A settled it by
+> sha256 and the answer is **two distinct builds**, so "the clinic bundle" is not one
+> thing:
+>
+> | Build | Hosts | Entry document (5518 B) sha256 |
+> |---|---|---|
+> | clinic `pow` | `carelinkhp.minimed.eu`, `carelink.medtronic.eu`, `carelink.medtronic.com` | `0f2c5f6257a6fc6a…` |
+> | support `cua` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` | `f637c8d0cd4ec6bc…` |
+>
+> Both rows and both asset sizes are **OBSERVED** in area A's ledger, not inferred
+> from the host names [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2;
+> `results.jsonl` seq 4, 8, 15, 19, 20].
+>
+> **Blocker:** the device table must be extracted from **each build separately** — the
+> two main assets are 3,397,615 B and 3,410,666 B, so they are **not** the same file, and
+> assuming otherwise is the exact defect that let a portal deployment be recorded as a
+> false positive. **Closes when** G states which source(s) list each model code **per
+> build**, where "build" is the sha256 set above. **A negative closes it**: if both
+> builds' device tables are identical, G's premise is unchanged, the addendum records
+> that, and the reconciliation stays three-way.
+>
+> **Assumptions (INFERRED):** that the shipped portal's device table lives in the main
+> asset and not in a lazy chunk, and that the two builds share a device-table format.
+> Neither is established — the chunk corpus was mined against the clinic build only.
+> The asset-level digests are in the area A log; its asset bodies were not committed
+> (3.4 MB each), so re-extraction costs 2 fetches.
+
 ### Q. The `appVersion` body gate — a second version axis our docs do not describe
 
 **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
@@ -441,7 +460,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 16 open plus 10 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 15 open plus 11 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -473,6 +492,7 @@ being superseded — never silently. Letters are not reused.
 | Y — how many "all three hosts" claims rest on a single row? | 2026-10-12 | **All 29 in-scope claims confirmed by row — the negative result, and it closes the audit.** Every multi-host claim in the area's stated scope (**`docs/03` + `docs/06`**, 29 lines) resolves to a row per host. The `clcloud.*` route claims are three-host evidenced because areas B, X, N, U and Z each swept all three hosts on 2026-10-12. **Four candidate findings — none of them in scope, and two of them withdrawn**, and they are the more useful half of the record: **Y-1 WITHDRAWN** — `docs/03:38`'s "all three hosts return the same document" was alleged to be two-host evidenced on the strength of one pass's ledger, and **area X's tracked ledger refutes that**: all three hosts at 20256 B, one digest. **`docs/03:38`** and `01-discovery-pin.hurl` are unchanged from main — `docs/03` does carry **one** other edit from this pass, the claim-#10 method-axis correction, which is unrelated to Y-1. **Y-2 corrected** — `docs/08:37` claimed five hosts while citing `SECURITY-FINDINGS §S3`, which says **"at least twice"**, and labelled it OBSERVED from a file that forbids that label. **Y-3 WITHDRAWN** — `docs/02` was alleged to over-claim a five-tenant comparison; `AUTH-TENANT-FINDINGS §1`'s three tenants *include* trials, and `docs/02` is unchanged. **Y-4** the 2026-10-12 captures are gitignored, so some pages are not re-derivable from a clean clone — recorded, not fixed. **0 requests, 0 cap.** **The lesson the record carries:** two of the four candidate findings (Y-1 and Y-3) were produced by reading **one file as the corpus** — the exact defect area Z's addendum names, written by the pass immediately before this one. It took **three verification rounds** to repair the arithmetic built on the false premise before anyone checked the premise. `audit-index.py --selftest` now asserts its two views read one corpus | [findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md] | #19 |
 | O — is `/patient/reports/*` on `carelink.*` the reports surface for every region? | 2026-10-12 | **Positive, and the area's split does not exist.** All seven recorded paths answer on **all three** patient deployments — `carelink.minimed.eu`, `carelink.minimed.com`, `carelink-trials.minimed.com` — and the responses are **byte-identical across hosts** (one body digest per path, three hosts). 21 of 21 cells reproduce their recorded code: `supported` / `snapshotTimelinesRange` **401**, `generateReport` / `favoriteReports` / `snapshotTimelinesForCalendar` **405**, `reportStatus` **400**, `report` **404**. **24 of a 30 cap**, GET only, controls first on every host, **all 6 passed** — the certainly-absent path `404`s on each host, so the status oracle is sound here (unlike the `clcloud.*` family, where it is uniform and useless) and the `404` is a true absence. **The negative the area anticipated did not occur.** **Two INFERRED premises are now confirmed rather than carried:** the three deployments share the namespace, and the status code is a usable discriminator. **A provenance correction:** the "live, gated 401/405" this area inherited cited a 2026-10-10 sweep whose committed artefact **disclaims itself** — *"a reconstruction from the agent's report"*, evidence *"not reproduced"*, *"re-verify before treating any row as OBSERVED"* ([`DRIFT-AND-NEW-2026-10-10.md:9`](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md)); the bundle inventory it produced names **none** of the camelCase paths; the only committed file naming `snapshotTimelinesRange` is the **archive** table, whose header says the codes are "as archived, **not** as measured live today" (2020-09-29→2021-03-31). So there was no live probe behind "live" — this pass is the first, and it reproduced the archived codes exactly. **Side-findings:** **`Allow: POST, OPTIONS` on all nine `405`s and on nothing else** — 9 of 24 responses, correlating exactly with the POST-only routes. This is a **scoping clarification** of `docs/09` §4's "no `clcloud.*` response carried `Allow`", not a correction of it: that row was already scoped to `clcloud.*` and to "this host family", so a `carelink.*` response carrying the header does not falsify it — it confirms the observation is **family-specific**, and a reader must not generalise it. (`docs/06:27,28,32` already records `Allow` — and its absence — on other patient routes.) Also a **host-aware CSP** that names **`commoncore-trials.medtronic.com`, a host in no prior note**. **⚠ The pass BREACHED the `>=2 s` delay floor** — 21 of 21 same-host gaps fell below it because a declared `DELAY=2.5` was never actually called; not re-run, because a clean re-run would exceed the 30 cap. Its first report of **min −0.538 s** was measured from `run.log` and **understated the breach**: the body-file mtimes give the true **min +0.092 s / max +0.387 s**, and show **no overlap**. It also added **two** backwards-clock-step occurrences (seq 9→10, seq 20→21), not one. Disclosed in full in the log §1a | [findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md] | #24 |
 | D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no key outside the 35-key vocabulary**, no report-vocabulary delta. **51 internal contradictions across 10 classes**, the headline being that the recorded two-country `bgUnits` vs `glucoseUnitsDefault` anomaly is **30 of 117** documents (BE reproduces; **CH no longer contradicts**; **IT and ES have drifted into it** since 2026-10-08), so `docs/04` is corrected in place with the original claim left readable. Also: three keys recorded as `null` are **absent** (41 of 117 for `cpMobileAppAvailable`, 115 for `stateCodes`) — `docs/04:377` had been contradicting the repo's own pinned assertion; **`ID` is enumerated by all three configs and refused by the endpoint**; KZ and PR publish a postal regex that rejects the document's own example. **119 of a 130 cap**, GET only, controls first. **Spacing floor 2.575 s with 0 of 118 gaps under the declared 2.5 s and 0 under the `>=2 s` floor** — measured from body-file mtimes, which the kernel sets at write time and which are therefore independent of the harness's own clock (**counting rule: consecutive pairs in `run.log` request order, 119 bodies, 118 gaps**; mtime span 304.9 s equals the harness span, confirming the series is the run's own). The harness `date` series disagrees with it (**1.642 s, 14 gaps under 2.5 s, 8 under 2 s**) because that pass recorded **11 negative request durations**, which is impossible, so those timestamps cannot all be faithful; **no cause asserted**. **Caveat on reuse: git does not preserve mtimes, so this oracle is valid only on the machine that ran the probe** — see [`docs/09`](09-methodology-and-oracles.md) §4. Three defects found in the reader itself are recorded, two of which would have manufactured findings | [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md] | #22 |
+| A — is `carelinkhp` really the clinician portal for every region? | 2026-10-12 | **Negative on the area's premise, and it corrected two published claims.** There is **no `.com` `carelinkhp` variant**: all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are **NXDOMAIN**, including `carelinkhp-prod.minimed.eu` — the only one the corpus had named and never probed. The portal is on **five hosts, two TLDs, two builds**, and the split is **product role** (clinic `pow` vs support `cua`), **not region**: every `.eu`/`.com` pair serves the same build. **Two refutations:** `carelink.medtronic.eu` **is** a portal deployment serving the byte-identical clinic bundle (3,397,615 B, sha256 `2a7fa8e7af519c2b`) — `docs/01:69` and `docs/10` §2 called it a false positive, which was caused by a document-path probe on a host family where **the catch-all *is* the entry document**; and `carelink-support.medtronic.com` serves the **support** build, not "the same document" as `docs/07:24`, `docs/01:68` and SECURITY-FINDINGS §S3 had it. A third correction: `docs/08`'s `sha256 f637c8d0…` is the **entry document**, not `main.759cddab23085086.js` (which is `a054555a0f22176e…`). **20 of a 20 cap**, GET only, controls first per host, 8 DNS lookups recorded outside the cap, measured minimum consecutive same-host gap **2 s over 15 gaps**: all 15 ≥ the repo's 2 s floor, **0 below it**, 11 of 15 ≥ the declared 2.5 s, 4 below it. `run.log` cannot distinguish truncation from a clock step from a post-hoc edit, so **no cause is asserted** for those 4 (`docs/09` §4). Cross-checked with area O's body-mtime oracle, offline and zero-request, over the **10 of 15** gaps whose bodies are committed: **0 corrupt-`t0` signatures, minimum 2.637 s, and all 4 short readings measure ≥ 2.5 s at sub-second resolution** — so no gap in this pass was actually short. That is OBSERVED for this pass only, it is **not re-derivable from a clean clone** (git does not preserve mtimes), and it does **not** answer the open question, which concerns areas B, X and Z. This pass contributes **1 pass / 4 occurrences** to that row's `n`, reconciled by the merge queue, not here | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] | #21 |
 ---
 
 > **Consumer note.** Findings here are consumed by

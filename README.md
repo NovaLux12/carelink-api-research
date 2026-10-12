@@ -382,7 +382,7 @@ research note that only records its successes isn't one. **[OBSERVED]** —
 `AGENTS.md` §6; `docs/09-methodology-and-oracles.md`.
 
 **The assertion is the arbiter, not the prose.** `regression/hurl/` holds **176
-pinned assertions** — 378 execute per run, once the 16-family loop in the config
+pinned assertions** — 380 execute per run, once the 16-family loop in the config
 suite is expanded and hurl's status-line checks are counted. Exit 0 = the vendor
 surface hasn't drifted past the pinned values. The suite has caught a page
 asserting a hash its own log had already retracted. **[OBSERVED]** —
