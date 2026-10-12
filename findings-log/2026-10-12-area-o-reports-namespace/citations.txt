@@ -1,0 +1,34 @@
+## Citation and link report — FINDINGS.md
+
+- relative links + line-numbered citations resolved: **24**
+- broken: **0**
+
+| citation | target line |
+|---|---|
+| `docs/00-summary-the-map.md` |  |
+| `docs/00-summary-the-map.md` |  |
+| `docs/01-hosts-and-estate.md` |  |
+| `docs/01-hosts-and-estate.md:70` | \| `commoncore.medtronic.{eu,com}` \| the reports backend (`/reports-broker`, `/reports- |
+| `docs/01-hosts-and-estate.md:93` | \| `commoncore.minimed.{eu,com}` \| **502 on every path** — backend not serving. A *diff |
+| `docs/06-patient-api-surface.md` |  |
+| `docs/06-patient-api-surface.md` |  |
+| `docs/06-patient-api-surface.md:27` | \| `/patient/monitor/data` \| 401 \| `Allow: HEAD, GET, OPTIONS` — GET works, the bridge |
+| `docs/06-patient-api-surface.md:28` | \| `/patient/connect/data` \| 401 \| no `Allow` header \| |
+| `docs/06-patient-api-surface.md:32` | \| `/patient/dataUpload/recentUploads` \| **405** \| newly confirmed live, `Allow: POST, |
+| `docs/09-methodology-and-oracles.md` |  |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md` |  |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md` |  |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md` |  |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:162` | `/patient/reports/supported` (401) · `/patient/reports/generateReport` (405) · `/patient |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:302` | unless noted; status codes as archived, **not** as measured live today): |
+| `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:329` | \| `/patient/reports/*` (7 paths) \| 2020-09-29 \| 2021-03-31 \| 400/401/404/405 \| YES  |
+| `findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md` |  |
+| `findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:252` | \| `commoncore-trials.minimed.com` \| 502 \| text/html \| backend down \| |
+| `findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md` |  |
+| `findings-log/probe-2026-10-08/recon/DRIFT-AND-NEW-2026-10-10.md:9` | > **Provenance:** this file is a **reconstruction from the agent's report**, because |
+| `findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md` |  |
+| `regression/hurl/03-patient-api.hurl` |  |
+| `scripts/scrub-patterns.txt` |  |
+
+No requests were issued. Run `python3 citations.py --selftest` to confirm
+this checker can fail before trusting a zero here.

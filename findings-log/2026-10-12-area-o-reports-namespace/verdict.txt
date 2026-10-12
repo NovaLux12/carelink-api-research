@@ -1,0 +1,69 @@
+### Seven-path row, three hosts
+
+| Path | archive verdict (ARCHIVE-URLS.md:162) | `carelink.minimed.eu` | `carelink.minimed.com` | `carelink-trials.minimed.com` | identical across all 3? |
+|---|---|---|---|---|---|
+| `/patient/reports/supported` | 401 | 401 | 401 | 401 | **yes** |
+| `/patient/reports/snapshotTimelinesRange` | 401 | 401 | 401 | 401 | **yes** |
+| `/patient/reports/generateReport` | 405 | 405 | 405 | 405 | **yes** |
+| `/patient/reports/favoriteReports` | 405 | 405 | 405 | 405 | **yes** |
+| `/patient/reports/snapshotTimelinesForCalendar` | 405 | 405 | 405 | 405 | **yes** |
+| `/patient/reports/reportStatus` | 400 | 400 | 400 | 400 | **yes** |
+| `/patient/reports/report` | 404 | 404 | 404 | 404 | **yes** |
+
+### Oracle usable?
+
+| Host | 7-path row complete | routed (200/401/400/405) | no route (404) | oracle usable? |
+|---|---|---|---|---|
+| `carelink.minimed.eu` | 7/7 | 6/7 | 1/7 | **yes** |
+| `carelink.minimed.com` | 7/7 | 6/7 | 1/7 | **yes** |
+| `carelink-trials.minimed.com` | 7/7 | 6/7 | 1/7 | **yes** |
+
+### Controls, sent first on every host
+
+| # | Host | Path | Role | Status | `Content-Type` | Bytes | body sha256 | `x-ca-err` | What it establishes |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | `carelink.minimed.eu` | `/patient/reports/(certainly-absent)` | CONTROL-certainly-absent-same-prefix | **404** | (none) | 0 | `e3b0c44298fc` | (none) | what **dead** looks like on this host |
+| 2 | `carelink.minimed.eu` | `/patient/reports/supported` | CONTROL-known-live-and-CANDIDATE-1-of-7 | **401** | application/json | 48 | `247825a42646` | 990 | the namespace is routed here (this row is also candidate 1 of 7) |
+| 3 | `carelink.minimed.eu` | `/patient/reports/snapshotTimelinesRange` | CANDIDATE-snapshotTimelinesRange | **401** | application/json | 48 | `247825a42646` | 990 |  |
+| 4 | `carelink.minimed.eu` | `/patient/reports/generateReport` | CANDIDATE-generateReport | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 5 | `carelink.minimed.eu` | `/patient/reports/favoriteReports` | CANDIDATE-favoriteReports | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 6 | `carelink.minimed.eu` | `/patient/reports/snapshotTimelinesForCalendar` | CANDIDATE-snapshotTimelinesForCalendar | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 7 | `carelink.minimed.eu` | `/patient/reports/reportStatus` | CANDIDATE-reportStatus | **400** | application/json | 130 | `216c87d78184` | (none) |  |
+| 8 | `carelink.minimed.eu` | `/patient/reports/report` | CANDIDATE-report | **404** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 9 | `carelink.minimed.com` | `/patient/reports/(certainly-absent)` | CONTROL-certainly-absent-same-prefix | **404** | (none) | 0 | `e3b0c44298fc` | (none) | what **dead** looks like on this host |
+| 10 | `carelink.minimed.com` | `/patient/reports/supported` | CONTROL-known-live-and-CANDIDATE-1-of-7 | **401** | application/json | 48 | `247825a42646` | 990 | the namespace is routed here (this row is also candidate 1 of 7) |
+| 11 | `carelink.minimed.com` | `/patient/reports/snapshotTimelinesRange` | CANDIDATE-snapshotTimelinesRange | **401** | application/json | 48 | `247825a42646` | 990 |  |
+| 12 | `carelink.minimed.com` | `/patient/reports/generateReport` | CANDIDATE-generateReport | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 13 | `carelink.minimed.com` | `/patient/reports/favoriteReports` | CANDIDATE-favoriteReports | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 14 | `carelink.minimed.com` | `/patient/reports/snapshotTimelinesForCalendar` | CANDIDATE-snapshotTimelinesForCalendar | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 15 | `carelink.minimed.com` | `/patient/reports/reportStatus` | CANDIDATE-reportStatus | **400** | application/json | 130 | `216c87d78184` | (none) |  |
+| 16 | `carelink.minimed.com` | `/patient/reports/report` | CANDIDATE-report | **404** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 17 | `carelink-trials.minimed.com` | `/patient/reports/(certainly-absent)` | CONTROL-certainly-absent-same-prefix | **404** | (none) | 0 | `e3b0c44298fc` | (none) | what **dead** looks like on this host |
+| 18 | `carelink-trials.minimed.com` | `/patient/reports/supported` | CONTROL-known-live-and-CANDIDATE-1-of-7 | **401** | application/json | 48 | `247825a42646` | 990 | the namespace is routed here (this row is also candidate 1 of 7) |
+| 19 | `carelink-trials.minimed.com` | `/patient/reports/snapshotTimelinesRange` | CANDIDATE-snapshotTimelinesRange | **401** | application/json | 48 | `247825a42646` | 990 |  |
+| 20 | `carelink-trials.minimed.com` | `/patient/reports/generateReport` | CANDIDATE-generateReport | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 21 | `carelink-trials.minimed.com` | `/patient/reports/favoriteReports` | CANDIDATE-favoriteReports | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 22 | `carelink-trials.minimed.com` | `/patient/reports/snapshotTimelinesForCalendar` | CANDIDATE-snapshotTimelinesForCalendar | **405** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+| 23 | `carelink-trials.minimed.com` | `/patient/reports/reportStatus` | CANDIDATE-reportStatus | **400** | application/json | 130 | `216c87d78184` | (none) |  |
+| 24 | `carelink-trials.minimed.com` | `/patient/reports/report` | CANDIDATE-report | **404** | (none) | 0 | `e3b0c44298fc` | (none) |  |
+
+### Cross-host byte identity
+
+| Path | statuses equal | bodies equal (sha256) | byte counts |
+|---|---|---|---|
+| `/patient/reports/supported` | yes | yes — `247825a42646` | 48/48/48 |
+| `/patient/reports/snapshotTimelinesRange` | yes | yes — `247825a42646` | 48/48/48 |
+| `/patient/reports/generateReport` | yes | yes — `e3b0c44298fc` | 0/0/0 |
+| `/patient/reports/favoriteReports` | yes | yes — `e3b0c44298fc` | 0/0/0 |
+| `/patient/reports/snapshotTimelinesForCalendar` | yes | yes — `e3b0c44298fc` | 0/0/0 |
+| `/patient/reports/reportStatus` | yes | yes — `216c87d78184` | 130/130/130 |
+| `/patient/reports/report` | yes | yes — `e3b0c44298fc` | 0/0/0 |
+
+### Stable header facts by status
+
+| Status | paths at that status | `x-cache` | `Allow` | `x-ca-err` | `Set-Cookie` names | `Access-Control-Allow-Origin` |
+|---|---|---|---|---|---|---|
+| **401** | `snapshotTimelinesRange`, `supported` | `Error from cloudfront` | — | 990 | 2 (`auth_tmp_token`, `c_token_valid_to`, both empty, `Max-Age=0`) | **absent on every one of the 24 responses** |
+| **400** | `reportStatus` | `Error from cloudfront` | — | (none) | — | **absent on every one of the 24 responses** |
+| **405** | `favoriteReports`, `generateReport`, `snapshotTimelinesForCalendar` | `Error from cloudfront` | POST, OPTIONS | (none) | — | **absent on every one of the 24 responses** |
+| **404** | `report` | `Error from cloudfront` | — | (none) | — | **absent on every one of the 24 responses** |

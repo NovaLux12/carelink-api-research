@@ -338,12 +338,38 @@ GET /patient/countries/settings?countryCode=XX   → 200 application/json, gzip,
   Supported"`. Both are clean, distinct error shapes — the country code is genuinely
   validated.
 - Swept across **18 countries**: GB US DE FR IT ES NL SE NO DK FI CH AT BE IE ZA CL RU.
+- **Swept COMPLETE 2026-10-12 (area D).** All **118** country codes the
+  vendor's own published config enumerates were requested and every key given
+  an ABSENT / NULL / VALUED verdict: **117 country documents** served, **33/34/35
+  keys** depending on country, **no key outside the 35-key vocabulary**, no
+  report-name vocabulary delta. **The document is not uniform in shape** — 35
+  keys for CA/US, 34 for 74 countries, 33 for 41 — and the per-country × per-key
+  matrix is on disk at
+  [findings-log/2026-10-12-area-d-country-sweep/matrix.tsv](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-area-d-country-sweep/matrix.tsv).
+  **51 internal contradictions** were enumerated across 10 classes
+  ([findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md) §5).
+  ⚠ The `109` country-code count previously recorded on `docs/11` **does not
+  reproduce**: the same counting rule over the captures on disk yields **118**.
+  Both numbers are left standing — the earlier one has no counting rule recorded
+  with it, so this pass can neither confirm nor explain it.
+- **`ID` is enumerated by all three vendor config documents and refused by this
+  endpoint** — `400 "Error! Country:ID Not Supported"`, the same envelope as the
+  bogus-code control. The vendor's published country lists and the countries this
+  endpoint serves are **not the same set** (OBSERVED, 2026-10-12).
 - **The EU host will happily serve US market config.** With `countryCode=US` the reply
   carries `region:"US"`, `mediaHost:https://carelink.minimed.com`, US state codes and US
   legal-document paths — all from `carelink.minimed.eu`. The host is not the region
   boundary; the parameter selects the market, the host only supplies the default.
 
-### ⚠ `bgUnits` and `glucoseUnitsDefault` disagree in BE and CH
+### ⚠ `bgUnits` and `glucoseUnitsDefault` disagree — in 30 countries, not 2
+
+> ⚠ **Corrected 2026-10-12 by area D.** The claim below was written from an
+> 18-country sweep and recorded a two-country anomaly. Swept across all **118**
+> country codes the vendor's own published config enumerates, the shape is
+> **30 of 117 served documents**. **BE still reproduces; CH no longer
+> contradicts; IT and ES have drifted into the contradiction since 2026-10-08.**
+> The original claim is kept readable below and the correction is not smoothed
+> over it.
 
 | key | MMOL_L | MG_DL |
 |---|---|---|
@@ -355,6 +381,36 @@ GET /patient/countries/settings?countryCode=XX   → 200 application/json, gzip,
 other mis-scales every value [source:
 findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md].
 
+**Swept live on 2026-10-12, the distribution across all 117 served countries:**
+
+| `bgUnits` | `glucoseUnitsDefault` | countries | client consequence |
+|---|---|---|---|
+| `MMOL_L` | `MMOL_L` | 51 | none |
+| `MG_DL` | `MG_DL` | 36 | none |
+| **`MG_DL`** | **`MMOL_L`** | **30** | **a factor of ~18 between the two keys** |
+
+The 30: `AE AR AW BE BO BR CO CW EC EG ES GR IL IN IT JM JP KR LB MV MX NC PE PK SA SD TH TT
+UY VE`. **A client that reads one key and a client that reads the other render the same
+reading on a patient's screen in 30 countries, ~18× apart** (OBSERVED,
+[findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md §4]). `CH` returns
+`MMOL_L`/`MMOL_L` today and is **not** in the set; `IT` and `ES` were recorded
+`MG_DL`/`MG_DL` on 2026-10-08 and return `MG_DL`/`MMOL_L` now.
+
+**Carbohydrate units disagree the same way, in 5 countries** — `carbDefaultUnit`
+`EXCHANGES` against `carbohydrateUnitsDefault` `GRAMS` in **AM ES GE KZ**, plus
+**AE**, where `carbDefaultUnit` is the lowercase string `grams` where all 116
+other documents use the enum member `GRAMS` [source:
+findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md §5].
+
+**Pinned:** `regression/hurl/05-public-config.check.sh` asserts BE's two unit
+values as **two separate checks**, because one check asserting "they differ"
+would keep passing after a vendor fix.
+
+**Downstream:** the 2 → 30 correction changes a value a client pins, so it is
+tracked for the consumer at
+[#29](https://github.com/NovaLux12/carelink-api-research/issues/29)
+(`downstream-bridge`).
+
 ### Other country-dependent keys
 
 | key | varies |
@@ -364,7 +420,7 @@ findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md].
 | `mfa.maxAttempts` / `rememberPeriod` | NO 5 / 10; every other country 3 / 3 |
 | `INSULIN_ASSESSMENT` report | **absent in FR, RU, US**; present in the other 15 |
 | `dateOfBirthRequired` | **`false` only for RU**; `true` everywhere else |
-| `stateCodes` | US only (state enumeration); `null` for all 17 others |
+| `stateCodes` | ⚠ **corrected 2026-10-12**: **US and CA only** (US states, CA provinces) · **absent** in 115 of 117 · never `null` (previously recorded as "`null` for all 17 others") |
 | `techHours` | 24/7 in GB, RU, CL only · US `7:00 am - 7:00 pm CST` · the rest weekday business hours |
 | `carbDefaultUnit` / `carbohydrateUnitsDefault` | `EXCHANGES` for AT/ES/RU, `GRAMS` elsewhere |
 | `defaultLanguage` / `languages` / `defaultCountryName` | 11 / 13 / 18 distinct values |
@@ -374,7 +430,14 @@ findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md].
 Constant across all 18 countries: `uploaderAllowed` = `true`, `smsSendingAllowed` = `true`,
 `defaultDevice` = `"GM"`, `firstDayOfWeek` = `"Monday"`, `legalAge` = `18`,
 `blePereodicDataEndpoint` = `https://clcloud.minimed.eu/connect/carepartner/v6/display/message`.
-`cpMobileAppAvailable` is `false` for 16 countries and **`null` for GB and IE only**.
+`cpMobileAppAvailable` is ⚠ **corrected 2026-10-12 by area D** — the earlier
+"false for 16 countries and `null` for GB and IE only" was an
+absent-read-as-null error, and it **contradicted this repo's own pinned
+assertion** (`regression/hurl/04-deep-surface.hurl` asserts
+`jsonpath "$.cpMobileAppAvailable" not exists` for GB). Measured over **117**
+live documents: **absent in 41**, `false` in **75**, `true` in **1** (AU), and
+**`null` in none**. So the key is never null — in GB and IE it is **absent**
+[source: findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md §6].
 
 Report availability is 10–11 reports per country; `INSULIN_ASSESSMENT` is the missing one
 in FR/RU/US. Full vocabulary: `ADHERENCE, ASSESSMENT_AND_PROGRESS,

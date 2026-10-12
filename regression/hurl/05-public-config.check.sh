@@ -229,18 +229,52 @@ check "captcha subkeys are the documented four" '.captcha | keys | sort | join("
 # `//`-swallows-false trap). Assert the state that is actually claimed.
 check "captcha.testKey is present and empty" '.captcha | has("testKey") and (.testKey == "")' 'true'
 
-# --- AREA A (2026-10-12): which portal BUILD each host serves ----------------
-# Source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md
+# =====================================================================
+# AREA D (2026-10-12) — the per-country glucose-unit disagreement.
+# Source: findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md
 #
-# There are TWO builds of the clinician portal in production, and the split is
-# PRODUCT ROLE, not region:
-#   clinic  (pow) -> main.fb5f8cb7eb60c4d5.js   carelinkhp.minimed.eu,
-#                                               carelink.medtronic.{eu,com}
-#   support (cua) -> main.759cddab23085086.js   carelink-support.medtronic.{eu,com}
-# Every .eu/.com pair measured serves the SAME build, so a client pinned to one
-# region's host works against the other region's host -- and a client that only
-# ever fetched the entry document could not tell the two builds apart at all,
-# because both are 5518 B of text/html.
+# THE HIGHEST-CONSEQUENCE CLAIM IN THIS FILE. `/patient/countries/settings`
+# publishes TWO keys naming the same quantity, and for BE they disagree:
+# `bgUnits` = MG_DL while `glucoseUnitsDefault` = MMOL_L. A client that reads
+# one key and not the other displays a glucose value scaled wrong by a factor
+# of ~18. The area-D sweep found this is not a two-country quirk: 30 of the 117
+# country documents served return MG_DL from one key and MMOL_L from the other.
+#
+# Asserted as TWO SEPARATE checks on purpose. A single check asserting
+# "they differ" would keep passing if the vendor fixed both keys to the same
+# value — and would keep passing if it broke them into some third pair. The
+# pair of checks fails if either value moves, in either direction, which is
+# what "a fix must update the note rather than pass silently" means.
+#
+# Costs ONE extra vendor request per run of this suite.
+# =====================================================================
+CC="https://carelink.minimed.eu/patient/countries/settings?countryCode=BE"
+BODY_CC="$(mktemp -u /tmp/clb-cc-XXXXXX.json)"
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" "$CC" -o "$BODY_CC"
+# `check()` reads $BODY, so $BODY must point at the document under test for the
+# duration of these four assertions. An earlier version of this block left
+# $BODY pointing at the 69-key config, so every country assertion silently
+# evaluated the CONFIG document: `glucoseUnitsDefault` came back `null` and
+# `keys | length` came back 69. The gate caught it — which is the whole point
+# of running it, and the reason the "it passed" reading is never enough.
+BODY="$BODY_CC"
+if [ ! -s "$BODY_CC" ] || [ "$(head -c1 "$BODY_CC")" != "{" ]; then
+  echo "  FAIL could not read the BE country document as JSON"
+  rm -f "$BODY_CC"
+  FAIL=$((FAIL + 1))
+else
+  check "BE bgUnits (KNOWN DISAGREEMENT: MG_DL)"             '.bgUnits'             'MG_DL'
+  check "BE glucoseUnitsDefault (KNOWN DISAGREEMENT: MMOL_L)" '.glucoseUnitsDefault' 'MMOL_L'
+  # The absent-vs-null distinction docs/09 §4 warns about, asserted as a state
+  # rather than a falsiness: `has()` cannot be satisfied by a null value, and a
+  # `| length == 0` style check would be (docs/09 §4: `length` returns 0 for
+  # absent and for null alike).
+  check "BE carries no stateCodes key (absent, not null)"    'has("stateCodes")'    'false'
+  check "BE has exactly 34 keys"                             'keys | length'        '34'
+fi
+BODY="$SCRATCH"
+
 #
 # WHY THIS FETCHES THE DOCUMENT AND NOT THE ASSET: the asset is 3.4 MB per host.
 # The entry document is 5.5 KB and NAMES its own content-hashed chunk, so the
@@ -263,7 +297,6 @@ for spec in "carelinkhp.minimed.eu:main.fb5f8cb7eb60c4d5.js" \
   fi
   sleep 2
 done
-
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "$FAIL" -eq 0 ]
