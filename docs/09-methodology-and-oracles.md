@@ -208,7 +208,25 @@ Practical consequences, all visible in this repo:
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;
-  findings-log/probe-2026-10-08/work/VALIDATION-RUNBOOK.md Tier 5]. The config
+  findings-log/probe-2026-10-08/work/VALIDATION-RUNBOOK.md Tier 5].
+- **⚠ Corrected 2026-10-12 — the counting rule counted INDENTATION as "inside
+  the loop", and said 423 where 363 was right.** Area D added four checks
+  inside an `if`/`else` in `05-public-config.check.sh`; they are indented, and
+  the rule read indentation as loop membership, so it multiplied four
+  once-executed checks by 16. `executed_05` went **61 → 125** and the derived
+  runtime **359 → 423**, against the **363** the live suite printed. **Both
+  numbers stood in prose** until the owner ruled it a rule bug rather than a
+  prose bug. The rule is now **structural** — a check site is a loop site iff a
+  `for`/`while`/`until` lexically encloses it — and measures loop structure, not
+  layout. **The pre-fix figures are kept above so the retraction history stays
+  visible**, and the evidence that the fix discriminates rather than merely
+  differing: the old rule returns **1** loop site at base `b275e2b` and **5** on
+  area D's branch, while the corrected rule returns **1** on **both**, and
+  `executed_05_derived` (65) now equals the live `N passed` (65) without being
+  told it. `scripts/measure_assertions.py --self-test` exercises the rule
+  against 16 synthetic shell shapes and exits non-zero on any regression
+  [source: scripts/measure_assertions.py header + `_loop_sites()`;
+  findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md §11]. The config
   checks deliberately pin the vendor's *current wrong* `lhpro` bound so a vendor
   fix breaks the test and updates the note [source: HURL-05].
 - Where a pass's own evidence could not be written to disk, the log says so

@@ -405,3 +405,85 @@ PR, naming the pinned constant:
 | `contradictions.tsv` | the enumeration, both values per finding |
 | `summary.txt` | the counts this file quotes |
 | `spacing.txt` | both gap series, every sub-2.5 s gap listed |
+---
+
+## 11. Follow-up rounds — verifier findings and the counting-rule correction
+
+Two later rounds changed bookkeeping, not findings. **Every research result in
+this log is unchanged**: the 30-country set, the 51 tier-1 contradictions across
+10 classes, `verdicts.jsonl`, `bodies/`, `headers/`, `results.jsonl` and
+`run.log` are byte-identical to what the first pass produced.
+
+### Round 1 — a fresh-context verifier, zero vendor requests
+
+It re-derived every result from raw bytes by a route that does not pass through
+this prose, and cleared the two claims it pressed hardest:
+
+- **The delay was never breached.** From the body-file mtimes (§1) — **118 gaps,
+  minimum 2.575 s, 0 below 2.5 s and 0 below the `>=2 s` floor.** The harness
+  `date` series reported 1.642 s and 8 sub-2 s gaps; those timestamps carry 11
+  negative durations, so they cannot all be faithful. **The settling evidence
+  was on disk and nobody looked** — which is why §1 now leads with the mtime
+  oracle and `docs/09` §4 records the method and its counting rule.
+- **`cpMobileAppAvailable`**: the reader's distribution (ABSENT 41 / false 75 /
+  true 1 / null 0) reproduced exactly under an independent reader; the pin is
+  right, `docs/04` was wrong, and `04-deep-surface.hurl`'s `not exists` for GB
+  must not change.
+
+Four defects it found in this pass's own bookkeeping, all fixed:
+
+1. **`reader.py` did not reproduce the artefact it shipped with.** Two causes:
+   `name[:-5]` yielded `cc-XX` from `cc-XX.json`, so the subdivision-prefix rule
+   tested `cc-CA-` and emitted two spurious tier-1 findings (53 vs the committed
+   51); and **sorting filenames reordered every row**, so the output differed
+   byte-for-byte even once the records were identical. The shipped command now
+   reproduces `verdicts.jsonl` byte-identically. *The first fix alone would have
+   looked like it worked* — the second only showed up when the bytes were
+   compared rather than the counts.
+2. A docstring said US carries **51** subdivision codes; it carries **50**.
+3. The canonical spacing statement was a `date` reading; it is now the mtime
+   series, and `docs/09` §4 gains the method.
+4. Stale `docs/04` line citations, re-derived against this HEAD. Two were wrong
+   **even at the base commit**: `docs/04:238` never pointed at NL's dotted clock
+   (that line reads "itemised in any source") and now cites
+   `CONFIG-NAMESPACE-DEEP.md:239`, its real source.
+
+It also found that **this PR asserted a `downstream-bridge` issue was filed when
+it was not.** It was not, and per `AGENTS.md` §3 the finding was incomplete
+until the consumer was linked — [#29](https://github.com/NovaLux12/carelink-api-research/issues/29)
+now exists, names both keys and links the PR.
+
+### Round 2 — the counting rule (owner decision)
+
+Area D added four checks inside an `if`/`else` in `05-public-config.check.sh`.
+They are **indented**, and `measure_assertions.py` used indentation as its proxy
+for "inside the 16-family loop":
+
+```python
+if line[0] in ' \t': loop_sites += 1
+```
+
+Indentation says a line is **nested**, not that it is nested *in a loop*, so
+four once-executed checks were multiplied by 16 — `executed_05` **61 → 125**,
+derived runtime **359 → 423**, against the **363** the suite actually printed.
+
+**Both numbers stood in prose** (README.md ×2, docs/00, docs/09) and the gate
+was green against one of them, because the gate's numbers check reads the
+*derived* figure when no suite log is present and the *measured* one when it is
+— so the same tree could be checked against two different numbers. The owner
+ruled it a rule bug. **Prose is unchanged at 363**, which is what the corrected
+rule now measures.
+
+**Evidence the fix discriminates rather than merely differing:**
+
+| tree | check sites | old (indent) | new (structural) |
+|---|---|---|---|
+| base `b275e2b` (miscount absent) | 41 | 1 | **1** |
+| this branch (4 in an `if`/`else`) | 45 | 5 | **1** |
+
+The old rule was **right at base by accident** — nothing indented existed there
+to misread — so it cannot distinguish the two trees. The corrected rule returns
+**1 on both**, and its `executed_05_derived` (65) equals the live `N passed`
+(65) without being passed it. The under-count direction is covered too:
+`--self-test` asserts that a check inside an `if` **nested in a loop** is still
+a loop site, alongside 15 other shell shapes.
