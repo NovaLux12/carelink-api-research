@@ -110,9 +110,40 @@ because the six Flex model numbers are consistent across every source held.
 
 | table | where | coverage | what it misses |
 |---|---|---|---|
-| patient config | `personal.device.family.to.model.mapping` | 16 families | `MMT-8200`, `MMT-8201`, `MMT-8400`, `MMT-8401` — present in the HCP report config, **absent here** |
-| clinic bundle device table | `hp-main.js` module `68462`, byte range 2999400–3007200; PUMP / SENSOR / StandaloneCGM / InsulinDelivery | **80 distinct `MMT-*`, 9 distinct `SKU-*`** | `MMT-8600`, `MMT-8601` — absent from the table *in the same file* |
+| patient config | `personal.device.family.to.model.mapping` | 16 families | `MMT-8200`, `MMT-8201`, `MMT-8400`, `MMT-8401` — present in the HCP report config **and in both portal builds**, **absent here** |
+| clinic bundle device table (both builds — see per-build note below) | `hp-main.js` module `68462`, byte range 2999400–3007200; PUMP / SENSOR / StandaloneCGM / InsulinDelivery | **80 distinct `MMT-*`, 9 distinct `SKU-*`** | `MMT-8600`, `MMT-8601` — absent from the table *in the same file* |
 | HCP report config | `/hcp/configuration/public/pow.common.core.report.generation` → `reportFileNamingSupportedPumpModels` (214 entries) | includes MMT-8600/8601 and MMT-8200/8201/8400/8401 | **a third, partial table** — no single table is authoritative |
+
+> **Per-build note — 2026-10-13 (area G).** "The clinic bundle's device table"
+> above is now confirmed to be **one table in two builds, not two tables**: the
+> clinic `pow` asset (`main.fb5f8cb7eb60c4d5.js`, 3,397,615 B) and the support
+> `cua` asset (`main.759cddab23085086.js`, 3,410,666 B) were fetched separately
+> (6 of a 12 cap, GET only, controls first per host) and extracted separately,
+> offline. Result: identical code sets (78 table codes + 9 `SKU-*`), identical
+> display-name pairs (76 quoted + 2 unquoted `MMT5100`/`MMT5101` aliases + 9
+> `SKU-*`), identical whole-file census (80 `MMT-*`, same set), identical
+> module-`90991` `["MMT-8600","MMT-8601"]` array, identical answers on 23
+> patient-map spot checks — in both builds [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. The segments differ
+> at the byte level (minified renaming, shifted offsets), so byte-identity was
+> never claimed; code-set and name-pair identity is, and both hold. **A negative
+> closes the area**: G's premise is unchanged and the reconciliation stays
+> three-way.
+>
+> One positive side-finding: `MMT-8200`/`8201` ("Guardian™ 4 system") and
+> `MMT-8400`/`8401` ("Simplera™ system") are **present in both builds' tables
+> with display names** [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. The patient map is
+> now the *only* compared source that lacks them. Against the patient map's
+> recorded rows, both builds agree: present are the six base `CC880` Flex codes,
+> `NMX8` `8162`/`8163`, `BLE780` base + XCU/XCE/XCF, base `MMT-5100`/`5101`;
+> absent (whole-file, case-exact) are `CC840` `8021`–`8023`, `MMT-1909`,
+> `MMT-8602`, all four `EAGLE` codes, all five `CC880` XCF/XCC variants,
+> `MMT-1886XCY`, and the `SIMPLERACC` JC/JD/P/M suffixes [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. Limits: the HCP
+> 214-entry list is compared only through its recorded count and named deltas
+> (the full list is not on disk), and the patient map only through its 8
+> recorded family rows.
 
 `MMT-8600`/`MMT-8601` appear elsewhere in the clinic bundle, module `90991`:
 
@@ -134,6 +165,46 @@ The HCP report config resolves that tension: MMT-8600/8601 are present in **both
 published configs — under `SIMPLERACC` in the patient map. **The bundle's table was the
 incomplete one** [source:
 findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
+
+> ### ⚠ Correction — 2026-10-13 — the 214-entry list is not HCP-only
+>
+> The row above (and `docs/11` area H) located `reportFileNamingSupportedPumpModels`
+> in the HCP namespace only. The **patient** public config carries the same list:
+> `personal.common.core.report.generation.reportFileNamingSupportedPumpModels`,
+> **214 strings**, re-derived live 2026-10-13 (`GET
+> /patient/v2/configuration/public` → 200, 69 keys, body digest
+> `d68b6b5…f1cb2d`) — the count above is now measured, not repeated
+> [source: findings-log/2026-10-13-area-h-report-naming/FINDINGS.md §3;
+> `list-verbatim.txt`].
+>
+> Every entry classified in code: **wire code 129 · display name 71 · bare
+> number 10 · placeholder 4**. Against the 16-family value set
+> (`family-map-verbatim.txt` — the first commit of all sixteen rows, prose
+> previously quoted 8): **82 wire codes matched by family, 47 unmatched**;
+> placeholders 4/4 matched (all are INSTINCT values); bare numbers 0/10;
+> display names 0/71. Normalization (uppercase + strip non-alphanumerics)
+> changes nothing — exact and normalized unmatched sets are identical, so no
+> residue entry is a mere spelling variant. Full partition in
+> [FINDINGS.md §5](findings-log/2026-10-13-area-h-report-naming/FINDINGS.md).
+>
+> Anomalies: `MMT-9015` ×2 and `Precision Xtra® / Xceed™` ×2; one trailing-space
+> entry (`MMT-5100J      `) that matches the map's own padded `SIMPLERA` entry
+> exactly, so the padding is vendor-side; ten `MMT-`+bare pairs (`MMT-515` +
+> `515`, …); display names in three sub-shapes (lowercase vendor slugs,
+> `®`/`™` meter names, `CSS-7200`/`CSS7200` hyphenated/bare pairs — the alias
+> split §Spelling traps already records). The 47 unmatched wire codes group by
+> prefix (`105*`, `151*`, `171*`, `178*`, legacy `5xx`/`7xx`, `5101`, `5420`,
+> `6500/6501`, `77xx/78xx/79xx`, `8200/8201/8400/8401`) — structural grouping
+> only, **INFERRED** as older generations on the stated assumption that the
+> family map covers the current lineup; no response demonstrates what any of
+> these codes is.
+>
+> Consequence for the table above: `MMT-8200/8201/8400/8401` are in **both**
+> report lists (patient and HCP) and in **neither** family table — the
+> "present in the HCP report config, absent here" cell stays true of the
+> *map* and is now wrong if read of the *config*. Guidance item 4 below is
+> read the same way: the patient **map** is missing those four codes; the
+> patient **config** is not.
 
 ## Spelling traps
 

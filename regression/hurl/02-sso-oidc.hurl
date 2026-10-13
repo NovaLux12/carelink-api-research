@@ -96,3 +96,52 @@ jsonpath "$.keys[0].kty" == "RSA"
 jsonpath "$.keys[0].alg" == "RS256"
 jsonpath "$.keys[0].kid" == "kCezLNMQV0tlc3hZinEly"
 jsonpath "$.keys[1].kid" == "pNzjt7ruOaWE4rlDCBPoP"
+
+# Advertised Auth0 sibling endpoints by OPTIONS (area J, 2026-10-13, #34).
+# Source: findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md §2.
+# All three paths are POST-only by specification, so a GET-only probe reads
+# every one of them as dead (area I's retracted error); the preflight below
+# is what proves routing without invoking the route. EU patient-tenant cells
+# pinned as canaries; the full 3-paths-x-5-tenants matrix is in the log.
+#
+# If any of these goes red, the vendor moved the advertised surface: re-run
+# the area-J probe before "fixing" the pin. In particular a 204 on
+# /bc-authorize means CIBA was enabled, not that the pin is stale.
+
+# /mfa/challenge answers the preflight on all five tenants (204 + CORS).
+# The allow-methods value is pinned EXACT (not contains): it is a broad
+# six-method list, unlike /oidc/register's bare POST, and a reordering or
+# narrowing is a change this header makes that contains cannot see.
+OPTIONS https://carelink-login.minimed.eu/mfa/challenge
+Origin: https://example.invalid
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+HTTP 204
+[Asserts]
+header "access-control-allow-origin" == "*"
+header "access-control-allow-methods" == "GET, PUT, POST, DELETE, PATCH, OPTIONS"
+
+# /bc-authorize is advertised but unrouted on all five tenants: the preflight
+# gets the front door's unrouted signature, byte-identical to a
+# one-character-different control on the same host.
+OPTIONS https://carelink-login.minimed.eu/bc-authorize
+Origin: https://example.invalid
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+HTTP 404
+[Asserts]
+header "x-auth0-not-found" == "1"
+header "content-type" == "text/plain; charset=utf-8"
+
+# /oauth/global-token-revocation/connection/Auth0 is unrouted for this
+# connection name on all five tenants (same unrouted signature). The
+# {connectionName} template means another name could route; this pin covers
+# only the Auth0 name already recorded in docs/02 and 04-deep-surface.hurl.
+OPTIONS https://carelink-login.minimed.eu/oauth/global-token-revocation/connection/Auth0
+Origin: https://example.invalid
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+HTTP 404
+[Asserts]
+header "x-auth0-not-found" == "1"
+header "content-type" == "text/plain; charset=utf-8"

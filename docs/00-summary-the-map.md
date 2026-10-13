@@ -115,8 +115,8 @@ flowchart LR
     B -->|"3.9 – 12.0"| E["one document<br/>no Auth0 · cumulus v2 · no CLINICAL"]
     C --> F["the pin the bridge uses"]
     E --> G["probing a new version<br/>re-derives this same document"]
-    style C fill:#2f3b2f,stroke:#6f6,stroke-width:2px
-    style E fill:#3b3b2f,stroke:#fd6
+    style C fill:#2f3b2f,stroke:#6f6,stroke-width:2px,color:#fff
+    style E fill:#3b3b2f,stroke:#fd6,color:#fff
 ```
 
 **`v12/display/message` is live** and was in no prior note. The downstream fork's
@@ -349,7 +349,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 193 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 203 of these facts so they fail loudly rather than rot.
 
 ---
 

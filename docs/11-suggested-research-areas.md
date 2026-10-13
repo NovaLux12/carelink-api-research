@@ -193,49 +193,6 @@ while the vendor ships a device it cannot match, which is the shape of a schema
 that static analysis *would* settle — but no one has tried, so the recovery rate
 is unknown.
 
-### G. Cross-check the three model tables against each other
-
-We hold three partial device tables — the patient config's family→model map, the
-clinic bundle's device table, and the HCP report config — and they **disagree with
-each other**. `MMT-8600`/`8601` are in the patient map but absent from the clinic
-bundle. We never did the full three-way reconciliation.
-
-**Closes when:** one table of every model code, with which source(s) list it and
-which don't.
-
-
-
-
-> **Addendum 2026-10-12 (from area A) — the premise is now well-posed, and it is an
-> N-way reconciliation, not a three-way one.** This area was blocked on an unanswered
-> question: the "clinic bundle's device table" was a single table read off one host, and
-> nobody knew whether the other portal hosts served the same bytes. Area A settled it by
-> sha256 and the answer is **two distinct builds**, so "the clinic bundle" is not one
-> thing:
->
-> | Build | Hosts | Entry document (5518 B) sha256 |
-> |---|---|---|
-> | clinic `pow` | `carelinkhp.minimed.eu`, `carelink.medtronic.eu`, `carelink.medtronic.com` | `0f2c5f6257a6fc6a…` |
-> | support `cua` | `carelink-support.medtronic.eu`, `carelink-support.medtronic.com` | `f637c8d0cd4ec6bc…` |
->
-> Both rows and both asset sizes are **OBSERVED** in area A's ledger, not inferred
-> from the host names [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md §1–§2;
-> `results.jsonl` seq 4, 8, 15, 19, 20].
->
-> **Blocker:** the device table must be extracted from **each build separately** — the
-> two main assets are 3,397,615 B and 3,410,666 B, so they are **not** the same file, and
-> assuming otherwise is the exact defect that let a portal deployment be recorded as a
-> false positive. **Closes when** G states which source(s) list each model code **per
-> build**, where "build" is the sha256 set above. **A negative closes it**: if both
-> builds' device tables are identical, G's premise is unchanged, the addendum records
-> that, and the reconciliation stays three-way.
->
-> **Assumptions (INFERRED):** that the shipped portal's device table lives in the main
-> asset and not in a lazy chunk, and that the two builds share a device-table format.
-> Neither is established — the chunk corpus was mined against the clinic build only.
-> The asset-level digests are in the area A log; its asset bodies were not committed
-> (3.4 MB each), so re-extraction costs 2 fetches.
-
 ### Q. The `appVersion` body gate — a second version axis our docs do not describe
 
 **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
@@ -279,6 +236,36 @@ apparently answered.
 **Assumptions (INFERRED):** that the routing field and the reported-family field stay
 distinct. If a future payload collapses them into one, the correction's shape changes.
 
+#### Addendum (2026-10-13, from area G): the offline half is ready — per-build model lists as casing candidates
+
+Area G extracted the device table from **each** portal build separately and found
+them identical as data (78 table codes + 9 `SKU-*`, 76 quoted name-pairs + 2
+unquoted `MMT5100`/`MMT5101` aliases + 9 `SKU-*` pairs, 80-code whole-file
+census — same sets in both builds), with `MMT-8600`/`8601` in module `90991`
+in both (OBSERVED,
+[source: findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]).
+
+**What this gives R:** the exact candidate strings whose casing a wire
+`deviceFamily` value must be compared against. The portal builds carry display
+names ("Guardian™ 4 system", "Simplera™ system", "MiniMed™ 780G", …) alongside
+every code, so a future authenticated response can be matched three ways:
+against the model code, against the display name, and against the patient map's
+16 family tokens — and whichever matches names the casing convention.
+
+**Blocker (unchanged, restated with the offline half discharged):** one
+authenticated `monitor/data` response (token-gated half stays); the offline
+half — G's per-build model lists — is done and needs no re-fetch unless the
+builds move (re-anchor by the asset sha256 pair `2a7fa8e7…` /
+`a054555a…` first).
+
+**Closes when:** one authenticated response records the `deviceFamily` value
+verbatim and it is matched against G's table entries, or `docs/05` records the
+casing as unobserved with the reason. A negative (casing unobservable without a
+token) counts.
+
+**Assumptions (INFERRED):** that the routing field and reported-family field
+stay distinct; that table strings are the wire vocabulary.
+
 ### S. Two more evidence classes for third-party source material
 
 **Added 2026-10-11.** `AGENTS.md` §2 defines three (OBSERVED / PUBLISHED / INFERRED). A
@@ -298,71 +285,6 @@ not a research task. It was deliberately **not** actioned by the pass that found
 rule attached, **or** a note records that third-party source stays under existing labels
 and must always be flagged as corroboration. Either closes it; silence does not.
 
-### H. The `reportFileNamingSupportedPumpModels` list
-
-The public config has `personal.common.core.report.generation.reportFileNamingSupportedPumpModels`
-— a list of pump models with a specific naming behaviour. It was recorded but never
-interpreted. It's a small, closed list worth extracting and matching against the
-family map.
-
-
-### J. `login-errors.ts` against the live error surface
-
-The bridge classifies Auth0 failure modes into named errors with operator-facing
-messages. Those were derived from the vendor surface. Are they *complete*? Probe the
-authorize/token error responses you can provoke unauthenticated (`invalid_client`,
-`unauthorized_client`, `access_denied`, `invalid_request`) and check the classification
-enumerates every one it can receive.
-
-**Closes when:** every reachable Auth0 error is either handled or explicitly listed
-as unhandled.
-
-> **Addendum 2026-10-12 (area I, #23) — an adjacent, cheaper pass with a ready oracle.**
-> Area I swept `registration_endpoint` reachability across all five `carelink-login.*`
-> tenants. Its three advertised siblings — `/bc-authorize`, `/mfa/challenge`,
-> `/oauth/global-token-revocation/connection/*` — were recorded on the EU tenant only,
-> and `/mfa/challenge` has no probe result in any source. That matters to *this* area,
-> not just to J's parent: a client coding against an advertised endpoint that fails
-> produces a failure mode `login-errors.ts` does not enumerate.
->
-> ⚠ **Corrected 2026-10-12 — the premise and the method were both wrong.** Area I first
-> reported `registration_endpoint` **absent on all five**, from a GET-only sweep, and
-> this addendum was written on that basis. A verifier refuted it: the endpoint is
-> **live and POST-only**, and area I's own supplementary OPTIONS sweep confirms it on
-> **3 of 5 tenants** (`204` + `access-control-allow-methods: POST` against a
-> one-character-different control at `404` + `x-auth0-not-found: 1`, same host, same
-> method, same headers). `PROBE-FINDINGS.md` §5 is titled *"Endpoints that are POST-only
-> (a GET-only probe reads them as dead)"*, and `PULL_REQUEST_TEMPLATE.md:15` permits
-> OPTIONS for exactly this. **The original wording is retained above for the record and
-> must not be read as current** — the whole addendum is rewritten below, not deleted.
->
-> - **Method — this is the part that was wrong. Do not repeat it.** **OPTIONS with an
->   empty body**, not GET: `Origin` + `Access-Control-Request-Method: POST` +
->   `Access-Control-Request-Headers: content-type`, per
->   `PULL_REQUEST_TEMPLATE.md:15` and the `docs/09:64-71` oracle. A GET sweep of these
->   three paths would return "absent" on every tenant and be **false every time** — all
->   three are POST-only by OAuth/OIDC specification (`bc-authorize` takes an
->   `auth_req_id`; `mfa/challenge` takes an MFA token; `global-token-revocation` takes a
->   connection name). Area I's error was not a hard question, it was the wrong verb.
-> - **Blocker:** none. GET + empty-body OPTIONS only, bounded candidate list (3 paths ×
->   5 tenants, all named inside a discovery document this project already holds, plus a
->   certainly-absent control per host).
-> - **Closes when:** each of the three has a verdict on all five tenants **by OPTIONS**,
->   controls first per host. **A negative closes it** — but a negative must mean "no
->   `access-control-*` header and `x-auth0-not-found: 1`", **not** "a 404", since area I
->   showed a routed path returns 404 too.
-> - **Oracle ready (OBSERVED, area I §3–§4):** discriminate on `access-control-allow-methods`
->   and `x-auth0-not-found`, not on status. Unrouted: `404` + `x-auth0-not-found: 1` +
->   `text/plain` 10 B (one digest across all five tenants). Routed-and-POST-only:
->   `204` + `access-control-allow-origin` + `allow-methods: POST`. **Routed-but-CORS-refused**
->   is a **third** signature area I found: `404` + `application/json` 107 B
->   (`"CORS error: Missing Access-Control-Request-Method header"`) with **no**
->   `access-control-*` header — the two shadow tenants' answer, and the one a
->   status-only sweep cannot distinguish from absence.
-> - **INFERRED:** that the shadow tenants route to a CORS handler rejecting the preflight
->   before method negotiation. The digests and the header absence are observed; the
->   handler's reason is not, and no verdict depends on it.
-> - **Not a token question**, and therefore distinct from J's blocked half.
 
 ---
 
@@ -443,8 +365,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 13 open plus 13 closed — and the priorities page's own gate
-counts open areas by matching `^### [A-Z]. ` headings against the number stated in
+**Every letter A–Z is now in use** — 10 open plus 16 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -477,6 +398,9 @@ being superseded — never silently. Letters are not reused.
 | D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no key outside the 35-key vocabulary**, no report-vocabulary delta. **51 internal contradictions across 10 classes**, the headline being that the recorded two-country `bgUnits` vs `glucoseUnitsDefault` anomaly is **30 of 117** documents (BE reproduces; **CH no longer contradicts**; **IT and ES have drifted into it** since 2026-10-08), so `docs/04` is corrected in place with the original claim left readable. Also: three keys recorded as `null` are **absent** (41 of 117 for `cpMobileAppAvailable`, 115 for `stateCodes`) — `docs/04:377` had been contradicting the repo's own pinned assertion; **`ID` is enumerated by all three configs and refused by the endpoint**; KZ and PR publish a postal regex that rejects the document's own example. **119 of a 130 cap**, GET only, controls first. **Spacing floor 2.575 s with 0 of 118 gaps under the declared 2.5 s and 0 under the `>=2 s` floor** — measured from body-file mtimes, which the kernel sets at write time and which are therefore independent of the harness's own clock (**counting rule: consecutive pairs in `run.log` request order, 119 bodies, 118 gaps**; mtime span 304.9 s equals the harness span, confirming the series is the run's own). The harness `date` series disagrees with it (**1.642 s, 14 gaps under 2.5 s, 8 under 2 s**) because that pass recorded **11 negative request durations**, which is impossible, so those timestamps cannot all be faithful; **no cause asserted**. **Caveat on reuse: git does not preserve mtimes, so this oracle is valid only on the machine that ran the probe** — see [`docs/09`](09-methodology-and-oracles.md) §4. Three defects found in the reader itself are recorded, two of which would have manufactured findings | [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md] | #22 |
 | A — is `carelinkhp` really the clinician portal for every region? | 2026-10-12 | **Negative on the area's premise, and it corrected two published claims.** There is **no `.com` `carelinkhp` variant**: all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are **NXDOMAIN**, including `carelinkhp-prod.minimed.eu` — the only one the corpus had named and never probed. The portal is on **five hosts, two TLDs, two builds**, and the split is **product role** (clinic `pow` vs support `cua`), **not region**: every `.eu`/`.com` pair serves the same build. **Two refutations:** `carelink.medtronic.eu` **is** a portal deployment serving the byte-identical clinic bundle (3,397,615 B, sha256 `2a7fa8e7af519c2b`) — `docs/01:69` and `docs/10` §2 called it a false positive, which was caused by a document-path probe on a host family where **the catch-all *is* the entry document**; and `carelink-support.medtronic.com` serves the **support** build, not "the same document" as `docs/07:24`, `docs/01:68` and SECURITY-FINDINGS §S3 had it. A third correction: `docs/08`'s `sha256 f637c8d0…` is the **entry document**, not `main.759cddab23085086.js` (which is `a054555a0f22176e…`). **20 of a 20 cap**, GET only, controls first per host, 8 DNS lookups recorded outside the cap, measured minimum consecutive same-host gap **2 s over 15 gaps**: all 15 ≥ the repo's 2 s floor, **0 below it**, 11 of 15 ≥ the declared 2.5 s, 4 below it. `run.log` cannot distinguish truncation from a clock step from a post-hoc edit, so **no cause is asserted** for those 4 (`docs/09` §4). Cross-checked with area O's body-mtime oracle, offline and zero-request, over the **10 of 15** gaps whose bodies are committed: **0 corrupt-`t0` signatures, minimum 2.637 s, and all 4 short readings measure ≥ 2.5 s at sub-second resolution** — so no gap in this pass was actually short. That is OBSERVED for this pass only, it is **not re-derivable from a clean clone** (git does not preserve mtimes), and it does **not** answer the open question, which concerns areas B, X and Z. This pass contributes **1 pass / 4 occurrences** to that row's `n`, reconciled by the merge queue, not here | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] | #21 |
 | I — Auth0 tenant behavioural differences | 2026-10-12 | **Negative on the difference the area hunted; positive on one it did not name; and it corrected two `kid` strings already published.** The estate is **five** tenants, not four — reconciling "three" (`AUTH-TENANT` §1, a policy axis) against "four" (`docs/11`/`docs/10`, a key-material axis) was part of the pass, and **neither number was an error**: they counted two different sets over the same five hosts, and the union revealed that **`carelink-login.minimed.com` was in nobody's policy comparison** and **`-trials` was in nobody's key set**. **The negative, in its strongest form:** substituting each tenant's own hostname out of its discovery document leaves **one digest across all five** (`sha256:0c0db635f5e9b08b…`, 2640 B) — the same *bytes*, not merely the same fields; **30 field names, 0 absent from any document**, and exactly **12 of 30** differing raw, every one a URL containing that tenant's hostname. That **corrects** `AUTH-TENANT` §1: `registration_endpoint` is **not** a separate difference, it differs only by hostname like the other eleven. **The positive:** `x-ratelimit-limit` is **500 on both `.eu` tenants and 100 on the other three** — 10 observations, 2 per tenant, constant within a tenant, and invisible in byte-identical documents (INFERRED as tenant configuration, on the stated assumption Auth0 treats it as static). **Also:** `registration_endpoint` is advertised by all five and **404 to GET on all five** (`/oidc/register` → 404 `application/json`, 60 B, one digest `f006bbd60894…` across five hosts) — ⚠ **this pass's `registration_endpoint` headline was REFUTED and is RETRACTED**: a verifier showed the endpoint is **live and POST-only**, which a GET-only sweep cannot see, and the pass's own supplementary OPTIONS run then confirmed it on **3 of 5** tenants (`204` + `allow-methods: POST` against a per-tenant `404` + `x-auth0-not-found: 1` control); the trials tenant's key set is fetched for the first time (2 further disjoint kids → **10 keys, 0 shared**, discharging `docs/02` §9's "Unknown"); and **two corpus transcription defects settled against the corpus** — `AUTH-TENANT` §8's `medtronic.com` kid (`…_lLOJ`) is wrong in favour of `RECON-SUBDOMAINS`' (`…_lOOJ`), which **resolves `docs/02` §8's unresolved disagreement against the very spelling it recommended**, and `minimed.com`'s second kid is the live string **minus one `Q`** (a *deletion*, so no second reading existed to compare — invisible to §8's method by construction). **19 of a 20 cap** (17 curl + 2 hurl), **GET only**, plus an owner-authorised **supplementary budget of 14 of which 13 were used** (10 OPTIONS probes + 3 diagnostics) — **32 requests total, no POST anywhere**; controls first per host, **both certainly-absent controls returned 404** (`x-auth0-not-found: 1`, one digest across two hosts) so the oracle held and **no stop condition fired**; measured spacing floor **2.000 s**, which this ledger's **1-second timestamps cannot resolve** against the declared 2.5 s — a lower bound, not a measurement, recorded rather than smoothed over (4th pass in a row). New pins on the trials tenant validated live. Successor: the three remaining advertised endpoints, added under area J **and rewritten on 2026-10-12 to use empty-body OPTIONS rather than GET**, since all three are POST-only by specification and a GET-only successor would have repeated this pass's error three more times | [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md] | #23 |
+| G — cross-check the three model tables against each other | 2026-10-13 | **Negative: both builds' device tables are identical as data.** The clinic `pow` asset (`main.fb5f8cb7eb60c4d5.js`, 3,397,615 B, sha256 `2a7fa8e7af519c2b`) and the support `cua` asset (`main.759cddab23085086.js`, 3,410,666 B, sha256 `a054555a0f22176e`) were fetched separately and extracted separately, offline: identical code sets (78 table codes + 9 `SKU-*`), identical display-name pairs (76 quoted + 2 unquoted `MMT5100`/`MMT5101` + 9 `SKU-*`), identical whole-file census (80 `MMT-*`, same set), identical module-`90991` `["MMT-8600","MMT-8601"]` array, identical answers on 23 patient-map spot checks — so G's premise is unchanged and the reconciliation stays three-way. **Side-finding:** `MMT-8200`/`8201` ("Guardian™ 4 system") and `MMT-8400`/`8401` ("Simplera™ system") are present in **both** builds' tables, so the patient map is the only compared source lacking them. **6 of a 12 cap**, GET only, controls first per host (fabricated asset → per-build 5518 B fallback; root anchors build digests, both reproducing area A), spacing floor **2.595 s**, 4/4 gaps ≥ 2.5 s | [findings-log/2026-10-13-area-g-device-tables/FINDINGS.md] | #32 |
+| J — `login-errors.ts` against the live error surface (addendum: the three advertised Auth0 endpoints) | 2026-10-13 | **One routed, two dangling — uniform across all five tenants, no shadow split.** `/mfa/challenge` answers the preflight `204` + `ACAO: *` + exact `allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS` on all five (the path with no probe result in any source was live); `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five — preflight byte-identical to per-host one-character-different controls (one 10 B digest `0802559db137…` across 15 bodies). POST-only-ness of `/mfa/challenge` is INFERRED from specification, not established — no POST sent, and the six-method list is a second live instance of `docs/09` §4's allow-methods trap. Revocation verdict scoped to the `Auth0` connection name. ⚠ **Correction history preserved:** this addendum was written 2026-10-12 as a GET sweep on area I's then-claim that `registration_endpoint` was absent everywhere; a verifier refuted the premise (the endpoint is live and POST-only) and the addendum was rewritten to empty-body OPTIONS before probing — the original wording is retained in the area-I log, not here. **23 of a 26 cap** (20 curl + 3 live hurl pin-validations), GET + empty-body OPTIONS only, controls first per host, all 5 passed, measured `t_sent` floor **2.395 s** (all gaps ≥ 2 s floor; 2 under the declared 2.5 s and 4 negative durations recorded with no cause asserted). EU cells pinned (exact allow-methods, not contains); counts re-measured 193→199 static, 401→413 execute. Successor: the parent half (bridge `login-errors.ts` taxonomy vs provoked errors) as a new `docs/10` §1 row | [findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md] | #34 |
+| H — the `reportFileNamingSupportedPumpModels` list, entry by entry | 2026-10-13 | **Positive with residue: 214 entries classified, 86 rows matched, 128 not.** The list lives in the **patient** public config (`personal.common.core.report.generation.reportFileNamingSupportedPumpModels`, 69-key document, re-derived live) — not HCP-only as the area premise had it. In code: wire code 129 · display name 71 · bare number 10 · placeholder 4; 82 wire codes matched by family, 47 unmatched by prefix group; placeholders 4/4 matched (all INSTINCT values); bare numbers and display names 0 matched; normalization changes nothing. Anomalies: `MMT-9015` ×2, `Precision Xtra® / Xceed™` ×2, one trailing-space entry matching the map's own padding exactly, ten `MMT-`+bare pairs. Correction attached in `docs/05`: `MMT-8200/8201/8400/8401` are in **both** report lists and **neither** family table. **5 of a 6 cap**, GET only; 3 hp-namespace requests voided by a harness header defect and disclosed as wasted — the close rests on the patient document alone | [findings-log/2026-10-13-area-h-report-naming/FINDINGS.md] | #33 |
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
 ---
 
