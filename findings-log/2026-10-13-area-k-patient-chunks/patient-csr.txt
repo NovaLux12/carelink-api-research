@@ -1,0 +1,91 @@
+====================================================================================================
+/patient/csr CENSUS — counting rule applied, figures re-derived, ZERO requests
+====================================================================================================
+
+rule 1 corpus       : 211 real chunks = 200 + application/javascript
+                     (asserted against 211 committed list entries)
+rule 2 unit         : one endpoint shape = (HTTP method, path template)
+rule 3 dedup        : once per distinct (method, template) across the corpus
+rule 4 exclusion    : a call whose first argument is a BARE IDENTIFIER is
+                     excluded — the URL comes from the caller, not this corpus
+rule 5 verbs        : from the call site, not the service name
+
+----------------------------------------------------------------------------------------------------
+RAW EVIDENCE — every `/patient/csr` literal in the corpus, with its byte offset
+----------------------------------------------------------------------------------------------------
+1635.2b842fa2d159ab23.js             baseUrl='/patient/csr/safety/notice/definitions'
+      @223     '/patient/csr/safety/notice/definitions'
+
+5109.0f5de0438b9f29bf.js             baseUrl=None
+      @576     '/patient/csr/configuration/whitelisted'
+
+5750.d7bef840102da905.js             baseUrl=None
+      @775     '/patient/csr/users/me/notifications/history/patients/${encodeURIComponent'
+      @855     '/patient/csr/users/me/notifications/history'
+      @985     '/patient/csr/users/me/notifications/history/patients/${encodeURIComponent'
+      @1076    '/patient/csr/users/me/notifications/history/export/csv'
+
+6633.5ae9e2d9434bfe48.js             baseUrl=None
+      @10212   '/patient/csr/users/me/consent/history'
+
+8942.34d711132d0a71d1.js             baseUrl='/patient/csr/safety/notice/definitions'
+      @223     '/patient/csr/safety/notice/definitions'
+
+9807.e449c8723c1e900b.js             baseUrl='/patient/csr/safety/notice/definitions'
+      @232     '/patient/csr/safety/notice/definitions'
+
+common.206e355a4a593fbd.js           baseUrl='/patient/csr'
+      @10619   '/patient/csr'
+
+TOTAL raw `/patient/csr` literals: 10 across 7 chunks
+
+----------------------------------------------------------------------------------------------------
+EXCLUDED BY RULE 4 — bare-identifier arguments, URL supplied by the caller
+----------------------------------------------------------------------------------------------------
+  1635.2b842fa2d159ab23.js             @575     GET    arg='t'
+  1635.2b842fa2d159ab23.js             @683     PUT    arg='t'
+  8942.34d711132d0a71d1.js             @575     GET    arg='o'
+  8942.34d711132d0a71d1.js             @683     PUT    arg='o'
+  9807.e449c8723c1e900b.js             @585     GET    arg='c'
+  9807.e449c8723c1e900b.js             @693     PUT    arg='c'
+  common.206e355a4a593fbd.js           @16070   GET    arg='u'
+TOTAL excluded: 7
+
+----------------------------------------------------------------------------------------------------
+RESOLVED ENDPOINT SHAPES — one row per (method, template), deduplicated
+----------------------------------------------------------------------------------------------------
+method  path template                                                  seen in call sites
+GET     /patient/csr/configuration/whitelisted                         1      5109.0f5de04@561
+GET     /patient/csr/incidents                                         1      common.206e3@10649
+POST    /patient/csr/incidents                                         1      common.206e3@10717
+GET     /patient/csr/incidents/configuration?region={1}                1      common.206e3@10939
+GET     /patient/csr/incidents/{1}                                     1      common.206e3@10781
+PUT     /patient/csr/incidents/{1}                                     1      common.206e3@10856
+GET     /patient/csr/safety/notice/definitions                         3      1635.2b842fa@382, 8942.34d7111@382, 9807.e449c87@391
+POST    /patient/csr/safety/notice/definitions                         3      1635.2b842fa@1129, 8942.34d7111@1129, 9807.e449c87@1139
+PUT     /patient/csr/safety/notice/definitions/{1}                     3      1635.2b842fa@1191, 8942.34d7111@1191, 9807.e449c87@1201
+GET     /patient/csr/safety/notice/definitions/{1}/file/url            3      1635.2b842fa@446, 8942.34d7111@446, 9807.e449c87@455
+POST    /patient/csr/safety/notice/definitions/{1}/notification/date   3      1635.2b842fa@1263, 8942.34d7111@1263, 9807.e449c87@1273
+GET     /patient/csr/safety/notice/definitions/{1}/users               3      1635.2b842fa@1051, 8942.34d7111@1051, 9807.e449c87@1061
+GET     /patient/csr/safety/notice/definitions/{1}/users/csv           3      1635.2b842fa@1355, 8942.34d7111@1355, 9807.e449c87@1365
+GET     /patient/csr/users/me/consent/history                          1      6633.5ae9e2d@10197
+GET     /patient/csr/users/me/notifications/history                    1      5750.d7bef84@758
+GET     /patient/csr/users/me/notifications/history/export/csv         1      5750.d7bef84@968
+GET     /patient/csr/users/me/notifications/history/patients/{1}       1      5750.d7bef84@758
+GET     /patient/csr/users/me/notifications/history/patients/{1}/export/csv 1      5750.d7bef84@968
+GET     patient/csr/users?{1}                                          1      common.206e3@15661
+
+====================================================================================================
+THE FIGURES, FROM THE RULE
+  distinct path templates        : 16
+  distinct method x path shapes  : 19
+  raw `/patient/csr` literals    : 10 in 7 chunks  (literals, not shapes —
+                                     two of them are the same path in two branches
+                                    of a ternary)
+  excluded bare-identifier calls : 7
+====================================================================================================
+
+WITHDRAWN: the '12 endpoint literals across 7 chunks' figure published in the first
+version of this pass. It was a subset of this pass's own tables.txt section T3 —
+chunk 5750 carries four literals and the route table named one — and no counting
+rule existed to produce it. The rule above yields 19 shapes / 16 templates.

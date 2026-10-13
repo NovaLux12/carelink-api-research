@@ -568,12 +568,45 @@ evidence about intent either way.
 bundles across three hosts — the patient bundle `main.6595daf83bd6d4b1.js`
 (3,417,255 B, sha256 `0fb4fbd4…`, **byte-identical on `carelink.minimed.eu` and
 `carelink.minimed.com`**) plus the two portal builds, whose digests reproduce areas A
-and G exactly. The **211 lazy chunks are not in this corpus**; their current inventory
-is committed at
-[findings-log/2026-10-13-area-v-pde-clients/chunks.txt](../findings-log/2026-10-13-area-v-pde-clients/chunks.txt)
-and reproduces the 2026-10-08 record — the patient build **has not bumped in five
-days**, so the stale-capture worry the area was filed with turned out to be the
-opposite of the risk: it was superseded by an *identical* build, not by a changed one.
+and G exactly. The patient build **has not bumped in five days**, so the stale-capture
+worry the area was filed with turned out to be the opposite of the risk: it was
+superseded by an *identical* build, not by a changed one.
+
+> **⚠ Extended 2026-10-13 (area K, #56) — the 211 lazy chunks ARE now in the corpus,
+> and the negative above survives them intact.** The gap this paragraph used to
+> describe is closed: all 211 chunks of the committed inventory were fetched from
+> `carelink.minimed.eu` and swept exhaustively [source:
+> findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md]. **Every
+> pointer-shaped token in the table above is still 0 — `baseUrlPde`,
+> `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`, `baseUrlCareLink`,
+> `discover/android`, `clcloud`, `api/carepartner` — across all 211 bodies, 2.85 MB.**
+> So "no web bundle reads the discovery document" is no longer scoped to the eager
+> bundles: it is a statement about **the whole patient web corpus**, one deployment,
+> one build. `discover` (12) and `pde` (5) do appear, and every hit is a zxcvbn
+> password-dictionary substring in a single chunk — **the same five and the same twelve
+> words this page already records for the two portal builds**, so this is the same false
+> hit class and not a second reading.
+>
+> **The eager-bundle scope above is nevertheless load-bearing, in the other direction:
+> it is what made a positive visible.** The same sweep found that lazy chunk
+> `6746.c6795ff7e9ff468d.js` **reads `system.gc.gz.transition.flags` twice**, in two
+> modules of that chunk, and that the value read flows into the URL that is then POSTed
+> — so area V's "the client does not follow this subtree" is correct **for the eager
+> main bundle** and refuted for the patient corpus as a whole. The measurement is not
+> retracted; the corpus it was measured over was the limit. See
+> [`docs/04`](04-configuration.md) §Which of the two identical CSR pointers the shipped
+> client actually follows.
+>
+> **One methodological correction to the committed inventory, which was wrong in a way
+> a clean sweep could not have seen.** `chunks.txt` lists chunk `2076` under its id
+> (`2076.206e355a4a593fbd.js`); the runtime's own `f.u` emits that chunk under the
+> **name** `common`, because it special-cases that one id. The id form answers **404**
+> — byte-identical to the certainly-absent control — while the emitted name answers
+> **200** / `application/javascript` / 21,157 B. A sweep that trusted the list would
+> have closed on "211 cells carry a verdict" with one verdict about a file that does not
+> exist. The defect is **present in the clinic build too**, where the 2026-10-08 sweep
+> recorded an SPA-fallback entry it never explained
+> ([`docs/11`](11-suggested-research-areas.md) §K addendum, 2026-10-13).
 
 **What the same corpus did settle**, on the neighbouring axis: the patient bundle
 **does** follow `csr.cumulus.periodic.data.endpoints` and POSTs its `display_message`

@@ -1,0 +1,178 @@
+T1  THE SWEEP, BY STATUS — one row per observed response shape
+====================================================================================================
+n    example path                                   code  content-type                           bytes  distinct digests
+213  /12.c22952a522974f5f.js                        200   application/javascript               3417255  213 of 213 bodies
+2    /2076.206e355a4a593fbd.js                      404   text/html; charset=iso-8859-1            196  1 of 2 bodies
+
+The distinct-digest column is the check that matters: a shape carrying more than
+one digest over N bodies is N distinct artefacts, and the rows above are the only
+places that happens (all 213 are chunks of one build). Where one digest covers
+every body in a shape, that shape is a single shared artefact — which is what
+makes the 404 below an oracle rather than a coincidence.
+
+total ledger rows             : 215
+  controls                    : 3
+  sweep rows, role SWEEP-*    : 211
+  follow-up rows, FOLLOWUP-*  : 1
+  of those, NOT a real chunk  : 1  (51=404 text/html; charset=iso-8859-1)
+cells in the committed list   : 211
+
+COUNTING RULE — what T2/T3/T4 are computed over, and why it is not the ledger:
+  a chunk = a body answering 200 + application/javascript.
+    210 SWEEP rows + 1 FOLLOWUP row = 211 real chunks
+  the 1 non-200 row(s) are the wrong-URL-form cell (FINDINGS.md section 2)
+    and are EXCLUDED, and the corrected FOLLOWUP chunk is INCLUDED.
+
+The first version of this script selected on role.startswith('SWEEP-') alone. That
+counted the 196 B HTML error page as a chunk and omitted the real 21,157 B chunk, so
+T4's denominator did not mean what it said. The ledger was never wrong and neither
+was grep-out.txt (which greps the ledger, not this selection) — only the denominator.
+  cross-check: 211 real chunks == 211 committed list entries  ->  the rule is asserted, not assumed.
+
+Every response shape in this table is discriminated on Content-Type, never on
+status. On this host family a status code IS an oracle (area V's fabricated-asset
+control 404s at 196 B), and the sweep's own control reproduces that digest exactly.
+
+
+T2  TOKEN CENSUS — the 211 REAL CHUNKS ONLY, beside the same token in the
+    POSITIVE CONTROL. A negative is only readable next to a positive.
+    (corpus = the 211 counted above, not the ledger's SWEEP rows)
+====================================================================================================
+token                                       chunks cs      chunks ci     control cs
+----------------------------------------------------------------------------------------------------
+baseUrlPde                                          0              0              0  <- zero in all 211 chunks
+/connect/pde                                        0              0              0  <- zero in all 211 chunks
+/connect/pde/v3                                     0              0              0  <- zero in all 211 chunks
+baseUrlCumulus                                      0              0              0  <- zero in all 211 chunks
+baseUrlCms                                          0              0              0  <- zero in all 211 chunks
+baseUrlAem                                          0              0              0  <- zero in all 211 chunks
+baseUrlCareLink                                     0              0              0  <- zero in all 211 chunks
+baseUrl                                            30             30              2  <- NON-ZERO, read T3
+discover/android                                    0              0              0  <- zero in all 211 chunks
+discover                                           12             12              0  <- NON-ZERO, read T3
+clcloud                                             0              0              0  <- zero in all 211 chunks
+api/carepartner                                     0              0              0  <- zero in all 211 chunks
+pde                                                 5              9              0  <- NON-ZERO, read T3
+system.gc.gz.transition.flags                       0              0              1  <- zero in all 211 chunks
+useCumulusUrls                                      6              6              0  <- NON-ZERO, read T3
+csrDisplayMessageUrl                                2              2              0  <- NON-ZERO, read T3
+personalDisplayMessageUrl                           2              2              0  <- NON-ZERO, read T3
+carepartnerDisplayMessageUrl                        2              2              0  <- NON-ZERO, read T3
+pullGMInfoFromCumulus                               0              0              0  <- zero in all 211 chunks
+pullSMSHistoryFromCumulus                           0              0              0  <- zero in all 211 chunks
+sendDiagnosticLogsToCumulus                         0              0              0  <- zero in all 211 chunks
+sendPeriodicToCumulus                               0              0              0  <- zero in all 211 chunks
+sendSMSFromCumulus                                  0              0              0  <- zero in all 211 chunks
+csr.cumulus.periodic.data.endpoints                 0              0              1  <- zero in all 211 chunks
+csrCumulusPeriodicDataAPI                           0              0              2  <- zero in all 211 chunks
+guardianCumulusPeriodicAPI                          0              0              2  <- zero in all 211 chunks
+display_message                                     2              2              1  <- NON-ZERO, read T3
+patient-timeline                                    0              0              5  <- zero in all 211 chunks
+dialog-lite                                         0              0              0  <- zero in all 211 chunks
+personal.patient.timeline.config                    0              0              1  <- zero in all 211 chunks
+personal.patient.timeline.host                      0              0              1  <- zero in all 211 chunks
+personalPatientTimelineHostURL                      0              0              1  <- zero in all 211 chunks
+sourceMappingURL                                    0              0              1  <- zero in all 211 chunks
+/patient/m2m                                        1              1              8  <- NON-ZERO, read T3
+retina.endpoints.config                             0              0              1  <- zero in all 211 chunks
+mmm.data.api.url                                    0              0              1  <- zero in all 211 chunks
+/patient/csr                                       10             10              6  <- NON-ZERO, read T3
+
+
+T3  PER-TOKEN — which of the 211 carried it, how many bytes, and what it is
+====================================================================================================
+    Case-VARIANT-ONLY tokens are listed here too, from the CASE-INSENSITIVE
+    pass, with the enclosing identifier. A token with cs=0 and ci>0 is not a
+    zero: the control found something the sensitive count missed, and this
+    section is where that something is accounted for.
+
+--- 'baseUrl'
+    case-sensitive in 4 of 211 chunks; case-INSENSITIVE in 4
+      /1635.2b842fa2d159ab23.js      offsets [214, 401, 468, 1073, 1149, 1213, 1286, 1377]
+        ...i(51044),d=i(55527),r=i(22281),u=i(89248);let _=(()=>{var s;class l{constructor(t){this.http=t,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(t="",e=0,a=50){const o={page:e,size:a};re...
+      /8942.34d711132d0a71d1.js      offsets [214, 401, 468, 1073, 1149, 1213, 1286, 1377]
+        ...s(51044),y=s(55527),_=s(22281),D=s(89248);let U=(()=>{var h;class T{constructor(o){this.http=o,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(o="",c=0,g=50){const p={page:c,size:g};re...
+      /9807.e449c8723c1e900b.js      offsets [223, 410, 477, 1083, 1159, 1223, 1296, 1387]
+        ...044),ut=W(55527),pt=W(22281),Dt=W(89248);let It=(()=>{var p;class y{constructor(c){this.http=c,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(c="",E=0,N=50){const P={page:E,size:N};re...
+      /common.206e355a4a593fbd.js    offsets [10610, 10671, 10740, 10803, 10878, 10961]
+        ....d(_,{S:()=>s});var l=t(22281),i=t(89248);let s=(()=>{var n;class r{constructor(o){this.http=o,this.baseUrl="/patient/csr"}getAll(){return this.http.get(`${this.baseUrl}/incidents`)}createIncident(o){return ...
+
+--- 'discover'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /8141.650c358996e4c19a.js      offsets [14960, 252304, 259151, 272592, 294946, 295332, 325518, 361713]
+        ...stal,blade,wisdom,pink,gorilla,katerina,pass123,andrew1,shaney14,dumbass,osiris,fuck_inside,oakland,discover,ranger1,spanking,lonestar,bingo,meridian,ping,heather1,dookie,stonecol,megaman,192837465,rjntyjr,le...
+
+--- 'pde'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 5
+      ** CASE VARIANT ** 'pDe' at 74111 in /7187.87daa49216a1a9ef.js   enclosing identifier: mapDeviceModelName
+      ** CASE VARIANT ** 'pDe' at 77086 in /7187.87daa49216a1a9ef.js   enclosing identifier: mapDeviceModelName
+      ** CASE VARIANT ** 'pDe' at 80017 in /7187.87daa49216a1a9ef.js   enclosing identifier: mapDeviceModelName
+      ** CASE VARIANT ** 'pDe' at 80248 in /7187.87daa49216a1a9ef.js   enclosing identifier: mapDeviceModelName
+      /8141.650c358996e4c19a.js      offsets [72313, 96374, 128269, 130050, 338216]
+        ...abushka,camilo,cimbom,tiffan,vfnbkmlf,ohbaby,gotigers,lindsey1,dragon13,romulus,qazxsw12,zxcvbn1,dropdead,hitman47,snuggle,eleven11,bloopers,357mag,avangard,bmw320,ginscoot,dshade,masterkey,voodoo1,roote...
+
+--- 'useCumulusUrls'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [22393, 22410, 69468, 69742, 70202, 70219]
+        ...e:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},connectData:()=>{const r=(0,P.WQX)...
+
+--- 'csrDisplayMessageUrl'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [22445, 70254]
+        ...ayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},connectData:()=>{const r=(0,P.WQX)(s.D),T=(0,P.WQX)(g.z),u=(0,P.WQX)(d.c$);r.showSpinner();c...
+
+--- 'personalDisplayMessageUrl'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [22360, 70169]
+        ....z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},connectData:...
+
+--- 'carepartnerDisplayMessageUrl'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [22329, 70138]
+        ...return(0,P.WQX)(pe.il).select(_.z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMe...
+
+--- 'display_message'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [22085, 70436]
+        ...pe.il).select(_.cO).pipe((0,fe.s)(1)),u=(0,P.WQX)(m.W).countrySettings;return r?T.pipe((0,$.T)(l=>l.display_message)):u.pipe((0,fe.s)(1),(0,$.T)(l=>l.blePereodicDataEndpoint))},guardianEndpointData:()=>{const r=I.c....
+
+--- '/patient/m2m'
+    case-sensitive in 1 of 211 chunks; case-INSENSITIVE in 1
+      /6746.c6795ff7e9ff468d.js      offsets [69567]
+        ....useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.getIsM2MEnabled()?`/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?cpSerialNumber=NONE&msg...
+
+--- '/patient/csr'
+    case-sensitive in 7 of 211 chunks; case-INSENSITIVE in 7
+      /1635.2b842fa2d159ab23.js      offsets [223]
+        ...d=i(55527),r=i(22281),u=i(89248);let _=(()=>{var s;class l{constructor(t){this.http=t,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(t="",e=0,a=50){const o={page:e,size:a};return t&&"*"!==...
+      /5109.0f5de0438b9f29bf.js      offsets [576]
+        ...a(89248);let S=(()=>{var t;class i{constructor(n){this.http=n}getCsrConfigs(){return this.http.get("/patient/csr/configuration/whitelisted")}}return(t=i).\u0275fac=function(n){return new(n||t)(r.KVO(Y.Qq))},t.\u0...
+      /5750.d7bef840102da905.js      offsets [775, 855, 985, 1076]
+        ... p=(()=>{var e;class n{constructor(a){this.http=a}getNotificationHistory(a){return this.http.get(a?`/patient/csr/users/me/notifications/history/patients/${encodeURIComponent(a)}`:"/patient/csr/users/me/notificati...
+      /6633.5ae9e2d9434bfe48.js      offsets [10212]
+        ...044);let I=(()=>{var e;class a{constructor(o){this.http=o}getConsentHistory(){return this.http.get("/patient/csr/users/me/consent/history").pipe((0,it.T)(o=>o.map(r=>{const _=JSON.parse(r.consent);return{...r,con...
+      /8942.34d711132d0a71d1.js      offsets [223]
+        ...y=s(55527),_=s(22281),D=s(89248);let U=(()=>{var h;class T{constructor(o){this.http=o,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(o="",c=0,g=50){const p={page:c,size:g};return o&&"*"!==...
+      /9807.e449c8723c1e900b.js      offsets [232]
+        ...(55527),pt=W(22281),Dt=W(89248);let It=(()=>{var p;class y{constructor(c){this.http=c,this.baseUrl="/patient/csr/safety/notice/definitions"}getNotifications(c="",E=0,N=50){const P={page:E,size:N};return c&&"*"!==...
+      /common.206e355a4a593fbd.js    offsets [10619]
+        ...)=>s});var l=t(22281),i=t(89248);let s=(()=>{var n;class r{constructor(o){this.http=o,this.baseUrl="/patient/csr"}getAll(){return this.http.get(`${this.baseUrl}/incidents`)}createIncident(o){return this.http.post...
+
+
+T4  CORPUS SIZE — re-derived, not inherited, over the COUNTED corpus
+====================================================================================================
+counting rule          : 200 + application/javascript  (see the rule above)
+real chunks counted    : 211
+  of which SWEEP rows  : 210
+  of which FOLLOWUP    : 1
+rows excluded as non-200: 1 (seq 51 /2076.206e355a4a593fbd.js)
+total chunk bytes      : 2874939 (2.87 MB)
+smallest / largest     : 78 B / 828225 B
+median                 : 1905 B
+distinct digests       : 211 of 211 bodies
+duplicate digests      : 0 
+bodies with 0 bytes    : 0
+
+Every digest here is of a DECOMPRESSED body: the harness sends
+`curl --compressed`, and this host serves brotli. A digest computed on the wire
+bytes would differ from every digest in results.jsonl.
