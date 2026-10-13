@@ -30,7 +30,9 @@ measured = [r for r in rows if r.get("role") != "HARNESS-DEBUG-not-evidence"]
 excluded = [r for r in rows if r.get("role") == "HARNESS-DEBUG-not-evidence"]
 
 print(f"requests in run order: {len(rows)}")
-print(f"  excluded from spacing (pre-fix debug harness, disclosed): {len(excluded)}")
+print(f"  excluded from spacing (pre-fix debug harness, disclosed): {len(excluded)}"
+      " -- these rows carry NO t_queued/t_sent/t_done at all (null), so they"
+      " are absent from the series rather than measured in it")
 print(f"  measured: {len(measured)}")
 
 # ---- harness t_sent series -------------------------------------------------
@@ -50,9 +52,17 @@ span = (allts[-1] - allts[0]).total_seconds()
 print(f"  {'ALL HOSTS':<26} gaps={len(gaps):>3} min={min(gaps):.3f}s "
       f"max={max(gaps):.3f}s under 2.5s={sum(g < 2.5 for g in gaps)} "
       f"under 2.0s={sum(g < 2.0 for g in gaps)} span={span:.3f}s")
-bad = [r["seq"] for r in measured
+# t_done <= t_sent, not < : a request that took zero time is as impossible as
+# one that finished before it started, and a strict < lets a zero-duration row
+# pass this check silently.
+neg = [r["seq"] for r in measured
        if r["t_done"] and r["t_sent"] and iso(r["t_done"]) < iso(r["t_sent"])]
-print(f"  requests whose t_done precedes t_sent (impossible): {len(bad)} {bad}")
+zero = [r["seq"] for r in measured
+        if r["t_done"] and r["t_sent"] and iso(r["t_done"]) == iso(r["t_sent"])]
+absent = [r["seq"] for r in rows if not (r["t_done"] and r["t_sent"])]   # across ALL rows, not just measured
+print(f"  t_done precedes t_sent (impossible): {len(neg)} {neg}")
+print(f"  t_done == t_sent, zero duration (also impossible): {len(zero)} {zero}")
+print(f"  of all {len(rows)} rows, those with an ABSENT timestamp series: {len(absent)} {absent}")
 
 # ---- kernel body-mtime series ---------------------------------------------
 print("\n--- kernel body-mtime series (independent of the harness clock) ---")

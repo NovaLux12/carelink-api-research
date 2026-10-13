@@ -1,11 +1,13 @@
 requests in run order: 44
-  excluded from spacing (pre-fix debug harness, disclosed): 4
+  excluded from spacing (pre-fix debug harness, disclosed): 4 -- these rows carry NO t_queued/t_sent/t_done at all (null), so they are absent from the series rather than measured in it
   measured: 40
 
 --- harness t_sent series ---
   index.commoncrawl.org      gaps= 39 min=4.102s max=79.318s under 2.5s=0 under 2.0s=0 span=556.858s
   ALL HOSTS                  gaps= 39 min=4.102s max=79.318s under 2.5s=0 under 2.0s=0 span=556.858s
-  requests whose t_done precedes t_sent (impossible): 0 []
+  t_done precedes t_sent (impossible): 0 []
+  t_done == t_sent, zero duration (also impossible): 0 []
+  of all 44 rows, those with an ABSENT timestamp series: 4 [1, 2, 3, 4]
 
 --- kernel body-mtime series (independent of the harness clock) ---
   bodies on disk: 40  gaps=39

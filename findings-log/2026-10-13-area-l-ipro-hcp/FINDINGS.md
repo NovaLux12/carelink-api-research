@@ -15,7 +15,7 @@ This is an **addendum**. It does **not** close area L; see §8.
 | Measured same-host gap floor | **4.275 s** (kernel body-mtime oracle), cross-checked at **4.102 s** from the harness `t_sent` series — see §7 |
 | Hosts contacted | `index.commoncrawl.org` (**44**), `data.commoncrawl.org` (**0**) — **nothing else** |
 | **Requests to any Medtronic host** | **0**. No vendor traffic of any kind, no DNS, no TLS, no HTTP |
-| Ledger rows | `results.jsonl` = **44 rows**, one per request, `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601 |
+| Ledger rows | `results.jsonl` = **44 rows**, one per request. **40** carry `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601; rows **1–4** carry **`null` in all three** because the harness that sent them wrote no timestamps — the series is **absent** there, not zero-duration (§8 Defect 1) |
 | Responses committed | **none.** Bodies live under `.loop/probe-bodies-area-l/`, **outside the repository**; only headers, byte counts, sha256 digests and a projected record tuple are committed |
 
 `wc -l results.jsonl` = 44, and the cap line above says 44 of a 45 cap. Both
@@ -88,8 +88,29 @@ here (`seq 8`), and §5 re-reads it.
 | presence, either form | **200** + ≥1 record, or `blocks` ≥ 1 (controls A, D) | — |
 
 **This API failed 18 of the 44 requests (41%)** — `502` ×6, `504` ×8, `400` ×4.
-Higher than area M's 28%. **Every one was re-issued and none was read as a
-zero.** §6 lists the cells that were still unresolved when the budget ran out.
+Higher than area M's 28%. **None of the 18 was read as a zero.** §6 lists the
+cells that were still unresolved when the budget ran out.
+
+**Not every failure was re-issued, and the first draft of this sentence claimed
+otherwise.** Re-issuing is the rule area M's correction binds on this API, and it
+was followed for every *cell* that mattered — but two individual rows were
+dropped after one attempt:
+
+| row | crawl | what it was | why it was dropped |
+|---|---|---|---|
+| `seq 25` | `CC-MAIN-2014-10` | the crawl-scoped `example.com` **control** for that crawl | the crawl's three `minimed.eu` attempts had already failed 504/504/502; the control's purpose was to say why, and a fourth request on a crawl that had answered nothing was not bought |
+| `seq 41` | `CC-MAIN-2013-48` | `minimed.eu` domain, one attempt, **400** | the budget went to `CC-MAIN-2015-06` instead |
+
+**What that cost, stated rather than absorbed.** `CC-MAIN-2013-48` is one of the
+three 2013-era crawls, so it sits in §6's indeterminate column for a reason this
+pass **chose** rather than one it hit: the crawl was given one attempt where
+`CC-MAIN-2013-20` was given two and `CC-MAIN-2014-10` three. Its verdict is
+`indeterminate` either way, but the evidence behind that verdict is thinner than
+its neighbours', and a reader weighing the 2013 end should know the difference was
+one request wide. **Correct statement of the rule as applied here: every
+`*minimed.eu*` cell was attempted at least twice except `CC-MAIN-2013-48`, and
+the 2014-10 control was sent once; both failures prove nothing in either
+direction.**
 
 ---
 
@@ -114,9 +135,16 @@ carries a **fourth member the `.jsf` framing does not name**:
 
 Three things follow, and they carry different weight, so they are kept apart:
 
-1. **The family is `/ipro/hcp/*`, not `/ipro/hcp/*.jsf`.** `index.jsp` is a
-   `.jsp`. `ARCHIVE-URLS §3` and `docs/11`'s addendum both write the family as
-   `ipro/hcp/*.jsf`; that glob **does not contain the fourth member**.
+1. **The family is `/ipro/hcp/*`; the `.jsf` glob is too narrow.** `index.jsp`
+   is a `.jsp`. **Narrower than first stated here:** the repository already
+   carries the wider glob once. `ARCHIVE-URLS §5` writes the family row as
+   **`/ipro/hcp/*`** (`recon/ARCHIVE-URLS.md:341`), and it is the **§3 timeline**
+   row (`recon/ARCHIVE-URLS.md:237`) that writes `ipro/hcp/*.jsf` — so the
+   narrow form is one line in one table, not the repository's only spelling.
+   The consequence is correspondingly narrower: the **§3 timeline row** omits
+   the fourth member, and `docs/11`'s addendum repeats that row's narrower glob.
+   **`ARCHIVE-URLS` was not modified** — area M's convention, and that log
+   belongs to the 2026-10-08 pass.
 2. **It is not a single three-capture entry.** Area L's close condition named
    "one three-capture entry with no siblings" as the negative that would close
    it. There is a sibling crawl and a sibling member.
@@ -181,13 +209,25 @@ The crawl after 2022-05-13 is **`CC-MAIN-2022-21`** (2022-05-16 → 2022-05-29),
 
 | seq | query | answer |
 |---|---|---|
-| 19, 22 | `minimed.eu` domain, `CC-MAIN-2022-05` | 504, then **404 `No Captures found`** |
+| 19, 22 | `minimed.eu` domain, `CC-MAIN-2022-05` | 504, then 404 `No Captures found` — **no 200 on this crawl, so not evidence** |
 | 18, 21, 24 | `minimed.eu` domain, `CC-MAIN-2022-21` | 502, 502, then **200, 4 records** |
 | 26 | `example.com` domain, `CC-MAIN-2022-21` — crawl-scoped control | **200, 5 records** |
 
-`seq 22`'s 404 is a **readable absence**: record form, control B's shape, on a
-crawl whose sibling cell answered 200. `seq 26` returns **200**, which is what
-makes `seq 24` a real answer rather than a lucky escape from the failure class.
+**This end is answered by `CC-MAIN-2022-21` alone.** `seq 26` returns **200 with
+5 records on that crawl**, so the crawl is served and the query shape returns
+data there; that is what makes `seq 24` a real answer rather than a lucky escape
+from the failure class.
+
+**`seq 22` carries no weight, and the first draft of this section said
+otherwise — it called that `404` a "readable absence … on a crawl whose sibling
+cell answered 200". There is no `200` anywhere on `CC-MAIN-2022-05`: its only
+two rows are `seq 19` (504) and `seq 22` (404).** The `200`s at `seq 24`/`26`
+belong to `CC-MAIN-2022-21`, a different crawl. A `404` whose control returned
+nothing on that same crawl raises the question; a `404` with **no** control at
+all has zero crawl-level evidence. By this pass's own rule — `docs/09` §4, never
+let a `404` carry a negative until a positive control has returned records **on
+that crawl** — `CC-MAIN-2022-05` is **indeterminate**, not empty, and it is
+counted as such in §6.
 
 **`CC-MAIN-2022-21`, `minimed.eu`, all four records:**
 
@@ -204,8 +244,12 @@ serving `/robots.txt` **403** twice and nothing else.
 
 > **Verdict, 2022 end: the family is a bounded 2020 deployment in the Common
 > Crawl record** — observed **2020-05-25 → 2020-12-02** across two crawls, and
-> absent from every other crawl this pass could read, including the crawl nearest
-> the 2022 date. Area L's second close condition is met **for the 2022 end**.
+> **absent from `CC-MAIN-2022-21`, the crawl nearest the 2022 date**, which is
+> served and returned records. Area L's second close condition is met **for the
+> 2022 end on that one crawl**. It is **not** met on `CC-MAIN-2022-05`, the
+> crawl before the date, which is **indeterminate** rather than empty: a `404`
+> there has no positive control behind it, because that crawl returned no `200`
+> on any of its two rows.
 
 **A host name neither this pass nor area M had seen:**
 **`carelink-stage3.minimed.eu`**, recorded 2022-05-17. It comes from a
@@ -363,19 +407,29 @@ crawls in all**:
 | `CC-MAIN-2019-51` | 2019-12-05 → 2019-12-16 | 29 | **200** | 3 | **0** |
 | `CC-MAIN-2020-24` | 2020-05-24 → 2020-06-07 | 30, 34, 38 | 504, **200**, **200** | 7 | **3** |
 | `CC-MAIN-2020-50` | 2020-11-23 → 2020-12-06 | 5, 10 | **200** | 6 | **3** |
-| `CC-MAIN-2021-04` | 2021-01-15 → 2021-01-28 | 31 | **404** | 0 | **0** — readable absence |
+| `CC-MAIN-2021-04` | 2021-01-15 → 2021-01-28 | 31 | 404 | — | **indeterminate** — no `200` on this crawl |
 | `CC-MAIN-2021-25` | 2021-06-12 → 2021-06-25 | 32, 35, 37 | 504, 400, 502 | — | **indeterminate** |
-| `CC-MAIN-2022-05` | 2022-01-16 → 2022-01-29 | 19, 22 | 504, **404** | 0 | **0** — readable absence |
+| `CC-MAIN-2022-05` | 2022-01-16 → 2022-01-29 | 19, 22 | 504, 404 | — | **indeterminate** — no `200` on this crawl |
 | `CC-MAIN-2022-21` | 2022-05-16 → 2022-05-29 | 18, 21, 24, 26 | 502, 502, **200**, **200** | 4 | **0** |
 
 Area M separately covered `CC-MAIN-2018-39`, `CC-MAIN-2022-40`, `CC-MAIN-2024-42`,
 `CC-MAIN-2025-30` and `CC-MAIN-2026-39`, none of which holds a family member.
 
-**Five cells are INDETERMINATE and are recorded as holes, not as absences:**
-`CC-MAIN-2013-20`, `CC-MAIN-2013-48`, `CC-MAIN-2014-10`, `CC-MAIN-2015-22`,
-`CC-MAIN-2021-25`. **One request of the cap is unspent**, and the indeterminate
-cells were not re-attempted a fourth time because the budget went to the §4
-truncation cells and the 2022 anchor, which were worth more.
+**Seven cells are INDETERMINATE and are recorded as holes, not as absences** —
+every crawl on which no row returned `200`: `CC-MAIN-2013-20`, `CC-MAIN-2013-48`,
+`CC-MAIN-2014-10`, `CC-MAIN-2015-22`, `CC-MAIN-2021-04`, `CC-MAIN-2021-25`,
+`CC-MAIN-2022-05`. **One request of the cap is unspent.**
+
+Two of those seven (`CC-MAIN-2021-04`, `CC-MAIN-2022-05`) were mislabelled
+**readable absences** in the first draft of this table, on the reasoning that a
+`404` in the record form is the absence answer. That reasoning ignores the
+control requirement this pass states at `docs/09` §4 and applies to `seq 39`
+above: a `404` means *absent* only once a positive control has returned records
+**on that same crawl**, and on both of these crawls nothing returned `200` at
+all. **Counting rule, so the next reader can re-derive the column:** a cell is
+readable as an absence only if some row for **that crawl** answered `200`. Seven
+of the fourteen crawls this pass touched fail that test; the other seven passed
+it, and they are the only cells whose answers carry weight.
 
 ### A `/patient/` prefix caveat on area M's §3c
 
@@ -406,15 +460,27 @@ the one worth keeping.
 Counting rule (`docs/09` §4): one gap per consecutive pair **in request order**,
 from `results.jsonl`; N bodies give N−1 gaps.
 
-| series | gaps | **floor** | max | under 2.5 s | under 2.0 s | span |
-|---|---|---|---|---|---|---|
-| harness `t_sent` | 39 | **4.102 s** | 79.318 s | **0** | **0** | 556.858 s |
-| **kernel body-mtime** | 39 | **4.275 s** | 79.029 s | **0** | **0** | 560.496 s |
+> **Read this before the floor, because the floor is not measured over all 44
+> requests.** Rows **1–4** — the four a debug harness sent before the send path
+> was fixed — carry **no timestamps at all** and are **excluded from both series**
+> (§8 Defect 1). The 39 gaps below are measured over the **40** rows that have a
+> series; the other **4 of the 44 requests sit outside both series entirely**,
+> and their own sub-floor gap is disclosed in §8 rather than being folded into
+> these numbers.
+
+| series | rows measured | gaps | **floor** | max | under 2.5 s | under 2.0 s | span |
+|---|---|---|---|---|---|---|---|
+| harness `t_sent` | **40 of 44** | 39 | **4.102 s** | 79.318 s | **0** | **0** | 556.858 s |
+| **kernel body-mtime** | **40 of 44** | 39 | **4.275 s** | 79.029 s | **0** | **0** | 560.496 s |
 
 **The series agree**: the spans differ by 3.638 s over 557 s, which is the
-validation `docs/09` §4 asks for before trusting the mtime series. Requests
-whose `t_done` precedes `t_sent` (impossible): **0**, so this pass's `date`
-readings are internally consistent, unlike areas B, D, X and Z.
+validation `docs/09` §4 asks for before trusting the mtime series. Requests whose
+`t_done` **precedes** `t_sent` (impossible): **0**; requests whose `t_done`
+**equals** `t_sent`, a zero-duration request and equally impossible: **0**; rows
+with an **absent** timestamp series: **4** (rows 1–4, as above). So this pass's
+`date` readings are internally consistent over the 40 rows that have them,
+unlike areas B, D, X and Z. `spacing.py` prints all three counts separately so
+a zero-duration row cannot pass silently again.
 
 Both floors exceed the **3.5 s** declared and the **≥3 s** `docs/09` §1 asks
 for on archive calls. Full output: `spacing.txt`, produced by `spacing.py`.
@@ -445,11 +511,25 @@ are committed as numbers; the bodies are not.
    must equal the number of requests sent.
 
 **The cost, stated exactly.** Four requests of the cap went to a discarded
-harness, at **0.2 s instead of the declared 3.5 s**. Measured gaps between those
-four sends, from kernel body-mtimes: **4.063 s, 7.592 s, 0.859 s**. **The 0.859 s
-gap is below the repository's `≥2 s` floor.** It is a real breach of this pass's
-own rate discipline, it happened before the send path was fixed, and **no cause
-is asserted for it.**
+harness, at **0.2 s instead of the declared 3.5 s**. The gaps between those four
+sends were measured at the time from kernel body-mtimes: **4.063 s, 7.592 s,
+0.859 s**. **The 0.859 s gap is below the repository's `≥2 s` floor.** It is a
+real breach of this pass's own rate discipline, it happened before the send path
+was fixed, and **no cause is asserted for it.**
+
+**Their timestamps are now `null`, and that is the honest form.** The first
+version of rows 1–4 carried a `t_queued`/`t_sent`/`t_done` reconstructed from
+those body-mtimes and emitted as though the harness had written them. It had
+not, and the reconstruction was wrong in a way that would have read as a real
+series: it was stamped **2025** rather than 2026, and it put
+**`t_sent == t_done` on all four rows**, which is a **zero-duration request** —
+as impossible as a negative one, and invisible to a check that only tests
+`t_done < t_sent`. The three fields are now **`null`**, a `timestamp_series` field
+records why, and `spacing.py` reports **zero-duration and negative-duration rows
+separately** so neither can pass silently again. The bodies for these four
+requests were not retained, so on this machine the send times are no longer
+re-derivable; **the three mtime gaps above are the record of what was measured
+at the time**, and they are the only spacing evidence for these rows.
 
 **What was done.** Rows 1–4 are **excluded from the §7 spacing measurement**;
 `spacing.py` prints the excluded count in its own output rather than dropping
@@ -461,15 +541,18 @@ The send path was then rewritten so the `curl` goes to its own `%q`-quoted file
 and `flock` is given `sh <file>` instead of `-c "<string>"`. That form has no
 nested quoting to get wrong. `probe.sh` is committed as sent.
 
-### Defect 2 — five crawls remain holes
+### Defect 2 — seven crawls remain holes
 
-`CC-MAIN-2013-20`, `CC-MAIN-2013-48`, `CC-MAIN-2014-10`, `CC-MAIN-2015-22` and
-`CC-MAIN-2021-25` are **indeterminate**. §6 marks them and no claim rests on
-them. In particular **the 2013 end is not answered** (§3a, §5-C2).
+`CC-MAIN-2013-20`, `CC-MAIN-2013-48`, `CC-MAIN-2014-10`, `CC-MAIN-2015-22`,
+`CC-MAIN-2021-04`, `CC-MAIN-2021-25` and `CC-MAIN-2022-05` are **indeterminate**
+— the seven of the fourteen crawls touched here on which no row returned `200`.
+§6 marks them and no claim rests on them. In particular **the 2013 end is not
+answered** (§3a, §5-C2), and the 2022 end rests on `CC-MAIN-2022-21` alone
+(§3b).
 
 ### Defect 3 — the sweep is a spread, not a census
 
-Fourteen crawls were read, not 128, and the five holes mean even those are not
+Fourteen crawls were read, not 128, and the seven holes mean even those are not
 a systematic sweep of the 2013–2022 window. **"Absent from every other crawl
 this pass could read"** is the claim; "absent from Common Crawl" is **not**
 claimed and cannot be.
