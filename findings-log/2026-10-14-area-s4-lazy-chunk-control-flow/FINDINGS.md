@@ -30,7 +30,7 @@ bundle `2a7fa8e7…` (3,397,615 B). **No vendor request was issued by this pass.
    the 215 chunks or in either portal bundle; every `marker` token resolves to
    SVG asset names, graph series markers, or i18n-less UI glyphs. This pass does
    not soften area P's negative; it re-measured it.
-4. **Endpoint surface mapped** — 141 distinct `(method, path)` pairs across the
+4. **Endpoint surface mapped** — 146 distinct `(method, path)` pairs across the
    215 chunks (§5). This is a structural inventory of call sites only; liveness
    by host is already documented in `docs/06-patient-api-surface.md`.
 
@@ -164,7 +164,7 @@ area P concluded. This pass adds no new negative but re-verified the old one.
 
 ## 6. Endpoint surface mapped from the 215 chunks
 
-141 distinct `(method, path)` pairs. Methods: 90 GET, 47 POST, 6 PUT, 7 DELETE, 1 PATCH.
+146 distinct `(method, path)` pairs. Methods: 90 GET, 50 POST, 21 PUT, 9 DELETE (0 PATCH at a direct call site).
 Paths are the literal strings as they appear in the minified call sites (template
 literals retained). Duplicates that differ only by interpolation parameter
 (`${V}` vs `${encodeURIComponent(V)}`) are kept separate because they are different
