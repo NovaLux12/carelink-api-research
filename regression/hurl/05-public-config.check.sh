@@ -390,6 +390,58 @@ BODY="$BODY_E_PKEY_TRIALS"
 check "-trials per-key form answers 200 with a one-member envelope" 'keys | sort | join(",")' 'value'
 check "-trials per-key logbook entry types unwrap to 12"    '.value | fromjson | length' '12'
 
+# =====================================================================
+# AREA F (2026-10-13) — personal.patient.timeline.config, and the second
+# timeline-host key the shipped bundle names but the document never publishes.
+# Source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md
+#
+# ZERO additional vendor requests: every body below is already on disk, fetched by
+# the area E block above. That is the only reason this block lives here rather than
+# in a new suite (AGENTS.md section 11 request budget; the area T block header).
+#
+# THE CLAIM: the Patient-Timeline tab is config-gated in shipped code — a template
+# reads `featureEnabled` off this object — and the object's SHAPE had never been
+# read by any pass. It is exactly two members, identical on all three patient
+# deployments. Pinned as the EXACT sorted member list, not `has("featureEnabled")`:
+# a member appearing or being renamed is a change this header makes and a `has`
+# assertion cannot see.
+#
+# "So this can fail" is not a claim you have to take on trust:
+#   findings-log/2026-10-13-area-f-timeline-config/pins-selftest.sh
+# runs both filters against synthetic documents built from the committed 69-name
+# list and proves (a) a third member breaks the member-set pin, (b) publishing the
+# bundle's stale key breaks the absent-key pin, and (c) neither a superstring nor
+# a prefix of the key name satisfies the ^$ anchor. Zero vendor requests. If you
+# change a filter below, change the copy in that file with it.
+#
+# THE NEGATIVE, which is the other half of the finding: the shipped patient bundle
+# ALSO names a top-level key `personal.patient.timeline.host`. It is not published on
+# any of the three deployments and its per-key route 404s on all three. Area V left
+# it half-open — "either the bundle names a stale key nothing reads, or the vendor
+# publishes a second, unrecorded key" — and this settles it 3 of 3. Anchored on ^$
+# so it cannot be satisfied by a longer name that merely contains this one; the
+# same expression returns 1 against a document that does carry the key (see
+# pins-selftest.sh step 3).
+#
+# LIMITS, stated rather than implied: these pin the member SET and the ABSENCE of
+# the second key. They do NOT pin the `host` VALUE, which is deployment-specific
+# and is published in the findings log as a digest rather than a value
+# (AGENTS.md section 7). A deployment whose `host` changed passes these checks;
+# `cell-digests.tsv` in the log is what carries the per-deployment digests.
+#
+# NO `for` LOOP HERE, for the reason stated in the area E header: a second loop
+# would multiply these sites by 16 and corrupt every derived count.
+# =====================================================================
+BODY="$SCRATCH"
+check "timeline config members are exactly featureEnabled,host (EU)" '.["personal.patient.timeline.config"] | keys | sort | join(",")' 'featureEnabled,host'
+check "no top-level personal.patient.timeline.host key (EU)" '[keys[] | select(test("^personal[.]patient[.]timeline[.]host$"))] | length' '0'
+BODY="$BODY_E_COM"
+check "timeline config members are exactly featureEnabled,host (.com)" '.["personal.patient.timeline.config"] | keys | sort | join(",")' 'featureEnabled,host'
+check "no top-level personal.patient.timeline.host key (.com)" '[keys[] | select(test("^personal[.]patient[.]timeline[.]host$"))] | length' '0'
+BODY="$BODY_E_TRIALS"
+check "timeline config members are exactly featureEnabled,host (-trials)" '.["personal.patient.timeline.config"] | keys | sort | join(",")' 'featureEnabled,host'
+check "no top-level personal.patient.timeline.host key (-trials)" '[keys[] | select(test("^personal[.]patient[.]timeline[.]host$"))] | length' '0'
+
 rm -f "$BODY_E_COM" "$BODY_E_TRIALS" "$BODY_E_PKEY_COM" "$BODY_E_PKEY_TRIALS"
 BODY="$SCRATCH"
 
