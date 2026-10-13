@@ -4,29 +4,36 @@
 source repositories at named commits, over the GitHub API · **Method words:
 GET only — no POST, no OPTIONS, no token exchange, no authentication attempted.**
 
-> **Accounting — read the cap line, it is not what the claim issue said.**
+> **Accounting — the cap of record was restated AFTER this pass ran. Read
+> `## Correction (2026-10-13)` at the foot of this file before trusting this line.**
 >
-> **21 of a 20 cap.** Claim issue #43 declared 20. **This pass sent 21 HTTP
-> requests** and `results.jsonl` carries 21 rows; `wc -l results.jsonl` = 21, which
-> is the number stated here, in both directions.
+> **21 of a 21 cap.** `results.jsonl` carries 21 rows; `wc -l results.jsonl` = 21,
+> which is the number stated here, in both directions. **The cap that was in force
+> while these 21 requests were being sent was 20** — claim issue #43 declared 20 —
+> and the pass spent 21. The cap was restated to 21 by **owner authorisation on
+> 2026-10-13, after the pass completed**, recorded on the public record as a dated
+> addendum on issue #43. **The restatement equals the spend exactly and grants no
+> slack** a later reader could spend.
+>
+> **⚠ `21 of a 21 cap` makes `research-checks.py` pass, and that is NOT the same as
+> the evidence having supported a cap of 21.** The number the check stops objecting
+> to and the number the ledger supports are the same number for different reasons:
+> one is *"this pass spent 21"*, the other is *"this pass spent 21 against a cap of
+> 20, and the cap was restated afterwards to match"*. The second is the true claim.
+> This line is written to match the first; the Correction below carries the second,
+> which is why the restatement is recorded rather than applied silently. **A reader
+> who takes the accounting line at face value will conclude there was no overrun.
+> There was one, of exactly one request.**
 >
 > **How the extra one happened, stated rather than reconciled.** `probe.sh` sent 18
 > (seq 1–18). `probe-followup.sh` was then run twice: its first run sent request 19,
-> and the second run re-sent request 19 and added request 20. The duplicate is a
-> harness defect — the script resets `SEQ` to 18 rather than reading the ledger's
-> last row, so a re-run re-issues the first request instead of continuing. **No row
-> was deleted to make the arithmetic work**, because a ledger that undercounts is
-> the quieter and worse failure (`docs/09` §4: a check that looks like it ran is
-> worse than no check). It has one further consequence, in §1b.
->
-> **⚠ `python3 scripts/research-checks.py` fails on exactly this line, and it should.**
-> Its rule is *"an accounting that exceeds its own cap fails"* — which is the correct
-> rule, correctly fired by a pass that really did exceed its cap. **Do not resolve it
-> by deleting the duplicate row, by lowering `N` to 20, or by restating the cap.** Any
-> of those would leave the artefact and the prose disagreeing, which is the failure
-> this repository exists to catch. Every other check passes: numbers, citation
-> integrity, priorities sync, prompt parity, append-only, leak scan (0 hits on all
-> nine `scripts/scrub-patterns.txt` patterns), and the counting rule's own self-test.
+> and the second run re-sent request 19 and added request 20. **No row was deleted**,
+> and the number above was never lowered, because a ledger that undercounts is the
+> quieter and worse failure (`docs/09` §4: a check that looks like it ran is worse
+> than no check). It has one further consequence, in §1b. The harness defect that
+> caused it is documented in the Correction, and the committed `probe-followup.sh` is
+> **left byte-faithful to what actually ran** — the Correction gives the reason, and
+> what a correct implementation would read instead.
 >
 > **Medtronic requests: 0.** Not "none attempted because it was unnecessary" —
 > **none made, deliberately.** The only way to settle a body-field gate is a POST
@@ -411,3 +418,54 @@ the abbreviated SHAs the 2026-10-11 pass recorded.
 
 No credential, token, session value or patient identifier was read, sent, handled or
 recorded at any point. The GitHub API calls carried **no `Authorization` header**.
+
+---
+
+## Correction (2026-10-13) — the cap was restated from 20 to 21, after the pass
+
+**The accounting line at the top of this file now reads `21 of a 21 cap`. The cap that
+was in force while the requests were being sent was 20.** Both numbers are recorded
+here because a cap that changes with no trace is a claim about this pass's budget
+that the ledger cannot support — and because the restatement happened *after* the
+spend, not before it.
+
+| | |
+|---|---|
+| Cap declared in claim issue #43, before any request was sent | **20** |
+| Requests actually sent, and rows in `results.jsonl` | **21** |
+| Overrun | **1 request** |
+| Cap of record now | **21** — restated by **owner authorisation on 2026-10-13, after the pass completed** |
+
+**The overrun, in full.** `probe.sh` sent 18 requests (seq 1–18). `probe-followup.sh`
+was then run **twice**: its first run sent request 19, and its second run **re-sent
+request 19** and added request 20. Twenty-one HTTP requests left this machine, and
+`results.jsonl` carries twenty-one rows. **No row was deleted**, and the number in
+the accounting line was never lowered, to make any check pass.
+
+**The harness defect, named.** `probe-followup.sh` sets `SEQ=18` at the top of each
+invocation instead of reading the last `seq` already in the ledger, so a second run
+**re-issued request 19** — the first request of the follow-up phase — rather than
+continuing past it. It re-issued exactly that one request.
+
+**Why the committed `probe-followup.sh` was not fixed.** It is the record of the run,
+and it is left **byte-faithful to what executed** — `SEQ=18` and all. A harness
+rewritten after the fact is a different and worse artefact than a harness with a
+documented defect: the first implies the run went differently, the second admits that
+it did not. **What a correct implementation would do, stated instead of shipped:**
+derive the starting `seq` from the ledger (or from a run-marker line in `run.log`)
+and begin one past it, so a re-run appends rather than re-issuing. A fixed harness,
+if one is wanted for the next pass, belongs in a successor area or a note in
+`docs/09` — not beside a capture it would contradict.
+
+**The authorisation is on the public record**, as a dated addendum on issue #43, so
+this restatement is not a private edit to a log.
+
+**⚠ The tension, kept visible rather than smoothed over.** `21 of a 21 cap` is
+precisely what makes `research-checks.py` pass — its rule is *"an accounting that
+exceeds its own cap fails"*, and once the cap is restated the accounting no longer
+exceeds it. **That is not the same as the evidence having supported a cap of 21.** The
+two numbers are equal by coincidence of restatement, not because the pass fitted
+inside a 21-request budget. Anyone reading the accounting line alone would conclude
+there was no overrun; that conclusion would be wrong. The original 20 therefore stays
+in this file, beside the restatement that supersedes it, and the restatement is
+labelled as post-hoc in every place it appears.
