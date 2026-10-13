@@ -1,3 +1,26 @@
+## Correction (2026-10-13) — the median line below was self-contradictory
+
+This file IS regenerable from committed evidence, and was regenerated. `spacing-recheck.sh`
+reads only `results.jsonl`, whose `body_mtime_ns` column is committed; it sends **zero
+requests**. Reproduce with:
+
+    ./spacing-recheck.sh results.jsonl > spacing-recheck.txt
+
+**WHAT WAS WRONG.** The script printed two diagnostic values from `ad[105]` and `ad[106]`
+while labelling them `ad[106]` and `ad[107]` — off by one. So the old capture showed
+`ad[106]=0.0130, ad[107]=0.0140`, whose mean is **0.0135**, sitting on the same line as a
+published median of **0.0145**. The line contradicted itself and the justification was not
+reproducible from its own numbers. **The published 0.0145 was correct and does not move**;
+only the labels and the two values printed beside them were wrong. The mean was always
+right: `statistics.median` on an even-length list takes `mean(ad[n//2 - 1], ad[n//2])`,
+and with 214 gaps `n//2 == 107`.
+
+**WHAT A READER CAN NOW CHECK.** `ad[107]` appears twice on the line — once as
+`spacing.sh`'s upper-middle element, once as a labelled element — and
+`mean(0.0140, 0.0149) = 0.01445`, which prints as the 0.0145 on the same line.
+
+Everything below the rule is the script's own stdout, unmodified.
+
 AREA K — independent re-derivation of spacing.txt (zero requests)
 rows=215  hosts=['carelink.minimed.eu']  declared=['2.5']
 
@@ -16,7 +39,7 @@ impossible durations (t_done < t_sent):
   ok   send floor: re-derived 1.835, artefact says 1.835
   ok   per-gap max |send-mtime|: re-derived 0.873, artefact says 0.873
   ok   per-gap gaps disagreeing >0.5 s: re-derived 20, artefact says 20
-  median — spacing.sh's upper-middle element ad[107] = 0.0149s; true median (mean of ad[106],ad[107]) = 0.0145s (ad[106]=0.0130, ad[107]=0.0140)
+  median — spacing.sh's upper-middle element ad[107] = 0.0149s; true median (mean of ad[106],ad[107]) = 0.0145s (ad[106]=0.0140, ad[107]=0.0149)
 
 span  first t_sent->last t_done 648.080s | kernel first->last write 647.799s | diff 0.281s
   (a two-endpoint check; it cannot detect interior corruption — see §4)

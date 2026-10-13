@@ -60,11 +60,57 @@ Prints the rule, the per-chunk raw evidence, the resolved shapes, and the total.
 Exits non-zero if the corpus count disagrees with the committed list, so it cannot
 report a clean census over the wrong rows.
 """
+## Correction (2026-10-13) — post-merge audit, defects 1/2/4/6: the
+## committed artefact on `main` predates this script; the stale-artefact guard
+## below makes that impossible to ship silently again.
+import hashlib
 import json
 import os
 import re
 import sys
 from collections import OrderedDict
+
+# --- STALE-ARTEFACT GUARD --------------------------------------------------------
+# WHY THIS EXISTS. `patient-csr.txt` is committed but CANNOT be regenerated from a
+# clean clone: this script reads response bodies and the repository commits 215 `.h`
+# header files and zero bodies. That is how a stale artefact reached `main`: the
+# script came to print rules 1-8 and the committed capture still prints 1-5 with
+# `rule 5 verbs`, and nothing could notice, because the only way to notice was to run
+# a script whose corpus nobody has.
+#
+# So the script now carries its own SHA-256 and compares it against the one the
+# committed artefact declares. Equal means: any divergence between this script and
+# that artefact has been accounted for on purpose. Different means: the script changed
+# and nobody re-declared the divergence, which is now an error rather than a footnote.
+#
+# It runs BEFORE argv[1] is touched and before any body is read, so it fires on a tree
+# where the corpus is absent — which is the only tree most readers have.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ARTEFACT = os.path.join(_HERE, "patient-csr.txt")
+SCRIPT_SHA256 = hashlib.sha256(
+    open(os.path.abspath(__file__), "rb").read()).hexdigest()
+_DECLARED = re.compile(r"^SCRIPT-SHA256-AS-OF-THIS-NOTE:[ \t]*([0-9a-f]{64})[ \t]*$", re.M)
+
+if os.path.exists(_ARTEFACT):
+    _declared = _DECLARED.search(open(_ARTEFACT, encoding="utf-8",
+                                       errors="replace").read())
+    if not _declared:
+        sys.stderr.write(
+            "FATAL: patient-csr.txt carries no `SCRIPT-SHA256-AS-OF-THIS-NOTE: <sha256>`\n"
+            "       line, so this script cannot tell whether it and the committed\n"
+            "       artefact agree. Add the line with this script's own sha256 (%s),\n"
+            "       stating why the artefact has not been regenerated.\n" % SCRIPT_SHA256)
+        raise SystemExit(3)
+    if _declared.group(1) != SCRIPT_SHA256:
+        sys.stderr.write(
+            "FATAL: patient-csr.txt is STALE.\n"
+            "       artefact declares script sha256 %s\n"
+            "       this script is           %s\n"
+            "       The script changed after the artefact's divergence was last declared.\n"
+            "       Regenerate the artefact if you can; if you cannot, update the\n"
+            "       SCRIPT-SHA256-AS-OF-THIS-NOTE line and say in the artefact why.\n"
+            % (_declared.group(1), SCRIPT_SHA256))
+        raise SystemExit(3)
 
 BODIES = sys.argv[1]
 LEDGER = sys.argv[2]

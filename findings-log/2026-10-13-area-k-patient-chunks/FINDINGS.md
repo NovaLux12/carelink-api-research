@@ -385,17 +385,32 @@ return h.useCumulusUrls && (y = O!==Be.CARE_PARTNER || L ? E
          : this.connectHttpService.getPeriodicDataWithGet(y);
 ```
 
-**The chain is contiguous, not inferred across a gap.** **THE RUN is bytes
-69458–69866** — derived, not chosen: it begins at
-`const L=h.useCumulusUrls…E=h.messageEndpoint` and ends at the `g` of
-`getPeriodicDataWithPost({reqUrl:y`. `resolve.py` prints **THE WINDOW, bytes
-69458–69898**, which is 32 bytes longer purely so the tail of the POST call is
-visible; **the window is not a claim boundary.** `getMessageRequest`'s own definition
-at **69249** shows `h` is its fifth parameter. So
+**The run is contiguous, not inferred across a gap — and the binding from the run to the
+cited POST definition is INFERRED, not observed.** These are two different spans and this
+log used to present them as one.
+
+- **THE RUN, bytes 69458–69866 — OBSERVED, and contiguous.** It is derived, not chosen: it
+  begins at `const L=h.useCumulusUrls…E=h.messageEndpoint` and ends at the `g` of
+  `getPeriodicDataWithPost({reqUrl:y`. Every byte is inside **one** webpack module,
+  **59567** (span 65786–84396). `resolve.py` prints **THE WINDOW, bytes 69458–69898**,
+  which is 32 bytes longer purely so the tail of the POST call is visible; **the window is
+  not a claim boundary.**
+- **THE DEFINITION, byte 61803 — OBSERVED, but in a DIFFERENT module.** `resolve.txt` §A
+  resolves 61803 to module **43064**, span 61690–62146. That span is **disjoint** from
+  59567's. The two offsets are ~8 KB apart **in the same chunk file** and in **two
+  different webpack modules**.
+- **THE BINDING between them — INFERRED.** Nothing in this pass asserts that
+  `this.connectHttpService` on the module-59567 instance is an instance of the class
+  module 43064 defines. **Assumption:** webpack module ids are unique within a chunk, and
+  the service registered as `connectHttpService` in module 59567 is the one module 43064
+  exports. The two are consistent with the bytes; no committed artefact closes them.
+
+`getMessageRequest`'s own definition at **69249** shows `h` is its fifth parameter. So
 `h.messageEndpoint` — a field of the object `getGuardianEndpoint()` built from the
-`system.gc.gz.transition.flags` selector — is assigned to `E`, folded into `y`, and
-passed as `reqUrl` to a POST. **The flags subtree does not merely get read: it selects
-the URL that is POSTed.**
+`system.gc.gz.transition.flags` selector — is assigned to `E`, folded into `y`, and passed
+as `reqUrl` **to a call at 69866** (OBSERVED, inside the run). **What that call does with
+`reqUrl`** rests on the definition at 61803 — OBSERVED as to what that definition does —
+joined to the call by the INFERRED binding above.
 
 > **Link 9, settled 2026-10-13 (verification round 1).** The first version of this log
 > asserted the flow from a ~200-byte window that stopped short of the POST call, and a
@@ -413,7 +428,9 @@ the URL that is POSTed.**
 > two cannot be conflated by a reader who only sees the numbers.
 
 **So the flags subtree is not merely read — `useCumulusUrls` and `messageEndpoint`
-select the URL that is then POSTed.** That is the vendor's own CSR pointer
+select the URL that is then POSTed** (the selection of the URL is OBSERVED inside the
+run; what the receiving method does with `reqUrl` rests on the INFERRED binding named
+above). That is the vendor's own CSR pointer
 `…/connect/csr/v2/display/message` (PUBLISHED, `docs/04`; `docs/10` §1) arriving in a
 client by the documented route area V could not see.
 
@@ -950,3 +967,156 @@ here only the second one failed. This matches #64's own "What is NOT retracted" 
   Both scripts read response bodies that this repository does not commit. Every figure
   in both artefacts is unaffected by the corrections above; both artefacts are stated as
   predating the corrected scripts rather than as captures of them.
+
+## Correction (2026-10-13) — post-merge audit: six defects that reached `main`
+
+This section is appended after the merge of PR #62. That PR merged with **no verifier on
+its final SHA** — its last verdict was NOT CLEAN on an earlier commit — and a post-merge
+audit then found six defects that were on `main`. Five are fixed here. One is reported,
+not fixed, and the reason is named.
+
+### A. Two committed artefacts were stale, and the round-3 write-up said so in the wrong file
+
+`resolve.txt` prints **no SELF-TEST block** and the old one-line `-> consistent`.
+`patient-csr.txt` prints **rules 1–5 with `rule 5 verbs`** while `patient-csr.py` emits
+**rules 1–8**, where `rule 5` is *ternaries*. Round-3 findings 4 and 5 were therefore
+closed **in the script only**.
+
+The round-3 commit message claimed "both are stated as predating the corrected scripts".
+That was true of `FINDINGS.md` (§4 and §5 above) and **false of the artefacts**, which is
+where a reader of a `.txt` artefact looks. Both artefacts now carry the statement in their
+own first screenful, together with: which script revision produced them (`7d0e325`, the
+commit that last touched both files — **INFERRED** as the producing revision, since the
+run cannot be repeated here); the exact command and its exact failure; and why no figure
+moves.
+
+**Neither can be regenerated. That is the honest fact and it is now stated, not implied:**
+
+```
+$ python3 patient-csr.py headers results.jsonl chunks-swept.txt
+FATAL: body missing for k-12-c22952a522974f5f-js          # exit 2
+$ python3 resolve.py headers results.jsonl
+FileNotFoundError: [Errno 2] No such file or directory:
+  'headers/k-6746-c6795ff7e9ff468d-js.b'                   # exit 1, an uncaught traceback
+```
+
+`headers/` holds **215 `.h` files and zero bodies**. A chunk body is a Medtronic asset,
+not evidence, and this repository does not commit one.
+
+**Why no figure moved** — `git diff 7d0e325 -- resolve.py` changes no assertion and no
+offset. `CITED` (13 entries), `MAIN_CITED` (3) and `A8_PARTS` (2) compare **identical**
+under an AST comparison, as do `RUN_START` / `RUN_END` / `PRINT_SLACK`; every changed
+line is a comment, a `w(...)` call, the extracted `self_consistency()` / `self_test()`,
+or the guard below. For `patient-csr.py` the diff is an `r"""` docstring prefix plus
+added `w(...)` lines — rule 7 (`canon()`) and rule 8 (the `rule 8` return in `resolve()`)
+were **already implemented at `7d0e325`**; only the printed summary lagged.
+
+### B. A stale artefact is now impossible to ship silently
+
+`resolve.py` and `patient-csr.py` each compute **their own sha256** and compare it with
+the `SCRIPT-SHA256-AS-OF-THIS-NOTE:` line the committed artefact declares. Mismatch exits
+**3**, naming both digests; a missing line exits **3** too, rather than trusting the
+artefact. **The guard runs before `argv[1]` and before any body is read**, so it fires on
+the tree a reader actually has.
+
+`staleness-proof.sh` / `.txt` prove both halves against deliberately broken copies, with a
+clean-tree control: a poisoned `self_consistency()` exits 1, a **single** mis-stated
+expectation exits 1, a wrong digest exits 3 before the corpus is touched, a removed digest
+line exits 3, and the committed artefacts at their declared digests pass. **Zero requests.**
+
+*Bound, stated rather than implied:* the two **unregenerable** artefacts are the ones the
+guard covers. Where an artefact *is* regenerable — `spacing-recheck.txt`,
+`leak-screen.txt` — the discipline is to regenerate, and both were regenerated in this
+correction. Editing a regenerable script and forgetting its output is therefore **not**
+mechanically caught. Named rather than left as a hole.
+
+### C. The SELF-TEST verdict was print-only
+
+`resolve.py`'s SELF-TEST printed `BAD` into its table and **appended nothing** to
+`failures`. A regression in `self_consistency()` would have printed `BAD` and the script
+would still have exited 0 — the print-only verdict, **inside the block written to
+eliminate it**, in the same pass that wrote `leak-screen-proof.sh` to eliminate it in the
+sibling file. `self_test()` now returns the count of misbehaving cases and the consumer
+appends it to `failures`, so `sys.exit(1 if failures else 0)` carries it.
+
+`--self-test-only` was added because the corpus is not committed: before it, **no** part
+of this script could be exercised on a clean clone, which is why the wiring went unproved
+for two rounds. `python3 resolve.py --self-test-only` → exit 0.
+
+**One correction to the audit that prompted this section:** the print-only SELF-TEST was
+in **`resolve.py`**, not in `leak-screen.py`. `leak-screen.py` was never affected — it
+sets `SELFTEST_OK = False` and `sys.exit(1 if (hits or not SELFTEST_OK) else 0)` consumes
+it. Proof B above shows the same class of defect in a different file, which is itself the
+finding: a pass that wrote one proof instrument did not run it over its other instrument.
+
+### D. `docs/09`'s trap table had **two** rows with the same defect, not one
+
+The `| Trap | Detail | Fix |` row for *CORS `allow-methods` read as a method register*
+carried a stray `|` that split its Fix cell; GFM drops the overflow cell, so the advice
+*"pin the **exact** value, not `contains "POST"`"* **was never rendered for any reader**.
+Pre-existing since `fbe5d9b` (area Z), and correctly declined as a drive-by last round.
+**The owner has now authorised it. Fixed**, and the whole trap table swept for the class.
+
+**The sweep found a second row**, `docs/09`'s *append-only guard* row — but it was a
+**false positive** and is left alone: its pipe sits inside a code span as `\|`, which GFM
+treats as escaped. A naive `line.count('|')` calls it broken; a scanner that honours
+escapes does not. Recording the false positive because a scanner that cannot tell an
+escaped pipe from a stray one will produce both.
+
+*This section supersedes the bullet in "Not corrected, and named so a reader does not
+assume it was" above, which declined the same row as a drive-by. It also mis-cited it as
+`docs/09` line **188**; the row is line **189**. Left standing rather than edited away.*
+
+### E. `docs/10` has the same defect, and is NOT fixed here
+
+The *Does Common Crawl cover the API surface?* row splits into **4 cells against a
+3-cell header**. GFM drops the fourth, which holds the whole *To close the two gaps area M
+left* cell — including *"one record query for `medtronic.eu` … and one sweep to establish
+whether the index API truncates a result set"* and the `#44 successor` marker. It is
+**OBSERVED on `main`**, it is a pre-existing row from area M, and the authorisation for
+this correction covers `docs/09` only. **Reported, not fixed.** The fix is to move that
+text into the third cell; one line, on request.
+
+Four further `docs/10` rows (the `carelink.medtronic.eu` deployment row and three
+`published document` rows) carry only **2 cells** — the trailing source column is simply
+absent. No content is dropped by that, so it is cosmetic, and it is reported rather than
+changed.
+
+### F. `spacing-recheck.sh` printed the wrong indices, so `spacing-recheck.txt` contradicted itself
+
+The first value used the correct `ad[107]`, but the two diagnostics were printed from
+`ad[105]` / `ad[106]` while **labelled** `ad[106]` / `ad[107]`. The committed line read
+`ad[106]=0.0130, ad[107]=0.0140` beside a published median of `0.0145` — and
+`mean(0.0130, 0.0140) = 0.0135`. **The published 0.0145 is correct and does not move:**
+`statistics.median` on an even-length list takes `mean(ad[n//2 - 1], ad[n//2])` and with
+214 gaps `n//2 == 107`. Only the labels and the two values printed beside them were wrong,
+and they were wrong in the direction that made a correct justification look fabricated.
+
+Labels fixed; `spacing-recheck.txt` **regenerated**, since unlike the two artefacts above
+this one reads only the committed `results.jsonl` (its `body_mtime_ns` column) and sends
+zero requests. `ad[107] = 0.0149` now appears twice on the line and
+`mean(0.0140, 0.0149) = 0.01445` prints as the `0.0145` beside it — the line checks out
+from its own numbers for the first time.
+
+### G. The chain is contiguous; the binding from the chain to the cited definition is not
+
+Corrected in §4 above, in `docs/04`, and in `resolve.py`'s own A8 output. Summary:
+**OBSERVED** — bytes 69458–69866 are one contiguous run inside **module 59567**, and
+`E = h.messageEndpoint` does reach `reqUrl:y` inside it. **OBSERVED** — a definition at
+**61803** destructures `reqUrl` to `b` and posts `b`. **INFERRED** — that the call at
+69866 reaches *that* definition: the two bytes are in **different webpack modules**
+(**43064**, span 61690–62146, and **59567**, span 65786–84396), disjoint spans, and
+nothing in this pass asserts the instance relation. The assumption is now written down:
+webpack module ids are unique within a chunk, and the `connectHttpService` reached in
+module 59567 is the one module 43064 exports.
+
+The headline *"The chain is contiguous, not inferred across a gap"* was true of the run
+and false of the published chain. It is narrowed to the run, and the join is labelled.
+
+### H. `docs/06` published a reproduce command no reader can run
+
+`python3 patient-csr.py <captures-dir> results.jsonl chunks-swept.txt` presented
+`<captures-dir>` as if a reader could supply it. **AGENTS.md §1 says label or delete**;
+it is now labelled — the bodies are not committed, the command fails with the exact
+message and exit code above, and the page says in as many words that the figures are
+reproducible only by a reader who already holds the corpus.

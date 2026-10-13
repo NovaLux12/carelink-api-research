@@ -89,9 +89,19 @@ check("per-gap max |send-mtime|", f"{ad[-1]:.3f}", "0.873")
 check("per-gap gaps disagreeing >0.5 s", sum(1 for v in ad if v > 0.5), 20)
 # spacing.sh reports sorted(ad)[len//2] — the UPPER middle element of an even-length
 # list, which is not the median. Both are published so the difference is visible.
+## Correction (2026-10-13) — post-merge audit, defect 5: the median line printed
+# the wrong indices. See spacing-recheck.txt's header for what moved and what did
+# not. The line below records the shape of the defect. The two values below were read
+# from ad[105] and ad[106] while labelled ad[106] and ad[107] — off by one, so the
+# printed pair could not produce the printed mean: mean(0.0130, 0.0140) = 0.0135,
+# not the 0.0145 printed on the line above. The MEAN was always right
+# (statistics.median on an even-length list takes mean(ad[n//2 - 1], ad[n//2]),
+# n//2 == 107); only the two labels and the two printed values were wrong, and they
+# were wrong in the direction that made the justification look like it had been
+# fabricated. The count of gaps makes the indices concrete: len(ad) == 214.
 print(f"  median — spacing.sh's upper-middle element ad[107] = {ad[len(ad)//2]:.4f}s; "
       f"true median (mean of ad[106],ad[107]) = {statistics.median(ad):.4f}s "
-      f"(ad[106]={ad[105]:.4f}, ad[107]={ad[106]:.4f})")
+      f"(ad[106]={ad[106]:.4f}, ad[107]={ad[107]:.4f})")
 
 hs = max(t(r["t_done"]) for r in rows) - min(t(r["t_sent"]) for r in rows)
 ks = (max(mt(r) for r in rows) - min(mt(r) for r in rows))
