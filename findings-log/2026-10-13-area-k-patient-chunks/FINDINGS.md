@@ -596,7 +596,7 @@ because three further chunks hard-code CSR paths without a `baseUrl` field:
 | chunk | endpoint literal |
 |---|---|
 | `common.…js` | `GET/POST /patient/csr/incidents`, `GET/PUT /patient/csr/incidents/{id}`, `GET /patient/csr/incidents/configuration?region={region}` |
-| `1635/8942/9807.…js` | `GET /patient/csr/safety/notice/definitions?…`, `…/{type}/file/url`, `…/{type}/users`, `POST …`, `PUT …/{id}`, `POST …/{id}/notification/date`, `GET …/users/csv` |
+| `1635/8942/9807.…js` | `GET /patient/csr/safety/notice/definitions?…`, `…/{type}/file/url`, `…/{type}/users`, `POST …`, `PUT …/{id}`, `POST …/{id}/notification/date`, `GET …/{type}/users/csv` |
 | `5109.…js` | `GET /patient/csr/configuration/whitelisted` |
 | `5750.…js` | `GET /patient/csr/users/me/notifications/history/patients/{id}` |
 | `6633.…js` | `GET /patient/csr/users/me/consent/history` |
@@ -749,7 +749,7 @@ one row per cell.
 | CORRECTED 2026-10-13 (verification round 1): read 1 is in module **`16746`** (177–32151) and read 2 in module **`59567`** (65786–84396). The first version attributed read 2 to `56358`, whose body is a device-settings enum at 65421–65785 | OBSERVED | `resolve.txt` §A |
 | Both reads bind **module id 4265**; module `4265` is **one contiguous 5,842 B span** at main-bundle bytes 91298–97139 and its export table maps `z2:()=>be` | OBSERVED | `resolve.txt` §C A1–A3 |
 | `z2` resolves to `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | OBSERVED | main bundle bytes 93798, 2189121; `resolve.txt` §C A4–A5 |
-| **The value demonstrably flows into the POSTed URL**: `E=h.messageEndpoint` at **69458** → the template → `y=…E…` at **69786** → `getPeriodicDataWithPost({reqUrl:y` at **69866**, one contiguous run inside `getMessageRequest` (defined **69249**, module `59567`). Bytes 69300–69700 printed in full | OBSERVED | `resolve.txt` §C A7 |
+| **The value demonstrably flows into the POSTed URL**: `E=h.messageEndpoint` at **69458** → the template → `y=…E…` at **69786** → `getPeriodicDataWithPost({reqUrl:y` at **69866**, one contiguous run inside `getMessageRequest` (defined **69249**, module `59567`). THE RUN is **69458–69866**; the window `resolve.py` prints is **69458–69898** | OBSERVED | `resolve.txt` §C A7 |
 | **No lazy chunk reads the discovery document**: `baseUrlPde`, `/connect/pde`, `baseUrlCumulus`/`Cms`/`Aem`/`CareLink`, `discover/android`, `clcloud`, `api/carepartner` are **0 / 0** across all 211 | OBSERVED | `grep-out.txt`; `tables.txt` §T2 |
 | CORRECTED 2026-10-13 (verification round 1): `pde` is **`cs=5` / `ci=34`** — the control found **29 case-variants**, not none as the prose said. All 29 classified into **7 identifiers, exactly the 7 area V listed**; the only corpus novelty is `mapDeviceModelName` also in chunk `7187` ×4. `extract.py` §2 now iterates the insensitive pass and labels every hit `cs`/`cv` | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
 | `discover` ×12 and `pde` ×5 `cs` are zxcvbn dictionary substrings in one chunk; the same 5 and 12 words the portal builds carry | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
@@ -762,3 +762,191 @@ one row per cell.
 | `carelink.minimed.com` and `carelink-trials.minimed.com` carry this chunk's logic | **INFERRED** — assumption: the three patient deployments serve one build, which area V measured for `.eu`/`.com` only. **Not probed here** | area V `FINDINGS.md` §Scope limits 4 |
 | Whether `csrEnabled` is true in any real session, i.e. whether `getGuardianEndpoint()` ever executes | **INFERRED — and unobserved in both directions.** No session was authenticated; `AGENTS.md` §11 forbids it | — |
 | Area T's reading that `baseUrlPde`'s deadness is a retired service rather than an ignore contract | **unchanged, still unresolved** — this pass produced no evidence about intent | `docs/03` §9a |
+---
+
+## Correction (2026-10-13)
+
+Raised by verification round 3, after this branch merged `origin/main` (PR #65,
+`2306477`). **No claim above changed; seven defects in how the pass's own evidence was
+presented were corrected, and two of the corrections found a defect the pass's
+instruments could not see in themselves.** Appended rather than edited in place, per
+`AGENTS.md` §3.
+
+### 1. A published endpoint that dropped a runtime slot
+
+`docs/06:559` published `/patient/csr/safety/notice/definitions/users/csv`. This
+pass's own corpus records **`/patient/csr/safety/notice/definitions/{1}/users/csv`**
+(`patient-csr.txt`, RESOLVED ENDPOINT SHAPES). The slot was not renamed — it was
+**absent**, while the three rows above it in the same table all carry `{id}` or
+`{type}`. **A reader following `docs/06` requests a path with no route.** The same
+slip was in this file's §5 table, whose column header promises the *endpoint
+literal*. Both now carry the slot.
+
+⚠ **One INFERRED element, labelled rather than hidden.** The corpus cannot distinguish
+`{id}` from `{type}` — the minifier emits one positional slot and the corpus
+canonicalises it to `{1}`. `{type}` is used because the row's immediate sibling is
+`definitions/{type}/users`; that is a choice for table consistency, **not** something
+the corpus establishes. **Also recorded, not fixed here:** the renumbering rule printed
+directly above that table in `docs/06` says slots "are renumbered `{1}`, `{2}`, … by
+position", and the table then uses `{id}`/`{type}` throughout. That inconsistency is
+pre-existing, is wider than this row, and is **not this pass's to settle** — it is
+named here so the next reader meets it knowingly.
+
+### 2. A retracted byte range still published in this pass's own claim table
+
+This file's evidence table carried "Bytes 69300–69700 printed in full" — a range the
+pass had already retracted in §4 and that `resolve.txt` contradicts. **THE RUN is
+69458–69866** (the span the claim is about); **THE WINDOW is 69458–69898** (what
+`resolve.py` prints, and a printing convenience, not a claim boundary). The table now
+states both and labels them. The retraction itself is unchanged and was never deleted.
+
+### 3. `leak-screen.py` had never been shown to fail
+
+`leak-screen.py` carried a SELF-TEST, but it proved the **patterns** fire on their own
+targets. Nothing had ever run the **screen's** failure path — the subject walk, the hit
+recording, the `file:line` output, the non-zero exit — because on this pass's real
+artefacts the honest answer is zero hits. `leak-screen-proof.sh` now plants three
+pattern violations at known lines in a throwaway copy and asserts: exit non-zero; the
+output names `file:line`; **the named line is the planted line** (locator correctness,
+not merely presence); every planted pattern is named in the FAILURES block and no value
+is reprinted; **and the control — the same screen on a clean tree — exits 0**, without
+which "exits non-zero" is satisfied by a script that always fails. Result in
+`leak-screen-proof.txt`: exit 1 on the poisoned tree, 3 of 3 hits named at lines 3, 4
+and 5, exit 0 on the clean tree.
+
+⚠ **The proof found a real defect, in `leak-screen.py` itself.** Run against the real
+repository, the screen reported hits on **its own committed output**: the SELF-TEST
+printed its probe strings with `%r`, and a `.txt` screen output is exactly what the
+screen reads. The fragmentation in that self-test was self-defeating — it assembled the
+material at runtime and then wrote the assembled string to a committed file, which is
+what it existed to prevent. Two further trips were found on the same run: this proof
+script echoed `$TMP`, a path under this account's home directory, into its own report;
+and the screen read that back. **Fixed in `leak-screen.py` (length only, never the
+value), in `leak-screen-proof.sh`, and both artefacts regenerated.** A screen that finds
+a leak in its own report is the most direct evidence available that it can fail at all,
+which is what this proof existed to establish.
+
+### 4. `resolve.py`'s self-consistency check tested emptiness, not correspondence
+
+The block's comment claimed "every line above that says FAIL must have produced an
+entry in `failures`"; the code tested only that the two collections were not both
+empty. **Two printed FAILs with one recorded entry printed `consistent`** — the
+`if not a8:` defect a second time, a printed verdict with no consequence, inside the
+block written to close it.
+
+**Counting rule, recorded because it decides what the check can mean.** Several
+assertions append **inside a loop** (A6, A7, A8 and the A-/B-offset sweeps), so one
+printed FAIL line may legitimately correspond to several entries; a raw equality of the
+two counts would fail a correctly reported run. The correspondence claimed and
+checkable is therefore **directional**, and both directions are now enforced: every
+printed FAIL is backed by ≥1 recorded entry, and every recorded entry by ≥1 printed
+FAIL. **Group-level correspondence is NOT checked** — proving a given entry belongs to
+the assertion whose line printed FAIL needs each site to label its own output. Two
+failing assertions on one run can still satisfy both directions while one records
+nothing of its own. That limit is stated in the code, not glossed.
+
+The rule is a pure function and is now exercised on **seven synthetic counts**,
+including the case the old code let through (2 printed, 1 recorded) and a worse one
+(3 printed, 2 recorded). All seven behave as the rule states.
+⚠ **`resolve.txt` has NOT been regenerated and is not byte-exact with the corrected
+script** — the corpus bodies it reads are **not committed** (`resolve.py` takes the
+bodies directory as `argv[1]`, and no such directory exists in the repository). The
+correction is **additive and touches no assertion**, so no figure in `resolve.txt`
+changes; what changed is a diagnostic block. Stated rather than left to look
+regenerated.
+
+### 5. `patient-csr.py`: the printed rule list renumbered the rules it summarised
+
+The module docstring defines **rules 1–8**. The printed summary listed only **1–5** and
+printed `rule 5 verbs` — but the code's own inline citations use the docstring's
+numbering (`rule 5: BOTH branches` for ternaries, `rule 4` for the bare-identifier
+exclusion, `rule 8` for out-of-scope). **A reader who followed the printed output to
+"rule 5" landed on the wrong rule**, and the two rules the summary omitted are the two
+that most move the figure (slot canonicalisation and scope). The summary now prints
+all eight, matching the docstring one for one.
+
+⚠ **`patient-csr.txt` is not byte-exact with the corrected script**, for the same reason
+as §4: the corpus is not committed. Verified that the edits are a raw-docstring prefix
+plus added `w(...)` lines — **no logic changed, so every figure in the artefact stands**.
+It also cannot be: the original capture was **not** byte-exact either, because line 24
+of the script contained `\`` in the docstring, an invalid Python escape. Every run
+emitted `SyntaxWarning: "\`" is an invalid escape sequence` **to stderr**, and a future
+Python makes it a `SyntaxError`. The docstring is now a raw string, so the script
+compiles with **zero warnings** — verified with `warnings.simplefilter("always")`.
+
+### 6. An independent re-derivation, and the mistake it caught in the re-deriver
+
+`spacing-recheck.sh` re-derives every figure `docs/09` §4 quotes for this pass, from
+`results.jsonl`, **by a second implementation and with zero requests** — a screen that
+has only ever agreed with its own source has not been tested. All **13** checks
+re-derive: 215 rows, 16 impossible durations, 22 bodies written before their own
+`t_sent`, 214 same-host gaps, 22 under 2.5 s and 7 under 2 s by `date` against 0 and 0
+by kernel mtime, floor 2.636 s / 1.835 s, max per-gap disagreement 0.873 s, 20 gaps
+disagreeing by >0.5 s.
+
+**Two things worth publishing because they are the kind of thing that is silently
+wrong:**
+
+- **The 16-set and the 22-set are different questions.** The 22 bodies written before
+  their own `t_sent` **contain** the 16 impossible durations plus
+  `{47, 73, 117, 140, 190, 207}`. A duration and a body-write offset are different
+  measurements and this pass's earlier prose moved between them as though they were
+  one.
+- **The first attempt at the re-derivation was wrong, and the artefact was right.** It
+  omitted `.replace(tzinfo=timezone.utc)` from its parser, so every timestamp shifted by
+  3600 s and it reported "0 bodies written before their own t_sent" against the
+  artefact's 22. `spacing.sh:47` pins the timezone. The mistake is published in the
+  script rather than deleted, because anyone re-deriving this will make it.
+- **One figure moved: the "median".** `spacing.txt` reports `sorted(ad)[n//2]` — the
+  **upper-middle element** of an even-length list — as the median. The true median is
+  the mean of the two central elements: **0.0145 s against the printed 0.0149 s**. Both
+  are now stated. This is the only disagreement between the artefact and the
+  re-derivation, and it is a definitional one, not a transcription error.
+
+### 7. `docs/09` §4, re-derived rather than added to
+
+This branch merged `origin/main`, where PR #65 had **rewritten** the sub-declared-gap
+rows. The governing rule now reads: *where a pass's harness series is shown to carry an
+impossible duration, its sub-declared gaps are artefacts of that corruption and are not
+evidence of underspacing; the kernel mtime series is the counter.*
+
+**This pass therefore contributes evidence, not a number.** Its 16 impossible durations
+put it on the same side of that rule as the CORS-method pass, so **its 7 gaps below the
+2 s floor are not added to the published 22**, which stays five passes.
+
+⚠ **And re-deriving the class exposed that this page's pass list was short.** Eleven
+passes show a sub-declared gap on their own `t_sent` series, not the five or six the
+page's own prose implied: **B 1, X 1, Z 5, O 21, D 14, J 2, Q 2, E 4, F 1, CORS 1,
+K 7.** **Three of them — E, J and Q — were never named on this page at all**, each
+against its own committed `spacing.txt`. Ordering by the commit time at which each
+pass's `FINDINGS.md` entered the repository (the only ordering proxy on disk, and
+**INFERRED** — it dates the write-up, not the probe) makes **F the ninth** and **O the
+fourth**, so **neither ordinal this page published re-derives**: F's *sixth occurrence*
+and O's *sixth pass to exhibit the signature*. Both sentences are left standing rather
+than edited away. **Q's instance is on `api.github.com`, not a vendor host** — which is
+the point and not an excuse: the defect is in the harness's clock and does not need
+Medtronic's edge to occur.
+
+### 8. `docs/10` — area V's measurement and the inference drawn from it, separated
+
+The open row for the discovery document's consumer carried both area V's measurement
+and this pass's refutation of a generalisation, in one sentence that said the claim was
+"correct for the eager main bundle and refuted for the patient corpus" and then
+"the measurement stands". That reads as self-contradictory. It now says plainly: **area
+V's measurement STANDS and is NOT retracted** (`.z2` is 0 in the eager main bundle,
+re-measured here against area V's own offsets), it was scoped to the eager main bundle
+and its published wording said so; **what this sweep refutes is the generalisation drawn
+from it**. A measurement and the inference drawn from it are separate artefacts, and
+here only the second one failed. This matches #64's own "What is NOT retracted" section.
+
+### Not corrected, and named so a reader does not assume it was
+
+- **`docs/09` line 188** (the CORS `allow-methods` row, on `origin/main`) carries a
+  stray `|` that splits its **Fix** cell, and GitHub drops the overflow cell — so the
+  advice *"pin the **exact** value, not `contains "POST"`"* **is not rendered on the
+  page**. Pre-existing, unrelated to this pass, and **not fixed here**: a drive-by edit
+  to another pass's row is not this pass's to make silently. Reported to the owner.
+- **`patient-csr.txt` and `resolve.txt` cannot be regenerated from a clean clone.**
+  Both scripts read response bodies that this repository does not commit. Every figure
+  in both artefacts is unaffected by the corrections above; both artefacts are stated as
+  predating the corrected scripts rather than as captures of them.

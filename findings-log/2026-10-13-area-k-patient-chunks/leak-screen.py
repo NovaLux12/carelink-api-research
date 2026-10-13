@@ -110,9 +110,15 @@ w("")
 # defect this pass was just corrected for twice. So the screen is given a known-bad
 # string and must report it.
 #
-# The strings are BUILT AT RUNTIME from fragments. Writing them out literally would
-# put the very material being screened into a new committed file, which is the one
-# thing this script exists to prevent.
+# The strings are BUILT AT RUNTIME from fragments, and — this was the defect
+# `leak-screen-proof.sh` caught — they are ALSO NOT PRINTED. The first version built
+# them from fragments and then printed the concatenation with `%r`, which is
+# self-defeating: the fragment trick exists so the assembled material never reaches a
+# committed file, and printing `'/home/zzprobe/x'` puts it straight into one. The
+# screen's own committed output then tripped `machine-specific paths` and
+# `internal .corp host` ON ITSELF when re-run over the tree — the most direct
+# available demonstration that the screen works. Only the probe's LENGTH is printed
+# now: enough to tell a truncated probe from an empty one, not enough to rebuild it.
 SELFTEST_OK = True
 w("-" * 96)
 w("SELF-TEST — a known-bad string must be caught, or this screen cannot be trusted")
@@ -132,8 +138,9 @@ for pname, probe in probes:
     fired = bool(rx and rx.search(probe))
     if not fired:
         SELFTEST_OK = False
-    w("%-4s %-48s probe %r"
-      % ("ok" if fired else "BAD", pname, probe[:34]))
+    # length only — see the note above. The value is never written to this report.
+    w("%-4s %-48s probe: %2d chars (value not printed)"
+      % ("ok" if fired else "BAD", pname, len(probe)))
 if not SELFTEST_OK:
     w("  -> *** at least one pattern did not fire on its own target: the screen is")
     w("     either mis-specified or the pattern is dead, exactly as the pattern file")

@@ -556,7 +556,7 @@ are stated:
 | `PUT` | `/patient/csr/safety/notice/definitions/{id}` | the same three |
 | `GET` | `/patient/csr/safety/notice/definitions/{type}/file/url` | the same three |
 | `GET` | `/patient/csr/safety/notice/definitions/{type}/users` | the same three |
-| `GET` | `/patient/csr/safety/notice/definitions/users/csv` | the same three |
+| `GET` | `/patient/csr/safety/notice/definitions/{type}/users/csv` | the same three |
 | `POST` | `/patient/csr/safety/notice/definitions/{id}/notification/date` | the same three |
 | `GET` | `/patient/csr/configuration/whitelisted` | `5109.…js` |
 | `GET` | `/patient/csr/users/me/consent/history` | `6633.…js` |

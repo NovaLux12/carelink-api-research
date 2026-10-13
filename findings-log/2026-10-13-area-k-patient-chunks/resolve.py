@@ -333,23 +333,95 @@ w("     a finding about the LAZY corpus rather than a contradiction of area V)")
 w("")
 
 # --- SELF-CONSISTENCY ----------------------------------------------------------
-# Every line above that says FAIL must have produced an entry in `failures`, and
-# every entry in `failures` must be accounted for by something that said FAIL. The
-# `if not a8:` defect above printed FAIL while exiting 0, which is precisely a
-# printed verdict with no consequence. Cross-checking the two closes that class.
+# WHAT IS ACTUALLY CLAIMED, stated as a rule and then implemented, because the
+# version this replaces claimed one thing and tested another.
+#
+# The comment used to read "Every line above that says FAIL must have produced an
+# entry in `failures`, and every entry in `failures` must be accounted for by
+# something that said FAIL", and the code beneath it tested only that the two
+# collections were not BOTH empty. Two printed FAILs with one recorded entry
+# therefore printed `consistent` — the `if not a8:` defect a second time, a printed
+# verdict with no consequence, in the very block written to close it.
+#
+# COUNTING RULE, recorded because it decides what the check can mean at all.
+# Several assertions append INSIDE A LOOP — A6, A7, A8, and the A-/B-offset
+# sweeps — so ONE printed FAIL line may legitimately correspond to SEVERAL
+# recorded entries, and a raw equality of the two counts would fail a correctly
+# reported run. The correspondence that is both claimed and checkable is therefore
+# DIRECTIONAL, and both directions are now enforced:
+#
+#   (1) every printed FAIL line is backed by at least one recorded entry, and
+#   (2) every recorded entry is backed by at least one printed FAIL line.
+#
+# (1) is the direction the old code could not see at all: it required `failures` to
+# be non-empty, which says nothing about how many. `len(failures) >= len(printed)`
+# is the weakest form of "at least one entry of its own" and it is the form that
+# does not false-positive on the looping assertions.
+#
+# NOT ATTEMPTED, and named rather than glossed: GROUP-level correspondence — proving
+# a given entry belongs to the assertion whose line printed FAIL, rather than to
+# some other failing assertion on the same run. That needs each site to label its
+# own output, which is a change to the assertions themselves and not to this check.
+# Two failing assertions on one run can therefore still pass direction (1) while one
+# of them records nothing of its own. Stated so a reader knows the bound of this
+# check instead of assuming it is tighter than it is.
+
+
+def self_consistency(printed, recorded):
+    """Return the list of correspondence problems between the two collections.
+
+    Pure function of the two counts, so it can be exercised on synthetic inputs
+    below — a check that has only ever run on a clean run has not been shown to
+    fire, which is the defect this block exists to close.
+    """
+    problems = []
+    if printed and not recorded:
+        problems.append("%d line(s) printed FAIL but `failures` is empty — a guard "
+                        "cannot fire" % printed)
+    elif recorded and not printed:
+        problems.append("%d entr(y/ies) recorded but nothing printed FAIL — a "
+                        "failure with no printed verdict" % recorded)
+    elif printed > recorded:
+        problems.append("%d line(s) printed FAIL but only %d entr(y/ies) recorded — "
+                        "at least one printed FAIL has no entry of its own"
+                        % (printed, recorded))
+    return problems
+
+
 printed_fail_lines = [l for l in out if re.search(r"FAIL|\*\*\* NO \*\*\*", l)]
 w("SELF-CONSISTENCY")
 w("  lines printed as FAIL            : %d" % len(printed_fail_lines))
 w("  entries in `failures`            : %d" % len(failures))
-if len(printed_fail_lines) and not failures:
-    failures.append("SELF-CONSISTENCY: %d line(s) printed FAIL but `failures` is "
-                    "empty — a guard cannot fire" % len(printed_fail_lines))
-    w("  -> *** a printed FAIL with no recorded failure: a guard cannot fire ***")
-elif failures and not printed_fail_lines:
-    failures.append("SELF-CONSISTENCY: failures recorded but nothing printed FAIL")
-    w("  -> *** failures recorded with nothing printed FAIL ***")
+_problems = self_consistency(len(printed_fail_lines), len(failures))
+if _problems:
+    for _p in _problems:
+        failures.append("SELF-CONSISTENCY: " + _p)
+        w("  -> *** %s ***" % _p)
 else:
-    w("  -> consistent")
+    w("  -> consistent: every printed FAIL is backed by >=1 recorded entry, and")
+    w("     every recorded entry by >=1 printed FAIL. Group-level correspondence is")
+    w("     NOT checked here; see the counting rule above for what that leaves open.")
+w("")
+
+# Prove the rule above can fail, on synthetic counts. The case named in the comment
+# is the third one and is the one the previous implementation let through.
+w("SELF-TEST — the correspondence rule, on synthetic counts (no corpus involved)")
+for _printed, _recorded, _should_fire, _why in (
+        (0, 0, False, "both empty — the clean run"),
+        (2, 2, False, "one line per assertion"),
+        (1, 3, False, "one line, three entries: the looping assertions, legitimately"),
+        (2, 1, True,  "TWO printed FAILs, ONE entry — the case the old code called consistent"),
+        (1, 0, True,  "a printed FAIL with nothing recorded"),
+        (0, 1, True,  "an entry with nothing printed"),
+        (3, 2, True,  "three printed FAILs, two entries — the same defect, worse"),
+):
+    _r = self_consistency(_printed, _recorded)
+    _fired = bool(_r)
+    w("  %-4s printed=%d recorded=%d  expect %-6s got %-6s  %s"
+      % ("ok" if _fired == _should_fire else "BAD", _printed, _recorded,
+         "fire" if _should_fire else "quiet", "fire" if _fired else "quiet", _why))
+    if _r:
+        w("         -> %s" % _r[0])
 w("")
 
 w("=" * 78)

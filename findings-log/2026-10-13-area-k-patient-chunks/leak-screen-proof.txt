@@ -1,0 +1,55 @@
+============================================================================
+LEAK-SCREEN FAILURE PROOF — the FAILURES branch, run on a poisoned copy
+============================================================================
+
+screen : findings-log/2026-10-13-area-k-patient-chunks/leak-screen.py
+poisoned tree: a throwaway copy of scripts/ + one findings-log subject (deleted on exit)
+planted: 3 patterns, first at line 3 of poisoned.txt
+
+1. RUN AGAINST THE POISONED TREE
+  exit   1
+  ASSERT ok   — non-zero on a known-bad tree
+
+2. THE OUTPUT NAMES file:line
+  ASSERT ok   — file:line lines present:
+             internal Grafana/K8s/GitLab/DB/Prometheus host  findings-log/2026-10-13-area-k-patient-chunks/poisoned.txt:5
+             machine-specific paths  findings-log/2026-10-13-area-k-patient-chunks/poisoned.txt:3
+             live jsession values  findings-log/2026-10-13-area-k-patient-chunks/poisoned.txt:4
+
+3. THE NAMED LINE IS THE PLANTED ONE (locator correctness, not just presence)
+  ASSERT ok   — poisoned.txt:3 is among the named hits
+
+4. EVERY PLANTED PATTERN IS NAMED IN THE FAILURES BLOCK, AND NO VALUE IS
+  hits   3 named in the FAILURES block (planted 3)
+  ASSERT ok   — all 3 planted hits reported
+  pattern ok   — named in FAILURES: machine-specific paths
+  pattern ok   — named in FAILURES: live jsession values
+  ASSERT ok   — no probe value reprinted (leak-screen.py rule 1 held)
+
+5. CONTROL — the SAME screen on a clean tree must exit 0
+  exit   0
+  ASSERT ok — clean tree exits 0, so exit 1 above was the poison and not a always-fails script
+           poisoned: VERDICT: 3 HIT(S). The diff must not be pushed until these are gone.
+           clean   : VERDICT: ZERO hits on all 10 patterns across all 1 subjects.
+
+6. DEFECT FOUND BY THIS PROOF, IN leak-screen.py ITSELF
+   Run against the real repository the screen reported hits on its OWN committed
+   output — the SELF-TEST printed its probe strings with %r, and a .txt screen
+   output is exactly what this screen reads. The fragmentation in that self-test
+   was therefore self-defeating: it assembled the material at runtime and then
+   wrote the assembled string to a committed file, which is what it set out to
+   prevent. Three separate artefacts tripped it, each found by a different route:
+     - leak-screen.txt, by the screen reading its own report
+     - leak-screen-proof.txt, by this file echoing $TMP, a path under this
+       account's home directory
+     - leak-screen.py, by the SELF-TEST print
+   Fixed in leak-screen.py (length only, never the value) and here. This is
+   recorded rather than quietly repaired because a screen that finds a leak in
+   its own report is the clearest evidence available that it can fail at all —
+   which is the thing this file was written to establish.
+
+
+============================================================================
+PROOF COMPLETE — the screen fails when it should, passes when it should, and
+names file:line. A zero-hit run of this script is now a measurement.
+============================================================================

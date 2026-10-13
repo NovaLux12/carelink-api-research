@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Area K — the `/patient/csr` census, with the counting rule stated and re-derived.
+# RAW docstring. The module docstring quotes JS template literals, so it contains
+# `\``, which is not a valid Python escape: on every run this emitted
+#   patient-csr.py:24: SyntaxWarning: "\`" is an invalid escape sequence
+# to stderr, and a future Python makes it a SyntaxError. It also meant the committed
+# patient-csr.txt was not a byte-exact capture of the command that produces it — the
+# command wrote to stderr as well as stdout. Fixed by making this a raw string, which
+# keeps the backslash the source actually carries.
+r"""Area K — the `/patient/csr` census, with the counting rule stated and re-derived.
 
 ZERO requests; reads only bodies already captured.
 
@@ -92,7 +99,21 @@ w("rule 2 unit         : one endpoint shape = (HTTP method, path template)")
 w("rule 3 dedup        : once per distinct (method, template) across the corpus")
 w("rule 4 exclusion    : a call whose first argument is a BARE IDENTIFIER is")
 w("                     excluded — the URL comes from the caller, not this corpus")
-w("rule 5 verbs        : from the call site, not the service name")
+w("rule 5 ternaries    : a ternary counts as BOTH branches — two templates")
+w("rule 6 verbs        : from the call site, not the service name")
+w("rule 7 slots        : a runtime slot's NAME is a minifier artefact and is")
+w("                     canonicalised away by position, so the three byte-identical")
+w("                     safety/notice chunks deduplicate instead of tripling")
+w("rule 8 scope        : only paths under /patient/csr — a neighbouring")
+w("                     /patient/consents is out of scope")
+w("")
+w("Rule numbers here match the module docstring's 1-8 one for one, and the inline")
+w("citations in this file's own code use the same numbers (`rule 5: BOTH branches`,")
+w("`rule 4` for the bare-identifier exclusion, `rule 8` for out-of-scope). An earlier")
+w("version of this summary listed only rules 1-5 and printed `rule 5 verbs`, so a")
+w("reader who followed the printed output to 'rule 5' landed on the ternary rule")
+w("while the code meant the verb rule — the summary renumbered the very thing it was")
+w("a summary of, and it omitted the two rules that most move the figure (7 and 8).")
 w("")
 
 # --- collect ------------------------------------------------------------------
