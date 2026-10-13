@@ -163,7 +163,8 @@ itself — four across the three cumulus hosts, **two of them on `.com`**, so **
 preflight does exist there** and
 status was never standing in for CORS presence. Area X re-derived the cell on all three
 hosts: **9 `200`-without-CORS responses, every one a `GET` of a discovery payload, and 0
-non-2xx carrying CORS anywhere**
+non-2xx carrying CORS on `clcloud.*` (area X's 25 rows; on the separate `commoncore*` family
+non-2xx responses *do* carry `access-control-allow-origin: *` — six captures, PR #59/#65)**
 ([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
 
 **The false premise does not close the question, and an earlier draft of this note claimed it
