@@ -32,7 +32,12 @@ chmod +x "$HERE/send.sh" 2>/dev/null || true
 RUNLOG=$LOGDIR/run.log
 JSONL=$LOGDIR/results.jsonl
 : > "$RUNLOG"; : > "$JSONL"
-echo "run start: $(date -u +%FT%T.%3NZ) tmpbodies=$TMPBODIES delay=${DELAY}" | tee -a "$RUNLOG"
+# The temp-body directory is REDACTED AT THE POINT OF GENERATION, not afterwards.
+# Round 1 redacted the committed run.log by hand, which left the mktemp basename
+# in the file AND meant any re-run wrote the machine path straight back. AGENTS.md
+# section 7 forbids a machine path in any committed file; a hand-scrub of an
+# artefact is not a control, it is a one-off.
+echo "run start: $(date -u +%FT%T.%3NZ) tmpbodies=<REDACTED> delay=${DELAY}" | tee -a "$RUNLOG"
 SEQ=0
 
 req() { # req <host> <path> <role> <tag>
@@ -132,4 +137,5 @@ echo "sup index names: main=${SUP_MAIN:-none}" >&2
 [ -n "$SUP_MAIN" ] && req carelink-support.medtronic.eu "/$SUP_MAIN" "CANDIDATE-support-portal-main-bundle" "sup-main"
 
 echo "run end: $(date -u +%FT%T.%3NZ)" | tee -a "$RUNLOG"
-echo "TMPBODIES=$TMPBODIES"
+# The bodies path is printed to the operator's terminal only, never to a file.
+echo "TMPBODIES=$TMPBODIES" >&2

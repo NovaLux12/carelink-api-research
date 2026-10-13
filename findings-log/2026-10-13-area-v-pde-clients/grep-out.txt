@@ -49,7 +49,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
    not a claim: read the identifier and the surrounding bytes before
    writing the hit as anything. Nothing is filtered out here.
 
-   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
            first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
@@ -65,7 +65,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x2   'mapDeviceModelName'               offsets [581421, 581727]
            first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
 
-   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
            first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
@@ -81,51 +81,51 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x2   'mapDeviceModelName'               offsets [581421, 581727]
            first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
 
-   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'baseUrl'                          offsets [2027033, 2027209]
            first-hit context: ...="us"){return this.cmsService.getBaseCmsUrl().pipe((0,Qi.n)(pe=>(this.baseUrl=pe,this.http.get(`${pe}/media/config/mm...
 
-   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'system.gc.gz.transition.flags'    offsets [2189151]
            first-hit context: ...hConnect="connect.countriesWithConnect",D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entries.pag...
 
-   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
            first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
 
-   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'csr.cumulus.periodic.data.endpoints' offsets [2188956]
            first-hit context: ...odeSettings="csr.control.codes.settings",D.csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints",D.browserCheckSettings="personal.appli...
 
-   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'csrCumulusPeriodicDataAPI'        offsets [93566, 2188929]
            first-hit context: ...ttings),J=(0,e.Mz)(f,gt=>gt.controlCodeSettings),ne=(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI),fe=(0,e.Mz)(f,gt=>gt.browserCheckSetti...
 
-   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'display_message'                  offsets [3373507]
            first-hit context: ...rofile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username...
 
-   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — all 8 hit(s) survive a case-SENSITIVE grep (cs=8)
       x8   '/patient/m2m'                     offsets [1468428, 1468476, 2967821, 3367293, 3367946, 3368243, 3368655, 3373009]
            first-hit context: ...patient/csr/users/me/email",h="/patient/users/anonymized/me/email",t="/patient/m2m/users/notifications/sms/status",d="/pat...
 
-   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'retina.endpoints.config'          offsets [2189560]
            first-hit context: ...ries="personal.dashboard.supported.countries",D.retinaEndpointConfig="retina.endpoints.config",D.otcLoginEnabled="personal.sso.otc.en...
 
-   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'mmm.data.api.url'                 offsets [2189269]
            first-hit context: ...="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="mmm.data.api.url",D.configRefetchSettings="config.refetc...
 
-   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — all 5 hit(s) survive a case-SENSITIVE grep (cs=5)
       x5   'patient-timeline'                 offsets [1718181, 1719243, 1963408, 1963661, 3340159]
            first-hit context: ....rXU(We.D),c.rXU(Dt.z))},Gt.\u0275cmp=c.VBU({type:Gt,selectors:[["app-patient-timeline"]],inputs:{reset:"reset"},features:[c.O...
 
-   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'sourceMappingURL'                 offsets [2850610]
            first-hit context: ...ubstring(Ue).replace(rt,"$1use strict$2")+"\n";return O&&Me.push("//# sourceMappingURL="+O+"\n"),Me}(P,re),se=new Blob(O,{type...
 
-   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — PARTIAL — 3 of 12 hit(s) survive a case-SENSITIVE grep (cs=3, ci=12); the rest are substrings of unrelated identifiers and are NOT references to the token
       x5   'guardian'                         offsets [247549, 247758, 254660, 254863, 2505032]
            first-hit context: ...),e.R7$(),e.SpI(" ",e.bMT(3,17,"report.settings.prefer.pump.data.over.guardian"),"\n"),e.R7$(2),e.Y8G("matLegacyPopove...
       x3   'GUARDIAN'                         offsets [1723322, 1723332, 2964263]
@@ -137,7 +137,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'my_profile_edit_guardian_info'    offsets [2504999]
            first-hit context: ...dit_personal_info="My profile - Edit personal info",o.my_profile_edit_guardian_info="My profile - Edit guardian info",o.my_profile_edit_two...
 
-   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — PARTIAL — 5 of 8 hit(s) survive a case-SENSITIVE grep (cs=5, ci=8); the rest are substrings of unrelated identifiers and are NOT references to the token
       x5   'deviceFamily'                     offsets [2964121, 3372241, 3372627, 3372658, 3373116]
            first-hit context: ...is.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWi...
       x2   'getDeviceFamily'                  offsets [2964069, 3372209]
@@ -145,7 +145,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'lastDeviceFamily'                 offsets [3373160]
            first-hit context: ...R=sessionStorage.getItem("deviceFamily");return R?V.map(X=>({...X,lastDeviceFamily:R})):V}))}fetchLatestCurrentPatientDetails(...
 
-   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x25  'numberingPlan'                    offsets [271520, 271588, 271867, 271904, 1460297, 1460445, 1460514, 1461181, 1461257, 1461338, 1461431, 1461523, 1461601, 1461688, 1461795, 1461891, 1461968, 1462037, 1462101, 1462432, 1760140, 1760192, 1760522, 1763001, 2736255]
            first-hit context: ...,o})()},13604:(Je,_e,i)=>{"use strict";function e(a,n){if(a&&n.numberingPlan.nationalPrefixForParsing()){var o=new RegExp("...
       x18  'selectNumberingPlan'              offsets [12665, 12723, 309507, 1460112, 1460143, 1462343, 1481313, 1481585, 1731908, 1760088, 1762973, 2735527, 2736234, 2736575, 2737371, 2738263, 2769169, 3161756]
@@ -183,8 +183,9 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'noReportingPeriod'                offsets [2669263]
            first-hit context: ...ckFilterButton"},features:[e.OA$],decls:12,vars:14,consts:[["noReportingPeriod",""],[1,"tc__toolbar"],[1,"toolbar-element"],[3,...
 
-   §2 arithmetic: 0 FAIL(s). A per-identifier count that does not sum to the token total is how the first version of this file published
-   two wrong multiplicities whose errors cancelled.
+   §2 cross-section check: 0 FAIL(s) across 16 section(s), 51 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
 
 ==============================================================================
 == us-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
@@ -232,7 +233,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
    not a claim: read the identifier and the surrounding bytes before
    writing the hit as anything. Nothing is filtered out here.
 
-   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
            first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
@@ -248,7 +249,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x2   'mapDeviceModelName'               offsets [581421, 581727]
            first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
 
-   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
            first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
@@ -264,51 +265,51 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x2   'mapDeviceModelName'               offsets [581421, 581727]
            first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
 
-   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'baseUrl'                          offsets [2027033, 2027209]
            first-hit context: ...="us"){return this.cmsService.getBaseCmsUrl().pipe((0,Qi.n)(pe=>(this.baseUrl=pe,this.http.get(`${pe}/media/config/mm...
 
-   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'system.gc.gz.transition.flags'    offsets [2189151]
            first-hit context: ...hConnect="connect.countriesWithConnect",D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entries.pag...
 
-   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
            first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
 
-   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'csr.cumulus.periodic.data.endpoints' offsets [2188956]
            first-hit context: ...odeSettings="csr.control.codes.settings",D.csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints",D.browserCheckSettings="personal.appli...
 
-   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'csrCumulusPeriodicDataAPI'        offsets [93566, 2188929]
            first-hit context: ...ttings),J=(0,e.Mz)(f,gt=>gt.controlCodeSettings),ne=(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI),fe=(0,e.Mz)(f,gt=>gt.browserCheckSetti...
 
-   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'display_message'                  offsets [3373507]
            first-hit context: ...rofile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username...
 
-   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — all 8 hit(s) survive a case-SENSITIVE grep (cs=8)
       x8   '/patient/m2m'                     offsets [1468428, 1468476, 2967821, 3367293, 3367946, 3368243, 3368655, 3373009]
            first-hit context: ...patient/csr/users/me/email",h="/patient/users/anonymized/me/email",t="/patient/m2m/users/notifications/sms/status",d="/pat...
 
-   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'retina.endpoints.config'          offsets [2189560]
            first-hit context: ...ries="personal.dashboard.supported.countries",D.retinaEndpointConfig="retina.endpoints.config",D.otcLoginEnabled="personal.sso.otc.en...
 
-   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'mmm.data.api.url'                 offsets [2189269]
            first-hit context: ...="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="mmm.data.api.url",D.configRefetchSettings="config.refetc...
 
-   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — all 5 hit(s) survive a case-SENSITIVE grep (cs=5)
       x5   'patient-timeline'                 offsets [1718181, 1719243, 1963408, 1963661, 3340159]
            first-hit context: ....rXU(We.D),c.rXU(Dt.z))},Gt.\u0275cmp=c.VBU({type:Gt,selectors:[["app-patient-timeline"]],inputs:{reset:"reset"},features:[c.O...
 
-   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'sourceMappingURL'                 offsets [2850610]
            first-hit context: ...ubstring(Ue).replace(rt,"$1use strict$2")+"\n";return O&&Me.push("//# sourceMappingURL="+O+"\n"),Me}(P,re),se=new Blob(O,{type...
 
-   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — PARTIAL — 3 of 12 hit(s) survive a case-SENSITIVE grep (cs=3, ci=12); the rest are substrings of unrelated identifiers and are NOT references to the token
       x5   'guardian'                         offsets [247549, 247758, 254660, 254863, 2505032]
            first-hit context: ...),e.R7$(),e.SpI(" ",e.bMT(3,17,"report.settings.prefer.pump.data.over.guardian"),"\n"),e.R7$(2),e.Y8G("matLegacyPopove...
       x3   'GUARDIAN'                         offsets [1723322, 1723332, 2964263]
@@ -320,7 +321,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'my_profile_edit_guardian_info'    offsets [2504999]
            first-hit context: ...dit_personal_info="My profile - Edit personal info",o.my_profile_edit_guardian_info="My profile - Edit guardian info",o.my_profile_edit_two...
 
-   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — PARTIAL — 5 of 8 hit(s) survive a case-SENSITIVE grep (cs=5, ci=8); the rest are substrings of unrelated identifiers and are NOT references to the token
       x5   'deviceFamily'                     offsets [2964121, 3372241, 3372627, 3372658, 3373116]
            first-hit context: ...is.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWi...
       x2   'getDeviceFamily'                  offsets [2964069, 3372209]
@@ -328,7 +329,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'lastDeviceFamily'                 offsets [3373160]
            first-hit context: ...R=sessionStorage.getItem("deviceFamily");return R?V.map(X=>({...X,lastDeviceFamily:R})):V}))}fetchLatestCurrentPatientDetails(...
 
-   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x25  'numberingPlan'                    offsets [271520, 271588, 271867, 271904, 1460297, 1460445, 1460514, 1461181, 1461257, 1461338, 1461431, 1461523, 1461601, 1461688, 1461795, 1461891, 1461968, 1462037, 1462101, 1462432, 1760140, 1760192, 1760522, 1763001, 2736255]
            first-hit context: ...,o})()},13604:(Je,_e,i)=>{"use strict";function e(a,n){if(a&&n.numberingPlan.nationalPrefixForParsing()){var o=new RegExp("...
       x18  'selectNumberingPlan'              offsets [12665, 12723, 309507, 1460112, 1460143, 1462343, 1481313, 1481585, 1731908, 1760088, 1762973, 2735527, 2736234, 2736575, 2737371, 2738263, 2769169, 3161756]
@@ -366,8 +367,9 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
       x1   'noReportingPeriod'                offsets [2669263]
            first-hit context: ...ckFilterButton"},features:[e.OA$],decls:12,vars:14,consts:[["noReportingPeriod",""],[1,"tc__toolbar"],[1,"toolbar-element"],[3,...
 
-   §2 arithmetic: 0 FAIL(s). A per-identifier count that does not sum to the token total is how the first version of this file published
-   two wrong multiplicities whose errors cancelled.
+   §2 cross-section check: 0 FAIL(s) across 32 section(s), 102 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
 
 ==============================================================================
 == hp-main: 3397615 B  sha256 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
@@ -415,7 +417,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
    not a claim: read the identifier and the surrounding bytes before
    writing the hit as anything. Nothing is filtered out here.
 
-   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — PARTIAL — 5 of 32 hit(s) survive a case-SENSITIVE grep (cs=5, ci=32); the rest are substrings of unrelated identifiers and are NOT references to the token
       x8   'propDecorators'                   offsets [1312749, 1312767, 1312786, 1312812, 1413327, 1413360, 1413389, 1413410]
            first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [2778434, 2778927, 2779600, 2783927, 2784096, 2784355]
@@ -443,7 +445,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'topdevice'                        offsets [326919]
            first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
 
-   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [1312749, 1312767, 1312786, 1312812, 1413327, 1413360, 1413389, 1413410]
            first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [2778434, 2778927, 2779600, 2783927, 2784096, 2784355]
@@ -471,11 +473,11 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'topdevice'                        offsets [326919]
            first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
 
-   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'baseUrl'                          offsets [2422149, 2422752]
            first-hit context: ...s,version:m_VERSION,suffix:m_dependency_suffix,receivers:o});const S={baseUrl:"https://pusher.com",urls:{authenticati...
 
-   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — all 12 hit(s) survive a case-SENSITIVE grep (cs=12)
       x1   'discover'                         offsets [211829]
            first-hit context: ...,katerina,pass123,andrew1,shaney14,dumbass,osiris,fuck_inside,oakland,discover,ranger1,spanking,lonestar,bingo,meridia...
       x1   'discovered'                       offsets [449173]
@@ -501,11 +503,11 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'undiscovered'                     offsets [954784]
            first-hit context: ...g,unflattering,unfairness,unexpressed,unending,unencumbered,unearth,undiscovered,undisciplined,understan,undershirt,underl...
 
-   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'sourceMappingURL'                 offsets [1791807]
            first-hit context: ...ubstring(st).replace(Dt,"$1use strict$2")+"\n";return F&&De.push("//# sourceMappingURL="+F+"\n"),De}(p,k),re=new Blob(F,{type:...
 
-   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x26  'Guardian'                         offsets [3004505, 3004541, 3004608, 3004644, 3004711, 3004747, 3004814, 3004850, 3004917, 3004953, 3006546, 3006575, 3006635, 3006664, 3006721, 3006750, 3006807, 3006836, 3006898, 3006927, 3006987, 3007023, 3007090, 3007126, 3007195, 3007231]
            first-hit context: ...",shortName:"Enlite Sensor",webDashboardEnabled:!1},"MMT-7811":{name:"Guardian\u2122 Sensor 3",shortName:"Guardian\u21...
       x1   'guardian'                         offsets [211405]
@@ -515,13 +517,13 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'guardianship'                     offsets [909938]
            first-hit context: ...ypnotic,hyped,hospitable,hoses,homemaker,hirschmuller,helpers,headset,guardianship,guapo,grubby,granola,granddaddy,goren,g...
 
-   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x1   'deviceFamily'                     offsets [2874214]
            first-hit context: ...,tags:[],ages:[],diabetesType:[],careTeam:[]},ur={type:De.he.ALL},Xr={deviceFamily:Ut.Ey.all,ageGroups:[Ut.Ey.all]};localS...
       x1   'deviceFamilyMapping'              offsets [1243187]
            first-hit context: ...d 0:ma.editableValues)??[]:[]}),fs=(0,e.Mz)(zt,ht=>null==ht?void 0:ht.deviceFamilyMapping),Hr=(0,e.Mz)(zt,ht=>(null==ht?void 0:ht...
 
-   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x11  'reportingPeriod'                  offsets [2956286, 2956321, 2959762, 2962966, 2966200, 2966258, 2970068, 3049072, 3329521, 3329577, 3331387]
            first-hit context: ...dReportTypes,patientId:null==Zr?void 0:Zr.patientId.toString(),reportingPeriod:null==Zr?void 0:Zr.reportingPeriod,comparisonP...
       x9   'loadingPromise'                   offsets [1413002, 1422540, 1422766, 1423356, 1423386, 1423417, 1423462, 1423518, 1475393]
@@ -567,8 +569,9 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'rangpur'                          offsets [671824]
            first-hit context: ...varun,shuja,khatun,chengde,bushels,lascelles,professionnelle,elfman,rangpur,unpowered,citytv,chojnice,quaternion,stok...
 
-   §2 arithmetic: 0 FAIL(s). A per-identifier count that does not sum to the token total is how the first version of this file published
-   two wrong multiplicities whose errors cancelled.
+   §2 cross-section check: 0 FAIL(s) across 40 section(s), 170 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
 
 ==============================================================================
 == sup-main: 3410666 B  sha256 a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954
@@ -616,7 +619,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
    not a claim: read the identifier and the surrounding bytes before
    writing the hit as anything. Nothing is filtered out here.
 
-   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — PARTIAL — 5 of 32 hit(s) survive a case-SENSITIVE grep (cs=5, ci=32); the rest are substrings of unrelated identifiers and are NOT references to the token
       x8   'propDecorators'                   offsets [1313078, 1313096, 1313115, 1313141, 1413660, 1413693, 1413722, 1413743]
            first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [3161217, 3161710, 3162383, 3166710, 3166879, 3167138]
@@ -644,7 +647,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'topdevice'                        offsets [326919]
            first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
 
-   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x8   'propDecorators'                   offsets [1313078, 1313096, 1313115, 1313141, 1413660, 1413693, 1413722, 1413743]
            first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
       x6   'removeStylesOnCompDestroy'        offsets [3161217, 3161710, 3162383, 3166710, 3166879, 3167138]
@@ -672,11 +675,11 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'topdevice'                        offsets [326919]
            first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
 
-   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x2   'baseUrl'                          offsets [2422091, 2422694]
            first-hit context: ...s,version:m_VERSION,suffix:m_dependency_suffix,receivers:o});const S={baseUrl:"https://pusher.com",urls:{authenticati...
 
-   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — all 12 hit(s) survive a case-SENSITIVE grep (cs=12)
       x1   'discover'                         offsets [211829]
            first-hit context: ...,katerina,pass123,andrew1,shaney14,dumbass,osiris,fuck_inside,oakland,discover,ranger1,spanking,lonestar,bingo,meridia...
       x1   'discovered'                       offsets [449173]
@@ -702,11 +705,11 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'undiscovered'                     offsets [954784]
            first-hit context: ...g,unflattering,unfairness,unexpressed,unending,unencumbered,unearth,undiscovered,undisciplined,understan,undershirt,underl...
 
-   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
       x1   'sourceMappingURL'                 offsets [1792143]
            first-hit context: ...ubstring(st).replace(Tt,"$1use strict$2")+"\n";return B&&De.push("//# sourceMappingURL="+B+"\n"),De}(p,E),ae=new Blob(B,{type:...
 
-   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x26  'Guardian'                         offsets [2806348, 2806384, 2806451, 2806487, 2806554, 2806590, 2806657, 2806693, 2806760, 2806796, 2808389, 2808418, 2808478, 2808507, 2808564, 2808593, 2808650, 2808679, 2808741, 2808770, 2808830, 2808866, 2808933, 2808969, 2809038, 2809074]
            first-hit context: ...",shortName:"Enlite Sensor",webDashboardEnabled:!1},"MMT-7811":{name:"Guardian\u2122 Sensor 3",shortName:"Guardian\u21...
       x1   'guardian'                         offsets [211405]
@@ -716,13 +719,13 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'guardianship'                     offsets [909938]
            first-hit context: ...ypnotic,hyped,hospitable,hoses,homemaker,hirschmuller,helpers,headset,guardianship,guapo,grubby,granola,granddaddy,goren,g...
 
-   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — case-SENSITIVE hits survive
+   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
       x1   'deviceFamily'                     offsets [3256997]
            first-hit context: ...,tags:[],ages:[],diabetesType:[],careTeam:[]},rr={type:De.he.ALL},Ea={deviceFamily:Ht.Ey.all,ageGroups:[Ht.Ey.all]};localS...
       x1   'deviceFamilyMapping'              offsets [1243187]
            first-hit context: ...d 0:ma.editableValues)??[]:[]}),ms=(0,e.Mz)(Ut,ft=>null==ft?void 0:ft.deviceFamilyMapping),Kr=(0,e.Mz)(Ut,ft=>(null==ft?void 0:ft...
 
-   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY (case-sensitive grep drops every one)
+   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
       x11  'reportingPeriod'                  offsets [2850915, 3131445, 3131501, 3133311, 3352001, 3352036, 3355477, 3358681, 3361915, 3361973, 3365783]
            first-hit context: ...enerateDownloadId(z,L){const{selectedReportTypes:W,patientId:H,reportingPeriod:$,comparisonPeriod:q,dailyReportDays:F,selecte...
       x9   'loadingPromise'                   offsets [1413335, 1422873, 1423099, 1423689, 1423719, 1423750, 1423795, 1423851, 1475729]
@@ -768,8 +771,9 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
       x1   'rangpur'                          offsets [671824]
            first-hit context: ...varun,shuja,khatun,chengde,bushels,lascelles,professionnelle,elfman,rangpur,unpowered,citytv,chojnice,quaternion,stok...
 
-   §2 arithmetic: 0 FAIL(s). A per-identifier count that does not sum to the token total is how the first version of this file published
-   two wrong multiplicities whose errors cancelled.
+   §2 cross-section check: 0 FAIL(s) across 48 section(s), 238 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
 
 ==============================================================================
 == eu-runtime: 8268 B  sha256 0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722
@@ -817,5 +821,66 @@ NGP                                  cs=0    ci=0    q=0
    not a claim: read the identifier and the surrounding bytes before
    writing the hit as anything. Nothing is filtered out here.
 
-   §2 arithmetic: 0 FAIL(s). A per-identifier count that does not sum to the token total is how the first version of this file published
-   two wrong multiplicities whose errors cancelled.
+   §2 cross-section check: 0 FAIL(s) across 48 section(s), 238 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+§3  PUBLISHED-MULTIPLICITIES GUARD (drift detection, not first-derivation proof)
+==============================================================================
+   ok   238 group(s) match the published multiplicities exactly
+   ok   case-sensitivity class per section (derived from the bytes, not stored):
+        eu-main     pde                                ci       cs=0   ci=25  groups=7
+        eu-main     PDE                                ci       cs=0   ci=25  groups=7
+        eu-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        eu-main     system.gc.gz.transition.flags      cs       cs=1   ci=1   groups=1
+        eu-main     guardianCumulusPeriodicAPI         cs       cs=2   ci=2   groups=1
+        eu-main     csr.cumulus.periodic.data.endpoints cs       cs=1   ci=1   groups=1
+        eu-main     csrCumulusPeriodicDataAPI          cs       cs=2   ci=2   groups=1
+        eu-main     display_message                    cs       cs=1   ci=1   groups=1
+        eu-main     /patient/m2m                       cs       cs=8   ci=8   groups=1
+        eu-main     retina.endpoints.config            cs       cs=1   ci=1   groups=1
+        eu-main     mmm.data.api.url                   cs       cs=1   ci=1   groups=1
+        eu-main     patient-timeline                   cs       cs=5   ci=5   groups=1
+        eu-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        eu-main     GUARDIAN                           partial  cs=3   ci=12  groups=5
+        eu-main     deviceFamily                       partial  cs=5   ci=8   groups=3
+        eu-main     NGP                                ci       cs=0   ci=94  groups=18
+        us-main     pde                                ci       cs=0   ci=25  groups=7
+        us-main     PDE                                ci       cs=0   ci=25  groups=7
+        us-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        us-main     system.gc.gz.transition.flags      cs       cs=1   ci=1   groups=1
+        us-main     guardianCumulusPeriodicAPI         cs       cs=2   ci=2   groups=1
+        us-main     csr.cumulus.periodic.data.endpoints cs       cs=1   ci=1   groups=1
+        us-main     csrCumulusPeriodicDataAPI          cs       cs=2   ci=2   groups=1
+        us-main     display_message                    cs       cs=1   ci=1   groups=1
+        us-main     /patient/m2m                       cs       cs=8   ci=8   groups=1
+        us-main     retina.endpoints.config            cs       cs=1   ci=1   groups=1
+        us-main     mmm.data.api.url                   cs       cs=1   ci=1   groups=1
+        us-main     patient-timeline                   cs       cs=5   ci=5   groups=1
+        us-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        us-main     GUARDIAN                           partial  cs=3   ci=12  groups=5
+        us-main     deviceFamily                       partial  cs=5   ci=8   groups=3
+        us-main     NGP                                ci       cs=0   ci=94  groups=18
+        hp-main     pde                                partial  cs=5   ci=32  groups=13
+        hp-main     PDE                                ci       cs=0   ci=32  groups=13
+        hp-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        hp-main     discover                           cs       cs=12  ci=12  groups=12
+        hp-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        hp-main     GUARDIAN                           ci       cs=0   ci=29  groups=4
+        hp-main     deviceFamily                       cs       cs=2   ci=2   groups=2
+        hp-main     NGP                                ci       cs=0   ci=51  groups=22
+        sup-main    pde                                partial  cs=5   ci=32  groups=13
+        sup-main    PDE                                ci       cs=0   ci=32  groups=13
+        sup-main    baseUrl                            cs       cs=2   ci=2   groups=1
+        sup-main    discover                           cs       cs=12  ci=12  groups=12
+        sup-main    sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        sup-main    GUARDIAN                           ci       cs=0   ci=29  groups=4
+        sup-main    deviceFamily                       cs       cs=2   ci=2   groups=2
+        sup-main    NGP                                ci       cs=0   ci=51  groups=22
+
+   LIMIT, stated so this guard is not over-read: it detects DRIFT between the
+   published numbers and the bytes. It cannot detect a wrong FIRST derivation,
+   because expected-multiplicities.txt was authored by this same pass from
+   these same bundles. MODE=--emit re-derives it; re-review any diff by hand
+   rather than trusting that it is small.

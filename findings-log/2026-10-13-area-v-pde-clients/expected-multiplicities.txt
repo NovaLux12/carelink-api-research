@@ -1,0 +1,280 @@
+# expected-multiplicities.txt — the per-identifier multiplicities area V PUBLISHED,
+# stated independently of the grouping code that recomputes them. GENERATED, then
+# committed as data: it is not hand-typed (this pass published two hand-typed
+# numbers that disagreed with its own artefact, so the file that guards against
+# that must not itself be typed by hand).
+#
+# WHY THIS FILE EXISTS. The first version of extract.sh's arithmetic guard compared
+# `sum(len(v) for v in groups.values())` against `len(hits)` — but `groups` is built
+# by iterating `hits`, so the partition sum IS the size of the set it partitions.
+# The assertion was a tautology, could not fire, and FINDINGS.md nevertheless
+# described it as stopping a class of error "silently". A check that looks like it
+# ran is worse than no check (docs/09 §5): it converts a gap into a green tick.
+#
+# WHAT THE GUARD NOW CHECKS. extract.sh recomputes every group from the bytes and
+# compares it against these stated multiplicities, so it fires when the published
+# table and the bundles disagree — which is exactly the defect this pass made twice
+# (a hand-written `x5`/`x4` that cancelled; `discover` published as 0 against a
+# `cs=12` in the same file).
+#
+# WHAT IT DOES NOT DO, and that is not a formality: it cannot catch a wrong FIRST
+# derivation, because these rows were authored by the same pass from the same
+# bundles. This is drift detection between published numbers and bytes, NOT proof
+# the published numbers were right the first time. Every row was re-derived
+# independently and set-compared before being committed.
+#
+# FORMAT:  <body> <token> <enclosing identifier> <multiplicity>
+# Multiplicity only. The case-sensitivity CLASS (cs / ci / partial) is derived by
+# the script from the bytes and printed in the section header; it is deliberately
+# NOT duplicated here, so this file cannot disagree with the script about it.
+#
+# Bodies, first 16 hex of the sha256 of each decompressed body. extract.sh asserts
+# the digest BEFORE comparing anything (AGENTS.md section 6 item 3):
+#   eu-main    0fb4fbd483b5f5d2      us-main    0fb4fbd483b5f5d2
+#   hp-main    2a7fa8e7af519c2b      sup-main   a054555a0f22176e
+#   eu-runtime 0dfea208804facf8
+# A bundle bump makes every row below wrong and the guard says so. Re-derive, do
+# not assume.
+#
+# Capture date 2026-10-13. Regenerate/verify with:
+#   TMPBODIES=<bodies> bash extract.sh      # section 3 prints the diff
+# Rows: 238
+
+eu-main pde LoopDetected 2
+eu-main pde WPDesktop 3
+eu-main pde getGroupDelayControl 2
+eu-main pde isDesktopDevice 2
+eu-main pde mapDeviceModelName 2
+eu-main pde propDecorators 8
+eu-main pde removeStylesOnCompDestroy 6
+eu-main PDE LoopDetected 2
+eu-main PDE WPDesktop 3
+eu-main PDE getGroupDelayControl 2
+eu-main PDE isDesktopDevice 2
+eu-main PDE mapDeviceModelName 2
+eu-main PDE propDecorators 8
+eu-main PDE removeStylesOnCompDestroy 6
+eu-main baseUrl baseUrl 2
+eu-main system.gc.gz.transition.flags system.gc.gz.transition.flags 1
+eu-main guardianCumulusPeriodicAPI guardianCumulusPeriodicAPI 2
+eu-main csr.cumulus.periodic.data.endpoints csr.cumulus.periodic.data.endpoints 1
+eu-main csrCumulusPeriodicDataAPI csrCumulusPeriodicDataAPI 2
+eu-main display_message display_message 1
+eu-main /patient/m2m /patient/m2m 8
+eu-main retina.endpoints.config retina.endpoints.config 1
+eu-main mmm.data.api.url mmm.data.api.url 1
+eu-main patient-timeline patient-timeline 5
+eu-main sourceMappingURL sourceMappingURL 1
+eu-main GUARDIAN GUARDIAN 3
+eu-main GUARDIAN guardian 5
+eu-main GUARDIAN guardianCumulusPeriodicAPI 2
+eu-main GUARDIAN guardianParent 1
+eu-main GUARDIAN my_profile_edit_guardian_info 1
+eu-main deviceFamily deviceFamily 5
+eu-main deviceFamily getDeviceFamily 2
+eu-main deviceFamily lastDeviceFamily 1
+eu-main NGP SwitchingProtocols 2
+eu-main NGP _draggingPredicate 2
+eu-main NGP bingpreview 1
+eu-main NGP fixMissingPlus 2
+eu-main NGP getNumberingPlanMetadata 3
+eu-main NGP hasSelectedNumberingPlan 7
+eu-main NGP incomingParameters 2
+eu-main NGP incomingParams 5
+eu-main NGP justLeadingPlus 2
+eu-main NGP landingPageFooterText 2
+eu-main NGP loadingPromise 9
+eu-main NGP marketingParams 2
+eu-main NGP missingPlus 3
+eu-main NGP noReportingPeriod 1
+eu-main NGP numberingPlan 25
+eu-main NGP pendingPageScroll 6
+eu-main NGP reportingPeriod 2
+eu-main NGP selectNumberingPlan 18
+us-main pde LoopDetected 2
+us-main pde WPDesktop 3
+us-main pde getGroupDelayControl 2
+us-main pde isDesktopDevice 2
+us-main pde mapDeviceModelName 2
+us-main pde propDecorators 8
+us-main pde removeStylesOnCompDestroy 6
+us-main PDE LoopDetected 2
+us-main PDE WPDesktop 3
+us-main PDE getGroupDelayControl 2
+us-main PDE isDesktopDevice 2
+us-main PDE mapDeviceModelName 2
+us-main PDE propDecorators 8
+us-main PDE removeStylesOnCompDestroy 6
+us-main baseUrl baseUrl 2
+us-main system.gc.gz.transition.flags system.gc.gz.transition.flags 1
+us-main guardianCumulusPeriodicAPI guardianCumulusPeriodicAPI 2
+us-main csr.cumulus.periodic.data.endpoints csr.cumulus.periodic.data.endpoints 1
+us-main csrCumulusPeriodicDataAPI csrCumulusPeriodicDataAPI 2
+us-main display_message display_message 1
+us-main /patient/m2m /patient/m2m 8
+us-main retina.endpoints.config retina.endpoints.config 1
+us-main mmm.data.api.url mmm.data.api.url 1
+us-main patient-timeline patient-timeline 5
+us-main sourceMappingURL sourceMappingURL 1
+us-main GUARDIAN GUARDIAN 3
+us-main GUARDIAN guardian 5
+us-main GUARDIAN guardianCumulusPeriodicAPI 2
+us-main GUARDIAN guardianParent 1
+us-main GUARDIAN my_profile_edit_guardian_info 1
+us-main deviceFamily deviceFamily 5
+us-main deviceFamily getDeviceFamily 2
+us-main deviceFamily lastDeviceFamily 1
+us-main NGP SwitchingProtocols 2
+us-main NGP _draggingPredicate 2
+us-main NGP bingpreview 1
+us-main NGP fixMissingPlus 2
+us-main NGP getNumberingPlanMetadata 3
+us-main NGP hasSelectedNumberingPlan 7
+us-main NGP incomingParameters 2
+us-main NGP incomingParams 5
+us-main NGP justLeadingPlus 2
+us-main NGP landingPageFooterText 2
+us-main NGP loadingPromise 9
+us-main NGP marketingParams 2
+us-main NGP missingPlus 3
+us-main NGP noReportingPeriod 1
+us-main NGP numberingPlan 25
+us-main NGP pendingPageScroll 6
+us-main NGP reportingPeriod 2
+us-main NGP selectNumberingPlan 18
+hp-main pde AppDefault 3
+hp-main pde LoopDetected 2
+hp-main pde WPDesktop 3
+hp-main pde WebPDecodeRGBA 2
+hp-main pde WebPDequantizeLevels 1
+hp-main pde dropdead 1
+hp-main pde hampden 1
+hp-main pde helpdesk 1
+hp-main pde herpderp 1
+hp-main pde mapDeviceModelName 2
+hp-main pde propDecorators 8
+hp-main pde removeStylesOnCompDestroy 6
+hp-main pde topdevice 1
+hp-main PDE AppDefault 3
+hp-main PDE LoopDetected 2
+hp-main PDE WPDesktop 3
+hp-main PDE WebPDecodeRGBA 2
+hp-main PDE WebPDequantizeLevels 1
+hp-main PDE dropdead 1
+hp-main PDE hampden 1
+hp-main PDE helpdesk 1
+hp-main PDE herpderp 1
+hp-main PDE mapDeviceModelName 2
+hp-main PDE propDecorators 8
+hp-main PDE removeStylesOnCompDestroy 6
+hp-main PDE topdevice 1
+hp-main baseUrl baseUrl 2
+hp-main discover discover 1
+hp-main discover discovered 1
+hp-main discover discoverer 1
+hp-main discover discoverers 1
+hp-main discover discoveries 1
+hp-main discover discovering 1
+hp-main discover discovers 1
+hp-main discover discovery 1
+hp-main discover rediscover 1
+hp-main discover rediscovered 1
+hp-main discover rediscovery 1
+hp-main discover undiscovered 1
+hp-main sourceMappingURL sourceMappingURL 1
+hp-main GUARDIAN Guardian 26
+hp-main GUARDIAN guardian 1
+hp-main GUARDIAN guardians 1
+hp-main GUARDIAN guardianship 1
+hp-main deviceFamily deviceFamily 1
+hp-main deviceFamily deviceFamilyMapping 1
+hp-main NGP ShadingPattern 1
+hp-main NGP SwitchingProtocols 2
+hp-main NGP TilingPattern 2
+hp-main NGP addShadingPattern 2
+hp-main NGP beginTilingPattern 2
+hp-main NGP bingpreview 1
+hp-main NGP cutOffSegmentsOutsideReportingPeriod 2
+hp-main NGP endTilingPattern 3
+hp-main NGP inpenReportingPeriod 1
+hp-main NGP kingpin 1
+hp-main NGP kingpins 1
+hp-main NGP landingPageFooterText 2
+hp-main NGP loadingPage 2
+hp-main NGP loadingPromise 9
+hp-main NGP marketingParams 2
+hp-main NGP networkingpe 1
+hp-main NGP pingpong 1
+hp-main NGP putShadingPatternDict 1
+hp-main NGP putTilingPatternDict 1
+hp-main NGP rangpur 1
+hp-main NGP reportingPeriod 11
+hp-main NGP reportingPeriodSegments 2
+sup-main pde AppDefault 3
+sup-main pde LoopDetected 2
+sup-main pde WPDesktop 3
+sup-main pde WebPDecodeRGBA 2
+sup-main pde WebPDequantizeLevels 1
+sup-main pde dropdead 1
+sup-main pde hampden 1
+sup-main pde helpdesk 1
+sup-main pde herpderp 1
+sup-main pde mapDeviceModelName 2
+sup-main pde propDecorators 8
+sup-main pde removeStylesOnCompDestroy 6
+sup-main pde topdevice 1
+sup-main PDE AppDefault 3
+sup-main PDE LoopDetected 2
+sup-main PDE WPDesktop 3
+sup-main PDE WebPDecodeRGBA 2
+sup-main PDE WebPDequantizeLevels 1
+sup-main PDE dropdead 1
+sup-main PDE hampden 1
+sup-main PDE helpdesk 1
+sup-main PDE herpderp 1
+sup-main PDE mapDeviceModelName 2
+sup-main PDE propDecorators 8
+sup-main PDE removeStylesOnCompDestroy 6
+sup-main PDE topdevice 1
+sup-main baseUrl baseUrl 2
+sup-main discover discover 1
+sup-main discover discovered 1
+sup-main discover discoverer 1
+sup-main discover discoverers 1
+sup-main discover discoveries 1
+sup-main discover discovering 1
+sup-main discover discovers 1
+sup-main discover discovery 1
+sup-main discover rediscover 1
+sup-main discover rediscovered 1
+sup-main discover rediscovery 1
+sup-main discover undiscovered 1
+sup-main sourceMappingURL sourceMappingURL 1
+sup-main GUARDIAN Guardian 26
+sup-main GUARDIAN guardian 1
+sup-main GUARDIAN guardians 1
+sup-main GUARDIAN guardianship 1
+sup-main deviceFamily deviceFamily 1
+sup-main deviceFamily deviceFamilyMapping 1
+sup-main NGP ShadingPattern 1
+sup-main NGP SwitchingProtocols 2
+sup-main NGP TilingPattern 2
+sup-main NGP addShadingPattern 2
+sup-main NGP beginTilingPattern 2
+sup-main NGP bingpreview 1
+sup-main NGP cutOffSegmentsOutsideReportingPeriod 2
+sup-main NGP endTilingPattern 3
+sup-main NGP inpenReportingPeriod 1
+sup-main NGP kingpin 1
+sup-main NGP kingpins 1
+sup-main NGP landingPageFooterText 2
+sup-main NGP loadingPage 2
+sup-main NGP loadingPromise 9
+sup-main NGP marketingParams 2
+sup-main NGP networkingpe 1
+sup-main NGP pingpong 1
+sup-main NGP putShadingPatternDict 1
+sup-main NGP putTilingPatternDict 1
+sup-main NGP rangpur 1
+sup-main NGP reportingPeriod 11
+sup-main NGP reportingPeriodSegments 2

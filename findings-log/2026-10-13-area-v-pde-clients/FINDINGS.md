@@ -81,8 +81,14 @@ request's own transfer time is inside the same lock; that is the design, not sla
 >
 > **One scrub applied to the ledger after the run, disclosed:** `run.log`'s start
 > line carried the absolute path of the temp-body directory. `AGENTS.md` §7 forbids
-> a machine path in any committed file, so it is redacted to `<TMPDIR>/…`. Nothing
-> else in `run.log`, `results.jsonl` or `headers/` ever contained a path.
+> a machine path in any committed file, so it is redacted to the literal `<REDACTED>`,
+> which is what `run.log` line 1 reads. Nothing else in `run.log`, `results.jsonl`
+> or `headers/` ever contained a path. **Corrected in round 2:** the first redaction
+> said `<TMPDIR>/…` while the file said `<REDACTED>` — two safe strings that were not
+> the same string, i.e. prose describing its own source without having read it. And
+> that redaction was applied **by hand to a committed artefact**, so any re-run wrote
+> the machine path straight back; `probe.sh` now redacts **at the point of
+> generation**. A hand-scrub of an artefact is a one-off, not a control.
 
 Asset bodies (3.4 MB each) are deliberately **not committed** — digests, sizes,
 byte offsets and the full grep output are.
@@ -492,18 +498,41 @@ each — 12 `discover` + 5 `pde` — and none of them is a pointer.**
 portal builds, which the filtered §2 never gave.** With §2 unfiltered, the portal
 builds' `pde` `ci=32` now resolves in full: **5 case-sensitive** zxcvbn words
 (`dropdead`, `helpdesk`, `herpderp`, `topdevice`, `hampden`) plus **27
-case-insensitive-only** hits in **seven unrelated identifiers**, identical in kind to
-the patient bundle's — `propDecorators` ×8, `removeStylesOnCompDestroy` ×6,
-`AppDefault` ×3, `WPDesktop` ×3, `LoopDetected` ×2, `WebPDecodeRGBA` ×2,
-`mapDeviceModelName` ×2, `WebPDequantizeLevels` ×1. 5 + 27 = 32, and the §2
-arithmetic assertion passes. **So both portal builds' entire `pde` token set is now
-accounted for, item by item** — which the first version of this pass could not claim.
+case-insensitive-only** hits in **eight unrelated identifiers** — `propDecorators` ×8,
+`removeStylesOnCompDestroy` ×6, `AppDefault` ×3, `WPDesktop` ×3, `LoopDetected` ×2,
+`WebPDecodeRGBA` ×2, `mapDeviceModelName` ×2, `WebPDequantizeLevels` ×1.
+
+**Counting rule, so this number is reproducible** (`AGENTS.md` §6 item 7 — a count with
+no rule is a count nobody can check): one row per **distinct maximal enclosing
+identifier** in §2, restricted to hits whose matched text is **not** the token itself
+(`pde` matched verbatim ⇒ case-sensitive survivor ⇒ the zxcvbn group). **13** distinct
+identifiers, of which **5** survive a case-sensitive grep, leaving **8**; and 5 + 27 =
+32 = §1's `ci` for that token. Every multiplicities table in this log is pinned in
+`expected-multiplicities.txt` and checked by `extract.sh` §3 — §C below.
+
+> **⚠ CORRECTED 2026-10-13 (round 2) — this sentence first read "seven unrelated
+> identifiers" while listing eight.** "Seven" is the *patient* bundle's distinct
+> identifier count over its 25 hits, carried across to the portal builds' 32 hits. The
+> two figures are unrelated, and the paragraph is headed *"a complete accounting"* — so
+> the item count of the very thing claiming to be complete was wrong.
+
+**So both portal builds' entire `pde` token set is now accounted for, item by item** —
+which the first version of this pass could not claim. A verifier read all **27**
+previously-unexamined case-insensitive hits at byte level and confirmed **every one is
+incidental**: Angular reflect-metadata and `@Input()` decorators (`propDecorators`,
+`removeStylesOnCompDestroy`), a jsPDF `PrintScaling` enum member (`AppDefault`), a
+UA-sniff string (`WPDesktop`), an RFC 9110 status enum (`LoopDetected`), two WebP
+decoder identifiers (`WebPDecodeRGBA`, `WebPDequantizeLevels`) and a reports
+device-model mapper (`mapDeviceModelName`). Every one is `pDe` / `PDe` / `PDE` with a
+capital; **none is a route, key, config value or directive, so no genuine PDE reference
+hides among them.** Offsets in `grep-out.txt` §2.
 
 **Fixed at the root, not just in the prose.** `extract.sh`'s §2 is now **unfiltered**:
 it prints enclosing identifier, `×N` multiplicity, every offset and the first-hit
-context for **every token with at least one hit**, and it ends with an **arithmetic
-assertion** that the per-identifier multiplicities sum to the token total. Re-running
-it reproduces every number in this section, including the ones below.
+context for **every token with at least one hit**. Re-running it reproduces every
+number in this section. **§C** below is the guard that checks those numbers, and **§D**
+records the two defects round 2 found in this fix itself — one of them a guard that
+could not fail while this log described it as protection.
 
 ### §B — two `pde` multiplicities were wrong, and unsourced.
 
@@ -526,7 +555,97 @@ nothing behind it — the `AGENTS.md` §1 failure (a claim with no source line) 
 the costume of a measurement. The offsets above, and the `×N` beside each, are now in
 `grep-out.txt` §2 and are re-derivable by re-running `extract.sh` with zero requests.
 
-### §C — a disclosure that travelled less far than it should
+### §C — the arithmetic guard could not fail, and this log called it protection
+
+**ROUND-2 CORRECTION, and the most serious of the three.** The round-1 fix added an
+"arithmetic assertion" and described it here as stopping a class of error *silently*.
+It could not fail. It compared:
+
+```python
+total = sum(len(v) for v in groups.values())   # 10 in the verifier's counterexample
+if total != len(hits):                        # len(hits) is ALSO 10 -> never fires
+```
+
+`groups` is built by iterating `hits`, so the partition sum **is** the size of the set it
+partitions — a quantity compared with itself. A prose table reading `propDecorators ×5,
+WPDesktop ×3, dropdead ×2` over 5 hits, which is exactly the +1/−2 cancellation round 1
+caught, sails straight through. What it proved was that the script's own grouping was
+self-consistent, which was never in doubt.
+
+**Both readings of the remedy were open and the honest one is implemented: made real,
+with its limit stated.** `extract.sh` now has **§3**, which checks §2 against
+**`expected-multiplicities.txt`** — a separate committed input, one row per
+`<body> <token> <enclosing identifier> <multiplicity>`, **238 rows**, generated
+mechanically (`MODE=--emit`, sorted so the generator is deterministic) rather than
+typed. It fires on a changed multiplicity **or** a row with no recomputed counterpart,
+prints the diff, and exits non-zero.
+
+**Demonstrated, not asserted** — the guard was run against a deliberately corrupted
+input and against the exact round-1 error:
+
+| injected fault | exit | reported |
+|---|---|---|
+| `hp-main pde propDecorators 5` (the real round-1 value; truth is 8) | **1** | `CHANGED hp-main pde 'propDecorators': published 5, computed 8` |
+| one row deleted (`hp-main discover undiscovered`) | **1** | `NEW hp-main discover 'undiscovered': computed 1, published NOTHING` |
+| none (committed file) | **0** | `ok 238 group(s) match the published multiplicities exactly` |
+
+**What §3 is, stated exactly so it is not over-read again.** It is **drift detection
+between the published numbers and the bytes.** It is **not** proof the published numbers
+were right the first time: `expected-multiplicities.txt` was authored by this same pass
+from these same bundles, so a wrong *first* derivation would sit in both and §3 would
+agree with it forever. Every row was re-derived independently and set-compared before
+being committed — that review is what this guard stands in for, and it is not
+mechanical.
+
+**One more defect found while checking my own work, recorded because the way it was
+found is the point.** §3 located `expected-multiplicities.txt` via
+`os.path.dirname(os.path.abspath(__file__))` — but the script's Python runs from a
+heredoc, so `__file__` is `<stdin>` and that resolved to **the caller's working
+directory**. Every test I had run was from inside this directory, so it passed; run from
+the worktree root, the guard reported the file *absent* and exited 1. **A guard that
+depends on your cwd is not a guard.** `HERE` is now derived in the bash preamble and
+passed in, and the script is byte-identical whether invoked from the repository root or
+from this directory. It was found by running the thing I had just claimed was verified,
+from somewhere I had not run it before — which is the only check that found it.
+
+`extract.sh` also keeps a second, weaker check, now **labelled as weak**: §2's
+per-identifier multiplicities must sum to §1's `ci` for that token. That one compares
+two *different* routes to the same number (§1 counts with `len(re.findall(...))` over
+the text; §2 arrives by grouping matches), so it can fire — but it catches a counting
+bug, not a wrong published number. It was the old tautology's replacement, not its
+alibi.
+
+**Artefact digests after this change**, so a reader can confirm they have the same files:
+`grep-out.txt` `sha256 2f86b0d6988d7c7b065db81d3d4f1338c8c0635dc1be94194a0f3b7b9e0998b9`,
+`expected-multiplicities.txt`
+`sha256 3e46f92cef313ed6e91b1ba5c0ed2be16fa92546b06a8ec8ef0e392566491aa9`. Two
+consecutive runs of the fixed script are byte-identical, and `MODE=--emit` reproduces
+the expected file from the bodies.
+
+### §D — §2 asserted the opposite of the distinction under audit
+
+**ROUND-2 CORRECTION.** §2 chose its label from `cs == len(hits)`, so a **partial** token
+(`0 < cs < ci`) fell into the `else` branch and was printed as *"case-insensitive ONLY
+(case-sensitive grep drops every one)"*. That is false for the partial case and it
+contradicted §1's own `cs=` number **on the same page**. Six cells were wrong:
+
+| body | token | §1 said | §2 said (wrong) | §2 says now |
+|---|---|---|---|---|
+| `hp-main`, `sup-main` | `pde` | `cs=5 ci=32` | "drops every one" | `PARTIAL — 5 of 32 survive a case-SENSITIVE grep` |
+| `eu-main`, `us-main` | `GUARDIAN` | `cs=3 ci=12` | "drops every one" | `PARTIAL — 3 of 12 survive` |
+| `eu-main`, `us-main` | `deviceFamily` | `cs=5 ci=8` | "drops every one" | `PARTIAL — 5 of 8 survive` |
+
+This is `AGENTS.md` §6 item 2 and it was **new** — the pre-fix script had no such line —
+and it mattered most for `pde`, the token the whole correction is about: §A's thesis is
+that `pde` **is** 5 case-sensitive hits per portal build, and §2 asserted the reverse. A
+verifier re-deriving from §2's header would land back on `cs = 0`.
+
+The test for "case-insensitive ONLY" is **`cs == 0`**, not `cs == len(hits)`. §2 now has
+three states — `ci` (`cs == 0`), `cs` (`cs == ci`), `partial` (`0 < cs < ci`) — each
+printing the observed counts, and the class is stored **nowhere** in the expected file so
+the two cannot disagree about it.
+
+### §E — a disclosure that travelled less far than it should
 
 The `body_mtime_epoch` caveat below (whole seconds, `stat -c%Y`, so the sub-second
 mtime figures are **not re-derivable from the committed ledger** and git does not
