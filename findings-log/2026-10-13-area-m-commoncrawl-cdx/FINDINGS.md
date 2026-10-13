@@ -94,6 +94,72 @@ S3 `SlowDown` ("Please reduce your request rate") from `data.commoncrawl.org`,
 and a **400 leaking a Python `RemoteDisconnected` as its body**. Every one of
 the 17 was re-issued or left as a recorded hole; **not one was read as a zero.**
 
+## Correction (2026-10-13) — verifier round 3
+
+Round 2 returned INCONCLUSIVE — out of steps, not blocked — with six of eight
+items fully confirmed and two small outstanding. The substance stands; these are
+the two edits, and the first one is a false claim of my own.
+
+### R3-1 — a mechanism claim in `derive.py` was false, and the self-test now proves the replacement
+
+`derive.py` justified binary detection by the gzip magic with: *"a NUL-sniff
+misses short payloads **and would have let this pass's own two gzip fetches
+through as text**."* **The second clause was false and is deleted.** Every gzip
+member carries `FLG=0x00` at byte offset 3, so a NUL-sniff *does* catch a gzip
+payload — verified on this pass's own `seq 55` body (632 173 B): gzip magic at
+offset 0, **first NUL at index 3**, inside the 4096-byte window. The first
+clause (a NUL-sniff misses short payloads) stands.
+
+**Two things bound the damage, and both are recorded rather than assumed.** The
+false clause **did not propagate**: `FINDINGS.md` carried only the weaker,
+true "short payloads" wording, so no published sentence was wrong. And **no
+published number moves** — removing the magic branch entirely leaves
+`--selftest` green and every figure identical.
+
+So what does the magic check buy? On the real bodies, nothing measurable. It is
+kept because a control now exercises it: **control (6)** feeds a payload
+carrying the magic but **no NUL byte** in the sniff window, which the signature
+catches and the sniff misses. **Demonstrated**: deleting the
+`body[:2] == "\x1f\x8b"` branch makes `--selftest` **exit 1**. That converts
+an unsupported mechanism claim into a claim a test holds up — which is the only
+kind worth keeping.
+
+This is §6 items 1 and 2 in miniature: a claim stated without evidence, and a
+mechanism asserted past what its own artefact shows.
+
+### R3-2 — "each of the five files' headers" was true of three
+
+`FINDINGS.md` said **each** of the five query files names its own dropped line.
+That held for `queries-04`, `-05`, `-06` and **failed for `queries-01` and
+`queries-03`** — the two files whose dropped-line evidence I had myself masked
+(§5 and §6 record that the newline was appended before the first commit).
+
+**I chose to fix the files rather than narrow the sentence**, because the header
+is the useful artefact and "the three files whose evidence survived" would have
+been a sentence about which files happen to be honest — a property of my
+bookkeeping, not of the reader's problem. Both files now carry the same
+dropped-line header as the other three, plus an explicit note that they are the
+two whose repair erased the evidence. `dropped-lines.py` still reports the same
+five tags, and **the file set and the published count are unchanged**.
+
+### R3-3 — main has moved once; not merged, count unaffected
+
+`origin/main` is now `77b2c8e` (PR #51, machine-path redaction), which touched
+`docs/09`, one `findings-log/` directory and **no `regression/hurl/` file**. This
+branch is **behind `main` and not stale**: measured **209 / 423**,
+`git diff 77b2c8e HEAD -- regression/` is empty, and nothing in those commits
+touches this pass's log directory. **Not merged** — a re-merge would only
+manufacture a fresh `docs/11` conflict for no benefit.
+
+⚠ **The brief for this round said "behind by one commit"; the measurement is
+five**, and the five are PR #51's own: `8a4ac41`, `2a1255b`, `9390715`,
+`f3da0b2`, and the merge `77b2c8e`. The brief counted the *merge* and not the
+commits it brought. The conclusion is unaffected — none of the five touches
+`regression/hurl/` or this log directory, so the assertion count cannot have
+moved — but the number is stated as measured rather than as received.
+
+---
+
 ## Correction (2026-10-13) — verifier rounds 1 and 2
 
 Round 1's three blocking findings and the non-blocking ones, then round 2's
@@ -447,8 +513,16 @@ three of them have no ledger row at all"* — while §5 said three and §6 said 
 All three are corrected here and in `probe.sh`; the count is now computed, not
 recalled.
 
-Each of the five files' headers names its own dropped line, and `probe.sh` warns
-to `run.log` when a query file lacks a trailing newline.
+**Each of the five files' headers now names its own dropped line**, and
+`probe.sh` warns to `run.log` when a query file lacks a trailing newline.
+⚠ (Added by verifier round 3.) That sentence was true for three of the five
+when it was written — `queries-04`, `-05` and `-06`, the files repaired before
+the run's first commit — and **false for `queries-01` and `queries-03`**, the
+two whose repair erased the evidence before anything was committed. Rather than
+narrow the sentence, the two missing headers were added, and both now carry an
+extra note saying they are the files whose evidence the fix destroyed. The
+asymmetry is preserved deliberately rather than tidied away: it is the same
+defect as the one it describes, one level up.
 
 ## 6. Three defects of this pass, recorded rather than smoothed over
 

@@ -1,3 +1,21 @@
+#
+# TRAILING NEWLINE — FIXED 2026-10-13 (verifier round 1; header added in round 3).
+# This file originally ended WITHOUT a newline and probe.sh's read loop was
+# `while IFS='|' read -r ...`, which drops the final unterminated line. The
+# line below therefore NEVER RAN and has no row in results.jsonl:
+#     control-D-positive-showNumPages-count-instrument
+# The newline is now present, the loop now carries a `|| [ -n ... ]` guard,
+# and probe.sh warns to run.log when a query file lacks a trailing newline.
+# Re-running this file as committed would now send that line — it did not
+# run in this pass, and nothing in the findings depends on it.
+#
+# ⚠ THIS FILE IS ALSO ONE OF THE TWO WHOSE EVIDENCE THE FIX ERASED. The newline
+# was appended AFTER the run and BEFORE the first commit, without that being
+# recorded, so for this file and queries-03 a reader of the committed tree
+# cannot see that it once lacked a newline — `run.log` is all that is left.
+# queries-04/-05/-06 were repaired before the run's first commit, so their
+# headers describe a defect that stayed visible in the record. That asymmetry
+# is why this note exists, and why it is not tidied away.
 # Area M — request set 1 of 3: reachability, then all four controls, nothing else.
 #
 # tag|role|host|path-and-query|extra curl args

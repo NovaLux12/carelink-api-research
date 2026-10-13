@@ -76,10 +76,21 @@ def derive(body: str) -> tuple[int | None, list[str], str, int]:
     mistake is still visible in the ledger.
     """
     hosts: set[str] = set()
-    # Binary detection by CONTENT TYPE SIGNATURE, not by "looks unprintable":
-    # a NUL-sniff misses short payloads and would have let this pass's own
-    # two gzip fetches through as text. \x1f\x8b is the gzip magic; the NUL
-    # check stays as a cheap second net for other binary forms.
+    # ⚠ CORRECTED 2026-10-13 (verifier round 3). This comment previously read:
+    #   "a NUL-sniff misses short payloads and would have let this pass's own
+    #    two gzip fetches through as text"
+    # The second clause was FALSE and is deleted. Every gzip member carries
+    # FLG=0x00 at byte offset 3, so a NUL-sniff DOES catch a gzip payload —
+    # verified on this pass's own seq 55 body: gzip magic at offset 0, first
+    # NUL at index 3, inside the 4096-byte window. The first clause (a NUL
+    # sniff misses short payloads) stands.
+    #
+    # So what does the magic check buy? On the real bodies, nothing — removing
+    # the branch entirely leaves --selftest green and every published number
+    # unchanged. It earns its place on a different shape, and the (binary, no
+    # NUL) control in _selftest is the one that proves it: a payload carrying
+    # the magic but no NUL byte is caught by the signature and missed by the
+    # sniff. Deleting the magic branch kills that control; that is the claim.
     if body[:2] == "\x1f\x8b" or "\x00" in body[:4096]:
         # Binary (a gzip member, or anything else that is not text). Decompress
         # first and re-derive, so a binary body still yields its real facts.
@@ -216,6 +227,20 @@ def _selftest() -> int:
     if binlines <= 0:
         fails.append("binary control: the phantom byte-line count was not "
                      "recorded separately, so it cannot be told apart from a count")
+
+    # (6) A binary payload with the gzip MAGIC but NO NUL byte in the sniff
+    # window. This is the only shape that exercises the signature branch: the
+    # NUL-sniff alone misses it. Added 2026-10-13 after verifier round 3
+    # established that the magic check bought nothing on the real bodies (a
+    # gzip member always has FLG=0x00 at offset 3), which made the previous
+    # justification a mechanism claim no test supported. Deleting the magic
+    # branch must kill this control.
+    _nomagic = "\x1f\x8b" + "\xff" * 64
+    n, hosts, shape, _b = derive(_nomagic)
+    if shape != "binary":
+        fails.append(f"a payload carrying the gzip magic but no NUL byte was "
+                     f"classified {shape!r}, not 'binary' — the signature branch "
+                     f"is not exercised by anything, so it cannot be justified")
 
     if fails:
         for f in fails:
