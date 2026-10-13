@@ -947,6 +947,24 @@ records, but **not verified**, because the clinic sweep's per-file ledger is not
 committed. Nothing observed here demonstrates it; the 5518 B page identifies the
 *host family*, not the chunk.
 
+#### Addendum (2026-10-13, pool-K clinic URL-form pass): the id form is now measured absent on the portal
+
+Four GETs to `carelinkhp.minimed.eu` (cap 4, `sleep 2.5` inside the host lock), GET
+only. `OBSERVED`: `/common.a62bb847b4ea289e.js` → 200 `application/javascript`, 20731 B,
+body begins `push([[2076]` (so the emitted name is genuinely chunk 2076); the
+committed-list form `/2076.a62bb847b4ea289e.js` → 200 `text/html` 5518 B,
+byte-identical (`0f2c5f62…`) to a certainly-absent name and to the documented SPA
+fallback; a known committed clinic chunk `/12.cfb28fafc1fe9cf5.js` returns
+`application/javascript`. Oracle (positive control + absent control) confirmed on
+this host family before the verdict was taken. **Result: the clinic 2076 entry is a
+second instance of the URL-form defect already measured on the patient corpus — the
+hash is the join key, the name moved.** `docs/09` §4's trap row stands unchanged and
+is corroborated, not weakened. **Still NOT measured:** re-fetching all 225 clinic
+entries under their `f.u` names; only id 2076 is settled here, and the negatives in
+the 2026-10-08 clinic corpus still rest on its uncommitted per-file ledger. K's
+denominator therefore stays provisional.
+[source: findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md]
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
