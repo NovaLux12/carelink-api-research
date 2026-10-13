@@ -52,8 +52,8 @@ flowchart LR
     E --> Z
     Z["one digest 0c0db635… · 30 fields ·<br/>0 absent from any document"]
     Z --> K["each holds 2 JWKS kids ·<br/>10 keys, 0 shared by any two of the five"]
-    style D fill:#3b2f2f,stroke:#f66
-    style E fill:#3b3b2f,stroke:#fd6
+    style D fill:#3b2f2f,stroke:#f66,color:#fff
+    style E fill:#3b3b2f,stroke:#fd6,color:#fff
 ```
 **OBSERVED.** The OAuth *policy* is identical across all five, and the evidence is
 stronger than a field-by-field comparison: substituting each tenant's own
