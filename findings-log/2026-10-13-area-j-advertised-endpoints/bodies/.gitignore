@@ -1,0 +1,13 @@
+# Raw response bodies are deliberately NOT committed, EXCEPT the carve-out below.
+*
+# CARVE-OUT (2026-10-13, area J). The 20 OPTIONS-phase bodies ARE committed:
+# each is 0 bytes (the five 204 preflights) or 10 bytes of vendor error text
+# ("Not found.") from the absent-path controls and the two unrouted candidates.
+# No RSA modulus, no x5c, no certificate, no CN, no internal hostname, no
+# session value -- verified before carving out (contents listed in FINDINGS.md
+# §2). Without these, the byte-identity between candidates and controls that
+# the unrouted verdicts turn on is not inspectable from a clean clone.
+!c-*.b
+!bc-*.b
+!mfa-*.b
+!gtr-*.b
