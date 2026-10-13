@@ -299,30 +299,62 @@ while the vendor ships a device it cannot match, which is the shape of a schema
 that static analysis *would* settle — but no one has tried, so the recovery rate
 is unknown.
 
-### Q. The `appVersion` body gate — a second version axis our docs do not describe
-
-**Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
-axis (`android/3.6`–`3.8` → Auth0 + cumulus v13). Third-party source review found a
-**second, independent axis on the request body** that our docs do not cover:
-`POST {baseUrlCumulus}/display/message` rejects `appVersion ≤ 3.6.9` with
-**HTTP 206 `{"message":"Upgrade application"}`** and accepts `≥ 3.7`.
-(SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on PR
-#4711. The *mechanism*, that it is a **body** field, is SOURCE-OBSERVED at xDrip
-`CareLinkClient.java:664` and `CarlosJPV src/carelink/cumulus.ts:146`.)
-
-The two axes are constrained in **opposite** directions: the discovery URL must stay
-**≤ 3.8** (3.9+ falls back to a legacy no-Auth0 config), while the body `appVersion`
-has **no upper bound**. A client can be correct on one axis and broken on the other.
-
-**Why it's ours:** nobody publishes a two-axis compatibility matrix. Every client
-re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
-`discovery.ts` each found one half.
-
-**Closes when:** the two axes are documented together in `docs/03` — **or** recorded as
-community-reported-and-unverifiable, which is a legitimate close.
-
-**Assumptions (INFERRED):** that the body gate and the discovery axis could move
-independently. No client dates either change, so no drift timeline is asserted.
+> **Area Q is CLOSED — see the Closed table at the foot of this page and
+> [`docs/03`](03-discovery-and-versions.md) §3a.** Closed 2026-10-13 on the area's
+> **second** close condition — *recorded as community-reported-and-unverifiable, with
+> the reason* — because the boundary is a **request-body** field and `AGENTS.md` §11
+> permits no vendor POST beyond the two already-pinned public-`client_id` requests.
+> The **mechanism** resolved in code; the **boundary values** did not and cannot be
+> resolved from outside the project. **The pass spent 21 requests against a cap of
+> 20** — a one-request overrun, disclosed in the log and not smoothed away. **The cap
+> was restated to 21 by owner authorisation on 2026-10-13, after the pass
+> completed**, so the log's accounting line now reads `21 of a 21 cap`; the declared
+> 20 is kept readable beside it, in the log's `## Correction (2026-10-13)`. The
+> restatement equals the spend exactly and grants no slack.
+>
+> **The area as written, kept verbatim so the correction stays readable.** One of the
+> two claims it rests on no longer holds. **⚠ Withdrawn:** *"corroborated by a xDrip
+> maintainer on PR #4711"*. Read at the artefact, PR #4711's three comments are the
+> boundary table (**by the same author as the README that repeats it**), a question,
+> and an approval that does not restate or retest the boundary values — so the table
+> is **one source stated twice**. **Still stands:** the table is SOURCE-PUBLISHED and
+> author-reported, and the *mechanism* — that `appVersion` is a **body** field — is
+> SOURCE-OBSERVED at `CarlosJPV src/carelink/cumulus.ts:146` @ `0180b89`, which this
+> pass read and which is byte-identical at branch head. **Not re-verified here:** the
+> xDrip half, `CareLinkClient.java:664`. Original text:
+>
+> > **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path**
+> > version axis (`android/3.6`–`3.8` → Auth0 + cumulus v13). Third-party source
+> > review found a **second, independent axis on the request body** that our docs do
+> > not cover: `POST {baseUrlCumulus}/display/message` rejects `appVersion ≤ 3.6.9`
+> > with **HTTP 206 `{"message":"Upgrade application"}`** and accepts `≥ 3.7`.
+> > (SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on
+> > PR #4711. The *mechanism*, that it is a **body** field, is SOURCE-OBSERVED at
+> > xDrip `CareLinkClient.java:664` and `CarlosJPV src/carelink/cumulus.ts:146`.)
+> >
+> > The two axes are constrained in **opposite** directions: the discovery URL must
+> > stay **≤ 3.8** (3.9+ falls back to a legacy no-Auth0 config), while the body
+> > `appVersion` has **no upper bound**. A client can be correct on one axis and
+> > broken on the other.
+> >
+> > **Why it's ours:** nobody publishes a two-axis compatibility matrix. Every client
+> > re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
+> > `discovery.ts` each found one half.
+> >
+> > **Closes when:** the two axes are documented together in `docs/03` — **or**
+> > recorded as community-reported-and-unverifiable, which is a legitimate close.
+> >
+> > **Assumptions (INFERRED):** that the body gate and the discovery axis could move
+> > independently. No client dates either change, so no drift timeline is asserted.
+>
+> **What the pass added that the area did not ask for:** the two constraints
+> **intersect in exactly `{3.7, 3.8}`** *for the `X.Y` forms the discovery axis has
+> been probed at* — `3.7.0`/`3.8.0` clear the body gate but are unobserved on the
+> discovery path, since no `X.Y.Z` cell was ever probed — and the one client whose
+> source is readable feeds **a single constant** into both axes, correct only because
+> `3.8` is in that window, so raising it to `3.9` breaks the discovery axis
+> *silently*, on a path this repo already pins. That is a bridge-facing coupling and
+> it is now a `docs/10` §1 row.
 
 ### R. Reconcile the `deviceFamily` correction against the client consensus
 
@@ -391,6 +423,48 @@ not a research task. It was deliberately **not** actioned by the pass that found
 rule attached, **or** a note records that third-party source stays under existing labels
 and must always be flagged as corroboration. Either closes it; silence does not.
 
+#### Addendum (2026-10-13, from area Q): a second pass, and the label was not the failure — the *count of sources* was
+
+Attached to area S rather than opened as a new letter (every A–Z is in use).
+
+**What was added.** Area Q is the **second** pass in this repo to need these two
+classes, and it produced the same awkwardness the 2026-10-11 pass did. It also
+surfaced something S's framing does not cover, which is the reason this addendum
+exists: **the problem was not the missing label, it was a strength word.**
+
+Area Q's own area text claimed the `appVersion` boundary table was *"corroborated by a
+xDrip maintainer on PR #4711"*. Reading the artefact, PR #4711 has **three** comments:
+the table (by `CarlosJPV` — also the author of the README repeating it), a question,
+and an approval that never restates or retests the boundary values. **The table is
+one source stated twice.** The claim would have been equally wrong had
+SOURCE-OBSERVED/SOURCE-PUBLISHED been classes all along — a label describes the
+*kind* of evidence and says nothing about how many independent sources produced it
+(SOURCE-OBSERVED §4, §7,
+[findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md]).
+
+**What is missing:** a rule that distinguishes **one source, restated** from **two
+independent sources** — and a rule about strength words (*independently*,
+*corroborated*, *confirms*) that says what each requires. Nothing in `AGENTS.md` §2
+or §3 requires checking that.
+
+**Blocker:** it is part of the same **maintainer decision** as area S proper, and it
+cannot be settled by a research pass — the question is what the repo's *rules* should
+say. The audit that would motivate it is not blocked and can be run first (§
+`docs/10` §1, the *corroborated independently* row, which carries the full framing).
+
+**Closes when:** either (a) `AGENTS.md` §2 gains SOURCE-OBSERVED/SOURCE-PUBLISHED
+**and** a statement of what "independently corroborated" requires — different
+authors, different artefacts, neither quoting the other; **or** (b) the decision is to
+keep the existing labels, in which case the rule about independence must still be
+written, because the failure does not depend on the labels. Either closes it; a
+labels-only decision does **not**, which is the point of this addendum.
+
+**Assumptions (INFERRED):** that independence is judged at the level of the
+**person or organisation that ran the measurement**, not the artefact — two files in
+one repository, or one file and a PR comment on it, are one source. This is the
+assumption area Q applied; a maintainer could reasonably define it more strictly, and
+the one confirmed instance (`CarlosJPV`'s table in his README and in his own PR
+comment) would fail under any definition strict enough to matter.
 
 ---
 
@@ -565,6 +639,7 @@ being superseded — never silently. Letters are not reused.
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
 | M — is Common Crawl's zero on the API surface real, or was it the method? | 2026-10-13 | **Partially refuted, and the correction is to the METHOD.** Re-derived through the **CDX index API** instead of computed byte offsets, across **six named crawls with dates**, **all four controls first**, both absence oracles established behind their own positive controls. **Refuted:** CC holds **24 records for `minimed.eu` across 5 of the 6 crawls** (8 / 6 / 5 / 2 / 3 in 2018-39 / 2020-50 / 2022-40 / 2025-30 / 2026-39, incl. `/ipro/hcp/login.jsf` **200** on `carelink.minimed.eu` @2020-12-02), and **`medtronic.eu` is non-empty in all 6** — against `COMMONCRAWL §1`'s own table recording `eu,medtronic)` = 0 blocks in the two crawls it used. **Confirmed, for a different reason:** **no captured path in any of the six begins `/patient/` or `/connect/`**, and `clcloud.minimed.eu` / `carelinkhp.minimed.eu` hold **zero**, established by *enumerating* the successful domain responses rather than by their own failed host queries. **So "essentially zero coverage of the API surface" stands; "not one record for any `carelink*` host" does not**, and "in either of two crawls" was a budget artefact — `CC-MAIN-2024-42` really is zero (404 `No Captures found`) and the other five are not. **Offset method, corrected at the mechanism:** of the three byte ranges `COMMONCRAWL §1` records, **one reproduces exactly at both ends, one starts exactly on its bound but overshoots its recorded end into `com,medtryck)`**, and one could not be fetched at all (`503 SlowDown` ×2) — the *opposite* defect from the recorded "alphabetical neighbours" one — and **the first pass's ranges are not re-derivable, because the record names no offsets**. **Side-findings:** the API **failed 17 of 61 (28%)** — 502 / 504 / 400 / 503 — so **one query never settles a zero**. ⚠ **CORRECTED 2026-10-13 (verifier round 1): this row originally read "with **0** failures against known-covered hosts". That was false — `seq 50`/`53` asked for a host `seq 42` had proven covered 32.6 s earlier and both failed.** Under the counting rule in `failclass.py` (only a **record-form** query names a host, so classify by what the ledger knew *before* the row was sent) the 17 split **2 covered / 0 absent / 13 indeterminate / 2 n/a**: **a gateway error on a host whose coverage was never established carries no information in either direction and must be re-issued, and coverage is not a shield either.** `index.commoncrawl.org` answered **200** here on 2026-10-13 (128 crawls published), recorded as an observation about *this host at this time* and **not generalised**. **61 of a 64 cap** (60 under the claim, **1** under owner authorisation for the overshoot re-read; **3 recorded as unspent**), GET only, **zero requests to any Medtronic host**, measured same-host floor **2.873 s** by kernel body-mtimes, cross-checked at **2.736 s** from `t_sent` (0 gaps under 2.5 s on either oracle). **No `regression/hurl/` pin** — those suites are vendor surfaces and `AGENTS.md` §11 bars one research pass from widening the gate's budget; the rot-prone half is pinned as `docs/09` §4 traps instead. Successor: dated addendum to area L | [findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md] | #44 |
 | E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
+| Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** for the `X.Y` forms the discovery axis has been probed at, the two constraints **intersect in exactly `{3.7, 3.8}`** (`3.7.0`/`3.8.0` clear the body gate but are **unobserved** on the discovery path — no `X.Y.Z` cell was ever probed), and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 requests against a cap of 20** — the overrun is **one** request, because `probe-followup.sh` sets `SEQ=18` rather than reading the ledger and was run twice, re-issuing request 19; **no ledger row was deleted to hide it**. **The cap was restated to 21 by owner authorisation on 2026-10-13, after the pass**, so the log's accounting line reads `21 of a 21 cap` with the declared 20 kept readable in its `## Correction (2026-10-13)`. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
 ---
 
 > **Consumer note.** Findings here are consumed by
