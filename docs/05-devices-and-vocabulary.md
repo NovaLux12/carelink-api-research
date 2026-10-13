@@ -110,9 +110,40 @@ because the six Flex model numbers are consistent across every source held.
 
 | table | where | coverage | what it misses |
 |---|---|---|---|
-| patient config | `personal.device.family.to.model.mapping` | 16 families | `MMT-8200`, `MMT-8201`, `MMT-8400`, `MMT-8401` — present in the HCP report config, **absent here** |
-| clinic bundle device table | `hp-main.js` module `68462`, byte range 2999400–3007200; PUMP / SENSOR / StandaloneCGM / InsulinDelivery | **80 distinct `MMT-*`, 9 distinct `SKU-*`** | `MMT-8600`, `MMT-8601` — absent from the table *in the same file* |
+| patient config | `personal.device.family.to.model.mapping` | 16 families | `MMT-8200`, `MMT-8201`, `MMT-8400`, `MMT-8401` — present in the HCP report config **and in both portal builds**, **absent here** |
+| clinic bundle device table (both builds — see per-build note below) | `hp-main.js` module `68462`, byte range 2999400–3007200; PUMP / SENSOR / StandaloneCGM / InsulinDelivery | **80 distinct `MMT-*`, 9 distinct `SKU-*`** | `MMT-8600`, `MMT-8601` — absent from the table *in the same file* |
 | HCP report config | `/hcp/configuration/public/pow.common.core.report.generation` → `reportFileNamingSupportedPumpModels` (214 entries) | includes MMT-8600/8601 and MMT-8200/8201/8400/8401 | **a third, partial table** — no single table is authoritative |
+
+> **Per-build note — 2026-10-13 (area G).** "The clinic bundle's device table"
+> above is now confirmed to be **one table in two builds, not two tables**: the
+> clinic `pow` asset (`main.fb5f8cb7eb60c4d5.js`, 3,397,615 B) and the support
+> `cua` asset (`main.759cddab23085086.js`, 3,410,666 B) were fetched separately
+> (6 of a 12 cap, GET only, controls first per host) and extracted separately,
+> offline. Result: identical code sets (78 table codes + 9 `SKU-*`), identical
+> display-name pairs (76 quoted + 2 unquoted `MMT5100`/`MMT5101` aliases + 9
+> `SKU-*`), identical whole-file census (80 `MMT-*`, same set), identical
+> module-`90991` `["MMT-8600","MMT-8601"]` array, identical answers on 23
+> patient-map spot checks — in both builds [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. The segments differ
+> at the byte level (minified renaming, shifted offsets), so byte-identity was
+> never claimed; code-set and name-pair identity is, and both hold. **A negative
+> closes the area**: G's premise is unchanged and the reconciliation stays
+> three-way.
+>
+> One positive side-finding: `MMT-8200`/`8201` ("Guardian™ 4 system") and
+> `MMT-8400`/`8401` ("Simplera™ system") are **present in both builds' tables
+> with display names** [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. The patient map is
+> now the *only* compared source that lacks them. Against the patient map's
+> recorded rows, both builds agree: present are the six base `CC880` Flex codes,
+> `NMX8` `8162`/`8163`, `BLE780` base + XCU/XCE/XCF, base `MMT-5100`/`5101`;
+> absent (whole-file, case-exact) are `CC840` `8021`–`8023`, `MMT-1909`,
+> `MMT-8602`, all four `EAGLE` codes, all five `CC880` XCF/XCC variants,
+> `MMT-1886XCY`, and the `SIMPLERACC` JC/JD/P/M suffixes [source:
+> findings-log/2026-10-13-area-g-device-tables/FINDINGS.md]. Limits: the HCP
+> 214-entry list is compared only through its recorded count and named deltas
+> (the full list is not on disk), and the patient map only through its 8
+> recorded family rows.
 
 `MMT-8600`/`MMT-8601` appear elsewhere in the clinic bundle, module `90991`:
 
