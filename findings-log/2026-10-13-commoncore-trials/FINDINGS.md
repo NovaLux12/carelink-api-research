@@ -562,8 +562,12 @@ inside an unrelated PR. The science above stands; the record around it was fixed
 ### It bears directly on two open readings — and supplies the discriminating cell
 
 - The two live readings are **`docs/10:56`** (whether a `clcloud.*` `200` carries
-  `Access-Control-Allow-Origin`) and the closed area X row at **`docs/11:932`**
-  (its correction, which found a separating `200`-without-CORS cell in the corpus).
+  `Access-Control-Allow-Origin`) and **area X's row in the `## Closed areas` table of
+  `docs/11`** — the row beginning `X — why the two clcloud.* route families differ in
+  their CORS headers`, evidence cell
+  `findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md`, issue cell `#15`, at
+  `docs/11:1102` **as of this commit** — whose correction found a separating
+  `200`-without-CORS cell in the corpus.
   **Six non-2xx responses carrying `acao: *` is a fact neither reading currently
   contains.**
 - The unexcluded reading — that CORS on this gateway family is **emitted only on
@@ -716,7 +720,11 @@ withdrawn** — only the support was wrong.
    with "the caution that CORS on an error is not the same as CORS on a success" and
    with a note that "a `200` carrying no preflight does exist on `clcloud.*`".
    **`docs/09` says "preflight" exactly once** (line 74, unrelated to CORS) and
-   carries no such caution. **Both readings live in `docs/10:56` and `docs/11:932`**
+   carries no such caution. **Both readings live in `docs/10:56` and in area X's
+   `## Closed areas` row in `docs/11`** (the row beginning `X — why the two clcloud.*
+   route families differ in their CORS headers`, evidence
+   `findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md`, issue cell **#15**;
+   `docs/11:1102` as of this commit)
    and the citations now say so — `AGENTS.md` §6 item 6.
 
 ### 13k. One verifier claim upheld, one corrected (2026-10-13)
@@ -753,7 +761,14 @@ No claim in §1–§12 changes, and no finding is withdrawn. Only the coordinate
 §12 and §13j both sent the reader to the closed area X row at **`docs/11:777`**. On
 this branch **line 777 is not area X at all** — it reads `Closes when: all 211 carry a
 verdict for that token set…`, the tail of a *different* area's entry. The area X row
-is at **`docs/11:932`**. Corrected in both places.
+is **area X's row in the `## Closed areas` table of `docs/11`** — the row beginning
+`X — why the two clcloud.* route families differ in their CORS headers`, evidence cell
+`findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md`, issue cell **#15** — at
+`docs/11:1102` **as of this commit**.
+
+Corrected in both places, and **to that content-addressed form rather than to another
+line number**: §13m records that this is the *third* rottedness of the same anchor, so
+the durable fix is the class, not the fourth coordinate.
 
 The pointer was correct when written. It was correct against `8373169`; two commits
 have since moved the row it names:
@@ -762,7 +777,12 @@ have since moved the row it names:
 |---|---|
 | `8373169` (branch, pre-rebase) | `docs/11:777` |
 | `614db77` (area F merge) | `docs/11:858` |
-| this branch | `docs/11:932` |
+| `6a4ae46` (round-7 reviewed tip) | `docs/11:932` |
+| this branch (`750bfca`, area L merged in) | `docs/11:1102` — **the fourth coordinate; §13m is why the pointer is now content-addressed** |
+
+Every row above was verified against *its own* ref, not against this tree: all four
+resolve to the same row. That is the whole problem in one table — a coordinate that was
+true, then was not, then was true again, without the sentence it addresses changing.
 
 `614db77` moved it **81** lines; this pass's own §12/§13 addendum moved it a further
 **74**. A line anchor is a claim about a *line*, and both commits invalidated it
@@ -826,14 +846,18 @@ The pointer drift above is a merge artefact, so the sites the merge was *suppose
 leave alone were re-checked rather than assumed: **`docs/00:166`, `docs/03:341`,
 `docs/10:56`, `docs/06:156`, and the area X row** are byte-identical to `614db77` (md5
 per site — and for the area X row that comparison is `614db77:858` against this
-branch's `docs/11:932`, since the rebase is what moved it). `docs/06:156` was added
+branch's area X `## Closed areas` row (`docs/11:1102` as of this commit), since the
+rebase is what moved it). `docs/06:156` was added
 to this inventory on 2026-10-13 after the round-5 verifier found it carrying the same
 CORS wording — "a \`GET\` of a discovery payload; 0 non-2xx responses carrying CORS
 anywhere" (md5 `863b149c2170ec6ad769534f75be8b08` at both refs) — it was simply missed
 the first time, so the inventory now names five byte-checked sites rather than four.
-The merge is provably correct — `git merge-tree --write-tree 8373169 614db77` yields a
-tree byte-identical to this branch's — and **no pin crept into `regression/`**. What
-moved was a line number, not a byte of CORS prose.
+The merge is provably correct — `git merge-tree --write-tree 8373169 614db77` yields
+`63a595a6…`, which is **byte-identical to the merge commit `7872a1c9`'s tree**, so the
+merge introduced nothing beyond `614db77` — and **no pin crept into `regression/`**. What
+moved was a line number, not a byte of CORS prose. (Stated against the merge commit
+rather than against "this branch's" tree, which stopped being true the moment the next
+correction was committed — §13m.)
 
 #### 13l-4. "12 citations" counted string occurrences, not citations (2026-10-13)
 
@@ -897,3 +921,99 @@ have to rediscover them.
 **This correction moved no claim, no host, no status and no request.** The pass's
 9 of a 10 cap is untouched: `wc -l results.jsonl` = **9**, one live accounting line
 at `:505`, and §13f's `:654` still quotes the superseded wording it superseded.
+
+### 13m. The same anchor rotted a third time, so the pointer is now content-addressed (2026-10-13)
+
+**This is an address defect. No claim, host, status, request count or evidence label
+below this heading changed.**
+
+Area L (#63) merged into `main` as `c521083` and this branch merged it forward to
+`750bfca`: **92 files, 1965 insertions, 2 deletions.** The insert
+`@@ -833,0 +834,170 @@` in `docs/11` moved area X's `## Closed areas` row from
+**`docs/11:932`** to **`docs/11:1102`**. The merge's only two deleted lines are two
+area M Common Crawl rows replaced in place at `docs/08:275` and `docs/10:64` — area L's
+wording, touching no CORS site.
+
+That left five live pointers in this log naming a line that is now `**Also INFERRED, and
+it was previously left in an OBSERVED sentence here rather**` — a mid-sentence
+continuation of an unrelated area's note:
+
+| was | now |
+|---|---|
+| `:565` (§12) | content-addressed |
+| `:719` (§13j) | content-addressed |
+| `:756` (§13l-1) | content-addressed |
+| `:765` (§13l-1 table) | `6a4ae46` row added as history; "this branch" row now content-addressed |
+| `:829` (§13l-3) | content-addressed |
+
+**Why this one is fixed as a class, and not as a fourth coordinate.** It is the third
+line-anchor correction in this one file: §13a fixed `…c1-absent.h:18` (a 15-line file),
+§13l-1 fixed `docs/11:777` → `932` **for exactly this reason**, and `932` has now rotted
+again. Every one of those fixes was correct when written and every one was invalidated by
+a later insert. Three correct-and-still-wrong coordinates is the evidence that the line
+number was never the right key.
+
+**The durable form.** What identifies the row is its table and its content, not its
+position:
+
+> **area X's row in the `## Closed areas` table of `docs/11-suggested-research-areas.md`**
+> — the row beginning ``X — why the two `clcloud.*` route families differ in their CORS
+> headers``, whose evidence cell names
+> `findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md` and whose issue cell reads
+> `#15`. Currently at `docs/11:1102` **as of this commit** — a convenience, not the key.
+
+All five sites now carry that form. The `## Closed areas` heading is at `docs/11:1090` and
+the row at `docs/11:1102` on this tree; both are re-derivable by `grep -n`.
+
+**The general rule, recorded so the next pass does not rediscover it.** *A line anchor
+into `docs/11` rots on every insert to that file, and `docs/11` is inserted into several
+times a week in this repo.* Cite by **table and row content**; treat a line number as a
+convenience that expires, and mark it "as of this commit" when you carry one. This is
+`AGENTS.md` §6 item 6 — the evidence is right and the address of it is wrong — but the
+generalisation matters more than the instance: **do not write a `docs/11` line anchor as
+a live pointer at all.**
+
+**The sweep, re-resolved against this tree.** Counting rule: one distinct
+`file:line` target, repo shorthand expanded (`docs/11` → `docs/11-*.md`, bare
+`*.h`/`*.b` → the single matching capture), each resolved to a string and asserted
+non-blank before it is called a resolution — `AGENTS.md` §6 item 3, and the reason a
+first pass at this sweep reported **21** "unresolved" targets that were in fact shorthand
+expansions never attempted.
+
+| sweep | result |
+|---|---|
+| **30** distinct `file:line` targets | **28 resolve in range and non-blank. Zero resolve to the wrong content** |
+| `docs/11` targets, **before** this correction | **3** resolved in range but not to area X: `932` (**live, 5 citations — rotted**), plus `777` and `858`, which are *historical* statements about refs `8373169` and `614db77` and are correct as such |
+| `docs/11` targets, **after** | **0** rotted. `777`, `858`, `932`, `1102` are each checked **at their own ref** — all four resolve to the area X row, which is the whole problem stated in one line: true, then not, then true again |
+| `carelink-trials-minimed-com--c1-absent.h:18` (`:594`, §13a) | out of range — the file has **15** lines. The one deliberate non-resolution: it is the *wrong* cite §13a quotes to document the error. Left as written |
+| `c1-absent.h:18` (`:806`) | not a pointer — it is the sweep table *naming* §13a's deliberate non-resolution |
+
+**What did not change, and was re-checked rather than assumed.** All five CORS-wording
+sites are byte-identical to `origin/main` on this tree (`docs/00:166`,
+`docs/03:341`, `docs/10:56`, `docs/06:156`, and the area X row, md5 per site);
+`docs/09` still says `preflight` **exactly once**, at `:74`, which §13j depends on; no
+disputed-wording line was added to `docs/`; `regression/` untouched; `216 / 430` and
+`research-checks.py` exit 0. `docs/00:170` — the seventh carrier of the disputed wording,
+found by the round-6 review — remains byte-unchanged and is **not** contradicted: it reads
+*"…is **not excluded**"*, asserts nothing about `clcloud.*`, and this pass's six cells are
+on a different host family. That hedge is in fact the strongest evidence that the disputed
+wording has already been qualified once on `main`, which is material to the #61 ruling.
+
+**The rule caught this file's author committing the bug one last time, which is why it
+is worth stating as a rule rather than a fix.** While re-confirming the five CORS sites
+against the *current* `origin/main`, the check was written as a fixed-line comparison —
+`origin/main:858` vs this branch's `:1102` — and reported **`DIFFERS`**. It did not.
+`origin/main` is now `c521083`, area L's merge, where the row sits at **`:1028`**, not
+`:858`; resolved there, the two digests are both `a5c5343312ba3886dab31bbba1c06319` and
+the row is byte-unchanged. The stale coordinate had survived **four** separate commits
+(`614db77` → `6a4ae46` → `750bfca` → `c521083`) while still being quoted as current. The
+first two rotted live pointers in this log were fixed to a coordinate that was already
+dying; only the content-addressed form survives that.
+
+**One further correction, made here rather than left standing.** §13l-3 said
+`git merge-tree --write-tree 8373169 614db77` "yields a tree byte-identical to **this
+branch's**". Re-run: it yields `63a595a6…`, which is **byte-identical to the merge commit
+`7872a1c9`'s tree** — so the merge claim is CONFIRMED on its proper target. The old
+wording named a target that stopped being true the moment the next correction was
+committed, which is §13m's own failure mode in miniature; it is now stated against the
+merge commit.
