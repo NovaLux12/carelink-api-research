@@ -1,0 +1,17 @@
+mutant  killed  expected  mutation
+------------------------------------------------------------------------------
+  A     yes     killed    ignores showNumPages, so a count cell is treated as a record query
+  C     NO      survives  reads an EMPTY host set as 'no captures' and wipes the bucket — the exact bug the module docstring says it was born catching
+  D     yes     killed    scopes the enumeration inference to the crawl instead of the registrable domain, so minimed.eu's enumeration would mark medtronic.eu absent
+  S     yes     killed    re-introduces sibling inheritance: a host-level query takes its state from any sibling under the same registrable domain
+
+HONEST READING:
+  The self-test kills mutants A, D and S. It does NOT kill C, and
+  `failclass.py`'s docstring no longer claims it does.
+  C survives because `covered` is consulted before `absent`, so the
+  damage a C-mutant does to the absent-set is never observable in a
+  classification. That is a known, measured limit of the suite — not a
+  claim that C is harmless: C would matter the moment check order
+  changed, and nothing in the published 2/0/13/2 split depends on it.
+
+OK: 4 mutants measured, 0 expectation(s) violated

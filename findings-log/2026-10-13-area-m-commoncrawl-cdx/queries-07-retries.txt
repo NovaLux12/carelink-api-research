@@ -1,0 +1,10 @@
+# Area M — request set 7: the four cells the cap would otherwise leave as holes.
+# Every one of these is a FAILURE cell, never a zero: 51 answered 502, 52
+# answered 400 (the index API leaking a Python RemoteDisconnected as a 400), 53
+# answered 504, 56 answered 503 `SlowDown` — CC's own rate limit. Re-issuing
+# them is the method: an unanswered cell is not an absent one.
+# tag|role|host|path-and-query|extra curl args
+
+retry-host-clcloud-minimed-eu-2026-39|RETRY-of-seq51-502|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=clcloud.minimed.eu&output=json&matchType=host|
+retry-host-carelinkhp-minimed-eu-2026-39|RETRY-of-seq52-400|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=carelinkhp.minimed.eu&output=json&matchType=host|
+retry-offsetA-r3-com-medtronic-2024-42|RETRY-of-seq56-503-SlowDown|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2024-42/indexes/cdx-00097.gz|-r 26751110-27650507
