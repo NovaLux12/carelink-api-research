@@ -214,6 +214,28 @@ unauthenticated. `dev.commoncore.medtronic.eu` resolves but is **502** (backend 
 `commoncore.minimed.eu` is also 502 — a **different host**, not a twin [source:
 findings-log/probe-2026-10-08/SECURITY-FINDINGS.md].
 
+> [!IMPORTANT]
+> ⚠ **Two corrections, 2026-10-13 (area D, #58).** Both readings are retained above.
+>
+> **(1) The `403` is not evidence these six endpoints exist.** This section read the
+> uniform `403` as "live, auth-gated". Under [Oracle A](09-methodology-and-oracles.md)
+> these hosts are AWS API Gateway behind CloudFront, where
+> `MissingAuthenticationTokenException` **is the unmatched-route error**, `404` is never
+> emitted, and a certainly-absent control is byte-identical to the published root. A
+> fabricated path (`/reports-broker/v1/ocl-probe-absent`) on `commoncore.medtronic.com`
+> returns the **same status, the same error type and the same body digest**
+> (`f249b63c…`, 42 B) as the real one (OBSERVED). **The six paths above remain the
+> vendor's own config values — that is unchanged — but the status code is not what
+> establishes that they are served**, and this section used it that way.
+>
+> **(2) The `commoncore.medtronic.{eu,com}` brace was missing a case.** The trials
+> deployment has its own pair: its *config* sets `nutrino.cc.broker.service.config.host`
+> to `https://commoncore-trials.minimed.com/reports-broker/v1`, while its *CSP* allows
+> **`commoncore-trials.medtronic.com`** — which is a **real host** (CNAME to
+> CloudFront, host-specific DigiCert SAN match). Both answer `403`. Whether that split
+> is deliberate or a stale config entry is **INFERRED and unresolved**
+> [findings-log/2026-10-13-area-d-commoncore-trials/FINDINGS.md §2b, §3b].
+
 > [!CAUTION]
 > **HELD BACK — not published.** A finding about these endpoints was
 > removed from this repo before it went public, at the maintainer's instruction. The

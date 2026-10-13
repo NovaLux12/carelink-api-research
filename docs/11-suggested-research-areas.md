@@ -24,6 +24,61 @@ everything else on this page moves.
 | Report bodies from `commoncore` | a clinician-scoped token |
 | Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
 
+#### Addendum (2026-10-13, from area D): the `commoncore` 403s are the gateway's *no-route* error, so "six endpoints on `commoncore.medtronic.{eu,com}`" is unproven
+
+Attached to the `Report bodies from commoncore` row above, which is the claim this
+actually refines. Area D closed the `docs/10` §1 row **"is
+`commoncore-trials.medtronic.com` a real host?"**; closing it produced this.
+
+**What is known (labels and cites).** `commoncore-trials.medtronic.com` **is** a
+real host: CNAME to a CloudFront distribution, a host-specific DigiCert leaf whose
+SAN matches the name, a gateway-shaped `403` — three signals a parked name cannot
+produce (OBSERVED, [findings-log/2026-10-13-area-d-commoncore-trials/FINDINGS.md]
+§2a). The trials deployment's **config** points `nutrino.cc.broker.service.config.host`
+at the **`.minimed.com`** sibling while its **CSP** allows the **`.medtronic.com`**
+one, so two vendor documents name two different trials hosts (OBSERVED, same log
+§3b; config value at
+[findings-log/2026-10-12-published-pointers/enumeration-scrubbed.txt:217]).
+
+**What was NOT established, and why it matters.** These hosts are AWS API Gateway
+behind CloudFront, where `MissingAuthenticationTokenException` **is the
+unmatched-route error** — `404` is never emitted and a fabricated path returns the
+published response byte-for-byte
+([docs/09-methodology-and-oracles.md](09-methodology-and-oracles.md) Oracle A).
+Area D confirmed it directly: `/reports-broker/v1/ocl` and
+`/reports-broker/v1/ocl-probe-absent` returned the **same status, error type and
+body digest** (`f249b63c…`, 42 B) on **two** hosts — six GETs, **one** distinct body
+(OBSERVED, same log §2b, §5). **So `docs/07`'s "all **403**" on the six
+`commoncore.medtronic.{eu,com}` endpoints is a statement about the gateway, not
+evidence that six endpoints are served.** The six paths are still the vendor's own
+config values; the *status* is what was being over-read. This matters because the
+row above assumes a reports surface exists to authenticate against — and on this
+host family that assumption is currently **unproven in both directions**.
+
+**Blocker:** a clinician-scoped token, **and** a path whose `403` means something
+other than "no route". The second half is the real obstacle: it needs either a
+`401`/`400`/`405` cell (the [carelink plane](00-summary-the-map.md) supplies those,
+`commoncore` does not) or one authenticated request. **This is a token question, not
+a request-budget question** — area D closed the whole unauthenticated half in
+**9 of a 10 cap**.
+
+**Closes when:** one authenticated `GET /reports-broker/v1/ocl` on any `commoncore`
+host returns a status that is **not** `MissingAuthenticationTokenException` — which
+would establish that the route exists and the family is reachable. **A negative
+counts, and on the current evidence it is the likely answer**: if the authenticated
+request also answers `403 MissingAuthenticationTokenException`, the six endpoints
+should be **retired from `docs/07`'s prose as unserved**, which is a real result.
+
+**Assumptions (INFERRED):** that the CloudFront distribution and its certificate
+are Medtronic-operated rather than third-party-hosted — the issuer and SAN are
+OBSERVED, the ownership is inferred from the vendor naming the host in its own CSP;
+and that the config/CSP split on the trials deployment is deliberate rather than a
+stale config entry, which **nothing observed here distinguishes**. The EU cell in
+area D's pass carries **no absent-path control** (the cap did not allow it), so it
+is corroboration rather than an adjudicated reading.
+
+---
+
 #### Addendum (2026-10-12, from area O): 24 more non-2xx responses, still zero `200`s
 
 Attached to the `Access-Control-Allow-Origin` row above, as area O's claim issue
