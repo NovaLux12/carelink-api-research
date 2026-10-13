@@ -487,4 +487,52 @@ exact values in §3's table — and the assertion count then needs re-measuring 
 | `attempt1-exit6-demo.txt` | the failure path reproduced offline, no vendor |
 | `options-shape-local-check.txt` | proof that `-X OPTIONS` with no data sends an empty body, from a local socket |
 
+## 9. Merge conflict on `docs/09`, reported and **not** resolved by this worker
+
+Pushed `45cd5c8`. CI did not run on it, because the PR went `CONFLICTING` while this work
+was in progress: `origin/main` moved from `20e4afc` (this branch's base) to `614db77` as
+other workers merged. `gh pr view 65` reports `mergeable=CONFLICTING`. A dry three-way merge
+(`git merge-tree --write-tree origin/main HEAD`, no worktree touched) isolates **one** real
+conflict, and it is not a formatting artefact:
+
+- `docs/11-suggested-research-areas.md` auto-merges cleanly.
+- `docs/09-methodology-and-oracles.md` conflicts, at the trap-table rows
+  **"A gap below the harness's own declared `sleep`"** (which `origin/main` rewrote) and
+  **"The `date` series itself is the suspect"** (which this branch rewrote). Both are single
+  lines several kilobytes long, and they are adjacent, so git cannot align them.
+
+**The conflict is between two claims, not two formats, and the merge queue's own rule says a
+`docs/` conflict is not auto-resolved. So it was not resolved here, and the branch is left
+parked.**
+
+Why it is a claim conflict, concretely:
+
+1. **The occurrence accounting disagrees.** `origin/main` now reads *"22 gaps" + DASH + "B 1, X 1, Z 5, D 14, F 1, which sums"* and
+   *"**F is the fifth pass whose harness emitted the sleep**"*, with area O explicitly
+   **excluded** from this class (*"contributes 0 to this class"*). This branch's row says
+   *"A sixth _pass_ to exhibit this signature"*. Under main's corrected numbering the two are
+   reconcilable " + DASH + " B, X, Z, D, F is five, so this pass is the sixth " + DASH + " but only if
+   "sixth pass to exhibit the signature" is read as main reads it for area O. That is a
+   judgement about someone else's correction, and it is not this worker's to make silently.
+2. **`origin/main` publishes the check this verification round retracted.**
+   `docs/09` on main now states, of area F: *"its span is 75.880 s against `t_sent`'s 75.655 s,
+   agreeing to 225 ms, which is **the trustworthiness test this page sets for the mtime
+   series**"*. `mtime_span " + DASH + " t_sent_span` is identically `dur[n] " + DASH + " dur[1]` " + DASH + " computed from the two `date` series
+   alone, never from an mtime " + DASH + " so it cannot discriminate a sound mtime series from an unsound one
+   however small the number comes out (" + SEC + "2.3, where the arithmetic is shown). **The wrong check is now
+   canonical in this page, and this branch's row replaces it.** Whichever side a merge keeps,
+   one contributor's validation is deleted without its author seeing it.
+3. **The assertion count has moved under this branch.** `origin/main` now states
+   `regression/hurl/` holds **216 assertions (430 execute)**; this branch, based on
+   `20e4afc`, measures **210 / 424** and says so. `research-checks.py` passes on each branch
+   separately because each is self-consistent. Merging changes the number and needs a
+   re-measure " + DASH + " `merge-queue.sh` step 3 does exactly that, which is the right owner for it.
+
+**What a resolver needs to know, so the choice is not made blind.** Both sides of items 1 and 2
+are recoverable from committed artefacts: area F's numbers are in
+`findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md`, and the arithmetic that shows
+item 2 has no discriminating power is in `spacing.txt` " + SEC + "5 and `spacing.py` " + SEC + "3. Nothing needs
+re-probing; it is a decision about which published check survives.
+
+<!-- allow-unresolved-cites: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md — exists on origin/main (merged via PR #60) but not on this branch's base 20e4afc, so it does not resolve in this worktree. It is cited in section 9 as the source of another worker's mtime figures, which is the point of that section. It resolves on any branch that has merged main. -->
 <!-- allow-unresolved-cites: findings-log/2026-10-13-commoncore-trials/FINDINGS.md — cited as the origin of the six GET 403 captures. That log lives on the open, unmerged PR #59 (head a7d90d3) and resolves on no branch until it merges. The captures were read directly at that ref and are quoted in section 3 by body digest, which a reader can check against the PR. -->
