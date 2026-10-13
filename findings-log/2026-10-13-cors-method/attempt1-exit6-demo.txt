@@ -1,0 +1,17 @@
+# Mechanism demonstration — why curl_exit 6 means no connection was attempted.
+# Run offline against a host under .invalid (RFC 2606, reserved, cannot resolve),
+# so this demonstration cannot reach any vendor under any circumstance.
+# It reproduces the defect of attempt 1 in findings-log/2026-10-13-cors-method/
+# without repeating it against a vendor name.
+#
+$ curl -sS -v -o /dev/null -w 'http_code=%{http_code}' https://corsmethod-demo.invalidGET
+* Could not resolve host: corsmethod-demo.invalidGET
+* Could not resolve host: corsmethod-demo.invalidGET
+* Could not resolve: corsmethod-demo.invalidGET:443
+* closing connection #0
+curl: (6) Could not resolve host: corsmethod-demo.invalidGET
+http_code=000
+curl exit: 6
+#
+# Note what is absent: no 'Trying <ip>:443...' line and no 'Connected to' line.
+# curl aborts at resolution, so the TCP and TLS handshakes are never attempted.
