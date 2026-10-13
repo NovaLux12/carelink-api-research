@@ -68,8 +68,9 @@ in the clinic's 224 lazy chunks, and not in the patient bundle.
 
 One authenticated `GET /patient/monitor/data` response, logged key-names-only,
 would resolve #81 outright. The instruction for that is in
-`findings-log/probe-2026-10-08/work/DRAFT-upstream-issue3-reply.md` (excluded from
-this repo by design — it is a third-party correspondence draft).
+`findings-log/probe-2026-10-08/work/DRAFT-upstream-issue3-reply.md` (deliberately
+unresolvable — excluded from this repo by design, as it is a third-party
+correspondence draft, so no committed path will ever satisfy this cite).
 
 ## Methodology note
 
@@ -77,3 +78,18 @@ This bundle was found by the source-map pass as a side effect, not by the
 targeted search. The lesson is that a **negative result on one artefact is worth
 extra probing on the same host** — the `.js.map` hunt was the wrong question for
 the root of the patient host, and it stumbled onto the right artefact.
+
+## Correction (2026-10-13)
+
+**The "What would settle it" section cites a path that resolves nowhere, and that
+is deliberate.** `findings-log/probe-2026-10-08/work/DRAFT-upstream-issue3-reply.md`
+is a third-party correspondence draft, excluded from this repo by design — so the
+cite is unresolvable on purpose, and the sentence above now says so explicitly
+instead of leaving the reader to infer it from "(excluded …)".
+
+<!-- allow-unresolved-cites: findings-log/probe-2026-10-08/work/DRAFT-upstream-issue3-reply.md — third-party correspondence draft, excluded from this repo by design -->
+
+The comment above is the machine-readable half of the same statement: the gate's
+findings-log citation check (`scripts/research-checks.py`) flags any cite that resolves
+nowhere, and this path is deliberately unresolvable, so the reason travels with the
+exemption rather than living only in prose.

@@ -619,3 +619,15 @@ and the priorities page's own gate counts open areas by matching `^### [A-Z]. `
 (`docs/11` §"Why there is no area AA"). See `docs/11` for where it was attached
 and why. The new fact it rests on is §6c's — the host-aware CSP and the
 `commoncore-trials.medtronic.com` name that is in no prior note.
+
+## Correction (2026-10-13)
+
+**The check this log documents now also watches this log.** `scripts/research-checks.py`
+grew a findings-log citation check that flags any `recon/|work/|recov/` cite resolving
+nowhere — and this file contains the string `` `recon/X.md` `` at §10, which resolves
+nowhere. **That occurrence is prose about the gate's own regex, not a citation**: it
+demonstrates the lookbehind that keeps a `](../probe-2026-10-08/recon/X.md)` link out
+of the match, and there is no artefact by that name to commit. No prose changed; the
+exemption below is the whole fix.
+
+<!-- allow-unresolved-cites: recon/X.md — prose demonstrating the gate regex's lookbehind, not a citation, and no such artefact exists to commit -->

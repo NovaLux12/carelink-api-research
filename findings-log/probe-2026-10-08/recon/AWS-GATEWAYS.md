@@ -262,7 +262,7 @@ repo pre-publication — see the redaction note in
 | `recon/AWS-GATEWAYS.md` | this report |
 | `recon/gw-probe-results.jsonl` | machine log, one record per request, 90 lines |
 | `recon/gw-probe.log` | human-readable log with the provenance/correction notes |
-| `recon/gw-probe-table.md` | the rendered request table, embedded below |
+| `recon/gw-probe-table.md` | the rendered request table — embedded inline as §10 below; never committed as a separate file |
 | `recon/aws-gw-probe.py` | harness: enforces the cap, the per-host delay, GET-only, body scrubbing |
 | `recon/render-table.py` | renders §10 from the JSONL so the table cannot drift from the log |
 
@@ -393,3 +393,17 @@ path *is* matched, which reveals that both deployments are a single stage-wide
 `ANY /{proxy+}` catch-all to a Lambda that throws on every request — including
 the OPTIONS preflight, meaning no CORS is configured and the service cannot be
 called from a browser at all.
+
+## Correction (2026-10-13)
+
+**The §9 Files table listed `recon/gw-probe-table.md` as though it were a committed
+artefact. It never was** — §10 *is* the rendered table, produced in-file by
+`render-table.py` from `gw-probe-results.jsonl`, and no separate table file was ever
+written. The row now says so instead of reading as a path that should resolve.
+
+<!-- allow-unresolved-cites: recon/gw-probe-table.md — rendered inline as §10 of this file, never committed as a separate file -->
+
+The comment above is the machine-readable half of the same statement: the gate's
+findings-log citation check (`scripts/research-checks.py`) flags any cite that resolves
+nowhere, and this path is deliberately unresolvable, so the reason travels with the
+exemption rather than living only in prose.
