@@ -40,7 +40,7 @@ hurl exit: 0
 
 ## Correction (2026-10-13) — a machine path was published in the Success line
 
-**What was on `main`.** Line 11 of the CAPTURED run is hurl's own success
+**What was on `main`.** On `main`, line 11 of this file was hurl's own success
 message, and hurl echoes **the path of the file it was given, verbatim**. In this
 pass that file was a scratch file in the capturing machine's temporary directory,
 so the echoed argument was an absolute path beginning at that machine's home
@@ -48,7 +48,11 @@ directory. `AGENTS.md` §7 lists absolute home directories in the never-publish
 scrub list, so the line should not have shipped — and because the path was a real
 one rather than a placeholder, it carried the account name as well as the path.
 
-**What is redacted.** Only the path argument, and only on line 11:
+**What is redacted.** Only the path argument, and only on the `Success` line of
+the CAPTURED run — line 14 of this file as it now stands, which is the line that
+was line 11 on `main`: the header note below it is three lines longer than the
+one it replaced. Quoted by content rather than by number, because a line number
+in a file this correction is editing is a citation that rots (AGENTS.md §6.6):
 
 ```
 Success <tmp>/area-b-revalidate.hurl (1 request(s) in 2069 ms)
