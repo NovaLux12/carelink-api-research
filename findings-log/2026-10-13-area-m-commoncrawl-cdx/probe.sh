@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Area M — Common Crawl via the CDX index API, not computed byte offsets.
-# Claim issue #44. Cap 60 requests. GET only. Zero vendor traffic.
+# Claim issue #44. Cap 60 requests, raised to 64 by OWNER AUTHORISATION
+# (dated addendum on #44, 2026-10-13) for the cdx-00101.gz overshoot re-read
+# only. GET only. Zero vendor traffic.
 #
 # WHAT THIS IS FOR
 # ----------------
@@ -67,7 +69,7 @@ set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="$HERE"
-CAP=60
+CAP=64
 DELAY=2.5
 QFILE="${1:?usage: probe.sh <queries-file>}"
 
@@ -177,7 +179,19 @@ PY
   return 0
 }
 
-while IFS='|' read -r tag role host path extra; do
+# FIXED 2026-10-13 (verifier round 1, BLOCKING 2). This loop was
+#   while IFS='|' read -r tag role host path extra; do ... done < "$QFILE"
+# which SILENTLY DROPS THE LAST LINE whenever the file has no trailing newline:
+# `read` returns non-zero at EOF-without-newline, so the loop exits before the
+# final line is dispatched. Four of this pass's query files had no trailing
+# newline, so four queries were never sent and three of them have no ledger row
+# at all. The `|| [ -n ... ]` guard makes the last unterminated line count, and
+# the check below says so out loud instead of only describing it in a comment.
+if [ "$(tail -c 1 "$QFILE" | wc -l)" -eq 0 ]; then
+  log "WARN $(basename "$QFILE") has no trailing newline; a bare read loop would drop its last line"
+fi
+
+while IFS='|' read -r tag role host path extra || [ -n "${tag}${role}${host}${path}" ]; do
   case "$tag" in ''|\#*) continue ;; esac
   req "$tag" "$role" "$host" "$path" "$extra" || break
 done < "$QFILE"

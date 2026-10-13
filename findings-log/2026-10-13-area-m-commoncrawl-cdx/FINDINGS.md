@@ -8,16 +8,16 @@ Closes `docs/11` area M.
 
 | item | value |
 |---|---|
-| **Requests sent** | **60 of a 60 cap** |
+| **Requests sent** | **61 of a 64 cap** — 60 under the original claim cap, **1 more under the owner-authorised extension** (dated addendum on issue #44, 2026-10-13), spent on the `cdx-00101.gz` overshoot re-read and on nothing else. **3 of the 4 authorised requests are recorded as UNSPENT.** |
 | Method | **GET only** — no POST, no OPTIONS, no token exchange, no authentication |
 | Declared delay | **2.5 s apart**, held **inside** a per-host `flock`, with `sleep 2.5` before the `curl` in the locked region |
 | Measured same-host gap floor | **2.873 s** (kernel body-mtime oracle), cross-checked at **2.736 s** from the harness `t_sent` series — see §7 |
-| Hosts contacted | `index.commoncrawl.org` (56), `data.commoncrawl.org` (4) — **nothing else** |
+| Hosts contacted | `index.commoncrawl.org` (56), `data.commoncrawl.org` (5) — **nothing else** |
 | **Requests to any Medtronic host** | **0**. No vendor traffic of any kind, no DNS, no TLS, no HTTP |
-| Ledger rows | `results.jsonl` = **60 rows**, one per request, `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601 |
+| Ledger rows | `results.jsonl` = **61 rows**, one per request, `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601 |
 | Responses committed | **none.** Bodies live under `bodies/` (this directory's `.gitignore`); only headers, byte counts, sha256 digests and a host-only projection are committed |
 
-`wc -l results.jsonl` = 60, and the cap line above says 60 of a 60 cap. Both
+`wc -l results.jsonl` = 61, and the cap line above says 61 of a 64 cap. Both
 directions agree; there is no shortfall to reconcile.
 
 `AGENTS.md` §7: Common Crawl captures carry Java session identifiers in URL
@@ -52,7 +52,7 @@ measure an absence until it had returned data on a target it is known to cover.
 | **A** positive, universal | 3 | `url=example.com&matchType=domain&limit=5` on `CC-MAIN-2026-39` | **200**, 5 records, 2 hosts (`example.com`, `www.example.com`) | **passed** |
 | **B** positive, same crawl, same shape, **on the namespace under test** | 4 | `url=medtronic.com&matchType=domain&limit=5` on `CC-MAIN-2026-39` | **200**, 5 records, 1 host (`www.medtronic.com`) | **passed** |
 | **C** absent, fabricated host under a covered domain | 5, then 7 | `url=zz-area-m-absent-20261013.medtronic.com&matchType=host` | **504** first, then **404** `{"message": "No Captures found for: …"}` | **passed on re-issue** |
-| **D** positive, the count instrument | 10, 15 | `url=medtronic.com&output=json&showNumPages=true` | **200** `{"pages": 2, "pageSize": 5, "blocks": 9}` | **passed** |
+| **D** positive, the count instrument | 10, 15 | `url=example.com&output=json&showNumPages=true&matchType=domain` | **200** `{"pages": 1, "pageSize": 5, "blocks": 1}` | **passed** |
 
 Control B's response is **byte-identical across three separate requests**
 (seq 4, 6, 11 — one sha256), so the instrument is also reproducible, not merely
@@ -86,17 +86,81 @@ until it was resolved. Ledger seq 6–16:
 | presence, either shape | **200** + ≥1 record, or `blocks` ≥ 1 | — |
 
 **This API fails often.** Across the whole pass, **17 of 60 requests (28%)**
+*(the original 60-request figures below are kept as first written; the pass ends
+at 61 rows and **⚠ the last paragraph of this subsection is retracted — see the
+"Correction (2026-10-13) — verifier round 1" section below, item C1")*
 answered 502 ×6, 504 ×7, 400 ×2 or 503 ×2 — nginx `text/html` gateway pages, an
 S3 `SlowDown` ("Please reduce your request rate") from `data.commoncrawl.org`,
 and a **400 leaking a Python `RemoteDisconnected` as its body**. Every one of
 the 17 was re-issued or left as a recorded hole; **not one was read as a zero.**
 
-**INFERRED, and it is only a hypothesis:** the failures cluster on queries the
-backend has no fast answer for — absence on an exact host needs an index scan
-the presence query does not. 17 of 17 failures are on absent-host or
-`data.commoncrawl.org` requests, and 0 of the 20 requests against hosts known
-to be covered ever failed. **No cause is asserted**, and nothing in this pass
-depends on the reading.
+## Correction (2026-10-13) — verifier round 1
+
+The three blocking findings and the non-blocking ones, each attached at the site
+it changes. The original wording stays readable at every one of them; nothing
+below is a rewrite in place.
+
+### C1 — the "covered hosts never fail" claim was false
+
+This section originally read: *"17 of 17 failures are on absent-host or
+`data.commoncrawl.org` requests, and **0 of the 20 requests against hosts known
+to be covered ever failed**."* **That is false, and the ledger refutes it from
+inside this pass.** `seq 50` and `seq 53` query `carelink.minimed.eu` on
+`CC-MAIN-2018-39` — a host `seq 42` had already returned **200** for, with
+`carelink.minimed.eu` among its 8 records, **32.6 s earlier**. Both failed (504).
+The claim was load-bearing: it was the reassurance that made the 28% failure
+rate survivable, and it was republished **unlabelled** in `docs/09` §4, the
+`docs/11` M row and the PR body.
+
+**The counting rule, stated before the number** (`failclass.py`, which computes
+it; `AGENTS.md` §6 item 7):
+
+> Only a **record-form** query returns a host list, so only a record-form query
+> can prove anything about a specific host — a `showNumPages` cell answers
+> `{"pages": N, "blocks": M}` and names no host. For each row, ask what the
+> ledger had established about that host **on that crawl before the row was
+> sent**:
+> **covered** — an earlier record-form query in the same crawl returned 200 and
+> its host set contains this host · **absent** — an earlier query returned the
+> definitive absence form (404 `No Captures found`, `{"pages": 0}`, or a complete
+> domain enumeration not naming it) · **indeterminate** — neither, which covers
+> every host no enumeration named, every `showNumPages` cell, and every
+> fabricated name, *including a fabricated sibling of a covered host* · **n/a** —
+> not an index-API query at all.
+
+**Result — 17 gateway errors:**
+
+| class | failures | rows |
+|---|---|---|
+| **covered** | **2** | 50, 53 |
+| absent | 0 | — |
+| indeterminate | 13 | 5, 8, 9, 12, 16, 21, 32, 33, 37, 51, 52, 57, 58 |
+| n/a (`data.commoncrawl.org` ranged fetch) | 2 | 56, 59 |
+
+**What replaces the false sentence, and it is narrower and more useful than
+either the original or "ten covered-host failures":**
+
+> **A gateway error on a host whose coverage was never established carries no
+> information in either direction, and must be re-issued rather than read as an
+> absence.** And the corollary the other direction points at: **coverage does
+> not protect you either** — 2 of 2 queries for `carelink.minimed.eu` on
+> `CC-MAIN-2018-39` failed, on a host this same ledger had just proven covered.
+
+`seq 51`/`52`/`57`/`58` (`clcloud.minimed.eu`, `carelinkhp.minimed.eu`) are the
+case the class distinction exists for. They are **neither** coverage failures
+nor absences: nothing in the ledger establishes coverage of those names, and the
+repo's own recorded finding is that CC covers essentially zero CareLink hosts.
+§3c's verdict on them comes from **enumerating** the successful `minimed.eu`
+domain responses, not from these four failures.
+
+**The INFERRED reading, restated and still only a hypothesis.** Gateway failures
+concentrate on queries whose result set is small or absent, i.e. on the backend
+doing work the index does not shortcut. **This does not explain `seq 50`/`53`**,
+which is exactly why it stays a hypothesis: a hypothesis that cannot account for
+the case that prompted the correction is not one to publish as a mechanism.
+**No cause is asserted**, and nothing in this pass depends on the reading. What
+survives of the original claim is the weaker and true one: **not one** of the
+17 gateway errors was read as a zero anywhere in this pass.
 
 ## 3. The finding — `docs/10` §2's closed negative is REFUTED in part
 
@@ -149,14 +213,21 @@ these are portal captures, not API captures):
 | crawl | `minimed.eu` | `minimed.com` | `medtronic.eu` | `medtronic.com` |
 |---|---|---|---|---|
 | `CC-MAIN-2018-39` | 1 | 1 | **1** | 3 |
-| `CC-MAIN-2020-50` | 1 † | 1 | **1** | 13 |
+| `CC-MAIN-2020-50` | 1 † ‡ | 1 | **1** | 13 |
 | `CC-MAIN-2022-40` | 1 | 1 | **1** | 14 ‡ |
 | `CC-MAIN-2024-42` | **0** | 1 | **1** | 9 |
 | `CC-MAIN-2025-30` | 1 † | 1 | **1** | 9 |
 | `CC-MAIN-2026-39` | 1 | 2 | **1** | 5 |
 
-† the `showNumPages` cell failed (504 / 502); the record query succeeded and is
-the row's source. ‡ the first cell failed (504) and was re-issued (seq 46).
+† the `showNumPages` cell failed (504 / 502); the value shown is **not observed**
+— it is **INFERRED** as "non-zero" from the record query that replaced it (seq 44
+returned 6 records, seq 43 returned 2). `blocks` is a block count and the two are
+not the same quantity, so **these two cells are the only ones in the table that
+were not measured as a block count**, and they are marked rather than smoothed.
+‡ the first cell failed (504) and was re-issued (seq 46); the `medtronic.eu`
+figure for 2022-40 and the `minimed.eu` figures for 2020-50 and 2025-30 are the
+only three cells whose value comes from a different query shape than the one the
+column names.
 
 **`medtronic.eu` is non-empty in all six**, against `COMMONCRAWL §1`'s table
 recording `eu,medtronic)` = **0 blocks** in both crawls it used — including
@@ -213,6 +284,21 @@ its own boundary keys read — a correct range begins on its recorded lower boun
 | `cdx-00102.gz` 741 698 501–742 330 673 (2026-39) | **206**, 632 173 B | `com,minimed)/en-us/support/product-support/sensors/sensor-replacement` — **matches** | `com,minimicroled)/nationstar-new-micro-led-nstar-iii` — **matches** | **6 000** |
 | `cdx-00097.gz` 26 751 110–27 650 507 (2024-42) | **503 `SlowDown` twice** | — | — | — |
 
+**Settled 2026-10-13 (verifier round 1) under the owner-authorised extension of
+the cap from 60 to 64, spent on this row only.** Ledger **seq 61**: the same
+ranged fetch, **206**, 1 470 800 B, **sha256 identical to seq 54's recorded
+digest**. Decompressed: **15 000 records**, first key
+`com,medtronic)/covidien/de-de/clinical-solutions/lung-health-solutions/resources.html`,
+last key `com,medtryck)/piketrojor/prima-polo` — both verbatim, so the earlier
+reading was right and is now **re-derivable from the repo**. The overshoot is
+also quantified: the range holds **109 distinct hosts** across 49 registrable
+domains, against a range labelled for one. Boundary keys, the digest and the
+host breakdown are committed in
+[`offset-boundaries.txt`](offset-boundaries.txt), because the original body had
+to be deleted under `research-checks.py`'s 1 MiB ceiling and without that file
+the finding rested on prose alone. **No URL, path or status code from that range
+is published** — `AGENTS.md` §7.
+
 **Verdict on the method, stated at the mechanism and not only at the count:**
 
 1. **One of the three recorded ranges reproduces exactly at both ends.**
@@ -239,33 +325,83 @@ successor, so the gap is visible rather than quietly absent.
 
 ## 5. What would have been a better use of the cap
 
-Stated because the pass's own budget is part of its honesty:
+Stated because the pass's own budget is part of its honesty. ⚠ **Corrected
+2026-10-13 (verifier round 1): this section originally claimed "22 of 60
+requests" on recoverable instrument defects. That over-counted, because it
+charged the pass for work the method legitimately does.**
 
-- 5 requests were spent on a query file whose last line had **no trailing
-  newline** (`read` silently drops it) and was re-issued — one wasted outright.
-- 4 were spent re-running control set 1 and control set 2 verbatim before it was
-  noticed that the same defect would drop the last line of those files too.
-- 13 were spent on cells that answered 502/504/503 and had to be re-issued.
+The honest split, with the ledger rows named:
 
-That is 22 of 60 requests on recoverable instrument defects. Against that: the
-defects are now **recorded in `docs/09` §4 with the oracle that fixes them**, so
-the next pass does not pay them again.
+| what | requests | rows |
+|---|---|---|
+| **pure duplicates** — a re-issue whose response was **byte-identical** to an earlier successful row, so it added nothing | **3** | 2 (dup of 1), 11 (dup of 6), 15 (dup of 10) |
+| **re-issues of a dropped line** — the newline defect below, re-sent as their own file | **2** | 47, 60 |
+| **re-issues of a failed cell that produced new information** — the method, not waste: these are how the absence oracles were established and how a repeat-failure rate was measured | **7** | 7, 13, 14, 43, 44, 46, 48 |
+| **re-issues of a failed cell that failed again** — also the method: they are the evidence that failures repeat | **6** | 12, 16, 53, 57, 58, 59 |
+| everything else — distinct information | 42 | — |
+
+**So 5 of 60 requests were spent on the harness defects, not 22.** The original
+"22" counted the 13 legitimate re-issue rounds as waste; they are not.
+
+**Three query lines were dropped and never sent at all**, so they have no ledger
+row and cost nothing. ⚠ **This list was wrong before this correction**: it
+previously named `rec-2026-34-minimed-eu-records` under "cost", but
+`CC-MAIN-2026-34` appears **zero** times in the ledger — that query never ran and
+nothing was spent on it. The three are:
+
+- `host-carelink-minimed-eu-2022-40` (queries-04)
+- `rec-2026-34-minimed-eu-records` (queries-05)
+- `offsetB-cluster-idx-2026-39` (queries-06) — the independent `cluster.idx`
+  binary search, which therefore **could not be sent by the command in §9
+  regardless of the cap**; that is a second, independent reason the offsets rest
+  on one instrument.
+
+Each file now carries the missing newline, a header naming its dropped line, and
+`probe.sh` warns to `run.log` when a query file lacks a trailing newline.
 
 ## 6. Three defects of this pass, recorded rather than smoothed over
 
 1. **A trailing newline silently dropped the last query line of four files.**
-   Cost: `sweep-2018-39-medtronic-com`, `rec-2026-34-minimed-eu-records`,
-   `host-carelink-minimed-eu-2020-50` (sent separately as `queries-08`), and one
-   wasted re-issue of `collinfo.json`. `run.log` carries a `seq=2 REFUSED` line
-   for the first occurrence — the harness's host allowlist refused a malformed
-   line rather than guessing at it, which is the one time the defect surfaced
-   loudly instead of quietly.
+   ⚠ **Fixed 2026-10-13 (verifier round 1, BLOCKING 2) — this defect was still
+   live in the committed artefacts, not merely described in prose.**
+   `probe.sh:180` was `while IFS='|' read -r …`, and `read` returns non-zero at
+   EOF-without-newline, so the loop exits before dispatching the final line.
+   `queries-04`, `queries-05` and `queries-06` were committed **without** a
+   trailing newline, so re-running them would have dropped
+   `host-carelink-minimed-eu-2022-40`, `rec-2026-34-minimed-eu-records` and
+   `offsetB-cluster-idx-2026-39` again — the last of which §9 tells a stranger
+   to run. Fixed three ways: the newline is now on all eight query files, the
+   loop carries the standard `|| [ -n "${tag}${role}${host}${path}" ]` guard, and
+   `probe.sh` **warns to `run.log`** when a query file has no trailing newline
+   so the next pass is told rather than silently shortchanged. Each of the three
+   files also now carries a header naming its dropped line. Verified: all eight
+   files dispatch every one of their query lines under the hardened loop.
+
+   The first occurrence of this defect is visible in `run.log` as a
+   `seq=2 REFUSED` line — the harness's host allowlist refused a malformed line
+   rather than guessing at it, which is the one time it surfaced loudly.
 2. **Six `host_tag`s were reused across re-issued requests**, so six body files
    hold one response instead of two and the kernel mtime oracle reads the same
    file twice. `spacing.py` detects and reports this rather than printing a
    `0.000 s` gap that looks like a rule breach. **The harness body is named by
    tag, not by sequence number, and a re-issued request must get a fresh tag.**
-3. **`spacing.py` divided seconds by 1000 on its first run** and printed a
+3. ⚠ **`record_count` was meaningless for binary bodies** (added by verifier
+   round 1). `derive.py` decoded the two ranged gzip fetches as UTF-8 and counted
+   *byte* lines: ledger `seq 54` recorded **38 112** "records" and `seq 55`
+   **16 284**, against true counts of **15 000** and **6 000** — a reader summing
+   that column would add ~54 000 phantom records to a corpus. The `shape` field
+   did say `"text"`, but the field is *named* `record_count`. Fixed three ways:
+   binary is now detected by the **gzip magic `\x1f\x8b`** rather than a NUL
+   sniff (which would have let short payloads through as text), the body is
+   decompressed and re-derived so a binary body still yields its **true** count,
+   and the phantom byte-line count is quarantined in a separate
+   `bytes_read_as_lines` field instead of being presented as a count. A binary
+   control was added to `--selftest`, which had none. **The three ledger rows
+   already written (54, 55, 61) are not edited** — a ledger row is a record of
+   what happened, and hand-correcting one would destroy that. Their true values
+   are in `offset-boundaries.txt` and in §4.
+
+4. **`spacing.py` divided seconds by 1000 on its first run** and printed a
    `0.003 s` floor with 58 of 58 gaps "under the 2 s floor" — a total rule breach
    that never happened. Caught because the per-gap mean did not reconcile with
    the run's span. Fixed; the unit constant and the reason are in the file.
@@ -278,11 +414,19 @@ the **same** host".
 
 | oracle | gaps | min | max | under 2.5 s | under 2.0 s |
 |---|---|---|---|---|---|
-| **kernel body-file mtimes** (independent of the harness clock) | 46 | **2.873 s** | 152.906 s † | **0** | **0** |
-| harness `t_sent` | 58 | **2.736 s** | 82.651 s | **0** | **0** |
+| **kernel body-file mtimes** (independent of the harness clock) | 45 | **2.873 s** | 152.906 s † | **0** | **0** |
+| harness `t_sent` | 59 | **2.736 s** | 1806.735 s ‡ | **0** | **0** |
 
-† inflated by the six excluded duplicate-tag bodies, which join two otherwise
-adjacent requests into one long gap.
+† inflated by the excluded duplicate-tag bodies, which join two otherwise
+adjacent requests into one long gap. ‡ the authorised `seq 61` went out in a
+later session, so the longest `t_sent` gap spans the interval between the two
+harness invocations rather than any in-run spacing. Neither figure is a spacing
+claim; the minimum is.
+
+Re-measured over all 61 rows on 2026-10-13. The floor is **unchanged** by the
+extra request: `seq 61`'s body was deleted under the 1 MiB ceiling, so the
+kernel series now covers 45 gaps rather than 47, and the minimum it reports is
+the same 2.873 s — the deleted bodies were never the minimum.
 
 **Measured floor: 2.873 s, from the kernel mtime series**, because
 `docs/09` §4 establishes that series as the independent one; the harness series
@@ -296,13 +440,14 @@ Git does not preserve mtimes, so **the kernel series is valid only on the
 machine that ran this probe** and is not re-derivable from a clean clone. Both
 series are recorded in `spacing.txt`.
 
-The bodies those numbers were measured from are not all still on disk: the one
-1 470 800-byte ranged CDX fetch was deleted after the run because
-`scripts/research-checks.py` enforces a **1 MiB ceiling over every file under
-`findings-log/`**, which it applies to the working tree and not only to
-committed files. Its byte count and sha256 remain in `results.jsonl`, and
-`spacing.txt` is the committed record of the measurement it supported. The
-smaller bodies are still under `bodies/` for local inspection.
+The bodies those numbers were measured from are not all still on disk: **two**
+1 470 800-byte ranged CDX fetches (`seq 54` and `seq 61`, byte-identical) were
+deleted after each run because `scripts/research-checks.py` enforces a **1 MiB
+ceiling over every file under `findings-log/`**, which it applies to the working
+tree and not only to committed files. `spacing.py` reports them as missing rather
+than skipping them silently. Their byte counts and sha256 remain in
+`results.jsonl`, the boundary keys are committed in `offset-boundaries.txt`, and
+`spacing.txt` is the committed record of the measurement the bodies supported.
 
 ## 8. Scope and limits, stated before anyone relies on this
 
@@ -343,8 +488,16 @@ python3 spacing.py               # both spacing series, counting rule in code
 ./probe.sh queries-05-other-named-hosts.txt          # the other two named hosts
 ./probe.sh queries-06-offsets.txt                    # offset reproduction
 ./probe.sh queries-07-retries.txt                    # failure cells, re-issued
-./probe.sh queries-08-final.txt                      # the last request of the cap
+./probe.sh queries-08-final.txt                      # the host-shape cross-check
+./probe.sh queries-09-overshoot-reread.txt                # authorised overshoot re-read
 ```
+
+⚠ **Read the loop before re-running this.** `probe.sh` now guards its read loop
+and warns when a query file lacks a trailing newline, but several of these files
+re-request queries this pass already made, and **re-running them against a live
+API is not a reproduction of this run** — it is new traffic. To re-derive the
+numbers in this document without any request, run the three scripts, which read
+only what is committed: `spacing.py`, `failclass.py` and `derive.py --selftest`.
 
 Every query file names its own justification. The harness refuses any host
 outside `index.commoncrawl.org` / `data.commoncrawl.org` and aborts at the cap.

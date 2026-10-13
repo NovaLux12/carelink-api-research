@@ -1,0 +1,34 @@
+# Area M — request set 9: ONE request under the owner-authorised extension of the
+# cap from 60 to 64 (dated addendum on issue #44), spent on the cdx-00101.gz
+# overshoot ONLY, as that authorisation specifies.
+#
+# WHY IT IS STILL WORTH ONE REQUEST
+# ---------------------------------
+# The overshoot verdict — "the range starts exactly on its recorded lower bound
+# but ends at com,medtryck)/…, past its recorded upper bound
+# com,medtronicdiabetes,origin)" — was derived from the body of ledger seq 54,
+# and that body was DELETED after the run: scripts/research-checks.py enforces a
+# 1 MiB ceiling over every file under findings-log/ and the fetch was 1 470 800
+# bytes. The byte count and sha256 survive in results.jsonl, but the two boundary
+# keys the finding rests on survive only in prose.
+#
+# That is the same defect this whole area exists to correct — a conclusion
+# nobody can re-derive — so this re-fetches the range verbatim and commits the
+# boundary keys as a small extract, `offset-boundaries.txt`. The verifier
+# re-fetched the same range and confirmed the digest (sha256 d516a620…,
+# identical to the recorded one) but ran out of steps before decompressing it.
+#
+# WHAT IT IS NOT
+# --------------
+# This is corroborating detail on the mechanism, not load-bearing. The headline
+# 24 records were re-derived independently through the CDX index API, and the
+# second recorded range (cdx-00102.gz) reproduces at both ends from a body that
+# IS committed. If this fetch fails, the overshoot claim stays marked
+# "not re-derivable from a clean clone" and nothing else changes.
+#
+# NO MEDRONETIC HOST IS INVOLVED: data.commoncrawl.org only. Per-host flock,
+# sleep 2.5 s inside the lock, GET only.
+#
+# tag|role|host|path-and-query|extra curl args
+
+offsetC-reread-cdx-00101-2026-39|offset-overshoot-re-read|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2026-39/indexes/cdx-00101.gz|-r 45560954-47031753

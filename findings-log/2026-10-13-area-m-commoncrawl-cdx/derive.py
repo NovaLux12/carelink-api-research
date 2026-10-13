@@ -64,9 +64,32 @@ def host_from_url(url: str) -> str | None:
     return netloc if re.fullmatch(r"[a-z0-9.\-]+", netloc) else None
 
 
-def derive(body: str) -> tuple[int, list[str], str]:
-    """Return (record_count, sorted distinct hosts, shape)."""
+def derive(body: str) -> tuple[int | None, list[str], str, int]:
+    """Return (record_count, sorted distinct hosts, shape, bytes_read_as_lines).
+
+    `record_count` is `None` for any binary body. A gzip member decoded as
+    UTF-8 yields byte-counts that LOOK like line counts — the two ranged CDX
+    fetches in this pass recorded 38 112 and 16 284 "records" when the true
+    counts were 15 000 and 6 000 — and a reader summing that column would add
+    ~54 000 phantom records to a corpus. The field is `None` rather than a wrong
+    number, and the byte count it would have been is returned separately so the
+    mistake is still visible in the ledger.
+    """
     hosts: set[str] = set()
+    # Binary detection by CONTENT TYPE SIGNATURE, not by "looks unprintable":
+    # a NUL-sniff misses short payloads and would have let this pass's own
+    # two gzip fetches through as text. \x1f\x8b is the gzip magic; the NUL
+    # check stays as a cheap second net for other binary forms.
+    if body[:2] == "\x1f\x8b" or "\x00" in body[:4096]:
+        # Binary (a gzip member, or anything else that is not text). Decompress
+        # first and re-derive, so a binary body still yields its real facts.
+        try:
+            import gzip
+            inner = gzip.decompress(body.encode("latin-1")).decode("utf-8", "replace")
+        except Exception:
+            return None, [], "binary", len(body.splitlines())
+        n, h, shape, _ = derive(inner)
+        return n, h, shape, len(body.splitlines())
     lines = [ln for ln in body.splitlines() if ln.strip()]
 
     # collinfo.json — a single JSON array document.
@@ -74,7 +97,7 @@ def derive(body: str) -> tuple[int, list[str], str]:
     if stripped.startswith("["):
         try:
             doc = json.loads(body)
-            return len(doc), [], "json-array"
+            return len(doc), [], "json-array", 0
         except ValueError:
             pass
 
@@ -84,7 +107,7 @@ def derive(body: str) -> tuple[int, list[str], str]:
     # failure. Recorded 2026-10-13 after the first absent-host control
     # answered 504 text/html.
     if stripped.lower().startswith(("<!doctype html", "<html")):
-        return 0, [], "html-error"
+        return 0, [], "html-error", 0
 
     # An index-API "no captures" answer is a plain-text sentence, not JSON.
     if not stripped.startswith(("{", "[")):
@@ -96,8 +119,8 @@ def derive(body: str) -> tuple[int, list[str], str]:
                 if h:
                     hosts.add(h)
         if hosts:
-            return len(lines), sorted(hosts), "cdx-text"
-        return len(lines), [], "text"
+            return len(lines), sorted(hosts), "cdx-text", 0
+        return len(lines), [], "text", 0
 
     for ln in lines:
         try:
@@ -113,7 +136,7 @@ def derive(body: str) -> tuple[int, list[str], str]:
             h = surt_to_host(obj["urlkey"])
         if h:
             hosts.add(h)
-    return len(lines), sorted(hosts), "cdx-json"
+    return len(lines), sorted(hosts), "cdx-json", 0
 
 
 def _selftest() -> int:
@@ -121,13 +144,13 @@ def _selftest() -> int:
 
     # (1) The extractor must FIRE. A selftest that cannot fail is the defect
     # area Y's addendum names, so these positives are asserted first.
-    n, hosts, _ = derive('{"url": "http://example.com/a", "timestamp": "2026"}\n'
-                         '{"url": "https://www.example.org/b"}\n')
+    n, hosts, _shape, _b = derive('{"url": "http://example.com/a", "timestamp": "2026"}\n'
+                                  '{"url": "https://www.example.org/b"}\n')
     if n != 2 or hosts != ["example.com", "www.example.org"]:
         fails.append(f"positive cdx-json control: got n={n} hosts={hosts}")
 
-    n, hosts, _ = derive('com,medtronic,www)/a 20260101 text/html 200 SHA - 1234 0 warc\n'
-                         'com,medtronic)/b 20260101 text/html 200 SHA - 1234 0 warc\n')
+    n, hosts, _shape, _b = derive('com,medtronic,www)/a 20260101 text/html 200 SHA - 1234 0 warc\n'
+                                  'com,medtronic)/b 20260101 text/html 200 SHA - 1234 0 warc\n')
     if n != 2 or hosts != ["medtronic.com", "www.medtronic.com"]:
         fails.append(f"positive cdx-text control: got n={n} hosts={hosts}")
 
@@ -136,7 +159,7 @@ def _selftest() -> int:
 
     # A gateway error page has lines and no URLs. Counting it as records is
     # how a server failure becomes a positive finding.
-    n, hosts, shape = derive("<html>\n<head><title>504 Gateway Time-out</title></head>\n"
+    n, hosts, shape, _b = derive("<html>\n<head><title>504 Gateway Time-out</title></head>\n"
                              "<body>\n<center><h1>504 Gateway Time-out</h1></center>\n"
                              "<hr><center>nginx/1.31.6</center>\n</body>\n</html>\n")
     if n != 0 or hosts != [] or shape != "html-error":
@@ -144,20 +167,20 @@ def _selftest() -> int:
 
     # (2) FALSE-POSITIVE controls. The host projection must not invent hosts,
     # and it must not be fooled by the shapes that have cost this repo time.
-    n, hosts, _ = derive('No Captures found for: minimed.eu/*\n')
+    n, hosts, _s, _b = derive('No Captures found for: minimed.eu/*\n')
     if hosts != []:
         fails.append(f"false positive: extracted hosts from a no-captures sentence: {hosts}")
 
     # A parked-wildcard name from the spaces AGENTS.md section 7 names must
     # still project to a host — that is a fact about the response, not an
     # assertion that the host is real. Recorded so the two are not confused.
-    n, hosts, _ = derive('{"url": "http://zz-random-9f2a.carelink.eu/"}\n')
+    n, hosts, _s, _b = derive('{"url": "http://zz-random-9f2a.carelink.eu/"}\n')
     if hosts != ["zz-random-9f2a.carelink.eu"]:
         fails.append(f"parked-wildcard control did not project its host: {hosts}")
 
     # A session parameter in the PATH must not survive the projection. The
     # value below is synthetic and is a control, not a capture.
-    n, hosts, _ = derive('{"url": "http://wwwp.medtronic.com/a/b;jsessionid_XYZZY=ABCDEF123456/c.html"}\n')
+    n, hosts, _s, _b = derive('{"url": "http://wwwp.medtronic.com/a/b;jsessionid_XYZZY=ABCDEF123456/c.html"}\n')
     if hosts != ["wwwp.medtronic.com"]:
         fails.append(f"session-in-path control leaked path material: {hosts}")
 
@@ -166,13 +189,33 @@ def _selftest() -> int:
     # name that used to stand in for "an internal-looking host" was removed —
     # scripts/scrub-patterns.txt scans every diff for that shape, and a
     # *control* that trips the leak scan is not a control, it is a defect.)
-    n, hosts, _ = derive('{"url": "http://a-host-nobody-has-seen.example/x"}\n')
+    n, hosts, _s, _b = derive('{"url": "http://a-host-nobody-has-seen.example/x"}\n')
     if hosts != ["a-host-nobody-has-seen.example"]:
         fails.append(f"unseen-host control did not project: {hosts}")
 
-    n, hosts, _ = derive('{"url": "http://single-label/x"}\n')
+    n, hosts, _s, _b = derive('{"url": "http://single-label/x"}\n')
     if hosts != ["single-label"]:
         fails.append(f"single-label control did not project: {hosts}")
+
+    # A BINARY body must never report a record count. This is the defect that
+    # made two ranged gzip fetches record 38 112 and 16 284 phantom "records"
+    # where the true counts were 15 000 and 6 000 — a reader summing that
+    # column would add ~54 000 phantom records to the corpus.
+    import gzip as _gz
+    _payload = _gz.compress(
+        "com,medtronic)/a 20260101 text/html 200 S - 1 0 w\n"
+        "com,medtronic)/b 20260101 text/html 200 S - 1 0 w\n".encode())
+    _blob = _payload.decode("latin-1")
+    n, hosts, shape, binlines = derive(_blob)
+    # The count must be the TRUE record count (2), not the phantom byte-line
+    # count a UTF-8 decode of the member would produce, and the phantom is
+    # quarantined in its own field rather than discarded.
+    if n != 2:
+        fails.append(f"binary control: count was {n}, expected the true 2 — a "
+                     "gzip body is reporting a byte count as a record count")
+    if binlines <= 0:
+        fails.append("binary control: the phantom byte-line count was not "
+                     "recorded separately, so it cannot be told apart from a count")
 
     if fails:
         for f in fails:
@@ -197,10 +240,12 @@ def main() -> int:
         return _selftest()
     if not a.body:
         ap.error("need a body file or --selftest")
-    with open(a.body, encoding="utf-8", errors="replace") as fh:
-        n, hosts, shape = derive(fh.read())
+    with open(a.body, "rb") as fh:
+        raw = fh.read()
+    n, hosts, shape, binbytes = derive(raw.decode("latin-1"))
     print(json.dumps({"record_count": n, "distinct_hosts": hosts,
-                      "distinct_host_count": len(hosts), "shape": shape}))
+                      "distinct_host_count": len(hosts), "shape": shape,
+                      "bytes_read_as_lines": binbytes}))
     return 0
 
 
