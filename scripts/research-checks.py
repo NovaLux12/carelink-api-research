@@ -49,6 +49,12 @@ What it enforces:
      different tasks carry different rules by design.
   5. APPEND-ONLY — findings-log/ deletions fail; modifications without a
      dated `## Correction (YYYY-MM-DD)` section fail. Additions are free.
+  6. PROSE COUNTS — docs/11's "N open plus M closed" sentence must equal the
+     heading count, the Closed-table row count and config.yml (N+M=26).
+     Quoted history inside blockquotes is excluded.
+  7. LOG CITES — cites inside findings-log/ must resolve, or carry a reasoned
+     `allow-unresolved-cites` exemption. Findings-log files were previously
+     read only as valid targets, never scanned as sources.
 
 Deliberately NOT enforced: whether a claim is true. That is the human's, or a
 second pass'. (scripts/research-gate.sh header.)
@@ -171,12 +177,15 @@ def check_numbers(suite_log):
 
     # Open research areas: docs/11 lettered headings vs config.yml's claim.
     areas = len(re.findall(r'^###\s+[A-Z]\.\s', read('docs/11-suggested-research-areas.md'), re.M))
+    areas_fail = False
     for i, line in enumerate(read('.github/ISSUE_TEMPLATE/config.yml').splitlines(), 1):
         m = re.search(r'about: (\d+) (?:open )?areas', line)
         if m and int(m.group(1)) != areas:
             fail(f'.github/ISSUE_TEMPLATE/config.yml:{i} states {m.group(1)} areas, '
                  f'measured {areas} (^### [A-Z]. headings in docs/11)')
-    ok(f'{areas} open areas listed in docs/11; config.yml agrees')
+            areas_fail = True
+    if not areas_fail:
+        ok(f'{areas} open areas listed in docs/11; config.yml agrees')
 
     # The sweep's own data file, when the counts branch exists.
     # Warning-only, not a failure: any PR that adds a pin legitimately moves
@@ -194,6 +203,127 @@ def check_numbers(suite_log):
             ok('counts:counts.json checked (warning-only)')
     except Exception:
         pass  # pre-first-sweep state: the branch does not exist yet
+
+
+def check_prose_counts():
+    """docs/11 states its own open/closed count in prose — nothing else read it.
+
+    The "Every letter A–Z is now in use — N open plus M closed" sentence carries
+    the page's no-new-letter argument, and it has drifted twice (area Z's log
+    records the first; area M's correction the second) while every check stayed
+    green, because check_numbers compares config.yml against the heading count
+    and nothing compares the prose against either. This check parses the prose
+    instead of the structure: every live (non-blockquote) "N open plus M closed"
+    must equal the heading count, the Closed-table row count, and config.yml —
+    and N+M must be 26, the sentence's own thesis. Quoted history inside
+    blockquotes is excluded: a correction quoting a past count is evidence, not
+    a claim. Zero vendor requests — pure string analysis.
+    """
+    print('--- prose counts ---')
+    text = read('docs/11-suggested-research-areas.md')
+    areas = len(re.findall(r'^###\s+[A-Z]\.\s', text, re.M))
+    closed_section = text.split('## Closed areas', 1)
+    closed = len(re.findall(r'^\| [A-Z] —', closed_section[1], re.M)) \
+        if len(closed_section) > 1 else 0
+    cfg = None
+    for line in read('.github/ISSUE_TEMPLATE/config.yml').splitlines():
+        m = re.search(r'about: (\d+) (?:open )?areas', line)
+        if m:
+            cfg = int(m.group(1))
+    live = [(i, m) for i, line in enumerate(text.splitlines(), 1)
+            if not re.match(r'\s*>', line)
+            for m in re.finditer(r'(\d+) open plus (\d+) closed', line)]
+    if not live:
+        warn('docs/11: no live "N open plus M closed" prose — the no-new-letter '
+             'argument states no count for this check to read')
+        return
+    for i, m in live:
+        n, c = int(m.group(1)), int(m.group(2))
+        if (n, c) != (areas, closed):
+            fail(f'docs/11:{i} states {n} open plus {c} closed, measured '
+                 f'{areas} open + {closed} closed')
+        elif cfg is not None and n != cfg:
+            fail(f'docs/11:{i} states {n} open, but config.yml states {cfg}')
+        elif n + c != 26:
+            fail(f'docs/11:{i} states {n} open plus {c} closed = {n + c}, '
+                 f'expected 26 (every letter A–Z exactly once)')
+        else:
+            ok(f'docs/11:{i} prose count {n} + {c} agrees with the page')
+
+
+def check_findings_log_cites():
+    """Cites inside findings-log/ must resolve — or say why they cannot.
+
+    The gate's citation check scans docs/*.md + README.md + AGENTS.md as sources
+    and reads findings-log/ only as valid targets, so a broken cite inside a raw
+    pass is structurally invisible (area O's log documents the blind spot at
+    length). This check scans findings-log/**/*.md as sources too: repo-root
+    `findings-log/….md` cites must resolve against the tree, and bare
+    `recon/|work/|recov/` cites resolve against the citing file's directory,
+    then against findings-log/probe-2026-10-08/ (the legacy convention).
+    A cite that dangles by policy — a capture AGENTS.md §7 forbids committing,
+    prose about the check's own regex — is allowed only with a machine-readable
+    exemption naming the reason, `<!-- allow-unresolved-cites: <path> — <reason>
+    [; …] -->`. An exemption without a reason fails; an exemption for a path
+    that resolves warns (stale). Zero vendor requests — pure string analysis.
+    """
+    print('--- findings-log citations ---')
+    real = set(glob.glob('findings-log/**/*.md', recursive=True))
+    abs_pat = re.compile(r'findings-log/[A-Za-z0-9._/-]+\.md')
+    rel_pat = re.compile(r'(?<![\w./-])(?:recon|work|recov)/[A-Za-z0-9._-]+\.md')
+    allow_pat = re.compile(r'<!--\s*allow-unresolved-cites:(.*?)-->', re.S)
+    comment_pat = re.compile(r'<!--.*?-->', re.S)
+    violations = 0
+    for f in sorted(real):
+        t = read(f)
+        allowed = set()
+        for m in allow_pat.finditer(t):
+            for entry in m.group(1).split(';'):
+                entry = entry.strip()
+                if not entry:
+                    continue
+                pm = re.match(r'(\S+\.md)\s*(?:—|--)\s*(.+)', entry, re.S)
+                if not pm or not pm.group(2).strip():
+                    fail(f'{f}: malformed allow-unresolved-cites entry {entry!r} — '
+                         f'write "<path> — <reason>"')
+                    violations += 1
+                    continue
+                allowed.add(pm.group(1))
+        body = comment_pat.sub('', t)
+        cites = set(abs_pat.findall(body)) | set(rel_pat.findall(body))
+        seen = set()
+
+        def resolves(m):
+            if '<' in m:
+                return True
+            if m.startswith('findings-log/'):
+                return m in real
+            d = os.path.dirname(f)
+            return (os.path.normpath(os.path.join(d, m)) in real
+                    or os.path.normpath(
+                        os.path.join('findings-log/probe-2026-10-08', m)) in real)
+
+        for m in sorted(cites):
+            if '<' in m:
+                continue
+            seen.add(m)
+            resolved = resolves(m)
+            if resolved:
+                if m in allowed:
+                    warn(f'{f}: exemption for {m} is stale — the path resolves; '
+                         f'remove it from allow-unresolved-cites')
+                continue
+            if m in allowed:
+                continue
+            fail(f'{f}: cites {m}, which resolves nowhere — fix the cite or add '
+                 f'<!-- allow-unresolved-cites: {m} — <reason> -->')
+            violations += 1
+        for m in sorted(allowed - seen):
+            if resolves(m):
+                warn(f'{f}: exemption for {m} is stale — the path resolves; '
+                     f'remove it from allow-unresolved-cites')
+    if not violations:
+        ok('all findings-log cites resolve or carry a reasoned exemption')
 
 
 def check_log_hygiene():
@@ -362,6 +492,8 @@ def main():
     args = ap.parse_args()
 
     check_numbers(args.suite_log)
+    check_prose_counts()
+    check_findings_log_cites()
     check_log_hygiene()
     check_priorities_sync()
     check_prompt_parity()
@@ -371,7 +503,7 @@ def main():
     if FAILED:
         print('CHECKS FAIL — see above. The counting rule is in this file\'s header.')
         return 1
-    print('CHECKS PASS — numbers, log hygiene, priorities, prompts, and append-only all agree.')
+    print('CHECKS PASS — numbers, prose counts, log cites, log hygiene, priorities, prompts, and append-only all agree.')
     return 0
 
 
