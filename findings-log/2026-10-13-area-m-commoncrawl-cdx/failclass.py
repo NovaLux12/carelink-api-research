@@ -42,12 +42,27 @@ is not "how many failed" but "how many failed on a host the ledger had already
 proven covered" — that is the one that refutes "coverage protects you", and it
 is the count a reader is most likely to check.
 
-`--selftest` asserts the classifier is falsifiable. It feeds the classifier a
-two-row ledger in which a covered host's query FAILS, and refuses to exit 0
-unless the class comes back "covered"; it also asserts a fabricated sibling of
-a covered host comes back "indeterminate", and that a `showNumPages` cell does
-not mark its own domain absent. A classifier that cannot report the very cases
-it exists to catch is not a classifier.
+`--selftest` asserts the classifier is falsifiable, and its strength is
+MEASURED rather than asserted. Five fixtures, each against a case that would
+otherwise pass silently:
+
+  1  a failure on a host an earlier row proved covered must classify covered
+  2  a fabricated sibling of a covered host must NOT inherit coverage
+  3  a `showNumPages` cell must not establish coverage — given a NON-EMPTY host
+     set, because with an empty one it passes a mutant that ignores
+     `showNumPages` outright (verifier round 2's MUTANT A)
+  4  a completed enumeration must not mark an UNRELATED registrable domain
+     absent — `complete` is keyed (crawl, registrable domain), and this fixture
+     is what found it keyed by crawl alone
+  5  coverage must be monotone within a crawl: a later empty enumeration must
+     not retract what an earlier row established
+
+`failclass-mutants.py` mutation-tests those fixtures and publishes the exact
+matrix in `failclass-mutants.txt`. **Measured: the suite kills mutants A, D and
+S; it does NOT kill C**, because `covered` is consulted before `absent`, so a
+C-mutant's damage to the absent-set is never observable in a classification.
+An earlier version of this docstring claimed coverage it did not have. Read the
+matrix, not this sentence.
 
 Exit 0 always. This counts; it does not gate.
 """
@@ -113,7 +128,10 @@ def establishes_absence(row: dict) -> bool:
 def classify(rows: list[dict]) -> dict[int, str]:
     covered: dict[str, set[str]] = {}   # crawl -> hosts a 200 record query returned
     absent: set[tuple[str, str]] = set()  # (crawl, host) proven absent
-    complete: set[str] = set()         # crawls where a domain enumeration finished
+    # complete is keyed (crawl, REGISTRABLE DOMAIN), not crawl alone. Keying it
+    # by crawl let an enumeration of minimed.eu mark medtronic.eu absent — a
+    # defect the (4) fixture exists to catch.
+    complete: set[tuple[str, str]] = set()
     classes: dict[int, str] = {}
 
     for r in sorted(rows, key=lambda x: x["seq"]):
@@ -128,7 +146,7 @@ def classify(rows: list[dict]) -> dict[int, str]:
             classes[r["seq"]] = "covered"
         elif (crawl, host) in absent:
             classes[r["seq"]] = "absent"
-        elif crawl in complete and mt == "domain":
+        elif (crawl, registrable(host)) in complete and mt == "domain":
             # a completed enumeration of this registrable domain named every
             # host it holds; this one was not among them
             classes[r["seq"]] = "absent"
@@ -139,8 +157,8 @@ def classify(rows: list[dict]) -> dict[int, str]:
         if r["http_status"] == "200" and record_form and r["distinct_hosts"]:
             covered.setdefault(crawl, set()).update(r["distinct_hosts"])
             if mt == "domain":
-                complete.add(crawl)
                 reg = registrable(host)
+                complete.add((crawl, reg))
                 for known in list(covered.get(crawl, set())):
                     if registrable(known) == reg and known not in r["distinct_hosts"]:
                         absent.add((crawl, known))
@@ -206,19 +224,68 @@ def _selftest() -> int:
         fails.append(f"a fabricated sibling inherited coverage "
                      f"({c[2]!r}); coverage of one host proves nothing about another")
 
-    # (3) a showNumPages cell names no host and must not mark its own domain absent
+    # (3) A showNumPages cell must not establish COVERAGE either, even when its
+    # `distinct_hosts` is non-empty. This fixture is deliberately given a host
+    # set: with an EMPTY one it passed under a mutant that ignores
+    # `showNumPages` entirely (verifier round 2, MUTANT A), because a count cell
+    # names no host, so an empty host set cannot discriminate. A count cell with
+    # a host set is the only shape that can.
     rows = [
         {"seq": 1, "host": "index.commoncrawl.org", "http_status": "200", "host_tag": "t3",
          "path": "/CC-MAIN-2018-39-index?url=minimed.eu&output=json&showNumPages=true&matchType=domain",
-         "distinct_hosts": []},
+         "distinct_hosts": ["carelink.minimed.eu"]},
         {"seq": 2, "host": "index.commoncrawl.org", "http_status": "504", "host_tag": "t4",
-         "path": "/CC-MAIN-2018-39-index?url=minimed.eu&output=json&matchType=host",
+         "path": "/CC-MAIN-2018-39-index?url=carelink.minimed.eu&output=json&matchType=host",
+         "distinct_hosts": []},
+    ]
+    c = classify(rows)
+    if c[2] != "indeterminate":
+        fails.append(f"a showNumPages cell established coverage ({c[2]!r}) — a "
+                     "count cell names no host and cannot prove one")
+
+    # (4) A completed enumeration must NOT make an UNRELATED registrable domain
+    # absent. `complete` was a per-CRAWL set, so any later domain query in that
+    # crawl — including one about a domain the enumeration never touched — was
+    # being labelled "absent". Found by writing this fixture, which is what a
+    # fixture is for.
+    rows = [
+        {"seq": 1, "host": "index.commoncrawl.org", "http_status": "200", "host_tag": "t5",
+         "path": "/CC-MAIN-2018-39-index?url=minimed.eu&output=json&matchType=domain",
+         "distinct_hosts": ["carelink.minimed.eu", "minimed.eu"]},
+        {"seq": 2, "host": "index.commoncrawl.org", "http_status": "504", "host_tag": "t6",
+         "path": "/CC-MAIN-2018-39-index?url=medtronic.eu&output=json&showNumPages=true&matchType=domain",
          "distinct_hosts": []},
     ]
     c = classify(rows)
     if c[2] == "absent":
-        fails.append("a showNumPages cell with a non-zero page count marked its "
-                     "own domain absent — it names no host at all")
+        fails.append("a completed enumeration of minimed.eu marked medtronic.eu "
+                     "absent — the inference must be scoped to the same "
+                     "registrable domain")
+    elif c[2] != "indeterminate":
+        fails.append(f"medtronic.eu after a minimed.eu enumeration classified "
+                     f"{c[2]!r}, want 'indeterminate'")
+
+    # (5) Coverage must be MONOTONE within a crawl: a later enumeration that
+    # returns no hosts must not retract coverage an earlier row established.
+    # Without this fixture, a mutant that drops the `and r["distinct_hosts"]`
+    # guard passes every other fixture — it reads an empty host set as "no
+    # captures" and wipes the bucket. That is verifier round 2's MUTANT C.
+    rows = [
+        {"seq": 1, "host": "index.commoncrawl.org", "http_status": "200", "host_tag": "t7",
+         "path": "/CC-MAIN-2018-39-index?url=minimed.eu&output=json&matchType=domain",
+         "distinct_hosts": ["carelink.minimed.eu"]},
+        {"seq": 2, "host": "index.commoncrawl.org", "http_status": "200", "host_tag": "t8",
+         "path": "/CC-MAIN-2018-39-index?url=minimed.eu&output=json&matchType=domain",
+         "distinct_hosts": []},
+        {"seq": 3, "host": "index.commoncrawl.org", "http_status": "504", "host_tag": "t9",
+         "path": "/CC-MAIN-2018-39-index?url=carelink.minimed.eu&output=json&matchType=host",
+         "distinct_hosts": []},
+    ]
+    c = classify(rows)
+    if c[3] != "covered":
+        fails.append(f"a later empty enumeration retracted earlier coverage "
+                     f"(seq 3 classified {c[3]!r}); coverage must be monotone "
+                     f"within a crawl")
 
     if fails:
         for f in fails:

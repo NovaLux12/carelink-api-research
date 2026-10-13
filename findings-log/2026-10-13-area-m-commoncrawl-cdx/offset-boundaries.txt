@@ -30,8 +30,13 @@ neighbours' failure COMMONCRAWL §1 records for the FIRST pass — the start
 here is exact — and it is the safe direction, since a span that reaches too
 far cannot hide a record of the target family.
 
-WHAT THE OVERSHOOT CONTAINS — host-level projection only, no URLs, no paths:
-  distinct hosts    109
+WHAT THE OVERSHOOT CONTAINS — registrable-domain projection only, no URLs,
+no paths, no statuses. Every record in the span is accounted for: the 53 rows
+below sum to exactly the 15 000 the span holds.
+  distinct registrable domains   53   <- derived from the 53 rows below
+  (the generation run also counted 109 distinct HOSTNAMES. That figure is NOT
+   re-derivable from this artefact, which is per-domain, so it is reported here
+   only as a note and no claim in FINDINGS.md rests on it.)
     medtronic.com                 10574 records
     medtryck.com                   1440 records
     medtronic-diabetes.com         1100 records
@@ -86,9 +91,21 @@ WHAT THE OVERSHOOT CONTAINS — host-level projection only, no URLs, no paths:
     medtronicspinal.com               1 records
     medtropolis.com                   1 records
 
-109 hosts, against a range labelled for one registrable domain. Counting rule:
-one host per distinct SURT authority in the decompressed span; records
-attributed to the last two labels of that authority.
+53 registrable domains, against a range labelled for one. COUNTING RULE: one row
+per distinct registrable domain, taken as the LAST TWO LABELS of the SURT
+authority (so `eu,medtronic,carelink)/…` and `com,medtronic)/…` both fold into
+`medtronic.com`); each row's count is the number of records in the span whose
+SURT authority ends with that domain. No public-suffix list was applied, so a
+multi-label public suffix such as `medtronic.co.uk` would be split — none occurs
+here, and every listed authority has exactly two labels.
+
+CORRECTION 2026-10-13 (verifier round 2): this file previously said
+"distinct hosts 109" directly above a 53-row table, and stated a counting rule
+("one host per distinct SURT authority") that its own table did not follow. It
+also did not state a domain count at all, and FINDINGS.md then claimed "49
+registrable domains", a number that appears nowhere in this artefact. The table
+was right; the header and the rule sentence were wrong. 53 is the derivable
+number and it is the one the header now carries.
 
 NOT INCLUDED, and why: no URL, no path, no status code and no capture is
 published from this range (AGENTS.md §7 — COMMONCRAWL §9 records 8 058 session

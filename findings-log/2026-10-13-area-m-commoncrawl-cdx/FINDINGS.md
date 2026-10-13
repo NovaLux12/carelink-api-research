@@ -94,11 +94,47 @@ S3 `SlowDown` ("Please reduce your request rate") from `data.commoncrawl.org`,
 and a **400 leaking a Python `RemoteDisconnected` as its body**. Every one of
 the 17 was re-issued or left as a recorded hole; **not one was read as a zero.**
 
-## Correction (2026-10-13) — verifier round 1
+## Correction (2026-10-13) — verifier rounds 1 and 2
 
-The three blocking findings and the non-blocking ones, each attached at the site
-it changes. The original wording stays readable at every one of them; nothing
-below is a rewrite in place.
+Round 1's three blocking findings and the non-blocking ones, then round 2's
+four. Each is attached at the site it changes; the original wording stays
+readable at every one of them, and nothing below is a rewrite in place.
+
+### ⚠ Correction (2026-10-13) — verifier round 2: the self-test's strength was overstated, and measuring it found a bug
+
+`failclass.py`'s docstring claimed the self-test asserted that "a
+`showNumPages` cell does not mark its own domain absent". **That assertion was
+vacuous**: the fixture gave the cell an empty `distinct_hosts`, so it could not
+discriminate, and two mutants passed with exit 0 — `record_form = True`
+(ignores `showNumPages`) and dropping the `and r["distinct_hosts"]` guard
+(reads an empty host set as "no captures"). **The claim overstated coverage by
+one assertion.**
+
+[`failclass-mutants.py`](failclass-mutants.py) now measures that strength
+instead of asserting it, and [`failclass-mutants.txt`](failclass-mutants.txt)
+is the committed matrix:
+
+| mutant | mutation | result |
+|---|---|---|
+| **A** | ignores `showNumPages` | **killed** |
+| **C** | empty host set read as "no captures" | **SURVIVES** |
+| **D** | enumeration inference scoped to the crawl, not the registrable domain | **killed** |
+| **S** | re-introduces sibling inheritance | **killed** |
+
+**C survives, and the suite does not claim otherwise.** It survives because
+`covered` is consulted before `absent`, so a C-mutant's damage to the absent-set
+never shows up in a classification. That is a measured limit, not a statement
+that C is harmless — it would matter the moment the check order changed, and
+**nothing in the published 2 / 0 / 13 / 2 split depends on it.**
+
+Two fixtures were added to close the gap, and **writing one of them found a real
+bug in this pass's own classifier**: `complete` was keyed by crawl alone, so a
+completed enumeration of `minimed.eu` marked **`medtronic.eu`** absent —
+inference leaking across registrable domains. It is now keyed
+`(crawl, registrable domain)`. **The fix does not move the published split**:
+the 17 failures re-classify to the same 2 covered / 0 absent / 13 indeterminate
+/ 2 n/a, because no affected cell was a `matchType=domain` query about a domain
+its own enumeration never touched.
 
 ### C1 — the "covered hosts never fail" claim was false
 
@@ -291,8 +327,22 @@ digest**. Decompressed: **15 000 records**, first key
 `com,medtronic)/covidien/de-de/clinical-solutions/lung-health-solutions/resources.html`,
 last key `com,medtryck)/piketrojor/prima-polo` — both verbatim, so the earlier
 reading was right and is now **re-derivable from the repo**. The overshoot is
-also quantified: the range holds **109 distinct hosts** across 49 registrable
-domains, against a range labelled for one. Boundary keys, the digest and the
+also quantified, against a range labelled for one registrable domain: it holds
+**53 distinct registrable domains** spanning all 15 000 records, derivable from
+the 53-row table in
+[`offset-boundaries.txt`](offset-boundaries.txt) — whose counts sum to exactly
+the span total, so the list is complete. ⚠ **Corrected 2026-10-13 (verifier
+round 2): this paragraph previously said "109 distinct hosts across 49
+registrable domains".** The table has 53 rows; **49 appears nowhere in the
+artefact** except as the record count beside `medtronicinteract.com`, and the
+artefact also labelled its own 53-row per-domain table "109 hosts" while
+stating a rule ("one host per distinct SURT authority") that it did not follow
+— the artefact's own header is now corrected, and it carries an explicit
+counting rule (one row per distinct registrable domain, last two labels, no
+public-suffix list). The generation run did also count **109 distinct
+hostnames**; that figure is **not re-derivable from the committed artefact**,
+which is per-domain, so it is recorded here as a note and **nothing else in
+this document rests on it**. Boundary keys, the digest and the
 host breakdown are committed in
 [`offset-boundaries.txt`](offset-boundaries.txt), because the original body had
 to be deleted under `research-checks.py`'s 1 MiB ceiling and without that file
@@ -312,7 +362,25 @@ is published** — `AGENTS.md` §7.
    family), but it does mean the artefact is not what its label says it is.
 3. **One could not be fetched at all** and is recorded as a failure, not a
    verdict.
-4. **The first pass's ranges cannot be re-derived, and that is a gap in the
+4. ⚠ **Correction (2026-10-13, verifier round 2): `offsetB` is blocked by the
+   cap, not by mechanics.** This item previously added that the independent
+   `cluster.idx` binary search "could not be sent by the command in §9
+   **regardless of the cap**". **That was false and is withdrawn** — the
+   hardened read loop now dispatches it (verified: under the old loop it was
+   dropped; under the guarded loop it is dispatched). With 61 rows against
+   `probe.sh`'s `CAP=64`, a re-run of `queries-06` sends its first three lines
+   as `seq 62/63/64` and **aborts before `offsetB`**. So the conclusion is
+   unchanged — the offsets rest on one instrument — but the blocker is the
+   ordinary cap and is recorded as such.
+
+   Verified both ways, and the detail matters. Against **`queries-06` as it
+   stood at the run's head** (ending `…true|` with no `\n`): the old loop
+   dispatched `offsetA-r1/r2/r3` and **dropped `offsetB`**; the guarded loop
+   dispatched all four. Against the **current** file (newline added in round 1)
+   **both** loops dispatch all four — so the newline, not the guard, is what
+   makes it sendable now. That is the same evidence-masking the verifier caught
+   in §5, and it is why the check above is stated against a named revision.
+5. **The first pass's ranges cannot be re-derived, and that is a gap in the
    record.** `COMMONCRAWL §1` reports that those ranges "landed on alphabetical
    neighbours" and names the neighbours, but **records no byte offsets and no
    block keys**. There is nothing in the repo to check them against, so the
@@ -343,39 +411,74 @@ The honest split, with the ledger rows named:
 **So 5 of 60 requests were spent on the harness defects, not 22.** The original
 "22" counted the 13 legitimate re-issue rounds as waste; they are not.
 
-**Three query lines were dropped and never sent at all**, so they have no ledger
-row and cost nothing. ⚠ **This list was wrong before this correction**: it
-previously named `rec-2026-34-minimed-eu-records` under "cost", but
-`CC-MAIN-2026-34` appears **zero** times in the ledger — that query never ran and
-nothing was spent on it. The three are:
+### ⚠ Correction (2026-10-13) — verifier round 2: FIVE lines were dropped, not three
 
-- `host-carelink-minimed-eu-2022-40` (queries-04)
-- `rec-2026-34-minimed-eu-records` (queries-05)
-- `offsetB-cluster-idx-2026-39` (queries-06) — the independent `cluster.idx`
-  binary search, which therefore **could not be sent by the command in §9
-  regardless of the cap**; that is a second, independent reason the offsets rest
-  on one instrument.
+The paragraph above previously said **three**, named three, and attributed all
+three to the trailing-newline defect. **All three counts were wrong.**
+[`dropped-lines.py`](dropped-lines.py) derives the answer mechanically by
+comparing every committed query line against every `host_tag` in
+`results.jsonl`; `dropped-lines.txt` is its output.
 
-Each file now carries the missing newline, a header naming its dropped line, and
-`probe.sh` warns to `run.log` when a query file lacks a trailing newline.
+**60 committed query lines · 61 ledger rows · 55 distinct host_tags · 5 query
+lines never sent**, across **five** files:
+
+| never sent | file | cost |
+|---|---|---|
+| `control-D-positive-showNumPages-count-instrument` | queries-01 | nothing — but **this is where the Control D mis-transcription came from**: the table row was written from the query file rather than from the ledger, and the file's line was never sent |
+| `sweep-2018-39-medtronic-com` | queries-03 | re-issued as `seq 47`, which succeeded |
+| `host-carelink-minimed-eu-2022-40` | queries-04 | nothing — no row, no finding rests on it |
+| `rec-2026-34-minimed-eu-records` | queries-05 | nothing — `CC-MAIN-2026-34` appears **zero** times in the ledger. This line was previously listed under "cost", which was a safe-direction over-count: it cost nothing |
+| `offsetB-cluster-idx-2026-39` | queries-06 | nothing — see §4 for why the offsets rest on one instrument |
+
+⚠ **On the cause, which was also mis-attributed.** `sweep-2018-39-medtronic-com`
+is the last line of a file that **ends in `\n` at every committed head** — so on
+the committed record it looks like a different defect. It is not. The newline
+was appended to `queries-03` **after** the run and **before** the first commit,
+without that being recorded anywhere, so the repair masked the evidence. What
+survives is `run.log`: the file's run stopped at `seq 39`, one line short of the
+24 the file now holds. **The same masking applies to `queries-01`'s
+`control-D`.** A repair that hides the defect it repairs is not a repair, and
+`dropped-lines.py` now exists because a reader of the committed files cannot
+derive this without it.
+
+`probe.sh`'s own header carried the same error in a third form — *"Four of this
+pass's query files had no trailing newline, so four queries were never sent and
+three of them have no ledger row at all"* — while §5 said three and §6 said four.
+All three are corrected here and in `probe.sh`; the count is now computed, not
+recalled.
+
+Each of the five files' headers names its own dropped line, and `probe.sh` warns
+to `run.log` when a query file lacks a trailing newline.
 
 ## 6. Three defects of this pass, recorded rather than smoothed over
 
 1. **A trailing newline silently dropped the last query line of four files.**
    ⚠ **Fixed 2026-10-13 (verifier round 1, BLOCKING 2) — this defect was still
    live in the committed artefacts, not merely described in prose.**
-   `probe.sh:180` was `while IFS='|' read -r …`, and `read` returns non-zero at
+   `probe.sh` was `while IFS='|' read -r …`, and `read` returns non-zero at
    EOF-without-newline, so the loop exits before dispatching the final line.
-   `queries-04`, `queries-05` and `queries-06` were committed **without** a
-   trailing newline, so re-running them would have dropped
-   `host-carelink-minimed-eu-2022-40`, `rec-2026-34-minimed-eu-records` and
-   `offsetB-cluster-idx-2026-39` again — the last of which §9 tells a stranger
-   to run. Fixed three ways: the newline is now on all eight query files, the
-   loop carries the standard `|| [ -n "${tag}${role}${host}${path}" ]` guard, and
-   `probe.sh` **warns to `run.log`** when a query file has no trailing newline
-   so the next pass is told rather than silently shortchanged. Each of the three
-   files also now carries a header naming its dropped line. Verified: all eight
-   files dispatch every one of their query lines under the hardened loop.
+   **FIVE query lines across FIVE files were lost to it** — `control-D…`
+   (queries-01), `sweep-2018-39-medtronic-com` (queries-03),
+   `host-carelink-minimed-eu-2022-40` (queries-04),
+   `rec-2026-34-minimed-eu-records` (queries-05) and
+   `offsetB-cluster-idx-2026-39` (queries-06); see §5's correction for why
+   two of those are invisible in the committed files, and
+   [`dropped-lines.py`](dropped-lines.py) for the mechanical derivation. This
+   paragraph previously said "four files … three of them", which was wrong.
+
+   Fixed four ways: the newline is on every query file; the loop carries the
+   standard `|| [ -n "${tag}${role}${host}${path}" ]` guard; `probe.sh`
+   **warns to `run.log`** when a query file has no trailing newline, so the
+   next pass is told rather than silently shortchanged; and each affected file
+   carries a header naming its dropped line. Verified: all nine files dispatch
+   every one of their query lines under the hardened loop.
+
+   ⚠ **And the honest limitation of that fix**, added by verifier round 2:
+   repairing the newline in the committed files **erased the evidence** for two
+   of the five losses. `queries-01` and `queries-03` now end in `\n` and look
+   clean; a reader of the committed tree cannot see that they once did not. The
+   guard means a re-run would now send those lines — which is the correct
+   behaviour and is **not** evidence that this pass sent them.
 
    The first occurrence of this defect is visible in `run.log` as a
    `seq=2 REFUSED` line — the harness's host allowlist refused a malformed line
