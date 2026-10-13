@@ -1,0 +1,366 @@
+##############################################################################
+# AREA V offline token census — zero requests, bodies captured 2026-10-13.
+# cs=case-sensitive  ci=case-insensitive (control)  q=complete quoted literal
+##############################################################################
+
+==============================================================================
+== eu-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+PDE                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=1    ci=1    q=1   
+guardianCumulusPeriodicAPI           cs=2    ci=2    q=0   
+csr.cumulus.periodic.data.endpoints  cs=1    ci=1    q=1   
+csrCumulusPeriodicDataAPI            cs=2    ci=2    q=0   
+display_message                      cs=1    ci=1    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=8    ci=8    q=0   
+retina.endpoints.config              cs=1    ci=1    q=1   
+mmm.data.api.url                     cs=1    ci=1    q=1   
+patient-timeline                     cs=5    ci=5    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=3    ci=12   q=1     <-- ci adds 9, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=5    ci=8    q=2     <-- ci adds 3, read §2
+NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, read §2
+
+-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,
+   with the maximal enclosing identifier. A hit is a token, not a claim.
+   pde          @s<581421    enclosing identifier 'mapDeviceModelName'
+   pde          @s<733029    enclosing identifier 'propDecorators'
+   pde          @s<1603222   enclosing identifier 'getGroupDelayControl'
+   pde          @s<1840258   enclosing identifier 'removeStylesOnCompDestroy'
+   pde          @s<1967564   enclosing identifier 'isDesktopDevice'
+   pde          @s<2887697   enclosing identifier 'WPDesktop'
+   pde          @s<3147133   enclosing identifier 'LoopDetected'
+   GUARDIAN     @s<93819     enclosing identifier 'guardianCumulusPeriodicAPI'
+   GUARDIAN     @s<247549    enclosing identifier 'guardian'
+   GUARDIAN     @s<1934651   enclosing identifier 'guardianParent'
+   GUARDIAN     @s<2504999   enclosing identifier 'my_profile_edit_guardian_info'
+   deviceFamily @s<2964069   enclosing identifier 'getDeviceFamily'
+   deviceFamily @s<3373160   enclosing identifier 'lastDeviceFamily'
+   NGP          @s<12665     enclosing identifier 'selectNumberingPlan'
+   NGP          @s<13348     enclosing identifier 'hasSelectedNumberingPlan'
+   NGP          @s<96487     enclosing identifier 'landingPageFooterText'
+   NGP          @s<271520    enclosing identifier 'numberingPlan'
+   NGP          @s<584330    enclosing identifier 'reportingPeriod'
+   NGP          @s<834636    enclosing identifier 'loadingPromise'
+   NGP          @s<974926    enclosing identifier 'incomingParams'
+   NGP          @s<975077    enclosing identifier 'incomingParameters'
+   NGP          @s<1460473   enclosing identifier 'getNumberingPlanMetadata'
+   NGP          @s<1659151   enclosing identifier 'pendingPageScroll'
+   NGP          @s<1733997   enclosing identifier 'missingPlus'
+   NGP          @s<1753699   enclosing identifier 'justLeadingPlus'
+   NGP          @s<1756156   enclosing identifier 'fixMissingPlus'
+   NGP          @s<2071102   enclosing identifier '_draggingPredicate'
+   NGP          @s<2669263   enclosing identifier 'noReportingPeriod'
+   NGP          @s<2880855   enclosing identifier 'bingpreview'
+   NGP          @s<2886978   enclosing identifier 'marketingParams'
+   NGP          @s<3144616   enclosing identifier 'SwitchingProtocols'
+
+==============================================================================
+== us-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+PDE                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=1    ci=1    q=1   
+guardianCumulusPeriodicAPI           cs=2    ci=2    q=0   
+csr.cumulus.periodic.data.endpoints  cs=1    ci=1    q=1   
+csrCumulusPeriodicDataAPI            cs=2    ci=2    q=0   
+display_message                      cs=1    ci=1    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=8    ci=8    q=0   
+retina.endpoints.config              cs=1    ci=1    q=1   
+mmm.data.api.url                     cs=1    ci=1    q=1   
+patient-timeline                     cs=5    ci=5    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=3    ci=12   q=1     <-- ci adds 9, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=5    ci=8    q=2     <-- ci adds 3, read §2
+NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, read §2
+
+-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,
+   with the maximal enclosing identifier. A hit is a token, not a claim.
+   pde          @s<581421    enclosing identifier 'mapDeviceModelName'
+   pde          @s<733029    enclosing identifier 'propDecorators'
+   pde          @s<1603222   enclosing identifier 'getGroupDelayControl'
+   pde          @s<1840258   enclosing identifier 'removeStylesOnCompDestroy'
+   pde          @s<1967564   enclosing identifier 'isDesktopDevice'
+   pde          @s<2887697   enclosing identifier 'WPDesktop'
+   pde          @s<3147133   enclosing identifier 'LoopDetected'
+   GUARDIAN     @s<93819     enclosing identifier 'guardianCumulusPeriodicAPI'
+   GUARDIAN     @s<247549    enclosing identifier 'guardian'
+   GUARDIAN     @s<1934651   enclosing identifier 'guardianParent'
+   GUARDIAN     @s<2504999   enclosing identifier 'my_profile_edit_guardian_info'
+   deviceFamily @s<2964069   enclosing identifier 'getDeviceFamily'
+   deviceFamily @s<3373160   enclosing identifier 'lastDeviceFamily'
+   NGP          @s<12665     enclosing identifier 'selectNumberingPlan'
+   NGP          @s<13348     enclosing identifier 'hasSelectedNumberingPlan'
+   NGP          @s<96487     enclosing identifier 'landingPageFooterText'
+   NGP          @s<271520    enclosing identifier 'numberingPlan'
+   NGP          @s<584330    enclosing identifier 'reportingPeriod'
+   NGP          @s<834636    enclosing identifier 'loadingPromise'
+   NGP          @s<974926    enclosing identifier 'incomingParams'
+   NGP          @s<975077    enclosing identifier 'incomingParameters'
+   NGP          @s<1460473   enclosing identifier 'getNumberingPlanMetadata'
+   NGP          @s<1659151   enclosing identifier 'pendingPageScroll'
+   NGP          @s<1733997   enclosing identifier 'missingPlus'
+   NGP          @s<1753699   enclosing identifier 'justLeadingPlus'
+   NGP          @s<1756156   enclosing identifier 'fixMissingPlus'
+   NGP          @s<2071102   enclosing identifier '_draggingPredicate'
+   NGP          @s<2669263   enclosing identifier 'noReportingPeriod'
+   NGP          @s<2880855   enclosing identifier 'bingpreview'
+   NGP          @s<2886978   enclosing identifier 'marketingParams'
+   NGP          @s<3144616   enclosing identifier 'SwitchingProtocols'
+
+==============================================================================
+== hp-main: 3397615 B  sha256 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=5    ci=32   q=0     <-- ci adds 27, read §2
+PDE                                  cs=0    ci=32   q=0     <-- ci adds 32, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=12   ci=12   q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=0    ci=29   q=0     <-- ci adds 29, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=2    ci=2    q=0   
+NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, read §2
+
+-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,
+   with the maximal enclosing identifier. A hit is a token, not a claim.
+   pde          @s<269182    enclosing identifier 'dropdead'
+   pde          @s<293243    enclosing identifier 'helpdesk'
+   pde          @s<325138    enclosing identifier 'herpderp'
+   pde          @s<326919    enclosing identifier 'topdevice'
+   pde          @s<535085    enclosing identifier 'hampden'
+   pde          @s<1312749   enclosing identifier 'propDecorators'
+   pde          @s<1828603   enclosing identifier 'WPDesktop'
+   pde          @s<2223058   enclosing identifier 'WebPDequantizeLevels'
+   pde          @s<2250137   enclosing identifier 'WebPDecodeRGBA'
+   pde          @s<2351890   enclosing identifier 'AppDefault'
+   pde          @s<2778434   enclosing identifier 'removeStylesOnCompDestroy'
+   pde          @s<3127720   enclosing identifier 'mapDeviceModelName'
+   pde          @s<3219000   enclosing identifier 'LoopDetected'
+   GUARDIAN     @s<211405    enclosing identifier 'guardian'
+   GUARDIAN     @s<505032    enclosing identifier 'guardians'
+   GUARDIAN     @s<909938    enclosing identifier 'guardianship'
+   GUARDIAN     @s<3004505   enclosing identifier 'Guardian'
+   deviceFamily @s<1243187   enclosing identifier 'deviceFamilyMapping'
+   NGP          @s<214484    enclosing identifier 'kingpin'
+   NGP          @s<218280    enclosing identifier 'pingpong'
+   NGP          @s<334419    enclosing identifier 'networkingpe'
+   NGP          @s<438553    enclosing identifier 'kingpins'
+   NGP          @s<671824    enclosing identifier 'rangpur'
+   NGP          @s<1413002   enclosing identifier 'loadingPromise'
+   NGP          @s<1536656   enclosing identifier 'loadingPage'
+   NGP          @s<1821813   enclosing identifier 'bingpreview'
+   NGP          @s<1827891   enclosing identifier 'marketingParams'
+   NGP          @s<2071479   enclosing identifier 'ShadingPattern'
+   NGP          @s<2071499   enclosing identifier 'TilingPattern'
+   NGP          @s<2071523   enclosing identifier 'addShadingPattern'
+   NGP          @s<2071610   enclosing identifier 'beginTilingPattern'
+   NGP          @s<2071793   enclosing identifier 'endTilingPattern'
+   NGP          @s<2080544   enclosing identifier 'putShadingPatternDict'
+   NGP          @s<2080817   enclosing identifier 'putTilingPatternDict'
+   NGP          @s<2404685   enclosing identifier 'landingPageFooterText'
+   NGP          @s<2953819   enclosing identifier 'reportingPeriodSegments'
+   NGP          @s<2953928   enclosing identifier 'inpenReportingPeriod'
+   NGP          @s<2956286   enclosing identifier 'reportingPeriod'
+   NGP          @s<2960279   enclosing identifier 'cutOffSegmentsOutsideReportingPeriod'
+   NGP          @s<3216483   enclosing identifier 'SwitchingProtocols'
+
+==============================================================================
+== sup-main: 3410666 B  sha256 a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=5    ci=32   q=0     <-- ci adds 27, read §2
+PDE                                  cs=0    ci=32   q=0     <-- ci adds 32, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=12   ci=12   q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=0    ci=29   q=0     <-- ci adds 29, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=2    ci=2    q=0   
+NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, read §2
+
+-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,
+   with the maximal enclosing identifier. A hit is a token, not a claim.
+   pde          @s<269182    enclosing identifier 'dropdead'
+   pde          @s<293243    enclosing identifier 'helpdesk'
+   pde          @s<325138    enclosing identifier 'herpderp'
+   pde          @s<326919    enclosing identifier 'topdevice'
+   pde          @s<535085    enclosing identifier 'hampden'
+   pde          @s<1313078   enclosing identifier 'propDecorators'
+   pde          @s<1828939   enclosing identifier 'WPDesktop'
+   pde          @s<2222999   enclosing identifier 'WebPDequantizeLevels'
+   pde          @s<2250078   enclosing identifier 'WebPDecodeRGBA'
+   pde          @s<2351832   enclosing identifier 'AppDefault'
+   pde          @s<2929563   enclosing identifier 'mapDeviceModelName'
+   pde          @s<3020924   enclosing identifier 'LoopDetected'
+   pde          @s<3161217   enclosing identifier 'removeStylesOnCompDestroy'
+   GUARDIAN     @s<211405    enclosing identifier 'guardian'
+   GUARDIAN     @s<505032    enclosing identifier 'guardians'
+   GUARDIAN     @s<909938    enclosing identifier 'guardianship'
+   GUARDIAN     @s<2806348   enclosing identifier 'Guardian'
+   deviceFamily @s<1243187   enclosing identifier 'deviceFamilyMapping'
+   NGP          @s<214484    enclosing identifier 'kingpin'
+   NGP          @s<218280    enclosing identifier 'pingpong'
+   NGP          @s<334419    enclosing identifier 'networkingpe'
+   NGP          @s<438553    enclosing identifier 'kingpins'
+   NGP          @s<671824    enclosing identifier 'rangpur'
+   NGP          @s<1413335   enclosing identifier 'loadingPromise'
+   NGP          @s<1536992   enclosing identifier 'loadingPage'
+   NGP          @s<1822149   enclosing identifier 'bingpreview'
+   NGP          @s<1828227   enclosing identifier 'marketingParams'
+   NGP          @s<2071456   enclosing identifier 'ShadingPattern'
+   NGP          @s<2071476   enclosing identifier 'TilingPattern'
+   NGP          @s<2071500   enclosing identifier 'addShadingPattern'
+   NGP          @s<2071587   enclosing identifier 'beginTilingPattern'
+   NGP          @s<2071770   enclosing identifier 'endTilingPattern'
+   NGP          @s<2080521   enclosing identifier 'putShadingPatternDict'
+   NGP          @s<2080794   enclosing identifier 'putTilingPatternDict'
+   NGP          @s<2404627   enclosing identifier 'landingPageFooterText'
+   NGP          @s<2850915   enclosing identifier 'reportingPeriod'
+   NGP          @s<2928834   enclosing identifier 'cutOffSegmentsOutsideReportingPeriod'
+   NGP          @s<3018407   enclosing identifier 'SwitchingProtocols'
+   NGP          @s<3349534   enclosing identifier 'reportingPeriodSegments'
+   NGP          @s<3349643   enclosing identifier 'inpenReportingPeriod'
+
+==============================================================================
+== eu-runtime: 8268 B  sha256 0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=0    q=0   
+PDE                                  cs=0    ci=0    q=0   
+baseUrl                              cs=0    ci=0    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=0    ci=0    q=0   
+GUARDIAN                             cs=0    ci=0    q=0   
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=0    ci=0    q=0   
+NGP                                  cs=0    ci=0    q=0   
+
+-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,
+   with the maximal enclosing identifier. A hit is a token, not a claim.

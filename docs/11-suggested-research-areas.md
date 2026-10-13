@@ -71,41 +71,20 @@ here demonstrates an actual cross-origin call.
 ## Tier 1 — no token needed, high value
 
 
-### V. Given that `baseUrlPde` names a dead namespace, does any vendor client follow it?
-
-Added 2026-10-12. **Derived from area T + area U** — this could not have been written
-before 2026-10-12, because until then the published base URL set had never been
-enumerated and nobody knew `baseUrlPde` was the one unroutable pointer in the corpus.
-
-`baseUrlPde` is published on **every region of every discovery document** and resolves
-to `/connect/pde/v3`, which has **no GET or OPTIONS route for either recorded path
-under it**, on all three cumulus hosts (OBSERVED,
-[findings-log/2026-10-12-published-pointers/FINDINGS.md §2b];
-[findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md]). The same day, a different
-key — `system.gc.gz.transition.flags.displayMessage.csrDisplayMessageUrl` — turned out to
-be live, load-bearing and already switched on.
-
-**What is missing:** whether the vendor's own frontends act on the published flags.
-`system.gc.gz.transition.flags` has **five sibling capability booleans, all `true`**
-(`pullGMInfoFromCumulus`, `pullSMSHistoryFromCumulus`, `sendDiagnosticLogsToCumulus`,
-`sendPeriodicToCumulus`, `sendSMSFromCumulus`), which says five capabilities already
-moved to Cumulus — so the flag mechanism is demonstrably in use. Nobody has ever looked
-for a `pde`-shaped token in a frontend bundle, because nobody knew the key existed.
-
-**Blocker:** one offline grep pass over the patient and clinician bundle captures for
-`pde` / `baseUrlPde` / `transition.flags` tokens — **zero requests** if those captures
-are still on disk. If they are not, this becomes a token- and artefact-blocked row and
-belongs in the table at the top of this page instead.
-
-**Closes when:** the bundles are searched for `pde`-shaped tokens and the result is
-**either** a call site that uses the published `baseUrlPde` value, **or** a recorded
-negative that no client in the corpus addresses PDE at all — in which case the vendor
-publishes a base URL that nothing follows, which is the finding. **A negative counts**,
-and is the likelier of the two outcomes given the namespace 403s before application code.
-
-**Assumptions (INFERRED):** that the bundles on disk are the ones the shipped apps load.
-They were captured 2026-10-08 and **never re-fetched**, so a bundle version bump would
-invalidate the negative — state the capture date with the result, always.
+> **Area V is CLOSED** (2026-10-13, claim #42) — see the Closed table at the foot of
+> this page and
+[findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md]. **Recorded negative, with a
+> sharper reason than the area expected:** no vendor web bundle contains `baseUrlPde` —
+> but neither does any `baseUrl*` key, `discover`, or `clcloud`, because **no web
+> bundle in the corpus reads the discovery document at all**. The document's consumer is
+> the mobile client its own path names (`discover/android/3.6`), so "does a client follow
+> it" remains **unobserved in both directions** and `docs/03` §9a's INFERRED reading
+> stands unchanged. The same corpus produced a **positive on the sibling pointer**: the
+> patient bundle follows `csr.cumulus.periodic.data.endpoints` and POSTs its
+> `display_message`, while naming `system.gc.gz.transition.flags` and never reading it.
+> Its reasoning is preserved below rather than deleted, and its follow-ups were filed as
+> **dated addenda to areas F and K**, not as new letters — see
+> [Why there is no area AA](#why-there-is-no-area-aa).
 
 > **Area Z is CLOSED** — see the Closed table at the foot of this page and
 [findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md]. `ACAO` is a constant `*`, not an
@@ -158,6 +137,57 @@ call.
 
 **Closes when:** you can name the caller and say whether a third-party client can
 reach these services at all.
+
+#### Addendum (2026-10-13, from area V): the shipped patient bundle names a timeline host that is not published
+
+**Derived:** none of this was knowable before 2026-10-13 — area V re-fetched the patient
+bundle and grepped it, and these four facts came out of that corpus rather than out of
+the network [findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md].
+
+**OBSERVED**, patient bundle `main.6595daf83bd6d4b1.js` (3,417,255 B, sha256
+`0fb4fbd4…`, captured 2026-10-13, byte-identical on `carelink.minimed.eu` and
+`carelink.minimed.com`):
+
+- **`dialog-lite` is 0 hits in all five captured bodies.** The premise that the portal
+  calls it is **not supported by the corpus** — a negative, not a refutation of the
+  route.
+- **`patient-timeline` is 5 hits and every one is an Angular component selector, not a
+  URL** — `["app-patient-timeline"]` (byte 1718181),
+  `"app-patient-timeline-filter-toolbar"` (1719243), two template calls (1963408,
+  1963661) and one `selectors:` array (3340159). A grep on the bare name reports an
+  integration that is not there: the `docs/09` §5 false-hit class, on the one token
+  this area is specifically hunting.
+- The bundle **does** carry `personal.patient.timeline.config` as a quoted literal and
+  reads it (selector `Nt`, exported as `bQ`, 3 property reads), and a template reads
+  **`.featureEnabled`** off it to choose between rendering the Patient-Timeline tab and
+  not (byte 1966110). The timeline is therefore **config-gated in shipped code**, which
+  is one step closer to a caller than "it must not be the browser".
+- ⚠ The bundle **also names `personal.patient.timeline.host`** — 1 occurrence, and its
+  constant `personalPatientTimelineHostURL` occurs **once**, so nothing reads it. The
+  **published** key is `personal.patient.timeline.config.host` (`docs/04`, an AWS API
+  Gateway answering 403). `personal.patient.timeline.host` is **not** in the 69-name
+  list area W committed, i.e. **the bundle names a config key the public document does
+  not publish.** Which of the two is real is **not** settled here.
+
+**Blocker:** the shape of `personal.patient.timeline.config` has never been read. This
+area asks "who calls `patient-timeline`", and the caller turns out to be gated on that
+object's `featureEnabled` — while the object itself is nowhere in this repo's recorded
+values and only its `.host` member is named. **It costs zero requests**: the whole
+public config document is already downloaded by `regression/hurl/05-public-config.check.sh`,
+so one `jq` on that body enumerates the object's full key set.
+
+**Closes when:** `personal.patient.timeline.config` has its **full key set** recorded
+from the live public config on all three deployments, and the bundle's two timeline-host
+keys are reconciled against it — either the bundle's key is a stale name nothing reads
+(half-evidenced now: its constant has zero readers in the eager bundle) or the vendor
+publishes a second, unrecorded key. **A negative counts**: "the bundle names a key the
+document does not publish, and nothing reads it" is a complete answer.
+
+**Assumptions (INFERRED):** that the patient bundle fetched from `carelink.minimed.eu`
+is what the shipped patient web app loads — its asset name is taken from that host's own
+entry document in the same run, but no authenticated session confirms a logged-in user
+receives it. And that a lazy chunk cannot read the timeline config: **only the eager main
+bundle was swept**, the 211 lazy chunks were not (see the addendum to area K).
 
 ---
 
@@ -301,6 +331,45 @@ what the conditional logic implies about the request shape.
 build the logbook entry payload would recover the request schema, not just the field
 names.
 
+#### Addendum (2026-10-13, from area V): the *patient* chunk corpus is a different, unswept set of 211
+
+**Derived and non-duplicate.** Area K's corpus is the **224** chunks of the **clinic
+portal** — `CHUNK-CORPUS-FINDINGS.md` names `hp-main.js` as its measure source. The
+**patient** app is a separate webpack build with its own runtime chunk map, and that map
+has **211 entries**
+([findings-log/2026-10-13-area-v-pde-clients/chunks.txt](../../findings-log/2026-10-13-area-v-pde-clients/chunks.txt)).
+Three were sampled once in 2026-10-08 (`JSMAP-HUNT §3.3`); **none of the 211 was ever
+fetched as a corpus.** So the gap is not "chunks are unmined" — it is **the patient
+corpus specifically**, which K's 224 does not cover.
+
+**The candidate list is closed, committed, and current.** `chunks.txt` was written from
+the runtime bundle's own map on 2026-10-13 and **reproduces** the 2026-10-08 record: the
+map still has 211 entries and the sampled hashes (`12.c22952a522974f5f`,
+`985.47eb741416e9cd44`) are unchanged. URL form is `<id>.<hash>.js` at the **asset
+root** (`carelink.minimed.eu`, not `/app/`) because the runtime sets `.p=""`;
+`JSMAP-HUNT §5` already recorded that the `<base href="/app">` reading is wrong.
+
+**Why it matters now.** Every bundle claim area V made — "no web bundle reads the
+discovery document", "the client follows `csr.cumulus.periodic.data.endpoints` but not
+`system.gc.gz.transition.flags`" — is a statement about the **eager main bundle only**,
+and that limit is stated at every use. A lazy chunk is exactly where a feature-gated
+call site would live, so those negatives are provisional until this set is swept.
+
+**Blocker:** 211 GETs of the committed list from one host — a real request budget
+(≈9 minutes at a 2.5 s spacing), not a token. Everything else is already done: the
+list, the host, the URL form, and the token set (`baseUrl*` / `discover` / `clcloud` /
+`pde` / the nine `transition.flags` leaves).
+
+**Closes when:** all 211 carry a verdict for that token set, each hit read to
+literal-vs-directive with a case-sensitivity control exactly as area V read its 13
+bodies — **and a negative counts**, since "no lazy chunk carries a discovery key" is
+the expected outcome and would convert area V's scoped negative into an unqualified one.
+
+**Assumptions (INFERRED):** that the chunk ids and hashes in the runtime map still
+resolve — verified today for the two sampled ids only, not for all 211; and that the
+patient `main`+`runtime` pair is the entry point for those chunks, which the runtime's
+own `f.u` construction implies but this pass did not trace to a loader.
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
@@ -401,6 +470,7 @@ being superseded — never silently. Letters are not reused.
 | G — cross-check the three model tables against each other | 2026-10-13 | **Negative: both builds' device tables are identical as data.** The clinic `pow` asset (`main.fb5f8cb7eb60c4d5.js`, 3,397,615 B, sha256 `2a7fa8e7af519c2b`) and the support `cua` asset (`main.759cddab23085086.js`, 3,410,666 B, sha256 `a054555a0f22176e`) were fetched separately and extracted separately, offline: identical code sets (78 table codes + 9 `SKU-*`), identical display-name pairs (76 quoted + 2 unquoted `MMT5100`/`MMT5101` + 9 `SKU-*`), identical whole-file census (80 `MMT-*`, same set), identical module-`90991` `["MMT-8600","MMT-8601"]` array, identical answers on 23 patient-map spot checks — so G's premise is unchanged and the reconciliation stays three-way. **Side-finding:** `MMT-8200`/`8201` ("Guardian™ 4 system") and `MMT-8400`/`8401` ("Simplera™ system") are present in **both** builds' tables, so the patient map is the only compared source lacking them. **6 of a 12 cap**, GET only, controls first per host (fabricated asset → per-build 5518 B fallback; root anchors build digests, both reproducing area A), spacing floor **2.595 s**, 4/4 gaps ≥ 2.5 s | [findings-log/2026-10-13-area-g-device-tables/FINDINGS.md] | #32 |
 | J — `login-errors.ts` against the live error surface (addendum: the three advertised Auth0 endpoints) | 2026-10-13 | **One routed, two dangling — uniform across all five tenants, no shadow split.** `/mfa/challenge` answers the preflight `204` + `ACAO: *` + exact `allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS` on all five (the path with no probe result in any source was live); `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five — preflight byte-identical to per-host one-character-different controls (one 10 B digest `0802559db137…` across 15 bodies). POST-only-ness of `/mfa/challenge` is INFERRED from specification, not established — no POST sent, and the six-method list is a second live instance of `docs/09` §4's allow-methods trap. Revocation verdict scoped to the `Auth0` connection name. ⚠ **Correction history preserved:** this addendum was written 2026-10-12 as a GET sweep on area I's then-claim that `registration_endpoint` was absent everywhere; a verifier refuted the premise (the endpoint is live and POST-only) and the addendum was rewritten to empty-body OPTIONS before probing — the original wording is retained in the area-I log, not here. **23 of a 26 cap** (20 curl + 3 live hurl pin-validations), GET + empty-body OPTIONS only, controls first per host, all 5 passed, measured `t_sent` floor **2.395 s** (all gaps ≥ 2 s floor; 2 under the declared 2.5 s and 4 negative durations recorded with no cause asserted). EU cells pinned (exact allow-methods, not contains); counts re-measured 193→199 static, 401→413 execute. Successor: the parent half (bridge `login-errors.ts` taxonomy vs provoked errors) as a new `docs/10` §1 row | [findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md] | #34 |
 | H — the `reportFileNamingSupportedPumpModels` list, entry by entry | 2026-10-13 | **Positive with residue: 214 entries classified, 86 rows matched, 128 not.** The list lives in the **patient** public config (`personal.common.core.report.generation.reportFileNamingSupportedPumpModels`, 69-key document, re-derived live) — not HCP-only as the area premise had it. In code: wire code 129 · display name 71 · bare number 10 · placeholder 4; 82 wire codes matched by family, 47 unmatched by prefix group; placeholders 4/4 matched (all INSTINCT values); bare numbers and display names 0 matched; normalization changes nothing. Anomalies: `MMT-9015` ×2, `Precision Xtra® / Xceed™` ×2, one trailing-space entry matching the map's own padding exactly, ten `MMT-`+bare pairs. Correction attached in `docs/05`: `MMT-8200/8201/8400/8401` are in **both** report lists and **neither** family table. **5 of a 6 cap**, GET only; 3 hp-namespace requests voided by a harness header defect and disclosed as wasted — the close rests on the patient document alone | [findings-log/2026-10-13-area-h-report-naming/FINDINGS.md] | #33 |
+| V — given that `baseUrlPde` names a dead namespace, does any vendor client follow it? | 2026-10-13 | **Negative, and the reason is sharper than the area expected.** No vendor **web** bundle contains `baseUrlPde` or `/connect/pde` — but neither does **any** `baseUrl*` key, `discover`, `discover/android`, `clcloud` or `api/carepartner`, because **no web bundle in the corpus reads the discovery document at all**; the two `baseUrl` hits in the patient bundle are `this.baseUrl = getBaseCmsUrl()`, a CMS media base. Every `pde` hit is accounted for: **5 per portal build, all zxcvbn password-dictionary substrings** (`dropdead`, `helpdesk`, `herpderp`, `topdevice`, `hampden`); **0 case-sensitive in the patient bundle**, whose 25 insensitive hits are 7 unrelated identifiers. **INFERRED, and stated as the limit not the finding:** the consumer is the *mobile* client the document's own path names (`discover/android/3.6`), so “does a client follow it” stays **unobserved in both directions** and `docs/03` §9a's reading is unchanged. **Positive on the sibling pointer:** the patient bundle **follows** `csr.cumulus.periodic.data.endpoints` — 1 genuine read, `display_message` destructured and **POSTed** with `{patientId, role, username}` — while naming `system.gc.gz.transition.flags`, exporting its selector as `z2` and reading `.z2` **0 times in the file**; all nine of its leaves are 0 hits everywhere. Also: **56 of 69** published config keys appear as quoted literals in the patient bundle (raw-substring counting would have said `captcha` 152 times, not 5); patient `.eu`/`.com` are byte-identical; both portal digests reproduce areas A and G; the patient build and its **211-chunk map reproduce the 2026-10-08 record**, so it has not bumped. **13 of a 24 cap**, GET only, 8 controls first per host, measured `t_sent` floor **2.566 s** (9 gaps, 0 under 2.5 s) cross-checked by kernel body-mtimes at **2.599 s** with spans agreeing to 15 ms and no negative durations. Successors: dated addenda to **area F** (timeline-host key named by the bundle but not published) and **area K** (the 211 patient chunks are not K's 224 portal chunks) | [findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md] | #42 |
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
 ---
 

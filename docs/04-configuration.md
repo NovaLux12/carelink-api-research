@@ -139,6 +139,56 @@ facts corroborate each other. **INFERRED:** that `gc` → `gz` names a service m
 and these are its completion switches — the key names support it, no document on any
 surface states it. The *values* are OBSERVED; the reading is not.
 
+### Which of the two identical CSR pointers the shipped client actually follows
+
+**Added 2026-10-13** (area V). The paragraph above is an *instruction*; this one is an
+**execution**. A key being present in a minified bundle proves only that a token exists
+(`docs/09` §5 item 2), so each pointer subtree was resolved to a **read** rather than a
+mention: key constant → observable selector → webpack export alias → property reads.
+Corpus: the patient bundle `main.6595daf83bd6d4b1.js` (3,417,255 B,
+sha256 `0fb4fbd4…`), captured 2026-10-13 [source:
+findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md].
+
+| pointer subtree | named? | selector exported as | property reads |
+|---|---|---|---|
+| **`csr.cumulus.periodic.data.endpoints`** | yes (byte 2188929) | `cO` | **1 genuine read** |
+| **`system.gc.gz.transition.flags`** | yes (byte 2189123) | `z2` | **0 — the substring `.z2` occurs nowhere in the file** |
+
+**OBSERVED.** At byte 3373465 the bundle reads the first subtree, destructures
+`display_message` and POSTs it:
+
+```js
+getUploadDeviceInfo(V){
+  return forkJoin([this.getProfile(), this.store.select(p.cO).pipe(take(1))])
+    .pipe(map(([R,{display_message:X}])=>{
+      const Q={patientId:V||R.username, role:this.isCarePartner()?'CARE_PARTNER':'PATIENT', username:R.username};
+      return this.http.post(X,Q)
+    }), …)
+}
+```
+
+(`forkJoin` / `take` / `map` are the unminified names of the module's own aliases
+`n.p`, `h.s` and `S.n`; the minified source is quoted verbatim in the log.) So the
+**live, POST-only `…/connect/csr/v2/display/message`** route is reached by a
+config-driven `POST` carrying `{patientId, role, username}` — which is what area T's
+inference needed and did not have. **The client does not hardcode the URL**: it reads
+the field, so a config change moves the call. The other two of the three `.cO` sites
+in the file are Angular Material's own injection token in a different module and are
+**disclosed rather than counted** [source:
+findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md §The positive].
+
+**The sharp part is the contrast.** Two unrelated subtrees publish **the same CSR
+URL**, and the client follows one and ignores the other: the `transition.flags`
+subtree that carries `csrDisplayMessageUrl` — the key this section is built around —
+is **named, given a selector, exported, and never read**, and **none of its nine leaf
+names appears anywhere in any of the five captured bundles**. So `useCumulusUrls`,
+`csrDisplayMessageUrl` and the five `*FromCumulus` booleans are **OBSERVED as
+published values and absent as code**. That is a statement about the **eager main
+bundle only**; the 211 lazy chunks were not fetched, and their current inventory is
+now committed at
+[findings-log/2026-10-13-area-v-pde-clients/chunks.txt](../findings-log/2026-10-13-area-v-pde-clients/chunks.txt).
+**What any of the other 56 followed keys' consumers do is not established.**
+
 ### The route that config cannot address
 
 `/connect/v2` — the **bare**, pre-`carepartner` route that the 2026-10-12 area-N pass

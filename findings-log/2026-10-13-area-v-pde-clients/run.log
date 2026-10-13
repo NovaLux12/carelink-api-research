@@ -1,0 +1,15 @@
+run start: 2026-10-13T09:44:02.513Z tmpbodies=<TMPDIR>/tmp.OPtFIXYLfO  # absolute path redacted: AGENTS.md 7 forbids machine paths in any committed file delay=2.5
+2026-10-13T09:44:05.226Z seq=1 host=carelink.minimed.eu tag=eu-absent code=404 ctype=text/html; charset=iso-8859-1 bytes=196 sha=80c3fe2ae1062abf56456f52518bd670f9ec3917b7f85e152b347ac6b6faf880
+2026-10-13T09:44:07.792Z seq=2 host=carelink.minimed.eu tag=eu-root code=200 ctype=text/html; charset=UTF-8 bytes=1833 sha=8dfb96a70999bdb4069375b732ec6a963f6192122232a152ba1db4224728daec
+2026-10-13T09:44:10.398Z seq=3 host=carelink.minimed.eu tag=eu-main code=200 ctype=application/javascript bytes=3417255 sha=0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+2026-10-13T09:44:13.253Z seq=4 host=carelink.minimed.eu tag=eu-runtime code=200 ctype=application/javascript bytes=8268 sha=0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722
+2026-10-13T09:44:16.118Z seq=5 host=carelink.minimed.com tag=us-absent code=404 ctype=text/html; charset=iso-8859-1 bytes=196 sha=80c3fe2ae1062abf56456f52518bd670f9ec3917b7f85e152b347ac6b6faf880
+2026-10-13T09:44:21.663Z seq=6 host=carelink.minimed.com tag=us-root code=200 ctype=text/html; charset=UTF-8 bytes=1833 sha=8dfb96a70999bdb4069375b732ec6a963f6192122232a152ba1db4224728daec
+2026-10-13T09:44:27.616Z seq=7 host=carelink.minimed.com tag=us-main code=200 ctype=application/javascript bytes=3417255 sha=0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+2026-10-13T09:44:30.503Z seq=8 host=carelinkhp.minimed.eu tag=hp-absent code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=0f2c5f6257a6fc6af22e4b31309264df4c148e08016c196e1048bdc19a87e32d
+2026-10-13T09:44:33.250Z seq=9 host=carelinkhp.minimed.eu tag=hp-root code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=0f2c5f6257a6fc6af22e4b31309264df4c148e08016c196e1048bdc19a87e32d
+2026-10-13T09:44:35.881Z seq=10 host=carelinkhp.minimed.eu tag=hp-main code=200 ctype=application/javascript bytes=3397615 sha=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
+2026-10-13T09:44:38.774Z seq=11 host=carelink-support.medtronic.eu tag=sup-absent code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=f637c8d0cd4ec6bc70944f7c9083ace6c205c5ecd22ce5da6ed533ece6d9a1bc
+2026-10-13T09:44:41.551Z seq=12 host=carelink-support.medtronic.eu tag=sup-root code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=f637c8d0cd4ec6bc70944f7c9083ace6c205c5ecd22ce5da6ed533ece6d9a1bc
+2026-10-13T09:44:44.181Z seq=13 host=carelink-support.medtronic.eu tag=sup-main code=200 ctype=application/javascript bytes=3410666 sha=a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954
+run end: 2026-10-13T09:44:44.591Z
