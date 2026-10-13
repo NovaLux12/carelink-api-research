@@ -1,4 +1,4 @@
-run start: 2026-10-13T09:44:02.513Z tmpbodies=<TMPDIR>/tmp.OPtFIXYLfO  # absolute path redacted: AGENTS.md 7 forbids machine paths in any committed file delay=2.5
+run start: 2026-10-13T09:44:02.513Z tmpbodies=<REDACTED>: AGENTS.md 7 forbids machine paths in any committed file delay=2.5
 2026-10-13T09:44:05.226Z seq=1 host=carelink.minimed.eu tag=eu-absent code=404 ctype=text/html; charset=iso-8859-1 bytes=196 sha=80c3fe2ae1062abf56456f52518bd670f9ec3917b7f85e152b347ac6b6faf880
 2026-10-13T09:44:07.792Z seq=2 host=carelink.minimed.eu tag=eu-root code=200 ctype=text/html; charset=UTF-8 bytes=1833 sha=8dfb96a70999bdb4069375b732ec6a963f6192122232a152ba1db4224728daec
 2026-10-13T09:44:10.398Z seq=3 host=carelink.minimed.eu tag=eu-main code=200 ctype=application/javascript bytes=3417255 sha=0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa

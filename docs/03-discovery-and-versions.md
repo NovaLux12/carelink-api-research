@@ -384,8 +384,23 @@ and grepped exhaustively [source: findings-log/2026-10-13-area-v-pde-clients/FIN
 | `/connect/pde` | 0 | 0 | 0 | 0 | 0 |
 | `pde` (case-sensitive) | **0** | **0** | 5 | 5 | 0 |
 | `baseUrlCumulus` / `baseUrlCms` / `baseUrlAem` / `baseUrlCareLink` | 0 | 0 | 0 | 0 | 0 |
-| `discover` / `discover/android` | 0 | 0 | 0 | 0 | 0 |
+| `discover/android` | 0 | 0 | 0 | 0 | 0 |
+| **`discover`** | **0** | **0** | **12** | **12** | **0** |
 | `clcloud` / `api/carepartner` | 0 | 0 | 0 | 0 | 0 |
+
+> **⚠ Correction (2026-10-13) — this row was wrong when first published.** Area V's
+> first report stated `discover` was **0 in all five bodies**. It is **12 in each
+> portal build**; the patient bundles and the runtime are **0** as stated. All 12 are
+> zxcvbn password-dictionary words at **identical byte offsets in both builds**
+> (`discover` @211829, `discovered` @449173, `discovery` @456020, `discovers` @469461,
+> `discovering` @491815, `discoveries` @492201, `rediscovered` @522387, `discoverer`
+> @558582, `rediscovery` @581388, `discoverers` @684648, `rediscover` @941540,
+> `undiscovered` @954784). The cause was a hardcoded token filter in the pass's own
+> extraction script, so the hits were counted but never given context —
+> `AGENTS.md` §6 item 2, propagated as §6 item 5. **The conclusion is unchanged and the
+> negative is stronger:** the portal builds carry **17 dictionary-word hits each
+> (12 `discover` + 5 `pde`)** and none is a pointer [source:
+> findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md §Correction (2026-10-13) §A].
 
 **Every hit is accounted for.** The 5 case-sensitive `pde` hits in each portal build
 are substrings of **zxcvbn password-dictionary entries** — `dropdead`, `helpdesk`,
@@ -400,7 +415,7 @@ assigned from `getBaseCmsUrl()` and used to fetch a CMS media file — a differe
 `baseUrl`, not a published pointer.
 
 **So the negative is not "no client calls `baseUrlPde`"; it is "no web bundle here
-reads the discovery document at all."** That is the finding, and it is **OBSERVED**.
+reads the discovery document at all."** That is the finding, and it is **OBSERVED** — on the tokens that are actually pointer-shaped: `baseUrlPde`, `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`, `baseUrlCareLink`, `discover/android`, `clcloud` and `api/carepartner` are all **0**, and the bare `discover` token is 12 in each portal build purely as zxcvbn dictionary words (see the correction above).**
 
 **INFERRED — and this is the load-bearing limit, so its assumption is stated:** the
 consumer of this document is a **mobile** client, because the document's own path

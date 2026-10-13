@@ -170,18 +170,59 @@ records for `ngp`/`guardian` in this same bundle. A case-insensitive grep would
 have reported "32 PDE references".
 
 **All 25 case-insensitive hits in the patient bundle are substrings of seven
-unrelated identifiers**, one distinct word each: `mapDeviceModelName` (×2),
-`propDecorators` (×8, Angular's reflect-metadata decorator),
-`getGroupDelayControl` (×2), `removeStylesOnCompDestroy` (×5, Angular Material),
-`isDesktopDevice` (×4), `WPDesktop` (×3, a Windows-Phone user-agent string) and
-`LoopDetected` (×2). **Case-sensitive `pde` in the patient bundle is 0.**
+unrelated identifiers**: `propDecorators` (**×8**, Angular's reflect-metadata
+decorator), `removeStylesOnCompDestroy` (**×6**, Angular Material), `WPDesktop`
+(**×3**, a Windows-Phone user-agent string), `mapDeviceModelName` (**×2**),
+`getGroupDelayControl` (**×2**), `isDesktopDevice` (**×2**), `LoopDetected` (**×2**).
+8+6+3+2+2+2+2 = **25**. **Case-sensitive `pde` in the patient bundle is 0.**
+
+> **⚠ CORRECTED 2026-10-13 — see [Correction (2026-10-13)](#correction-2026-10-13)
+> §B.** The multiplicities above originally read `removeStylesOnCompDestroy` **×5**
+> and `isDesktopDevice` **×4**. Those were **wrong**, they summed to **26** against a
+> stated total of **25**, and the two errors **cancelled** (+1/−2) so the total looked
+> right. They were also **unsourced**: `grep-out.txt` §2 deduped by enclosing
+> identifier and printed one offset each, so no per-identifier count existed anywhere
+> in a committed artefact. `extract.sh` is fixed — §2 is now unfiltered, prints `×N`
+> with every offset and the first-hit context, and **asserts that the multiplicities
+> sum to the token total** so this class cannot recur silently.
 
 ### `baseUrlPde`, `/connect/pde`
 
 **0 / 0 / 0 in all five bodies**, case-sensitive, case-insensitive and quoted. Same
-for `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`, `baseUrlCareLink`, `discover`,
+for `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`, `baseUrlCareLink`,
 `discover/android`, `clcloud`, `api/carepartner`. The only `baseUrl` hits are the
 two CMS reads already described.
+
+> **⚠ CORRECTED 2026-10-13 — see [Correction (2026-10-13)](#correction-2026-10-13)
+> §A.** This paragraph originally read *"0 / 0 / 0 … Same for … **`discover`**"* and
+> was **wrong**: `discover` is **0 in the patient bundles and the runtime, and 12 in
+> each portal build**. All 12 are zxcvbn dictionary words, at **identical byte offsets
+> in both builds** — so the conclusion survives and the negative gets *stronger*, but
+> the number published here was wrong and had already been propagated to four
+> canonical pages. Corrected counts are in the `discover` table below; the original
+> wording is preserved verbatim in the Correction section and is not deleted.
+
+**The corrected `discover` census** (case-sensitive; `grep-out.txt` §2 for the
+enclosing identifiers and every offset):
+
+| body | `discover` cs | what every hit is |
+|---|---|---|
+| `eu-main` / `us-main` (patient) | **0** | — |
+| `hp-main` (clinic portal) | **12** | zxcvbn password-dictionary words |
+| `sup-main` (support portal) | **12** | zxcvbn password-dictionary words, **same 12 at the same bytes** |
+| `eu-runtime` | **0** | — |
+
+The 12, identical in both portal builds: `discover` @211829, `discovered` @449173,
+`discovery` @456020, `discovers` @469461, `discovering` @491815, `discoveries`
+@492201, `rediscovered` @522387, `discoverer` @558582, `rediscovery` @581388,
+`discoverers` @684648, `rediscover` @941540, `undiscovered` @954784. Each is a
+comma-separated entry in the embedded wordlist — e.g. @211829 sits between
+`oakland` and `ranger1`. **Literals in a password-strength dictionary, not
+directives.**
+
+**So the portal builds carry 17 dictionary-word hits each — 12 `discover` + 5 `pde` —
+and zero of either token is anything else.** That is a stronger negative than "0", and
+a reader can re-derive it from `grep-out.txt` alone.
 
 ### `system.gc.gz.transition.flags` and its nine leaves
 
@@ -372,7 +413,8 @@ millisecond UTC resolution; `headers/` holds one `<tag>.h` per request.
 | Patient main digest `0fb4fbd4…`, 3,417,255 B — **new baseline**; no digest was recorded before | OBSERVED | `results.jsonl` seq 3 |
 | Patient fingerprint and 211-chunk map reproduce the 2026-10-08 record — the build has not bumped | OBSERVED | `chunks.txt`; `results.jsonl` seq 4; `findings-log/probe-2026-10-08/recon/JSMAP-HUNT.md §3.3, §5` |
 | `baseUrlPde` and `/connect/pde`: **0 hits** in all five bodies | OBSERVED | `grep-out.txt` |
-| No `baseUrl*` discovery key, no `discover`, no `clcloud`, no `api/carepartner` in any bundle | OBSERVED | `grep-out.txt` |
+| No `baseUrl*` discovery key, no `discover/android`, no `clcloud`, no `api/carepartner` in any bundle | OBSERVED | `grep-out.txt` |
+| ⚠ **CORRECTED 2026-10-13:** `discover` is **0** in the patient bundles and runtime and **12** in each portal build — all 12 zxcvbn dictionary words, same bytes in both. Portal builds therefore carry **17 dictionary hits each** (12 `discover` + 5 `pde`), none a pointer | OBSERVED | `grep-out.txt` §2; `FINDINGS.md` §Correction (2026-10-13) §A |
 | The bundle's only `baseUrl` is a CMS media base from `getBaseCmsUrl()`, bytes 2027033 / 2027209 | OBSERVED | `grep-out.txt` |
 | All 5 case-sensitive `pde` hits per portal build are zxcvbn dictionary entries (`dropdead`, `helpdesk`, `herpderp`, `topdevice`, `hampden`) | OBSERVED | `grep-out.txt`; `consumers-out.txt` |
 | Case-sensitive `pde` is 0 in the patient bundle; its 25 insensitive hits are 7 unrelated identifiers | OBSERVED | `grep-out.txt` |
@@ -387,3 +429,118 @@ millisecond UTC resolution; `headers/` holds one `<tag>.h` per request.
 | The bundle names `personal.patient.timeline.host`, which is not a published key, and reads it nowhere | OBSERVED | `consumers-out.txt §2, §3` |
 | **No web bundle reads the discovery document, so this corpus cannot see `baseUrlPde`'s consumer** | INFERRED | assumption: the consumer is the Android client the document's own path names (`discover/android/3.6`) and no mobile artefact is on any host probed — **not observed**, and stated as the limit rather than the finding |
 | The area's INFERRED reading (dead `baseUrlPde` = retired service, not an ignore contract) | **unchanged, still unresolved** | `docs/03` §9a — this pass produced no evidence either way about intent |
+
+---
+
+## Correction (2026-10-13)
+
+Two errors in this log, both found by a verifier reading the committed artefacts
+against the committed prose. **Both were mine**, both were re-derived here on the
+digest-matched bodies (`hp-main` `2a7fa8e7af519c2b…` / 3,397,615 B, `sup-main`
+`a054555a0f22176e…` / 3,410,666 B, `eu-main` `0fb4fbd483b5f5d2…` / 3,417,255 B —
+**digest asserted before any comparison**, `AGENTS.md` §6 item 3), and both originals
+stay visible above and here. `AGENTS.md` §3: corrections are appended, never edited
+away.
+
+### §A — `discover` was published as `0` in all five bodies. It is `12` in each portal build.
+
+| | original text | corrected |
+|---|---|---|
+| `discover`, `hp-main` | 0 | **12** |
+| `discover`, `sup-main` | 0 | **12** |
+| `discover`, `eu-main` / `us-main` / `eu-runtime` | 0 | **0** (unchanged) |
+
+**What was written.** FINDINGS.md: *"**0 / 0 / 0 in all five bodies**, case-sensitive,
+case-insensitive and quoted. Same for `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`,
+`baseUrlCareLink`, **`discover`**, `discover/android`, `clcloud`,
+`api/carepartner`."* — and, in the evidence table: *"No `baseUrl*` discovery key,
+**no `discover`**, no `clcloud`, no `api/carepartner` in any bundle | OBSERVED"*.
+
+**Why it was wrong, at the root.** `extract.sh`'s §2 printed an offset list for a
+hand-picked list of five tokens and nothing for the rest:
+
+```python
+if tok not in ('pde', 'PDE', 'NGP', 'GUARDIAN', 'deviceFamily'):
+    continue
+```
+
+`discover` was outside that list, so its 12 hits appeared in §1 as the bare number
+`cs=12` with no context, and the number **above** them (`cs=0`, for `discover/android`)
+was read as the answer. This is `AGENTS.md` **§6 item 2** — a grep that hit without
+proving — and I had applied my own doctrine to `pde` and then skipped it for
+`discover`, which is the shape of the failure, not an unrelated one. It propagated
+into four canonical pages as **§6 item 5**, including one table labelled **OBSERVED**
+whose clinic and support columns were wrong.
+
+**What the 12 actually are.** zxcvbn password-dictionary words, **identical in both
+portal builds at identical byte offsets**: `discover` @211829 (between `oakland` and
+`ranger1`), `discovered` @449173, `discovery` @456020, `discovers` @469461,
+`discovering` @491815, `discoveries` @492201, `rediscovered` @522387, `discoverer`
+@558582, `rediscovery` @581388, `discoverers` @684648, `rediscover` @941540,
+`undiscovered` @954784.
+
+**The conclusion is unchanged and the negative is now stronger.** The load-bearing
+claim — *no web bundle in this corpus reads the discovery document* — does not depend
+on the token count at all; it rests on `baseUrlPde`, `baseUrlCumulus`, `baseUrlCms`,
+`baseUrlAem`, `baseUrlCareLink`, `discover/android`, `clcloud` and `api/carepartner`
+all being **0**, which they still are, and on the only `baseUrl` in the patient
+bundle being `this.baseUrl = getBaseCmsUrl()` (bytes 2027033, 2027209). What improves
+is the honest form of the claim: the portal builds carry **17 dictionary-word hits
+each — 12 `discover` + 5 `pde` — and none of them is a pointer.**
+
+**What the fixed script additionally surfaced — a complete `pde` accounting for the
+portal builds, which the filtered §2 never gave.** With §2 unfiltered, the portal
+builds' `pde` `ci=32` now resolves in full: **5 case-sensitive** zxcvbn words
+(`dropdead`, `helpdesk`, `herpderp`, `topdevice`, `hampden`) plus **27
+case-insensitive-only** hits in **seven unrelated identifiers**, identical in kind to
+the patient bundle's — `propDecorators` ×8, `removeStylesOnCompDestroy` ×6,
+`AppDefault` ×3, `WPDesktop` ×3, `LoopDetected` ×2, `WebPDecodeRGBA` ×2,
+`mapDeviceModelName` ×2, `WebPDequantizeLevels` ×1. 5 + 27 = 32, and the §2
+arithmetic assertion passes. **So both portal builds' entire `pde` token set is now
+accounted for, item by item** — which the first version of this pass could not claim.
+
+**Fixed at the root, not just in the prose.** `extract.sh`'s §2 is now **unfiltered**:
+it prints enclosing identifier, `×N` multiplicity, every offset and the first-hit
+context for **every token with at least one hit**, and it ends with an **arithmetic
+assertion** that the per-identifier multiplicities sum to the token total. Re-running
+it reproduces every number in this section, including the ones below.
+
+### §B — two `pde` multiplicities were wrong, and unsourced.
+
+| identifier | published | actual | offsets |
+|---|---|---|---|
+| `propDecorators` | ×8 | ×8 ✓ | 733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044 |
+| `removeStylesOnCompDestroy` | **×5** | **×6** | 1840258, 1840750, 1841416, 1845706, 1845875, 1846132 |
+| `WPDesktop` | ×3 | ×3 ✓ | 2887697, 2889198, 2889490 |
+| `mapDeviceModelName` | ×2 | ×2 ✓ | 581421, 581727 |
+| `getGroupDelayControl` | ×2 | ×2 ✓ | 1603222, 1607946 |
+| `isDesktopDevice` | **×4** | **×2** | 1967564, 1974820 |
+| `LoopDetected` | ×2 | ×2 ✓ | 3147133, 3147152 |
+| **sum** | **26** | **25** | 25 hits, 7 distinct identifiers |
+
+The stated total (25) and the distinct-identifier count (7) were both right; only the
+per-identifier numbers were wrong, in **opposite directions**, so the arithmetic
+appeared to close. **They were also not in any committed artefact**: §2 deduped by
+enclosing identifier and printed the first offset only, so `×5` / `×4` was prose with
+nothing behind it — the `AGENTS.md` §1 failure (a claim with no source line) wearing
+the costume of a measurement. The offsets above, and the `×N` beside each, are now in
+`grep-out.txt` §2 and are re-derivable by re-running `extract.sh` with zero requests.
+
+### §C — a disclosure that travelled less far than it should
+
+The `body_mtime_epoch` caveat below (whole seconds, `stat -c%Y`, so the sub-second
+mtime figures are **not re-derivable from the committed ledger** and git does not
+preserve mtimes) sat about twenty lines after the table printing `2.599 s`, and did not
+travel into `docs/11` at all, where a reader sees only that number. It now travels
+with the number at every site. Stated as a disclosure weakness, not a wrong claim: the
+figure itself is correct and the load-bearing floor is the millisecond `t_sent`
+series, which reproduces from `results.jsonl` alone.
+
+### Not changed, and why
+
+`baseUrlPde`, `/connect/pde`, `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`,
+`baseUrlCareLink`, `discover/android`, `clcloud`, `api/carepartner` — re-counted on the
+digest-matched bodies, still **0 everywhere**. The 5 `pde` hits per portal build, the
+`system.gc.gz.transition.flags` key constant at 2189151, the `.z2` zero-read result,
+the 56-of-69 key census, the 211-chunk map, the 2.566 s `t_sent` floor and the pin are
+untouched by this correction and were re-checked rather than assumed.

@@ -11,8 +11,19 @@
 #   cs  = case-sensitive substring hits
 #   ci  = case-insensitive substring hits      (the control)
 #   q   = hits as a complete quoted literal    (the strict test)
-# A token with cs=0 and ci>0 is noise until its enclosing words are read, and
-# §2 prints them.
+#
+# §2 is UNFILTERED, and that is a correction, not a preference — see
+# "Correction (2026-10-13)" §A in FINDINGS.md. The first version of this script
+# printed an offset list for a hand-picked list of five tokens and nothing for
+# the rest, so `discover`'s 12 hits sat in §1 with no context and the count above
+# them was read as the answer. §2 now covers EVERY token with at least one hit.
+#
+# §2 also prints MULTIPLICITIES (xN per enclosing identifier, with every offset),
+# because the first version deduped by word and printed one offset each. That
+# made per-identifier counts unsourceable prose: two of them were wrong and the
+# errors cancelled (+1/-2) so the stated total still matched. §2 therefore ends
+# with an arithmetic assertion — the per-identifier multiplicities of §2 MUST sum
+# to the §1 hit count for that token — and prints FAIL loudly if they do not.
 set -u
 : "${TMPBODIES:?set TMPBODIES to the directory holding eu-main.b, hp-main.b, …}"
 python3 - "$TMPBODIES" <<'EOF'
@@ -74,20 +85,33 @@ for tag in BODIES:
         mark = '' if len(cs) == len(ci) else '  <-- ci adds %d, read §2' % (len(ci)-len(cs))
         print('%-36s cs=%-4d ci=%-4d q=%-4d%s' % (tok, len(cs), len(ci), q, mark))
     print()
-    print('-- §2 every case-INsensitive hit that case-sensitive grep did NOT keep,')
-    print('   with the maximal enclosing identifier. A hit is a token, not a claim.')
-    shown = set()
+    print('-- §2 EVERY token with at least one hit, grouped by its maximal enclosing')
+    print('   identifier, with the multiplicity and EVERY offset. A hit is a token,')
+    print('   not a claim: read the identifier and the surrounding bytes before')
+    print('   writing the hit as anything. Nothing is filtered out here.')
+    assert_fail = 0
     for tok in TOKENS:
-        for m in re.finditer(re.escape(tok), t, re.I):
-            s, e = m.start(), m.end()
-            if tok not in ('pde', 'PDE', 'NGP', 'GUARDIAN', 'deviceFamily'):
-                continue
-            w = enclosing(t, s, e)
-            if w == tok:
-                continue
-            key = (tok.lower(), w)
-            if key in shown:
-                continue
-            shown.add(key)
-            print(f'   {tok:<12} @s<{s:<9} enclosing identifier {w!r}')
+        hits = list(re.finditer(re.escape(tok), t, re.I))
+        if not hits:
+            continue
+        cs = len(re.findall(re.escape(tok), t))
+        groups = {}
+        for m in hits:
+            groups.setdefault(enclosing(t, m.start(), m.end()), []).append(m.start())
+        survives = 'case-SENSITIVE hits survive' if cs == len(hits) else \
+                   'case-insensitive ONLY (case-sensitive grep drops every one)'
+        print(f'\n   {tok!r}: {len(hits)} hit(s), {len(groups)} distinct enclosing '
+              f'identifier(s) — {survives}')
+        for w, os_ in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+            ctx = t[max(0, os_[0] - 70):os_[0] + len(w) + 40].replace(chr(10), ' ')
+            print(f'      x{len(os_):<3} {w!r:<34} offsets {os_}')
+            print(f'           first-hit context: ...{ctx}...')
+        total = sum(len(v) for v in groups.values())
+        if total != len(hits):
+            print(f'      FAIL arithmetic: multiplicities sum to {total}, '
+                  f'expected {len(hits)}')
+            assert_fail += 1
+    print(f'\n   §2 arithmetic: {assert_fail} FAIL(s). A per-identifier count that does '
+          f'not sum to the token total is how the first version of this file published')
+    print('   two wrong multiplicities whose errors cancelled.')
 EOF
