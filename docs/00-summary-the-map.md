@@ -85,7 +85,7 @@ full are in [`04-configuration.md`](04-configuration.md).
 | `/patient/v2/configuration/public` | **Unauthenticated, 69 keys.** The single best find — see *Configuration*. |
 | `/patient/v2/monitor/data` | **405 — POST-only.** *A live route exists here.* Previously unrecorded; the v2 tree is a real data plane, not just a config document. GET is undefined, so 405 rather than 404 is the tell. |
 | `/patient/v2/users/me` | **401 — exists, token-gated.** ditto. |
-| `/patient/configuration/system/<flat.name>` | **Unauthenticated per-key projection** of the 69-key doc. 21/21 non-null keys returned byte-identical subtrees in a `{"value": "<string>"}` envelope — **booleans arrive as the strings `"true"`/`"false"`**, so a `=== false` check silently never fires. |
+| `/patient/configuration/system/<flat.name>` | **Unauthenticated per-key projection** of the 69-key doc. **Swept complete on all three deployments 2026-10-13** (areas W and E): the 69-name vocabulary is **identical on `.eu`, `.com` and `-trials`**, and every valued response unwraps to exactly its own host's bulk subtree — **123 valued cells, 0 mismatches, 0 names outside the bulk document**. So it is a **projection**, not an enumeration path. Two traps ride with it: values arrive in a `{"value": "<string>"}` envelope — **booleans arrive as the strings `"true"`/`"false"`**, so a `=== false` check silently never fires — and **one key on EU carries a stray trailing `]`** that makes its value unparseable (`.com` and `-trials` parse cleanly). **What differs by deployment is which keys 404** (null-valued keys: 5 on `.eu`/`.com`, 6 on trials), not the grammar. |
 | `/api/carepartner/v2/*` | What the app's `baseUrlCareLink` declares, but no client actually uses it. |
 | `/connect/carepartner/v{11,12,13}/display/message` | The carepartner data endpoint. GET at v11/v12/v13; **v6 exists but is POST-only**; v1–5, v7–10, v14–16 have no route. |
 | `/connect/carepartner/v13/discover/android/{3.6,3.7,3.8}` | The only cells that select Auth0 **and** cumulus v13. **This is the pin that matters.** |
@@ -349,7 +349,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 203 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 209 of these facts so they fail loudly rather than rot.
 
 ---
 
