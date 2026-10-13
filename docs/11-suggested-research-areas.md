@@ -332,7 +332,7 @@ hosts, no `commoncore*` cell was ever matched, and none has ever varied `Origin`
 a documented placement problem and the reason was missing.** Every letter A—Z is in use, so a
 new `### ` heading would leave this page's own "N open plus M closed" sentence disagreeing
 with its contents — which is the failure `docs/11`'s own addenda have already been written to repair
-twice. Of the six open areas, **F is the only one whose subject is the CORS behaviour of an
+twice. Of the five open areas, **F is the only one whose subject is the CORS behaviour of an
 AWS-API-Gateway-behind-CloudFront deployment**: its own text turns on "zero of 90 responses
 carried `Access-Control-*`", which is the same question on the `clcloud.*` stage. The host
 family differs and this addendum says so in every sentence that could be misread; the
