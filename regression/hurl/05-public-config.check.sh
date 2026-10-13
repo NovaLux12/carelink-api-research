@@ -404,8 +404,15 @@ check "-trials per-key logbook entry types unwrap to 12"    '.value | fromjson |
 # read by any pass. It is exactly two members, identical on all three patient
 # deployments. Pinned as the EXACT sorted member list, not `has("featureEnabled")`:
 # a member appearing or being renamed is a change this header makes and a `has`
-# assertion cannot see. The jq expression was checked against a synthetic document
-# carrying a third member, and returns the other string, so this can fail.
+# assertion cannot see.
+#
+# "So this can fail" is not a claim you have to take on trust:
+#   findings-log/2026-10-13-area-f-timeline-config/pins-selftest.sh
+# runs both filters against synthetic documents built from the committed 69-name
+# list and proves (a) a third member breaks the member-set pin, (b) publishing the
+# bundle's stale key breaks the absent-key pin, and (c) neither a superstring nor
+# a prefix of the key name satisfies the ^$ anchor. Zero vendor requests. If you
+# change a filter below, change the copy in that file with it.
 #
 # THE NEGATIVE, which is the other half of the finding: the shipped patient bundle
 # ALSO names a top-level key `personal.patient.timeline.host`. It is not published on
@@ -413,7 +420,8 @@ check "-trials per-key logbook entry types unwrap to 12"    '.value | fromjson |
 # it half-open — "either the bundle names a stale key nothing reads, or the vendor
 # publishes a second, unrecorded key" — and this settles it 3 of 3. Anchored on ^$
 # so it cannot be satisfied by a longer name that merely contains this one; the
-# same expression returns 1 against a document that does carry the key.
+# same expression returns 1 against a document that does carry the key (see
+# pins-selftest.sh step 3).
 #
 # LIMITS, stated rather than implied: these pin the member SET and the ABSENCE of
 # the second key. They do NOT pin the `host` VALUE, which is deployment-specific

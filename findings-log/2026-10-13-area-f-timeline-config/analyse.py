@@ -18,9 +18,15 @@ TWO TRAPS THIS FILE EXISTS TO AVOID
 1. AGENTS.md section 6 item 3 — a hash comparison over a lookup that silently
    returns null manufactures consensus. Two different values hashing to the same
    digest once looked like agreement here. So every resolve is TYPE-ASSERTED
-   before it is hashed, and a resolve that fails writes NULLRESOLVED rather than
-   the digest of `None`. The all-zero digest (e3b0c442..., sha256 of the empty
-   string) is treated as a FAILURE, not as a comparison.
+   before it is hashed, and a resolve that returns None writes NULLRESOLVED
+   rather than the digest of anything. **The NULL check is the whole live guard**,
+   and it is deliberately the only one: an earlier version of this file also
+   compared against the all-zero digest (e3b0c442..., sha256 of the empty string),
+   advertising a belt-and-braces check that **cannot fire**, because `canon()`
+   always emits at least one character for a non-None value and the NULL branch
+   above has already continued. A guard that cannot fail is worse than no guard —
+   it reads as protection and is not — so it was removed rather than kept as
+   reassurance. This was caught in verification on 2026-10-13.
 
 2. personal.patient.timeline.config is a LITERAL DOTTED KEY, not a nested path.
    The 69 published names are literal strings — 68 of 69 are dotted, and exactly
@@ -36,7 +42,10 @@ import json
 import os
 import sys
 
-EMPTY_SHA = hashlib.sha256(b"").hexdigest()
+# NOTE: an EMPTY_SHA constant and an all-zero-digest guard were removed here on
+# 2026-10-13. The guard sat AFTER the None check, which `continue`s, so it was
+# unreachable: canon() never yields "" for a non-None value. An unreachable guard
+# reads as protection and is not protection, so it is gone rather than kept.
 
 HOSTS = [
     ("carelink.minimed.eu", "eu"),
@@ -138,7 +147,12 @@ def main():
         "split_walk_control": {},
     }
 
-    keyrows = ["host\tshort\tkey\tpresent\tresolved_type\tmember\tmember_type\thost_member_sha256"]
+    # Column 8 is sha256 of canon(member) -- the CANONICAL-JSON encoding, so a
+    # string member hashes with its quotes. derived.json's member_shape.sha256 for a
+    # string is sha256 of the RAW string, without quotes. Two conventions, two files,
+    # one sentence apart; stated here because a reader comparing the two digests
+    # would otherwise conclude one of them is wrong.
+    keyrows = ["host\tshort\tkey\tpresent\tresolved_type\tmember\tmember_type\tmember_canonical_sha256"]
     drows = ["host\tkey\tseq\tnorm\tsha256_canonical_parsed_value\tsha256_canonical_resolved_bulk_subtree\tequality"]
     routes = []
 
@@ -206,7 +220,12 @@ def main():
             "bundle_named_key_present_in_bulk": isinstance(bulk, dict) and HOST_KEY in bulk,
             "published_config_carries_host_member": cfg_has_host_member,
             "published_key_present_in_bulk": present,
-            "host_member_equals_top_level_key": None,
+            # A former key, host_member_equals_top_level_key, was written here as a
+            # literal False and removed on 2026-10-13: it compared nothing and read
+            # like a measurement. The two questions it implied are already answered
+            # by the two keys above -- the bundle-named key is absent from the
+            # document, and the document publishes its host as a member of the
+            # config object. No claim cited it.
         }
 
         for m in (members if present and isinstance(val, dict) else []):
@@ -273,10 +292,6 @@ def main():
             d_parsed = sha(parsed)
             d_bulk = sha(bulk_side)
             eq = (d_parsed == d_bulk)
-            if EMPTY_SHA in (d_parsed, d_bulk):
-                eq = False
-                derived["deliverable_4_cell_digests"].append(
-                    {"host": host, "key": name, "verdict": "EMPTY_DIGEST_TREATED_AS_FAILURE"})
             drows.append("\t".join([host, name, str(lseq), norm, d_parsed, d_bulk, str(eq).lower()]))
             rec = {"host": host, "key": name, "norm": norm, "parsed_type": parsed_type,
                    "bulk_type": bulk_type, "sha256_parsed": d_parsed, "sha256_bulk": d_bulk,
@@ -284,9 +299,6 @@ def main():
             if isinstance(parsed, dict):
                 rec["members_sorted"] = sorted(parsed.keys())
             derived["deliverable_4_cell_digests"].append(rec)
-
-        if cfg_has_host_member:
-            derived["deliverable_2_two_timeline_host_keys"][host]["host_member_equals_top_level_key"] = False
 
     # ---- DELIVERABLE 3 — the dedicated routes -------------------------------
     # Verdicts are read from results.jsonl (the ledger), not re-requested.

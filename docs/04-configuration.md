@@ -51,7 +51,7 @@ were **Unknown** — not enumerated in any source.
 | device vocabulary | `personal.device.family.to.model.mapping`, `system.settings.transfer.feature.config.device.mapping` | 16 families; `{"BLE780":"780G","CC880":"MiniMed™ Flex"}` — see `05-devices-and-vocabulary.md` |
 | logbook | `logbook.supported.entry.types` (12 types), `logbook.enabled`, `logbook.entries.page.size` (= 30), `system.logbook.entry.validation.config` | validation config is `null` on both patient regions, full schema on trials |
 | device control codes | `csr.control.codes.settings` | `dpml`/`tup`/`lhpro`/`lghpro`/`vex`/`ssd`/`tcc`/`gstpro`/`gstrc` with ranges. **Not** the NGP alarm set — no N-codes |
-| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed. **`csr.cumulus.periodic.data.endpoints` now has its value read for the first time — see [The published pointer set](#the-published-pointer-set)**. **`personal.patient.timeline.config` is now read (2026-10-13, area F): exactly two members, `featureEnabled` (boolean, `true`) and `host`, the same member set on all three deployments and pinned. There is no second, top-level `personal.patient.timeline.host` on any of them — see [The timeline config](#the-timeline-config-one-published-pointer-and-one-stale-name)** |
+| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed. **`csr.cumulus.periodic.data.endpoints` now has its value read for the first time — see [The published pointer set](#the-published-pointer-set)**. **`personal.patient.timeline.config`'s SHAPE is now read for the first time (2026-10-13, area F): exactly two members, `featureEnabled` (boolean, `true`) and `host`, the same member set on all three deployments and pinned.** The **value** of `host` is not new — it was read on 2026-10-08 and published ellipsised ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]). There is no second, top-level `personal.patient.timeline.host` on any of them — see [The timeline config](#the-timeline-config-one-published-pointer-and-one-stale-name)** |
 | **the vendor's own migration switchboard** | **`system.gc.gz.transition.flags`** | **Added 2026-10-12.** Absent from every key list this repo recorded before that date. `displayMessage.useCumulusUrls` = **`true` on all three deployments**, beside a three-way plane dispatch table; five sibling capability booleans are **all `true`**. See [The published pointer set](#the-published-pointer-set) |
 | regional feature flags | `personal.clinical.environment`, `personal.safety.notices.enabled`, `personal.data.csv.export.enable`, `personal.cookie.consent.policy.enabledGlobally`, `personal.dob.validation.enabled`, `personal.mixpanel.analytics.settings.{enabled,token}`, `personal.username.as.email.settings.enabled`, `personal.inpen.supported.countries.enabledGlobally` | see the regional table below |
 | country lists | `personal.common.core.reporting.enabled.countries`, `personal.countries.certification.enabled`, `personal.inpen.supported.countries` | grow over time — see the drift note |
@@ -257,7 +257,16 @@ thing that otherwise gets written up as a correction of a correct claim.
 **Added 2026-10-13 (area F, claim #55).** This is the shape
 [`docs/11`](11-suggested-research-areas.md) area F and its area-V addendum had as
 their blocker: the shipped patient web app gates the Patient-Timeline tab on this
-object, and **nobody had read the object**.
+object, and **nobody had read the object's shape**.
+
+⚠ **What was new, precisely — because "unread" is an easy overstatement.** The
+**object** was not unread: its `host` member's value was read on 2026-10-08 and
+published ellipsised ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md],
+"Every host below was disclosed only by the config"), which is how `docs/07` and the
+key table above already name this key as the disclosing one. What no pass had read was
+the object's **shape**: how many members it has, what they are called, what type
+`featureEnabled` is, and what its value is. Those are what this pass established first,
+and they are what the addendum below and the six new pins are about.
 
 `personal.patient.timeline.config` resolves to an **object of exactly two
 members** — `featureEnabled` and `host` — with the **same member set on all three
@@ -295,15 +304,20 @@ vendor requests** (every body is already fetched by that suite's area-E block). 
 `host` **value** is deliberately not pinned; `cell-digests.tsv` in the findings log
 carries the per-deployment digests instead.
 
-**Open, and not resolvable from this page:** the recorded host shape for this
+**Open, and not resolvable from what is committed:** the recorded host shape for this
 service is `…eu-central-1…/prod/patient-timeline` (EU) and
 `…us-east-1…/prod/patient-timeline` (US and trials)
 ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]). The
 measured lengths are 79 / 76 / 76, so **EU is three characters longer than the other
-two, while those recorded region names differ by two.** Something other than the
-region string therefore differs between the EU and US pointers, or one of the two
-records is wrong. **This page does not say which** — only the value settles it, and
-that is the successor recorded in [`docs/11`](11-suggested-research-areas.md) area F.
+two, while those recorded region names differ by two.** Either something other than
+the region string differs between the EU and US pointers, or one of the two records
+is wrong — **this page does not say which.** The value *was* read in 2026-10-08 and
+published ellipsised; the abbreviation sits exactly where the region and the
+Gateway id live, which is the segment the discrepancy is about, so the arithmetic is
+the part that does not re-derive from the log. The successor and its 3-request cost
+are recorded in [`docs/11`](11-suggested-research-areas.md) area F. **Whether that
+value may be published is a call for a human holding it, not a pre-committed step
+here.**
 
 ### Credential-shaped values — structure only, comparison held
 

@@ -92,21 +92,18 @@
     "carelink-trials.minimed.com": {
       "bundle_named_key_present_in_bulk": false,
       "bundle_named_top_level_key": "personal.patient.timeline.host",
-      "host_member_equals_top_level_key": false,
       "published_config_carries_host_member": true,
       "published_key_present_in_bulk": true
     },
     "carelink.minimed.com": {
       "bundle_named_key_present_in_bulk": false,
       "bundle_named_top_level_key": "personal.patient.timeline.host",
-      "host_member_equals_top_level_key": false,
       "published_config_carries_host_member": true,
       "published_key_present_in_bulk": true
     },
     "carelink.minimed.eu": {
       "bundle_named_key_present_in_bulk": false,
       "bundle_named_top_level_key": "personal.patient.timeline.host",
-      "host_member_equals_top_level_key": false,
       "published_config_carries_host_member": true,
       "published_key_present_in_bulk": true
     }

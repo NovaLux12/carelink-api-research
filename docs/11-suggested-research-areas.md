@@ -347,12 +347,18 @@ the literal key resolves to an object, so a dotted-path walker would have hashed
 against nothing and reported agreement (`OBSERVED`, recorded deliberately as a control).
 
 **And a fifth, negative result about the 404 content-type set:** **9 of 9** 404s in this
-pass carried **no** `content-type` header at all. Within the *same* namespace, area W's
-**absurd** fabricated name returns `text/vnd.a` while this pass's **plausible-shaped**
-unpublished name returns none. **INFERRED, n = 1 per reading:** the discriminator may be the
-*plausibility of the requested name* rather than area W's "control versus real key".
-Assumption: the header tracks the name, not unseen route state. `docs/04`'s standing
-instruction not to discriminate on it is confirmed, with a second independent reason.
+pass carried **no** `content-type` header at all — and, unlike areas W and E, this pass
+probed the **namespace root level**, which no prior pass had, so that shape is observed
+for the first time. ⚠ **A hypothesis this addendum briefly carried is withdrawn.** It
+proposed that the discriminator is *the plausibility of the requested name* (an absurd
+fabricated name returns `text/vnd.a`, a plausible unpublished name returns none).
+**Falsified by a cell that sits beside it**: area E's trials **seq 127**,
+`personal.linking.request.interval`, is a **real-key 404** against a **published** name
+(69-name list, line 48) and carries **`application/vnd.nervana`** — exactly what the
+plausibility reading predicts it would not. **Three values exist and no property of the
+requested name separates them.** `docs/04`'s standing instruction not to discriminate on
+it is confirmed, with a third independent reason [findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md
+"Deliverable 3"].
 
 **Two corrections to this page's own premises, recorded rather than smoothed over.** The
 claim and the pool brief both named **`/patient/configuration/`** as the bulk document; it is
@@ -371,38 +377,53 @@ of inherited, which is what made them usable.
 (`OBSERVED`, [source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 1"]). The
 `host` member is an `https` string of **79 / 76 / 76** characters on `.eu` / `.com` /
 `-trials`, with **three distinct** sha256 digests (`OBSERVED`, same source). The value itself
-is **not published** and its shape is **not claimed**. Separately, this repo records the
+is **not published** here and its content is **not claimed**. Separately, this repo records the
 service's host shape as `…eu-central-1…/prod/patient-timeline` (EU) and
 `…us-east-1…/prod/patient-timeline` (US and trials) (`OBSERVED`,
-[source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]), and
+[source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]), which is how
 [`07-admin-portal-and-reporting.md`](../07-admin-portal-and-reporting.md) attributes the
 probed `patient-timeline` gateway to this config key.
 
 **Missing, and why it matters.** The measured lengths and the recorded region names
 **disagree**: EU is **three** characters longer than the other two deployments, while
 `eu-central-1` and `us-east-1` differ by **two**. So either something other than the region
-string differs between the EU and US pointers, or one of the two records is wrong. **Neither
-can be checked from what is committed**, because the config value has never been read and
-the 2026-10-08 log abbreviates it with ellipses. Until it is read, the parenthetical
-attribution in `docs/07` is an **unlabelled inference** — and `AGENTS.md` §6 item 1 is a
-claim without evidence, not a stylistic nit.
+string differs between the EU and US pointers, or one of the two records is wrong.
 
-**Blocker:** the value is only readable **while a response body is in hand**, and bodies are
-transient by design (`AGENTS.md` §7). It cannot be recovered after a sweep, and the value is
-one unauthenticated GET away — so the blocker is a harness, not a token or a budget:
+⚠ **The reason this is not checkable from the log — corrected 2026-10-13.** Area F first
+wrote that the value "has never been read". **That was false, and it was false against this
+repo's own record**: the 2026-10-08 pass read it and published it **ellipsised**
+([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md] — *"Every host
+below was disclosed only by the config"*). The true obstacle is narrower and worth stating
+precisely: **the committed record abbreviates exactly the segment the question turns on.** The
+ellipsis sits where the host's region and API-Gateway id live, and the length discrepancy is
+about that segment. So the disclosure is evidenced and the *arithmetic* is not re-derivable
+from what is committed — which is a different defect from an unevidenced claim, and the one
+actually worth someone's request budget.
+
+**Blocker:** the un-abbreviated string is readable only **while a response body is in hand**,
+and bodies are transient by design (`AGENTS.md` §7). It cannot be recovered after a sweep, and
+it is one unauthenticated GET away — so the blocker is a harness, not a token or a budget:
 **3 requests, 1 per patient deployment**, plus the recorded shapes already on disk.
 
-**Closes when:** the value is read on all three deployments and either (a) **matches** the
-recorded shape, or (b) the discrepancy is explained and the wrong record is corrected in
-place with the original kept visible. **A negative counts and is the more likely answer** —
-"the pointer does not name the gateway this repo probed" would be the more consequential
-result, and it closes this.
+**Closes when:** the string is read on all three deployments and either (a) its length
+accounts for the discrepancy against the recorded shape, or (b) the discrepancy is explained
+and the wrong record is corrected in place with the original kept visible. **A negative
+counts and is the more likely answer** — "the pointer does not name the gateway this repo
+probed" would be the more consequential result, and it closes this.
+
+**A note on the value itself, and a deliberate non-decision.** Whether the un-abbreviated
+`host` value may be published is **not settled here and not pre-committed**. Area F's first
+draft of this successor promised publication conditional on a scrub-list check; that has been
+**removed**, because deciding in advance whether a disclosure is publishable is a disclosure
+decision, and it belongs to a human holding the value — not to a research pass writing a
+placeholder. **What a reader should take from this row:** the question is answerable for
+**3 requests**, the answer decides nothing about the vendor's behaviour, and whether the
+answer becomes public is a separate call made by a person, with the value in hand and
+`scripts/scrub-patterns.txt` in front of them.
 
 **Assumptions (INFERRED):** that the 2026-10-08 shape record and the 2026-10-13 measurement
 describe the same field — the 2026-10-08 pass may have read a different deployment's value, or
-an abbreviated form that dropped a character. That the value is safe to publish if it matches
-the recorded shape — it must still be screened against `scripts/scrub-patterns.txt` first, and
-**if it matches any pattern, the digest and the shape go in and the value does not**.
+abbreviated in a way that dropped a character. Nothing above assumes the value is publishable.
 
 #### Successor to area F — what is in `/patient/configuration/messages/{lang}` now?
 

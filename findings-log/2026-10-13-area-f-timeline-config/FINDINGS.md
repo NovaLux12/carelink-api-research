@@ -51,6 +51,15 @@ Per-member types and digests — `timeline-keys.tsv`, `derived.json`:
 | `featureEnabled` | boolean | `true` | `true` | `true` |
 | `host` | string | 79 chars, `https` | 76 chars, `https` | 76 chars, `https` |
 
+⚠ **The two digest columns are two different conventions for the same member, and a
+reader comparing them would conclude one is wrong.** `timeline-keys.tsv` column 8 is
+`sha256(canon(member))` — the **canonical-JSON** encoding, so a string member hashes
+**with its quotes** (`.com` `host` → `fbc3c350…`). `derived.json`'s
+`member_shape.host.sha256` is `sha256` of the **raw string**, without quotes (same
+member → `24ee5564…`). Both are correct for what they claim; neither is re-derivable
+from the other, and `analyse.py` carries the distinction in a comment at the write
+site. **A hash is only comparable inside one convention.**
+
 **The member set is identical across all three deployments; the `host` value is
 not.** `featureEnabled` carries the same canonical digest on all three
 (`b5bea41b…`); `host` carries three distinct digests (`f81e6648…` / `24ee5564…` /
@@ -173,18 +182,40 @@ carried none; area E added one trials real-key 404 carrying
 `application/vnd.nervana`. The value is three-way and remains so
 (`text/vnd.a`, `application/vnd.nervana`, absent).
 
-**INFERRED, and it is the interesting part.** Within the *same* namespace
-(`/patient/configuration/system/`), an **absurd** fabricated name
-(`zzz.not.a.real.key.zzz`, areas W and E) returns `text/vnd.a`, while a
-**plausible-shaped** unpublished name (`personal.patient.timeline.host`, this pass)
-returns **no** content-type at all. That suggests the discriminator is the
-*plausibility of the requested name*, not area W's "control versus real key".
-**Assumption:** the header depends on the name rather than on some unseen property
-of the route state. **n = 1 per reading, so this is a hypothesis, not a finding.**
-It reopens if either reading is re-measured. `docs/04`'s standing instruction —
-do not discriminate on that odd content-type — is confirmed for the fifth time and
-this pass adds a second independent reason: two different 404s from the same
-namespace on the same host carry two different content-type behaviours.
+**INFERRED — and then falsified, in the next paragraph below. Both are kept.**
+Within the *same* namespace (`/patient/configuration/system/`), an **absurd**
+fabricated name (`zzz.not.a.real.key.zzz`, areas W and E) returns `text/vnd.a`,
+while a **plausible-shaped** unpublished name (`personal.patient.timeline.host`,
+this pass) returns **no** content-type at all. I first read that as: the
+discriminator is the *plausibility of the requested name*, not area W's "control
+versus real key". **Assumption stated:** the header depends on the name rather than
+on some unseen property of the route state. **n = 1 per reading.**
+
+> ⚠ **Retracted 2026-10-13 (verification). The hypothesis above is falsified by a
+> cell two paragraphs above it, and it is withdrawn.**
+>
+> Area E's trials **seq 127**, `personal.linking.request.interval`, is a
+> **real-key 404** — a 404 against a name in the committed candidate list, and that
+> name is **published** in the 69-name list (`keys.txt` line 48). It carries
+> **`application/vnd.nervana`**. So a *published, plausible* name produces a
+> content-type, which the plausibility reading predicts it would not. **The
+> hypothesis predicts the very cell it is placed beside.** `AGENTS.md` §6 item 2 is
+> the shape of the mistake: a pattern in two cells that a third cell contradicts.
+>
+> **What survives, stated honestly: nothing about the name.** Three values exist —
+> `text/vnd.a`, `application/vnd.nervana`, absent — and **no property of the
+> requested name separates them**, which is the opposite of what I proposed.
+>
+> **What this pass does contribute, and it is coverage, not explanation: 9 of 9 of
+> its own 404s carry no `content-type`, across all three deployments** — and,
+> unlike areas W and E, it probed the **namespace root level** (`/patient/…/version`
+> and `/patient/configuration/`), which no prior pass had. So the *root-level* 404
+> shape is observed for the first time, and it is the absent-value shape.
+>
+> `docs/04`'s standing instruction — do not discriminate on that odd content-type —
+> is confirmed again, and this pass adds a third independent reason: it now has a
+> counterexample for **every** candidate rule. The correct summary is the negative
+> one, and I should have written it the first time.
 
 ---
 
@@ -259,7 +290,13 @@ mtime (`body_mtime_ms`) that `curl -o` set at write time.
 seq 11 → 12 on `carelink.minimed.com`. **Seq 11 is the one row in 24 whose
 timestamps are impossible**: its `t_done` precedes its `t_sent` by **0.740 s**, and
 its body mtime precedes its `t_sent` by **0.744 s**. Every other row has a
-positive duration and a positive mtime-minus-`t_sent` offset (0.125–0.547 s).
+positive duration and a positive mtime-minus-`t_sent` offset (**0.045–0.547 s**).
+⚠ **Corrected 2026-10-13 (verification):** this range first read **0.125–0.547 s**,
+which was taken from the four rows printed during the run rather than from all 23.
+The minimum is seq 2 at **+0.045 s**; the corrected range is the one above. Harmless
+to the argument's direction — every one of the 23 is positive either way — but a
+number in a findings log that does not re-derive is the defect this repo keeps
+paying for, and the correction is recorded rather than quietly applied.
 
 **So the sequence the two oracles disagree on is precisely the sequence whose
 `date` readings are broken.** That is `docs/09` §4's finding reproduced on a new
@@ -314,6 +351,74 @@ that stops answering would. The cost is real and the brief asks for few pins, so
 the trade is recorded here rather than made silently: **a reader who wants these
 three rot-proof pays 6 requests per gate run.** Their current verdicts are in
 `results.jsonl`, and the suite's own budget is the deciding constraint.
+
+---
+
+## Correction (2026-10-13, verification round) — four defects in this pass, and one of them was mine alone
+
+Every measurement in this log was re-derived by a fresh-context verifier and held.
+These four were **not** measurement errors; they are wording, provenance and
+artefact-reproducibility defects, and they are appended here rather than edited into
+place. `AGENTS.md` §3: the retraction history *is* the evidence.
+
+**1. A false first-read claim, in three places.** This log's framing, `docs/04` and
+`docs/11` said the `host` value had **never been read**. **False, against this repo's
+own record:** the 2026-10-08 pass read it and published it ellipsised
+([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md] — *"Every
+host below was disclosed only by the config"*), which is how `docs/07` and the key table
+at `docs/04` already name this key as the disclosing one. **What was genuinely new is
+the SHAPE** — the member set, `featureEnabled`'s type and value, the per-deployment
+digests and lengths — and that claim (`FINDINGS.md` "Deliverable 1", *"the shape had
+never been read"*) **stands**. The three overstatements are narrowed to the shape, and
+the successor's stated reason is replaced: the obstacle is not an unread value, it is
+that **the committed record abbreviates exactly the segment the question turns on**.
+**I overstated novelty by generalising a true statement about one thing (the shape)
+into a false statement about another (the value).**
+
+**2. An INFERRED hypothesis that the repo's own record falsifies.** I proposed that
+the 404 `content-type` discriminator is *the plausibility of the requested name*.
+Falsified by area E's trials seq 127, `personal.linking.request.interval` — a
+**published, plausible** name carrying `application/vnd.nervana`. **The hypothesis
+predicted the very cell it was placed beside.** Withdrawn above, with the retraction
+kept visible, and restated honestly: three values exist and **no property of the
+requested name separates them**. Aggravating and separately fixed: my `docs/10`
+rewrite **dropped the word "real-key"** from the retained sentence about that cell —
+and that word is precisely what made the cell falsifying. **A faithful paraphrase
+deleted the evidence that refuted my own claim.** `AGENTS.md` §6 item 5, committed by
+a synthesis step.
+
+**3. A number that did not re-derive.** The other rows' mtime-minus-`t_sent` offsets
+read **0.125–0.547 s**; the correct range is **0.045–0.547 s** (seq 2). Taken from the
+four rows printed during the run instead of all 23. Fixed in this log and in
+`docs/09` §4, both sites, with the retraction visible.
+
+**4. The committed artefact did not match its committed generator.**
+`timeline-keys.tsv`'s column 8 read `member_canonical_sha256` while `analyse.py` wrote
+`host_member_sha256` — I renamed the header after the run and did not change the
+generator, so **re-running the committed generator could not reproduce the committed
+file.** In a commit whose stated purpose is *"two columns a stranger can re-hash"*
+this is the defect that mattered most. The generator now writes the name the artefact
+carries, which is also the accurate one (the column covers every member row, not only
+`host`). Separately, `derived.json` published
+`host_member_equals_top_level_key = false`, written as a **literal** at `analyse.py:289`
+and computing nothing — it read as a measurement. **No claim cited it**; deleted from
+both files with the reasoning recorded at the write site.
+
+**Non-blocking, also fixed:** (5) the two digest conventions are now stated in one
+sentence instead of two files disagreeing silently; (6) the all-zero-digest guard is
+**removed**, because the NULL check above it `continue`s first and `canon()` never
+yields `""` — it was unreachable, and the docstring advertised it as live; (7) both
+"this pin can fail" claims are now **settled offline and committed** as
+`pins-selftest.sh`, which proves a third member breaks the member-set pin, publishing
+the stale key breaks the absent-key pin, and neither a superstring nor a prefix
+satisfies the `^$` anchor — **zero vendor requests**, jq only; (8) the site the gate's
+`(\d+) pinned assertions` pattern cannot see is recorded as such in the PR.
+
+**A disclosure pre-commitment was withdrawn on request.** The successor originally
+promised to publish the un-abbreviated `host` value if it matched the recorded shape,
+gated on a scrub-list check. That is a disclosure decision taken in advance, and it is
+not a research pass's to make. **It is removed;** the successor now states the question
+and its 3-request cost and leaves publication to a human holding the value.
 
 ---
 
@@ -382,7 +487,11 @@ wording stays above and stays readable.
 | `defaultCountry` and `messages/en` are byte-identical across `.com` / `-trials`; `recaptcha/key` differs | OBSERVED | `derived.json` → `deliverable_3_dedicated_routes` sha256 fields |
 | `messages/en` is 22 B where the recorded `.eu` value `{"messages": []}` is 16 B; **content not claimed** | OBSERVED (length) / not claimed (content) | `results.jsonl` seq 15, 24 (`bytes`); `findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md` line 90 |
 | 9 of 9 404s in this pass carried **no** `content-type`; all 0 B, `x-cache: Error from cloudfront` | OBSERVED | `results.jsonl` seq 2, 3, 6, 8, 9, 12, 17, 18, 21 (`content_type` empty); `headers/carelink.minimed.eu--002-control-absent.h` |
-| an absurd fabricated name returns `text/vnd.a` while a plausible unpublished name returns none, in the same namespace on the same host | **INFERRED** (n=1 per reading; assumes the header tracks the name, not unseen route state) | `results.jsonl` seq 6 vs `findings-log/2026-10-13-area-w-per-key/FINDINGS.md` line 95–100 and `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 |
+| an absurd fabricated name returns `text/vnd.a` while a plausible unpublished name returns none, same namespace, same host | OBSERVED (both cells); the **INFERRED rule drawn from them is withdrawn** | `results.jsonl` seq 6 vs `findings-log/2026-10-13-area-w-per-key/FINDINGS.md` line 95–100 and `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 |
+| the falsifying cell: trials seq 127, `personal.linking.request.interval` — a **published** name — carries `application/vnd.nervana`, so **no property of the requested name separates the three values** | OBSERVED | `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 (`keys.txt` line 48 for the name being published) |
+| the namespace **root**-level 404 shape (`/patient/…/version`, `/patient/configuration/`) was never probed before this pass; all 3 hosts return 404 with no `content-type` | OBSERVED | `results.jsonl` seq 2, 3, 8, 9, 17, 18 |
+| the other rows' mtime-minus-`t_sent` offsets are **0.045–0.547 s** (23 rows) | OBSERVED | `results.jsonl` `body_mtime_ms` (first published 0.125–0.547 s — retracted, see the verification-round correction) |
+| both AREA F pins discriminate: a third member and a published stale key each break them; `^$` survives a superstring and a prefix | OBSERVED, **re-runnable, 0 requests** | `pins-selftest.sh` (jq only, fixtures built from the committed 69-name list) |
 | the per-key projection of `…timeline.config` equals its own host's bulk subtree, 3 of 3 | OBSERVED | `cell-digests.tsv` rows 1, 3, 5 |
 | split-on-`.` resolves `…timeline.config` to `null` while the literal key resolves to an object, 3 of 3 | OBSERVED | `derived.json` → `split_walk_control` |
 | measured spacing floor **2.542 s** from kernel body-mtimes; 0 of 21 gaps under 2.5 s | OBSERVED | `results.jsonl` `body_mtime_ms`; `run.log` |
@@ -393,5 +502,15 @@ wording stays above and stays readable.
 ## Files
 
 `FINDINGS.md` · `probe.sh` (harness as sent) · `analyse.py` (post-sweep derivation,
-run while bodies were in hand) · `results.jsonl` (24 rows) · `run.log` · `headers/`
-(24 captures) · `cell-digests.tsv` · `timeline-keys.tsv` · `derived.json`
+run while bodies were in hand) · `pins-selftest.sh` (proves the six AREA F pins can
+fail — jq only, **zero vendor requests**) · `results.jsonl` (24 rows) · `run.log` ·
+`headers/` (24 captures) · `cell-digests.tsv` · `timeline-keys.tsv` · `derived.json`
+
+**Artefact / generator consistency, after the verification round.** `timeline-keys.tsv`
+and `cell-digests.tsv` are both written by `analyse.py`, and both now match their
+generator's column headers exactly. **They are still not byte-reproducible from a
+re-run**, and could not be: the bodies are deleted when the sweep ends
+(`AGENTS.md` §7), so a re-run re-derives them from a fresh fetch, and the per-cell
+digests are a property of what the vendor served on the day. `pins-selftest.sh` **is**
+byte-reproducible offline and is the part of the generator a stranger can verify
+without the network.
