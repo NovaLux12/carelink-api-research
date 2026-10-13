@@ -1106,7 +1106,7 @@ not probed).
 The 2026-10-14 re-issue of the seven indeterminate crawls (`findings-log/2026-10-13-area-l-7crawl-reissue`,
 issue #79) added a capture the earlier readings did not have: `carelink.minimed.eu`
 `/ipro/hcp/login.jsf` **200** on `CC-MAIN-2014-10` at **2014-03-10**, confirmed on the same
-crawl by `matchType=host` (worker seqs 19 and 22). The two statements above that the family's
+crawl by `matchType=host` (worker seqs 21 and 22 — seq 19 was a `504` gateway failure). The two statements above that the family's
 earliest Common Crawl member opened at **2020-05-27 21:29:18** (and, before the round-3 correction,
 **2020-05-25**) are therefore superseded for `CC-MAIN-2014-10` and the crawls that read. They
 are left in place as the dated record of prior readings; this note does not erase them. The
@@ -1115,7 +1115,7 @@ lower bound in the Common Crawl record is now **2014-03-10**, and the 2013 end
 that re-issue. Area L stays open — per-member host/date enumeration is incomplete — and the
 per-crawl supplemental control for three of those crawls is at
 `findings-log/2026-10-13-area-l-7crawl-reissue/SUPPLEMENT-2026-10-14-ipro-early-crawl-controls.md`
-(OBSERVED, [source: findings-log/2026-10-13-area-l-7crawl-reissue/FINDINGS.md F2; ledger seq 19, 22]).
+(OBSERVED, [source: findings-log/2026-10-13-area-l-7crawl-reissue/FINDINGS.md F2; ledger seqs 21, 22]).
 
 
 **⚠ CORRECTED 2026-10-13, in this pass's own first draft:** that draft also

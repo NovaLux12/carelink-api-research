@@ -56,7 +56,7 @@ the answer (502/504 → a final answer) is retained as separate ledger rows.
 | CC-MAIN-2015-22 | 24 502, 25 200 | **200** | 1 | 26 200 | **200** | 1 | 0 (`carelink.minimed.eu` `/`, 2015-05-29, no ipro) | capture, root only |
 | CC-MAIN-2021-04 | 29 404 | **404** | 0 | 30 404 | **404** | 0 | 0 | **readable absence** |
 | CC-MAIN-2021-25 | 33 504, 34 502, 35 200 | **200** | 2 | 36 200 | **200** | 2 | 0 (`/patient/entry.jsp` 403, `/robots.txt` 403) | capture, no ipro |
-| CC-MAIN-2022-05 | 38 404 | **404** | 0 | 39 504, 40 404 | **404** (host, behind domain control) | 0 | 0 | **readable absence** (domain scope) |
+| CC-MAIN-2022-05 | 38 404 | **404** | 0 | 39 504, 40 404 | **404** (host, behind domain control) | 0 | 0 | **readable absence** (domain scope) — *retracted 2026-10-14; see Correction below; independent control unavailable* |
 
 ## Findings
 
@@ -67,7 +67,9 @@ behind positive controls on the same crawl (commoncrawl.org / google.com, `200`,
 §6 ("a cell reads as an absence only if some row for that crawl answered 200"),
 these two counts are readable absences, and so is the adjacent
 `CC-MAIN-2021-04` (commoncrawl.org control, `404`) and `CC-MAIN-2022-05`
-(commoncrawl.org control, domain `404`). **OBSERVED.**
+(`404` on domain, *independent control unavailable in the 2026-10-14 supplement —
+absence weight retracted; see Correction (2026-10-14) below*). **OBSERVED for the
+three controlled cells; `CC-MAIN-2022-05` absence now INFERRED/unresolved.**
 
 **F2 — The family extends into 2014, nine months before the previously recorded
 earliest member.** `CC-MAIN-2014-10` returns one record: `carelink.minimed.eu`
@@ -128,3 +130,27 @@ crawl, and is recorded as such per `findings-log/2026-10-13-area-l-ipro-hcp`
 - [findings-log/2026-10-13-area-l-early-crawl-reissue/FINDINGS.md] — successor three-crawl re-issue, host-scope indeterminacy.
 - [docs/09-methodology-and-oracles.md] §4 — oracle and spacing rules.
 - [docs/11-suggested-research-areas.md] §L — close conditions.
+
+## Correction (2026-10-14) — CC-MAIN-2022-05 absence retracted
+
+The `CC-MAIN-2022-05` readable-absence claim in F1 and the closing table above
+was made on a domain-scoped `404` backed by `commoncrawl.org` seq 37 (`200`, 5
+records) in the original 2026-10-13 pass. The 2026-10-14 supplemental pass
+([findings-log/…/SUPPLEMENT-2026-10-14-ipro-early-crawl-controls.md]) attempted an
+independent replication: both `commoncrawl.org` and `google.com` controls returned
+`504` on `CC-MAIN-2022-05`, while the minimed `404`s (domain and host scope)
+answered. Because no positive control succeeded on that crawl, its `404` carries
+no absence weight under this repo's own rule, and the earlier "readable absence"
+claim is **retracted in prose sense only** — the original cells stay in the
+ledger unchanged (append-only). The corrected statement:
+
+- **OBSERVED (2026-10-13):** domain and host probes returned `404` for
+  minimed.eu under a control that *other crawls* used successfully, and the catch
+  above is not repeated in the supplement.
+- **UNRESOLVED (2026-10-14):** no independent positive control exists, so the
+  entry cannot be promoted to a readable absence. The 2020 → 2022 "bounded
+  deployment" reading in F5 therefore stands **without** the 2022-05 absence as
+  support; it is supported by `CC-MAIN-2022-21` only (`/robots.txt` 403,
+  nothing under `/ipro/hcp/`).
+- **What would settle it:** one successful control host on `CC-MAIN-2022-05`
+  followed by the minimed probe, or retirement of the crawl as unservable.
