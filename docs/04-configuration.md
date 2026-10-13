@@ -152,7 +152,7 @@ findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md].
 | pointer subtree | named? | selector exported as | property reads |
 |---|---|---|---|
 | **`csr.cumulus.periodic.data.endpoints`** | yes (byte 2188929) | `cO` | **1 genuine read** |
-| **`system.gc.gz.transition.flags`** | yes (byte 2189123) | `z2` | **0 — the substring `.z2` occurs nowhere in the file** |
+| **`system.gc.gz.transition.flags`** | yes (byte 2189121) | `z2` | **0 — the substring `.z2` occurs nowhere in the file** |
 
 **OBSERVED.** At byte 3373465 the bundle reads the first subtree, destructures
 `display_message` and POSTs it:
@@ -218,10 +218,23 @@ now committed at
 > `csr.cumulus.periodic.data.endpoints.display_message` the contrast above is built on.
 > Both reads are gated on `csrEnabled`.
 >
-> **And the value is used, not merely read.** Bytes 69458–69866 of the same chunk are
-> one unbroken run: `E = h.messageEndpoint` → the M2M URL template → `y = …E…` →
-> `getPeriodicDataWithPost({ reqUrl: y, … })`. **The flags subtree selects the URL that
-> is POSTed** [source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §4].
+> **And the value is used, not merely read.** **THE RUN is bytes 69458–69866** of the
+> same chunk, one unbroken stretch: `E = h.messageEndpoint` → the M2M URL template →
+> `y = …E…` → `getPeriodicDataWithPost({ reqUrl: y, … })`. **The flags subtree selects
+> the URL that is POSTed** [source:
+> findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §4].
+>
+> **The POST is cited, not inferred from its name.** At chunk byte **61803** the method
+> is defined: `getPeriodicDataWithPost({reqUrl:b,…}){return this.http.post(b,{…},{observe:"response"})}`.
+> So `reqUrl: y` destructures to `b`, and `b` is what reaches `this.http.post` — the
+> value read out of the flags selector **is the string handed to the HTTP client**
+> [source: `resolve.txt` §C A8].
+>
+> ⚠ **Corrected 2026-10-13, verification round 2 — two offsets in the round-1 version of
+> this note pointed at the evidence rather than the token.** Byte 22260 holds
+> `.z2).pipe(…)`; `select(_.z2)` starts at **22252**. Byte 70054 holds the same; the
+> read is at **70046**. Both are now asserted with `re.match` at the offset
+> [`resolve.txt` §A].
 >
 > **The corrected claim, stated once:** for the **patient** build, the shipped web
 > client **does follow both** CSR pointers. Area V's "`transition.flags` is named and
@@ -236,8 +249,10 @@ now committed at
 > **A second, separate positive from the same sweep**, because it is a patient-plane
 > address this page does not carry: the lazy chunks also hard-code
 > `this.baseUrl="/patient/csr"` and
-> `this.baseUrl="/patient/csr/safety/notice/definitions"` — **12 endpoint literals
-> across 7 chunks**, recorded in **no** `docs/` page before now. **OBSERVED as code
+> `this.baseUrl="/patient/csr/safety/notice/definitions"` — **19 method × path shapes
+> over 16 distinct path templates**, from 10 raw literals in 7 chunks, recorded in
+> **no** `docs/` page before now. The counting rule and its exclusions are in
+> [`docs/06`](06-patient-api-surface.md) and `patient-csr.txt`. **OBSERVED as code
 > literals; liveness is UNOBSERVED** — nothing was requested against them. Note the
 > direction: these are hard-coded **constants**, the opposite of a config-following
 > client, so they strengthen rather than weaken the discovery negative. See

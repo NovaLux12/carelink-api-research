@@ -8,52 +8,58 @@
 A. CITED OFFSETS IN THE LAZY CHUNK 6746.c6795ff7e9ff468d.js (101,594 B)
 ==============================================================================
 byte   module    span      what is there
-579    16746     177-32151 read 1 import: module 16746 binds the config module
-       text: 'o(4265),fe=o(31451),$=o(51044),me=o(86195),t=o(59567),K=o(43064),pe=o(86332),H=o(58572);le'
-       match at this offset: YES
-22260  16746     177-32151 read 1: the select of the alias, module 16746
-       text: '.z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMes'
-       match at this offset: YES
-66109  59567     65786-84396 read 2 import: module 59567 binds the same config module
-       text: 'o(4265),Q=o(68940),se=o(86207),j=o(56358),B=o(25653),te=o(89248),le=o(22281),xe=o(43064),P'
-       match at this offset: YES
-67573  59567     65786-84396 getMessageRequest CALL SITE, module 59567
-       text: 'getMessageRequest(n.username,v.username,O,c,h).pipe((0,_e.n)(E=>{if(204==E.status||206==E.'
-       match at this offset: YES
-67391  59567     65786-84396 getGuardianEndpoint DEFINITION, module 59567
+577    16746     177-32151 read 1 import: module 16746 binds the config module
+       text: '_=o(4265),fe=o(31451),$=o(51044),me=o(86195),t=o(59567),K=o(43064),pe=o(86332),H=o(58572);'
+       anchored at this offset: YES
+22252  16746     177-32151 read 1: the select of the alias, module 16746
+       text: 'select(_.z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDi'
+       anchored at this offset: YES
+66107  59567     65786-84396 read 2 import: module 59567 binds the same config module
+       text: 'F=o(4265),Q=o(68940),se=o(86207),j=o(56358),B=o(25653),te=o(89248),le=o(22281),xe=o(43064)'
+       anchored at this offset: YES
+61803  43064     61690-62146 THE POST DEFINITION: reqUrl destructured to b, b is posted
+       text: 'getPeriodicDataWithPost({reqUrl:b,username:Me,role:re,patientId:ge}){return this.http.post'
+       anchored at this offset: YES
+67391  59567     65786-84396 getGuardianEndpoint CALL SITE: the result is stashed as guardianEndpointData
        text: 'getGuardianEndpoint()}).pipe((0,d.s)(1),(0,_e.n)(({userProfile:n,bleEndpoint:c,guardianEnd'
-       match at this offset: YES
-69249  59567     65786-84396 getMessageRequest DEFINITION, module 59567
+       anchored at this offset: YES
+67573  59567     65786-84396 getMessageRequest CALL SITE: guardianEndpointData arrives as the 5th arg h
+       text: 'getMessageRequest(n.username,v.username,O,c,h).pipe((0,_e.n)(E=>{if(204==E.status||206==E.'
+       anchored at this offset: YES
+69249  59567     65786-84396 getMessageRequest DEFINITION: h is its 5th parameter
        text: 'getMessageRequest(i,v,n,c,h){const O=this.userService.isCarePartner()?Be.CARE_PARTNER:Be.P'
-       match at this offset: YES
+       anchored at this offset: YES
 69458  59567     65786-84396 the value is unpacked: E = h.messageEndpoint
        text: 'const L=h.useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.'
-       match at this offset: YES
-69567  59567     65786-84396 the M2M template literal (the /patient/m2m branch)
+       anchored at this offset: YES
+69567  59567     65786-84396 the M2M branch of the URL template
        text: '/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?c'
-       match at this offset: YES
-69787  59567     65786-84396 the endpoint value is substituted into the URL
-       text: '.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodic'
-       match at this offset: YES
-69866  59567     65786-84396 THE POST: the URL built above is the request body URL
+       anchored at this offset: YES
+69786  59567     65786-84396 the endpoint value is substituted into the URL
+       text: 'E.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodi'
+       anchored at this offset: YES
+69866  59567     65786-84396 THE POST CALL: the URL built above is its reqUrl
        text: 'getPeriodicDataWithPost({reqUrl:y,username:i,patientId:v,role:O}):this.connectHttpService.'
-       match at this offset: YES
-70054  59567     65786-84396 read 2: the select of the alias, module 59567
-       text: '.z2).pipe((0,x.T)(({displayMessage:v})=>{const n=this.userService.isCarePartner()?v.carepa'
-       match at this offset: YES
+       anchored at this offset: YES
+69982  59567     65786-84396 getGuardianEndpoint DEFINITION, module 59567
+       text: 'getGuardianEndpoint(){const i=ee.c.csrEnabled;return this.store.select(F.z2).pipe((0,x.T)('
+       anchored at this offset: YES
+70046  59567     65786-84396 read 2: the select of the alias, module 59567
+       text: 'select(F.z2).pipe((0,x.T)(({displayMessage:v})=>{const n=this.userService.isCarePartner()?'
+       anchored at this offset: YES
 
 ==============================================================================
 B. CITED OFFSETS IN THE EAGER MAIN BUNDLE main.6595daf83bd6d4b1.js (3,417,255 B)
 ==============================================================================
-2189123  module 51551    the key constant: guardianCumulusPeriodicAPI = the dotted key
-       text: 'guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entr'
-       match at this offset: YES
-93819    module 4265     the selector over that key: be = createSelector(f, gt => gt.guardianCumulusPeriodicAPI)
-       text: 'guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),ae=(0,e.Mz)(f,gt=>gt.capt'
-       match at this offset: YES
+2189121  module 51551    the key constant: guardianCumulusPeriodicAPI = the dotted key
+       text: 'D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.en'
+       anchored at this offset: YES
+93798    module 4265     the selector over that key: be = createSelector(f, gt => gt.guardianCumulusPeriodicAPI)
+       text: 'be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),ae=('
+       anchored at this offset: YES
 91992    module 4265     module 4265's export table maps z2 to be
        text: 'z2:()=>be});var e=i(86332),a=i(61435),n=i(10319),o=i(86437),g=i(17762),h=i(88447);const t='
-       match at this offset: YES
+       anchored at this offset: YES
 
 ==============================================================================
 C. THE ASSERTIONS — each one is allowed to fail
@@ -65,17 +71,39 @@ A4  `be` selects `gt.guardianCumulusPeriodicAPI`         : PASS
 A5  ... is assigned `system.gc.gz.transition.flags`      : PASS
 A6  every `.z2` in the chunk is in a 4265-importing module: 2 occurrence(s) -> PASS
 A6b the binding is `_` or `F` at each read               : PASS
-A7  h.messageEndpoint -> y -> getPeriodicDataWithPost   : PASS
+A7  THE FLOW, each component anchored at its OWN byte
+A7    the value is unpacked into E               @69458  ok
+A7    the M2M branch of the template             @69567  ok
+A7    the endpoint value is substituted          @69786  ok
+A7    THE POST carries it as reqUrl              @69866  ok
+A7  ALL FOUR ANCHORED                              PASS
 
-    the contiguous run, bytes 69458-69900, verbatim:
-    'const L=h.useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.getIsM2MEnabled()?`/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${(new Date).getTime()}`;return h.useCumulusUrls&&(y=O!==Be.CARE_PARTNER||L?E:E.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodicDataWithPost({reqUrl:y,'
+A8  THE POST DEFINITION, chunk byte 61803 — what the method does with reqUrl
+A8    'getPeriodicDataWithPost({reqUrl:b,username:Me,role:re,patientId:ge}){return this.http.post(b,{username:Me,role:re,patientId:ge},{observe:"response"})}'
+A8    reqUrl is destructured to b                @61803  ok
+A8    ...and b is what this.http.post receives   @61803  ok
+A8  BOTH ANCHORED                                  PASS
 
-    and the method's own head, byte 69249:
-    'getMessageRequest(i,v,n,c,h){const O=this.userService.isCarePartner()?Be.CARE_PARTNER:Be.PATIENT;if(n===I.v.BLE)return this.connectHttpService.getPeriodicDataWithPost({reqUrl:c,username:i,patientId:v,role:O});const L=h.us'
+A8  This closes the loop. `reqUrl: y` at 69866 destructures to `b` at 61803, and
+A8  `this.http.post(b, ...)` is the call — so the value read out of the
+A8  system.gc.gz.transition.flags selector is the STRING HANDED TO THE HTTP CLIENT,
+A8  not merely passed to a function with a suggestive name.
 
-A8  `.z2` is read 0 times in the EAGER main bundle       : 0  -> PASS
+A8  THE RUN is bytes 69458-69866 (claim boundary). THE WINDOW printed below is
+A8  bytes 69458-69898 -- a printing convenience, NOT a claim boundary.
+A8    'const L=h.useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.getIsM2MEnabled()?`/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${(new Date).getTime()}`;return h.useCumulusUrls&&(y=O!==Be.CARE_PARTNER||L?E:E.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodicDataWithPost({reqUrl:'
+
+A8  and the method's own head, byte 69249:
+A8    'getMessageRequest(i,v,n,c,h){const O=this.userService.isCarePartner()?Be.CARE_PARTNER:Be.PATIENT;if(n===I.v.BLE)return this.connectHttpService.getPeriodicDataWithPost({reqUrl:c,username:i,patientId:v,role:O});const L=h.us'
+
+A9  `.z2` is read 0 times in the EAGER main bundle       : 0  -> PASS
     (area V's measurement, re-measured here; it is what makes the chunk read
      a finding about the LAZY corpus rather than a contradiction of area V)
+
+SELF-CONSISTENCY
+  lines printed as FAIL            : 0
+  entries in `failures`            : 0
+  -> consistent
 
 ==============================================================================
 VERDICT: all assertions PASS.

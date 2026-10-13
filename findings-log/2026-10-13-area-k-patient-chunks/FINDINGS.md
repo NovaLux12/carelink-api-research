@@ -21,7 +21,7 @@ negative is scoped to the eager bundle, and the scope was load-bearing at every 
 
 **Lazy chunk `6746.c6795ff7e9ff468d.js` reads it — twice, in two different modules, and
 the value it reads flows into the URL that is then POSTed.** Both reads bind module id
-**4265** (`_=o(4265)` at byte 579, `F=o(4265)` at byte 66109), and module `4265` is
+**4265** (`_=o(4265)` at byte 577, `F=o(4265)` at byte 66107), and module `4265` is
 **defined in the main bundle at byte 91298**, whose export table maps `z2:()=>be`, where
 `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and
 `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"`. So this is not a
@@ -48,8 +48,9 @@ the captures were still on disk.
    `application/javascript`, 21,157 B**. §2.
 2. **`baseUrl` in the lazy chunks is not area V's CMS base at all -- it is a hard-coded
    patient API base**, `this.baseUrl="/patient/csr"` and
-   `this.baseUrl="/patient/csr/safety/notice/definitions"`, carrying **12 endpoint
-   literals across 7 chunks** that appear in **no `docs/` page**. OBSERVED as code;
+   `this.baseUrl="/patient/csr/safety/notice/definitions"`, carrying **19 method x
+   path shapes across 16 distinct path templates in 7 chunks** — none of which appears
+   in any `docs/` page. OBSERVED as code;
    **liveness unobserved in both directions** -- nothing was requested. This is the
    pass's **second positive**, and it was a measured token the first version of this log
    left in no table and no prose at all. Section 5.
@@ -308,14 +309,14 @@ offset in the named body.
 
 | # | Link | Where | Class |
 |---|---|---|---|
-| 1 | `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | main bundle, byte **2189123**, module `51551` | OBSERVED |
-| 2 | `f=(0,e.Mz)(t,gt=>gt.configuration)`, `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` | main, byte **93819**, module `4265` | OBSERVED |
+| 1 | `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | main bundle, byte **2189121**, module `51551` | OBSERVED |
+| 2 | `f=(0,e.Mz)(t,gt=>gt.configuration)`, `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` | main, byte **93798**, module `4265` | OBSERVED |
 | 3 | module `4265`'s export table contains `z2:()=>be`, and also `cO:()=>ne` and `X2:()=>ye` | main, byte **91298** | OBSERVED |
 | 4 | `.z2` occurs **0 times** in the main bundle | main (re-measured; area V's claim) | OBSERVED |
-| 5 | chunk `6746` module `16746` binds `_=o(4265)` | chunk, byte **579** | OBSERVED |
-| 6 | chunk `6746` module **`59567`** binds `F=o(4265)` | chunk, byte **66109** | OBSERVED |
-| 7 | **read 1** `select(_.z2).pipe(({displayMessage:l})=>…)` | chunk, byte **22260** | OBSERVED |
-| 8 | **read 2** `this.store.select(F.z2).pipe(({displayMessage:v})=>…)` | chunk, byte **70054** | OBSERVED |
+| 5 | chunk `6746` module `16746` binds `_=o(4265)` | chunk, byte **577** | OBSERVED |
+| 6 | chunk `6746` module **`59567`** binds `F=o(4265)` | chunk, byte **66107** | OBSERVED |
+| 7 | **read 1** `select(_.z2).pipe(({displayMessage:l})=>…)` | chunk, byte **22252** | OBSERVED |
+| 8 | **read 2** `this.store.select(F.z2).pipe(({displayMessage:v})=>…)` | chunk, byte **70046** | OBSERVED |
 
 Links 5+6 are why this is not the alias trap this repo has been bitten by twice: a
 two-character minified export is **not** unique, and area V said so about its own `.bQ`
@@ -349,7 +350,8 @@ structural match to area T's published subtree, not merely to a token.
 > attributed read 2 to module `56358`. That is wrong and is corrected here.**
 > Module `56358` occupies bytes **65421–65785** and its body is a device-settings
 > enum (`d.CALIBRATION="CALIBRATION"`, `d.AUTO_BASAL_DELIVERY…`). Bytes 66109, 67348,
-> 67391, 67573, 69567, 70054 and 70254 are all inside module **`59567`**, which spans
+> The bytes 67391 (the `getGuardianEndpoint` CALL SITE), 67573, 69567, 70046 and
+> 70254 are all inside module **`59567`**, which spans
 > **65786–84396**. The binding, the offsets and the positive are unaffected; only the
 > module id was wrong. `resolve.py` now resolves **every** cited offset to its
 > enclosing module and prints the span, so the id is a derived value rather than an
@@ -357,8 +359,16 @@ structural match to area T's published subtree, not merely to a token.
 > to fail (`resolve.txt` §C, A6).
 
 **And the value is used, in the same chunk**, in `getMessageRequest` — **definition at
-byte 69249** in module `59567`, with the call site at byte **67573** and
-`getGuardianEndpoint` defined at **67391**. The flow, at exact offsets:
+byte 69249** in module `59567`, **called** at byte **67573**. The flow, at exact
+offsets:
+
+> **⚠ Corrected 2026-10-13 (verification round 2): `getGuardianEndpoint`'s call site and
+> definition were swapped.** An earlier version of this log gave **67391** as the
+> *definition*. It is the **call site** — `guardianEndpointData:this.getGuardianEndpoint()`
+> inside a factory object. The **definition** is at **69982**:
+> `getGuardianEndpoint(){const i=ee.c.csrEnabled;return this.store.select(F.z2)…`.
+> The verifier's trace had this right and this log had it backwards; the substance
+> is unchanged and the chain is now stated in the order the bytes actually run.
 
 ```js
 // byte 69458 — the value is unpacked out of the object getGuardianEndpoint() returned
@@ -367,7 +377,7 @@ const L = h.useCumulusUrls && this.isCsrEnabled, E = h.messageEndpoint;
 let y = `${this.userService.getIsM2MEnabled()
       ? `/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`
       : "/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${(new Date).getTime()}`;
-// byte 69787 — the published endpoint value is substituted into the URL
+// byte 69786 — the published endpoint value is substituted into the URL
 return h.useCumulusUrls && (y = O!==Be.CARE_PARTNER || L ? E
                               : E.replace("{patientUsername}", encodeURIComponent(v))),
 // byte 69866 — THE POST, and `y` is its reqUrl
@@ -375,9 +385,13 @@ return h.useCumulusUrls && (y = O!==Be.CARE_PARTNER || L ? E
          : this.connectHttpService.getPeriodicDataWithGet(y);
 ```
 
-**The chain is contiguous, not inferred across a gap.** Bytes **69458–69866** are one
-unbroken run of the same method, printed verbatim in `resolve.txt` §C/A7, and
-`getMessageRequest`'s own definition at **69249** shows `h` is its fifth parameter. So
+**The chain is contiguous, not inferred across a gap.** **THE RUN is bytes
+69458–69866** — derived, not chosen: it begins at
+`const L=h.useCumulusUrls…E=h.messageEndpoint` and ends at the `g` of
+`getPeriodicDataWithPost({reqUrl:y`. `resolve.py` prints **THE WINDOW, bytes
+69458–69898**, which is 32 bytes longer purely so the tail of the POST call is
+visible; **the window is not a claim boundary.** `getMessageRequest`'s own definition
+at **69249** shows `h` is its fifth parameter. So
 `h.messageEndpoint` — a field of the object `getGuardianEndpoint()` built from the
 `system.gc.gz.transition.flags` selector — is assigned to `E`, folded into `y`, and
 passed as `reqUrl` to a POST. **The flags subtree does not merely get read: it selects
@@ -386,10 +400,17 @@ the URL that is POSTed.**
 > **Link 9, settled 2026-10-13 (verification round 1).** The first version of this log
 > asserted the flow from a ~200-byte window that stopped short of the POST call, and a
 > verifier declined to sign CONFIRMS on it — correctly, because "the value is used
-> somewhere in this method" is not the claim being made. Bytes **69300–69700** are now
-> printed in full above and in `resolve.txt`; the POST is at **69866**. **No request was
-> needed** — the bodies were still on disk, so this cost none of the 15 remaining
-> cap, and the ledger stays at 215 rows.
+> somewhere in this method" is not the claim being made. **THE RUN, 69458–69866, is
+> now printed in full** above and in `resolve.txt`; the POST is at **69866**.
+> **No request was needed** — the bodies were still on disk, so this cost none of the
+> 15 remaining cap, and the ledger stays at 215 rows.
+
+> **⚠ Corrected 2026-10-13 (verification round 2): this log stated the same claim with
+> THREE different ranges — "69458–69866", "bytes 69300–69700 are printed in full", and
+> `resolve.py`'s own slice, which actually prints 69458–69898. None of the three
+> agreed with any other.** One is a claim boundary, one is a display window, and the
+> third was a third thing. `resolve.py` now labels both, in its own output, so the
+> two cannot be conflated by a reader who only sees the numbers.
 
 **So the flags subtree is not merely read — `useCumulusUrls` and `messageEndpoint`
 select the URL that is then POSTed.** That is the vendor's own CSR pointer
@@ -425,6 +446,54 @@ mirroring area V's eager-bundle call site. So **`6746` carries both CSR consumer
 and the pointer area V followed in the main bundle is followed here too.
 
 ---
+
+## 4a. Verification round 2 — what the anchored check caught
+
+Two of these are the pass's own worst habit, caught by the tool the pass wrote to
+catch bad bytes. Both are recorded here rather than quietly repaired.
+
+> **The offset check could not fail.** `resolve.py` asserted each cited byte with
+> `re.search(pat, body[off-40 : off+120])` — a **neighbourhood** match. Prepending one
+> byte to the chunk left every pattern matching while every printed offset and module
+> span became wrong by one, and the script printed `VERDICT: all assertions PASS`. Its
+> own docstring claimed it "cannot report a clean run over a body that no longer
+> supports the claim." **It could, and did.** Fixed by `re.match` at the offset
+> (`resolve.py`'s `anchored()`).
+>
+> **And the fix immediately falsified seven of my own published offsets.** They pointed
+> at the position of the *evidence* rather than the start of the *token* — byte 579
+> holds `o(4265),…` while `_=o(4265)` starts at **577**; 22260 → **22252**; 66109 →
+> **66107**; 70054 → **70046**; 69787 → **69786**; main-bundle 93819 → **93798**;
+> 2189123 → **2189121**. `AGENTS.md` §6 item 6 in offset form: a citation that does not
+> resolve at the place it names. The corrected values are the ones in §4 and in
+> `resolve.txt`, and all sixteen cited offsets are now asserted with `re.match`.
+>
+> **A guard that could not fire, found by the harness rather than by reading.** While
+> renumbering the assertions, A9's guard was left reading `if not a8:` while assigning
+> `a9` — and `a8` is the *POST-definition* flag, which is True. So A9 printed
+> `FAIL` and the script still **exited 0**. `resolve.py` now cross-checks its own
+> printed FAIL lines against its recorded failures and fails itself when they
+> disagree.
+>
+> **The mutation test is committed, not promised.** `resolve-mutants.py` applies **12**
+> mutations to throwaway copies — including the 1-byte prepend — and requires a
+> non-zero exit with a named failure from each, plus **1 control** that must stay
+> green. **12 of 12 caught, 1 of 1 control behaved** (`resolve-mutants.txt`). The
+> 1-byte prepend is now caught with
+> `A-offset read 1 import … at byte 577: expected '_=o(4265)'`.
+>
+> **"12 endpoint shapes" was a subset, and no rule produced it.** Chunk `5750` carries
+> **four** `/patient/csr` offsets — `[775, 855, 985, 1076]`, all four already in this
+> pass's own `tables.txt` §T3 — and the route table named one. Re-derived under a
+> recorded rule (`patient-csr.py` → `patient-csr.txt`), a shape being one distinct
+> **(method, path template)** pair: **19 shapes over 16 templates**, from **10 raw
+> literals in 7 chunks**, with **7 calls excluded** because their first argument is a
+> bare identifier and the URL comes from the caller. Three things moved that number and
+> all three are in the rule: **ternaries count as both branches** (the 5750 ternaries);
+> **a bare `this.baseUrl` is a shape, not an exclusion**; and **a runtime slot's NAME is
+> a minifier artefact** — the same slot is `{t}`, `{o}` and `{c}` in three builds of one
+> service, so slots are renumbered by position, without which the three safety/notice
+> chunks never deduplicate against each other and the count triples.
 
 ## 5. The negative — and every hit that has to be accounted for
 
@@ -539,9 +608,10 @@ addresses them by **constant**, with no config field and no discovery document i
 **It is NOT an existence claim.** No request was sent to any `/patient/csr/*` path:
 these are outside the area's candidate list, and the area's scope was the discovery
 token set. **Whether the routes are live is UNOBSERVED in both directions**, and these
-12 endpoint shapes appear in **no `docs/` page** — I checked before writing this, and
-they are absent from `docs/06-patient-api-surface.md` and from every other canonical
-page.
+**19 method x path shapes over 16 distinct path templates** appear in **no `docs/`
+page** — I checked before writing this, and they are absent from
+`docs/06-patient-api-surface.md` and from every other canonical page. The counting
+rule, the raw evidence and the exclusions are in `patient-csr.txt`.
 
 This **strengthens** the negative in §5 rather than weakening it: the lazy chunks do
 not read the discovery document, and where they *do* carry API addresses they are
@@ -675,15 +745,15 @@ one row per cell.
 | Runtime re-fetched; **211 entries re-derived from `f.u`**, `f.p=""` (asset root) | OBSERVED | `runtime-map.txt`; `results.jsonl` seq 3 |
 | Controls 1–3 reproduce area V's three digests **byte for byte**; the build has not bumped in 5½ hours | OBSERVED | `results.jsonl` seq 1, 2, 3 |
 | CORRECTED 2026-10-13 (verification round 1): **211 real chunks = 210 `SWEEP-*` 200s + 1 `FOLLOWUP` 200**, counting rule = `200` + `application/javascript`, asserted against the committed list and **exiting non-zero on disagreement**. The first version selected on `role.startswith("SWEEP-")`, counting the 196 B error page as a chunk and dropping the real 21,157 B one. **211 distinct digests**, 0 duplicates, 0 empty, **2,874,939 B** (was mis-reported as 2,853,978) | OBSERVED | `tables.txt` §T4; `tables.py` counting rule |
-| **Lazy chunk `6746.c6795ff7e9ff468d.js` reads the `system.gc.gz.transition.flags` selector twice** — bytes 22260 and 70054 | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3; `resolve.txt` §A |
+| **Lazy chunk `6746.c6795ff7e9ff468d.js` reads the `system.gc.gz.transition.flags` selector twice** — bytes 22252 and 70046 | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3; `resolve.txt` §A |
 | CORRECTED 2026-10-13 (verification round 1): read 1 is in module **`16746`** (177–32151) and read 2 in module **`59567`** (65786–84396). The first version attributed read 2 to `56358`, whose body is a device-settings enum at 65421–65785 | OBSERVED | `resolve.txt` §A |
 | Both reads bind **module id 4265**; module `4265` is **one contiguous 5,842 B span** at main-bundle bytes 91298–97139 and its export table maps `z2:()=>be` | OBSERVED | `resolve.txt` §C A1–A3 |
-| `z2` resolves to `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | OBSERVED | main bundle bytes 93819, 2189123; `resolve.txt` §C A4–A5 |
-| **The value demonstrably flows into the POSTed URL**: `E=h.messageEndpoint` at **69458** → the template → `y=…E…` at **69787** → `getPeriodicDataWithPost({reqUrl:y` at **69866**, one contiguous run inside `getMessageRequest` (defined **69249**, module `59567`). Bytes 69300–69700 printed in full | OBSERVED | `resolve.txt` §C A7 |
+| `z2` resolves to `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | OBSERVED | main bundle bytes 93798, 2189121; `resolve.txt` §C A4–A5 |
+| **The value demonstrably flows into the POSTed URL**: `E=h.messageEndpoint` at **69458** → the template → `y=…E…` at **69786** → `getPeriodicDataWithPost({reqUrl:y` at **69866**, one contiguous run inside `getMessageRequest` (defined **69249**, module `59567`). Bytes 69300–69700 printed in full | OBSERVED | `resolve.txt` §C A7 |
 | **No lazy chunk reads the discovery document**: `baseUrlPde`, `/connect/pde`, `baseUrlCumulus`/`Cms`/`Aem`/`CareLink`, `discover/android`, `clcloud`, `api/carepartner` are **0 / 0** across all 211 | OBSERVED | `grep-out.txt`; `tables.txt` §T2 |
 | CORRECTED 2026-10-13 (verification round 1): `pde` is **`cs=5` / `ci=34`** — the control found **29 case-variants**, not none as the prose said. All 29 classified into **7 identifiers, exactly the 7 area V listed**; the only corpus novelty is `mapDeviceModelName` also in chunk `7187` ×4. `extract.py` §2 now iterates the insensitive pass and labels every hit `cs`/`cv` | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
 | `discover` ×12 and `pde` ×5 `cs` are zxcvbn dictionary substrings in one chunk; the same 5 and 12 words the portal builds carry | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
-| ADDED 2026-10-13 (verification round 1): **`baseUrl` is 30 `cs` across 4 chunks and is a hard-coded patient API base, not a CMS base** — `this.baseUrl="/patient/csr"` (×6 in the corrected `common` chunk) and `this.baseUrl="/patient/csr/safety/notice/definitions"` (×8 in each of 3 chunks), with `/patient/csr` literals in **7 chunks / 10 hits**. **OBSERVED as code literals only; liveness UNOBSERVED in both directions** — no request was sent to any of them, and these 12 endpoint shapes appear in **no `docs/` page** | OBSERVED (literals) · UNOBSERVED (liveness) | `grep-out.txt` §2; `tables.txt` §T2/§T3; `FINDINGS.md` §5 |
+| ADDED 2026-10-13 (verification round 1): **`baseUrl` is 30 `cs` across 4 chunks and is a hard-coded patient API base, not a CMS base** — `this.baseUrl="/patient/csr"` (×6 in the corrected `common` chunk) and `this.baseUrl="/patient/csr/safety/notice/definitions"` (×8 in each of 3 chunks), with `/patient/csr` literals in **7 chunks / 10 hits**. **OBSERVED as code literals only; liveness UNOBSERVED in both directions** — no request was sent to any of them, and these resolve to **19 method x path shapes over 16 path templates**, in **no `docs/` page** | OBSERVED (literals) · UNOBSERVED (liveness) | `grep-out.txt` §2; `tables.txt` §T2/§T3; `FINDINGS.md` §5 |
 | Four of the nine `transition.flags` leaves appear, all in chunk `6746`; the **other five are 0 across all 211** | OBSERVED | `tables.txt` §T2, §T3 |
 | `patient-timeline` and `dialog-lite` are **0 / 0 across all 211 chunks**; the main bundle's five `patient-timeline` hits reproduce area V's offsets exactly and classify as Angular component selectors | OBSERVED | `grep-out.txt` §2 |
 | Area V's "`.z2` read 0 times in the main bundle" — **re-measured, still true**, scope corrected not retracted | OBSERVED | `grep-out.txt`; area V `consumers-out.txt §2` |
