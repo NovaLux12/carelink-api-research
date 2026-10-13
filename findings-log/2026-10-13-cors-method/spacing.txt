@@ -1,0 +1,63 @@
+spacing — attempt 3, 8 ledger rows
+counting rule: consecutive pairs in request order, same host only; the cross-host
+pair is reported separately and is not part of the floor.
+
+  1. the mtime series in full, microsecond resolution, as re-derivable evidence
+     (results.jsonl's own body_mtime_epoch is integer seconds and cannot separate
+     sub-second gaps; git does not preserve mtimes, so these numbers are the copy)
+      seq 17  commoncore-trials-a-ocl-get  1791903034.287749
+      seq 18  commoncore-trials-b-absent-get  1791903037.042183
+      seq 19  commoncore-trials-c-absent-options  1791903039.955919
+      seq 20  commoncore-trials-d-ocl-options  1791903042.707862
+      seq 21  commoncore-a-ocl-get  1791903045.706489
+      seq 22  commoncore-b-absent-get  1791903048.443239
+      seq 23  commoncore-c-absent-options  1791903051.186529
+      seq 24  commoncore-d-ocl-options  1791903053.939043
+
+  2. the floor, measured from the mtime series
+     6 same-host gaps   min 2.737s   max 2.914s   span 19.651s
+     gaps under the declared 2.5s: 0
+     gaps under the repo floor of 2s: 0
+       seq 17 -> 18  commoncore-trials.medtronic.com 2.754s
+       seq 18 -> 19  commoncore-trials.medtronic.com 2.914s
+       seq 19 -> 20  commoncore-trials.medtronic.com 2.752s
+       seq 21 -> 22  commoncore.medtronic.com       2.737s
+       seq 22 -> 23  commoncore.medtronic.com       2.743s
+       seq 23 -> 24  commoncore.medtronic.com       2.753s
+     cross-host (excluded from the floor): seq 20 -> 21  2.999s
+
+  3. VALIDATION against t_done, the series a body-write mtime physically corresponds to
+      seq 17  mtime - t_done = -0.004251
+      seq 18  mtime - t_done = -0.421817
+      seq 19  mtime - t_done = -0.004081
+      seq 20  mtime - t_done = -0.004138
+      seq 21  mtime - t_done = -0.003511
+      seq 22  mtime - t_done = -0.003761
+      seq 23  mtime - t_done = -0.004471
+      seq 24  mtime - t_done = -0.003957
+     mtime span 19.651294   t_done span 19.651000   difference +0.000294 s over 8 requests
+     Seven of the eight rows sit within -0.0035..-0.0045 s, which is what the pair is
+     supposed to look like: the kernel stamps the body, curl exits, `date` runs. The
+     span agrees to 0.000294 s. The eighth row is seq 18 and is discussed below.
+
+  4. the suspect series, and why it is the suspect here
+      seq 17  dur +0.040s   mtime - t_sent +0.035749
+      seq 18  dur +0.564s   mtime - t_sent +0.142183
+      seq 19  dur +0.307s   mtime - t_sent +0.302919
+      seq 20  dur +0.143s   mtime - t_sent +0.138862
+      seq 21  dur +0.393s   mtime - t_sent +0.389489
+      seq 22  dur +0.131s   mtime - t_sent +0.127239
+      seq 23  dur -0.334s   mtime - t_sent -0.338471
+      seq 24  dur +0.145s   mtime - t_sent +0.141043
+     impossible durations (t_done earlier than t_sent): ['seq 23: -0.334s']
+     seq 23's reading is the one that manufactures the apparent 2.273 s gap in the
+     t_sent series; seq 18's is late by 0.42 s against its own body write. Both are
+     readings of one clock, not requests that fired early. No cause is asserted.
+
+  5. RETRACTED CHECK, kept so the retraction stays visible
+     mtime span 19.651294   t_sent span 19.546000   difference +0.105294 s
+     This was published as the validation. It is arithmetically identical to
+     `dur[n] - dur[1]` -- computed from t_sent and t_done alone, never from mtimes --
+     so it cannot discriminate a sound mtime series from an unsound one. It happens
+     to be small here, and that is a coincidence of how long the last request took,
+     not evidence about the mtime series.

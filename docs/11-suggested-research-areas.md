@@ -323,6 +323,87 @@ host, whereas the response side is not. The one case a digest cannot settle is a
 hash collision, which this repo already treats as an acceptable residual for the
 same reason (`docs/09` §5 item 3).
 
+#### Addendum (2026-10-13, from the #61 CORS-method pass): the family claim rests on two
+hosts, no `commoncore*` cell was ever matched, and none has ever varied `Origin`
+
+**Why this is filed under F rather than in a letter of its own, recorded because the page has
+a documented placement problem and the reason was missing.** Every letter A—Z is in use, so a
+new `### ` heading would leave this page's own "N open plus M closed" sentence disagreeing
+with its contents — which is the failure `docs/11`'s own addenda have already been written to repair
+twice. Of the six open areas, **F is the only one whose subject is the CORS behaviour of an
+AWS-API-Gateway-behind-CloudFront deployment**: its own text turns on "zero of 90 responses
+carried `Access-Control-*`", which is the same question on the `clcloud.*` stage. The host
+family differs and this addendum says so in every sentence that could be misread; the
+**mechanism** does not, and that is what the successor is about. Filing it under a token-
+gated row would have been worse: this needs no token.
+
+**Derived from a cell nobody had run.** Before 2026-10-13 no **OPTIONS** request had ever
+been sent to any `commoncore*` host, so two things were unaskable. One has an answer. **OBSERVED,
+8 of 8 cells**, 2 hosts × {recorded path, certainly-absent path} × {`GET`, empty-body
+`OPTIONS`}: `403` `MissingAuthenticationTokenException`, `ACAO`/`ACAM`/`ACAH` all `*`, no
+`ACAC`, no `Allow`, no `Vary`, all 8 byte-identical once the per-request headers are
+stripped ([findings-log/2026-10-13-cors-method/FINDINGS.md §3]). On this origin stack the CORS set is **not
+method-conditional** — **and the bound is `non-2xx` only: every cell is a no-route `403`, so this says
+nothing about a `2xx` on either method.** So **"emitted only on `OPTIONS`" is excluded for
+this family**, and the corollary is the useful half: an `OPTIONS` response carrying `ACAO: *`
+**here is not proof that a resource exists**, so `docs/09` §2's `GET 403 + OPTIONS 200` rule
+needs the status beside the header, not the header alone (**no `clcloud.*` host was probed,
+and `clcloud.*` emits no CORS at all on this error — `regression/hurl/04-deep-surface.hurl:182`, `:444` — so
+nothing here transfers to that family**; F's own premise, that these gateways are not
+browser-callable, is untouched).
+
+**⚠ What this addendum does NOT claim, because its first version did and the log did not
+support it.** Not "not path-conditional": **all 8 cells returned the same no-route envelope,
+so nothing was ever matched and the path question is untested rather than answered.** The
+path axis shows only that `ACAO` does not discriminate between a path a prior pass recorded
+and one the gateway has never heard of ([findings-log/2026-10-13-cors-method/FINDINGS.md
+§3.2]).
+
+**What is missing, in three halves.** (a) **Breadth:** `commoncore-trials.minimed.com`
+carries 1 of the six counter-examples and was **not** probed — three cells per host is 9 requests
+against a cap of 8, and the full matrix is 12. That was a **trade**, not a rule: the fourth
+cell per host is the only one that adds contrast, so 8 requests on 2 hosts buys a complete
+square twice where 6 on 3 buys a pair and no square anywhere.
+(b) **A matched cell.** No pass has yet sent a request to a `commoncore*` path that this
+stage actually routes, so no claim about how the CORS set behaves on a *routed* response
+here can be made at all. (c) **A dimension no pass has varied:** `Origin`. Area Z excluded
+"ACAO appears only when an `Origin` header is sent" on `clcloud.*` route cells; on
+`commoncore*` **no pass has ever sent one**, and this pass sent none deliberately, to match the
+captures it follows. `Vary` is absent on all 8 cells — that is a caching directive and **no
+emission mechanism is inferred from it**.
+
+**Blocker:** not an idea and not a token for the two halves that are reachable — **8
+requests**. (a) Four: the same square on the third host, `GET` and empty-body `OPTIONS` on
+`/reports-broker/v1/ocl` and on `/reports-broker/v1/ocl-probe-absent`. **No "positive
+control" is claimed here**: the first version of this addendum justified that phrase and
+the verification round disproved it — on this stage the recorded path answers identically to the absent one, so
+it is a second data point on the same envelope, not a control over it. (c) Four: one host,
+two paths, each bare and each with `Origin: https://example.invalid` — a reserved name, so the value can
+only be echoed or dropped, never dialled. `Origin` is a request header, so it adds no traffic
+to a third party. (b) **Is not reachable and is not budgeted:** finding a *matched* cell needs
+a `commoncore*` path this stage actually routes, and the only routes recorded there are the
+token-gated report ones — already the blocked-table row *"Report bodies from `commoncore`"*. Naming that
+is more useful than a request count that could not be spent.
+
+**Closes when:** (a) the third host has a verdict on the square **and** (c) one host has a
+verdict on the `Origin` axis. A verdict is the **status plus** the header set, never the
+header alone, so a partial answer cannot read as a settled one. **A negative counts** on both,
+and is the likely answer for (c), given the literal `*` in every cell recorded so far. (b)
+closes when it joins the blocked table with a token named, or is retired as unanswerable from
+outside — it does not close by another unauthenticated sweep.
+
+**Assumptions (INFERRED):** that these two hosts are representative of the
+`commoncore-trials.medtronic.com` / `commoncore.medtronic.com` family — **which is exactly
+what half (a) tests, and is not assumed by this addendum's own claim**, since the claim is
+stated per host. That the `*` is stage-level gateway configuration rather than a per-route
+setting: it appears on a `MissingAuthenticationTokenException`, which is evidence about the
+*stage*, but the mechanism remains unestablished, as `docs/09` §2 says. That half (b) is
+token-blocked rather than merely unprobed: the reasoning is that the only `commoncore*` paths
+on the record are report routes behind a clinician token — **INFERRED from the blocked-table row, not
+measured**, and one probe of the namespace root would settle it or refute it. That an `Origin`
+on a no-route error would be handled by the same code path as an `Origin` on a routed one —
+**untested**, and the two are not interchangeable.
+
 #### Addendum (2026-10-13, from area V): the shipped patient bundle names a timeline host that is not published
 
 **Derived:** none of this was knowable before 2026-10-13 — area V re-fetched the patient
