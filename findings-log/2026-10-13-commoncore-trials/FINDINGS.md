@@ -562,7 +562,7 @@ inside an unrelated PR. The science above stands; the record around it was fixed
 ### It bears directly on two open readings — and supplies the discriminating cell
 
 - The two live readings are **`docs/10:56`** (whether a `clcloud.*` `200` carries
-  `Access-Control-Allow-Origin`) and the closed area X row at **`docs/11:777`**
+  `Access-Control-Allow-Origin`) and the closed area X row at **`docs/11:932`**
   (its correction, which found a separating `200`-without-CORS cell in the corpus).
   **Six non-2xx responses carrying `acao: *` is a fact neither reading currently
   contains.**
@@ -570,7 +570,7 @@ inside an unrelated PR. The science above stands; the record around it was fixed
   `OPTIONS`** — is exactly what these cells speak to, because **these six are bare
   `GET`s**: the request block in each `.v` trace sent exactly `Host`,
   `User-Agent`, `Accept` and `Accept-Encoding` and **no `Origin` header**
-  [e.g. `headers/09-ct-medtronic-ocl.v`, request block lines 1-7]. So this is **not**
+  [e.g. `headers/09-ct-medtronic-ocl.v`, request block lines 52-57]. So this is **not**
   a preflight artefact and not an origin-dependent reflection. **It is the
   discriminating cell that reading needs**, and it cuts against it.
 
@@ -716,7 +716,7 @@ withdrawn** — only the support was wrong.
    with "the caution that CORS on an error is not the same as CORS on a success" and
    with a note that "a `200` carrying no preflight does exist on `clcloud.*`".
    **`docs/09` says "preflight" exactly once** (line 74, unrelated to CORS) and
-   carries no such caution. **Both readings live in `docs/10:56` and `docs/11:777`**
+   carries no such caution. **Both readings live in `docs/10:56` and `docs/11:932`**
    and the citations now say so — `AGENTS.md` §6 item 6.
 
 ### 13k. One verifier claim upheld, one corrected (2026-10-13)
@@ -742,3 +742,81 @@ human added it to the suite"**, which is exactly what a maintainer would do to p
 it. **The disposition is unchanged — a pass that cannot edit `regression/` should not
 make that edit as a side effect — but the reasoning under it is tightened here**, and
 the maintainer's route is named rather than implied to be forbidden.
+
+### 13l. Two pointers the rebase moved, found by the round-3 verifier (2026-10-13)
+
+Both are `AGENTS.md` §6 item 6 — **the evidence is right, the address of it is wrong.**
+No claim in §1–§12 changes, and no finding is withdrawn. Only the coordinates change.
+
+#### 13l-1. `docs/11:777` resolves to a sentence that has nothing to do with area X
+
+§12 and §13j both sent the reader to the closed area X row at **`docs/11:777`**. On
+this branch **line 777 is not area X at all** — it reads `Closes when: all 211 carry a
+verdict for that token set…`, the tail of a *different* area's entry. The area X row
+is at **`docs/11:932`**. Corrected in both places.
+
+The pointer was correct when written. It was correct against `8373169`; two commits
+have since moved the row it names:
+
+| ref | area X row |
+|---|---|
+| `8373169` (branch, pre-rebase) | `docs/11:777` |
+| `614db77` (area F merge) | `docs/11:858` |
+| this branch | `docs/11:932` |
+
+`614db77` moved it **81** lines; this pass's own §12/§13 addendum moved it a further
+**74**. A line anchor is a claim about a *line*, and both commits invalidated it
+without changing a byte of the sentence that used it.
+
+**Why the gate went green — the second time this pass has recorded it (§13a was the
+first):** `research-checks.py` resolves `[source: findings-log/…]` **paths**, never
+line anchors, so a well-formed path carrying a stale line number is invisible to it.
+Nothing in CI would ever have caught this. Recorded because the next reader will
+otherwise assume the checks cleared the anchors too.
+
+**Because `docs/11` moved twice, the whole log was swept for the same failure.** Every
+line anchor in this file was re-resolved against this tree — **14 distinct
+`file:line` targets**, including the three written in prose form ("line 12", "line
+12", "line 74"):
+
+| sweep | result |
+|---|---|
+| 14 distinct `file:line` targets | **13 resolve. Exactly one did not: `docs/11:777`, cited twice — corrected above** |
+| `docs/10:56`, the *other* live reading | resolves; it did **not** drift |
+| `c1-absent.h:18` (§13a) | the one deliberate non-resolution — it is the *wrong* cite §13a quotes in order to document the error. Left as written. |
+
+**No `docs/` or `README.md` page carries a line anchor into this log** — of the **12**
+citations `docs/` and `README.md` make to this file, **0** are followed by a line
+number; all 12 name a `§` instead — so the drift is confined to this file and **no
+`docs/` repair was needed**.
+
+#### 13l-2. "request block lines 1-7" pointed at the DNS/TLS preamble
+
+§12/§13j cited *"[e.g. `headers/09-ct-medtronic-ocl.v`, request block **lines 1-7**]"*
+as the evidence that the six bare `GET`s sent no `Origin`. **Lines 1-7 are the DNS and
+TLS preamble** — `"* Host commoncore-trials.medtronic.com:443 was resolved."` through
+`"* TLSv1.3 (OUT), TLS handshake, Client hello (1):"` — and carry **zero** request
+headers: `awk 'NR<=7 && /^> /'` returns **0** lines. **The request block is lines
+52-57**, corrected in place.
+
+**The corrected range is not file-specific — it is identical in all six captures.**
+Every `.v` trace in `headers/` (`02`, `04`, `05`, `07`, `08`, `09`) has exactly six
+`> ` lines, and in each they sit at **52-57**. So the reader may check *any* of the
+six at the same address, and the union of header names sent across all six request
+blocks is exactly **`Host`, `User-Agent`, `Accept`, `Accept-Encoding`** — the four
+names §12 lists — with `grep -ci origin` over lines 52-57 of all six returning **0**.
+
+**The claim §12 made is CONFIRMED; only its address moved.** These six are bare
+`GET`s, so they are not a preflight artefact and not an origin-dependent reflection —
+which is exactly the disposition §12 took, and it stands.
+
+#### 13l-3. The rebase left the four disputed CORS sites byte-unchanged
+
+The pointer drift above is a merge artefact, so the sites the merge was *supposed* to
+leave alone were re-checked rather than assumed: **`docs/00:166`, `docs/03:341`,
+`docs/10:56`, and the area X row** are byte-identical to `614db77` (md5 per site —
+and for the area X row that comparison is `614db77:858` against this branch's
+`docs/11:932`, since the rebase is what moved it). The merge is provably correct —
+`git merge-tree --write-tree 8373169 614db77` yields a tree byte-identical to this
+branch's — and **no pin crept into `regression/`**. What moved was a line number, not
+a byte of CORS prose.
