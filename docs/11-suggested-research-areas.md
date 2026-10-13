@@ -643,6 +643,33 @@ it without reading the body.
   not settled by either of the above.
 - F remains **open**; area count unchanged.
 
+
+#### Addendum (2026-10-13, from `area-f-dedicated-routes`): independent controls-first re-derivation of the dedicated routes on `.com` and `-trials`
+
+Area F's dedicated-route half (Deliverable 3 of the 2026-10-13 pass) stands, but the
+controls behind it had not been re-issued from a clean baseline after the dispatch: both
+controls turn out to reproduce byte-for-byte. This pass re-issues them, controls first per
+host, on the two remaining patient hosts.
+
+**Derived from 10 GETs (2 controls + 3 routes × 2 hosts), cap 14, `results.jsonl` in
+`findings-log/2026-10-13-area-f-dedicated-routes/`.**
+
+- **Controls.** `/patient/configuration/version` and `/patient/configuration/` (root) both
+  404 with 0 bytes and no `content-type` on both hosts — the same shape the earlier pass
+  recorded.
+- **Routes.** All three answer `200 application/json` with the earlier digests:
+  `defaultCountry` 20 B (`a8c04033…`), `recaptcha/key` 58 B (differs by host,
+  `2018cee4…` com vs `a3e59c56…` trials), `messages/en` 22 B (`04868b50…`), with the
+  byte-identical split preserved across `.com` and `-trials` for the first and third.
+- **No `content-type` change, no new 404 shape, and no contradiction of the earlier
+  record.** Area F's substantive conclusion (a third read path lives on every deployment)
+  is corroborated rather than amended.
+- `EU` is not re-probed; its record stays cited from the earlier pass.
+
+Area F remains open: neither the caller nor the reachability question for
+`patient-timeline` moves, and this pass claims no closure. Successors 1 and 2 above stand.
+Area count unchanged.
+
 ## Tier 2 — cheap, moderate value
 
 ### P. Recover the request schema from the vendor's own app, statically
@@ -1009,6 +1036,27 @@ entries under their `f.u` names; only id 2076 is settled here, and the negatives
 the 2026-10-08 clinic corpus still rest on its uncommitted per-file ledger. K's
 denominator therefore stays provisional.
 [source: findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md]
+
+#### Addendum (2026-10-13, from area K residual, issue #78): the denominator is now body-verified at 225
+
+**This closes the residual.** The predecessor left the 2026-10-08 clinic sweep's "one
+entry returned the SPA fallback" unexplained and the per-file ledger uncommitted.
+
+**OBSERVED — all 225 map entries resolve as `application/javascript` under the
+name `f.u` emits** (one GET per map entry, 225 distinct digests, zero duplicates,
+zero empty bodies, zero 5518 B fallbacks; host `carelinkhp.minimed.eu`).
+Under those names the corpus is **225** JS chunks. Measurement:
+`findings-log/2026-10-13-area-k-clinic-denominator/results.jsonl` (seq 1–225),
+`spacing.txt` (body-mtime floor 2.561 s, 0 of 224 gaps under 2.5 s).
+
+**INFERRED (bounded)** — the unexplained 5518 B cell is id 2076 fetched under
+its id instead of its emitted name `common.a62bb847b4ea289e.js`, reproducing the
+defect measured on the patient corpus (pool K pass req 2 vs req 4). The negatives
+in the 2026-10-08 record survive (an HTML shell can only add false hits, never
+false misses), and the published conclusions now carry N = 225.
+
+**Successor -> K proper (unchanged):** control-flow mining of the call-sites and
+the state-dependent shape of `system.logbook.entry.validation.config`.
 
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 

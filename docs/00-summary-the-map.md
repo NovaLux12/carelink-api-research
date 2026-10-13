@@ -302,13 +302,15 @@ host literals in its 3.4 MB bundle, exactly one is Medtronic's, and it contains
 zero `/patient/*`, `medicalDeviceFamily` or NGP tokens. Source it for `hcp/*`
 and device tables, never for the patient API.
 
-Its `hp-runtime.js` holds a **225-entry lazy-chunk manifest**. All 224 chunks
-were fetched and mined: they are view code — 3 hosts, 3 path literals, 0 device
-families, 0 NGP codes. Their value is **89 field names** at call-sites, including
+Its `hp-runtime.js` holds a **225-entry lazy-chunk manifest**. Under the name each
+entry emits via webpack's `f.u` (re-derived 2026-10-13) all 225 resolve as
+`application/javascript` (the single 2026-10-08 "SPA fallback" cell was id 2076
+fetched under its id instead of its emitted name `common.<hash>.js`); the mined
+content is view code — 3 hosts, 3 path literals, 0 device families, 0 NGP codes. Their value is **89 field names** at call-sites, including
 the logbook/marker fields (`removalType`, `removalReason`,
 `sensorInsertionLocation`, `timecapUnscrewed`) that the deferred work needed.
 
-**No source maps exist** on any bundle (verified for all 224 chunks offline,
+**No source maps exist** on any bundle (verified for all 225 chunks offline,
 plus a stratified `.js.map` sample).
 
 The clinician portal is deployed in **two builds across five hosts**, and the split is

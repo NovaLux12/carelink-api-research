@@ -1,0 +1,10 @@
+# spacing (area K clinic denominator, 225 GETs, carelinkhp.minimed.eu)
+# Authority series = kernel body-write mtimes (set by curl -o at write time);
+# harness t_sent (date) shown alongside for comparison.
+
+=== t_sent (harness) ===
+n=224 min=1.727 max=3.425 under2.0=7 under2.5=19
+=== body mtimes (kernel) ===
+n=224 min=2.561 max=2.661 under2.0=0 under2.5=0
+mtime span=578.978s, t_sent span=579.005s
+negative t_done-t_sent rows=17
