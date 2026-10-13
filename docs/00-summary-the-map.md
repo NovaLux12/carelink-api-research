@@ -310,8 +310,10 @@ content is view code — 3 hosts, 3 path literals, 0 device families, 0 NGP code
 the logbook/marker fields (`removalType`, `removalReason`,
 `sensorInsertionLocation`, `timecapUnscrewed`) that the deferred work needed.
 
-**No source maps exist** on any bundle (verified for all 225 chunks offline,
-plus a stratified `.js.map` sample).
+**No source maps exist** on any bundle (verified for the 224 chunk bodies
+retained offline, plus a stratified `.js.map` sample; the 225th emitted name
+`common.a62bb847b4ea289e.js` is not retained, so its source-map line
+remains formally unchecked and is recorded as such rather than counted).
 
 The clinician portal is deployed in **two builds across five hosts**, and the split is
 **product role**, not region — `carelinkhp.minimed.eu`, `carelink.medtronic.eu` and
