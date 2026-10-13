@@ -178,3 +178,8 @@ re-grepped by hand.
 minimed.com 3.106/2.84/2.88; medtronic.eu 2.395/2.698/2.748; medtronic.com
 3.373/2.524/2.822. Floor 2.395 s, all gaps ≥ 2 s, four negative durations
 recorded with no cause asserted (top of file).
+
+## Correction (2026-10-13) — verifier round 1 on PR #38
+
+1. `docs/02` left a stale sentence standing: the open-questions table kept "`/mfa/challenge` … no probe result in any source" as current beside this pass's 5/5 routed result. Fixed in `docs/02-auth-tenants-and-flows.md` (row now "Partially answered 2026-10-13", old wording retained inside it); the email-scope Unknown stands.
+2. Evidence-class label, applied here rather than by rewriting the record: the sentences stating all three paths are POST-only by OAuth/OIDC specification (§0 above, `probe.sh` method comment) are **INFERRED** — reasoned from the specification and from area I's retracted GET-only error, with the assumption stated there. No POST was sent by this pass, so the method set beyond "routed" is unobserved. Assumption: the specification's method requirements describe these deployments.
