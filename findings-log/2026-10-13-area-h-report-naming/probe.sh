@@ -2,6 +2,11 @@
 # probe.sh — area H (reportFileNamingSupportedPumpModels, entry by entry).
 # Claim #33. Cap 6, delay 2.5 s inside the per-host flock, GET only.
 #
+# POST-RUN CORRECTION (2026-10-13, see FINDINGS.md §0 Correction 1): the
+# corpus block below was wrong — seq 5 proved the patient document carries
+# the 214-entry list. Retained verbatim as the record of what the harness
+# assumed at send time; the probe's two-host span follows from that error.
+#
 # CORPUS CORRECTION recorded before probing (see FINDINGS.md §0): the claim
 # located the 214-entry list in the patient public config
 # (personal.common.core.report.generation...). That key does not exist there;
@@ -28,7 +33,11 @@
 # vendor's own portal sends (committed matrix used it throughout; without it
 # every key 412s). It is not a credential, session, or token.
 set -uo pipefail
-MAIN=/home/jack/.openclaw/workspace/projects/novas-github/carelink-api-research
+# POST-RUN FIX (2026-10-13, verifier round 1 F2): MAIN was an absolute machine
+# path, which the gate's leak scan forbids. Derived from the script's own
+# location instead — identical value on the run machine.
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+MAIN="$(cd "$HERE/../.." && pwd)"
 OUT="$(dirname "$0")"
 mkdir -p "$OUT/headers"
 : > "$OUT/run.log"

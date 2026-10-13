@@ -6,3 +6,4 @@ probe start: 2026-10-13T08:28:33Z
 2026-10-13T08:28:49Z seq=5 host=carelink.minimed.eu role=CANDIDATE-patient-public-config http=200 exit=0
 probe end: 2026-10-13T08:28:49Z
 5 of a 6 cap. GET only. sleep 2.5 s inside each per-host flock.
+2026-10-13T08:51:10Z seq=6 host=carelink.minimed.eu role=CANDIDATE-patient-public-config-refetch http=200 exit=0

@@ -23,14 +23,22 @@ sent, count against the cap, and prove only the header gate — not absence, not
 liveness. The area still closes because seq 5 returned both halves of the
 corpus (list + family map) in one document, as the claim said it would.
 
-## §1 Accounting — 5 of a 6 cap
+## §1 Accounting — 6 of a 6 cap
 
-**5 of a 6 cap. Method GET throughout** — no POST, no OPTIONS, no `-d`, no
+**6 of a 6 cap. Method GET throughout** — no POST, no OPTIONS, no `-d`, no
 token exchange, no authentication. Delay: `sleep 2.5` inside each per-host
 `flock` (lock files in the main clone's `.loop/`, hostnames as lock names),
 `curl --compressed` on every request. Harness committed as `probe.sh`;
-per-request ledger in `results.jsonl` (one row per request, seq 1–5);
+per-request ledger in `results.jsonl` (one row per request, seq 1–6);
 response heads in `headers/`; completion timestamps in `run.log`.
+
+The PR body's "1 local pin-verification fetch" was local: `jq` predicates
+over the committed seq-5 body, no vendor socket opened, so no ledger row
+exists for it and none is owed. The gate-suite runs are the standard PR-gate
+`05-public-config` suite (the same suite CI runs on every PR), not probe
+traffic — following the B/O-pass precedent, the cap covers probe and
+pin-validation requests against the vendor, which here totals the 6 ledger
+rows.
 
 **Harness defect (mine, disclosed).** `probe.sh` passed extra curl args
 through unquoted `$*`, so `-H "X-System-ID: ProWeb"` split into
@@ -174,3 +182,10 @@ sub-shapes). The negative the claim allowed (exact family-map agreement) did
 finding: the report list is a superset vocabulary reaching past the family
 map, not a view of it. Successor: `docs/10` §1 new row (per-build mapping of
 these 214 once area G lands).
+
+## Correction (2026-10-13) — verifier round 1 on PR #36
+
+1. **§6's exhaustiveness claim was false.** `personal.common.core.report.generation` holds **five** keys, not three: besides `dualReportEnabled`/`deviceModelShouldBeInclude` (both `true`) and the 214-entry list, it carries `separateDevices` (29 slugs) and `reportGenerationRules` (9 Cosmos/CC composition rules). Proven by a one-request re-fetch (seq 6, `results.jsonl:6`, body byte-identical to seq 5 — sha256 `d68b6b57…`, so this was wrong at capture time, not drift), committed verbatim in `generation-dict-keys.txt`. The 214-entry classification itself stands. Assessment: the miss **strengthens** the §7 superset conclusion — 28 of 29 `separateDevices` slugs are the lowercase meter slugs of the display-name entries, i.e. more naming vocabulary outside the family map — and adds a second naming dict (composition rules, not pump models). The `docs/10` §1 successor row is widened accordingly (214 entries + 29 slugs + 9 rule names).
+2. **Precision correction.** §3's "`content-length: 6359` reproduces the 2026-10-11 reading … byte-for-byte" overreaches: no 2026-10-11 digest is on record. The honest reading is a **compressed-length match** (same 69-key set, same wire length), not byte equality.
+3. **Accounting update.** The §1 cap line now reads **6 of a 6 cap** (seq 6 added above); the PR body's local pin-verification fetch is stated in §1 as local (no socket, no row owed).
+4. **`probe.sh` repairs (this section is their record).** `MAIN` was an absolute machine path the gate's leak scan forbids — derived from the script's own location instead (same value on the run machine). The corpus comment block (ex-"the list lives in the HCP family") was the retracted §0 premise — retained verbatim below a correction header pointing at §0 Correction 1.
