@@ -119,7 +119,7 @@ crawl, and is recorded as such per `findings-log/2026-10-13-area-l-ipro-hcp`
 - Ledger: `findings-log/2026-10-13-area-l-7crawl-reissue/results.jsonl` (40 rows).
 - Request script: `…/req.sh` (cap 60, 3.5 s delay inside flock).
 - Response headers: `…/headers/XX-*.h`; bodies stored outside the repository
-  under `/home/jack/.tmp/l79-bodies/` (not committed, per policy).
+  under `<tmp>/l79-bodies/` (not committed, per policy).
 - Re-derive record counts and `ipro_hcp` members from `results.jsonl`; the
   projection rules are in `req.sh`.
 

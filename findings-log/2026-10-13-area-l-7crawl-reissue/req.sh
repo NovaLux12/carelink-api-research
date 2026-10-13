@@ -6,7 +6,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 WT="$(cd "$HERE/../.." && pwd)"
 LOOP="$(cd "$WT/../.." && pwd)"
 LOCK="$LOOP/host-index.commoncrawl.org.lock"
-BODIES="/home/jack/.tmp/l79-bodies"
+BODIES="${TMPDIR:-/tmp}/l79-bodies"
 mkdir -p "$BODIES" "$HERE/headers" "$HERE/tmp"
 if [ "$#" -lt 3 ]; then echo "usage: req.sh <path> <tag> <role>" >&2; exit 2; fi
 path="$1"; tag="$2"; role="$3"
