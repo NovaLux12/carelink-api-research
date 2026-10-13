@@ -502,11 +502,35 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 9 open plus 17 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 8 open plus 18 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
 [`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
+
+> ⚠ **Corrected 2026-10-13 by area M.** This read *"9 open plus 17 closed"*. **The
+> words are not mine — `git diff origin/main...HEAD -- docs/ | grep -c 'Every letter A'`
+> is 0 — but the values are mine to maintain, because closing area M is what broke
+> them.** Measured across the three revisions:
+>
+> | revision | sentence read | actual | `config.yml` |
+> |---|---|---|---|
+> | `3166c3a` (this branch's base) | 10 open plus 16 closed | **10 / 16** ✓ | 10 |
+> | `cd626d6` (area E merged) | 9 open plus 17 closed | **9 / 17** ✓ | 9 |
+> | HEAD (area M closed) | 9 open plus 17 closed | **8 / 18** ✗ | 8 |
+>
+> So this was **not** a stale sentence I inherited — area E had it right, and my
+> own closure took closed 17→18 and open 9→8 while `config.yml` moved 9→8. **8 + 18
+> = 26 = A–Z**, both figures re-derived from this page, and `config.yml` agrees.
+>
+> **This is the third time this exact sentence has been wrong.** Area Z fixed it at
+> `fbe5d9b` (from "20 open plus 6 closed" to 19 and 7) and recorded why a green gate
+> missed it: `research-checks.py` compares `config.yml` against the **heading** count
+> (`^### [A-Z]. `), and **nothing anywhere compares this prose against either number**.
+> That blind spot is unchanged, so this will drift again on the next closure unless a
+> check is added. **Not added here**: extending the gate's own patterns in the same PR
+> the gate passed is a maintainer decision, for the reason `docs/09` §4 already records
+> about its count-pattern defect. Recorded as the successor instead.
 
 **So a pass that discovers a successor cannot mint a letter.** The options are: attach it to an
 existing open area as a dated addendum (what area Z did — see area Y), or record it in

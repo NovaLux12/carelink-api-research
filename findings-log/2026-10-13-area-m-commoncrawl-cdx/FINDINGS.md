@@ -94,6 +94,71 @@ S3 `SlowDown` ("Please reduce your request rate") from `data.commoncrawl.org`,
 and a **400 leaking a Python `RemoteDisconnected` as its body**. Every one of
 the 17 was re-issued or left as a recorded hole; **not one was read as a zero.**
 
+## Correction (2026-10-13) — verifier round 4
+
+### R4-1 — `docs/11` held a self-refuting count, and **my closure is what broke it**
+
+`docs/11`'s "Why there is no area AA" paragraph read *"Every letter A–Z is now in
+use — **9 open plus 17 closed**"*. The page held **8** open headings and **18**
+closed rows, and `config.yml` said **8**.
+
+⚠ **The brief's framing needed correcting, and the correction matters.** It said
+the words predate this pass while "the values became wrong because of what you
+merged and added". Measuring all three revisions:
+
+| revision | sentence read | actual | `config.yml` |
+|---|---|---|---|
+| `3166c3a` (this branch's base) | 10 open plus 16 closed | **10 / 16** ✓ | 10 |
+| `cd626d6` (area E merged) | 9 open plus 17 closed | **9 / 17** ✓ | 9 |
+| HEAD (area M closed) | 9 open plus 17 closed | **8 / 18** ✗ | 8 |
+
+**The sentence was correct at both earlier revisions.** Area E had maintained it
+properly. **Closing area M is what made it stale** — my row took closed 17→18,
+my closure took open 9→8, and my round-2 merge moved `config.yml` 9→8, while
+this one sentence went untouched. So it is not an inherited defect I swept up;
+it is one I created and then failed to notice in three rounds of fixing other
+things. `git diff origin/main...HEAD -- docs/ | grep -c 'Every letter A'` is 0 —
+the words are not mine, but **the values are mine to maintain**, and the honest
+statement is that I changed the facts the sentence asserts.
+
+**Fixed** to **8 open plus 18 closed**, original left visible with the correction
+attached per `AGENTS.md` §3. **8 + 18 = 26 = A–Z**, both re-derived from the page.
+
+**This is the third time this sentence has been wrong.** Area Z fixed it at
+`fbe5d9b` ("20 open plus 6 closed" → 19 and 7) and recorded why a green gate
+missed it: `research-checks.py` compares `config.yml` against the **heading**
+count, and nothing anywhere compares that prose against either number. The
+blind spot is unchanged, so this will drift again on the next closure.
+**No check added here** — extending the gate's patterns in the same PR the gate
+passed is a maintainer decision, the reason `docs/09` §4 already records about
+its count-pattern defect. Recorded as the successor instead.
+
+### R4-2 — the sweep for a second instance of the same class
+
+Run across `docs/*.md`, `README.md` and `.github/ISSUE_TEMPLATE/config.yml`:
+
+| sweep | result |
+|---|---|
+| any `N open plus M closed` on `docs/11` | **one live instance** (line 505, now fixed); five more hits, all inside the correction blockquote quoting history |
+| `N open areas` / `N closed` prose anywhere | no other live instance |
+| assertion counts in the pages this pass touched | `README.md` ×2 (one **wrapped inside a bold span**), `docs/00`, `docs/09` — all **209**, matching the measured static count |
+| `docs/09`'s `147 pinned assertions` | **not a live count** — it is the trap-table row that *describes* the historical defect, quoted correctly |
+| this pass's own numbers | `results.jsonl` 61 rows, `FINDINGS.md` "61 of a 64 cap", **consistent** |
+
+**No second live instance was found.** The two candidates the sweep flagged were
+both quoted history and are left as they are: deleting a correct quotation of a
+past value is the same class of error as the one being fixed.
+
+### R4-3 — `main` still not merged
+
+`origin/main` is `77b2c8e`; this branch is **behind by five commits**, none
+touching `regression/hurl/` or this log directory. Measured **209 / 423** and
+`git diff 77b2c8e HEAD -- regression/` is empty, so the count cannot have moved.
+Re-merging would only manufacture a fresh `docs/11` conflict for no benefit.
+
+---
+
+
 ## Correction (2026-10-13) — verifier round 3
 
 Round 2 returned INCONCLUSIVE — out of steps, not blocked — with six of eight
