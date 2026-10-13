@@ -61,8 +61,8 @@ flowchart TD
     C3 -->|"MissingAuthenticationToken"| C4["no route — wasted probe"]
     C3 -->|"Unauthorized + x-ca-err 990"| C5["reached the Layer7 authoriser<br/>the resource EXISTS"]
     H -->|"public config / countries"| C6["200 — no credential needed"]
-    style C2 fill:#3b2f2f,stroke:#f66
-    style C5 fill:#2f3b2f,stroke:#6f6,stroke-width:2px
+    style C2 fill:#3b2f2f,stroke:#f66,color:#fff
+    style C5 fill:#2f3b2f,stroke:#6f6,stroke-width:2px,color:#fff
 ```
 
 The asymmetry is the point: on `carelink.*` a 401 is informative, on
