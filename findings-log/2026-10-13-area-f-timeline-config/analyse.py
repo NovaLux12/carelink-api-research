@@ -136,7 +136,35 @@ def split_walk(doc, dotted):
 
 
 def main():
+    # USAGE GUARD (added 2026-10-13, verification round 2). Bare `analyse.py` with
+    # no arguments used to die on an IndexError traceback, exit 1, and write
+    # nothing -- so `diff derived.json new.json` afterwards would report the two
+    # files IDENTICAL and prove nothing at all. A verifier checking only the diff
+    # gets a green tick from a crashed script. Exit 2 with a message instead.
+    if len(sys.argv) != 3:
+        sys.stderr.write("usage: analyse.py <TMPD> <OUT>\n"
+                         "  TMPD  the sweep's transient body directory (must still hold\n"
+                         "        bulk-<host>.json and pkey-*.json; they are deleted at sweep end)\n"
+                         "  OUT   this directory, where results.jsonl and the artefacts live\n")
+        return 2
+
     tmpd, out = sys.argv[1], sys.argv[2]
+
+    # BODY-PRESENCE GUARD, same round. A missing body is a normal condition during a
+    # sweep (a 404 has no body to parse), so the per-cell code already handles it --
+    # but a run with NO bodies at all means the sweep is not what this file was
+    # written for, and emitting artefacts from nothing would overwrite good ones
+    # with empty ones. Refuse rather than clobber.
+    expected = ["bulk-%s.json" % h for h, _ in HOSTS]
+    present = [f for f in expected if os.path.exists(os.path.join(tmpd, f))]
+    if not present:
+        sys.stderr.write(
+            "analyse.py: no bulk bodies in %s — the sweep's transient bodies are\n"
+            "  deleted at its end, so this script only runs DURING a sweep.\n"
+            "  Refusing to write artefacts from nothing; %s left untouched.\n"
+            % (tmpd, out))
+        return 2
+
     LEDGER = load_ledger(os.path.join(out, "results.jsonl"))
 
     derived = {
@@ -334,4 +362,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Propagate the exit code. A caller that regenerates an artefact and then diffs
+    # it MUST check this, because a non-zero exit here means nothing was written and
+    # the diff will report "identical" for the wrong reason.
+    sys.exit(main())

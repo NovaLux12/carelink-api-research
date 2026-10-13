@@ -51,13 +51,35 @@ with_config() { # with_config <in> <out>
 build "$TMPD/base.json"
 with_config "$TMPD/base.json" "$TMPD/good.json"
 
-# The two filters, copied VERBATIM from the AREA F block of the suite. If the
-# suite's filter changes, this file must change with it -- that is the point of
-# copying rather than importing.
+# The two filters, copied from the AREA F block of the suite. Step 0 below PROVES
+# the copies are still equal, so "copy, don't import" is not merely a discipline note:
+# an import would let a change to one silently escape the other, while a stale copy
+# would make every result below a proof about the wrong string.
 F_MEMBER='.["personal.patient.timeline.config"] | keys | sort | join(",")'
 F_NOHOST='[keys[] | select(test("^personal[.]patient[.]timeline[.]host$"))] | length'
+SUITE="$DIR/../../regression/hurl/05-public-config.check.sh"
+SUITE_MEMBERS=3   # one check per deployment
+SUITE_NOHOST=3
 
 echo "--- pins-selftest: can the AREA F assertions fail? ---"
+
+echo "0. the copies must still equal the suite's filters"
+if [ ! -f "$SUITE" ]; then
+  bad "suite not found at the expected path — cannot prove the copies are equal"
+else
+  n=$(grep -cF -- "$F_MEMBER" "$SUITE")
+  if [ "$n" -eq "$SUITE_MEMBERS" ]; then
+    ok "F_MEMBER appears verbatim $n/$SUITE_MEMBERS times in the suite"
+  else
+    bad "F_MEMBER appears $n times in the suite, expected $SUITE_MEMBERS — the copy has drifted and every result below is about the wrong string"
+  fi
+  n=$(grep -cF -- "$F_NOHOST" "$SUITE")
+  if [ "$n" -eq "$SUITE_NOHOST" ]; then
+    ok "F_NOHOST appears verbatim $n/$SUITE_NOHOST times in the suite"
+  else
+    bad "F_NOHOST appears $n times in the suite, expected $SUITE_NOHOST — the copy has drifted"
+  fi
+fi
 
 echo "1. the real shape satisfies both pins"
 got_member=$(jq -r "$F_MEMBER" "$TMPD/good.json")
@@ -97,8 +119,8 @@ got=$(jq -r "$F_NOHOST" "$TMPD/longer.json")
 
 echo
 if [ "$FAIL" -eq 0 ]; then
-  echo "PINS CAN FAIL — all four discrimination checks passed (0 vendor requests)."
+  echo "PINS CAN FAIL — all checks passed (0 vendor requests)."
   exit 0
 fi
-echo "$FAIL discrimination check(s) FAILED — a pin here cannot fail, which is a defect."
+echo "$FAIL check(s) FAILED — a pin here cannot fail, or a copy has drifted. Either is a defect."
 exit 1

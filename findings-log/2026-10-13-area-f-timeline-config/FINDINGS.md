@@ -387,6 +387,19 @@ and that word is precisely what made the cell falsifying. **A faithful paraphras
 deleted the evidence that refuted my own claim.** `AGENTS.md` §6 item 5, committed by
 a synthesis step.
 
+> ⚠ **Corrected in this correction, 2026-10-13 (verification round 2): the sentence
+> above said the fix was to *restore* "real-key", and it was not.** `grep -c real-key
+> docs/10-open-questions.md` is **0** on this branch — the word is **not** back, and
+> it was not back at `7f3987e` either. What the fix actually did was **replace** that
+> phrase with an explicit **`keys.txt:48` citation** naming
+> `personal.linking.request.interval` as a *published* name. That is **functionally
+> stronger** than the adjective — a reader can go and check the line rather than trust
+> the word — so the fix stands and is not being undone. But a reader resolving my
+> sentence would have gone looking for a word that is not there and concluded the
+> defect was half-fixed. **This is the same species of error as the first-read claim
+> I am correcting in item 1: describing a change to prose as though it were a change
+> to a fact.** Original wording kept.
+
 **3. A number that did not re-derive.** The other rows' mtime-minus-`t_sent` offsets
 read **0.125–0.547 s**; the correct range is **0.045–0.547 s** (seq 2). Taken from the
 four rows printed during the run instead of all 23. Fixed in this log and in
@@ -419,6 +432,86 @@ promised to publish the un-abbreviated `host` value if it matched the recorded s
 gated on a scrub-list check. That is a disclosure decision taken in advance, and it is
 not a research pass's to make. **It is removed;** the successor now states the question
 and its 3-request cost and leaves publication to a human holding the value.
+
+---
+
+## Correction (2026-10-13, verification round 2) — one number that did not sum, and four descriptions that did not match what happened
+
+Round 1's four blocking fixes were all **confirmed** on re-derivation by routes that do
+not pass through this log's wording, and `pins-selftest.sh` survived four adversarial
+mutations. What follows is the residue: **one blocking finding and four nits**, all
+wording or provenance rather than a wrong measurement, and **no measurement in this PR
+changed and no vendor request was spent.**
+
+**5. A number in `docs/09` §4 that did not sum — a pre-existing defect inside this
+PR, not a regression.** My first commit (`16b1476`, confirmed by
+`git log -S "24 sub-declared gaps" origin/main..HEAD`) wrote *"six passes and **24
+sub-declared gaps** (B 1, X 1, Z 5, D 14, O 21-by-construction, F 1)"*. That
+parenthetical sums to **43**; excluding `O`, which the same row explicitly excludes
+from this class, the remaining five sum to **22**. **Neither is 24.** It appears to be
+`origin/main`'s *"across five passes the figure is 23"* plus my 1, carrying a counting
+rule nobody had written down.
+
+**Resolved by writing the rule down, and making the parenthetical obey it.**
+*Counting rule: a sub-declared gap is one same-host consecutive pair, measured on the
+pass's own timestamp series, below the delay that pass declared it would hold —
+counted only for passes whose harness actually emitted the sleep.* Under it the class
+is **five passes and 22 gaps: B 1, X 1, Z 5, D 14, F 1.** Area O is the sixth pass to
+exhibit the signature and contributes **0 to this class**.
+
+**`origin/main`'s own figures are wrong by the same arithmetic, and are corrected here
+rather than inherited.** That row's *"9 occurrences as of area O (B, X, Z and O)"*
+cannot be reconstructed: B 1 + X 1 + Z 5 = **7**, and area O contributed 21 gaps by
+construction, which fits 9 no better than 7 does. So **7 + D's 14 = 21**, not the 23
+stated. **The original sentence is kept verbatim in `docs/09` §4 with this correction
+dated beside it** — another pass's sentence is not edited silently (`AGENTS.md` §3).
+It is uncomfortable that a row I was correcting in the same commit contained a second
+number that did not re-derive; that is `AGENTS.md` §6 items 5 and 7 landing inside one
+edit, and the reason the counting rule is now written down rather than left implicit.
+
+**6. My own correction note described a fix that did not happen as described.** The
+round-1 note said the `docs/10` fix **restored** the word `real-key`. It did not:
+`grep -c real-key docs/10-open-questions.md` is **0** on this branch and was 0 at
+`7f3987e`. What the fix did was **replace** that adjective with an explicit
+`keys.txt:48` citation establishing `personal.linking.request.interval` as a published
+name — **functionally stronger**, since a reader can check the line instead of trusting
+a word, so the fix stands. But a reader resolving my sentence would have gone looking
+for a word that is not there. **Same species as the first-read claim in item 1:**
+describing a change to prose as though it were a change to a fact.
+
+**7. One novelty claim was still slightly too wide.** `docs/04` said the pass
+established "how many members it has, **what they are called**, what type
+`featureEnabled` is, and what its value is". Both member *names* were already on
+record — `featureEnabled` from area V's bundle grep, `host` in the 2026-10-08 value
+path. Narrowed to **the count and the types**.
+
+**8. An evidence-table row was safe only when read whole.** The row juxtaposing the
+two 404 cells led with *"X while Y"*, which is the shape that invites a reader to infer
+a discriminator — and a reader who copied that claim into an issue **without** the
+class cell would have carried the rule this repo withdrew. It now **leads with the
+negative**: *"two cells, and nothing follows from them … Do not build a rule on this
+pair."*
+
+**9. `pins-selftest.sh` proved a copy, not the suite's filters.** Nothing enforced that
+`F_MEMBER` / `F_NOHOST` still equalled the strings in
+`regression/hurl/05-public-config.check.sh`; both files relied on a prose discipline
+note. Until then a future edit to the suite's filters would have **silently voided the
+proof**, which is the one property the script exists to protect. Step 0 now runs
+`grep -cF` for each filter against the suite and fails on drift. **Proven to fail, not
+merely written:** mutating the suite's `join ","` → `join "-"` makes it exit 1 with
+`F_MEMBER appears 0 times in the suite, expected 3`, and the suite was restored
+byte-identical to `HEAD` afterwards.
+
+**10. A methodological trap worth keeping — a crashed script that diffs clean.**
+`analyse.py` with no arguments used to die on an `IndexError`, exit 1, and **write
+nothing**. A verifier that regenerates an artefact and then diffs it would get
+`IDENTICAL` from a run that never happened; the verifier that caught it here did so by
+checking the exit code rather than the diff. **This file now exits 2 with a usage
+message on bad arguments, and 2 with a refusal if the sweep's transient bodies are
+absent — it will not overwrite good artefacts with empty ones — and propagates the
+code with `sys.exit(main())`.** Anyone citing an offline regeneration of
+`timeline-keys.tsv` must check the exit code; the artefacts themselves are still not
+byte-reproducible from a re-run, because the bodies they hash are gone (see "Files").
 
 ---
 
@@ -487,7 +580,7 @@ wording stays above and stays readable.
 | `defaultCountry` and `messages/en` are byte-identical across `.com` / `-trials`; `recaptcha/key` differs | OBSERVED | `derived.json` → `deliverable_3_dedicated_routes` sha256 fields |
 | `messages/en` is 22 B where the recorded `.eu` value `{"messages": []}` is 16 B; **content not claimed** | OBSERVED (length) / not claimed (content) | `results.jsonl` seq 15, 24 (`bytes`); `findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md` line 90 |
 | 9 of 9 404s in this pass carried **no** `content-type`; all 0 B, `x-cache: Error from cloudfront` | OBSERVED | `results.jsonl` seq 2, 3, 6, 8, 9, 12, 17, 18, 21 (`content_type` empty); `headers/carelink.minimed.eu--002-control-absent.h` |
-| an absurd fabricated name returns `text/vnd.a` while a plausible unpublished name returns none, same namespace, same host | OBSERVED (both cells); the **INFERRED rule drawn from them is withdrawn** | `results.jsonl` seq 6 vs `findings-log/2026-10-13-area-w-per-key/FINDINGS.md` line 95–100 and `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 |
+| **two cells, and nothing follows from them:** an absurd fabricated name returned `text/vnd.a` while a plausible unpublished name returned none, same namespace, same host — and a **third**, published name returned `application/vnd.nervana`, so **no property of the requested name separates the values. Do not build a rule on this pair.** | OBSERVED for all three cells; **any rule drawn from them is WITHDRAWN** | `results.jsonl` seq 6 vs `findings-log/2026-10-13-area-w-per-key/FINDINGS.md` line 95–100 and `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 |
 | the falsifying cell: trials seq 127, `personal.linking.request.interval` — a **published** name — carries `application/vnd.nervana`, so **no property of the requested name separates the three values** | OBSERVED | `findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md` §4 (`keys.txt` line 48 for the name being published) |
 | the namespace **root**-level 404 shape (`/patient/…/version`, `/patient/configuration/`) was never probed before this pass; all 3 hosts return 404 with no `content-type` | OBSERVED | `results.jsonl` seq 2, 3, 8, 9, 17, 18 |
 | the other rows' mtime-minus-`t_sent` offsets are **0.045–0.547 s** (23 rows) | OBSERVED | `results.jsonl` `body_mtime_ms` (first published 0.125–0.547 s — retracted, see the verification-round correction) |
@@ -513,4 +606,6 @@ re-run**, and could not be: the bodies are deleted when the sweep ends
 (`AGENTS.md` §7), so a re-run re-derives them from a fresh fetch, and the per-cell
 digests are a property of what the vendor served on the day. `pins-selftest.sh` **is**
 byte-reproducible offline and is the part of the generator a stranger can verify
-without the network.
+without the network — and since verification round 2 its step 0 **proves** its filter
+copies still match the suite's, so the proof is about the suite's strings and not a
+stale duplicate.

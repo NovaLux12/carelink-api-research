@@ -264,9 +264,12 @@ object, and **nobody had read the object's shape**.
 published ellipsised ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md],
 "Every host below was disclosed only by the config"), which is how `docs/07` and the
 key table above already name this key as the disclosing one. What no pass had read was
-the object's **shape**: how many members it has, what they are called, what type
-`featureEnabled` is, and what its value is. Those are what this pass established first,
-and they are what the addendum below and the six new pins are about.
+the object's **shape**: **how many members it has**, **what types they carry**, and
+**what `featureEnabled`'s value is**. Both member *names* were already on record — the
+`featureEnabled` string from area V's bundle grep, the `host` in the 2026-10-08 value
+path — so the novelty is **the count and the types**, not the vocabulary. Those are
+what this pass established first, and they are what the addendum below and the six new
+pins are about.
 
 `personal.patient.timeline.config` resolves to an **object of exactly two
 members** — `featureEnabled` and `host` — with the **same member set on all three
