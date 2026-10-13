@@ -645,7 +645,7 @@ it without reading the body.
 
 ## Tier 2 — cheap, moderate value
 
-### P. Recover the request schema from the vendor's own app, statically
+### P (closed 2026-10-13) Recover the request schema from the vendor's own app, statically
 
 Half of `docs/10`'s open questions — the `markers[]` per-entry field names, the
 `deviceFamily` casing, the NGP alarm vocabulary — are blocked on *one
@@ -732,20 +732,52 @@ is unknown.
 > *silently*, on a path this repo already pins. That is a bridge-facing coupling and
 > it is now a `docs/10` §1 row.
 
-#### Addendum (2026-10-13, from area P): documented negative on recoverability
+#### Addendum (2026-10-13, from area P): static schema recovered in part — issue #80
 
-Area P exercised its zero-vendor-request path and found that no reproducible mobile
-binary is cited anywhere in the repo; only store metadata exists, which disclaims any
-decompilation. The bundled, hash-verifiable **web** bundles exhibit route literals
-and one client-side `deviceFamily` matching enum, but no request-body field names or
-NGP alarm vocabulary (`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md`).
-So the static-confirmability half of the area stays **unverified**, and the request
-shape remains blocked on an authenticated response or a sourced app binary.
+The successor pass re-read the hash-pinned patient bundle (`0fb4fbd4…`, 3,417,255 B) and
+its 211 lazy chunks, plus both portal bundles (`2a7fa8e7…` / `a054555a…`), and moved
+two of the three targets forward:
+
+1. **Per-entry logbook payload shape (a).** Lazy chunk `k-9799-ae484032a07c9d4f-js.b`
+   (176,766 B; sha256 `713cd95f…`) carries the client's submission object:
+   `entryTs`, `type`, `id`, `comment`, plus `sensorInsertionInfo { sensorLocation,
+   otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation,
+   otherSensorLocation, removalType, removalReason, removalDescription }`,
+   `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, and a dynamic
+   `attributes` bag. **Casing correction:** the wire field is **`timeCapUnscrewed`**
+   (capital C); docs/10 row 46's `timecapUnscrewed` is wrong. `sensorInsertionLocation`
+   is a *form-control* name; the serialized field is `sensorInsertionInfo.sensorLocation`.
+2. **`deviceFamily` routing-discriminator casing (b).** The patient bundle defines a
+   client-side enum `{ BLE: "BLE", BLE_X: "BLE_X", SIMPLERA: "SIMPLERA",
+   SIMPLERA_X: "SIMPLERA_X", GUARDIAN: "GUARDIAN" }` (module 45559, byte 1,723,245) and
+   matches `deviceFamily` with `.startsWith(...)` (byte 2,964,121). Area R's first
+   observed candidate: uppercase `BLE`/`SIMPLERA`/`GUARDIAN`. Still client-side, so the
+   live wire string stays token-gated (`docs/10` row 37).
+3. **`system.logbook.entry.validation.config` schema (c)** stays **not recoverable**:
+   bundles and all 211 chunks carry the route literal only (offsets 2,768,979 /
+   2,769,017) and the patient config-key registry names it without a field set. The
+   configured key now also has a name in the patient map (`yt`, `gt.logbookConfiguration`).
+   Partial compensating result: NGP `lastAlarm.code` is a **number** on the wire,
+   rendered zero-padded by the UI (chunk byte 76,305), which settles the representation
+   half of `docs/10` row 39. The NGP alarm *vocabulary* itself (#84) stays unpublished.
+   `alarmCode` occurs zero times across patient + portals + 211 chunks.
+
+**Close position:** area P closes on this evidence. Prior negative
+(`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md`) is preserved as
+the first pass; the successor's log is
+`findings-log/2026-10-13-area-p-static-schema/FINDINGS.md`. The first pass's
+disclaimer about store metadata and no mobile binary stands and is not weakened.
 
 **Successor (attached, not a new letter):**
-- Blocker: a sourced, reproducible mobile artifact, or a clinician token.
-- Closes when: the artifacts above are recorded, or both paths are retired as unanswerable.
-- Assumptions (INFERRED): the vendor web bundle corpus does not represent the mobile client; area G's candidate lists stand as the comparison target.
+- Mobile side (still attached): a sourced, hash-verifiable mobile artefact or a
+  clinician token, for live wire values and the validation-config field set.
+- Attached to area F: if a fuller NGP alarm vocabulary is recovered, its
+  patient-facing i18n shape (`messages/{lang}`).
+
+**Assumptions (INFERRED):** the web bundle represents enough of the mobile client for
+the casing/form facts above; area J is the known counter-example where build location
+is not stable across builds, so deviceFamily wire strings are candidates, not
+confirmed live values.
 
 
 ### R. Reconcile the `deviceFamily` correction against the client consensus
@@ -1280,7 +1312,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 6 open plus 20 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 5 open plus 21 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -1345,6 +1377,7 @@ being superseded — never silently. Letters are not reused.
 | M — is Common Crawl's zero on the API surface real, or was it the method? | 2026-10-13 | **Partially refuted, and the correction is to the METHOD.** Re-derived through the **CDX index API** instead of computed byte offsets, across **six named crawls with dates**, **all four controls first**, both absence oracles established behind their own positive controls. **Refuted:** CC holds **24 records for `minimed.eu` across 5 of the 6 crawls** (8 / 6 / 5 / 2 / 3 in 2018-39 / 2020-50 / 2022-40 / 2025-30 / 2026-39, incl. `/ipro/hcp/login.jsf` **200** on `carelink.minimed.eu` @2020-12-02), and **`medtronic.eu` is non-empty in all 6** — against `COMMONCRAWL §1`'s own table recording `eu,medtronic)` = 0 blocks in the two crawls it used. **Confirmed, for a different reason:** **no captured path in any of the six begins `/patient/` or `/connect/`**, and `clcloud.minimed.eu` / `carelinkhp.minimed.eu` hold **zero**, established by *enumerating* the successful domain responses rather than by their own failed host queries. **So "essentially zero coverage of the API surface" stands; "not one record for any `carelink*` host" does not**, and "in either of two crawls" was a budget artefact — `CC-MAIN-2024-42` really is zero (404 `No Captures found`) and the other five are not. **Offset method, corrected at the mechanism:** of the three byte ranges `COMMONCRAWL §1` records, **one reproduces exactly at both ends, one starts exactly on its bound but overshoots its recorded end into `com,medtryck)`**, and one could not be fetched at all (`503 SlowDown` ×2) — the *opposite* defect from the recorded "alphabetical neighbours" one — and **the first pass's ranges are not re-derivable, because the record names no offsets**. **Side-findings:** the API **failed 17 of 61 (28%)** — 502 / 504 / 400 / 503 — so **one query never settles a zero**. ⚠ **CORRECTED 2026-10-13 (verifier round 1): this row originally read "with **0** failures against known-covered hosts". That was false — `seq 50`/`53` asked for a host `seq 42` had proven covered 32.6 s earlier and both failed.** Under the counting rule in `failclass.py` (only a **record-form** query names a host, so classify by what the ledger knew *before* the row was sent) the 17 split **2 covered / 0 absent / 13 indeterminate / 2 n/a**: **a gateway error on a host whose coverage was never established carries no information in either direction and must be re-issued, and coverage is not a shield either.** `index.commoncrawl.org` answered **200** here on 2026-10-13 (128 crawls published), recorded as an observation about *this host at this time* and **not generalised**. **61 of a 64 cap** (60 under the claim, **1** under owner authorisation for the overshoot re-read; **3 recorded as unspent**), GET only, **zero requests to any Medtronic host**, measured same-host floor **2.873 s** by kernel body-mtimes, cross-checked at **2.736 s** from `t_sent` (0 gaps under 2.5 s on either oracle). **No `regression/hurl/` pin** — those suites are vendor surfaces and `AGENTS.md` §11 bars one research pass from widening the gate's budget; the rot-prone half is pinned as `docs/09` §4 traps instead. Successor: dated addendum to area L | [findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md] | #44 |
 | E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
 | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** for the `X.Y` forms the discovery axis has been probed at, the two constraints **intersect in exactly `{3.7, 3.8}`** (`3.7.0`/`3.8.0` clear the body gate but are **unobserved** on the discovery path — no `X.Y.Z` cell was ever probed), and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 requests against a cap of 20** — the overrun is **one** request, because `probe-followup.sh` sets `SEQ=18` rather than reading the ledger and was run twice, re-issuing request 19; **no ledger row was deleted to hide it**. **The cap was restated to 21 by owner authorisation on 2026-10-13, after the pass**, so the log's accounting line reads `21 of a 21 cap` with the declared 20 kept readable in its `## Correction (2026-10-13)`. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
+| P — recover the request schema from the vendor's own app, statically | 2026-10-13 | **Partial positive, asks (a) and (b); documented negative on the validation-config field set.** Static pass over the hash-pinned patient bundle `0fb4fbd4…` (3,417,255 B), both portal bundles (`2a7fa8e7…` / `a054555a…`) and its 211 lazy chunks, **0 requests**: (a) per-entry logbook submission payload recovered in lazy chunk `k-9799-ae484032a07c9d4f-js.b` — `entryTs`, `type`, `id`, `comment`, `sensorInsertionInfo { sensorLocation, otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation, otherSensorLocation, removalType, removalReason, removalDescription }`, plus `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, dynamic `attributes`; **casing correction `timecapUnscrewed` → `timeCapUnscrewed`**, and `sensorInsertionLocation` is a form-control, serialized as `sensorInsertionInfo.sensorLocation`. (b) `deviceFamily` routing-discriminator casing = client enum `{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }` (bundle module 45559 / byte 1,723,245, compared at byte 2,964,121) — candidates for area R, still client-side. (c) **negative**: `system.logbook.entry.validation.config` occurs only as a route literal (offsets 2,768,979 / 2,769,017) and once in the patient config-key registry (`D.logbookConfiguration`, offset 2,190,314; selector `yt` at 96,883), with no field set. `alarmCode` occurs 0 times in patient + portals + 211 chunks. Compensating: NGP `lastAlarm.code` is a **number** on the wire (chunk byte 76,314 / 87,560), settling the shape half of `docs/10` row 39. Prior negative `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md` preserved as pass 1 | [findings-log/2026-10-13-area-p-static-schema/FINDINGS.md] | #80 |
 ---
 
 > **Consumer note.** Findings here are consumed by
