@@ -614,6 +614,35 @@ it without reading the body.
 
 ---
 
+#### Addendum (2026-10-13, from `pool-f-config-host`): successor evidence for the published pointer and `messages/en`
+
+**Derived from 6 GETs across the three patient deployments, unauthenticated, cap 6/6,
+`results.jsonl` in `findings-log/2026-10-13-pool-f-config-host/`.**
+
+- **Successor 1 (pointer naming).** `personal.patient.timeline.config` is still a
+  two-member object (`featureEnabled`, `host`) with the same member set on all three
+  deployments; `featureEnabled` boolean `true` everywhere. The `host` member remains
+  an `https` string of **79 / 76 / 76** characters with **three distinct digests**
+  (`f81e6648…` / `24ee5564…` / `988acbd7…`), **unchanged** since the
+  2026-10-13 area-F pass. In-process shape classification shows it is an AWS
+  API Gateway host (`.execute-api.`, 10-character gateway id, ending
+  `/prod/patient-timeline`) whose region segment is `eu-central-1` on `.eu` and
+  `us-east-1` on `.com` and `-trials`. The measured 3-character length delta
+  (`79 − 76`) is exactly the difference between `eu-central-1` (13) and
+  `us-east-1` (10), leaving no unexplained characters. So the pointer is
+  **consistent with naming the gateway this repo probed**; the id segment was
+  not compared (it is infrastructure, not published), so this is strong
+  consistency rather than proof. **Raw `host` value not published.**
+- **Successor 2 (`messages/en`).** All three deployments answer `200`,
+  `application/json`, 22 bytes, digest `04868b50…` (byte-identical). Envelope
+  member list is `["messages"]`; the array length is **0** on all three. The
+  16-vs-22-byte difference against the 2026-10-08 record is a formatting
+  difference on the same empty array.
+- Neither successor closes area F: the caller / reachability question for
+  `patient-timeline` is untouched; a third-party client's ability to reach it is
+  not settled by either of the above.
+- F remains **open**; area count unchanged.
+
 ## Tier 2 — cheap, moderate value
 
 ### P. Recover the request schema from the vendor's own app, statically
@@ -946,6 +975,24 @@ without applying the `f.u` name substitution — the same mistake the patient li
 records, but **not verified**, because the clinic sweep's per-file ledger is not
 committed. Nothing observed here demonstrates it; the 5518 B page identifies the
 *host family*, not the chunk.
+
+#### Addendum (2026-10-13, pool-K clinic URL-form pass): the id form is now measured absent on the portal
+
+Four GETs to `carelinkhp.minimed.eu` (cap 4, `sleep 2.5` inside the host lock), GET
+only. `OBSERVED`: `/common.a62bb847b4ea289e.js` → 200 `application/javascript`, 20731 B,
+body begins `push([[2076]` (so the emitted name is genuinely chunk 2076); the
+committed-list form `/2076.a62bb847b4ea289e.js` → 200 `text/html` 5518 B,
+byte-identical (`0f2c5f62…`) to a certainly-absent name and to the documented SPA
+fallback; a known committed clinic chunk `/12.cfb28fafc1fe9cf5.js` returns
+`application/javascript`. Oracle (positive control + absent control) confirmed on
+this host family before the verdict was taken. **Result: the clinic 2076 entry is a
+second instance of the URL-form defect already measured on the patient corpus — the
+hash is the join key, the name moved.** `docs/09` §4's trap row stands unchanged and
+is corroborated, not weakened. **Still NOT measured:** re-fetching all 225 clinic
+entries under their `f.u` names; only id 2076 is settled here, and the negatives in
+the 2026-10-08 clinic corpus still rest on its uncommitted per-file ledger. K's
+denominator therefore stays provisional.
+[source: findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md]
 
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
