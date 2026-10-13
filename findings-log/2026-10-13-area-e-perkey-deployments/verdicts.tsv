@@ -1,0 +1,147 @@
+host	key	seq	code	bytes	content_type	bulk_resolved	bulk_type	bulk_is_null	bulk_len	verdict	norm
+carelink.minimed.com	captcha	4	404	0		yes	dict	-	4	DEDICATED-ROUTE-404	-
+carelink.minimed.com	config.refetch	5	200	72	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	connect.countriesWithConnect	6	200	1231	application/json	yes	list	-	110	VALUED-match	exact
+carelink.minimed.com	country.reports	7	404	0		yes	NoneType	null		NULL-404	-
+carelink.minimed.com	csr.application.browser.check.configuration	8	200	3172	application/json	yes	dict	-	4	VALUED-match	exact
+carelink.minimed.com	csr.control.codes.settings	9	200	1011	application/json	yes	dict	-	5	VALUED-match	exact
+carelink.minimed.com	csr.crm.settings	10	200	138	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	csr.cumulus.periodic.data.endpoints	11	200	256	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	default.country	12	404	0		yes	str	-	2	DEDICATED-ROUTE-404	-
+carelink.minimed.com	doppler.cc.trace.service.enable	13	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	logbook.enabled	14	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	logbook.entries.page.size	15	200	20	application/json	yes	int	-		VALUED-match	exact
+carelink.minimed.com	logbook.reset.time.on.type.change	16	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	logbook.supported.entry.types	17	200	281	application/json	yes	list	-	12	VALUED-match	exact
+carelink.minimed.com	mmm.data.api.url	18	200	93	application/json	yes	str	-	75	VALUED-match	rawstr
+carelink.minimed.com	nutrino.cc.broker.service.config	19	200	380	application/json	yes	dict	-	6	VALUED-match	exact
+carelink.minimed.com	nutrino.cc.metadata.service.config	20	200	356	application/json	yes	dict	-	4	VALUED-match	exact
+carelink.minimed.com	outages.nextupdateat	21	404	0		yes	NoneType	null		NULL-404	-
+carelink.minimed.com	patient.application.gender	22	200	645	application/json	yes	list	-	4	VALUED-match	exact
+carelink.minimed.com	patient.email.regex	23	200	51	application/json	yes	str	-	29	VALUED-match	rawstr
+carelink.minimed.com	personal.aggregated.report.interval.config	24	200	22	application/json	yes	int	-		VALUED-match	exact
+carelink.minimed.com	personal.application.browser.check.configuration	25	200	3325	application/json	yes	dict	-	4	VALUED-match	exact
+carelink.minimed.com	personal.banner.notifications	26	200	266	application/json	yes	dict	-	6	VALUED-match	exact
+carelink.minimed.com	personal.captcha.enable	27	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.clinical.environment	28	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.common.core.report.generation	29	200	10937	application/json	yes	dict	-	5	VALUED-match	exact
+carelink.minimed.com	personal.common.core.reporting.enabled.countries	30	200	34	application/json	yes	list	-	2	VALUED-match	exact
+carelink.minimed.com	personal.communication.enabled	31	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.cookie.consent.policy	32	200	249	application/json	yes	dict	-	6	VALUED-match	exact
+carelink.minimed.com	personal.countries.certification.enabled	33	200	21	application/json	yes	list	-	0	VALUED-match	exact
+carelink.minimed.com	personal.countries.with.anonymization	34	200	307	application/json	yes	list	-	1	VALUED-match	exact
+carelink.minimed.com	personal.cp.follow.limit	35	200	103	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	personal.cp.m2m.enabled	36	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.crm.settings	37	200	130	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	personal.dashboard.supported.countries	38	200	560	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	personal.data.csv.export.enable	39	200	171	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.device.family.to.model.mapping	40	200	3470	application/json	yes	dict	-	16	VALUED-match	exact
+carelink.minimed.com	personal.dob.validation.enabled	41	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.inpen.redirect.url	42	404	0		yes	NoneType	null		NULL-404	-
+carelink.minimed.com	personal.inpen.supported.countries	43	200	80	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.input.validation.params	44	200	721	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.integrations.redirect.scheme.whitelist	45	200	203	application/json	yes	list	-	8	VALUED-match	exact
+carelink.minimed.com	personal.landing.page.background.image	46	200	58	application/json	yes	str	-	40	VALUED-match	rawstr
+carelink.minimed.com	personal.landing.page.footer.texts	47	200	300	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.last.sync.date.enabled	48	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.link.carepartner.app.download	49	200	227	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.link.help.system	50	200	68	application/json	yes	str	-	50	VALUED-match	rawstr
+carelink.minimed.com	personal.linking.request.interval	51	200	19	application/json	yes	int	-		VALUED-match	exact
+carelink.minimed.com	personal.mixpanel.analytics.settings	52	200	171	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	personal.myinsights.banner.supported.devices	53	200	41	application/json	yes	list	-	2	VALUED-match	exact
+carelink.minimed.com	personal.myinsights.supported.countries	54	200	20	application/json	yes	list	-	0	VALUED-match	exact
+carelink.minimed.com	personal.notification.enabled	55	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.patient.timeline.config	56	200	149	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	personal.report.generation.settings	57	200	66	application/json	yes	dict	-	1	VALUED-match	exact
+carelink.minimed.com	personal.retina.endpoint.config	58	404	0		yes	NoneType	null		NULL-404	-
+carelink.minimed.com	personal.safety.notices.enabled	59	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.session.timeout	60	200	20	application/json	yes	int	-		VALUED-match	exact
+carelink.minimed.com	personal.sso.otc.enabled	61	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink.minimed.com	personal.third.party.apps	62	200	760	application/json	yes	list	-	1	VALUED-match	exact
+carelink.minimed.com	personal.udi.number	63	200	47	application/json	yes	str	-	29	VALUED-match	rawstr
+carelink.minimed.com	personal.user.skip.consent.click.mandate	64	200	43	application/json	yes	list	-	2	VALUED-match	exact
+carelink.minimed.com	personal.username.as.email.settings	65	200	76	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	praas.uri.path.reports.ping	66	200	70	application/json	yes	str	-	52	VALUED-match	rawstr
+carelink.minimed.com	retina.endpoints.config	67	200	480	application/json	yes	dict	-	2	VALUED-match	exact
+carelink.minimed.com	safety.notice.domain.whitelist	68	200	123	application/json	yes	list	-	3	VALUED-match	exact
+carelink.minimed.com	system.auth0.url.whitelist	69	200	88	application/json	yes	list	-	4	VALUED-match	exact
+carelink.minimed.com	system.gc.gz.transition.flags	70	200	581	application/json	yes	dict	-	6	VALUED-match	exact
+carelink.minimed.com	system.logbook.entry.validation.config	71	404	0		yes	NoneType	null		NULL-404	-
+carelink.minimed.com	system.settings.transfer.feature.config	72	200	199	application/json	yes	dict	-	3	VALUED-match	exact
+carelink.minimed.com	captcha.enabled	73	404	0		-	-	-	-	SUBKEY-404	-
+carelink.minimed.com	captcha.key	74	404	0		-	-	-	-	SUBKEY-404	-
+carelink.minimed.com	captcha.type	75	404	0		-	-	-	-	SUBKEY-404	-
+carelink.minimed.com	captcha.testKey	76	404	0		-	-	-	-	SUBKEY-404	-
+carelink-trials.minimed.com	captcha	80	404	0		yes	dict	-	4	DEDICATED-ROUTE-404	-
+carelink-trials.minimed.com	config.refetch	81	200	72	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	connect.countriesWithConnect	82	200	1308	application/json	yes	list	-	117	VALUED-match	exact
+carelink-trials.minimed.com	country.reports	83	404	0		yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	csr.application.browser.check.configuration	84	200	3172	application/json	yes	dict	-	4	VALUED-match	exact
+carelink-trials.minimed.com	csr.control.codes.settings	85	200	1087	application/json	yes	dict	-	5	VALUED-match	exact
+carelink-trials.minimed.com	csr.crm.settings	86	200	145	application/json	yes	dict	-	3	VALUED-match	exact
+carelink-trials.minimed.com	csr.cumulus.periodic.data.endpoints	87	200	263	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	default.country	88	404	0		yes	str	-	2	DEDICATED-ROUTE-404	-
+carelink-trials.minimed.com	doppler.cc.trace.service.enable	89	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	logbook.enabled	90	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	logbook.entries.page.size	91	200	20	application/json	yes	int	-		VALUED-match	exact
+carelink-trials.minimed.com	logbook.reset.time.on.type.change	92	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	logbook.supported.entry.types	93	200	281	application/json	yes	list	-	12	VALUED-match	exact
+carelink-trials.minimed.com	mmm.data.api.url	94	404	0		yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	nutrino.cc.broker.service.config	95	200	377	application/json	yes	dict	-	6	VALUED-match	exact
+carelink-trials.minimed.com	nutrino.cc.metadata.service.config	96	200	358	application/json	yes	dict	-	4	VALUED-match	exact
+carelink-trials.minimed.com	outages.nextupdateat	97	200	191	application/json	yes	dict	-	1	VALUED-match	exact
+carelink-trials.minimed.com	patient.application.gender	98	200	645	application/json	yes	list	-	4	VALUED-match	exact
+carelink-trials.minimed.com	patient.email.regex	99	200	51	application/json	yes	str	-	29	VALUED-match	rawstr
+carelink-trials.minimed.com	personal.aggregated.report.interval.config	100	200	22	application/json	yes	int	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.application.browser.check.configuration	101	200	3325	application/json	yes	dict	-	4	VALUED-match	exact
+carelink-trials.minimed.com	personal.banner.notifications	102	200	260	application/json	yes	dict	-	6	VALUED-match	exact
+carelink-trials.minimed.com	personal.captcha.enable	103	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.clinical.environment	104	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.common.core.report.generation	105	200	10937	application/json	yes	dict	-	5	VALUED-match	exact
+carelink-trials.minimed.com	personal.common.core.reporting.enabled.countries	106	200	122	application/json	yes	list	-	13	VALUED-match	exact
+carelink-trials.minimed.com	personal.communication.enabled	107	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.cookie.consent.policy	108	200	247	application/json	yes	dict	-	6	VALUED-match	exact
+carelink-trials.minimed.com	personal.countries.certification.enabled	109	200	21	application/json	yes	list	-	0	VALUED-match	exact
+carelink-trials.minimed.com	personal.countries.with.anonymization	110	200	307	application/json	yes	list	-	1	VALUED-match	exact
+carelink-trials.minimed.com	personal.cp.follow.limit	111	200	1259	application/json	yes	dict	-	3	VALUED-match	exact
+carelink-trials.minimed.com	personal.cp.m2m.enabled	112	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.crm.settings	113	200	137	application/json	yes	dict	-	3	VALUED-match	exact
+carelink-trials.minimed.com	personal.dashboard.supported.countries	114	200	560	application/json	yes	dict	-	3	VALUED-match	exact
+carelink-trials.minimed.com	personal.data.csv.export.enable	115	200	171	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.device.family.to.model.mapping	116	200	3470	application/json	yes	dict	-	16	VALUED-match	exact
+carelink-trials.minimed.com	personal.dob.validation.enabled	117	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.inpen.redirect.url	118	404	0		yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	personal.inpen.supported.countries	119	200	81	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.input.validation.params	120	200	721	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.integrations.redirect.scheme.whitelist	121	200	203	application/json	yes	list	-	8	VALUED-match	exact
+carelink-trials.minimed.com	personal.landing.page.background.image	122	200	58	application/json	yes	str	-	40	VALUED-match	rawstr
+carelink-trials.minimed.com	personal.landing.page.footer.texts	123	200	300	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.last.sync.date.enabled	124	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.link.carepartner.app.download	125	200	227	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.link.help.system	126	200	75	application/json	yes	str	-	57	VALUED-match	rawstr
+carelink-trials.minimed.com	personal.linking.request.interval	127	404	0	application/vnd.nervana	yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	personal.mixpanel.analytics.settings	128	200	64	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.myinsights.banner.supported.devices	129	200	41	application/json	yes	list	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.myinsights.supported.countries	130	200	20	application/json	yes	list	-	0	VALUED-match	exact
+carelink-trials.minimed.com	personal.notification.enabled	131	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.patient.timeline.config	132	200	149	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	personal.report.generation.settings	133	200	66	application/json	yes	dict	-	1	VALUED-match	exact
+carelink-trials.minimed.com	personal.retina.endpoint.config	134	404	0		yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	personal.safety.notices.enabled	135	200	23	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.session.timeout	136	200	20	application/json	yes	int	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.sso.otc.enabled	137	200	22	application/json	yes	bool	-		VALUED-match	exact
+carelink-trials.minimed.com	personal.third.party.apps	138	404	0		yes	NoneType	null		NULL-404	-
+carelink-trials.minimed.com	personal.udi.number	139	200	47	application/json	yes	str	-	29	VALUED-match	rawstr
+carelink-trials.minimed.com	personal.user.skip.consent.click.mandate	140	200	20	application/json	yes	list	-	0	VALUED-match	exact
+carelink-trials.minimed.com	personal.username.as.email.settings	141	200	77	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	praas.uri.path.reports.ping	142	200	70	application/json	yes	str	-	52	VALUED-match	rawstr
+carelink-trials.minimed.com	retina.endpoints.config	143	200	494	application/json	yes	dict	-	2	VALUED-match	exact
+carelink-trials.minimed.com	safety.notice.domain.whitelist	144	200	123	application/json	yes	list	-	3	VALUED-match	exact
+carelink-trials.minimed.com	system.auth0.url.whitelist	145	200	88	application/json	yes	list	-	4	VALUED-match	exact
+carelink-trials.minimed.com	system.gc.gz.transition.flags	146	200	602	application/json	yes	dict	-	6	VALUED-match	exact
+carelink-trials.minimed.com	system.logbook.entry.validation.config	147	200	8628	application/json	yes	dict	-	5	VALUED-match	exact
+carelink-trials.minimed.com	system.settings.transfer.feature.config	148	200	199	application/json	yes	dict	-	3	VALUED-match	exact
+carelink-trials.minimed.com	captcha.enabled	149	404	0		-	-	-	-	SUBKEY-404	-
+carelink-trials.minimed.com	captcha.key	150	404	0		-	-	-	-	SUBKEY-404	-
+carelink-trials.minimed.com	captcha.type	151	404	0		-	-	-	-	SUBKEY-404	-
+carelink-trials.minimed.com	captcha.testKey	152	404	0		-	-	-	-	SUBKEY-404	-

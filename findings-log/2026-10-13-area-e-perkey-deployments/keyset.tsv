@@ -1,0 +1,3 @@
+host	top_level_keys	bulk_bytes	bulk_sha256_12	null_valued_keys	keys_not_in_eu_69	keys_missing_from_this_bulk
+carelink.minimed.com	69	24479	b0351f79cee0	country.reports,outages.nextupdateat,personal.inpen.redirect.url,personal.retina.endpoint.config,system.logbook.entry.validation.config	-	-
+carelink-trials.minimed.com	69	31698	bd4c69f9231e	country.reports,mmm.data.api.url,personal.inpen.redirect.url,personal.linking.request.interval,personal.retina.endpoint.config,personal.third.party.apps	-	-
