@@ -10,7 +10,7 @@
 **Verdict:** **Partial positive.** One client-side NGP alarm-code artefact is recovered
 verbatim from the reproducible patient lazy-chunk corpus: a **137-input → 62-canonical
 code canonicalisation map** embedded in the connect monitor component, plus its
-application rules (pump-model gating, three excluded codes, fallback to canonical
+application rules (pump-model gating, two excluded codes, fallback to canonical
 `062`). It is a real, usable recovery of the aliasing the client applies before
 looking the code up in its i18n table. It is not, however, the human-readable
 vocabulary or an unauthenticated server surface: no `connect.ble.*` message key was
@@ -163,3 +163,12 @@ an authenticated `POST hcp/configuration/application` for the meaning side.
   the chunk file was read locally and is not part of this repository.
 - Citations above resolve to `findings-log/2026-10-13-area-p-static-schema/FINDINGS.md`
   and `findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md`, both present.
+
+## Correction (2026-10-14)
+
+The pass's §1 sentence said "three excluded codes" where every other surface (the
+quoted control flow on line 85, the PR body, and `docs/05` line 291) says two:
+`"00-1"` and `"121"` (the early-return set `["00-1","121"]`). The committed TSV
+contains neither `00-1` nor `121`, so the correct count is **two**. The original
+phrasing was over-stated by one; it is retained above and corrected here rather
+than deleted. The "three" did not affect any count, code, or pin.
