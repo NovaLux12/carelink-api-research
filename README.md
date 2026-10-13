@@ -88,8 +88,11 @@ already have.
 > accept `≥ 3.7` with **no upper bound** — so the path has a ceiling and the body
 > does not. **That half is a client's report, not this repo's observation**, and it
 > cannot be settled from outside the project (settling a body field needs a POST, and
-> `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned ones). The two
-> constraints intersect in exactly **`{3.7, 3.8}`**, and one shipped client feeds a
+> `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned ones). For the
+> `X.Y` forms the discovery axis has been probed at, the two constraints intersect in
+> exactly **`{3.7, 3.8}`** — `3.7.0` and `3.8.0` clear the body gate, but their
+> discovery-path status is **unobserved**, since no `X.Y.Z` cell was ever probed. One
+> shipped client feeds a
 > **single constant** into both — correct only because `3.8` is in that window, so
 > raising it to `3.9` breaks the discovery path **silently**. Full treatment, with
 > both evidence labels and the reasoning:

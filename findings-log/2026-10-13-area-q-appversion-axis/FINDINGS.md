@@ -389,7 +389,9 @@ the point is how much of it the tree can reproduce, which is **5 of 10**.
 > directory: decode `bodies/10-cj-readme-pin.b`, take the **first data cell** of each
 > of the two status rows, and pull the backticked values out of it. (The *second*
 > cell is the result — `206 Upgrade application` / `200 OK` — and reading that cell
-> instead yields 1, which is how this number was got wrong the first time.)
+> instead yields **1**, not 10. That trap is real and is why this rule says *first*
+> cell; it is **not** the route to the wrong denominator, because 1 cannot reach 11
+> by any arithmetic. See the Correction below for the route that is claimed.)
 
 **8.2 — The PR body and the PR comment describe different test accounts.** The PR
 body says it was tested with *"a Medtronic 780G + Guardian 4 user and Medtronic InPen
@@ -414,8 +416,11 @@ until a later pass found it.
 > select their subjects by file extension** — `git ls-files '*.md' '*.yml' '*.yaml'
 > '*.sh' '*.hurl'` in `--all`, and the same `\.(md|yml|yaml|sh|hurl)$` filter in
 > `--staged` and diff mode. **A `.txt` capture is excluded by extension in every
-> mode**, so `--all` would not have read it either. That filter was last touched
-> 2026-10-12 19:25, before this pass ran, so nothing about it is a consequence of
+> mode**, so `--all` would not have read it either. **The three filter lines
+> (`scripts/research-gate.sh:86`, `:89`, `:92`) are all blamed to `6ed0a8d4`,
+> 2026-10-11 16:32** — a file's later last-touch does not date a line, and
+> `2457a59` (2026-10-12 19:25) added **zero** filter lines. Either way the filter
+> predates this pass, so nothing about it is a consequence of
 > anything here. The same distinction is what `docs/09`'s neighbouring row already
 > recorded for the assertion counts — the check sees only what its own filter
 > selects, and a value it cannot select is a value it is not evidence about.
@@ -562,7 +567,8 @@ The conclusion held; the reason did not. **All three gate modes select subjects 
 extension** — `git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl'` for `--all`, and
 the same `\.(md|yml|yaml|sh|hurl)$` filter for `--staged` and diff mode — so a `.txt`
 capture is excluded in **every** mode and `--all` would not have read it either. That
-filter predates this pass (last touched 2026-10-12 19:25), so nothing here caused it.
+filter predates this pass (the three filter lines are blamed to `6ed0a8d4`,
+2026-10-11 16:32), so nothing here caused it.
 The same point is what `docs/09`'s neighbouring row already recorded for the
 assertion counts: a check sees only what its own filter selects.
 
@@ -580,3 +586,71 @@ are **unobserved** on the discovery path (no `X.Y.Z` cell exists anywhere) rathe
 than excluded from it. That is a wording scope correction, not a retraction: the
 verifier recorded it as prose reaching past its evidence, and the evidence itself
 never moved.
+
+---
+
+## Correction (2026-10-13, verifier round 2) — three one-line items; the substance is unchanged
+
+**Verdict: CONTRADICTS on three items, each a one-line edit.** The count itself was
+**not** re-litigated: round 2 re-derived `5 of 10` from both captures by a different
+route and **confirmed the counting rule reproduces**. All three items below are
+wording, sourcing or scope — the same defect class round 1 caught, one level down.
+
+**1. The window qualifier was not applied everywhere, and the front door was the
+miss.** Round 1's fix scoped `{3.7, 3.8}` at four sites. **`README.md` was a fifth
+and was not among them** — the commit message said "everywhere it appears", which was
+false, and `git log -S` shows that paragraph was **added by this same pass** at
+`432adf6`. The fix touched `docs/00`, `docs/03`, `docs/11` and this file, and missed
+the file a newcomer reads first. It now carries the same `X.Y`-forms qualifier, with
+`3.7.0`/`3.8.0` marked **unobserved** on the discovery path. **Five sites, not four.**
+
+**2. A causal clause with nothing to point at. Deleted as asserted, relabelled as
+INFERRED.** The counting rule said the second-cell trap *"yields 1, which is how this
+number was got wrong the first time."* **The trap is real and does yield exactly 1 —
+but 1 cannot reach 11 by any arithmetic**, so the clause pointed at nothing, and
+`AGENTS.md` §1 says a sentence with no line to point at gets deleted rather than
+hedged. The trap is kept, because it is verified and it is why the rule says *first*
+cell. The **route** is now INFERRED and the assumption is stated:
+
+> **INFERRED — how the wrong denominator arose.** The most likely route is the one
+> visible in the preserved original itself: it read *"`README.md:52-53` tabulates
+> **eleven**"* and then **listed ten values on the same line** — self-refuting on its
+> face, with the wrong count in front of the reader and the right list immediately
+> after. **Assumption:** that the number came from reading the prose label rather than
+> counting the list. Nothing in the tree establishes how the sentence was actually
+> written, and no counter is recorded. This is a hypothesis about a past edit, offered
+> because it is checkable against the preserved text — not a finding.
+
+**3. A line wearing a file's date. The filter's date is now the line's.** §8.3 said
+the extension filter *"was last touched 2026-10-12 19:25"*. `2457a59` at that
+timestamp **touched the file**, and added **zero** filter lines; `git blame` puts
+`scripts/research-gate.sh:86`, `:89` and `:92` all at **`6ed0a8d4`, 2026-10-11
+16:32**. The conclusion — *the filter predates this pass, nothing here caused it* —
+holds on either date, so only the attribution moves. A file's last-touch wearing a
+line's name is `AGENTS.md` §6 item 2, and the number was the *file's* throughout.
+Corrected at both places it appeared: §8.3 and the round-1 Correction above.
+
+**Also recorded, and not changed: the round-1 commit message overstates what was
+corrected.** It claims *"Corrected at all four sites: the 8.1 heading, its body, the
+section 7 row, and docs/03 section 3a.1."* **`FINDINGS.md`'s §7 "10-row boundary
+table" row was always correct and was not changed** — the correction text in the file
+says so honestly; only the message implied otherwise. **The pushed message is not
+amended.** Rewriting a pushed commit rewrites history a reviewer may already have
+read, for no change to any file; the accurate account is this paragraph and the
+commit that carries it.
+
+**Not re-litigated, per round 2's own confirmations:** `5 of 10` re-derived from both
+captures by a different route; the second-cell trap yielding 1; the original `6 of 11`
+character-identical and self-refuting; §8.3's extension filter confirmed at source;
+the 32-minute staleness interval; zero `X.Y.Z` cells repo-wide; `unobserved` **not**
+converted to `excluded`; the `rows` → `values` noun correction; the retraction, the
+cap restatement, the byte-faithful `probe-followup.sh`, `config.yml` = 7, 209/423 at
+all four sites, and nothing added to `regression/hurl/`.
+
+**Method note for the next worker, from the verifier's near-miss:** this repo's local
+`main` is **shared across worktrees and goes stale** — here it sat at `77b2c8e` while
+`origin/main` was `5b72995`, **9 commits behind**. Diffing against it reported a
+`3+/2−` change to `docs/09` that does not exist, i.e. **a manufactured false
+contradiction**. `git fetch origin` and diff against **`origin/main`**, never a local
+`main`. `docs/09` is byte-identical to `origin/main` on this branch, and its
+`:162` historical `147` is untouched.
