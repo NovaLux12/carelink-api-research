@@ -1,6 +1,9 @@
 hurl 8.0.1 (x86_64-pc-linux-gnu) libcurl/8.22.0 OpenSSL/3.6.5 zlib/1.3.1.zlib-ng brotli/brotli/1.2.0 zstd/zstd/1.5.7 libidn2/2.3.8 libssh2/1.11.1 nghttp2/1.70.0 quic/ngtcp2/1.25.0 nghttp3/1.18.0
 
-# Command (1 request) and verbatim output, captured to this file at run time.
+# Command (1 request) and output, captured to this file at run time. Verbatim
+# except for the path argument on the Success line, redacted 2026-10-13 — see
+# the Correction at the foot of this file. Every count, duration and exit code
+# below is untouched.
 # The 4-cell batch below is TRANSCRIBED from the session transcript, not captured:
 # re-issuing those 4 requests would take the pass to 26 of its 24 cap, and the cap
 # is not a number to exceed for the sake of a tidier artefact. Labelled rather than
@@ -8,7 +11,7 @@ hurl 8.0.1 (x86_64-pc-linux-gnu) libcurl/8.22.0 OpenSSL/3.6.5 zlib/1.3.1.zlib-ng
 # applies to the 2026-10-10 drift sweep.
 
 $ hurl --test --delay 2000 --no-color <discover cell with 3 assertions>
-Success /home/jack/.tmp/opencode/area-b-revalidate.hurl (1 request(s) in 2069 ms)
+Success <tmp>/area-b-revalidate.hurl (1 request(s) in 2069 ms)
 --------------------------------------------------------------------------------
 Executed files:    1
 Executed requests: 1 (0.5/s)
@@ -34,3 +37,58 @@ hurl exit: 0
 # This batch validated the ORIGINAL 4 assertions. The two `not exists` assertions added
 # afterwards are covered by the CAPTURED run at the top of this file.
 # --------------------------------------------------------------------------------
+
+## Correction (2026-10-13) — a machine path was published in the Success line
+
+**What was on `main`.** On `main`, line 11 of this file was hurl's own success
+message, and hurl echoes **the path of the file it was given, verbatim**. In this
+pass that file was a scratch file in the capturing machine's temporary directory,
+so the echoed argument was an absolute path beginning at that machine's home
+directory. `AGENTS.md` §7 lists absolute home directories in the never-publish
+scrub list, so the line should not have shipped — and because the path was a real
+one rather than a placeholder, it carried the account name as well as the path.
+
+**What is redacted.** Only the path argument, and only on the `Success` line of
+the CAPTURED run — line 14 of this file as it now stands, which is the line that
+was line 11 on `main`: the header note below it is three lines longer than the
+one it replaced. Quoted by content rather than by number, because a line number
+in a file this correction is editing is a citation that rots (AGENTS.md §6.6):
+
+```
+Success <tmp>/area-b-revalidate.hurl (1 request(s) in 2069 ms)
+```
+
+The filename is kept, because it is what ties this capture to the pass and it
+names nothing sensitive. **Nothing else in this file changed.** The request
+count, the 2069 ms duration, the executed/succeeded/failed tallies, hurl's
+version line and `hurl exit: 0` are exactly as captured, so every claim the
+artefact exists to support — that the re-validated `discover` cell passed, 1
+request, all assertions held — stands unaltered. The header comment above was
+edited only to stop calling the output "verbatim" without qualification.
+
+**The original is deliberately not reproduced here.** A dated correction that
+quotes the offending line re-publishes it: `scripts/research-gate.sh` scans
+**added lines** (`git diff -U0 "$BASE" -- "$f" | grep '^+'`), so the quotation
+would be a `+` line carrying the exact pattern the gate fails on. Documenting
+the leak reproduces the leak. The removal itself is invisible to that scan,
+which is why this correction can exist without tripping it. Recording *what the
+line was, when it was redacted, and why* is what preserves the audit trail.
+
+**The honest asymmetry.** Append-only exists so a retraction stays readable
+(AGENTS.md §3). This line is neither a claim nor a retraction — it is hurl
+reporting which file it opened, and no claim in this repo was ever derived from
+the path. Keeping a username published so that the location of a scratch file is
+auditable is a bad trade; the audit value is *that the validation ran and
+passed*, not where its temporary input lived. Retractions are preserved here.
+A machine path is redacted.
+
+**Why it recurs, and what prevents it.** `hurl --test` prints the input path it
+was handed, so the shape of the leak follows the location of the input file, not
+the tool. Areas X and Z captured the same kind of run and their `Success` lines
+carry repo-relative paths, because both ran a committed `.hurl` from inside their
+own pass directory. This pass ran a scratch file from outside the repo. **Run
+`hurl` against a committed `.hurl` inside the pass directory and the echo is a
+relative path that is safe to commit.** See `docs/09` §4, "A leak scan that
+cannot see the file it was written for", for the check-side half — the gate's
+machine-path pattern does not read `.txt` files at all, so neither this artefact
+nor any other raw `findings-log/` text file has ever been in scope of it.
