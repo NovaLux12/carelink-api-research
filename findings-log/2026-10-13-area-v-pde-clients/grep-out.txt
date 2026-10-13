@@ -4,7 +4,7 @@
 ##############################################################################
 
 ==============================================================================
-== eu-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+== eu-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa (printed here; COMPARED in section 3)
 ==============================================================================
 baseUrlPde                           cs=0    ci=0    q=0   
 /connect/pde                         cs=0    ci=0    q=0   
@@ -188,7 +188,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
    old guard was claimed to be; §3 is that.
 
 ==============================================================================
-== us-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+== us-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa (printed here; COMPARED in section 3)
 ==============================================================================
 baseUrlPde                           cs=0    ci=0    q=0   
 /connect/pde                         cs=0    ci=0    q=0   
@@ -372,7 +372,7 @@ NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, rea
    old guard was claimed to be; §3 is that.
 
 ==============================================================================
-== hp-main: 3397615 B  sha256 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
+== hp-main: 3397615 B  sha256 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba (printed here; COMPARED in section 3)
 ==============================================================================
 baseUrlPde                           cs=0    ci=0    q=0   
 /connect/pde                         cs=0    ci=0    q=0   
@@ -574,7 +574,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
    old guard was claimed to be; §3 is that.
 
 ==============================================================================
-== sup-main: 3410666 B  sha256 a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954
+== sup-main: 3410666 B  sha256 a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954 (printed here; COMPARED in section 3)
 ==============================================================================
 baseUrlPde                           cs=0    ci=0    q=0   
 /connect/pde                         cs=0    ci=0    q=0   
@@ -776,7 +776,7 @@ NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, rea
    old guard was claimed to be; §3 is that.
 
 ==============================================================================
-== eu-runtime: 8268 B  sha256 0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722
+== eu-runtime: 8268 B  sha256 0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722 (printed here; COMPARED in section 3)
 ==============================================================================
 baseUrlPde                           cs=0    ci=0    q=0   
 /connect/pde                         cs=0    ci=0    q=0   
@@ -828,6 +828,8 @@ NGP                                  cs=0    ci=0    q=0
 ==============================================================================
 §3  PUBLISHED-MULTIPLICITIES GUARD (drift detection, not first-derivation proof)
 ==============================================================================
+   header matches expected-multiplicities.HEADER: True
+   ok   5 body digest(s) match the published file
    ok   238 group(s) match the published multiplicities exactly
    ok   case-sensitivity class per section (derived from the bytes, not stored):
         eu-main     pde                                ci       cs=0   ci=25  groups=7
@@ -879,8 +881,9 @@ NGP                                  cs=0    ci=0    q=0
         sup-main    deviceFamily                       cs       cs=2   ci=2   groups=2
         sup-main    NGP                                ci       cs=0   ci=51  groups=22
 
-   LIMIT, stated so this guard is not over-read: it detects DRIFT between the
-   published numbers and the bytes. It cannot detect a wrong FIRST derivation,
-   because expected-multiplicities.txt was authored by this same pass from
-   these same bundles. MODE=--emit re-derives it; re-review any diff by hand
-   rather than trusting that it is small.
+   LIMIT, stated so this guard is not over-read twice: it detects DRIFT between
+   the published numbers and the bytes, and the digest rows additionally prove
+   the bytes on disk ARE the published ones. Neither detects a wrong FIRST
+   derivation: the multiplicities AND the digests were both produced by this
+   same pass from these same bundles on 2026-10-13. MODE=--emit re-derives;
+   re-review any diff by hand rather than trusting that it is small.

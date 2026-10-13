@@ -72,11 +72,20 @@ print('# selector resolution is by hand-checked literal, not by regex: a regex')
 print('# over minified signal-selector factories resolves some selectors to the')
 print('# wrong leaf, and a wrong leaf is worse than an absent one.')
 
+# The first two are area V's own pointers. The third exists because FINDINGS.md's
+# area-F addendum carried selector Nt -> bQ, "3 reads" and a template string at
+# byte 1966110 that appeared in NO artefact (AGENTS.md section 1: a claim you
+# cannot point at a line for is deleted). Rather than delete verified information
+# area F needs, it is sourced here, by the same hand-checked-literal method — not
+# by regex, which resolves some minified signal-selector factories to the wrong
+# leaf, and a wrong leaf is worse than an absent one.
 POINTERS = [
     ('csr.cumulus.periodic.data.endpoints', 'csrCumulusPeriodicDataAPI',
      '(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI)'),
     ('system.gc.gz.transition.flags', 'guardianCumulusPeriodicAPI',
      '(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)'),
+    ('personal.patient.timeline.config', 'patientTimelineConfig',
+     '(0,e.Mz)(f,gt=>null==gt?void 0:gt.patientTimelineConfig)'),
 ]
 for keyname, const, selector_src in POINTERS:
     print()
@@ -102,10 +111,30 @@ for keyname, const, selector_src in POINTERS:
         continue
     sites = [m.start() for m in re.finditer(r'\.' + re.escape(al) + r'(?![\w$])', t)]
     print(f'    property reads of ".{al}" in the whole file: {len(sites)}')
-    for s in sites:
-        print(f'      @{s}: ...{t[max(0, s-200):s+160]}...')
+    # A two-character export alias is NOT unique across a bundle, so some of these
+    # sites read a same-named export from a DIFFERENT module. The split is a HAND
+    # CHECK, not machine-resolved, and it is not automated here on purpose: a
+    # "resolve each site to its owning module" search gets it wrong, because minified
+    # identifiers are shadowed per function scope and the nearest preceding binding is
+    # frequently the wrong one. An attempted resolver in round 3 reported the .cO
+    # read at byte 3373465 as NOT genuine (it took a shadowing binding from another
+    # module); the enclosing module is 99040, whose own head binds p = i(4265), so
+    # the site IS genuine and the resolver was wrong. Shipping it would have been the
+    # fourth round of a control claiming more than it checks. Known instance:
+    # .cO sites at 1522284 and 1522483 are module 86332's Angular Material injection
+    # token. Read the printed namespace and context; do not take the count as a
+    # consumer count without that step.
     if not sites:
         print(f'      the substring ".{al}" does not occur anywhere in this file.')
+
+print()
+print('--- the Patient-Timeline tab gate that consumes personal.patient.timeline.config')
+# The template reads .featureEnabled off the selected value; this prints that
+# string verbatim so the addendum's claim is sourced rather than asserted.
+for probe in ['patientTimelineConfig$', 'featureEnabled']:
+    for m in re.finditer(re.escape(probe), t):
+        s2 = m.start()
+        print(f'    {probe!r} @ {s2}: ...{t[max(0, s2 - 120):s2 + 130]}...')
 
 print()
 print('--- personal.patient.timeline.host (area F addendum)')

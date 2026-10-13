@@ -96,9 +96,6 @@
     byte offsets : constant assignment @2188929, selector definition @93547
     selector local 'ne' -> exported as 'cO'
     property reads of ".cO" in the whole file: 3
-      @1522284: ...anel]},changeDetection:0}),Fe})()},38581:(Je,_e,i)=>{"use strict";i.d(_e,{$R:()=>f,KS:()=>t,Qo:()=>d,YV:()=>n,Zq:()=>g,cC:()=>h,tL:()=>o});var e=i(90821),a=i(22618);let n=(()=>{var E;class c extends e.cO{}return(E=c).\u0275fac=(()=>{let S;return function(w){return(S||(S=a.xGo(E)))(w||E)}})(),E.\u0275dir=a.FsC({type:E,selectors:[["","matLegacyCellDef",""]],st...
-      @1522483: ...e.cO{}return(E=c).\u0275fac=(()=>{let S;return function(w){return(S||(S=a.xGo(E)))(w||E)}})(),E.\u0275dir=a.FsC({type:E,selectors:[["","matLegacyCellDef",""]],standalone:!1,features:[a.Jv_([{provide:e.cO,useExisting:E}]),a.Vt3]}),c})(),o=(()=>{var E;class c extends e.n5{}return(E=c).\u0275fac=(()=>{let S;return function(w){return(S||(S=a.xGo(E)))(w||E)}})(),...
-      @3373465: ....filter(X=>X.username===V)),(0,S.n)(R=>(0,a.of)(R[0])),(0,f.M)(R=>this.currentPatient$.next(R)),(0,t.W)(()=>(0,a.of)(null)))}getUploadDeviceInfo(V){return(0,n.p)([this.getProfile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username,role:this.isCarePartner()?L.P.CARE_PARTNER:L.P.PATIENT,usernam...
 
 --- system.gc.gz.transition.flags
     key constant : guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"  (1 occurrence(s) of the key string)
@@ -106,6 +103,19 @@
     selector local 'be' -> exported as 'z2'
     property reads of ".z2" in the whole file: 0
       the substring ".z2" does not occur anywhere in this file.
+
+--- personal.patient.timeline.config
+    key constant : patientTimelineConfig="personal.patient.timeline.config"  (1 occurrence(s) of the key string)
+    byte offsets : constant assignment @2190423, selector definition @96965
+    selector local 'Nt' -> exported as 'bQ'
+    property reads of ".bQ" in the whole file: 3
+
+--- the Patient-Timeline tab gate that consumes personal.patient.timeline.config
+    'patientTimelineConfig$' @ 1966082: ...bMT(7,18,"recent.activity.tabs.Logs"))),t.R7$(2),t.vxM(1===m.currentTabIndex?8:-1),t.R7$(),t.vxM(null!=(b=t.bMT(10,20,m.patientTimelineConfig$))&&b.featureEnabled?9:-1),t.R7$(2),t.vxM(t.bMT(12,22,m.isSettingsTransferFeatureEnabled$)?11:-1)}}function ...
+    'patientTimelineConfig$' @ 1968135: ....isCCTraceEnabled=Ae}),this.store.select(Ws.wm).pipe((0,Oe.pQ)(this.destroyRef)).subscribe(m=>{this.userLocale=m}),this.patientTimelineConfig$=this.store.select(Ri.bQ),this.load(),this.loadLoginSync()}load(){this.filters$.pipe((0,ua.B)(100),(0,De.M)(...
+    'featureEnabled' @ 1490867: ....dialog=et,this.destroyRef=ht}showAboutCookiesIfNeeded(){this.store.select(be.TB).pipe((0,ee.s)(1),(0,J.p)(ge=>!!ge&&ge.featureEnabled&&ge.status===ye.o.NONE),(0,e.n)(ge=>this.dialog.open(p,{autoFocus:!1,restoreFocus:!1,disableClose:!0,hasBackdrop:!1...
+    'featureEnabled' @ 1966110: ...bs.Logs"))),t.R7$(2),t.vxM(1===m.currentTabIndex?8:-1),t.R7$(),t.vxM(null!=(b=t.bMT(10,20,m.patientTimelineConfig$))&&b.featureEnabled?9:-1),t.R7$(2),t.vxM(t.bMT(12,22,m.isSettingsTransferFeatureEnabled$)?11:-1)}}function L0(D,y){if(1&D&&t.nrm(0,"app...
+    'featureEnabled' @ 2203128: ...ing$=po(()=>this.actions.pipe(mc(ol.SS),(0,va.E)(this.store.select(Ri.kZ)),(0,De.M)(([{cookieAnalytics:Ut},Xt])=>{const{featureEnabled:_n,status:Dn}=Ut,kn=Dn===Jm.o.ACCEPTED;Xt&&this.mixpanelService.init(Xt),_n&&kn?this.mixpanelService.optInTracking(...
 
 --- personal.patient.timeline.host (area F addendum)
     constant D.personalPatientTimelineHostURL assigned at byte 2190453; 1 occurrence(s) of the key, 1 of the constant name

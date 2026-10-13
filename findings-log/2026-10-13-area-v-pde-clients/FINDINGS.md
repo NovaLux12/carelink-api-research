@@ -374,10 +374,20 @@ in `docs/11`:
   (3340159). `dialog-lite` is **0 hits** in all five bodies. A grep on the bare
   name would have reported a `patient-timeline` integration.
 - The bundle **does** carry `personal.patient.timeline.config` as a quoted literal
-  (1 occurrence), reads it through selector `Nt` (exported as `bQ`, 3 reads), and a
-  template reads `.featureEnabled` off it to choose between rendering the
-  Patient-Timeline tab and not (byte 1966110:
+  (1 occurrence) and reads it through selector `Nt`, exported as `bQ` — **3 property
+  reads, at bytes 1968178, 3326686 and 3327799** — and a template reads `.featureEnabled`
+  off the selected value to choose between rendering the Patient-Timeline tab and not
+  (byte 1966110:
   `…t.vxM(null!=(b=t.bMT(10,20,m.patientTimelineConfig$))&&b.featureEnabled?9:-1)…`).
+  **All four facts are now printed by `consumers.sh §2`** — the selector chain and every
+  read site, under *`personal.patient.timeline.config`* and *the Patient-Timeline tab
+  gate* in `consumers-out.txt` — so they are **sourced rather than asserted**
+  (`AGENTS.md` §1). They were unsourced in the first two rounds, which was a defect in
+  its own right however load-bearing-free and out-of-scope they were.
+  ⚠ **3 counts `.bQ` occurrences, not consumers**: a two-character export alias is not
+  unique across a bundle, and 2 of the 3 sites belong to other modules (`f`, bound to
+  module 90669). That split is a **hand check**, and `consumers.sh` now says so where a
+  reader meets the number instead of letting it stand as a consumer count.
 - The bundle also names **`personal.patient.timeline.host`** — 1 occurrence, and its
   constant `personalPatientTimelineHostURL` occurs **once**, so nothing reads it.
   ⚠ The published key is **`personal.patient.timeline.config.host`** (`docs/04`;
@@ -444,7 +454,9 @@ Two errors in this log, both found by a verifier reading the committed artefacts
 against the committed prose. **Both were mine**, both were re-derived here on the
 digest-matched bodies (`hp-main` `2a7fa8e7af519c2b…` / 3,397,615 B, `sup-main`
 `a054555a0f22176e…` / 3,410,666 B, `eu-main` `0fb4fbd483b5f5d2…` / 3,417,255 B —
-**digest asserted before any comparison**, `AGENTS.md` §6 item 3), and both originals
+**digest asserted before any comparison** — ⚠ **that clause was FALSE and is withdrawn;
+the assertion is now real, see [§F](#f--the-guard-advertised-a-digest-check-it-did-not-perform)**),
+and both originals
 stay visible above and here. `AGENTS.md` §3: corrections are appended, never edited
 away.
 
@@ -620,7 +632,12 @@ alibi.
 `expected-multiplicities.txt`
 `sha256 3e46f92cef313ed6e91b1ba5c0ed2be16fa92546b06a8ec8ef0e392566491aa9`. Two
 consecutive runs of the fixed script are byte-identical, and `MODE=--emit` reproduces
-the expected file from the bodies.
+`expected-multiplicities.txt` **byte-for-byte** — header, digest rows and multiplicity
+rows — because the header now lives in its own committed file,
+`expected-multiplicities.HEADER`, which `--emit` copies verbatim and `--check` verifies.
+Demonstrated, not asserted: `--emit` output is `diff`-clean against the committed file,
+and truncating the HEADER file changes the emitted file's first line, which is what
+proves the header is an *input* rather than something the generator rewrites (§F).
 
 ### §D — §2 asserted the opposite of the distinction under audit
 
@@ -645,7 +662,78 @@ three states — `ci` (`cs == 0`), `cs` (`cs == ci`), `partial` (`0 < cs < ci`) 
 printing the observed counts, and the class is stored **nowhere** in the expected file so
 the two cannot disagree about it.
 
-### §E — a disclosure that travelled less far than it should
+### §F — the guard advertised a digest check it did not perform
+
+**ROUND-3 CORRECTION, and the third instance of one pattern in this PR.** Round 1
+published a corroboration that did not exist. Round 2 shipped a guard that compared a
+partition sum to the size of the set it partitioned, and called it protection. Round 3
+shipped a *replacement* guard that **printed** each body's sha256 and had three places
+claiming it **asserted** the digest before any comparison and that **a bundle bump makes
+the guard say so**. None of that was true. The pattern across all three is the same:
+**a control describing more than it checks** — `docs/09` §5's verdict on the shape, *"a
+check that looks like it ran is worse than no check, because it converts a gap into a
+green tick."*
+
+**Reproduced here before the fix**, on the digest-matched bodies (§6 item 3 discipline
+carried into the test, not into a claim):
+
+| body | size | sha256 | guard exit |
+|---|---|---|---|
+| published `eu-runtime` | 8,268 B | `0dfea208804facf8…` | **0** |
+| bumped `eu-runtime`, every group and multiplicity identical | **13,272 B** | **`1cdfa1ea2103b29a…`** | **0** |
+
+Different digest, different size, every byte offset moved — **exit 0**, with the wrong
+digest printed two hundred lines above the green tick.
+
+**The claim is now real rather than withdrawn**, for the same reason round 2's was: the
+consistent choice across rounds is to make a control do the thing it says.
+`expected-multiplicities.txt` now carries **5 digest rows** —
+`<body> sha256 <hex>` — alongside the 238 multiplicity rows, and `extract.sh` §3
+**compares the digests FIRST**, before any multiplicity is read. A bundle bump now
+fails the guard on the digest and the multiplicities are never consulted.
+
+| test | exit | reported |
+|---|---|---|
+| clean, committed file | **0** | `ok 5 body digest(s) match` · `ok 238 group(s) match` |
+| **bumped body, identical multiplicities** (the verifier's demonstration) | **1** | `FAIL 1 body digest mismatch(es) — the bytes being compared are NOT the bytes that were published` |
+| `propDecorators 5` (the round-1 error) | **1** | multiplicity CHANGED |
+| a deleted row | **1** | multiplicity MISSING |
+| a phantom row | **1** | multiplicity NEW |
+
+**The limit, stated in three places — this file, `extract.sh`'s header, and
+`expected-multiplicities.HEADER` — because it is the thing that has now been got wrong
+three times.** §3 is **drift detection** between the published rows and the bytes on
+disk; the digest rows additionally prove the bytes being compared **are** the bytes that
+were published. **Neither detects a wrong first derivation**: the multiplicities *and*
+the digests were produced by this same pass from these same bundles on 2026-10-13, so a
+bundle misread on the first pass is misread here identically. What replaces a first
+derivation is re-derivation plus review by hand — §A's and §B's re-derivations were
+done by a reviewer who had not built the numbers, and that is precisely the step no
+script in this directory can perform. **It is stated in the artefact's own header so a
+reader who opens the data file — not this log — still gets it.**
+
+**And the fourth thing round 3 checked, which I got wrong again in the other
+direction.** `MODE=--emit` used to write its own short header over the committed
+rationale header, destroying the digest table and every explanation of how the numbers
+were derived, while this log claimed it "reproduces the expected file". The header now
+lives in **its own committed file**, `expected-multiplicities.HEADER`, which `--emit`
+copies verbatim, and `--check` **verifies the emitted file begins with it** — so a
+rewritten header is a guard failure, not a silent overwrite. Demonstrated rather than
+asserted: `--emit` output is `diff`-clean against the committed file, and truncating the
+HEADER file changes the emitted file's first line, which is what proves it is an input.
+
+**A control I built and then withdrew, recorded because the failure mode is the point.**
+To make the read counts more precise I added a resolver mapping each `.<alias>` site to
+the module its namespace is bound to. It reported the `.cO` read at byte 3373465 as
+**not** genuine, contradicting a round-1 finding. It was the resolver that was wrong:
+that site is in module **99040**, whose head binds **`p = i(4265)`**, so it *is* genuine
+— minified identifiers are shadowed per function scope, and a nearest-preceding-binding
+search finds the wrong one. Shipping it would have been the fourth round of the same
+meta-pattern, so it is **withdrawn**, and `consumers.sh` now prints the warning where a
+reader meets the number: 3 `.bQ` sites, 2 of them another module's same-named export,
+hand-checked not machine-resolved.
+
+### §G — a disclosure that travelled less far than it should
 
 The `body_mtime_epoch` caveat below (whole seconds, `stat -c%Y`, so the sub-second
 mtime figures are **not re-derivable from the committed ledger** and git does not

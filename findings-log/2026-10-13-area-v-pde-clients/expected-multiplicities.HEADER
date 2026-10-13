@@ -1,0 +1,53 @@
+# expected-multiplicities.txt — the published state of area V's token census.
+#
+# THIS FILE IS HEADER + COMPARED ROWS, and the header lives in
+# expected-multiplicities.HEADER, which extract.sh --emit copies verbatim.
+# Round 3 found --emit writing its own short header over the committed one and
+# destroying this file's rationale while FINDINGS.md claimed it "reproduces the
+# expected file". The header is now a separate committed input, so --emit
+# reproduces this file byte-for-byte and cannot silently overwrite the
+# explanation of how the numbers were derived.
+#
+# WHAT extract.sh §3 CHECKS, and what it does not. Everything below is a
+# COMPARED input, not documentation: section 3 reads this file, compares it to
+# what it recomputes from the bodies, prints the diff, and exits non-zero.
+#
+#   ROW KIND 1 — body digests:   <body> sha256 <hex>
+#   ROW KIND 2 — multiplicities: <body> <token> <enclosing identifier> <n>
+#
+# §3 compares the DIGESTS FIRST. A bundle bump fails the guard before any
+# multiplicity is even read. Round 3 found this guard PRINTING each body's sha256
+# in section 1, while three places claimed it "asserts the digest before any
+# comparison" and that "a bundle bump makes the guard say so". That was false and
+# was reproduced here before the fix: a body of 13272 B, sha256 1cdfa1ea..., with
+# every group and multiplicity identical to the published 8268 B,
+# sha256 0dfea208..., exited 0. Digests are now compared rows.
+#
+# THE LIMIT, and this is the third round of a control describing more than it
+# checks, so it is stated here, in extract.sh, and in FINDINGS.md rather than once:
+#
+#   §3 is DRIFT DETECTION between the published rows and the bytes on disk. The
+#   digest rows additionally prove the bytes being compared ARE the bytes that
+#   were published. NEITHER detects a wrong FIRST derivation — both the
+#   multiplicities and the digests were produced by this same pass from these same
+#   bundles on 2026-10-13, so a bundle misread on the first pass is misread here
+#   identically. What replaces a first derivation is re-derivation and review by
+#   hand, not a check this script can perform.
+#
+#   The case-sensitivity CLASS (cs / ci / partial) is deliberately NOT stored here.
+#   It is derived by the script from the bytes and printed per section, so this
+#   file cannot disagree with the script about it. Round 3's other finding was §2
+#   labelling partial tokens "case-insensitive ONLY"; storing the class here would
+#   have let the same disagreement return through a second channel.
+#
+#   Counters: 238 multiplicity rows + 5 digest rows = 243 compared rows.
+#
+# Bodies and digests. §3 compares the digest rows against these bodies:
+#   eu-main     3,417,255 B   us-main     3,417,255 B
+#   hp-main     3,397,615 B   sup-main    3,410,666 B
+#   eu-runtime     8,268 B
+# A bundle bump makes every multiplicity row for that body wrong AND fails the
+# digest row. Re-derive with MODE=--emit; re-review any diff by hand.
+#
+# Capture date 2026-10-13. Full derivation and the correction history:
+# FINDINGS.md, "Correction (2026-10-13)" sections C, D and F.
