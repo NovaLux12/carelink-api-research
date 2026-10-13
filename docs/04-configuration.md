@@ -262,7 +262,7 @@ object, and **nobody had read the object**.
 `personal.patient.timeline.config` resolves to an **object of exactly two
 members** — `featureEnabled` and `host` — with the **same member set on all three
 patient deployments** (`OBSERVED`, live bulk document on each host;
-[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §1]):
+[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 1"]):
 
 | member | type | `.eu` | `.com` | `-trials` |
 |---|---|---|---|---|
@@ -282,7 +282,7 @@ from the bulk document on all three deployments**, and its per-key route 404s wi
 0 bytes on all three. So the document publishes **exactly one** timeline host, as
 `…timeline.config.host`, and the bundle's other name is a **stale key**
 (`OBSERVED`, 3 of 3; [source:
-findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §2]). This closes the
+findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 2"]). This closes the
 half-open question area V recorded — "either the bundle names a stale key nothing
 reads, or the vendor publishes a second, unrecorded key" — in favour of the first,
 on the evidence of a **membership test against the document**, not a status code.

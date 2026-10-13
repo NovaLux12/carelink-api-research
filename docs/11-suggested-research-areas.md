@@ -368,7 +368,7 @@ of inherited, which is what made them usable.
 #### Successor to area F — does the published `config.host` pointer name the gateway this repo probed?
 
 **Known, labelled.** The object's full member set is recorded and pinned
-(`OBSERVED`, [source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §1]). The
+(`OBSERVED`, [source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 1"]). The
 `host` member is an `https` string of **79 / 76 / 76** characters on `.eu` / `.com` /
 `-trials`, with **three distinct** sha256 digests (`OBSERVED`, same source). The value itself
 is **not published** and its shape is **not claimed**. Separately, this repo records the
@@ -409,7 +409,7 @@ the recorded shape — it must still be screened against `scripts/scrub-patterns
 **Known, labelled.** The route answers `200 application/json` on `.com` and `-trials`
 (**22 B**, byte-identical by sha256 across the two) and was recorded `200` returning
 `{"messages": []}` (**16 B**) on `.eu` in 2026-10-08 (`OBSERVED`,
-[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §3];
+[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 3"];
 [`CONFIG-NAMESPACE-DEEP.md`](../findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md)
 line 90). The live value's **content is not in the ledger**, because bodies are transient.
 
