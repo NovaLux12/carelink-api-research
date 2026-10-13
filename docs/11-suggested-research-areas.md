@@ -113,36 +113,11 @@ echo: **45 of 45** cells, 3 hosts × 5 route families × 3 `Origin` conditions. 
 rather than deleted so the reasoning survives; a closed area never leaves the page silently
 ([How to claim one](#how-to-claim-one), rule 5).
 
-### E. Config-key archaeology on `/patient/configuration/system/*`
-
-The per-key form is confirmed unauthenticated and returns a 21/21 exact match
-against the public document — in a `{"value": "<string>"}` envelope where **booleans
-arrive as strings**. But only the non-null keys were probed.
-
-Every `null`-valued key currently 404s. The interesting question: **is there a key
-that exists on one deployment but not another**, or a key whose per-key form works
-where the bulk document returns nothing? Probe the 69 by deployment and record
-which are absent rather than null.
-
-**Closes when:** the per-key form is confirmed/refuted for all 69 keys × 3
-deployments.
-
-#### Addendum (2026-10-13, from area W): one deployment swept, two remain
-
-Area W swept all 69 keys plus `captcha`'s four subkeys on **EU only**
-([findings-log/2026-10-13-area-w-per-key/FINDINGS.md]): 61 VALUED-match, 5
-NULL-404, `captcha`/`default.country` on dedicated routes, zero names outside
-the bulk document — and the complete 69-name list is now committed at
-[findings-log/2026-10-13-area-w-per-key/keys.txt](../../findings-log/2026-10-13-area-w-per-key/keys.txt),
-so the candidate list for the remaining two deployments is closed and needs no
-re-derivation. One caveat travels with it: `personal.common.core.reporting.enabled.countries`
-does **not** round-trip on EU — its per-key value carries a stray trailing `]`
-(reproduced byte-identical), so a cross-deployment value comparison must parse
-defensively, not string-compare. **Closes when:** the per-key form has a verdict
-for all 69 keys on `.com` and `-trials`, with absent-vs-null resolved per
-deployment. A negative (all three identical) counts. **Assumptions (INFERRED):**
-that the per-key grammar is keyed off the same flat-name form on all three
-deployments — only one has ever been swept.
+> **Area E is CLOSED** — see the Closed table at the foot of this page and
+> [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md]. It is left here
+> rather than deleted so the addendum that framed it survives; a closed area never
+> leaves the page silently ([How to claim one](#how-to-claim-one), rule 5). Its
+> successor is the dated addendum under **F** below.
 
 ### F. What the timeline and dialog-lite gateways actually are
 
@@ -158,6 +133,58 @@ call.
 
 **Closes when:** you can name the caller and say whether a third-party client can
 reach these services at all.
+
+#### Addendum (2026-10-13, from area E): the two config-escape routes have only ever been read on one deployment
+
+**Derived from area E's negative, which is what makes this askable.** E swept
+all 69 names per-key on `.com` and `-trials` and found the projection is
+byte-for-byte identical to each host's own bulk document, **0 mismatches in 123
+valued cells** ([findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md]
+§2). That means a third-party client reading config unauthenticated has exactly
+**three** read paths, not 69: the bulk document, plus the two keys whose per-key
+form is a 404 because they live at **dedicated routes** —
+`/patient/configuration/defaultCountry` and `/patient/configuration/recaptcha/key`
+— plus `/patient/configuration/messages/{lang}` beside them.
+
+**All three were recorded on `.eu` only**, by the 2026-10-08 namespace pass
+([findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md]). No pass has
+requested either dedicated route on `.com` or `-trials`, and area E's own log says
+so rather than implying it ([source:
+findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §7]). A client that
+falls back to `defaultCountry` when the per-key form 404s has **never been
+observed to succeed anywhere but the EU host** — and that fallback is exactly what
+the `default.country` / `captcha` verdict is for.
+
+**What is missing:** whether the two dedicated routes are live, and return the
+same envelope, on the other two deployments; and whether `messages/{lang}` is
+still `{"messages":[]}` or has gained content. A **third** question fell out of
+E and is the cheaper one: the trials host returned **one real-key 404 carrying
+`content-type: application/vnd.nervana`** — a value in **no prior reading anywhere
+in this namespace** — so the 404 content-type set is **deployment-dependent and
+three-valued**, not the two-valued shape area W recorded on EU.
+
+**Blocker:** a bounded candidate list that already exists on disk and needs no
+invention — the three routes above, plus `/patient/configuration/version` and the
+`/patient/configuration/` root (both already tried and 404'd on EU, so they are
+**controls**, not candidates). That is 5 paths × 2 hosts + 2 controls per host =
+**14 requests**, GET only, controls first per host.
+
+**Closes when:** all three routes have a recorded verdict on `.com` and `-trials`,
+and the per-deployment 404 content-type set is tabulated. **A negative counts**
+and is the likely answer — that the two dedicated routes are EU-only, or that the
+whole sibling namespace is identical everywhere, would both close this. The one
+outcome that does *not* close it is a new key appearing under
+`/patient/configuration/` on a non-EU host, which would reopen the projection
+question E just retired.
+
+**Assumptions (INFERRED):** that the `/patient/configuration/` sibling namespace
+behaves the same on all three deployments — E established this for the
+`/system/` subtree only, on the strength of an identical 69-name key set and
+identical per-key verdicts, which is evidence about `/system/` and not about the
+siblings. `application/vnd.nervana` is recorded once, on one cell, on one
+deployment: that it is a deployment-level constant rather than a per-key or
+per-route value is **not** established, and one observation cannot separate those
+three readings.
 
 ---
 
@@ -365,7 +392,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 10 open plus 16 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 9 open plus 17 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -402,6 +429,7 @@ being superseded — never silently. Letters are not reused.
 | J — `login-errors.ts` against the live error surface (addendum: the three advertised Auth0 endpoints) | 2026-10-13 | **One routed, two dangling — uniform across all five tenants, no shadow split.** `/mfa/challenge` answers the preflight `204` + `ACAO: *` + exact `allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS` on all five (the path with no probe result in any source was live); `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five — preflight byte-identical to per-host one-character-different controls (one 10 B digest `0802559db137…` across 15 bodies). POST-only-ness of `/mfa/challenge` is INFERRED from specification, not established — no POST sent, and the six-method list is a second live instance of `docs/09` §4's allow-methods trap. Revocation verdict scoped to the `Auth0` connection name. ⚠ **Correction history preserved:** this addendum was written 2026-10-12 as a GET sweep on area I's then-claim that `registration_endpoint` was absent everywhere; a verifier refuted the premise (the endpoint is live and POST-only) and the addendum was rewritten to empty-body OPTIONS before probing — the original wording is retained in the area-I log, not here. **23 of a 26 cap** (20 curl + 3 live hurl pin-validations), GET + empty-body OPTIONS only, controls first per host, all 5 passed, measured `t_sent` floor **2.395 s** (all gaps ≥ 2 s floor; 2 under the declared 2.5 s and 4 negative durations recorded with no cause asserted). EU cells pinned (exact allow-methods, not contains); counts re-measured 193→199 static, 401→413 execute. Successor: the parent half (bridge `login-errors.ts` taxonomy vs provoked errors) as a new `docs/10` §1 row | [findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md] | #34 |
 | H — the `reportFileNamingSupportedPumpModels` list, entry by entry | 2026-10-13 | **Positive with residue: 214 entries classified, 86 rows matched, 128 not.** The list lives in the **patient** public config (`personal.common.core.report.generation.reportFileNamingSupportedPumpModels`, 69-key document, re-derived live) — not HCP-only as the area premise had it. In code: wire code 129 · display name 71 · bare number 10 · placeholder 4; 82 wire codes matched by family, 47 unmatched by prefix group; placeholders 4/4 matched (all INSTINCT values); bare numbers and display names 0 matched; normalization changes nothing. Anomalies: `MMT-9015` ×2, `Precision Xtra® / Xceed™` ×2, one trailing-space entry matching the map's own padding exactly, ten `MMT-`+bare pairs. Correction attached in `docs/05`: `MMT-8200/8201/8400/8401` are in **both** report lists and **neither** family table. **5 of a 6 cap**, GET only; 3 hp-namespace requests voided by a harness header defect and disclosed as wasted — the close rests on the patient document alone | [findings-log/2026-10-13-area-h-report-naming/FINDINGS.md] | #33 |
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
+| E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
 ---
 
 > **Consumer note.** Findings here are consumed by
