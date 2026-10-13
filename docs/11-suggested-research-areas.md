@@ -1076,6 +1076,11 @@ and a **second crawl**, and the fourth member is not a `.jsf`:
 
 **Four paths · one host · two crawls · two dates spanning 2020-05-25 →
 2020-12-02** (OBSERVED, [source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md
+**Correction (2026-10-13).** The earliest **`/ipro/hcp/*`** member of that same
+crawl body is **2020-05-27 21:29:18**, not 2020-05-25; the 2020-05-25
+strings in that body are `/patient/*` records. The absence verdict of the
+2026-10-13 re-issue is unaffected.
+
 §2]). Two query shapes agree on the new member — `matchType=domain` and
 `matchType=host` return the identical 7-record set — so it carries the same
 weight as area M's anchor. **Consequences:** the family is
