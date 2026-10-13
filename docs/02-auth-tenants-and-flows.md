@@ -134,10 +134,36 @@ AUTH-TENANT §1]:
   advertised but not enabled for this client on either tenant.
 - `/.well-known/jwks.json` — 200, two RSA RS256 keys per region, different kids
   for `.com` vs `.eu`. Plain `/jwks.json` is 404 — the wrong path, not drift.
-- `/bc-authorize`, `/oidc/register`, `/oauth/global-token-revocation/connection/Auth0`
-  — all advertised, all 404, absent.
-- `/mfa/challenge` — advertised in the OIDC document; **Unknown — no probe result
-  in any source.**
+- `/bc-authorize`, `/oauth/global-token-revocation/connection/Auth0`
+  — advertised; **unrouted on all five tenants by empty-body OPTIONS** — the
+  preflight gets the front door's unrouted signature (`404 text/plain` 10 B +
+  `x-auth0-not-found: 1`), byte-identical to a one-character-different control
+  on the same host (OBSERVED, 10 of 10 cells)
+  [source: findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md §2].
+- `/mfa/challenge` — advertised in the OIDC document; **routed on all five
+  tenants** — the preflight answers `204` + `access-control-allow-origin: *`
+  with exact `access-control-allow-methods: GET, PUT, POST, DELETE, PATCH,
+  OPTIONS` on every tenant including both shadow tenants (OBSERVED, 5 of 5
+  cells) [source:
+  findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md §2].
+  POST-only is INFERRED from the OAuth specification, not established: no POST
+  was sent, and the six-method allow-list is CORS configuration, not a method
+  register (`docs/09` §4).
+
+> ### Correction (2026-10-13, area J, #34) — the GET-era sentence these two
+> bullets replace is kept visible
+>
+> The previous wording here read *"`/bc-authorize`, `/oidc/register`,
+> `/oauth/global-token-revocation/connection/Auth0` — all advertised, all 404,
+> absent"* with *"`/mfa/challenge` — Unknown — no probe result in any
+> source."* The 404s were real observations; "absent" from a GET-only probe
+> was the wrong method for POST-only paths (area I's retracted error, §1
+> above). Re-probed by OPTIONS: `/bc-authorize` and
+> `…/connection/Auth0` stay unrouted on all five, while `/mfa/challenge` —
+> the one with no probe result anywhere — turns out routed on all five. The
+> revocation verdict covers only the `Auth0` connection name; the
+> `{connectionName}` template means another name could route and was not
+> probed.
 
 ## 2. The public client and the custom-scheme redirect
 
@@ -421,7 +447,7 @@ The consolidated table — open, closed, and unknown — is in
 |---|---|
 | Would a patient host accept a shadow-tenant token? | Blocked on a token |
 | ~~JWKS kids for `carelink-login-trials.minimed.com`~~ | **CLOSED 2026-10-12** — `kCezLNMQV0tlc3hZinEly`, `pNzjt7ruOaWE4rlDCBPoP`; disjointness is now a **five**-tenant statement [area I, #23] |
-| `/mfa/challenge`, and an email address from `/userinfo` | **Unknown** — advertised on all five tenants but no probe result in any source; and the email scope is not obtainable for this client without a server-side change |
+| `/mfa/challenge`, and an email address from `/userinfo` | **Partially answered 2026-10-13** — `/mfa/challenge` is routed on all five tenants (204 + CORS, exact allow-methods `GET, PUT, POST, DELETE, PATCH, OPTIONS`) [area J, #34; findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md §2]. Before that pass there was no probe result in any source (the earlier wording is kept here so the change is auditable); the email scope remains not obtainable for this client without a server-side change |
 | Is the `device_code` grant rejected for the *trials* client too? | **Unknown.** All five tenants advertise it; `docs/02` §1 has it rejected for the two *patient* clients. Re-proving it needs a POST to `/oauth/token`, which belongs to area J — deliberately not attempted here |
-| Do the other advertised-but-absent endpoints (`/bc-authorize`, `/mfa/challenge`, global-token-revocation) 404 on **all five** tenants? | **Unknown.** `registration_endpoint` was swept across all five on 2026-10-12 (404 everywhere); its three siblings were not, for want of request budget. Successor recorded under area J in `docs/11` |
+| Do the other advertised-but-absent endpoints (`/bc-authorize`, `/mfa/challenge`, global-token-revocation) 404 on **all five** tenants? | **ANSWERED 2026-10-12/13 — and the premise holds for two of three.** `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five (OPTIONS preflight byte-identical to per-host controls); `/mfa/challenge` is **routed** on all five (204 + CORS, exact allow-methods `GET, PUT, POST, DELETE, PATCH, OPTIONS`), so it was never "absent" — it had no probe result in any source. Revocation verdict scoped to the `Auth0` connection name [area J, #34; findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md §2] |
 

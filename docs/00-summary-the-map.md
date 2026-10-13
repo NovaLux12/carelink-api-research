@@ -349,7 +349,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 193 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 199 of these facts so they fail loudly rather than rot.
 
 ---
 
