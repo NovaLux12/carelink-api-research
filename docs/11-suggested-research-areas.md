@@ -113,78 +113,6 @@ echo: **45 of 45** cells, 3 hosts × 5 route families × 3 `Origin` conditions. 
 rather than deleted so the reasoning survives; a closed area never leaves the page silently
 ([How to claim one](#how-to-claim-one), rule 5).
 
-
-### W. Is the per-key projection a complete enumeration path for the 69-key document?
-
-Added 2026-10-12. **Derived from area T**, which produced the full 69-key name list for
-the first time and showed the document's shape is **not** uniform.
-
-The per-key form at `/patient/configuration/system/<key>` returned **21/21**
-byte-identical subtrees for non-null keys, and null-valued keys 404 — so the form cannot
-tell "absent" from "null", and `docs/04` rejected it under `/patient/v2/`. But it has
-never been run in the **reverse** direction: from a name the bulk document does not
-carry to the per-key form. Nobody knows whether that namespace has keys the bulk
-document does not.
-
-**What is missing:** whether the two key sets are identical. Area T also found the
-document's **68 of 69 key *names* are literal dotted strings and exactly one is a bare
-segment** (`captcha`), while 28–30 of the keys hold object *values*. A reverse probe
-therefore has to decide what "name" means before it can be bounded: a naive splitter on
-`.` misses `captcha`, and a type-blind walker misses every object-valued key.
-
-**Blocker:** none, and the candidate list is finally closed: 69 flat names plus
-`captcha`'s four subkeys, all derived from documents on disk. Only the null-valued ones
-(5 per patient deployment, 6 on trials) need the 404-means-absent-or-null rule stated.
-
-**Closes when:** every key the bulk document carries has a per-key verdict on one
-deployment, **and** any per-key name outside the bulk document is recorded. **A negative
-— identical key sets — closes it**, and would retire the "69-request enumeration path"
-framing in `docs/04`.
-
-**Assumptions (INFERRED):** that the per-key grammar is keyed off the same flat-name
-form on all three deployments. Only one deployment has ever been swept.
-
-#### Addendum (2026-10-12, from area D): the per-key matrix now exists
-
-Area D produced the artefact this area was missing — a **country × key matrix
-over 118 codes** in which every one of the 35 country-document keys has an
-explicit ABSENT / NULL / VALUED verdict
-([findings-log/2026-10-12-area-d-country-sweep/matrix.tsv](../../findings-log/2026-10-12-area-d-country-sweep/matrix.tsv)).
-It is a **state** matrix and deliberately carries no per-key value comparison,
-because differences between countries are area W's subject to derive, not a
-by-product of D's contradiction hunt.
-
-**What D established that W did not have, and why it bears on W's question:**
-
-- **The country document is not uniform in shape**: **35 keys** for CA and US,
-  **34** for 74 countries, **33** for 41. The 33-key documents are missing
-  `stateCodes` **and** `cpMobileAppAvailable`; the 34-key ones are missing
-  `stateCodes`. So "what does this document carry" is itself country-dependent,
-  and an enumeration that assumes one shape will mis-read two thirds of them.
-- **Absent and null are different states and neither is rare here.**
-  `cpMobileAppAvailable` is **absent in 41 of 117** documents and `null` in
-  **none**; `stateCodes` is absent in 115. The 2026-10-08 pass recorded both as
-  `null`, which `docs/09` §4 names as the `//`-swallows-`false` trap. Any
-  per-key projection that reads a missing key as a null value inherits exactly
-  that error, so **W's `404`-means-absent-or-null rule now has a second,
-  independent instance to be consistent with.**
-- **One key outside the 35 is impossible to confirm absent on this axis**: the
-  matrix only says "not present in any of the 118 documents".
-
-**Closes when:** W can state, from that matrix plus its own per-key probes,
-whether the 35 country keys and the 69 bulk-config keys are the same names or two
-disjoint sets — **and can say so against a matrix in which absent, null and
-valued are three distinct cells rather than one falsy one**. A negative closes
-it: disjoint sets, and W's "69-request enumeration path" framing is retired
-rather than extended.
-
-**Assumptions (INFERRED):** that the matrix's key vocabulary — the union of
-top-level names across three documents captured 2026-10-12 — is the complete
-vocabulary of the endpoint. **118 country codes were requested and none produced
-a 36th key**, which is evidence for completeness on this list and **not** proof
-that the endpoint cannot serve a key for a country the config does not list
-(§6 of D's log records `ID` as one such gap already).
-
 ### E. Config-key archaeology on `/patient/configuration/system/*`
 
 The per-key form is confirmed unauthenticated and returns a 21/21 exact match
@@ -198,6 +126,23 @@ which are absent rather than null.
 
 **Closes when:** the per-key form is confirmed/refuted for all 69 keys × 3
 deployments.
+
+#### Addendum (2026-10-13, from area W): one deployment swept, two remain
+
+Area W swept all 69 keys plus `captcha`'s four subkeys on **EU only**
+([findings-log/2026-10-13-area-w-per-key/FINDINGS.md]): 61 VALUED-match, 5
+NULL-404, `captcha`/`default.country` on dedicated routes, zero names outside
+the bulk document — and the complete 69-name list is now committed at
+[findings-log/2026-10-13-area-w-per-key/keys.txt](../../findings-log/2026-10-13-area-w-per-key/keys.txt),
+so the candidate list for the remaining two deployments is closed and needs no
+re-derivation. One caveat travels with it: `personal.common.core.reporting.enabled.countries`
+does **not** round-trip on EU — its per-key value carries a stray trailing `]`
+(reproduced byte-identical), so a cross-deployment value comparison must parse
+defensively, not string-compare. **Closes when:** the per-key form has a verdict
+for all 69 keys on `.com` and `-trials`, with absent-vs-null resolved per
+deployment. A negative (all three identical) counts. **Assumptions (INFERRED):**
+that the per-key grammar is keyed off the same flat-name form on all three
+deployments — only one has ever been swept.
 
 ### F. What the timeline and dialog-lite gateways actually are
 
@@ -498,7 +443,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 15 open plus 11 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 13 open plus 13 closed — and the priorities page's own gate
 counts open areas by matching `^### [A-Z]. ` headings against the number stated in
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
@@ -532,6 +477,7 @@ being superseded — never silently. Letters are not reused.
 | D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no key outside the 35-key vocabulary**, no report-vocabulary delta. **51 internal contradictions across 10 classes**, the headline being that the recorded two-country `bgUnits` vs `glucoseUnitsDefault` anomaly is **30 of 117** documents (BE reproduces; **CH no longer contradicts**; **IT and ES have drifted into it** since 2026-10-08), so `docs/04` is corrected in place with the original claim left readable. Also: three keys recorded as `null` are **absent** (41 of 117 for `cpMobileAppAvailable`, 115 for `stateCodes`) — `docs/04:377` had been contradicting the repo's own pinned assertion; **`ID` is enumerated by all three configs and refused by the endpoint**; KZ and PR publish a postal regex that rejects the document's own example. **119 of a 130 cap**, GET only, controls first. **Spacing floor 2.575 s with 0 of 118 gaps under the declared 2.5 s and 0 under the `>=2 s` floor** — measured from body-file mtimes, which the kernel sets at write time and which are therefore independent of the harness's own clock (**counting rule: consecutive pairs in `run.log` request order, 119 bodies, 118 gaps**; mtime span 304.9 s equals the harness span, confirming the series is the run's own). The harness `date` series disagrees with it (**1.642 s, 14 gaps under 2.5 s, 8 under 2 s**) because that pass recorded **11 negative request durations**, which is impossible, so those timestamps cannot all be faithful; **no cause asserted**. **Caveat on reuse: git does not preserve mtimes, so this oracle is valid only on the machine that ran the probe** — see [`docs/09`](09-methodology-and-oracles.md) §4. Three defects found in the reader itself are recorded, two of which would have manufactured findings | [findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md] | #22 |
 | A — is `carelinkhp` really the clinician portal for every region? | 2026-10-12 | **Negative on the area's premise, and it corrected two published claims.** There is **no `.com` `carelinkhp` variant**: all five `carelinkhp*.minimed.{eu,com}` names outside the baseline are **NXDOMAIN**, including `carelinkhp-prod.minimed.eu` — the only one the corpus had named and never probed. The portal is on **five hosts, two TLDs, two builds**, and the split is **product role** (clinic `pow` vs support `cua`), **not region**: every `.eu`/`.com` pair serves the same build. **Two refutations:** `carelink.medtronic.eu` **is** a portal deployment serving the byte-identical clinic bundle (3,397,615 B, sha256 `2a7fa8e7af519c2b`) — `docs/01:69` and `docs/10` §2 called it a false positive, which was caused by a document-path probe on a host family where **the catch-all *is* the entry document**; and `carelink-support.medtronic.com` serves the **support** build, not "the same document" as `docs/07:24`, `docs/01:68` and SECURITY-FINDINGS §S3 had it. A third correction: `docs/08`'s `sha256 f637c8d0…` is the **entry document**, not `main.759cddab23085086.js` (which is `a054555a0f22176e…`). **20 of a 20 cap**, GET only, controls first per host, 8 DNS lookups recorded outside the cap, measured minimum consecutive same-host gap **2 s over 15 gaps**: all 15 ≥ the repo's 2 s floor, **0 below it**, 11 of 15 ≥ the declared 2.5 s, 4 below it. `run.log` cannot distinguish truncation from a clock step from a post-hoc edit, so **no cause is asserted** for those 4 (`docs/09` §4). Cross-checked with area O's body-mtime oracle, offline and zero-request, over the **10 of 15** gaps whose bodies are committed: **0 corrupt-`t0` signatures, minimum 2.637 s, and all 4 short readings measure ≥ 2.5 s at sub-second resolution** — so no gap in this pass was actually short. That is OBSERVED for this pass only, it is **not re-derivable from a clean clone** (git does not preserve mtimes), and it does **not** answer the open question, which concerns areas B, X and Z. This pass contributes **1 pass / 4 occurrences** to that row's `n`, reconciled by the merge queue, not here | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] | #21 |
 | I — Auth0 tenant behavioural differences | 2026-10-12 | **Negative on the difference the area hunted; positive on one it did not name; and it corrected two `kid` strings already published.** The estate is **five** tenants, not four — reconciling "three" (`AUTH-TENANT` §1, a policy axis) against "four" (`docs/11`/`docs/10`, a key-material axis) was part of the pass, and **neither number was an error**: they counted two different sets over the same five hosts, and the union revealed that **`carelink-login.minimed.com` was in nobody's policy comparison** and **`-trials` was in nobody's key set**. **The negative, in its strongest form:** substituting each tenant's own hostname out of its discovery document leaves **one digest across all five** (`sha256:0c0db635f5e9b08b…`, 2640 B) — the same *bytes*, not merely the same fields; **30 field names, 0 absent from any document**, and exactly **12 of 30** differing raw, every one a URL containing that tenant's hostname. That **corrects** `AUTH-TENANT` §1: `registration_endpoint` is **not** a separate difference, it differs only by hostname like the other eleven. **The positive:** `x-ratelimit-limit` is **500 on both `.eu` tenants and 100 on the other three** — 10 observations, 2 per tenant, constant within a tenant, and invisible in byte-identical documents (INFERRED as tenant configuration, on the stated assumption Auth0 treats it as static). **Also:** `registration_endpoint` is advertised by all five and **404 to GET on all five** (`/oidc/register` → 404 `application/json`, 60 B, one digest `f006bbd60894…` across five hosts) — ⚠ **this pass's `registration_endpoint` headline was REFUTED and is RETRACTED**: a verifier showed the endpoint is **live and POST-only**, which a GET-only sweep cannot see, and the pass's own supplementary OPTIONS run then confirmed it on **3 of 5** tenants (`204` + `allow-methods: POST` against a per-tenant `404` + `x-auth0-not-found: 1` control); the trials tenant's key set is fetched for the first time (2 further disjoint kids → **10 keys, 0 shared**, discharging `docs/02` §9's "Unknown"); and **two corpus transcription defects settled against the corpus** — `AUTH-TENANT` §8's `medtronic.com` kid (`…_lLOJ`) is wrong in favour of `RECON-SUBDOMAINS`' (`…_lOOJ`), which **resolves `docs/02` §8's unresolved disagreement against the very spelling it recommended**, and `minimed.com`'s second kid is the live string **minus one `Q`** (a *deletion*, so no second reading existed to compare — invisible to §8's method by construction). **19 of a 20 cap** (17 curl + 2 hurl), **GET only**, plus an owner-authorised **supplementary budget of 14 of which 13 were used** (10 OPTIONS probes + 3 diagnostics) — **32 requests total, no POST anywhere**; controls first per host, **both certainly-absent controls returned 404** (`x-auth0-not-found: 1`, one digest across two hosts) so the oracle held and **no stop condition fired**; measured spacing floor **2.000 s**, which this ledger's **1-second timestamps cannot resolve** against the declared 2.5 s — a lower bound, not a measurement, recorded rather than smoothed over (4th pass in a row). New pins on the trials tenant validated live. Successor: the three remaining advertised endpoints, added under area J **and rewritten on 2026-10-12 to use empty-body OPTIONS rather than GET**, since all three are POST-only by specification and a GET-only successor would have repeated this pass's error three more times | [findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md] | #23 |
+| W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
 ---
 
 > **Consumer note.** Findings here are consumed by

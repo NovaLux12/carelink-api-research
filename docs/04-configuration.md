@@ -40,9 +40,11 @@ and every later `jq` fails with `utf-8 codec can't decode byte 0x8b`. Use `curl
 
 ## The 69 keys, by group
 
-**Not all 69 key names are recoverable from the sources.** The groups below name the keys
-the findings logs actually record; the remaining key names are **Unknown** — not enumerated
-in any source.
+**The complete 69-name list is committed** at
+[findings-log/2026-10-13-area-w-per-key/keys.txt](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-13-area-w-per-key/keys.txt)
+(sorted, extracted live from the EU bulk document and asserted 69 in-harness).
+The groups below organise those names; before 2026-10-13 the remaining names
+were **Unknown** — not enumerated in any source.
 
 | group | keys | notes |
 |---|---|---|
@@ -297,22 +299,40 @@ Every response is a Java-style config envelope:
 - Scalars arrive as the scalar; **booleans arrive as the strings `"true"`/`"false"`**;
   objects and arrays arrive as a JSON document *serialised into the string*. A naive
   `resp.value === false` check silently never fires. Unwrap, then `JSON.parse` again.
-- **21 of 21 probed non-null keys returned a value byte-identical to the corresponding
-  subtree of the 69-key document.** This is a projection, not a second source — but it is
-  a 69-request enumeration path for the namespace.
-- **Null-valued keys 404.** `system.logbook.entry.validation.config` and
-  `personal.retina.endpoint.config` are both `null` on EU and both 404. A per-key
-  consumer must treat 404 as "absent-or-null", not "key does not exist".
+- **Swept COMPLETE 2026-10-13 (area W).** All 69 bulk names probed per-key on EU,
+  plus `captcha`'s four subkeys in flat-name form: **61 VALUED-match** (envelope
+  unwrapped deep-equals the bulk subtree), **5 NULL-404** (every null-valued key),
+  `captcha` and `default.country` 404 via their dedicated routes, and **zero names
+  outside the bulk document** — the reverse direction finds nothing further, so
+  the per-key form is a projection of the bulk document, **not** an enumeration
+  path to anything beyond it. The "69-request enumeration path" framing is retired
+  [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md].
+- **One key does not round-trip.** `personal.common.core.reporting.enabled.countries`
+  answers 200 but its envelope value is the 29-country array **plus one extra
+  trailing `]`** — not valid JSON, reproduced byte-identical on re-issue. Strip
+  one `]` and it equals the bulk value. A consumer that unwraps-then-parses hits
+  this on exactly one key [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §4].
+- **Null-valued keys 404.** All five EU nulls (`country.reports`,
+  `outages.nextupdateat`, `personal.inpen.redirect.url`,
+  `personal.retina.endpoint.config`, `system.logbook.entry.validation.config`)
+  404 per-key. A per-key consumer must treat 404 as "absent-or-null", not "key
+  does not exist".
 - Dedicated alias routes: `/patient/configuration/defaultCountry` → `{"value":"GB"}`,
   `/patient/configuration/recaptcha/key` → `{"value":"6LfUbuor…"}`.
   `/patient/configuration/messages/en` is live and returns `{"messages":[]}`.
 - Control: `/patient/configuration/system/zzz.not.a.real.key.zzz` → 404 with
   `content-type: text/vnd.a`, so 404 is a genuine "absent", not a catch-all. Do not
-  discriminate on that odd content-type.
+  discriminate on that odd content-type — with one refinement 2026-10-13: the
+  control's 404 carries `text/vnd.a` while all 12 real-key 404s in the area-W
+  sweep (nulls, `captcha`, `default.country`, captcha subkeys) carry **no**
+  `content-type` at all. N=1 control shape — not an oracle, but a second header
+  to check [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §5].
 - `personal.device.family.to.model.mapping` also answers on `carelink.minimed.com` and is
   **identical to the EU body** — the vocabulary is global.
 - Rejected grammars: no per-key form under `/patient/v2/`; no
-  `/patient/configuration/public/<key>` on the patient host; `?countryCode=GB` on the
+  `/patient/configuration/public/<key>` on the patient host; no flat-name
+  `captcha.<enabled|key|type|testKey>` form (all four 404 — `captcha` answers
+  only via `/patient/configuration/recaptcha/key`); `?countryCode=GB` on the
   per-key form is byte-identical, so the per-key namespace is **not** country-parameterised.
 
 ## `?countryCode=` on the public config is accepted and ignored
@@ -346,6 +366,10 @@ GET /patient/countries/settings?countryCode=XX   → 200 application/json, gzip,
   keys for CA/US, 34 for 74 countries, 33 for 41 — and the per-country × per-key
   matrix is on disk at
   [findings-log/2026-10-12-area-d-country-sweep/matrix.tsv](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-area-d-country-sweep/matrix.tsv).
+  The 35 country-key names and the 69 bulk-config names have a **0-name
+  intersection** — disjoint vocabularies (camelCase vs dotted/lowercase),
+  compared offline 2026-10-13 against the committed name list
+  [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §3].
   **51 internal contradictions** were enumerated across 10 classes
   ([findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-12-area-d-country-sweep/FINDINGS.md) §5).
   ⚠ The `109` country-code count previously recorded on `docs/11` **does not
