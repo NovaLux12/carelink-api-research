@@ -166,6 +166,46 @@ published configs — under `SIMPLERACC` in the patient map. **The bundle's tabl
 incomplete one** [source:
 findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
 
+> ### ⚠ Correction — 2026-10-13 — the 214-entry list is not HCP-only
+>
+> The row above (and `docs/11` area H) located `reportFileNamingSupportedPumpModels`
+> in the HCP namespace only. The **patient** public config carries the same list:
+> `personal.common.core.report.generation.reportFileNamingSupportedPumpModels`,
+> **214 strings**, re-derived live 2026-10-13 (`GET
+> /patient/v2/configuration/public` → 200, 69 keys, body digest
+> `d68b6b5…f1cb2d`) — the count above is now measured, not repeated
+> [source: findings-log/2026-10-13-area-h-report-naming/FINDINGS.md §3;
+> `list-verbatim.txt`].
+>
+> Every entry classified in code: **wire code 129 · display name 71 · bare
+> number 10 · placeholder 4**. Against the 16-family value set
+> (`family-map-verbatim.txt` — the first commit of all sixteen rows, prose
+> previously quoted 8): **82 wire codes matched by family, 47 unmatched**;
+> placeholders 4/4 matched (all are INSTINCT values); bare numbers 0/10;
+> display names 0/71. Normalization (uppercase + strip non-alphanumerics)
+> changes nothing — exact and normalized unmatched sets are identical, so no
+> residue entry is a mere spelling variant. Full partition in
+> [FINDINGS.md §5](findings-log/2026-10-13-area-h-report-naming/FINDINGS.md).
+>
+> Anomalies: `MMT-9015` ×2 and `Precision Xtra® / Xceed™` ×2; one trailing-space
+> entry (`MMT-5100J      `) that matches the map's own padded `SIMPLERA` entry
+> exactly, so the padding is vendor-side; ten `MMT-`+bare pairs (`MMT-515` +
+> `515`, …); display names in three sub-shapes (lowercase vendor slugs,
+> `®`/`™` meter names, `CSS-7200`/`CSS7200` hyphenated/bare pairs — the alias
+> split §Spelling traps already records). The 47 unmatched wire codes group by
+> prefix (`105*`, `151*`, `171*`, `178*`, legacy `5xx`/`7xx`, `5101`, `5420`,
+> `6500/6501`, `77xx/78xx/79xx`, `8200/8201/8400/8401`) — structural grouping
+> only, **INFERRED** as older generations on the stated assumption that the
+> family map covers the current lineup; no response demonstrates what any of
+> these codes is.
+>
+> Consequence for the table above: `MMT-8200/8201/8400/8401` are in **both**
+> report lists (patient and HCP) and in **neither** family table — the
+> "present in the HCP report config, absent here" cell stays true of the
+> *map* and is now wrong if read of the *config*. Guidance item 4 below is
+> read the same way: the patient **map** is missing those four codes; the
+> patient **config** is not.
+
 ## Spelling traps
 
 Medtronic is not internally consistent, so **family matching must be case-insensitive and

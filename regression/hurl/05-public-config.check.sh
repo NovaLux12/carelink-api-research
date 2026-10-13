@@ -75,6 +75,16 @@ done
 # normalise() strips it; a naive exact-match parser would silently miss them.
 check "SIMPLERA still padded (trap)"        '.["personal.device.family.to.model.mapping"].SIMPLERA | index("MMT-5100       ") != null' 'true'
 
+# --- Report-naming list (area H, #33): 214 entries, classified 2026-10-13 ---
+# personal.common.core.report.generation.reportFileNamingSupportedPumpModels.
+# The list is a superset vocabulary reaching past the family map (47 wire
+# codes match no family), so its length and the two anomaly sentinels are
+# pinned: if Medtronic adds a model or dedupes, this fails loudly.
+check "report list length is 214"           '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | length' '214'
+check "report list contains MMT-8200"       '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | index("MMT-8200") != null' 'true'
+check "report list duplicates MMT-9015"     '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | map(select(. == "MMT-9015")) | length' '2'
+check "report list keeps padded MMT-5100J"  '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | index("MMT-5100J      ") != null' 'true'
+
 # --- Logbook entry types (#76: markers read side) --------------------------
 check "logbook has SENSOR_INSERTION"        '.["logbook.supported.entry.types"] | index("SENSOR_INSERTION") != null' 'true'
 check "logbook has INFUSION_SET_CHANGE"     '.["logbook.supported.entry.types"] | index("INFUSION_SET_CHANGE") != null' 'true'

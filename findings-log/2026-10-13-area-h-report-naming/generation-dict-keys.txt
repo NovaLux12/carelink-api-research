@@ -1,0 +1,55 @@
+# `personal.common.core.report.generation` — full key list (OBSERVED, seq 6 re-fetch 2026-10-13T08:51:10Z, byte-identical to seq 5 body sha256 d68b6b57…)
+
+Top-level dict holds FIVE keys, not three (corrects FINDINGS.md §6):
+
+- dualReportEnabled: true (boolean)
+- deviceModelShouldBeInclude: true (boolean)
+- reportFileNamingSupportedPumpModels: 214 strings (see list-verbatim.txt)
+- separateDevices: 29 slugs (below)
+- reportGenerationRules: 9 [name, {dual,single}] pairs (below)
+
+## separateDevices (29 slugs, verbatim)
+
+780G
+bayerbreeze
+bayercontour
+bayercontourlink
+bayercontournext
+bayercontournextez
+bayercontournextlink2
+bayercontournextlinkintl
+bayercontournextone
+bayercontournextusb
+bayercontourpluslink2
+bayercontourusb
+bayercontourxt
+lifescanonetouchultra
+lifescanonetouchultra2
+lifescanonetouchultraeasy
+lifescanonetouchultralink
+lifescanonetouchultramini
+lifescanonetouchultrasmart
+lifescanonetouchultravue
+lifescanonetouchverioiq
+lifescanonetouchveriovue
+rocheaviva
+rochenano
+rocheguide
+rocheguideme
+therasensefreestyle
+therasensefreestylelite
+therasensefreestylefreedomlite
+
+28 of 29 are the lowercase meter slugs of the 214 list's display-name entries;
+`780G` is a pump-system slug standing alone in a meter list.
+
+## reportGenerationRules (9 rule names, verbatim)
+
+COSMOS_CC, DEVICE_CC, CC_COSMOS, CC_DEVICE, COSMOS_CC_COSMOS,
+DEVICE_CC_DEVICE, CC_COSMOS_CC, CC_DEVICE_CC, COSMOS_DEVICE_CC
+
+Each pairs a name with `{dual: [...], single: [...]}` deviceType rules over
+exactly two deviceTypes (`CC`, `Cosmos`), with an optional `lastPeriod: true`
+flag. This is report-composition vocabulary (which device feeds which report
+section), not pump-model vocabulary — a second naming-relevant dict the §6
+negative missed.
