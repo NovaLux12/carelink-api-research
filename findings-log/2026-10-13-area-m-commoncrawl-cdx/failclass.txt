@@ -1,0 +1,12 @@
+ledger rows: 61   gateway errors (502/503/504/400): 17
+
+  covered          2  seq [50, 53]
+  indeterminate   13  seq [5, 8, 9, 12, 16, 21, 32, 33, 37, 51, 52, 57, 58]
+  n/a              2  seq [56, 59]
+  TOTAL           17
+
+  the three rows the correction turned on:
+    seq 42 2026-10-13T09:53:48.892Z 200 class=indeterminate  hosts=['carelink.minimed.eu', 'minimed.eu', 'www.carelink.minimed.eu']
+    seq 50 2026-10-13T09:54:21.455Z 504 class=covered        hosts=[]
+    seq 53 2026-10-13T09:55:43.454Z 504 class=covered        hosts=[]
+    seq 50 asked for a host seq 42 had proven covered 32.6 s earlier -> ['carelink.minimed.eu']

@@ -300,7 +300,17 @@ itemised in any source.
 | `personal.mixpanel.analytics.settings.enabled` | true | true | **false**, empty token |
 | `personal.username.as.email.settings.enabled` | true | true | **false** |
 | `personal.inpen.supported.countries.enabledGlobally` | false | **true** | false |
-| `personal.common.core.reporting.enabled.countries` | **29 countries** (17 before the 2026-10-09→10 rollout) | `["US","PR"]` | 21 |
+| `personal.common.core.reporting.enabled.countries` | **29 countries** (17 before the 2026-10-09→10 rollout) | `["US","PR"]` | 21 — ⚠ **measured 13 on 2026-10-13**, see below |
+
+⚠ **A dated disagreement in that row, both numbers left standing.** The trials
+cell reads **21**; a direct GET of the trials bulk document on **2026-10-13**
+returned **13** countries (`US NZ AU GB SI DE FR BE IT ES NL DK IL`), and the
+trials **per-key** projection of the same key agrees with it cell for cell. The
+EU figure in the same row was verified 2026-10-11 and this pass did **not**
+re-probe EU, so it cannot say whether trials shrank, whether the earlier 21 was
+a different reading, or whether the two rows were never the same measurement.
+Both numbers stand; the trials one carries its date
+[source: findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §3].
 
 `personal.safety.notices.enabled` is the medically relevant one: it is **true on the US
 deployment only**, and safety notices are how Medtronic communicates device advisories to
@@ -349,36 +359,86 @@ Every response is a Java-style config envelope:
 - Scalars arrive as the scalar; **booleans arrive as the strings `"true"`/`"false"`**;
   objects and arrays arrive as a JSON document *serialised into the string*. A naive
   `resp.value === false` check silently never fires. Unwrap, then `JSON.parse` again.
-- **Swept COMPLETE 2026-10-13 (area W).** All 69 bulk names probed per-key on EU,
-  plus `captcha`'s four subkeys in flat-name form: **61 VALUED-match** (envelope
-  unwrapped deep-equals the bulk subtree), **5 NULL-404** (every null-valued key),
-  `captcha` and `default.country` 404 via their dedicated routes, and **zero names
-  outside the bulk document** — the reverse direction finds nothing further, so
-  the per-key form is a projection of the bulk document, **not** an enumeration
-  path to anything beyond it. The "69-request enumeration path" framing is retired
-  [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md].
-- **One key does not round-trip.** `personal.common.core.reporting.enabled.countries`
-  answers 200 but its envelope value is the 29-country array **plus one extra
-  trailing `]`** — not valid JSON, reproduced byte-identical on re-issue. Strip
-  one `]` and it equals the bulk value. A consumer that unwraps-then-parses hits
-  this on exactly one key [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §4].
+- **Swept COMPLETE on all three deployments.** EU by area W (2026-10-13); **`.com` and
+  `-trials` by area E, same day**. Every key has a verdict on all three, and every
+  column reconciles to **73** (69 bulk names + 4 `captcha` subkeys):
+  **61 / 62 / 61 VALUED-match** (EU / `.com` / trials), **5 / 5 / 6 NULL-404**, plus
+  **2 / 2 / 2** dedicated-route 404s, **4 / 4 / 4** subkey 404s, and **zero names
+  outside the bulk document**. **⚠ Read EU's `61` as 61 *exact* matches, not 61
+  valued cells** — EU carries a 62nd valued cell, the stray-bracket quirk below, so
+  **valued cells are 62 / 62 / 61** (EU / `.com` / trials) and trials is the one that
+  differs, by one, because it has one more null-valued key. Zero mismatches across
+  the **123** valued cells of this pass's two hosts. **The negative holds and is now
+  three-host evidenced: the 69-name vocabulary is deployment-portable and the
+  per-key form is a projection everywhere, not an enumeration path to anything
+  beyond the bulk document.** The "69-request enumeration path" framing is
+  retired, not extended [source:
+  findings-log/2026-10-13-area-w-per-key/FINDINGS.md;
+  findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §2].
+- **What is *not* identical is which keys 404** — and that is downstream of the
+  bulk document's null set, not of the per-key grammar. **EU and `.com` have the
+  same five null-valued keys, name for name; trials has six.** Trials-only
+  nulls: `mmm.data.api.url` (corroborating `07-admin-portal-and-reporting.md`
+  §`dialog-lite` first-hand), **`personal.linking.request.interval`** (named in
+  no page here), `personal.third.party.apps`. Trials-only non-nulls:
+  `outages.nextupdateat` and `system.logbook.entry.validation.config`. Three keys
+  are null on all three. **So the client-facing rule is unchanged but sharper:
+  a per-key 404 means "null *on this deployment*, or served by a dedicated
+  route", and the null set must be read from that deployment's own bulk
+  document. A client that hardcodes "these five keys 404" is wrong on trials
+  [source: findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §2].
+- **One key does not round-trip — and the defect is EU-only as measured.**
+  `personal.common.core.reporting.enabled.countries` answers 200 on all three,
+  but on **EU** its envelope value is the 29-country array **plus one extra
+  trailing `]`** — not valid JSON, reproduced byte-identical on re-issue. On
+  **`.com` (34 B, `["US","PR"]`) and `-trials` (122 B, 13 countries)** the same
+  key's value parses cleanly and equals its own bulk subtree exactly, with no
+  normalisation. **Two readings and neither is excluded:** that the quirk is a
+  property of the EU serialisation (assumption: the EU cell still behaves as
+  area W measured it the same day — it is cited, not re-measured here), or that
+  it rides with value length (29 against 2 and 13). A consumer must strip **at
+  most one** trailing `]` after a parse failure and must not assume the defect
+  is confined to EU [source:
+  findings-log/2026-10-13-area-w-per-key/FINDINGS.md §4;
+  findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §3].
 - **Null-valued keys 404.** All five EU nulls (`country.reports`,
   `outages.nextupdateat`, `personal.inpen.redirect.url`,
   `personal.retina.endpoint.config`, `system.logbook.entry.validation.config`)
-  404 per-key. A per-key consumer must treat 404 as "absent-or-null", not "key
-  does not exist".
+  404 per-key — and so do the identical five on `.com`. On trials the six
+  nulls listed above 404 instead. A per-key consumer must treat 404 as
+  "absent-or-null", not "key does not exist".
 - Dedicated alias routes: `/patient/configuration/defaultCountry` → `{"value":"GB"}`,
   `/patient/configuration/recaptcha/key` → `{"value":"6LfUbuor…"}`.
   `/patient/configuration/messages/en` is live and returns `{"messages":[]}`.
 - Control: `/patient/configuration/system/zzz.not.a.real.key.zzz` → 404 with
   `content-type: text/vnd.a`, so 404 is a genuine "absent", not a catch-all. Do not
-  discriminate on that odd content-type — with one refinement 2026-10-13: the
-  control's 404 carries `text/vnd.a` while all 11 real-key 404s in the area-W
-  sweep (nulls, `captcha`, `default.country`, captcha subkeys — first written as 12 in the pass log, corrected 2026-10-13: the enumeration sums to 11) carry **no**
+  discriminate on that odd content-type — with one refinement 2026-10-13 (area W):
+  the control's 404 carries `text/vnd.a` while all 11 real-key 404s in the area-W
+  sweep (nulls, `captcha`, `default.country`, captcha subkeys — first written as 12
+  in the pass log, corrected 2026-10-13: the enumeration sums to 11) carry **no**
   `content-type` at all. N=1 control shape — not an oracle, but a second header
   to check [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §5].
+- ⚠ **And a second refinement the same day, from area E: the split above does not
+  hold on `-trials`.** There, **one of the twelve real-key 404s carries a
+  content-type** — `personal.linking.request.interval`, `application/vnd.nervana`,
+  `content-length: 0`, `x-cache: Error from cloudfront` — a value in **no prior
+  reading on any host of this namespace**. On `.com` the split reproduces exactly
+  (**11 of 11** real-key 404s carry no content-type; the trials denominator is 12
+  because trials has one more null-valued key, not because this pass re-used
+  area W's figure — **counting rule: a real-key 404 is a `NULL-404`,
+  `DEDICATED-ROUTE-404` or `SUBKEY-404` row, i.e. a 404 against a name in the
+  committed candidate list, with the absent-path control excluded**). So the discriminator is
+  **three-valued, not two-valued**, and **"the control carries `text/vnd.a` and
+  real keys do not" is false on one deployment of three** — a reader who built a
+  test on area W's sentence would mis-classify exactly this cell. This does not
+  make the header an oracle; it makes it worse as one, and it is the second
+  independent reason to keep the standing instruction not to discriminate on it
+  [source:
+  findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md §4].
 - `personal.device.family.to.model.mapping` also answers on `carelink.minimed.com` and is
-  **identical to the EU body** — the vocabulary is global.
+  **identical to the EU body** — the vocabulary is global. (2026-10-13: area E went
+  further — the **entire** 69-name vocabulary and its per-key projection were swept
+  on `.com` and `-trials`, and the key *set* is identical on all three.)
 - Rejected grammars: no per-key form under `/patient/v2/`; no
   `/patient/configuration/public/<key>` on the patient host; no flat-name
   `captcha.<enabled|key|type|testKey>` form (all four 404 — `captcha` answers

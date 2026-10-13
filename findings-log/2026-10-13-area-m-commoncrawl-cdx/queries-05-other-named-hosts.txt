@@ -1,0 +1,24 @@
+#
+# TRAILING NEWLINE — FIXED 2026-10-13 (verifier round 1, BLOCKING 2).
+# This file originally ended WITHOUT a newline and probe.sh's read loop was
+# `while IFS='|' read -r ...`, which drops the final unterminated line. The
+# line below therefore NEVER RAN and has no row in results.jsonl:
+#     rec-2026-34-minimed-eu-records
+# The newline is now present, the loop now carries a `|| [ -n ... ]` guard,
+# and probe.sh warns to run.log when a query file lacks a trailing newline.
+# Re-running this file as committed would now send that line — it did not
+# run in this pass, and nothing in the findings depends on it.
+# Area M — request set 5: the other two API hosts the closed row names, and a
+# second recent crawl to show the positive is not a one-crawl accident.
+#
+# docs/10 §2 reads "not one record for any `carelink*`/`clcloud*`/`carelinkhp*`
+# host in either of two crawls". `carelink.minimed.eu` is now refuted. The other
+# two families in that sentence have never been asked through this instrument,
+# so they are asked now rather than being left standing on the same old evidence.
+#
+# tag|role|host|path-and-query|extra curl args
+
+host-clcloud-minimed-eu-2026-39|HOST-level-second-named-API-host|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=clcloud.minimed.eu&output=json&matchType=host|
+host-carelinkhp-minimed-eu-2026-39|HOST-level-third-named-API-host|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=carelinkhp.minimed.eu&output=json&matchType=host|
+host-carelink-minimed-eu-2018-39-retry|RETRY-of-seq50-which-answered-504|index.commoncrawl.org|/CC-MAIN-2018-39-index?url=carelink.minimed.eu&output=json&matchType=host|
+rec-2026-34-minimed-eu-records|records-minimed.eu-second-recent-crawl|index.commoncrawl.org|/CC-MAIN-2026-34-index?url=minimed.eu&output=json&matchType=domain|

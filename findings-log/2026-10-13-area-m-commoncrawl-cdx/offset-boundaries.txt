@@ -1,0 +1,113 @@
+offset-boundaries.txt — area M, 2026-10-13
+
+The boundary keys of the byte range COMMONCRAWL §1 records as
+  cdx-00101.gz  45 560 954 - 47 031 753   (CC-MAIN-2026-39)
+  prefix com,medtronic)  ..  com,medtronicdiabetes,origin)
+
+Committed because the first body this was derived from (ledger seq 54, the
+same 1 470 800 bytes) had to be deleted: scripts/research-checks.py enforces
+a 1 MiB ceiling over every file under findings-log/. Without this file the
+finding rested on prose alone — the defect this area was opened to correct.
+
+RE-FETCH (ledger seq 61, owner-authorised, 1 request, data.commoncrawl.org):
+  status            206
+  bytes             1470800
+  sha256            d516a6203583a9c4b8d3cccd0b2942152b1e170e4fd98eb6aca7b35d840634a9
+  identical to seq 54's recorded digest: True
+
+DECOMPRESSED (gzip, concatenated members):
+  records           15000
+  FIRST key         com,medtronic)/covidien/de-de/clinical-solutions/lung-health-solutions/resources.html
+  LAST  key         com,medtryck)/piketrojor/prima-polo
+  first authority   com,medtronic)
+  last  authority   com,medtryck)
+
+VERDICT: the range STARTS exactly on its recorded lower bound and does NOT
+end on its recorded upper bound. It runs past com,medtronicdiabetes,origin)
+and continues into com,medtryck), so the span overshoots the family it is
+labelled with. This is the OPPOSITE defect from the 'landed on alphabetical
+neighbours' failure COMMONCRAWL §1 records for the FIRST pass — the start
+here is exact — and it is the safe direction, since a span that reaches too
+far cannot hide a record of the target family.
+
+WHAT THE OVERSHOOT CONTAINS — registrable-domain projection only, no URLs,
+no paths, no statuses. Every record in the span is accounted for: the 53 rows
+below sum to exactly the 15 000 the span holds.
+  distinct registrable domains   53   <- derived from the 53 rows below
+  (the generation run also counted 109 distinct HOSTNAMES. That figure is NOT
+   re-derivable from this artefact, which is per-domain, so it is reported here
+   only as a note and no claim in FINDINGS.md rests on it.)
+    medtronic.com                 10574 records
+    medtryck.com                   1440 records
+    medtronic-diabetes.com         1100 records
+    medtrue.com                     425 records
+    medtruth.com                    392 records
+    medtrustsurgical.com            176 records
+    medtronicdiabetes.com           169 records
+    medtronicsolutions.com          116 records
+    medtronicacademy.com             84 records
+    medtrw.com                       76 records
+    medtrum.com                      75 records
+    medtronicinteract.com            49 records
+    medtronicam.com                  48 records
+    medtronicspark.com               46 records
+    medtronictraders.com             40 records
+    medtronusa.com                   28 records
+    medtrucks.com                    15 records
+    medtronic-nt.com                 14 records
+    medtrustadvocates.com            14 records
+    medtronica-angola.com            11 records
+    medtronicdiabeteslatam.com        7 records
+    medtronicstents.com               7 records
+    medtrx.com                        7 records
+    medtronic-diabetes-mena.com       6 records
+    medtru.com                        6 records
+    medtrusthealth.com                6 records
+    medtronicconnect.com              5 records
+    medtronicpillcamfilter.com        5 records
+    medtrustbilling.com               5 records
+    medtronic-ers.com                 4 records
+    medtroniclearn.com                4 records
+    medtronicvirtualpump.com          4 records
+    medtronicwebinars.com             4 records
+    medtronic-diabetes-look.com       3 records
+    medtronicdbs.com                  3 records
+    medtroniceureka.com               3 records
+    medtronicheart.com                3 records
+    medtronictusalud.com              3 records
+    medtruly.com                      3 records
+    medtronicdiabetesbrasil.com       2 records
+    medtronicdiabetesproducttraining.com      2 records
+    medtronicendo.com                 2 records
+    medtronicendovascular.com         2 records
+    medtronicsuasaude.com             2 records
+    medtrustpr.com                    2 records
+    medtronicdiagnostics.com          1 records
+    medtronicendovenous.com           1 records
+    medtronicminimed.com              1 records
+    medtronicophthalmics.com          1 records
+    medtronicphysiocontrol.com        1 records
+    medtronicrdn.com                  1 records
+    medtronicspinal.com               1 records
+    medtropolis.com                   1 records
+
+53 registrable domains, against a range labelled for one. COUNTING RULE: one row
+per distinct registrable domain, taken as the LAST TWO LABELS of the SURT
+authority (so `eu,medtronic,carelink)/…` and `com,medtronic)/…` both fold into
+`medtronic.com`); each row's count is the number of records in the span whose
+SURT authority ends with that domain. No public-suffix list was applied, so a
+multi-label public suffix such as `medtronic.co.uk` would be split — none occurs
+here, and every listed authority has exactly two labels.
+
+CORRECTION 2026-10-13 (verifier round 2): this file previously said
+"distinct hosts 109" directly above a 53-row table, and stated a counting rule
+("one host per distinct SURT authority") that its own table did not follow. It
+also did not state a domain count at all, and FINDINGS.md then claimed "49
+registrable domains", a number that appears nowhere in this artefact. The table
+was right; the header and the rule sentence were wrong. 53 is the derivable
+number and it is the one the header now carries.
+
+NOT INCLUDED, and why: no URL, no path, no status code and no capture is
+published from this range (AGENTS.md §7 — COMMONCRAWL §9 records 8 058 session
+identifiers in the sibling 2024-42 range). Hostnames are the leftmost label
+of a URL and cannot carry a path, a query string or a session parameter.

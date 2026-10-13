@@ -316,6 +316,83 @@ for spec in "carelinkhp.minimed.eu:main.fb5f8cb7eb60c4d5.js" \
   fi
   sleep 2
 done
+#
+# =====================================================================
+# AREA E (2026-10-13) — the per-key projection is deployment-portable.
+# Source: findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md
+#
+# THE CLAIM BEHIND THIS BLOCK: a client may treat the 69-name vocabulary as
+# the same on every patient deployment. Area W proved the per-key form is a
+# PROJECTION of the bulk document on EU (no name outside it, no value
+# mismatch). Area E swept `.com` and `-trials` the same day and found the same
+# thing: 69 top-level keys on each, 0 outside the committed EU list, 0 of the
+# EU list missing, and 0 value mismatches across 123 valued cells.
+#
+# What IS deployment-specific is WHICH KEYS 404 — the bulk document's null
+# set is 5 keys on `.eu`/`.com` and 6 on trials. That is deliberately NOT
+# pinned here: pinning it would mean hardcoding the null set, which is
+# exactly the hardcoding this pass says is wrong. Read the null set from the
+# bulk document instead, which is what the key-count check below supports.
+#
+# NO `for` LOOP IN THIS BLOCK, ON PURPOSE. scripts/measure_assertions.py
+# multiplies every `check "` site that sits inside a loop by
+# LOOP_FAMILY_SITES (16), and it documents that this is only correct because
+# 05 has exactly one such loop (the family loop). A second loop would
+# multiply these six sites by 16 and silently corrupt every derived count in
+# the repo. Two explicit blocks, no loop — see docs/09 §4 for the rule and the
+# bug it exists after.
+#
+# LIMITS, stated rather than implied:
+#  - the bulk checks pin the key COUNT (69), not the key SET. A deployment
+#    that swapped one key for another would keep 69 and pass. The set-level
+#    proof is in the findings log, which is not re-runnable from here.
+#  - these four requests assert the two deployments SERVE the projection.
+#    They do not re-derive the projection property, which is 152 requests of
+#    work and belongs in the weekly drift sweep, not in every PR.
+# =====================================================================
+BODY_E_COM="$(mktemp -u /tmp/clb-e-com-XXXXXX.json)"
+BODY_E_TRIALS="$(mktemp -u /tmp/clb-e-trials-XXXXXX.json)"
+BODY_E_PKEY_COM="$(mktemp -u /tmp/clb-epk-com-XXXXXX.json)"
+BODY_E_PKEY_TRIALS="$(mktemp -u /tmp/clb-epk-trials-XXXXXX.json)"
+
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" \
+  "https://carelink.minimed.com/patient/v2/configuration/public" -o "$BODY_E_COM"
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" \
+  "https://carelink.minimed.com/patient/configuration/system/logbook.supported.entry.types" \
+  -o "$BODY_E_PKEY_COM"
+BODY="$BODY_E_COM"
+check ".com bulk config has the same 69 top-level keys"  'keys | length' '69'
+BODY="$BODY_E_PKEY_COM"
+# The per-key form answers with the SAME envelope shape on all three
+# deployments: exactly one member, `value`, carrying the config value as a
+# STRING. Asserted as the exact member list, not `has("value")` — a second
+# member appearing would be a shape change this must not absorb.
+check ".com per-key form answers 200 with a one-member envelope" 'keys | sort | join(",")' 'value'
+# 12 entry types, unwrapped and re-parsed. This is the string-boolean-style
+# double-decode in one assertion: `.value` is a JSON array serialised INTO a
+# string, so a client must fromjson it. `fromjson` failing here is itself the
+# signal that the EU stray-`]` class of defect has spread to another
+# deployment — which as of 2026-10-13 it has not.
+check ".com per-key logbook entry types unwrap to 12"     '.value | fromjson | length' '12'
+
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" \
+  "https://carelink-trials.minimed.com/patient/v2/configuration/public" -o "$BODY_E_TRIALS"
+sleep 2.5
+curl -s --compressed --max-time 30 -A "$UA" \
+  "https://carelink-trials.minimed.com/patient/configuration/system/logbook.supported.entry.types" \
+  -o "$BODY_E_PKEY_TRIALS"
+BODY="$BODY_E_TRIALS"
+check "-trials bulk config has the same 69 top-level keys" 'keys | length' '69'
+BODY="$BODY_E_PKEY_TRIALS"
+check "-trials per-key form answers 200 with a one-member envelope" 'keys | sort | join(",")' 'value'
+check "-trials per-key logbook entry types unwrap to 12"    '.value | fromjson | length' '12'
+
+rm -f "$BODY_E_COM" "$BODY_E_TRIALS" "$BODY_E_PKEY_COM" "$BODY_E_PKEY_TRIALS"
+BODY="$SCRATCH"
+
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "$FAIL" -eq 0 ]
