@@ -169,8 +169,12 @@ The **boundary values** are a different kind of claim and are labelled as such:
 author-reported, and not reproducible from the tree**: the repository commits the
 probe *script* but gitignores its *outputs* (`.gitignore:12` resolves exactly, as
 `cumulus-response*.json`; `:13` `cumulus-hit.json`, under a comment saying those files
-carry personal and health data). The committed script varies only **5 of the 11**
-values the table lists [same source §8.1].
+carry personal and health data). The committed script varies only **5 of the 10**
+version values the table lists — the table is **two status rows, 4 values on the
+`206` row and 6 on the `200` row, not eleven rows** [same source §8.1, where the
+counting rule is recorded]. The five it never varies are `3.6`, `3.7.0`, `3.8`,
+`3.8.0`, `4.0.0` — and the last two of those are the exact values the client ships
+(`3.8`) and the xDrip PR merged (`3.8.0`).
 
 ### 3a.2 ⚠ Why this cannot be settled from outside this project
 
@@ -189,13 +193,25 @@ discovery axis's upper bound is OBSERVED and ours** — `docs/10` §2 records th
 axis serves exactly two documents past 3.8 — **while the body axis's lower bound is
 third-party-reported and unverifiable here.** Same word "axis", different evidence.
 
-### 3a.3 Derived: the two axes share a **two-value window**, and one client uses a single constant for both
+### 3a.3 Derived: the two axes share a **two-value window** (in `X.Y` form), and one client uses a single constant for both
 
 **INFERRED, from the two SOURCE-PUBLISHED constraints above; the assumption is that
 they hold over the ranges the author reports, which is itself unverified.**
 
 Intersecting them — a version string that is on the Auth0+v13 track **and** clears
-the body gate — leaves **`3.7` and `3.8`, and nothing else.**
+the body gate — leaves **`3.7` and `3.8`, and nothing else, among the `X.Y` forms
+the discovery axis has been probed at.**
+
+⚠ **That restriction is load-bearing, not a hedge.** The author's table lists
+`3.7.0` and `3.8.0` as accepted by the body gate, and its prose says both `X.Y` and
+`X.Y.Z` work there — but **nothing establishes what those strings do on the
+discovery path**, because that axis is probed in `X.Y` form only. There is **no
+`X.Y.Z` cell anywhere** in `ORACLE-PROBE-MATRIX` (which holds only
+`discover/android/3.6` and `…/3.8`) and **zero** in `VERSION-AXIS.md`. So `3.7.0`
+and `3.8.0` are **unobserved** on the axis that would place them in or out of the
+window — not excluded from it. The window is closed at exactly two values **for the
+forms anyone has probed**; read it as a statement about every string either client
+could send and it over-reaches.
 
 And the one client whose source is readable does not run two axes at all.
 `cumulus.ts:31` declares `const APP_VERSION = '3.8';` and uses that **one** constant

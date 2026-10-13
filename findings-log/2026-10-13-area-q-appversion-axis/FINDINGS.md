@@ -264,7 +264,20 @@ SOURCE-PUBLISHED]:
 | body `appVersion` | **≥ 3.7, no upper bound** | `README.md:87` |
 
 The intersection — the version strings that satisfy **both** — is therefore
-**`3.7` and `3.8`, and nothing else.**
+**`3.7` and `3.8`, and nothing else, among the `X.Y` forms the discovery axis has
+actually been probed at.**
+
+> **⚠ Scope of the window, added 2026-10-13 (verifier round 1).** "Exactly
+> `{3.7, 3.8}`" is a statement about **`X.Y` forms only**, and that restriction is
+> load-bearing. The author's table lists `3.7.0` and `3.8.0` as **accepted by the
+> body gate**, and its prose says both `X.Y` and `X.Y.Z` forms work there — but
+> **nothing establishes what those two strings do on the discovery path.** The
+> discovery axis is probed in `X.Y` form only: there is **no `X.Y.Z` cell anywhere**
+> in `ORACLE-PROBE-MATRIX` (which contains only `discover/android/3.6` and `…/3.8`)
+> and **zero** in `VERSION-AXIS.md`. So `3.7.0` and `3.8.0` are *not excluded* from
+> the window — they are **unobserved** on the axis that would put them in or out of
+> it. The window is closed at exactly two values **for the forms anyone has probed**,
+> and saying otherwise would over-read a table about a different axis.
 
 **And the one client whose source is readable uses a single constant for both
 axes.** `cumulus.ts:31` declares `const APP_VERSION = '3.8';` — three characters,
@@ -354,16 +367,29 @@ and it was found by reading the artefact, which is the only way it is findable.
 
 ## 8. Side findings
 
-**8.1 — The committed probe script does not cover 6 of the README's own 11 table
-rows.** `src/probe-appversion.ts:24` declares
-`const VERSIONS = ['3.7', '3.6.9', '3.6.1', '3.5.0', '10.0.0'];` — **five** values.
-`README.md:52-53` tabulates **eleven**: `3.5.0`, `3.6`, `3.6.1`, `3.6.9` → 206 and
-`3.7`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0`, `10.0.0` → 200. The rows with **no
+**8.1 — The committed probe script covers only 5 of the 10 version values in the
+README's own boundary table.** `src/probe-appversion.ts:24` declares
+`const VERSIONS = ['3.7', '3.6.9', '3.6.1', '3.5.0', '10.0.0'];` — **5** values.
+`README.md:52-53` tabulates **10**: `3.5.0`, `3.6`, `3.6.1`, `3.6.9` → 206 and
+`3.7`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0`, `10.0.0` → 200. The values with **no
 corresponding entry in the committed `VERSIONS` array** are `3.6`, `3.7.0`, `3.8`,
 `3.8.0`, `4.0.0` — and `3.8.0` is the exact value the xDrip PR merged, and `3.8` is
-the exact value the client ships. **The two rows that matter most operationally are
+the exact value the client ships. **The two values that matter most operationally are
 two of the five the committed script never varies.** Nothing contradicts the table;
-the point is how much of it the tree can reproduce, which is 5 of 11.
+the point is how much of it the tree can reproduce, which is **5 of 10**.
+
+> **Counting rule, recorded so the 10 is reproducible** (the number was wrong twice
+> before this line existed — see the Correction below). **Denominator 10:** the
+> table's version values are counted **per status row** — **4** on the `206` row
+> (`README.md:52`) and **6** on the `200` row (`README.md:53`) — and both rows are
+> counted, giving 10 distinct values. It is **not** 11: there is no eleventh value,
+> and the table is **two rows, not eleven rows**. **Numerator 5:** the length of the
+> `VERSIONS` array at `probe-appversion.ts:24`, and every one of its 5 entries is a
+> member of the 10, so coverage is 5. Re-derive with the `extract.py` method in this
+> directory: decode `bodies/10-cj-readme-pin.b`, take the **first data cell** of each
+> of the two status rows, and pull the backticked values out of it. (The *second*
+> cell is the result — `206 Upgrade application` / `200 OK` — and reading that cell
+> instead yields 1, which is how this number was got wrong the first time.)
 
 **8.2 — The PR body and the PR comment describe different test accounts.** The PR
 body says it was tested with *"a Medtronic 780G + Guardian 4 user and Medtronic InPen
@@ -374,13 +400,34 @@ reporting against two different setups, recorded so a reader does not read the
 comment's "tested against a live MiniMed Go + Instinct account" as covering the
 combined-device claim in the PR.
 
-**8.3 — A machine path is committed on `main`.** While checking the repo's own
-hygiene I found a literal user-home path inside a committed capture in
-`findings-log/2026-10-12-area-b-v12-routing/` — one line of captured `hurl` output,
-outside any file this pass touched. It does not fail the gate, which scans the diff
-rather than the tree. **Recorded, not fixed**: it is not this pass's file, and
-`findings-log/` is append-only. It is the same defect class area I hit, where its own
-`probe.sh` carried a hard-coded home path until a later pass found it.
+**8.3 — ⚠ A machine path was committed on `main`; it was true when written and is
+now STALE.** While checking the repo's own hygiene I found a literal user-home path
+inside a committed capture in `findings-log/2026-10-12-area-b-v12-routing/` — one
+line of captured `hurl` output, outside any file this pass touched. **Recorded, not
+fixed**: it is not this pass's file, and `findings-log/` is append-only. It is the
+same defect class area I hit, where its own `probe.sh` carried a hard-coded home path
+until a later pass found it.
+
+> **⚠ Corrected 2026-10-13 (verifier round 1): the CONCLUSION above is right, the
+> REASON was wrong.** I wrote that the capture *"does not fail the gate, which scans
+> the diff rather than the tree"*. That is not the mechanism. **All three gate modes
+> select their subjects by file extension** — `git ls-files '*.md' '*.yml' '*.yaml'
+> '*.sh' '*.hurl'` in `--all`, and the same `\.(md|yml|yaml|sh|hurl)$` filter in
+> `--staged` and diff mode. **A `.txt` capture is excluded by extension in every
+> mode**, so `--all` would not have read it either. That filter was last touched
+> 2026-10-12 19:25, before this pass ran, so nothing about it is a consequence of
+> anything here. The same distinction is what `docs/09`'s neighbouring row already
+> recorded for the assertion counts — the check sees only what its own filter
+> selects, and a value it cannot select is a value it is not evidence about.
+>
+> **And the finding is now stale, which is the record working rather than breaking.**
+> `8a4ac41` ("correction: redact a machine path from area B's hurl-validation
+> capture", 2026-10-13 11:27) redacted it on `main` **32 minutes after this pass
+> committed** (10:55). The finding was **true when written** and is not true now.
+> The sentence above is left in place unedited because that timeline is the
+> evidence: the gap existed, a pass noticed it from outside its own scope, and it
+> was fixed within the hour. **What is stale is the phrasing "is committed on
+> `main`" — the value is no longer there.**
 
 **8.4 — No pin is possible for this area, and that is a result.** Step 4 of
 `CONTRIBUTING` asks for pins for values someone will rely on. The value here is the
@@ -469,3 +516,67 @@ inside a 21-request budget. Anyone reading the accounting line alone would concl
 there was no overrun; that conclusion would be wrong. The original 20 therefore stays
 in this file, beside the restatement that supersedes it, and the restatement is
 labelled as post-hoc in every place it appears.
+
+---
+
+## Correction (2026-10-13, verifier round 1) — §8.1 said "6 of the README's own 11 table rows"; it is 5 of 10
+
+**Verdict: CONTRADICTS, on one count, at three sites. The finding beneath it stands.**
+
+The original §8.1 heading, kept verbatim so the correction is auditable:
+
+> **8.1 — The committed probe script does not cover 6 of the README's own 11 table
+> rows.** … `README.md:52-53` tabulates **eleven**: … the point is how much of it the
+> tree can reproduce, which is 5 of 11.
+
+**Three defects in that one passage**, and they are the recurring classes in
+`AGENTS.md` §6 items 1, 5 and 7 rather than three separate slips:
+
+1. **The denominator was wrong: 11, not 10.** The table is **two status rows**, not
+   eleven rows. Counting the version values per row gives **4** on the `206` row
+   (`README.md:52`) and **6** on the `200` row (`README.md:53`) = **10**.
+2. **The heading's numerator contradicted its own body.** The heading said `6`; two
+   lines below the body correctly said *"two of the **five** the committed script
+   never varies"* and then *also* said `5 of 11`. The body's `5` was right; the
+   heading's `6` was not supported by anything.
+3. **The file contradicted itself 29 lines earlier.** `§7`'s table row already called
+   it *"the **10**-row boundary table"*. The same file carried both numbers.
+
+**The counting rule is now recorded in §8.1** so the 10 is reproducible, including the
+specific trap that produced the first wrong value: the table row's **second** cell is
+the *result* (`206 Upgrade application` / `200 OK`), and reading that cell instead of
+the first yields 1 — which is how `11` first became reachable.
+
+**The substantive point is unchanged and is what makes the finding worth keeping.**
+The committed `VERSIONS` array covers 5 of the 10, and the five it never varies are
+`3.6`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0` — of which **`3.8` and `3.8.0` are the exact
+values the client ships and the xDrip PR merged**. A wrong count here was a wrong
+count about how much of a third party's boundary table is reproducible from their
+tree; it was not a wrong count about Medtronic. Corrected at all four sites: this
+file's §8.1 heading, its body, and `docs/03-discovery-and-versions.md` §3a.1, which is
+where it had propagated into canonical prose.
+
+**Also corrected here, same round: §8.3's mechanism.** It claimed the committed
+machine path *"does not fail the gate, which scans the diff rather than the tree."*
+The conclusion held; the reason did not. **All three gate modes select subjects by
+extension** — `git ls-files '*.md' '*.yml' '*.yaml' '*.sh' '*.hurl'` for `--all`, and
+the same `\.(md|yml|yaml|sh|hurl)$` filter for `--staged` and diff mode — so a `.txt`
+capture is excluded in **every** mode and `--all` would not have read it either. That
+filter predates this pass (last touched 2026-10-12 19:25), so nothing here caused it.
+The same point is what `docs/09`'s neighbouring row already recorded for the
+assertion counts: a check sees only what its own filter selects.
+
+**And §8.3 is now STALE, which is the record working.** `8a4ac41` redacted that
+capture on `main` at 2026-10-13 11:27, **32 minutes after** this pass committed
+(10:55). The finding was **true when written** and is not true now. The original
+sentence is left in place because the timeline is the evidence: the gap existed, a
+pass found it from outside its own scope, and it was fixed within the hour. **What
+no longer holds is the phrase "is committed on `main`".**
+
+**Not changed: the `{3.7, 3.8}` window is still true**, but its scope is now stated
+where it is claimed — see §5, which records that the window is closed at two values
+**for the `X.Y` forms the discovery axis was probed at**, and that `3.7.0`/`3.8.0`
+are **unobserved** on the discovery path (no `X.Y.Z` cell exists anywhere) rather
+than excluded from it. That is a wording scope correction, not a retraction: the
+verifier recorded it as prose reaching past its evidence, and the evidence itself
+never moved.

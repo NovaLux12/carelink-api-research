@@ -348,10 +348,13 @@ is unknown.
 > > independently. No client dates either change, so no drift timeline is asserted.
 >
 > **What the pass added that the area did not ask for:** the two constraints
-> **intersect in exactly `{3.7, 3.8}`**, and the one client whose source is readable
-> feeds **a single constant** into both axes — correct only because `3.8` is in that
-> window, so raising it to `3.9` breaks the discovery axis *silently*, on a path this
-> repo already pins. That is a bridge-facing coupling and it is now a `docs/10` §1 row.
+> **intersect in exactly `{3.7, 3.8}`** *for the `X.Y` forms the discovery axis has
+> been probed at* — `3.7.0`/`3.8.0` clear the body gate but are unobserved on the
+> discovery path, since no `X.Y.Z` cell was ever probed — and the one client whose
+> source is readable feeds **a single constant** into both axes, correct only because
+> `3.8` is in that window, so raising it to `3.9` breaks the discovery axis
+> *silently*, on a path this repo already pins. That is a bridge-facing coupling and
+> it is now a `docs/10` §1 row.
 
 ### R. Reconcile the `deviceFamily` correction against the client consensus
 

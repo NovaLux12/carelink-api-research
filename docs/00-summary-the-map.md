@@ -118,10 +118,13 @@ open-ended" note is superseded: there is no undiscovered Auth0+v13 fallback.**
 > no vendor POST beyond the two already-pinned ones. Read it as *a client's report*,
 > labelled SOURCE-PUBLISHED, never as OBSERVED.
 >
-> **The consequence worth carrying: the two constraints intersect in exactly
-> `{3.7, 3.8}`**, and the one client whose source is readable feeds **a single
-> constant** into both axes — correct only because `3.8` is in that window. Raising
-> it to `3.9` breaks the discovery axis silently, while the body gate stays happy.
+> **The consequence worth carrying: for the `X.Y` forms the discovery axis has been
+> probed at, the two constraints intersect in exactly `{3.7, 3.8}`** — `3.7.0` and
+> `3.8.0` clear the body gate, but their discovery-path status is **unobserved**,
+> since no `X.Y.Z` cell was ever probed. Inside that window, the one client whose
+> source is readable feeds **a single constant** into both axes — correct only
+> because `3.8` is in it. Raising it to `3.9` breaks the discovery axis silently,
+> while the body gate stays happy.
 > Full treatment, controls and both evidence labels:
 > [`03-discovery-and-versions.md`](03-discovery-and-versions.md) §3a
 > [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md].
