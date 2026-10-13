@@ -92,25 +92,85 @@ Higher than area M's 28%. **None of the 18 was read as a zero.** §6 lists the
 cells that were still unresolved when the budget ran out.
 
 **Not every failure was re-issued, and the first draft of this sentence claimed
-otherwise.** Re-issuing is the rule area M's correction binds on this API, and it
-was followed for every *cell* that mattered — but two individual rows were
-dropped after one attempt:
+otherwise.** Re-issuing is the rule area M's correction binds on this API. It was
+applied **unevenly**, and the table is the honest record: **four** rows were
+dropped without a re-issue, not two. `seq 31` and `seq 39` were **added to this
+table on 2026-10-13** after re-deriving the record from `results.jsonl` and
+`run.log`; the correction is immediately below and quotes what was wrong.
 
 | row | crawl | what it was | why it was dropped |
 |---|---|---|---|
 | `seq 25` | `CC-MAIN-2014-10` | the crawl-scoped `example.com` **control** for that crawl | the crawl's three `minimed.eu` attempts had already failed 504/504/502; the control's purpose was to say why, and a fourth request on a crawl that had answered nothing was not bought |
+| `seq 31` | `CC-MAIN-2021-04` | `minimed.eu` domain, one attempt, **404** | ⚠ **added 2026-10-13.** The `404` is the API's *absence answer*, so it reads like a result rather than like a failure; the budget moved on |
+| `seq 39` | `CC-MAIN-2013-20` | `minimed.eu` domain, one attempt, **404** | ⚠ **added 2026-10-13.** Same shape as `seq 31`: a first-and-only `404`, not re-issued |
 | `seq 41` | `CC-MAIN-2013-48` | `minimed.eu` domain, one attempt, **400** | the budget went to `CC-MAIN-2015-06` instead |
 
-**What that cost, stated rather than absorbed.** `CC-MAIN-2013-48` is one of the
-three 2013-era crawls, so it sits in §6's indeterminate column for a reason this
-pass **chose** rather than one it hit: the crawl was given one attempt where
-`CC-MAIN-2013-20` was given two and `CC-MAIN-2014-10` three. Its verdict is
-`indeterminate` either way, but the evidence behind that verdict is thinner than
-its neighbours', and a reader weighing the 2013 end should know the difference was
-one request wide. **Correct statement of the rule as applied here: every
-`*minimed.eu*` cell was attempted at least twice except `CC-MAIN-2013-48`, and
-the 2014-10 control was sent once; both failures prove nothing in either
-direction.**
+### ⚠ Correction (2026-10-13) — round 2: a one-request asymmetry the ledger does not contain
+
+The two paragraphs below are **superseded** and are kept readable because the
+retraction is the evidence. They were written specifically to discharge a blocking
+verification finding, and **both claims in them are false**:
+
+> **What that cost, stated rather than absorbed.** `CC-MAIN-2013-48` is one of the
+> three 2013-era crawls, so it sits in §6's indeterminate column for a reason this
+> pass **chose** rather than one it hit: the crawl was given one attempt where
+> `CC-MAIN-2013-20` was given two and `CC-MAIN-2014-10` three. Its verdict is
+> `indeterminate` either way, but the evidence behind that verdict is thinner than
+> its neighbours', and a reader weighing the 2013 end should know the difference was
+> one request wide. **Correct statement of the rule as applied here: every
+> `*minimed.eu*` cell was attempted at least twice except `CC-MAIN-2013-48`, and
+> the 2014-10 control was sent once; both failures prove nothing in either
+> direction.**
+
+**`results.jsonl` and `run.log` agree against both claims, and there is no
+reading that rescues either.**
+
+1. **`CC-MAIN-2013-20` was not given two attempts. It was given exactly one, the
+   same as `CC-MAIN-2013-48`.** Counting `minimed.eu` rows per crawl:
+   `2013-20` = **1**, `2013-48` = **1**, `2014-10` = **3**. Counting *all* rows per
+   crawl: `2013-20` = **2**, `2013-48` = **2**, `2014-10` = **4**. The two are
+   identical under either counting rule, so the one-request asymmetry the sentence
+   asserted does not exist.
+2. **"Every `*minimed.eu*` cell was attempted at least twice except
+   `CC-MAIN-2013-48`" is false. Six crawls have a single `minimed.eu` attempt** —
+   `2013-20` (**404**), `2013-48` (**400**), `2015-06` (**200**), `2017-04`
+   (**200**), `2019-51` (**200**), `2021-04` (**404**). Three of those six
+   (`2015-06`, `2017-04`, `2019-51`) were first-try `200`s and needed no re-issue
+   under the rule, so a correct sentence would have covered them. **The two it
+   would not have covered are un-re-issued failures: `CC-MAIN-2013-20` and
+   `CC-MAIN-2021-04`, each a `404` on a first and only attempt.** Both are now in
+   the table above.
+
+**What actually distinguished `CC-MAIN-2013-48`, since the budget did not: almost
+nothing — and that is the finding, not an excuse.** The one real difference from
+`CC-MAIN-2013-20` is the **shape of its single answer**: `2013-48` returned a
+**`400`**, a bare failure with no result-shaped answer at all, while `2013-20`
+returned a **`404`** — the API's *absence answer*, which looks like a finding and
+is the more seductive thing to leave un-re-issued. In both cases the budget
+simply went elsewhere. **`CC-MAIN-2013-48` was not treated more carefully than
+`CC-MAIN-2013-20`; it answered differently.**
+
+**The consequence for §6's column, which is what a reader should carry away.** The
+7/7 readable-versus-indeterminate split is **partly a budget artefact, not purely
+a property of the API.** Attempts per `minimed.eu` among the seven indeterminate
+crawls:
+
+| attempts | crawls and their answers |
+|---|---|
+| **1** | `CC-MAIN-2013-20` (404), `CC-MAIN-2013-48` (400), `CC-MAIN-2021-04` (404) |
+| 2 | `CC-MAIN-2022-05` (504, then 404) |
+| 3 | `CC-MAIN-2014-10` (504/504/502), `CC-MAIN-2015-22` (504/504/502), `CC-MAIN-2021-25` (504/400/502) |
+
+**Three of the seven holes were asked once.** For those three, "the API will not
+serve this crawl" and "this pass asked once and moved on" are **not
+distinguishable in the ledger**, and no amount of re-reading separates them — only
+a re-issue does. The other four were asked two or three times, and for those the
+hole is a genuine repeated failure.
+
+`CC-MAIN-2022-05` is the instructive contrast and the reason the distinction is
+worth stating: it **was** re-issued, and its **second** answer was a `404`. A
+`404` as a **second** answer is evidence; the same `404` as a **first and only**
+answer is not. That is the whole difference between `seq 22` and `seq 39`.
 
 ---
 
@@ -138,9 +198,11 @@ Three things follow, and they carry different weight, so they are kept apart:
 1. **The family is `/ipro/hcp/*`; the `.jsf` glob is too narrow.** `index.jsp`
    is a `.jsp`. **Narrower than first stated here:** the repository already
    carries the wider glob once. `ARCHIVE-URLS §5` writes the family row as
-   **`/ipro/hcp/*`** (`recon/ARCHIVE-URLS.md:341`), and it is the **§3 timeline**
-   row (`recon/ARCHIVE-URLS.md:237`) that writes `ipro/hcp/*.jsf` — so the
-   narrow form is one line in one table, not the repository's only spelling.
+   **`/ipro/hcp/*`** (`findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:341`),
+   and it is the **§3 timeline** row
+   (`findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md:237`) that writes
+   `ipro/hcp/*.jsf` — so the narrow form is one line in one table, not the
+   repository's only spelling.
    The consequence is correspondingly narrower: the **§3 timeline row** omits
    the fourth member, and `docs/11`'s addendum repeats that row's narrower glob.
    **`ARCHIVE-URLS` was not modified** — area M's convention, and that log
@@ -430,6 +492,15 @@ all. **Counting rule, so the next reader can re-derive the column:** a cell is
 readable as an absence only if some row for **that crawl** answered `200`. Seven
 of the fourteen crawls this pass touched fail that test; the other seven passed
 it, and they are the only cells whose answers carry weight.
+
+⚠ **The column is also partly a budget artefact, and the split above does not
+show that by itself.** Of the seven indeterminate crawls, **three were asked
+once** (`CC-MAIN-2013-20`, `-2013-48`, `-2021-04`), one twice and three three
+times. For the three asked once, "this crawl cannot be served" and "this pass
+asked once and moved on" are indistinguishable in the ledger. Per-attempt
+counts and the dropped rows are in §1's round-2 correction; a reader weighing a
+hole should check how many attempts bought it before treating it as a property
+of the API.
 
 ### A `/patient/` prefix caveat on area M's §3c
 

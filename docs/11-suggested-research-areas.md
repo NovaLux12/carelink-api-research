@@ -660,17 +660,31 @@ reason is worth more than a negative would have been: `CC-MAIN-2013-20`
 `CC-MAIN-2013-48` and `CC-MAIN-2014-10` each failed the `minimed.eu` query in a
 **different** way (`404`, `400`, `502`/`504`), so the failure mode is
 crawl-dependent and a status code is not an oracle across crawls. Five requests
-were spent and it did not yield an answer (OBSERVED, same source, §3a and §5) —
-and `CC-MAIN-2013-48` was given **one** attempt where its neighbours were given
-two and three, so its hole is thinner than theirs by exactly that one request
-(same source, §1 and §8).
+were spent and it did not yield an answer (OBSERVED, same source, §3a and §5).
+
+⚠ **CORRECTED 2026-10-13, in this pass's own prose:** the draft also said
+`CC-MAIN-2013-48` "was given **one** attempt where its neighbours were given two
+and three". **`results.jsonl` does not support it.** `CC-MAIN-2013-20` and
+`CC-MAIN-2013-48` have **identical** request records — one `minimed.eu` attempt
+and one crawl-scoped control each — and `CC-MAIN-2014-10` got three
+`minimed.eu` attempts. **Six crawls in total have a single `minimed.eu`
+attempt**, of which two are un-re-issued *failures* returning `404`
+(`CC-MAIN-2013-20`, `CC-MAIN-2021-04`) and three were first-try `200`s that
+needed no re-issue. **The honest account is uneven discipline, not a considered
+choice:** `2013-48` was not treated more carefully than `2013-20`, it answered
+differently — a bare `400` rather than a `404` that reads like a finding. **Three
+of the seven indeterminate crawls were asked once**, so for those the hole is
+partly a budget artefact rather than a demonstrated property of the API
+([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §1 round-2
+correction, §6]).
 
 **Blocker:** a request budget against an API that fails **18 of 44** requests
 (41%), against crawls whose failure mode varies. Not access-shaped, and not
 "more research": re-issuing the **seven** indeterminate crawls
 (`CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`, `-2021-04`, `-2021-25`,
 `-2022-05`) is a fixed, small, mechanical list that one pass could finish inside
-45 requests.
+45 requests. **Three of those seven were only asked once**, which makes the list
+cheaper and more valuable than it looks — see the dated correction above.
 
 **Closes when** each of the seven indeterminate crawls has produced **either** a
 record set **or** a `404` confirmed by a positive control on that same crawl, so
