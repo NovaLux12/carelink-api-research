@@ -17,11 +17,21 @@
 # pair in REQUEST ORDER taken from results.jsonl, so N rows give N-1 gaps. All
 # rows are on one host.
 #
-# SERIES VALIDATION, per docs/09 section 4: a trustworthy run's mtime span EQUALS
-# the harness span. Git does not preserve mtimes, so on a fresh clone every body
-# carries the checkout time and the spread collapses to 0.0 s. The spans are
-# compared here and the verdict printed, so the reader does not have to take the
-# series on trust.
+# SERIES VALIDATION, per docs/09 section 4. Two things are checked, and they are
+# NOT the same thing:
+#
+#   1. PER-GAP comparison - the two series must agree gap by gap. This can fail,
+#      and on this run it does: it is what names each `date` timestamp that moved.
+#   2. Span comparison - both series must agree about the run's extent. This
+#      cannot detect interior corruption; it is a two-endpoint consistency check
+#      and is labelled as one.
+#
+# The first version of this script had only (2), written as arithmetic whose
+# difference telescopes to the first row's own latency — a number that could not
+# fail. See the SPAN COMPARISON section for the retraction.
+#
+# Git does not preserve mtimes, so on a fresh clone every body carries the
+# checkout time and the spread collapses to 0.0 s; that is what (2) is for.
 set -u
 LEDGER=${1:?usage: spacing.sh <results.jsonl>}
 python3 - "$LEDGER" <<'EOF'
@@ -44,7 +54,7 @@ print()
 # --- per request --------------------------------------------------------------
 print("per request:")
 print("  seq  t_sent (inside flock)        dur      mtime-t_sent   status  path")
-sends, mtimes = [], []
+sends, mtimes, dones = [], [], []
 for r in rows:
     ts, td = t(r["t_sent"]), t(r["t_done"])
     ns = r.get("body_mtime_ns", "")
@@ -52,6 +62,7 @@ for r in rows:
     dur = (td - ts) if (ts and td) else None
     skew = (mt - ts) if (mt and ts) else None
     if ts: sends.append(ts)
+    if td: dones.append(td)
     if mt: mtimes.append(mt)
     print(f"  {r['seq']:<4d} {r['t_sent']:<26s} "
           f"{('%.3fs' % dur) if dur is not None else '(none)':<9s}"
@@ -76,15 +87,56 @@ for seq_a, seq_b, g in sorted(send_gaps, key=lambda x: x[2])[:10]:
 print(f"  ({len(send_gaps)} send-series gaps; the ten shortest are printed above)")
 print()
 
-print("SERIES VALIDATION (the mtime series is only usable if this holds):")
+print()
+print("SPAN COMPARISON — and what it can and cannot do, stated because the first")
+print("version of this section was arithmetic dressed as evidence:")
+print()
+print("  The first version computed")
+print("    harness = max(max(sends),max(mtimes)) - min(min(sends),min(mtimes))")
+print("    kernel  = max(mtimes) - min(mtimes)")
+print("  whose difference TELESCOPES to mtime[0] - send[0] — the first request's own")
+print("  latency — and to nothing else. Every interior timestamp cancels, so it could")
+print("  not have detected a corrupted series short of total collapse. Its 'agreement")
+print("  to 0.274s' was a number that could not fail. Replaced with two endpoints that")
+print("  genuinely differ, and — more to the point — with the PER-GAP comparison")
+print("  below, which can.")
+print()
 if sends and mtimes:
-    hs = max(max(sends), max(mtimes)) - min(min(sends), min(mtimes))
+    hs = max(dones) - min(sends)
     ms = max(mtimes) - min(mtimes)
-    print(f"  harness span  (first t_sent -> last body write): {hs:.3f}s")
-    print(f"  kernel mtime span                            : {ms:.3f}s")
-    print(f"  difference                                   : {abs(hs - ms):.3f}s")
-    print(f"  verdict                                     : "
-          f"{'USABLE — spans agree' if abs(hs - ms) < 5.0 else 'SUSPECT — spans disagree'}")
+    print(f"  harness  first t_sent -> last t_done : {hs:.3f}s")
+    print(f"  kernel   first write  -> last write  : {ms:.3f}s")
+    print(f"  difference                           : {abs(hs - ms):.3f}s")
+    print(f"  = first-row latency {mtimes[0]-sends[0]:.3f}s + last-row latency "
+          f"{dones[-1]-mtimes[-1]:.3f}s")
+    print("  STILL a two-endpoint check: it confirms both series agree about the run's")
+    print("  extent and says NOTHING about the gaps between them. The per-gap comparison")
+    print("  below is what carries that weight.")
+else:
+    print("  (insufficient data)")
+
+print()
+print("PER-GAP SERIES COMPARISON — the check that CAN fail")
+print("  For each consecutive pair: |send_gap - mtime_gap|. Two clocks measuring the")
+print("  same interval must agree; where they do not, the `date` series is wrong at")
+print("  that specific gap, and the gap is NAMED rather than summarised away.")
+if send_gaps and mtime_gaps:
+    sg = {s: g for s, _, g in send_gaps}
+    mg = {s: g for s, _, g in mtime_gaps}
+    common = sorted(set(sg) & set(mg))
+    deltas = [(s, sg[s] - mg[s]) for s in common]
+    ad = [abs(d) for _, d in deltas]
+    worst = sorted(deltas, key=lambda x: -abs(x[1]))[:10]
+    over = [(s, d) for s, d in deltas if abs(d) > 0.5]
+    print(f"  gaps compared          : {len(deltas)}")
+    print(f"  max |send - mtime|     : {max(ad):.3f}s")
+    print(f"  median |send - mtime|  : {sorted(ad)[len(ad)//2]:.3f}s")
+    print(f"  gaps disagreeing >0.5s : {len(over)}")
+    for s, d in worst:
+        print(f"     seq{s:<5d} send {sg[s]:8.3f}s  mtime {mg[s]:8.3f}s  delta {d:+.3f}s")
+    print("  Every disagreement above is a `date` timestamp that moved; the kernel")
+    print("  series holds. That is the finding, visible PER GAP rather than inferred")
+    print("  from two spans.")
 else:
     print("  (insufficient data)")
 
@@ -102,6 +154,20 @@ neg = [(r['seq'], round((t(r['t_done']) - t(r['t_sent'])) * 1000)) for r in rows
        if t(r['t_done']) and t(r['t_sent']) and t(r['t_done']) < t(r['t_sent'])]
 print(f"  negative request durations (impossible; the corrupt-t0 signature, "
       f"docs/09 §4): {len(neg)}" + (f" {neg[:6]}" if neg else ""))
+negm = [s for s, _, g in mtime_gaps if g <= 0]
+print(f"  negative KERNEL gaps (also impossible; the same signature measured by the "
+      f"independent series): {len(negm)}" + (f" {negm}" if negm else ""))
+print()
+print("  Long gaps (>10 s), BOTH series. Every long gap in this run is explained and")
+print("  every one is OVER the declared delay, not under it. Reported from both")
+print("  series because the prose quotes the kernel figures, and the two series")
+print("  differ in the second decimal — quoting one while naming the other is how a")
+print("  35.6 s gap becomes a 35.62 s gap in someone's write-up.")
+if mtime_gaps:
+    sg = {s: g for s, _, g in send_gaps}
+    for a, b, g in sorted([(a, b, g) for a, b, g in mtime_gaps if g > 10]):
+        print(f"     seq{a:<5d} ->{b:<5d}  kernel {g:8.3f}s   send {sg.get(a, float('nan')):8.3f}s")
+print()
 early = [r['seq'] for r in rows
          if r.get('body_mtime_ns', '') not in ('', '(none)')
          and t(r['t_sent']) and int(r['body_mtime_ns']) / 1e9 < t(r['t_sent'])]

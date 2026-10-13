@@ -960,14 +960,22 @@ NGP                                    cs=6        ci=139      q=4
     UNFILTERED, on purpose: see the header of this script.
 ==============================================================================
 
---- 'baseUrl': 32 hit(s), 1 distinct enclosing identifier(s) ---
+    The offsets below come from the CASE-INSENSITIVE pass, and every hit is
+    labelled cs or cv. `cv` is a case VARIANT - the case-sensitivity control
+    found something the sensitive count missed, which is the entire point of
+    running `ci` at all. An earlier version of this script iterated the
+    CASE-SENSITIVE pass only, so a section-1 line reading "ci adds N, read
+    section 2" could not reach those N offsets and the pointer lied. Iterating
+    `ci` is what makes the control reachable.
+
+--- 'baseUrl': 32 hit(s) case-insensitive (32 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x32    baseUrl
            offsets [2027033, 2027209, 214, 401, 468, 1073, 1149, 1213, 1286, 1377, 214, 401, 468, 1073, 1149, 1213, 1286, 1377, 223, 410, 477, 1083, 1159, 1223] ...
            proposed: bare token in an identifier or expression
            first-hit context: ...hPdfMapping(m="en",j="us"){return this.cmsService.getBaseCmsUrl().pipe((0,Qi.n)(pe=>(this.baseUrl=pe,this.http.get(`${pe}/media/config/mmm/${j}.json`,{params:{skipHeader:"auth"}}))),(0,ro...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'discover': 12 hit(s), 12 distinct enclosing identifier(s) ---
+--- 'discover': 12 hit(s) case-insensitive (12 cs + 0 cv), 12 distinct enclosing identifier(s) ---
   x1     discover
            offsets [14960]
            proposed: bare token in an identifier or expression
@@ -1029,7 +1037,71 @@ NGP                                    cs=6        ci=139      q=4
            first-hit context: ...ed,unfunny,unfreezing,unflattering,unfairness,unexpressed,unending,unencumbered,unearth,undiscovered,undisciplined,understan,undershirt,underlings,underline,undercurrent,uncivilized,unchar...
            first-hit file: /8141.650c358996e4c19a.js
 
---- 'pde': 5 hit(s), 5 distinct enclosing identifier(s) ---
+--- 'pde': 34 hit(s) case-insensitive (5 cs + 29 cv), 12 distinct enclosing identifier(s) ---
+  x8     propDecorators
+           ** cv ** matched text 'pDe' at offset 733029 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 733047 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 733066 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 733092 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 834961 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 834994 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 835023 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 835044 in /main.6595daf83bd6d4b1.js
+           offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...u=s.propMetadata;return"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){const u=s.propDecorators,C={};return Object...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x6     mapDeviceModelName
+           ** cv ** matched text 'pDe' at offset 581421 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 581727 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 74111 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'pDe' at offset 77086 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'pDe' at offset 80017 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'pDe' at offset 80248 in /7187.87daa49216a1a9ef.js
+           offsets [581421, 581727, 74111, 77086, 80017, 80248]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...length){const gt=Ye.CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{...an,segments:(null==($t=an.segments...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x6     removeStylesOnCompDestroy
+           ** cv ** matched text 'pDe' at offset 1840258 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1840750 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1841416 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1845706 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1845875 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1846132 in /main.6595daf83bd6d4b1.js
+           offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...is,"sharedStylesHost",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platformId",void 0),(0,e.A)(this,"...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x3     WPDesktop
+           ** cv ** matched text 'PDe' at offset 2887697 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'PDe' at offset 2889198 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'PDe' at offset 2889490 in /main.6595daf83bd6d4b1.js
+           offsets [2887697, 2889198, 2889490]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ackBerry|PlayBook|BB10)/i.test(P)?"BlackBerry":ct.includes(P,"IEMobile")||ct.includes(P,"WPDesktop")?"Internet Explorer Mobile":ct.includes(P,"SamsungBrowser/")?"Samsung Internet":ct....
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     LoopDetected
+           ** cv ** matched text 'pDe' at offset 3147133 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 3147152 in /main.6595daf83bd6d4b1.js
+           offsets [3147133, 3147152]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...06]="VariantAlsoNegotiates",Re[Re.InsufficientStorage=507]="InsufficientStorage",Re[Re.LoopDetected=508]="LoopDetected",Re[Re.NotExtended=510]="NotExtended",Re[Re.NetworkAuthenticatio...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     getGroupDelayControl
+           ** cv ** matched text 'pDe' at offset 1603222 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1607946 in /main.6595daf83bd6d4b1.js
+           offsets [1603222, 1607946]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...MT(7,9,"cp-notifications.time-period-label"))," "),e.R7$(3),e.Y8G("formControl",Kt.getGroupDelayControl(rn))("size",Kt.timePeriodControlSize.Medium)("disableControl",!Kt.settings.push...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     isDesktopDevice
+           ** cv ** matched text 'pDe' at offset 1967564 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'pDe' at offset 1974820 in /main.6595daf83bd6d4b1.js
+           offsets [1967564, 1974820]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...eType:this.currentTabIndex===this.LOGS_TAB_INDEX?Ho.W.PUMP:null})}ngOnInit(){this.isDesktopDevice=this.detectDeviceService.isExactlyDesktop(),(0,bs.z)([this.store.select(Ri.x0),this.s...
+           first-hit file: /main.6595daf83bd6d4b1.js
   x1     dropdead
            offsets [72313]
            proposed: bare token in an identifier or expression
@@ -1056,155 +1128,700 @@ NGP                                    cs=6        ci=139      q=4
            first-hit context: ...1,tayson,mike2,dogday,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pink123,team3x,nolimit5,snickers1,annies,098778...
            first-hit file: /8141.650c358996e4c19a.js
 
---- 'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'system.gc.gz.transition.flags': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     system.gc.gz.transition.flags
            offsets [2189151]
            proposed: quoted dotted config key
            first-hit context: ...tion",D.countriesWithConnect="connect.countriesWithConnect",D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="m...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'useCumulusUrls': 6 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'useCumulusUrls': 6 hit(s) case-insensitive (6 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x6     useCumulusUrls
            offsets [22393, 22410, 69468, 69742, 70202, 70219]
            proposed: bare token in an identifier or expression
            first-hit context: ...nst p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},connectData:()=>{const r...
            first-hit file: /6746.c6795ff7e9ff468d.js
 
---- 'csrDisplayMessageUrl': 2 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'csrDisplayMessageUrl': 2 hit(s) case-insensitive (2 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x2     csrDisplayMessageUrl
            offsets [22445, 70254]
            proposed: bare token in an identifier or expression
            first-hit context: ...rl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},connectData:()=>{const r=(0,P.WQX)(s.D),T=(0,P.WQX)(g.z),u=(0,P.WQX)(d.c$);r.showS...
            first-hit file: /6746.c6795ff7e9ff468d.js
 
---- 'personalDisplayMessageUrl': 2 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'personalDisplayMessageUrl': 2 hit(s) case-insensitive (2 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x2     personalDisplayMessageUrl
            offsets [22360, 70169]
            proposed: bare token in an identifier or expression
            first-hit context: ...(0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.csrDisplayMessageUrl:p}}))},co...
            first-hit file: /6746.c6795ff7e9ff468d.js
 
---- 'carepartnerDisplayMessageUrl': 2 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'carepartnerDisplayMessageUrl': 2 hit(s) case-insensitive (2 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x2     carepartnerDisplayMessageUrl
            offsets [22329, 70138]
            proposed: bare token in an identifier or expression
            first-hit context: ....WQX)(pe.il).select(_.z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMessageUrl:l.personalDisplayMessageUrl;return{useCumulusUrls:l.useCumulusUrls,messageEndpoint:r?l.cs...
            first-hit file: /6746.c6795ff7e9ff468d.js
 
---- 'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'csr.cumulus.periodic.data.endpoints': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     csr.cumulus.periodic.data.endpoints
            offsets [2188956]
            proposed: quoted dotted config key
            first-hit context: ...rty.apps",D.controlCodeSettings="csr.control.codes.settings",D.csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints",D.browserCheckSettings="personal.application.browser.check.configuration",D.countriesWit...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'csrCumulusPeriodicDataAPI': 2 hit(s) case-insensitive (2 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x2     csrCumulusPeriodicDataAPI
            offsets [93566, 2188929]
            proposed: bare token in an identifier or expression
            first-hit context: ...,gt=>gt.thirdPartySettings),J=(0,e.Mz)(f,gt=>gt.controlCodeSettings),ne=(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI),fe=(0,e.Mz)(f,gt=>gt.browserCheckSettings),ye=(0,e.Mz)(f,o.PZ,(gt,an)=>{var lt,wt;return...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'guardianCumulusPeriodicAPI': 2 hit(s) case-insensitive (2 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x2     guardianCumulusPeriodicAPI
            offsets [93819, 2189123]
            proposed: bare token in an identifier or expression
            first-hit context: ...cludes(null==(lt=null==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),ae=(0,e.Mz)(f,gt=>gt.captchaSettings),te=(0,e.Mz)(f...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'display_message': 3 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'display_message': 3 hit(s) case-insensitive (3 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x3     display_message
            offsets [3373507, 22085, 70436]
            proposed: bare token in an identifier or expression
            first-hit context: ...rn(0,n.p)([this.getProfile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username,role:this.isCarePartner()?L.P.CARE_PARTNER:L.P.PA...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'patient-timeline': 5 hit(s) case-insensitive (5 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x5     patient-timeline
            offsets [1718181, 1719243, 1963408, 1963661, 3340159]
            proposed: ANGULAR COMPONENT SELECTOR (not a URL)
            first-hit context: ...e.$),c.rXU(ie.gRc),c.rXU(We.D),c.rXU(Dt.z))},Gt.\u0275cmp=c.VBU({type:Gt,selectors:[["app-patient-timeline"]],inputs:{reset:"reset"},features:[c.OA$],decls:4,vars:5,consts:[["id","pt-rca-content",...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'personal.patient.timeline.config': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'personal.patient.timeline.config': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     personal.patient.timeline.config
            offsets [2190446]
            proposed: quoted dotted config key
            first-hit context: ....validation.config",D.outagesNextUpdateAt="outages.nextupdateat",D.patientTimelineConfig="personal.patient.timeline.config",D.personalPatientTimelineHostURL="personal.patient.timeline.host",D.settingsTransferDevi...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'personal.patient.timeline.host': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'personal.patient.timeline.host': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     personal.patient.timeline.host
            offsets [2190514]
            proposed: quoted dotted config key
            first-hit context: ...atientTimelineConfig="personal.patient.timeline.config",D.personalPatientTimelineHostURL="personal.patient.timeline.host",D.settingsTransferDeviceMapping="system.settings.transfer.feature.config",D}(mh||{}),xm=...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'personalPatientTimelineHostURL': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'personalPatientTimelineHostURL': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     personalPatientTimelineHostURL
            offsets [2190482]
            proposed: quoted dotted config key
            first-hit context: ...ateAt="outages.nextupdateat",D.patientTimelineConfig="personal.patient.timeline.config",D.personalPatientTimelineHostURL="personal.patient.timeline.host",D.settingsTransferDeviceMapping="system.settings.transfe...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- '/patient/m2m': 9 hit(s), 1 distinct enclosing identifier(s) ---
+--- '/patient/m2m': 9 hit(s) case-insensitive (9 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x9     /patient/m2m
            offsets [1468428, 1468476, 2967821, 3367293, 3367946, 3368243, 3368655, 3373009, 69567]
            proposed: URL-shaped pointer inside a quoted string
            first-hit context: ...t/email/verify",g="/patient/csr/users/me/email",h="/patient/users/anonymized/me/email",t="/patient/m2m/users/notifications/sms/status",d="/patient/m2m/users/notifications/enable",f="carelink/h...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'retina.endpoints.config': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     retina.endpoints.config
            offsets [2189560]
            proposed: quoted dotted config key
            first-hit context: ...hboardSupportedCountries="personal.dashboard.supported.countries",D.retinaEndpointConfig="retina.endpoints.config",D.otcLoginEnabled="personal.sso.otc.enabled",D.certificationLinkEnabledCountries="person...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'mmm.data.api.url': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     mmm.data.api.url
            offsets [2189269]
            proposed: quoted dotted config key
            first-hit context: ...s",D.logbookPageSize="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="mmm.data.api.url",D.configRefetchSettings="config.refetch",D.csvGropingTime="personal.aggregated.report.in...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'sourceMappingURL': 1 hit(s) case-insensitive (1 cs + 0 cv), 1 distinct enclosing identifier(s) ---
   x1     sourceMappingURL
            offsets [2850610]
            proposed: URL-shaped pointer inside a quoted string
            first-hit context: ...++St)Me[St]=Me[St].substring(Ue).replace(rt,"$1use strict$2")+"\n";return O&&Me.push("//# sourceMappingURL="+O+"\n"),Me}(P,re),se=new Blob(O,{type:"application/javascript"});return URL.createObjec...
            first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'GUARDIAN': 14 hit(s), 2 distinct enclosing identifier(s) ---
+--- 'GUARDIAN': 151 hit(s) case-insensitive (14 cs + 137 cv), 21 distinct enclosing identifier(s) ---
+  x41    isGuardian
+           ** cv ** matched text 'Guardian' at offset 71328 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'Guardian' at offset 71536 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'Guardian' at offset 77341 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'Guardian' at offset 77417 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'Guardian' at offset 1542 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 4161 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 4174 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 5169 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 13753 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 13822 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'Guardian' at offset 11859 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'Guardian' at offset 14437 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'Guardian' at offset 14449 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'Guardian' at offset 9175 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'Guardian' at offset 10500 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'Guardian' at offset 10512 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'Guardian' at offset 3536 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 3805 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 3817 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 7446 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 7460 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 11998 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 12011 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 14140 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 45400 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 46081 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 51397 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 54924 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 55024 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 55124 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 74306 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 74347 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 76238 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 80313 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 80367 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 93915 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 93975 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 61259 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 61481 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 70829 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 70922 in /9283.40d76e6099adfa8b.js
+           offsets [71328, 71536, 77341, 77417, 1542, 4161, 4174, 5169, 13753, 13822, 11859, 14437, 14449, 9175, 10500, 10512, 3536, 3805, 3817, 7446, 7460, 11998, 12011, 14140] ...
+           proposed: bare token in an identifier or expression
+           first-hit context: ...teFormat)("required",n.dateOfBirthRequired)("languageCode",e.bMT(1,4,n.languageCode$))("isGuardian",n.profile.guardianParent)}}function Qa(t,o){if(1&t&&(e.nrm(0,"app-month-year-picker",5),...
+           first-hit file: /270.e53d2319a4358b16.js
+  x33    guardian
+           ** cv ** matched text 'guardian' at offset 247549 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 247758 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 254660 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 254863 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 2505032 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 85521 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 118180 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 137338 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 143587 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 143621 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 148256 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 151069 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 158414 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 158459 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 158518 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 158563 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 159897 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 159942 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 160010 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 160055 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 270 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'guardian' at offset 14278 in /3819.eaf85cd9088dca77.js
+           ** cv ** matched text 'guardian' at offset 9591 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'guardian' at offset 11843 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'guardian' at offset 15448 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'guardian' at offset 17026 in /4761.82fb0c2dc4728796.js
+           ** cv ** matched text 'guardian' at offset 7258 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'guardian' at offset 9159 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'guardian' at offset 12228 in /6243.8eb70b7c3c69e54c.js
+           ** cv ** matched text 'guardian' at offset 14536 in /8141.650c358996e4c19a.js
+           ** cv ** matched text 'guardian' at offset 34806 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 70063 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 73337 in /9283.40d76e6099adfa8b.js
+           offsets [247549, 247758, 254660, 254863, 2505032, 85521, 118180, 137338, 143587, 143621, 148256, 151069, 158414, 158459, 158518, 158563, 159897, 159942, 160010, 160055, 270, 14278, 9591, 11843] ...
+           proposed: quoted dotted config key
+           first-hit context: ....data.preferPumpData),e.R7$(),e.SpI(" ",e.bMT(3,17,"report.settings.prefer.pump.data.over.guardian"),"\n"),e.R7$(2),e.Y8G("matLegacyPopoverTriggerFor",X)("matLegacyPopoverTriggerOn",R.data...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x14    guardianParent
+           ** cv ** matched text 'guardian' at offset 1934651 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 7831 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 11189 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 22623 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 22640 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 22665 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 71348 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 71556 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 112355 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 115444 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 115534 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 138847 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 154764 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'guardian' at offset 3385 in /9283.40d76e6099adfa8b.js
+           offsets [1934651, 7831, 11189, 22623, 22640, 22665, 71348, 71556, 112355, 115444, 115534, 138847, 154764, 3385]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...isCsrEnabled?this.route.snapshot.data.userLanguage.languageCode:m))}get userName$(){const{guardianParent:m,parentFirstName:j,parentLastName:pe,firstName:Ae,lastName:Ve,username:ft}=this.us...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x11    guardianInfoModel
+           ** cv ** matched text 'guardian' at offset 1274 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 2570 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 3010 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 3742 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 4123 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 4206 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 31604 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 31696 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 31929 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 48990 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'guardian' at offset 79372 in /9283.40d76e6099adfa8b.js
+           offsets [1274, 2570, 3010, 3742, 4123, 4206, 31604, 31696, 31929, 48990, 79372]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...null,this.consentsModel=[],this.loginInfoModel=new Ee,this.patientInfoModel=new oe.p,this.guardianInfoModel=new $e}showUsernameErrorMfa(){this.snackbarService.error(this.translate.instant(...
+           first-hit file: /9283.40d76e6099adfa8b.js
   x8     LEGAL_GUARDIAN
            offsets [955, 971, 22050, 2735, 29302, 78222, 79641, 80127]
            proposed: bare token in an identifier or expression
            first-hit context: ...3:(x,d,t)=>{t.d(d,{S:()=>o,p:()=>s});var o=function(u){return u.PATIENT="patient",u.LEGAL_GUARDIAN="LEGAL_GUARDIAN",u}(o||{});class s{}},40260:(x,d,t)=>{t.d(d,{A:()=>z});var o=t(22281),s=t...
            first-hit file: /4761.82fb0c2dc4728796.js
+  x7     legalGuardian
+           ** cv ** matched text 'Guardian' at offset 61276 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 61498 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 64018 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 64054 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 65506 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 66470 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 73313 in /9283.40d76e6099adfa8b.js
+           offsets [61276, 61498, 64018, 64054, 65506, 66470, 73313]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...anguageCode$))("isRegistration",!0)("required",t.dateOfBirthRequired)("isGuardian",t.legalGuardian)}}function ci(n,s){if(1&n&&(e.nrm(0,"app-month-year-picker",17),e.nI1(1,"async")),2&n){co...
+           first-hit file: /9283.40d76e6099adfa8b.js
   x6     GUARDIAN
            offsets [1723322, 1723332, 2964263, 74316, 77447, 77499]
            proposed: bare token in an identifier or expression
            first-hit context: ...e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e=i(26279),a=i(15680),n...
            first-hit file: /main.6595daf83bd6d4b1.js
+  x5     guardianEndpointData
+           ** cv ** matched text 'guardian' at offset 10601 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'guardian' at offset 10647 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'guardian' at offset 22162 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'guardian' at offset 67365 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'guardian' at offset 67470 in /6746.c6795ff7e9ff468d.js
+           offsets [10601, 10647, 22162, 67365, 67470]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...guageService.code),this.blePeriodicDataEndpoint=this.route.snapshot.data.bleEndpoint,this.guardianEndpointData=this.route.snapshot.data.guardianEndpointData,this.userService.profile$.pipe(...
+           first-hit file: /6746.c6795ff7e9ff468d.js
+  x5     isLegalGuardian
+           ** cv ** matched text 'Guardian' at offset 2670 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 2996 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 3412 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 31563 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 65547 in /9283.40d76e6099adfa8b.js
+           offsets [2670, 2996, 3412, 31563, 65547]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...foModel.parentFirstName||this.patientInfoModel.firstName,country:t,language:i}}get isLegalGuardian(){return this.patientInfoModel.patientType===oe.S.LEGAL_GUARDIAN}get isPatient(){return t...
+           first-hit file: /9283.40d76e6099adfa8b.js
+  x4     legalGuardianName
+           ** cv ** matched text 'Guardian' at offset 2449 in /2356.ce46b9bb18508690.js
+           ** cv ** matched text 'Guardian' at offset 2595 in /2356.ce46b9bb18508690.js
+           ** cv ** matched text 'Guardian' at offset 2861 in /2356.ce46b9bb18508690.js
+           ** cv ** matched text 'Guardian' at offset 4775 in /2356.ce46b9bb18508690.js
+           offsets [2449, 2595, 2861, 4775]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...t.k0s()),2&o){const i=t.XpG().$implicit,e=t.XpG(3);t.R7$(),t.vxM(e.isAcceptConsent||"legalGuardianName"!==i?1:-1),t.R7$(),t.Y8G("formControlName",i)("id","tp-consent-"+i+"-input"),t.R7$(),...
+           first-hit file: /2356.ce46b9bb18508690.js
+  x3     isPatientOrLegalGuardianAccount
+           ** cv ** matched text 'Guardian' at offset 29211 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 29658 in /9283.40d76e6099adfa8b.js
+           ** cv ** matched text 'Guardian' at offset 36335 in /9283.40d76e6099adfa8b.js
+           offsets [29211, 29658, 36335]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ent}get isCarePartner(){return this.registrationService.isCarePartner}get isPatientOrLegalGuardianAccount(){const t=this.registrationService.accountType;return"PATIENT"===t||"LEGAL_GUARDIA...
+           first-hit file: /9283.40d76e6099adfa8b.js
+  x2     editGuardianInfo
+           ** cv ** matched text 'Guardian' at offset 117181 in /270.e53d2319a4358b16.js
+           ** cv ** matched text 'Guardian' at offset 137185 in /270.e53d2319a4358b16.js
+           offsets [117181, 137185]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...j41(0,"button",102),e.bIt("click",function(){d.eBV(n);const i=e.XpG(2);return d.Njj(i.editGuardianInfo())}),e.nrm(1,"mat-legacy-icon",94),e.k0s()}if(2&t){const n=e.XpG(2);e.Y8G("disabled",...
+           first-hit file: /270.e53d2319a4358b16.js
+  x2     getGuardianEndpoint
+           ** cv ** matched text 'Guardian' at offset 67394 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'Guardian' at offset 69985 in /6746.c6795ff7e9ff468d.js
+           offsets [67394, 69985]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...:this.userService.profile$,bleEndpoint:this.getBleEndpoint(),guardianEndpointData:this.getGuardianEndpoint()}).pipe((0,d.s)(1),(0,_e.n)(({userProfile:n,bleEndpoint:c,guardianEndpointData:h...
+           first-hit file: /6746.c6795ff7e9ff468d.js
+  x2     guardianCumulusPeriodicAPI
+           ** cv ** matched text 'guardian' at offset 93819 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 2189123 in /main.6595daf83bd6d4b1.js
+           offsets [93819, 2189123]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...cludes(null==(lt=null==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),ae=(0,e.Mz)(f,gt=>gt.captchaSetti...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     my_profile_edit_guardian_info
+           ** cv ** matched text 'guardian' at offset 2504999 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'guardian' at offset 137248 in /270.e53d2319a4358b16.js
+           offsets [2504999, 137248]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...info",o.my_profile_edit_personal_info="My profile - Edit personal info",o.my_profile_edit_guardian_info="My profile - Edit guardian info",o.my_profile_edit_two_factor="My profile - Edit tw...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x1     GuardianConnect
+           ** cv ** matched text 'Guardian' at offset 5246 in /3819.eaf85cd9088dca77.js
+           offsets [5246]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...me;if(this.isGuardian){this.cloudPostTitleKey="gm4"===e.deviceKind?"GuardianConnectZeus":"GuardianConnect";const y=Hs&&!T,B=e.sensorDaysToChange,k=e.sensorHoursToChange;if(y){switch(this.s...
+           first-hit file: /3819.eaf85cd9088dca77.js
+  x1     GuardianConnectZeus
+           ** cv ** matched text 'Guardian' at offset 5224 in /3819.eaf85cd9088dca77.js
+           offsets [5224]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...=e.sensorCalibrationTime;if(this.isGuardian){this.cloudPostTitleKey="gm4"===e.deviceKind?"GuardianConnectZeus":"GuardianConnect";const y=Hs&&!T,B=e.sensorDaysToChange,k=e.sensorHoursToChan...
+           first-hit file: /3819.eaf85cd9088dca77.js
+  x1     guardians
+           ** cv ** matched text 'guardian' at offset 308163 in /8141.650c358996e4c19a.js
+           offsets [308163]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ised,youths,declares,tasmanian,canadiens,fumble,refinery,weekdays,unconstitutional,upward,guardians,brownish,imminent,hamas,endorsement,naturalist,martyrs,caledonia,chords,yeshiva,reptiles...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     guardianship
+           ** cv ** matched text 'guardian' at offset 713069 in /8141.650c358996e4c19a.js
+           offsets [713069]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...illuminate,iguanas,hypnotic,hyped,hospitable,hoses,homemaker,hirschmuller,helpers,headset,guardianship,guapo,grubby,granola,granddaddy,goren,goblet,gluttony,globes,giorno,getter,geritol,ga...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     legalGuardianPart
+           ** cv ** matched text 'Guardian' at offset 141100 in /270.e53d2319a4358b16.js
+           offsets [141100]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...nTruncation"],["birthMonrthYearPart",""],["addressPart",""],["carePartnerPart",""],["legalGuardianPart",""],["phonePart",""],["emptyPhone",""],["emptyDOB",""],["emptyBirthMonthYear",""],["...
+           first-hit file: /270.e53d2319a4358b16.js
+  x1     legal_guardian
+           ** cv ** matched text 'guardian' at offset 22077 in /4761.82fb0c2dc4728796.js
+           offsets [22077]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...],E=[{value:h.S.PATIENT,view:".type.patient"},{value:h.S.LEGAL_GUARDIAN,view:".type.legal_guardian"}],c=[{value:o.TYPE_1,view:".select.type_1"},{value:o.TYPE_2,view:".select.type_2"},{valu...
+           first-hit file: /4761.82fb0c2dc4728796.js
 
---- 'deviceFamily': 15 hit(s), 1 distinct enclosing identifier(s) ---
+--- 'deviceFamily': 25 hit(s) case-insensitive (15 cs + 10 cv), 4 distinct enclosing identifier(s) ---
   x15    deviceFamily
            offsets [2964121, 3372241, 3372627, 3372658, 3373116, 10825, 10955, 67507, 74267, 74330, 76314, 77460, 77512, 78368, 87574]
            proposed: bare token in an identifier or expression
            first-hit context: ...void 0:p.username,this.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMP...
            first-hit file: /main.6595daf83bd6d4b1.js
+  x5     medicalDeviceFamily
+           ** cv ** matched text 'DeviceFamily' at offset 74289 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'DeviceFamily' at offset 83152 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'DeviceFamily' at offset 83181 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'DeviceFamily' at offset 83216 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'DeviceFamily' at offset 83909 in /6746.c6795ff7e9ff468d.js
+           offsets [74289, 83152, 83181, 83216, 83909]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...n)),c}mgDlToMmol(i){return i/18.016}parseJsonData(i,v){const n={};n.deviceFamily=i.medicalDeviceFamily,n.isGuardian="GUARDIAN"===n.deviceFamily,n.isGuardian&&(Ue=i.sgBelowLimit),n.sgBelowLimit...
+           first-hit file: /6746.c6795ff7e9ff468d.js
+  x4     getDeviceFamily
+           ** cv ** matched text 'DeviceFamily' at offset 2964069 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'DeviceFamily' at offset 3372209 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'DeviceFamily' at offset 22778 in /6746.c6795ff7e9ff468d.js
+           ** cv ** matched text 'DeviceFamily' at offset 22839 in /6746.c6795ff7e9ff468d.js
+           offsets [2964069, 3372209, 22778, 22839]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ull);let A=null;return G.pipe((0,a.n)(p=>(A=null==p?void 0:p.username,this.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.starts...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x1     lastDeviceFamily
+           ** cv ** matched text 'DeviceFamily' at offset 3373160 in /main.6595daf83bd6d4b1.js
+           offsets [3373160]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...),(0,E.T)(V=>{const R=sessionStorage.getItem("deviceFamily");return R?V.map(X=>({...X,lastDeviceFamily:R})):V}))}fetchLatestCurrentPatientDetails(V){return this.getM2MPatients().pipe((0,E.T)(R...
+           first-hit file: /main.6595daf83bd6d4b1.js
 
---- 'NGP': 6 hit(s), 2 distinct enclosing identifier(s) ---
+--- 'NGP': 139 hit(s) case-insensitive (6 cs + 133 cv), 33 distinct enclosing identifier(s) ---
+  x25    numberingPlan
+           ** cv ** matched text 'ngP' at offset 271520 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 271588 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 271867 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 271904 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460297 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460445 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460514 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461181 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461257 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461338 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461431 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461523 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461601 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461688 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461795 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461891 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1461968 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462037 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462101 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462432 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1760140 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1760192 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1760522 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1763001 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2736255 in /main.6595daf83bd6d4b1.js
+           offsets [271520, 271588, 271867, 271904, 1460297, 1460445, 1460514, 1461181, 1461257, 1461338, 1461431, 1461523, 1461601, 1461688, 1461795, 1461891, 1461968, 1462037, 1462101, 1462432, 1760140, 1760192, 1760522, 1763001] ...
+           proposed: bare token in an identifier or expression
+           first-hit context: ...actory:n.\u0275fac}),o})()},13604:(Je,_e,i)=>{"use strict";function e(a,n){if(a&&n.numberingPlan.nationalPrefixForParsing()){var o=new RegExp("^(?:"+n.numberingPlan.nationalPrefixForP...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x18    selectNumberingPlan
+           ** cv ** matched text 'ngP' at offset 12665 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 12723 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 309507 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460112 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460143 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462343 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1481313 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1481585 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1731908 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1760088 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1762973 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2735527 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2736234 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2736575 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2737371 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2738263 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2769169 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 3161756 in /main.6595daf83bd6d4b1.js
+           offsets [12665, 12723, 309507, 1460112, 1460143, 1462343, 1481313, 1481585, 1731908, 1760088, 1762973, 2735527, 2736234, 2736575, 2737371, 2738263, 2769169, 3161756]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...n=xt.countryCallingCodeSource,mn=xt.countryCallingCode,Mn=xt.number;if(mn)It.selectNumberingPlan(mn);else{if(!Mn||!wt&&!$t)return{};It.selectNumberingPlan(wt,$t),wt?bn=wt:et&&It.isNon...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x16    reportingPeriod
+           ** cv ** matched text 'ngP' at offset 584330 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 636183 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 10543 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 11067 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 11128 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 11585 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 11668 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 15535 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 15622 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 15718 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 15747 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 18112 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 18129 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 22795 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 96475 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 105873 in /7187.87daa49216a1a9ef.js
+           offsets [584330, 636183, 10543, 11067, 11128, 11585, 11668, 15535, 15622, 15718, 15747, 18112, 18129, 22795, 96475, 105873]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...Set(Object.keys(Nt).filter(gn=>Nt[gn]).map(gn=>gn)),patientId:String(this.user.id),reportingPeriod:{from:z()(this.state.periods.value.main.periodStart),to:z()(this.state.periods.value...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x9     loadingPromise
+           ** cv ** matched text 'ngP' at offset 834636 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 844201 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 844430 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 845022 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 845052 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 845083 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 845128 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 845184 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 897450 in /main.6595daf83bd6d4b1.js
+           offsets [834636, 844201, 844430, 845022, 845052, 845083, 845128, 845184, 897450]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...,s){return r<s}function gs(r,s){Xi(Sr.Placeholder,s,r[s.index])}function us(r,s,l){r.loadingPromise.then(()=>{r.loadingState===ds.COMPLETE?Xi(Sr.Complete,s,l):r.loadingState===ds.FAIL...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x7     hasSelectedNumberingPlan
+           ** cv ** matched text 'ngP' at offset 13348 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 13725 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462379 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1754623 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1754773 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1754942 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1759566 in /main.6595daf83bd6d4b1.js
+           offsets [13348, 13725, 1462379, 1754623, 1754773, 1754942, 1759566]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ntryCallingCode,Qn=Mn.countryCallingCodeSource,li=Mn.carrierCode;if(!$t.hasSelectedNumberingPlan()){if(wt.v2)throw new B("INVALID_COUNTRY");return{}}if(!jn||jn.length<a.c7){if(wt.v2)t...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x6     pendingPageScroll
+           ** cv ** matched text 'ngP' at offset 1659151 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1661877 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1663569 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1663705 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1663744 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1663767 in /main.6595daf83bd6d4b1.js
+           offsets [1659151, 1661877, 1663569, 1663705, 1663744, 1663767]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...is.searchSources=new Set(q),this.searchSourceMenuOpen=!1,this.filteredEvents=[],this.pendingPageScroll=null,this.sourceColors=Ai,this.severityIcon=me,this.sources=[...q],this.swimLane...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x5     incomingParams
+           ** cv ** matched text 'ngP' at offset 974926 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 975293 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 975317 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 975366 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 975419 in /main.6595daf83bd6d4b1.js
+           offsets [974926, 975293, 975317, 975366, 975419]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...s.queryParamsService=E,this.returnParams={[g.Result]:a.k.Cancel,[g.Expire]:!1},this.incomingParams={returnUrl:"",audiences:null};const c=this.queryParamsService.getByName("return"),S=...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x5     landingPageFooterText
+           ** cv ** matched text 'ngP' at offset 96487 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2189902 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 5489 in /9601.8e160cf4543bee68.js
+           ** cv ** matched text 'ngP' at offset 8455 in /9601.8e160cf4543bee68.js
+           ** cv ** matched text 'ngP' at offset 8562 in /9601.8e160cf4543bee68.js
+           offsets [96487, 2189902, 5489, 8455, 8562]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...an?void 0:an.code)?void 0:lt.toUpperCase()]))}),Ft=(0,e.Mz)(f,gt=>null==gt?void 0:gt.landingPageFooterText),tn=(0,e.Mz)(t,gt=>null==gt?void 0:gt.cookieAnalytics),on=(0,e.Mz)(f,gt=>{va...
+           first-hit file: /main.6595daf83bd6d4b1.js
   x4     NGP
            offsets [76305, 78360, 83894, 87565]
            proposed: bare token in an identifier or expression
            first-hit context: ...TimeString(y,i)}if(n.isGuardian)n.sLastAlarmCode=O.kind;else if(n.connectType===I.v.BLE&&"NGP"===n.deviceFamily){const y=O.code;n.sLastAlarmCode=y<10?"00"+y:y<100?"0"+y:""+y}else n.sL...
            first-hit file: /6746.c6795ff7e9ff468d.js
+  x4     reportingPeriodDays
+           ** cv ** matched text 'ngP' at offset 13834 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 15693 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 16371 in /7187.87daa49216a1a9ef.js
+           ** cv ** matched text 'ngP' at offset 17147 in /7187.87daa49216a1a9ef.js
+           offsets [13834, 15693, 16371, 17147]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...e.progress.from")," "),e.R7$(3),e.R50("value",i.selectedOption),e.Y8G("disabled",i.reportingPeriodDays>30),e.R7$(),e.Y8G("ngForOf",i.options)}}function Pe(o,r){if(1&o){const i=e.RV6()...
+           first-hit file: /7187.87daa49216a1a9ef.js
+  x3     FloatingPoint
+           ** cv ** matched text 'ngP' at offset 72058 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 72076 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 143025 in /6280.0d3a0d92906a32a8.js
+           offsets [72058, 72076, 143025]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...var E=function(n){return n[n.NONE=0]="NONE",n[n.Null=1]="Null",n[n.Int=2]="Int",n[n.FloatingPoint=3]="FloatingPoint",n[n.Binary=4]="Binary",n[n.Utf8=5]="Utf8",n[n.Bool=6]="Bool",n[n.D...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x3     endFloatingPoint
+           ** cv ** matched text 'ngP' at offset 122111 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 122240 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 136146 in /6280.0d3a0d92906a32a8.js
+           offsets [122111, 122240, 136146]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...(t){t.startObject(1)}static addPrecision(t,e){t.addFieldInt16(0,e,Y.HALF)}static endFloatingPoint(t){return t.endObject()}static createFloatingPoint(t,e){return Dt.startFloatingPoint(...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x3     getNumberingPlanMetadata
+           ** cv ** matched text 'ngP' at offset 1460473 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1460819 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1462731 in /main.6595daf83bd6d4b1.js
+           offsets [1460473, 1460819, 1462731]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...row new Error("Unknown calling code: ".concat(U));this.numberingPlan=new k(this.getNumberingPlanMetadata(U),this)}else this.numberingPlan=void 0;return this}},{key:"getCountryCodesFor...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x3     missingPlus
+           ** cv ** matched text 'ngP' at offset 1733997 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1748175 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1756789 in /main.6595daf83bd6d4b1.js
+           offsets [1733997, 1748175, 1756789]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...t",value:function(Re){var We=Re.country,Dt=Re.callingCode;this.international=!1,this.missingPlus=!1,this.IDDPrefix=void 0,this.callingCode=void 0,this.digits="",this.resetNationalSign...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x3     startFloatingPoint
+           ** cv ** matched text 'ngP' at offset 122014 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 122196 in /6280.0d3a0d92906a32a8.js
+           ** cv ** matched text 'ngP' at offset 136092 in /6280.0d3a0d92906a32a8.js
+           offsets [122014, 122196, 136092]
+           proposed: bare token in an identifier or expression
+           first-hit context: ..._offset(this.bb_pos,4);return t?this.bb.readInt16(this.bb_pos+t):Y.HALF}static startFloatingPoint(t){t.startObject(1)}static addPrecision(t,e){t.addFieldInt16(0,e,Y.HALF)}static endFl...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x2     SwitchingProtocols
+           ** cv ** matched text 'ngP' at offset 3144616 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 3144641 in /main.6595daf83bd6d4b1.js
+           offsets [3144616, 3144641]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...or=We.error||null}}var ae=function(Re){return Re[Re.Continue=100]="Continue",Re[Re.SwitchingProtocols=101]="SwitchingProtocols",Re[Re.Processing=102]="Processing",Re[Re.EarlyHints=103...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     _draggingPredicate
+           ** cv ** matched text 'ngP' at offset 2071102 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2071488 in /main.6595daf83bd6d4b1.js
+           offsets [2071102, 2071488]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ragInstances",(0,o.vPA)([])),(0,e.A)(this,"_globalListeners",void 0),(0,e.A)(this,"_draggingPredicate",m=>m.isDragging()),(0,e.A)(this,"_domNodesToDirectives",null),(0,e.A)(this,"poin...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     fixMissingPlus
+           ** cv ** matched text 'ngP' at offset 1756156 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1756598 in /main.6595daf83bd6d4b1.js
+           offsets [1756156, 1756598]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...icantNumber,function(We){return Re.update(We)})||(this.extractIddPrefix(Re)||this.fixMissingPlus(Re)?(this.extractCallingCodeAndNationalSignificantNumber(Re),!0):void 0)}},{key:"extra...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     incomingParameters
+           ** cv ** matched text 'ngP' at offset 975077 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 975266 in /main.6595daf83bd6d4b1.js
+           offsets [975077, 975266]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...msService.getByName("return"),S=this.queryParamsService.getByName("audiences");this.incomingParameters={returnUrl:c,audiences:S}}set sessionExpired(E){this.returnParams={...this.retur...
+           first-hit file: /main.6595daf83bd6d4b1.js
   x2     isNGP
            offsets [87560, 87653]
            proposed: bare token in an identifier or expression
            first-hit context: ...AlarmFlash,this.lastAlarmTime=K.sLastAlarmTime,this.lastAlarmDate=K.sLastAlarmDate,this.isNGP="NGP"===K.deviceFamily;const pe=K.pumpModelNumber;let H=K.sLastAlarmCode,ye=!1;if(this.is...
            first-hit file: /6746.c6795ff7e9ff468d.js
+  x2     justLeadingPlus
+           ** cv ** matched text 'ngP' at offset 1753699 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 1759354 in /main.6595daf83bd6d4b1.js
+           offsets [1753699, 1759354]
+           proposed: bare token in an identifier or expression
+           first-hit context: ....startInternationalNumber(),Gt||(ut=!0))),Gt&&this.inputDigits(Gt,We),{digits:Gt,justLeadingPlus:ut}}},{key:"inputDigits",value:function(Re,We){var Dt=We.digits,Pt=Dt.length<3&&Dt.len...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x2     marketingParams
+           ** cv ** matched text 'ngP' at offset 2886978 in /main.6595daf83bd6d4b1.js
+           ** cv ** matched text 'ngP' at offset 2949877 in /main.6595daf83bd6d4b1.js
+           offsets [2886978, 2949877]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...turn ct.each(ma,function(O){(P=ct.getQueryParam(Cn.URL,O)).length&&(re[O]=P)}),re},marketingParams:function(){return ct.extend(ct.info.campaignParams(),ct.info.clickParams())},searchE...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x1     bingpreview
+           ** cv ** matched text 'ngp' at offset 2880855 in /main.6595daf83bd6d4b1.js
+           offsets [2880855]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...+"-"+P()}}();var Bs=["ahrefsbot","ahrefssiteaudit","amazonbot","baiduspider","bingbot","bingpreview","chrome-lighthouse","facebookexternal","petalbot","pinterest","screaming frog","ya...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x1     createFloatingPoint
+           ** cv ** matched text 'ngP' at offset 122162 in /6280.0d3a0d92906a32a8.js
+           offsets [122162]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...FieldInt16(0,e,Y.HALF)}static endFloatingPoint(t){return t.endObject()}static createFloatingPoint(t,e){return Dt.startFloatingPoint(t),Dt.addPrecision(t,e),Dt.endFloatingPoint(t)}}cla...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x1     floatingpoint
+           ** cv ** matched text 'ngp' at offset 139052 in /6280.0d3a0d92906a32a8.js
+           offsets [139052]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...||[])}switch(e){case"int":{const i=n.type;return new rt(i.isSigned,i.bitWidth)}case"floatingpoint":return new se(Y[n.type.precision]);case"decimal":{const i=n.type;return new rn(i.sca...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x1     getRootAsFloatingPoint
+           ** cv ** matched text 'ngP' at offset 121670 in /6280.0d3a0d92906a32a8.js
+           offsets [121670]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...=null,this.bb_pos=0}__init(t,e){return this.bb_pos=t,this.bb=e,this}static getRootAsFloatingPoint(t,e){return(e||new Dt).__init(t.readInt32(t.position())+t.position(),t)}static getSiz...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x1     getSizePrefixedRootAsFloatingPoint
+           ** cv ** matched text 'ngP' at offset 121784 in /6280.0d3a0d92906a32a8.js
+           offsets [121784]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ew Dt).__init(t.readInt32(t.position())+t.position(),t)}static getSizePrefixedRootAsFloatingPoint(t,e){return t.setPosition(t.position()+4),(e||new Dt).__init(t.readInt32(t.position()...
+           first-hit file: /6280.0d3a0d92906a32a8.js
+  x1     kingpin
+           ** cv ** matched text 'ngp' at offset 17615 in /8141.650c358996e4c19a.js
+           offsets [17615]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...s,omega1,speaker,viktoria,fuckers,bowler,starbuck,gjkbyf,valhalla,anarchy,blacks,herbie,kingpin,starfish,nokia,loveit,achilles,906090,labtec,ncc1701a,fitness,jordan1,brando,arsenal1,b...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     kingpins
+           ** cv ** matched text 'ngp' at offset 241684 in /8141.650c358996e4c19a.js
+           offsets [241684]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...man1,tummybed,financia,nusrat,euroline,magicone,jimkirk,ameritec,daniel26,sevenn,topazz,kingpins,dima1991,macdog,spencer5,oi812,geoffre,music11,baffle,123569,usagi,cassiope,polla,lilc...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     networkingpe
+           ** cv ** matched text 'ngp' at offset 137550 in /8141.650c358996e4c19a.js
+           offsets [137550]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...an01,love2000,23wesdxc,kswiss,anna2000,geniusnet,baby2000,33ds5x,waverly,onlyone4,networkingpe,raven123,blesse,gocards,wow123,pjflkork,juicey,poorboy,freeee,billybo,shaheen,zxcvbnm.,b...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     noReportingPeriod
+           ** cv ** matched text 'ngP' at offset 2669263 in /main.6595daf83bd6d4b1.js
+           offsets [2669263]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...ickFilterButton:"clickFilterButton"},features:[e.OA$],decls:12,vars:14,consts:[["noReportingPeriod",""],[1,"tc__toolbar"],[1,"toolbar-element"],[3,"rangeSelected","availablePeriod","i...
+           first-hit file: /main.6595daf83bd6d4b1.js
+  x1     pingpong
+           ** cv ** matched text 'ngp' at offset 21411 in /8141.650c358996e4c19a.js
+           offsets [21411]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...s,calico,nyjets,damnit,robotech,duchess,rctybz,hooter,keywest,18436572,hal9000,mechanic,pingpong,operator,presto,sword,rasputin,spank,bristol,faggot,shado,963852741,amsterda,321456,wi...
+           first-hit file: /8141.650c358996e4c19a.js
+  x1     rangpur
+           ** cv ** matched text 'ngp' at offset 474955 in /8141.650c358996e4c19a.js
+           offsets [474955]
+           proposed: bare token in an identifier or expression
+           first-hit context: ...e,ludwigsburg,adoor,varun,shuja,khatun,chengde,bushels,lascelles,professionnelle,elfman,rangpur,unpowered,citytv,chojnice,quaternion,stokowski,aschaffenburg,commutes,subramaniam,methy...
+           first-hit file: /8141.650c358996e4c19a.js
 
 ==============================================================================
 §3  BODIES WITH ZERO HITS FOR THE WHOLE TOKEN SET

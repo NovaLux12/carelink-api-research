@@ -234,14 +234,62 @@ order, N rows give N-1 gaps — docs/09 §4):
   seq108   ->109    send 2.029s
   (214 send-series gaps; the ten shortest are printed above)
 
-SERIES VALIDATION (the mtime series is only usable if this holds):
-  harness span  (first t_sent -> last body write): 648.073s
-  kernel mtime span                            : 647.799s
-  difference                                   : 0.274s
-  verdict                                     : USABLE — spans agree
+
+SPAN COMPARISON — and what it can and cannot do, stated because the first
+version of this section was arithmetic dressed as evidence:
+
+  The first version computed
+    harness = max(max(sends),max(mtimes)) - min(min(sends),min(mtimes))
+    kernel  = max(mtimes) - min(mtimes)
+  whose difference TELESCOPES to mtime[0] - send[0] — the first request's own
+  latency — and to nothing else. Every interior timestamp cancels, so it could
+  not have detected a corrupted series short of total collapse. Its 'agreement
+  to 0.274s' was a number that could not fail. Replaced with two endpoints that
+  genuinely differ, and — more to the point — with the PER-GAP comparison
+  below, which can.
+
+  harness  first t_sent -> last t_done : 648.080s
+  kernel   first write  -> last write  : 647.799s
+  difference                           : 0.281s
+  = first-row latency 0.274s + last-row latency 0.007s
+  STILL a two-endpoint check: it confirms both series agree about the run's
+  extent and says NOTHING about the gaps between them. The per-gap comparison
+  below is what carries that weight.
+
+PER-GAP SERIES COMPARISON — the check that CAN fail
+  For each consecutive pair: |send_gap - mtime_gap|. Two clocks measuring the
+  same interval must agree; where they do not, the `date` series is wrong at
+  that specific gap, and the gap is NAMED rather than summarised away.
+  gaps compared          : 214
+  max |send - mtime|     : 0.873s
+  median |send - mtime|  : 0.015s
+  gaps disagreeing >0.5s : 20
+     seq1     send    3.697s  mtime    2.824s  delta +0.873s
+     seq159   send    3.502s  mtime    2.676s  delta +0.826s
+     seq160   send    1.835s  mtime    2.655s  delta -0.820s
+     seq66    send    3.446s  mtime    2.666s  delta +0.780s
+     seq67    send    1.887s  mtime    2.667s  delta -0.780s
+     seq203   send    3.382s  mtime    2.640s  delta +0.742s
+     seq201   send    1.931s  mtime    2.665s  delta -0.734s
+     seq204   send    1.920s  mtime    2.640s  delta -0.720s
+     seq200   send    3.380s  mtime    2.669s  delta +0.711s
+     seq110   send    3.367s  mtime    2.668s  delta +0.699s
+  Every disagreement above is a `date` timestamp that moved; the kernel
+  series holds. That is the finding, visible PER GAP rather than inferred
+  from two spans.
 
 MEASURED FLOOR
   SEND  series: n=214 gaps, min 1.835s, max 35.622s, 22 under the declared 2.5s, 7 under the 2s floor
   MTIME series: n=214 gaps, min 2.636s, max 35.615s, 0 under the declared 2.5s, 0 under the 2s floor
   negative request durations (impossible; the corrupt-t0 signature, docs/09 §4): 16 [(2, -593), (44, -428), (67, -702), (70, -633), (108, -562), (111, -622)]
+  negative KERNEL gaps (also impossible; the same signature measured by the independent series): 0
+
+  Long gaps (>10 s), BOTH series. Every long gap in this run is explained and
+  every one is OVER the declared delay, not under it. Reported from both
+  series because the prose quotes the kernel figures, and the two series
+  differ in the second decimal — quoting one while naming the other is how a
+  35.6 s gap becomes a 35.62 s gap in someone's write-up.
+     seq4     ->5      kernel   34.016s   send   34.017s
+     seq214   ->215    kernel   35.615s   send   35.622s
+
   bodies written before their own t_sent (same signature): 22 [2, 44, 47, 67, 70, 73]

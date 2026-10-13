@@ -189,6 +189,61 @@ now committed at
 [findings-log/2026-10-13-area-v-pde-clients/chunks.txt](../findings-log/2026-10-13-area-v-pde-clients/chunks.txt).
 **What any of the other 56 followed keys' consumers do is not established.**
 
+> ### ⚠ CORRECTED 2026-10-13 by area K (#56) — the contrast above was drawn on the
+> wrong corpus, and **both** clauses of its last sentence are now false
+>
+> The paragraph above is **preserved unedited**, per `AGENTS.md` §3. What follows is
+> what the lazy chunks do to it.
+>
+> **The 211 lazy chunks were fetched** — all of them, from `carelink.minimed.eu`,
+> 215 of a 230 cap, GET only: **211 real chunks, 211 distinct digests, 0 duplicates,
+> 0 empty bodies, 2,874,939 B** [source:
+> findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §3].
+>
+> **Falsified: "none of its nine leaf names appears anywhere in any of the five
+> captured bundles."** Four of the nine **do** appear — in lazy chunk
+> `6746.c6795ff7e9ff468d.js`, which **reads** the subtree's selector. The other five
+> (`pullGMInfoFromCumulus`, `pullSMSHistoryFromCumulus`, `sendDiagnosticLogsToCumulus`,
+> `sendPeriodicToCumulus`, `sendSMSFromCumulus`) remain **0 across all 211 chunks**, so
+> "absent as code" survives for them and only for them.
+>
+> **Falsified: "the client follows one and ignores the other."** It follows **both**.
+> Chunk `6746` reads `system.gc.gz.transition.flags` **twice** — bytes 22260 and 70054,
+> in modules `16746` and `59567`, both binding **module id `4265`**, a single 5,842 B
+> span in the eager main bundle whose export table maps `z2:()=>be` to the
+> `gt.guardianCumulusPeriodicAPI` selector. Each read destructures `displayMessage` and
+> returns `{ useCumulusUrls, messageEndpoint }`, choosing between
+> `carepartnerDisplayMessageUrl` / `personalDisplayMessageUrl` / `csrDisplayMessageUrl`
+> — **exactly this section's subject subtree**, and the same
+> `csr.cumulus.periodic.data.endpoints.display_message` the contrast above is built on.
+> Both reads are gated on `csrEnabled`.
+>
+> **And the value is used, not merely read.** Bytes 69458–69866 of the same chunk are
+> one unbroken run: `E = h.messageEndpoint` → the M2M URL template → `y = …E…` →
+> `getPeriodicDataWithPost({ reqUrl: y, … })`. **The flags subtree selects the URL that
+> is POSTed** [source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §4].
+>
+> **The corrected claim, stated once:** for the **patient** build, the shipped web
+> client **does follow both** CSR pointers. Area V's "`transition.flags` is named and
+> never read" was **OBSERVED-correct for the eager main bundle and is not retracted** —
+> `.z2` is still read **0 times** there, re-measured in this pass — but the corpus it
+> was measured over was the limit, and a lazy chunk is where the feature-gated call
+> site lived. **What is still not established:** the other 56 followed keys'
+> consumers; whether `csrEnabled` is true in any real session (**UNOBSERVED in both
+> directions** — no session was authenticated, and `AGENTS.md` §11 forbids it); and any
+> claim about the clinic or support builds, which this sweep did not touch.
+>
+> **A second, separate positive from the same sweep**, because it is a patient-plane
+> address this page does not carry: the lazy chunks also hard-code
+> `this.baseUrl="/patient/csr"` and
+> `this.baseUrl="/patient/csr/safety/notice/definitions"` — **12 endpoint literals
+> across 7 chunks**, recorded in **no** `docs/` page before now. **OBSERVED as code
+> literals; liveness is UNOBSERVED** — nothing was requested against them. Note the
+> direction: these are hard-coded **constants**, the opposite of a config-following
+> client, so they strengthen rather than weaken the discovery negative. See
+> [`docs/06`](06-patient-api-surface.md) §Patient CSR paths hard-coded in the lazy
+> chunks.
+
 ### The route that config cannot address
 
 `/connect/v2` — the **bare**, pre-`carepartner` route that the 2026-10-12 area-N pass

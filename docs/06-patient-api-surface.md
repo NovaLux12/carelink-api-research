@@ -500,3 +500,65 @@ valid token cannot be answered without credentials.** Which of `{v11, v12, v13}`
 cumulus leg returns the data the bridge wants is the same class of question — route
 existence is settled, behaviour is not [source:
 findings-log/probe-2026-10-08/recon/VERSION-AXIS.md].
+
+---
+
+## Patient CSR paths hard-coded in the lazy chunks (2026-10-13, area K #56, NEW)
+
+**OBSERVED as code literals. LIVENESS IS UNOBSERVED — nothing was requested.** Read
+this section as a map of what the shipped client *addresses*, not as a map of what the
+server *serves*. Every path below was found by sweeping the **211 patient lazy chunks**
+of `carelink.minimed.eu` for hard-coded API path literals; none was probed, because they
+are outside the area's committed candidate list and probing them would need a
+justification this pass did not have.
+
+⚠ **This namespace was in no `docs/` page before this section.** `/patient/csr` does not
+appear in the discovery document, in the 69-key public config, or in the eager main
+bundle's token set — which is why a sweep of the eager bundles could not have found it.
+
+| path literal | methods the code calls | chunk |
+|---|---|---|
+| `/patient/csr/incidents` | `GET`, `POST` | `common.206e355a4a593fbd.js` |
+| `/patient/csr/incidents/{id}` | `GET`, `PUT` | `common.…js` |
+| `/patient/csr/incidents/configuration?region={region}` | `GET` | `common.…js` |
+| `/patient/csr/safety/notice/definitions` | `GET`, `POST` | `1635.…js`, `8942.…js`, `9807.…js` |
+| `/patient/csr/safety/notice/definitions/{type}/file/url` | `GET` | the same three |
+| `/patient/csr/safety/notice/definitions/{type}/users` | `GET` | the same three |
+| `/patient/csr/safety/notice/definitions/{id}` | `PUT` | the same three |
+| `/patient/csr/safety/notice/definitions/{id}/notification/date` | `POST` | the same three |
+| `/patient/csr/safety/notice/definitions/users/csv` | `GET` | the same three |
+| `/patient/csr/configuration/whitelisted` | `GET` | `5109.0f5de0438b9f29bf.js` |
+| `/patient/csr/users/me/notifications/history/patients/{id}` | `GET` | `5750.d7bef840102da905.js` |
+| `/patient/csr/users/me/consent/history` | `GET` | `6633.5ae9e2d9434bfe48.js` |
+
+**How they are addressed: hard-coded constants, not config.** In the `common` chunk a
+service sets `this.baseUrl="/patient/csr"` in its constructor and calls
+`this.http.get(\`${this.baseUrl}/incidents\`)`; in the three `safety/notice` chunks one
+sets `this.baseUrl="/patient/csr/safety/notice/definitions"`. The remaining three
+inline the path. **No config key, no discovery field and no `baseUrl*` pointer is
+involved** — the opposite of the `csr/v2` display-message pointer, which arrives
+*through* config. This is why the sweep's central negative survives: the lazy chunks do
+not read the discovery document, and where they do carry API addresses they are
+constants.
+
+⚠ **Three distinctions a reader should not collapse.**
+
+1. **Literal ≠ live.** The code would call these paths; whether the routes are routed,
+   and with what status, is **UNOBSERVED in both directions**. Do not read this table as
+   a route inventory.
+2. **`/patient/csr/*` is a different namespace from `/connect/csr/*`.** The latter is
+   the cumulus plane's POST-only `csr/v2` display-message route, probed live on all
+   three cumulus hosts. The former is on the patient host and was **never probed**. The
+   shared `csr` segment is a naming coincidence at this repo's current state of
+   knowledge, **not** evidence that one resolves to the other.
+3. **`baseUrl` in the eager main bundle is a different token.** Area V's two `baseUrl`
+   hits are `this.baseUrl = getBaseCmsUrl()`, a CMS media base. These 30 chunk hits are
+   `this.baseUrl = "/patient/csr…"`. Same identifier, unrelated values — which is
+   exactly why the token needed reading rather than counting.
+
+**Counting rule, so the table is reproducible:** path literals beginning
+`/patient/csr`, case-sensitive, over the **211 real chunks** (a body answering `200` +
+`application/javascript`; 210 `SWEEP-*` rows + 1 `FOLLOWUP` row) — **10 hits in 7
+chunks**. Byte offsets and enclosing contexts for every one are in `tables.txt` §T3 and
+`grep-out.txt` §2 [source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5,
+§The baseUrl and /patient/csr census].

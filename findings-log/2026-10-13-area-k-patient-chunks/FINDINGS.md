@@ -3,8 +3,8 @@
 **Pass date:** 2026-10-13 · **Claim issue:** #56
 **Branch:** `research/k-patient-chunks` · **Ledger:** `results.jsonl` (215 rows, one per HTTP request)
 **Harness (as sent):** `probe.sh` + `send.sh` (the sweep) · `probe-followup.sh` (one cell, §2)
-**Offline, zero requests:** `runtime-map.py` · `extract.py` · `tables.py` · `spacing.sh`
-**Outputs:** `chunks-swept.txt` · `verdicts.tsv` · `runtime-map.txt` · `grep-out.txt` · `tables.txt` · `spacing.txt`
+**Offline, zero requests:** `runtime-map.py` · `extract.py` · `tables.py` · `spacing.sh` · `resolve.py`
+**Outputs:** `chunks-swept.txt` · `verdicts.tsv` · `runtime-map.txt` · `grep-out.txt` · `tables.txt` · `spacing.txt` · `resolve.txt`
 
 ---
 
@@ -32,6 +32,12 @@ two-character alias collision — the identity is closed by **module id**, which
 > **OBSERVED and re-measured here** (§4). What the sweep changes is which corpus the
 > claim is about, and that is what a lazy chunk is for.
 
+**The flow into the POST is settled on disk, not inferred.** Bytes **69458-69866** are one
+unbroken run of `getMessageRequest`: `E=h.messageEndpoint` -> the M2M template ->
+`y = ... E ...` -> `getPeriodicDataWithPost({reqUrl:y, ...})`. `resolve.py` prints the
+whole run and asserts it (`resolve.txt` section C, A7). Settled at **zero requests** --
+the captures were still on disk.
+
 **Two secondary results, one of them a correction to a committed artefact.**
 
 1. **The committed chunk list's URL form is wrong for exactly one entry.** `chunks.txt`
@@ -40,7 +46,14 @@ two-character alias collision — the identity is closed by **module id**, which
    with a clean negative over 211 bodies in which one cell is a statement about a
    filename. Re-requested under the name the runtime emits, it resolves: **200,
    `application/javascript`, 21,157 B**. §2.
-2. **`patient-timeline` and `dialog-lite` stay at zero across all 211 chunks**, and the
+2. **`baseUrl` in the lazy chunks is not area V's CMS base at all -- it is a hard-coded
+   patient API base**, `this.baseUrl="/patient/csr"` and
+   `this.baseUrl="/patient/csr/safety/notice/definitions"`, carrying **12 endpoint
+   literals across 7 chunks** that appear in **no `docs/` page**. OBSERVED as code;
+   **liveness unobserved in both directions** -- nothing was requested. This is the
+   pass's **second positive**, and it was a measured token the first version of this log
+   left in no table and no prose at all. Section 5.
+3. **`patient-timeline` and `dialog-lite` stay at zero across all 211 chunks**, and the
    eager bundle's five `patient-timeline` hits reproduce area V's byte offsets exactly
    and classify as Angular component selectors. Area F's caller question is not
    answered — it is narrowed. §6.
@@ -75,15 +88,42 @@ per consecutive pair in request order, so 215 rows give 214 gaps — `docs/09` �
 records **16 impossible negative request durations** (`t_done` earlier than `t_sent`) and
 22 bodies written *before* their own `t_sent` — the corrupt-`t0` signature `docs/09` §4
 records in areas B, X, Z, D and E. The kernel series, which no harness clock feeds,
-shows **0 gaps under 2.5 s and 0 under the 2 s floor** across all 214.
+shows **0 gaps under 2.5 s and 0 under the 2 s floor** across all 214, and **0 negative
+gaps** — the same corruption check measured by the instrument that is not suspect.
 
-Series validated before use, per `docs/09` §4: harness span **648.073 s** against kernel
-mtime span **647.799 s** — agreement to **0.274 s** over a 10-minute run, so the mtime
-series is this run's own and not a checkout artefact. **No cause is asserted for the
-`date` disagreement.** The two long gaps are both explained and both are *over* the
-declared delay, not under it: **seq 4→5 = 34.017 s** is the harness restart described
-below, and **seq 214→215 = 35.622 s** is the gap between the sweep finishing and the
-one follow-up cell being issued (§2), during which four offline scripts ran.
+**The two series are now compared gap by gap**, because the span comparison the first
+version of this log used **could not fail**:
+
+> **⚠ Correction (2026-10-13, verification round 1): the span "validation" was
+> arithmetic, not evidence.** `spacing.sh` computed
+> `harness = max(max(sends),max(mtimes)) − min(min(sends),min(mtimes))` against
+> `kernel = max(mtimes) − min(mtimes)`, whose difference **telescopes to
+> `mtime[0] − send[0]`** — the first request's own latency — and to nothing else. Every
+> interior timestamp cancels, so it could not have detected a corrupted series short of
+> total collapse. "Agreement to 0.274 s over a 10-minute run" was a number that could
+> not fail, and this log cited it as validation.
+>
+> **Replaced by the per-gap comparison, which fires.** Across **214 gaps**:
+> **max |send − mtime| = 0.873 s**, median **0.015 s**, and **20 gaps disagree by more
+> than 0.5 s** — each named in `spacing.txt` with both figures (worst: `seq1` send
+> 3.697 s vs mtime 2.824 s; `seq160` send 1.835 s vs mtime 2.655 s). Every disagreement
+> is a `date` timestamp that moved. The span check is kept but **relabelled for what it
+> is**: a two-endpoint consistency check with differing left endpoints (first `t_sent`
+> → last `t_done` = 648.080 s, versus first write → last write = 647.799 s, difference
+> **0.281 s** = first-row latency 0.274 s + last-row latency 0.007 s). It confirms only
+> that both series agree about the run's extent, and says nothing about the gaps.
+
+The two long gaps are both explained, reported from **both** series, and both are *over*
+the declared delay rather than under it:
+
+| gap | kernel | `date` | explanation |
+|---|---|---|---|
+| **seq 4→5** | **34.016 s** | 34.017 s | the harness restart described below |
+| **seq 214→215** | **35.615 s** | 35.622 s | the sweep finishing and the one follow-up cell being issued (§2), during which four offline scripts ran |
+
+> The first version of this log quoted **34.017 s** and **35.622 s** in the very
+> paragraph that said it was reporting the kernel series. **Both figures came from
+> `date`.** The kernel figures are 34.016 s and 35.615 s, and are the ones above.
 
 > **Three defects in this pass, disclosed rather than smoothed over.**
 >
@@ -100,12 +140,41 @@ one follow-up cell being issued (§2), during which four offline scripts ran.
 >    `transition.flags` **leaves**, which is where this pass's positive came from — is
 >    `grep-out.txt` and `tables.txt`. Reading the column alone would have shown
 >    `6746…js → 0` and missed the finding.
-> 3. **The 211 bodies (2.85 MB) and the 3.4 MB main bundle are deliberately not
->    committed.** Digests, sizes, byte offsets, verdict table and grep output are.
+> 3. **The 211 bodies (2.87 MB) and the 3.4 MB main bundle are deliberately not
+>    committed.** What *is** committed is the full census with byte offsets, the
+>    enclosing identifiers, the verdict table, and — since verification round 1 —
+>    **`resolve.txt`, which resolves every cited offset to its enclosing webpack module
+>    and prints the module span and the bytes on both sides.**
 >    `body_mtime_ns` is recorded at **nanosecond** resolution in the ledger itself, so
 >    unlike area V's `stat -c%Y` column the mtime series **is** re-derivable from the
 >    committed artefacts — though the *files* it describes are not on disk in a clean
 >    clone, since git does not preserve mtimes.
+>
+>    > **⚠ Correction (2026-10-13, verification round 1): the first version of this
+>    > bullet said "Digests, sizes, **byte offsets**, verdict table and grep output are"
+>    > committed. The byte offsets were committed only *inside this prose* — `4265`
+>    > appeared in no committed artefact at all, and the six offsets carrying the
+>    > identity argument (91298, 579, 66109, 22260, 70054, 69249) existed nowhere but
+>    > in the paragraphs below. The claim was true of the census and false of the
+>    > headline.**
+>    >
+>    > **`resolve.py` is the fix.** It resolves all **11** chunk offsets and **3** main
+>    > offsets to their enclosing modules, prints each module's span, prints the bytes,
+>    > and asserts nine properties — each of which **exits non-zero on failure**, so it
+>    > cannot report a clean run over a body that no longer supports the claim. All
+>    > nine PASS (`resolve.txt` §C): `o(4265)` occurs **exactly twice** in the chunk;
+>    > module `4265` is **one contiguous 5,842 B span** at 91298–97139 of the main
+>    > bundle; its export table maps `z2:()=>be`; `be` selects
+>    > `gt.guardianCumulusPeriodicAPI`; that key is assigned
+>    > `"system.gc.gz.transition.flags"`; every `.z2` in the chunk sits in a
+>    > 4265-importing module **and on the binding**; the value reaches the POST; and
+>    > `.z2` is read **0** times in the eager main bundle.
+>    >
+>    > **Stated plainly: the bodies are still not committed, so re-deriving this needs
+>    > the captures — 215 GETs at the recorded 2.5 s spacing. What is now committed is
+>    > the resolution table, so a reader with the captures gets an automatic check
+>    > instead of a promise, and a reader without them can at least audit which offsets
+>    > and which module the claim rests on.**
 
 ---
 
@@ -182,12 +251,27 @@ never explained. That is the successor (§8).
 
 ## 3. The sweep
 
-**211 cells, 211 distinct digests, 0 duplicates, 0 empty bodies.** 2,853,978 B total
-(2.85 MB); smallest 78 B, largest 828,225 B, median 1,882 B. `tables.txt` §T1/§T4.
+**211 real chunks, 211 distinct digests, 0 duplicates, 0 empty bodies.** 2,874,939 B
+total (2.87 MB); smallest 78 B, largest 828,225 B, median 1,905 B. `tables.txt` §T1/§T4.
+
+> **⚠ Correction (2026-10-13, verification round 1): the counting rule.** The first
+> version of this section said "211 cells" and reported **2,853,978 B**, computed by
+> `role.startswith("SWEEP-")`. That definition **counted the 196 B HTML error page
+> (`seq 51`) as a chunk and dropped the real 21,157 B chunk (`seq 215`, role
+> `FOLLOWUP`)** — the two halves of the §2 defect. The ledger was never wrong, and
+> neither was the substantive negative (`grep-out.txt` greps the ledger, not this
+> selection), but **the denominator did not mean what it said**.
+>
+> **The rule is now: a chunk is a body answering `200` + `application/javascript`.**
+> That gives **211 = 210 `SWEEP-*` 200s + 1 `FOLLOWUP` 200**, which the script asserts
+> against the committed list length and **exits non-zero** if they disagree. Re-derived
+> total: **2,874,939 B** — the old figure −196 +21,157. `tables.txt` §T4 prints the
+> rule, the arithmetic, and the excluded row by name.
 
 Every cell answered `200 application/javascript` except `/2076.…js`, which answered
-`404` for the reason in §2 and was re-requested under the correct name. **All 211 cells
-carry a verdict for the committed token set**, which is this area's close condition.
+`404` for the reason in §2 and was re-requested under the correct name. **All 211 real
+chunks carry a verdict for the committed token set**, which is this area's close
+condition.
 
 `chunks-swept.txt` is committed here so the sweep is re-derivable without another pass's
 note, and `verdicts.tsv` is the per-cell ledger (`chunk status bytes sha256 hits`).
@@ -229,7 +313,7 @@ offset in the named body.
 | 3 | module `4265`'s export table contains `z2:()=>be`, and also `cO:()=>ne` and `X2:()=>ye` | main, byte **91298** | OBSERVED |
 | 4 | `.z2` occurs **0 times** in the main bundle | main (re-measured; area V's claim) | OBSERVED |
 | 5 | chunk `6746` module `16746` binds `_=o(4265)` | chunk, byte **579** | OBSERVED |
-| 6 | chunk `6746` module `56358` binds `F=o(4265)` | chunk, byte **66109** | OBSERVED |
+| 6 | chunk `6746` module **`59567`** binds `F=o(4265)` | chunk, byte **66109** | OBSERVED |
 | 7 | **read 1** `select(_.z2).pipe(({displayMessage:l})=>…)` | chunk, byte **22260** | OBSERVED |
 | 8 | **read 2** `this.store.select(F.z2).pipe(({displayMessage:v})=>…)` | chunk, byte **70054** | OBSERVED |
 
@@ -255,24 +339,57 @@ guardianEndpointData: () => {
 }
 ```
 
-**Read 2** is a service method `getGuardianEndpoint()` in module `56358`, byte-for-byte
+**Read 2** is a service method `getGuardianEndpoint()` in module **`59567`**, byte-for-byte
 the same logic. Both destructure `displayMessage` and read **exactly the published
 leaves** of `system.gc.gz.transition.flags` — `carepartnerDisplayMessageUrl`,
 `personalDisplayMessageUrl`, `csrDisplayMessageUrl`, `useCumulusUrls` — which is a
 structural match to area T's published subtree, not merely to a token.
 
-**And the value is used, in the same chunk**, at byte **69200ff** in `getMessageRequest`:
+> **Correction (2026-10-13, verification round 1): the first version of this log
+> attributed read 2 to module `56358`. That is wrong and is corrected here.**
+> Module `56358` occupies bytes **65421–65785** and its body is a device-settings
+> enum (`d.CALIBRATION="CALIBRATION"`, `d.AUTO_BASAL_DELIVERY…`). Bytes 66109, 67348,
+> 67391, 67573, 69567, 70054 and 70254 are all inside module **`59567`**, which spans
+> **65786–84396**. The binding, the offsets and the positive are unaffected; only the
+> module id was wrong. `resolve.py` now resolves **every** cited offset to its
+> enclosing module and prints the span, so the id is a derived value rather than an
+> assertion, and the assertion `every .z2 sits in a 4265-importing module` is allowed
+> to fail (`resolve.txt` §C, A6).
+
+**And the value is used, in the same chunk**, in `getMessageRequest` — **definition at
+byte 69249** in module `59567`, with the call site at byte **67573** and
+`getGuardianEndpoint` defined at **67391**. The flow, at exact offsets:
 
 ```js
+// byte 69458 — the value is unpacked out of the object getGuardianEndpoint() returned
 const L = h.useCumulusUrls && this.isCsrEnabled, E = h.messageEndpoint;
+// byte 69567 — the M2M branch of the template
 let y = `${this.userService.getIsM2MEnabled()
       ? `/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`
-      : "/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${…}`;
+      : "/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${(new Date).getTime()}`;
+// byte 69787 — the published endpoint value is substituted into the URL
 return h.useCumulusUrls && (y = O!==Be.CARE_PARTNER || L ? E
                               : E.replace("{patientUsername}", encodeURIComponent(v))),
-       L ? this.connectHttpService.getPeriodicDataWithPost({ reqUrl:y, … })
+// byte 69866 — THE POST, and `y` is its reqUrl
+       L ? this.connectHttpService.getPeriodicDataWithPost({ reqUrl:y, username:i, patientId:v, role:O })
          : this.connectHttpService.getPeriodicDataWithGet(y);
 ```
+
+**The chain is contiguous, not inferred across a gap.** Bytes **69458–69866** are one
+unbroken run of the same method, printed verbatim in `resolve.txt` §C/A7, and
+`getMessageRequest`'s own definition at **69249** shows `h` is its fifth parameter. So
+`h.messageEndpoint` — a field of the object `getGuardianEndpoint()` built from the
+`system.gc.gz.transition.flags` selector — is assigned to `E`, folded into `y`, and
+passed as `reqUrl` to a POST. **The flags subtree does not merely get read: it selects
+the URL that is POSTed.**
+
+> **Link 9, settled 2026-10-13 (verification round 1).** The first version of this log
+> asserted the flow from a ~200-byte window that stopped short of the POST call, and a
+> verifier declined to sign CONFIRMS on it — correctly, because "the value is used
+> somewhere in this method" is not the claim being made. Bytes **69300–69700** are now
+> printed in full above and in `resolve.txt`; the POST is at **69866**. **No request was
+> needed** — the bodies were still on disk, so this cost none of the 15 remaining
+> cap, and the ledger stays at 215 rows.
 
 **So the flags subtree is not merely read — `useCumulusUrls` and `messageEndpoint`
 select the URL that is then POSTed.** That is the vendor's own CSR pointer
@@ -332,24 +449,103 @@ see — 211 more bodies, 2.85 MB, **0 hits on every pointer-shaped token.** Area
 negative converts from *scoped* to **unqualified over the patient web corpus**, and
 `docs/03` §9c is updated accordingly.
 
-### `discover` (12) and `pde` (5) — both dictionary noise, both accounted for
+### `discover` (12) and `pde` (5 `cs` / 34 `ci`) — both dictionary noise, and the control **did** find a second reading
 
-Both appear in exactly **one** chunk, `8141.650c358996e4c19a.js` (828,225 B), and every
-hit is a **substring of a zxcvbn password-dictionary entry** in a comma-separated word
-list. The `cs`/`ci` counts are equal for both, so the case-sensitivity control adds
-**nothing** here — there is no second reading hiding behind the first.
+`discover` appears in exactly **one** chunk, `8141.650c358996e4c19a.js` (828,225 B), and
+every hit is a **substring of a zxcvbn password-dictionary entry** in a comma-separated
+word list. For `discover` the `cs` and `ci` counts are equal (12/12), so there is no
+second reading for that token.
 
-- `pde` ×5 → `dropdead` (72313), `helpdesk` (96374), `herpderp` (128269),
-  `topdevice` (130050), `hampden` (338216).
 - `discover` ×12 → `discover`, `discovered`, `discovery`, `discovers`, `discovering`,
   `discoveries`, `rediscovered`, `discoverer`, `rediscovery`, `discoverers`,
   `rediscover`, `undiscovered`.
+
+> **⚠ Correction (2026-10-13, verification round 1): this section originally read
+> "The `cs`/`ci` counts are equal for **both** … the case-sensitivity control adds
+> nothing here." That was false for `pde`, and the prose contradicted the table it
+> sat above.** Corpus-wide `pde` is **`cs=5`, `ci=34`** — the control found **29 hits
+> the sensitive count missed**. All 29 are classified, and **none is a new identifier
+> class**:
+
+| enclosing identifier | `cv` hits | where |
+|---|---|---|
+| `propDecorators` | 8 | main |
+| `removeStylesOnCompDestroy` | 6 | main |
+| **`mapDeviceModelName`** | **6** | **4 in chunk `7187.87daa49216a1a9ef.js`**, 2 in main |
+| `WPDesktop` | 3 | main |
+| `isDesktopDevice` | 2 | main |
+| `getGroupDelayControl` | 2 | main |
+| `LoopDetected` | 2 | main |
+| **total** | **29** | |
+
+Every one matched the text `pDe` inside a longer camelCase identifier. **The seven
+identifiers are exactly the seven area V already listed** for the patient bundle's 25
+insensitive hits. The only corpus novelty is that **`mapDeviceModelName` also occurs in
+lazy chunk `7187`** (offsets 74111, 77086, 80017, 80248) — the same identifier, so
+**no new false-hit class is introduced by the lazy corpus**.
+
+> **The prose was wrong because the tool could not have caught it.**
+> `extract.py`'s §2 iterated the **case-sensitive** pass only, so §1's own pointer
+> "ci adds 29, read §2" pointed at a section that could not show those 29. §2 now
+> iterates the case-**insensitive** pass and labels every hit `cs` or `cv`
+> (`grep-out.txt`), and `tables.py` T3 prints case-variant-only rows instead of
+> omitting them. This is `AGENTS.md` §6 item 5 — prose that contradicted its own source
+> table — and it survived because the table was correct and the sentence about it was
+> not.
+
+- `pde` ×5 **case-sensitive** → `dropdead` (72313), `helpdesk` (96374), `herpderp`
+  (128269), `topdevice` (130050), `hampden` (338216).
 
 **These are the same five and the same twelve words area V found in the two portal
 builds**, now shipping in the patient chunk corpus too — only the byte offsets differ.
 They are literals in a password-strength wordlist, **not directives**. Same false-hit
 class as `docs/09` §5 records for `ngp`/`guardian`, and a bare grep on either name would
 have reported an integration that is not there.
+
+### `baseUrl` (30 `cs` across 4 chunks) — and it is the pass's **second** positive
+
+`baseUrl` was measured (`extract.py`, `grep-out.txt`) at **32 corpus-wide hits, `q=0`**,
+but it was **absent from `tables.py`'s token list and from this section** in the first
+version of the log — a measured token in no table and no prose. It is accounted for
+here, and it is not noise.
+
+**2 hits in the eager main bundle**, and they are area V's finding unchanged: `this.baseUrl`
+assigned from `getBaseCmsUrl()` to fetch a CMS media file (bytes 2027033, 2027209).
+**Not** a discovery pointer.
+
+**30 hits across four lazy chunks**, and here the token means something entirely
+different — a **hard-coded patient API base**, not a config value:
+
+| chunk | hits | the literal |
+|---|---|---|
+| `1635.…js`, `8942.…js`, `9807.…js` | 8 each | `this.baseUrl="/patient/csr/safety/notice/definitions"` |
+| `common.206e355a4a593fbd.js` | **6** | `this.baseUrl="/patient/csr"` |
+
+and the `/patient/csr` literal appears in **7 chunks / 10 case-sensitive hits** in all,
+because three further chunks hard-code CSR paths without a `baseUrl` field:
+
+| chunk | endpoint literal |
+|---|---|
+| `common.…js` | `GET/POST /patient/csr/incidents`, `GET/PUT /patient/csr/incidents/{id}`, `GET /patient/csr/incidents/configuration?region={region}` |
+| `1635/8942/9807.…js` | `GET /patient/csr/safety/notice/definitions?…`, `…/{type}/file/url`, `…/{type}/users`, `POST …`, `PUT …/{id}`, `POST …/{id}/notification/date`, `GET …/users/csv` |
+| `5109.…js` | `GET /patient/csr/configuration/whitelisted` |
+| `5750.…js` | `GET /patient/csr/users/me/notifications/history/patients/{id}` |
+| `6633.…js` | `GET /patient/csr/users/me/consent/history` |
+
+**What this is, and what it is not.** It is **OBSERVED as code**: these are path
+literals in shipped, lazy-loaded Angular services, reached by relative
+`this.http.get(...)`/`post(...)`/`put(...)` against a hard-coded base — so the client
+addresses them by **constant**, with no config field and no discovery document involved.
+**It is NOT an existence claim.** No request was sent to any `/patient/csr/*` path:
+these are outside the area's candidate list, and the area's scope was the discovery
+token set. **Whether the routes are live is UNOBSERVED in both directions**, and these
+12 endpoint shapes appear in **no `docs/` page** — I checked before writing this, and
+they are absent from `docs/06-patient-api-surface.md` and from every other canonical
+page.
+
+This **strengthens** the negative in §5 rather than weakening it: the lazy chunks do
+not read the discovery document, and where they *do* carry API addresses they are
+hard-coded constants. That is the opposite of a config-following client.
 
 ### The four `transition.flags` leaves that DO appear
 
@@ -444,12 +640,18 @@ python3 findings-log/2026-10-13-area-k-patient-chunks/runtime-map.py \
         findings-log/2026-10-13-area-k-patient-chunks/results.jsonl > runtime-map.txt
 python3 findings-log/2026-10-13-area-k-patient-chunks/extract.py "$TMPBODIES" \
         findings-log/2026-10-13-area-k-patient-chunks/results.jsonl > grep-out.txt
+python3 findings-log/2026-10-13-area-k-patient-chunks/resolve.py "$TMPBODIES"  > resolve.txt
 python3 findings-log/2026-10-13-area-k-patient-chunks/tables.py "$TMPBODIES" \
         findings-log/2026-10-13-area-k-patient-chunks/results.jsonl \
         findings-log/2026-10-13-area-k-patient-chunks/chunks-swept.txt > tables.txt
 bash    findings-log/2026-10-13-area-k-patient-chunks/spacing.sh \
         findings-log/2026-10-13-area-k-patient-chunks/results.jsonl > spacing.txt
 ```
+
+`resolve.py` **exits non-zero if any of its nine assertions fails**, so it cannot print a
+clean run over a body that no longer supports the headline. It is the re-derivation path
+for section 4: it resolves every cited byte offset to its enclosing webpack module and
+prints the module's span.
 
 `probe.sh` is **idempotent**: re-running it skips every path already in the ledger.
 `results.jsonl` rows carry `t_queued` / `t_sent` / `t_done` at millisecond UTC resolution
@@ -464,22 +666,24 @@ one row per cell.
 |---|---|---|
 | **215 of a 230 cap**, GET only, one host, no `OPTIONS`, no `POST`, no token | OBSERVED | `results.jsonl` seq 1–215; `run.log` |
 | Declared delay 2.5 s with the sleep **inside** the per-host `flock` | OBSERVED | `probe.sh` `req()`; `send.sh` |
-| Spacing floor **2.636 s** by kernel body-mtimes — 214 gaps, **0** under 2.5 s, **0** under the 2 s floor | OBSERVED | `spacing.txt` |
+| Spacing floor **2.636 s** by kernel body-mtimes — 214 gaps, **0** under 2.5 s, **0** under the 2 s floor, **0 negative kernel gaps** | OBSERVED | `spacing.txt` |
 | The harness `date` series disagrees: **min 1.835 s**, 22 under 2.5 s, **7 under the 2 s floor**, **16 negative durations**, 22 bodies written before their own `t_sent`; **no cause asserted** | OBSERVED | `spacing.txt`; `results.jsonl` |
-| Series validated: harness span 648.073 s vs kernel mtime span 647.799 s, difference 0.274 s | OBSERVED | `spacing.txt` |
-| The two long gaps are the harness restart (34.017 s) and the sweep→follow-up gap (35.622 s), both **over** the declared delay | OBSERVED | `results.jsonl` seq 4→5, 214→215 |
+| CORRECTED 2026-10-13 (verification round 1): the span "validation" was arithmetic that **telescoped to the first row's own latency** and could not detect interior corruption. Replaced by a **per-gap** comparison that fires: **max abs(send − mtime) 0.873 s**, median 0.015 s, **20 of 214 gaps disagree by >0.5 s**, each named | OBSERVED | `spacing.txt` §PER-GAP SERIES COMPARISON |
+| The two long gaps, **kernel series**: **34.016 s** (seq 4→5, harness restart) and **35.615 s** (seq 214→215, sweep→follow-up), both **over** the declared delay. The first version quoted 34.017 / 35.622 — the `date` figures — in a paragraph naming the kernel series | OBSERVED | `results.jsonl` seq 4→5, 214→215; `spacing.txt` |
 | Negative twin 404s at 196 B with one digest, byte-identical to area V's certainly-absent control | OBSERVED | `results.jsonl` seq 1 |
 | Positive control resolves and **carries the token set** — so a zero sweep is a zero, not a broken matcher | OBSERVED | `results.jsonl` seq 2; `grep-out.txt` |
 | Runtime re-fetched; **211 entries re-derived from `f.u`**, `f.p=""` (asset root) | OBSERVED | `runtime-map.txt`; `results.jsonl` seq 3 |
 | Controls 1–3 reproduce area V's three digests **byte for byte**; the build has not bumped in 5½ hours | OBSERVED | `results.jsonl` seq 1, 2, 3 |
-| 211 cells, **211 distinct digests**, 0 duplicates, 0 empty bodies, 2,853,978 B | OBSERVED | `tables.txt` §T4 |
-| **The committed list's URL form is wrong for one entry**: `2076.…js` vs the runtime's `common.…js`, same hash; the id form 404s at control 1's digest, the emitted name resolves 200 / 21,157 B | OBSERVED | `runtime-map.txt`; `results.jsonl` seq 51, 215 |
-| **Lazy chunk `6746.c6795ff7e9ff468d.js` reads the `system.gc.gz.transition.flags` selector twice**, at bytes 22260 and 70054, in modules `16746` and `56358` | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
-| Both reads bind **module id 4265**; module `4265` is defined in the **main bundle** at byte 91298 and its export table maps `z2:()=>be` | OBSERVED | `grep-out.txt`; main bundle bytes 579, 66109, 91298, 93819 |
-| `z2` resolves to `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | OBSERVED | main bundle bytes 93819, 2189123 |
-| The value read **flows into the URL that is POSTed** — `useCumulusUrls` and `messageEndpoint` gate `getPeriodicDataWithPost` | OBSERVED | `tables.txt` §T3 (`getMessageRequest`, byte ~69200) |
+| CORRECTED 2026-10-13 (verification round 1): **211 real chunks = 210 `SWEEP-*` 200s + 1 `FOLLOWUP` 200**, counting rule = `200` + `application/javascript`, asserted against the committed list and **exiting non-zero on disagreement**. The first version selected on `role.startswith("SWEEP-")`, counting the 196 B error page as a chunk and dropping the real 21,157 B one. **211 distinct digests**, 0 duplicates, 0 empty, **2,874,939 B** (was mis-reported as 2,853,978) | OBSERVED | `tables.txt` §T4; `tables.py` counting rule |
+| **Lazy chunk `6746.c6795ff7e9ff468d.js` reads the `system.gc.gz.transition.flags` selector twice** — bytes 22260 and 70054 | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3; `resolve.txt` §A |
+| CORRECTED 2026-10-13 (verification round 1): read 1 is in module **`16746`** (177–32151) and read 2 in module **`59567`** (65786–84396). The first version attributed read 2 to `56358`, whose body is a device-settings enum at 65421–65785 | OBSERVED | `resolve.txt` §A |
+| Both reads bind **module id 4265**; module `4265` is **one contiguous 5,842 B span** at main-bundle bytes 91298–97139 and its export table maps `z2:()=>be` | OBSERVED | `resolve.txt` §C A1–A3 |
+| `z2` resolves to `be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI)` and `D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"` | OBSERVED | main bundle bytes 93819, 2189123; `resolve.txt` §C A4–A5 |
+| **The value demonstrably flows into the POSTed URL**: `E=h.messageEndpoint` at **69458** → the template → `y=…E…` at **69787** → `getPeriodicDataWithPost({reqUrl:y` at **69866**, one contiguous run inside `getMessageRequest` (defined **69249**, module `59567`). Bytes 69300–69700 printed in full | OBSERVED | `resolve.txt` §C A7 |
 | **No lazy chunk reads the discovery document**: `baseUrlPde`, `/connect/pde`, `baseUrlCumulus`/`Cms`/`Aem`/`CareLink`, `discover/android`, `clcloud`, `api/carepartner` are **0 / 0** across all 211 | OBSERVED | `grep-out.txt`; `tables.txt` §T2 |
-| `discover` (12) and `pde` (5) are zxcvbn dictionary substrings in one chunk, `cs == ci` so no second reading hides behind the first; the same 5 and 12 words area V found in the portal builds | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
+| CORRECTED 2026-10-13 (verification round 1): `pde` is **`cs=5` / `ci=34`** — the control found **29 case-variants**, not none as the prose said. All 29 classified into **7 identifiers, exactly the 7 area V listed**; the only corpus novelty is `mapDeviceModelName` also in chunk `7187` ×4. `extract.py` §2 now iterates the insensitive pass and labels every hit `cs`/`cv` | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
+| `discover` ×12 and `pde` ×5 `cs` are zxcvbn dictionary substrings in one chunk; the same 5 and 12 words the portal builds carry | OBSERVED | `grep-out.txt` §2; `tables.txt` §T3 |
+| ADDED 2026-10-13 (verification round 1): **`baseUrl` is 30 `cs` across 4 chunks and is a hard-coded patient API base, not a CMS base** — `this.baseUrl="/patient/csr"` (×6 in the corrected `common` chunk) and `this.baseUrl="/patient/csr/safety/notice/definitions"` (×8 in each of 3 chunks), with `/patient/csr` literals in **7 chunks / 10 hits**. **OBSERVED as code literals only; liveness UNOBSERVED in both directions** — no request was sent to any of them, and these 12 endpoint shapes appear in **no `docs/` page** | OBSERVED (literals) · UNOBSERVED (liveness) | `grep-out.txt` §2; `tables.txt` §T2/§T3; `FINDINGS.md` §5 |
 | Four of the nine `transition.flags` leaves appear, all in chunk `6746`; the **other five are 0 across all 211** | OBSERVED | `tables.txt` §T2, §T3 |
 | `patient-timeline` and `dialog-lite` are **0 / 0 across all 211 chunks**; the main bundle's five `patient-timeline` hits reproduce area V's offsets exactly and classify as Angular component selectors | OBSERVED | `grep-out.txt` §2 |
 | Area V's "`.z2` read 0 times in the main bundle" — **re-measured, still true**, scope corrected not retracted | OBSERVED | `grep-out.txt`; area V `consumers-out.txt §2` |

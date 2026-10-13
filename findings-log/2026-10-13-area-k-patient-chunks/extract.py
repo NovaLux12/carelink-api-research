@@ -182,24 +182,48 @@ w('    identifier, the proposed reading and the bytes that justify it.')
 w('    UNFILTERED, on purpose: see the header of this script.')
 w('=' * 78)
 w('')
+w('    The offsets below come from the CASE-INSENSITIVE pass, and every hit is')
+w('    labelled cs or cv. `cv` is a case VARIANT - the case-sensitivity control')
+w('    found something the sensitive count missed, which is the entire point of')
+w('    running `ci` at all. An earlier version of this script iterated the')
+w('    CASE-SENSITIVE pass only, so a section-1 line reading "ci adds N, read')
+w('    section 2" could not reach those N offsets and the pointer lied. Iterating')
+w('    `ci` is what makes the control reachable.')
+w('')
 for tok in TOKENS:
     groups = {}
     for tag, path, nbytes, sha, text in bodies:
-        for s in count(text, tok):
-            e = s + len(tok)
-            groups.setdefault(enclosing(text, s, e), []).append((path, s, text))
+        # ITERATE THE CASE-INSENSITIVE PASS. Every hit the sensitive count
+        # missed is a case variant and is labelled as one, so the control is
+        # reachable from section 2 rather than only from section 1 arithmetic.
+        for m in re.finditer(re.escape(tok), text, re.IGNORECASE):
+            s = m.start()
+            e = s + len(m.group(0))
+            kind = 'cs' if m.group(0) == tok else 'cv'
+            groups.setdefault(enclosing(text, s, e), []).append(
+                (path, s, kind, m.group(0), text))
     if not groups:
         continue
     n = sum(len(v) for v in groups.values())
-    w(f"--- {tok!r}: {n} hit(s), {len(groups)} distinct enclosing identifier(s) ---")
+    ncs = sum(1 for v in groups.values() for h in v if h[2] == 'cs')
+    ncv = n - ncs
+    w("--- %r: %d hit(s) case-insensitive (%d cs + %d cv), %d distinct "
+      "enclosing identifier(s) ---" % (tok, n, ncs, ncv, len(groups)))
     for ident in sorted(groups, key=lambda i: (-len(groups[i]), i)):
         hits = groups[ident]
-        w(f"  x{len(hits):<5d} {ident}")
+        w("  x%-5d %s" % (len(hits), ident))
+        for h in hits:
+            if h[2] == 'cv':
+                w("           ** cv ** matched text %r at offset %d in %s"
+                  % (h[3], h[1], h[0]))
         offs = [h[1] for h in hits]
-        w(f"           offsets {offs if len(offs) <= 24 else str(offs[:24]) + ' ...'}")
-        w(f"           proposed: {classify(window(hits[0][2], hits[0][1], hits[0][1] + len(tok)))}")
-        w(f"           first-hit context: ...{window(hits[0][2], hits[0][1], hits[0][1] + len(tok), 90)}...")
-        w(f"           first-hit file: {hits[0][0]}")
+        w("           offsets %s" % (offs if len(offs) <= 24 else str(offs[:24]) + ' ...'))
+        first = hits[0]
+        w("           proposed: %s"
+          % classify(window(first[4], first[1], first[1] + len(tok))))
+        w("           first-hit context: ...%s..."
+          % window(first[4], first[1], first[1] + len(tok), 90))
+        w("           first-hit file: %s" % first[0])
     w('')
 
 w('=' * 78)

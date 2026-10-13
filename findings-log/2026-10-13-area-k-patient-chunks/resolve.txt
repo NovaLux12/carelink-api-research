@@ -1,0 +1,82 @@
+##############################################################################
+# AREA K — every cited byte offset resolved to its enclosing webpack module.
+# ZERO requests. Bodies are not committed; THIS TABLE IS, so the identity
+# argument is checkable without re-fetching 3.4 MB.
+##############################################################################
+
+==============================================================================
+A. CITED OFFSETS IN THE LAZY CHUNK 6746.c6795ff7e9ff468d.js (101,594 B)
+==============================================================================
+byte   module    span      what is there
+579    16746     177-32151 read 1 import: module 16746 binds the config module
+       text: 'o(4265),fe=o(31451),$=o(51044),me=o(86195),t=o(59567),K=o(43064),pe=o(86332),H=o(58572);le'
+       match at this offset: YES
+22260  16746     177-32151 read 1: the select of the alias, module 16746
+       text: '.z2).pipe((0,$.T)(({displayMessage:l})=>{const p=T.isCarePartner()?l.carepartnerDisplayMes'
+       match at this offset: YES
+66109  59567     65786-84396 read 2 import: module 59567 binds the same config module
+       text: 'o(4265),Q=o(68940),se=o(86207),j=o(56358),B=o(25653),te=o(89248),le=o(22281),xe=o(43064),P'
+       match at this offset: YES
+67573  59567     65786-84396 getMessageRequest CALL SITE, module 59567
+       text: 'getMessageRequest(n.username,v.username,O,c,h).pipe((0,_e.n)(E=>{if(204==E.status||206==E.'
+       match at this offset: YES
+67391  59567     65786-84396 getGuardianEndpoint DEFINITION, module 59567
+       text: 'getGuardianEndpoint()}).pipe((0,d.s)(1),(0,_e.n)(({userProfile:n,bleEndpoint:c,guardianEnd'
+       match at this offset: YES
+69249  59567     65786-84396 getMessageRequest DEFINITION, module 59567
+       text: 'getMessageRequest(i,v,n,c,h){const O=this.userService.isCarePartner()?Be.CARE_PARTNER:Be.P'
+       match at this offset: YES
+69458  59567     65786-84396 the value is unpacked: E = h.messageEndpoint
+       text: 'const L=h.useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.'
+       match at this offset: YES
+69567  59567     65786-84396 the M2M template literal (the /patient/m2m branch)
+       text: '/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?c'
+       match at this offset: YES
+69787  59567     65786-84396 the endpoint value is substituted into the URL
+       text: '.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodic'
+       match at this offset: YES
+69866  59567     65786-84396 THE POST: the URL built above is the request body URL
+       text: 'getPeriodicDataWithPost({reqUrl:y,username:i,patientId:v,role:O}):this.connectHttpService.'
+       match at this offset: YES
+70054  59567     65786-84396 read 2: the select of the alias, module 59567
+       text: '.z2).pipe((0,x.T)(({displayMessage:v})=>{const n=this.userService.isCarePartner()?v.carepa'
+       match at this offset: YES
+
+==============================================================================
+B. CITED OFFSETS IN THE EAGER MAIN BUNDLE main.6595daf83bd6d4b1.js (3,417,255 B)
+==============================================================================
+2189123  module 51551    the key constant: guardianCumulusPeriodicAPI = the dotted key
+       text: 'guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entr'
+       match at this offset: YES
+93819    module 4265     the selector over that key: be = createSelector(f, gt => gt.guardianCumulusPeriodicAPI)
+       text: 'guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),ae=(0,e.Mz)(f,gt=>gt.capt'
+       match at this offset: YES
+91992    module 4265     module 4265's export table maps z2 to be
+       text: 'z2:()=>be});var e=i(86332),a=i(61435),n=i(10319),o=i(86437),g=i(17762),h=i(88447);const t='
+       match at this offset: YES
+
+==============================================================================
+C. THE ASSERTIONS — each one is allowed to fail
+==============================================================================
+A1  o(4265) occurs exactly twice in the chunk           : 2  -> PASS
+A2  module 4265 is ONE contiguous span in main          : span 91298-97139 (5842 B) -> PASS
+A3  that span's export table maps `z2:()=>be`            : PASS
+A4  `be` selects `gt.guardianCumulusPeriodicAPI`         : PASS
+A5  ... is assigned `system.gc.gz.transition.flags`      : PASS
+A6  every `.z2` in the chunk is in a 4265-importing module: 2 occurrence(s) -> PASS
+A6b the binding is `_` or `F` at each read               : PASS
+A7  h.messageEndpoint -> y -> getPeriodicDataWithPost   : PASS
+
+    the contiguous run, bytes 69458-69900, verbatim:
+    'const L=h.useCumulusUrls&&this.isCsrEnabled,E=h.messageEndpoint;let y=`${this.userService.getIsM2MEnabled()?`/patient/m2m/connect/data/gc/patients/${encodeURIComponent(v)}`:"/patient/connect/data"}?cpSerialNumber=NONE&msgType=last24hours&requestTime=${(new Date).getTime()}`;return h.useCumulusUrls&&(y=O!==Be.CARE_PARTNER||L?E:E.replace("{patientUsername}",encodeURIComponent(v))),L?this.connectHttpService.getPeriodicDataWithPost({reqUrl:y,'
+
+    and the method's own head, byte 69249:
+    'getMessageRequest(i,v,n,c,h){const O=this.userService.isCarePartner()?Be.CARE_PARTNER:Be.PATIENT;if(n===I.v.BLE)return this.connectHttpService.getPeriodicDataWithPost({reqUrl:c,username:i,patientId:v,role:O});const L=h.us'
+
+A8  `.z2` is read 0 times in the EAGER main bundle       : 0  -> PASS
+    (area V's measurement, re-measured here; it is what makes the chunk read
+     a finding about the LAZY corpus rather than a contradiction of area V)
+
+==============================================================================
+VERDICT: all assertions PASS.
+==============================================================================
