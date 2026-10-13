@@ -98,6 +98,26 @@ dropped without a re-issue, not two. `seq 31` and `seq 39` were **added to this
 table on 2026-10-13** after re-deriving the record from `results.jsonl` and
 `run.log`; the correction is immediately below and quotes what was wrong.
 
+**The predicate, because "four" is not simply the number of first-and-only `404`s
+in the ledger, and the boundary is the part a reader would otherwise have to
+guess.** Re-derived from `results.jsonl` by grouping on (crawl, query target): the
+rows that were **asked once and answered something other than `200`** are
+`seq 25` (504), `31` (404), `39` (404), `40` (404), `41` (400), `42` (404) and
+`44` (404) — **seven**, not four. `seq 40`, `42` and `44` are left out because
+each is a crawl-scoped **`example.com` control**, and §5-C2's one-directional
+result is precisely what a control `404` is *for*: re-issuing it cannot establish
+that the crawl is served, so the row is a completed observation, not a dropped
+failure. ⚠ **Acknowledged, because that narrowing is a judgement and not a fact.**
+`seq 40` and `seq 42` sit on crawls whose serving status is **unknown** — exactly
+the condition that puts `seq 39` and `seq 41` in the table — so a predicate
+stated purely as *"a first-and-only `404` on a crawl whose serving status is
+unestablished"* would admit them and give **six**. They are excluded on the
+narrower ground that a control's subject is the crawl rather than the host, and
+that this pass counts a dropped **control** separately (`seq 25`). **A reader who
+rejects that narrowing should read the number as seven**; nothing else in this
+file depends on the difference, and both readings are left standing rather than
+one picked.
+
 | row | crawl | what it was | why it was dropped |
 |---|---|---|---|
 | `seq 25` | `CC-MAIN-2014-10` | the crawl-scoped `example.com` **control** for that crawl | the crawl's three `minimed.eu` attempts had already failed 504/504/502; the control's purpose was to say why, and a fourth request on a crawl that had answered nothing was not bought |
@@ -107,9 +127,10 @@ table on 2026-10-13** after re-deriving the record from `results.jsonl` and
 
 ### ⚠ Correction (2026-10-13) — round 2: a one-request asymmetry the ledger does not contain
 
-The two paragraphs below are **superseded** and are kept readable because the
-retraction is the evidence. They were written specifically to discharge a blocking
-verification finding, and **both claims in them are false**:
+The blockquote below is **superseded** and is kept readable because the retraction
+is the evidence. It is **one** paragraph carrying **two** claims, and it was
+written specifically to discharge a blocking verification finding. **Both of its
+claims are false**:
 
 > **What that cost, stated rather than absorbed.** `CC-MAIN-2013-48` is one of the
 > three 2013-era crawls, so it sits in §6's indeterminate column for a reason this
@@ -142,13 +163,41 @@ reading that rescues either.**
    the table above.
 
 **What actually distinguished `CC-MAIN-2013-48`, since the budget did not: almost
-nothing — and that is the finding, not an excuse.** The one real difference from
-`CC-MAIN-2013-20` is the **shape of its single answer**: `2013-48` returned a
-**`400`**, a bare failure with no result-shaped answer at all, while `2013-20`
-returned a **`404`** — the API's *absence answer*, which looks like a finding and
-is the more seductive thing to leave un-re-issued. In both cases the budget
-simply went elsewhere. **`CC-MAIN-2013-48` was not treated more carefully than
+nothing — and that is the finding, not an excuse (OBSERVED).** The two crawls are
+identical in what the ledger does to them: **one** `*minimed.eu*` attempt each,
+and identical under either counting rule (`2013-20` = 1 `minimed.eu` row / 2 rows
+total; `2013-48` = 1 / 2 — the one-request asymmetry the superseded paragraph
+asserted does not exist). Neither was re-issued, and the budget went elsewhere
+for both. The one real difference is the **shape of the single answer**:
+`2013-48` returned a **`400`**, a bare failure with no result-shaped answer at
+all; `2013-20` returned a **`404`**, which is this API's **absence answer** (§1,
+control B — `404` + `No Captures found for: …`, established behind its own
+positive control). **`CC-MAIN-2013-48` was not treated more carefully than
 `CC-MAIN-2013-20`; it answered differently.**
+
+**INFERRED, and the assumption is stated rather than hidden (correction, round 4 —
+this paragraph previously carried the inference below unlabelled).** That the two
+answer *shapes* pull an operator in opposite directions: a `400` reads as a bare
+failure to be retried, a `404` reads as a result already in hand and therefore not
+worth a second request. That is what "looks like a finding", and "the more
+seductive thing to leave un-re-issued", assert.
+
+**The assumption:** that whether a row gets re-issued here is driven by the
+*answer's apparent result-ness* rather than by the ledger's classification of it.
+**Nothing in this file observes an operator or a decision**, and the reason is
+worth stating precisely rather than loosely. `results.jsonl` records a `role`
+per row (`REISSUE-of-seq-N`, `CONTROL-crawl-scoped`, `ANCHOR-2013-END`, …) and
+**no reason for any row discussed here**: the file's only `note` field sits on
+the four debug rows `seq 1`–`4`, where it records the delay defect of §8 Defect 1
+and not a re-issue decision. `run.log` is four columns — timestamp, `seq`, host,
+status, path — and `grep -iE 're-issue|reissue|drop|skip|budget|reason'` over it
+returns **nothing**. So a reader who wants to check the assumption cannot, because
+the evidence for *why* a row was dropped was never captured. The sentence above
+is therefore a reading of **the shape of the gap in the ledger**, not a reading of
+anyone's reasoning, and it is the weaker half of this paragraph. The OBSERVED half
+carries the finding on its own: **the budget, not the answer shape, is what
+distinguishes the two rows** — which is precisely why the answer shape is not the
+thing to draw a lesson from.
 
 **The consequence for §6's column, which is what a reader should carry away.** The
 7/7 readable-versus-indeterminate split is **partly a budget artefact, not purely
@@ -164,13 +213,36 @@ crawls:
 **Three of the seven holes were asked once.** For those three, "the API will not
 serve this crawl" and "this pass asked once and moved on" are **not
 distinguishable in the ledger**, and no amount of re-reading separates them — only
-a re-issue does. The other four were asked two or three times, and for those the
-hole is a genuine repeated failure.
+a re-issue does. The other four were asked two or three times, ⚠ **but "a genuine
+repeated failure" is true of only three of them, and the fourth does not fit the
+sentence** (correction, round 4). `CC-MAIN-2014-10` (`504/504/502`),
+`-2015-22` (`504/504/502`) and `-2021-25` (`504/400/502`) each repeated a
+**failure**. `CC-MAIN-2022-05` repeated a **change of answer**: `504`, then
+**`404`** — the API's *absence* answer, not a second failure. It therefore sits in
+this table under the same "asked more than once" heading while carrying the
+opposite character, and quoting its answers back is the way to see that.
 
 `CC-MAIN-2022-05` is the instructive contrast and the reason the distinction is
 worth stating: it **was** re-issued, and its **second** answer was a `404`. A
 `404` as a **second** answer is evidence; the same `404` as a **first and only**
 answer is not. That is the whole difference between `seq 22` and `seq 39`.
+
+⚠ **"Evidence" there means evidence *about the probe*. It does not survive
+contact with §3b without saying so — §3b calls this very row (`seq 22`) one that
+"carries no weight" (correction, round 4).** Both sentences are right, about
+different objects, and this is the one a reader is most likely to collapse:
+
+| what the `404` is evidence **of** | `seq 22` — `2022-05`, a **second** answer | `seq 39` — `2013-20`, **first and only** |
+|---|---|---|
+| **the probe** — that the API returned a well-formed *absence* answer on a request the ledger shows was sent twice | **yes**: re-issuing changed the answer, so the first answer was not the whole story | **no**: nothing establishes what a second request would have returned |
+| **the corpus** — that the crawl holds no `minimed.eu` captures | **no weight** (§3b: no `200` anywhere on `2022-05`, so its serving status is unestablished) | **no weight**, for the same reason and with less behind it |
+
+So the claim is **not** that `seq 22`'s `404` is better evidence of absence than
+`seq 39`'s — as corpus evidence neither carries any. It is that **re-issuing
+converted an open cell into an answered one**: `CC-MAIN-2022-05` still cannot be
+read, but it now *cannot be read* rather than *not having been read*, and only the
+second of those is a statement about the API. That is the whole difference, and
+it is why `seq 22` is absent from the drop table above while `seq 39` is in it.
 
 ---
 

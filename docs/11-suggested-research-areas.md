@@ -826,8 +826,11 @@ and one crawl-scoped control each — and `CC-MAIN-2014-10` got three
 attempt**, of which two are un-re-issued *failures* returning `404`
 (`CC-MAIN-2013-20`, `CC-MAIN-2021-04`) and three were first-try `200`s that
 needed no re-issue. **The honest account is uneven discipline, not a considered
-choice:** `2013-48` was not treated more carefully than `2013-20`, it answered
-differently — a bare `400` rather than a `404` that reads like a finding. **Three
+choice** (OBSERVED): `2013-48` was not treated more carefully than `2013-20` —
+both were given exactly **one** `*minimed.eu*` attempt and neither was re-issued,
+so the budget, not the answer shape, is what distinguishes them. They answered
+differently: a bare **`400`** against a **`404`**, the API's absence answer.
+**Three
 of the seven indeterminate crawls were asked once**, so for those the hole is
 partly a budget artefact rather than a demonstrated property of the API
 ([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §1 round-2
@@ -851,6 +854,21 @@ would make "this crawl cannot be read" the finding.
 unchanged from area M's addendum and **still not demonstrated** — a fourth
 member in a second crawl is consistent with one surface and does not prove it,
 since `index.jsp` could equally be a second portal sharing the prefix.
+
+**Also INFERRED, and it was previously left in an OBSERVED sentence here rather
+than here (correction, round 4):** that a `404` "reads like a finding" while a
+`400` reads like a failure to be retried, and that this difference in apparent
+result-ness is what left `CC-MAIN-2021-04` and `-2013-20` un-re-issued.
+**Assumption:** that the re-issue decision here is driven by an answer's shape
+rather than by its ledger classification. `results.jsonl` records a `role` per row
+and no reason for any of these — its only `note` sits on the four debug rows and
+records the delay defect — while `run.log` records sends only, so **nothing in
+the pass observes an operator or a decision**. This is a reading of the shape of
+the gap in the ledger, not a claim about why anyone acted, and the OBSERVED
+version above ("the budget, not the answer shape, is what distinguishes the two
+rows") stands without it
+([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §1 round-2
+correction, §1 round-4 correction]).
 
 #### Successor to area L (dated addendum to area L, #57): the crawl-scoped control is one-directional, and that is the real blocker on this corpus
 
