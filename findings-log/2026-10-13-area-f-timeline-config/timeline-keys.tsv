@@ -1,0 +1,7 @@
+host	short	key	present	resolved_type	member	member_type	member_canonical_sha256
+carelink.minimed.eu	eu	personal.patient.timeline.config	true	object	featureEnabled	boolean	b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b
+carelink.minimed.eu	eu	personal.patient.timeline.config	true	object	host	string	4795c0df0489d0de0c6eaf1903e8b20c1ea7db481d9c19842eabda5426a4f92e
+carelink.minimed.com	com	personal.patient.timeline.config	true	object	featureEnabled	boolean	b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b
+carelink.minimed.com	com	personal.patient.timeline.config	true	object	host	string	fbc3c3502aa864a8d8ed1df829feb64cf6303283358ec328ca2bc01e65171ad0
+carelink-trials.minimed.com	trials	personal.patient.timeline.config	true	object	featureEnabled	boolean	b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b
+carelink-trials.minimed.com	trials	personal.patient.timeline.config	true	object	host	string	f51cfeeb97cc1faad415973b7850da2be7c25af2d79d7fb172bd5513bf1a4511

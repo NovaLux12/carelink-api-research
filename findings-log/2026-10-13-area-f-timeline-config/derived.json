@@ -1,0 +1,357 @@
+{
+  "deliverable_1_timeline_config_key_set": {
+    "carelink-trials.minimed.com": {
+      "key_present": true,
+      "member_count": 2,
+      "member_shape": {
+        "featureEnabled": {
+          "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "type": "boolean",
+          "value": true
+        },
+        "host": {
+          "is_https": true,
+          "length": 76,
+          "scheme": "https",
+          "sha256": "988acbd7f2894c56a9ce102e448ef128217a22cf1fa554d284d22843d1a5a47e",
+          "type": "string"
+        }
+      },
+      "member_types": {
+        "featureEnabled": "boolean",
+        "host": "string"
+      },
+      "members_joined": "featureEnabled,host",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "resolved_type": "object",
+      "top_level_key_count": 69
+    },
+    "carelink.minimed.com": {
+      "key_present": true,
+      "member_count": 2,
+      "member_shape": {
+        "featureEnabled": {
+          "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "type": "boolean",
+          "value": true
+        },
+        "host": {
+          "is_https": true,
+          "length": 76,
+          "scheme": "https",
+          "sha256": "24ee55644de5944b93e3f1c290ba1836df3540e1eaaf23afcf9efc0e95073689",
+          "type": "string"
+        }
+      },
+      "member_types": {
+        "featureEnabled": "boolean",
+        "host": "string"
+      },
+      "members_joined": "featureEnabled,host",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "resolved_type": "object",
+      "top_level_key_count": 69
+    },
+    "carelink.minimed.eu": {
+      "key_present": true,
+      "member_count": 2,
+      "member_shape": {
+        "featureEnabled": {
+          "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "type": "boolean",
+          "value": true
+        },
+        "host": {
+          "is_https": true,
+          "length": 79,
+          "scheme": "https",
+          "sha256": "f81e6648a6d9f9385be6da3e7280ad437ac108229fca4045a022cbfcb9100d00",
+          "type": "string"
+        }
+      },
+      "member_types": {
+        "featureEnabled": "boolean",
+        "host": "string"
+      },
+      "members_joined": "featureEnabled,host",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "resolved_type": "object",
+      "top_level_key_count": 69
+    }
+  },
+  "deliverable_2_two_timeline_host_keys": {
+    "carelink-trials.minimed.com": {
+      "bundle_named_key_present_in_bulk": false,
+      "bundle_named_top_level_key": "personal.patient.timeline.host",
+      "published_config_carries_host_member": true,
+      "published_key_present_in_bulk": true
+    },
+    "carelink.minimed.com": {
+      "bundle_named_key_present_in_bulk": false,
+      "bundle_named_top_level_key": "personal.patient.timeline.host",
+      "published_config_carries_host_member": true,
+      "published_key_present_in_bulk": true
+    },
+    "carelink.minimed.eu": {
+      "bundle_named_key_present_in_bulk": false,
+      "bundle_named_top_level_key": "personal.patient.timeline.host",
+      "published_config_carries_host_member": true,
+      "published_key_present_in_bulk": true
+    }
+  },
+  "deliverable_3_dedicated_routes": [
+    {
+      "bytes": 281,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink.minimed.eu",
+      "seq": 1,
+      "sha256": "7f0a5bb46ea59a78435dd168b2949c6f12706e3af8a787269805915ea03975e1",
+      "tag": "001-control-live",
+      "url": "/patient/configuration/system/logbook.supported.entry.types"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink.minimed.eu",
+      "seq": 2,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "002-control-absent",
+      "url": "/patient/configuration/version"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink.minimed.eu",
+      "seq": 3,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "003-control-root",
+      "url": "/patient/configuration/"
+    },
+    {
+      "bytes": 281,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink.minimed.com",
+      "seq": 7,
+      "sha256": "7f0a5bb46ea59a78435dd168b2949c6f12706e3af8a787269805915ea03975e1",
+      "tag": "001-control-live",
+      "url": "/patient/configuration/system/logbook.supported.entry.types"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink.minimed.com",
+      "seq": 8,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "002-control-absent",
+      "url": "/patient/configuration/version"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink.minimed.com",
+      "seq": 9,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "003-control-root",
+      "url": "/patient/configuration/"
+    },
+    {
+      "bytes": 20,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink.minimed.com",
+      "seq": 13,
+      "sha256": "a8c0403359d740b19fda2a92eaf2aeb4311889ad46b51d7f28629145dc8de763",
+      "tag": "007-dedicated-defaultCountry",
+      "url": "/patient/configuration/defaultCountry"
+    },
+    {
+      "bytes": 58,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink.minimed.com",
+      "seq": 14,
+      "sha256": "2018cee47605e9f4a4b484641b285c259757dad3afa169b31c6495f4761feddb",
+      "tag": "008-dedicated-recaptcha-key",
+      "url": "/patient/configuration/recaptcha/key"
+    },
+    {
+      "bytes": 22,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink.minimed.com",
+      "seq": 15,
+      "sha256": "04868b500ed8e38089ded0fc0d832c551a3d2f7f91f11323307e2d7eff4cf227",
+      "tag": "009-dedicated-messages-en",
+      "url": "/patient/configuration/messages/en"
+    },
+    {
+      "bytes": 281,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink-trials.minimed.com",
+      "seq": 16,
+      "sha256": "7f0a5bb46ea59a78435dd168b2949c6f12706e3af8a787269805915ea03975e1",
+      "tag": "001-control-live",
+      "url": "/patient/configuration/system/logbook.supported.entry.types"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink-trials.minimed.com",
+      "seq": 17,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "002-control-absent",
+      "url": "/patient/configuration/version"
+    },
+    {
+      "bytes": 0,
+      "code": 404,
+      "content_type": "",
+      "host": "carelink-trials.minimed.com",
+      "seq": 18,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tag": "003-control-root",
+      "url": "/patient/configuration/"
+    },
+    {
+      "bytes": 20,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink-trials.minimed.com",
+      "seq": 22,
+      "sha256": "a8c0403359d740b19fda2a92eaf2aeb4311889ad46b51d7f28629145dc8de763",
+      "tag": "007-dedicated-defaultCountry",
+      "url": "/patient/configuration/defaultCountry"
+    },
+    {
+      "bytes": 58,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink-trials.minimed.com",
+      "seq": 23,
+      "sha256": "a3e59c56e8a6f6e99c9a93394a4fd08728da387b8f4a3b14c1b1d2730ffb2681",
+      "tag": "008-dedicated-recaptcha-key",
+      "url": "/patient/configuration/recaptcha/key"
+    },
+    {
+      "bytes": 22,
+      "code": 200,
+      "content_type": "application/json",
+      "host": "carelink-trials.minimed.com",
+      "seq": 24,
+      "sha256": "04868b500ed8e38089ded0fc0d832c551a3d2f7f91f11323307e2d7eff4cf227",
+      "tag": "009-dedicated-messages-en",
+      "url": "/patient/configuration/messages/en"
+    }
+  ],
+  "deliverable_4_cell_digests": [
+    {
+      "bulk_type": "object",
+      "equal": true,
+      "host": "carelink.minimed.eu",
+      "key": "personal.patient.timeline.config",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "norm": "envelope-fromjson",
+      "parsed_type": "object",
+      "sha256_bulk": "a96b7d576ddd656ec481565d42569c0fa69ac898d995d0c5742d396b8abd894d",
+      "sha256_parsed": "a96b7d576ddd656ec481565d42569c0fa69ac898d995d0c5742d396b8abd894d"
+    },
+    {
+      "bytes": 0,
+      "host": "carelink.minimed.eu",
+      "http_code": 404,
+      "key": "personal.patient.timeline.host",
+      "seq": 6,
+      "verdict": "ABSENT_HTTP_404_0B_NO_ENVELOPE"
+    },
+    {
+      "bulk_type": "object",
+      "equal": true,
+      "host": "carelink.minimed.com",
+      "key": "personal.patient.timeline.config",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "norm": "envelope-fromjson",
+      "parsed_type": "object",
+      "sha256_bulk": "f9daee21abcbf4bbe3421a4a3246af1e8dc7769f8f39179c3b7aeb2af22401f6",
+      "sha256_parsed": "f9daee21abcbf4bbe3421a4a3246af1e8dc7769f8f39179c3b7aeb2af22401f6"
+    },
+    {
+      "bytes": 0,
+      "host": "carelink.minimed.com",
+      "http_code": 404,
+      "key": "personal.patient.timeline.host",
+      "seq": 12,
+      "verdict": "ABSENT_HTTP_404_0B_NO_ENVELOPE"
+    },
+    {
+      "bulk_type": "object",
+      "equal": true,
+      "host": "carelink-trials.minimed.com",
+      "key": "personal.patient.timeline.config",
+      "members_sorted": [
+        "featureEnabled",
+        "host"
+      ],
+      "norm": "envelope-fromjson",
+      "parsed_type": "object",
+      "sha256_bulk": "09233608824780c2d02c0808a4a67aa743c63ba1862b22e487ae3a61921daacd",
+      "sha256_parsed": "09233608824780c2d02c0808a4a67aa743c63ba1862b22e487ae3a61921daacd"
+    },
+    {
+      "bytes": 0,
+      "host": "carelink-trials.minimed.com",
+      "http_code": 404,
+      "key": "personal.patient.timeline.host",
+      "seq": 21,
+      "verdict": "ABSENT_HTTP_404_0B_NO_ENVELOPE"
+    }
+  ],
+  "split_walk_control": {
+    "carelink-trials.minimed.com": {
+      "dotted_name": "personal.patient.timeline.config",
+      "literal_key_resolves": true,
+      "literal_key_type": "object",
+      "note": "68 of the 69 published names are LITERAL dotted strings; only `captcha` is a real nested object. Splitting on '.' resolves nothing here.",
+      "split_on_dot_resolves": false,
+      "split_on_dot_type": "null"
+    },
+    "carelink.minimed.com": {
+      "dotted_name": "personal.patient.timeline.config",
+      "literal_key_resolves": true,
+      "literal_key_type": "object",
+      "note": "68 of the 69 published names are LITERAL dotted strings; only `captcha` is a real nested object. Splitting on '.' resolves nothing here.",
+      "split_on_dot_resolves": false,
+      "split_on_dot_type": "null"
+    },
+    "carelink.minimed.eu": {
+      "dotted_name": "personal.patient.timeline.config",
+      "literal_key_resolves": true,
+      "literal_key_type": "object",
+      "note": "68 of the 69 published names are LITERAL dotted strings; only `captcha` is a real nested object. Splitting on '.' resolves nothing here.",
+      "split_on_dot_resolves": false,
+      "split_on_dot_type": "null"
+    }
+  }
+}
