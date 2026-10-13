@@ -310,11 +310,15 @@ Every response is a Java-style config envelope:
   objects and arrays arrive as a JSON document *serialised into the string*. A naive
   `resp.value === false` check silently never fires. Unwrap, then `JSON.parse` again.
 - **Swept COMPLETE on all three deployments.** EU by area W (2026-10-13); **`.com` and
-  `-trials` by area E, same day**. Every key has a verdict on all three:
-  **61 / 62 / 61 VALUED-match**, **5 / 5 / 6 NULL-404**, `captcha` and
-  `default.country` 404 via their dedicated routes, `captcha`'s four flat-name
-  subkeys 404 on all three, **zero names outside the bulk document** and **zero
-  value mismatches across 123 valued cells**. **The negative holds and is now
+  `-trials` by area E, same day**. Every key has a verdict on all three, and every
+  column reconciles to **73** (69 bulk names + 4 `captcha` subkeys):
+  **61 / 62 / 61 VALUED-match** (EU / `.com` / trials), **5 / 5 / 6 NULL-404**, plus
+  **2 / 2 / 2** dedicated-route 404s, **4 / 4 / 4** subkey 404s, and **zero names
+  outside the bulk document**. **⚠ Read EU's `61` as 61 *exact* matches, not 61
+  valued cells** — EU carries a 62nd valued cell, the stray-bracket quirk below, so
+  **valued cells are 62 / 62 / 61** (EU / `.com` / trials) and trials is the one that
+  differs, by one, because it has one more null-valued key. Zero mismatches across
+  the **123** valued cells of this pass's two hosts. **The negative holds and is now
   three-host evidenced: the 69-name vocabulary is deployment-portable and the
   per-key form is a projection everywhere, not an enumeration path to anything
   beyond the bulk document.** The "69-request enumeration path" framing is

@@ -114,10 +114,37 @@ rather than deleted so the reasoning survives; a closed area never leaves the pa
 ([How to claim one](#how-to-claim-one), rule 5).
 
 > **Area E is CLOSED** — see the Closed table at the foot of this page and
-> [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md]. It is left here
-> rather than deleted so the addendum that framed it survives; a closed area never
-> leaves the page silently ([How to claim one](#how-to-claim-one), rule 5). Its
-> successor is the dated addendum under **F** below.
+> [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md]. Its framing
+> addendum from area W is **reproduced verbatim below**, not deleted, so the
+> reasoning that produced the area survives; a closed area never leaves the page
+> silently ([How to claim one](#how-to-claim-one), rule 5). Its successor is the
+> dated addendum under **F** below.
+
+#### Addendum (2026-10-13, from area W) — preserved: one deployment swept, two remained
+
+> **Restored 2026-10-13 by area E.** Area E's first version of this page deleted
+> this addendum along with the `### E.` heading while the pointer above promised
+> the addendum would survive — a pointer promising non-erasure while erasing, which
+> is `AGENTS.md` §6 item 5 in miniature. The wording below is area W's, unchanged.
+> **Its close condition was met on 2026-10-13 by area E** (negative — all three
+> deployments carry the same 69-name key set), so it is history rather than an open
+> task. Its `Assumptions (INFERRED)` line is now **tested, not assumed**: the
+> per-key grammar *is* keyed off the same flat-name form on all three deployments.
+
+Area W swept all 69 keys plus `captcha`'s four subkeys on **EU only**
+([findings-log/2026-10-13-area-w-per-key/FINDINGS.md]): 61 VALUED-match, 5
+NULL-404, `captcha`/`default.country` on dedicated routes, zero names outside
+the bulk document — and the complete 69-name list is now committed at
+[findings-log/2026-10-13-area-w-per-key/keys.txt](../../findings-log/2026-10-13-area-w-per-key/keys.txt),
+so the candidate list for the remaining two deployments is closed and needs no
+re-derivation. One caveat travels with it: `personal.common.core.reporting.enabled.countries`
+does **not** round-trip on EU — its per-key value carries a stray trailing `]`
+(reproduced byte-identical), so a cross-deployment value comparison must parse
+defensively, not string-compare. **Closes when:** the per-key form has a verdict
+for all 69 keys on `.com` and `-trials`, with absent-vs-null resolved per
+deployment. A negative (all three identical) counts. **Assumptions (INFERRED):**
+that the per-key grammar is keyed off the same flat-name form on all three
+deployments — only one has ever been swept.
 
 ### F. What the timeline and dialog-lite gateways actually are
 
@@ -185,6 +212,58 @@ siblings. `application/vnd.nervana` is recorded once, on one cell, on one
 deployment: that it is a deployment-level constant rather than a per-key or
 per-route value is **not** established, and one observation cannot separate those
 three readings.
+
+#### Addendum (2026-10-13, verifier round 2 of area E): commit the per-cell digests, or the "0 mismatches" claim is unverifiable forever
+
+**Derived from a failure, not from a topic.** Area E's central claim — **0 value
+mismatches across 123 valued cells** — is the one number in its log that **no
+reviewer can re-derive.** It passed two verifier rounds as sound and
+*unverifiable*, which are not the same property: the claim needs, per cell, both
+sides of the equality (the response body to unwrap the envelope, and the host's
+resolved bulk subtree), the response bodies were transient by design
+(`AGENTS.md` §7, no raw captures), and `verdicts.py` cannot be re-run without
+them. The verdict was recorded as **inherent, not a defect** — areas W, G and H
+share the same property. **But area E also published a row claiming a second code
+path had confirmed it, and no such path existed** ([findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md]
+§Correction (2026-10-13), F1). **That is the honest reason it was a fabrication
+rather than an overstatement: there was nothing to confirm it with.**
+
+**What would have made it checkable, forever, at zero extra requests.** One line
+in `verdicts.py`, emitting a committed `cell-digests.tsv`:
+
+```
+host  key  seq  norm  sha256(canonical(parsed value))  sha256(canonical(resolved bulk subtree))
+```
+
+Digests, **never values** — so it satisfies `AGENTS.md` §7 exactly as this repo's
+bulk-document digests already do, and a verifier can re-hash both sides from the
+committed file and confirm the equality without ever holding a body. **This is
+one line of code and zero requests; it is not hard, which is exactly why its
+absence is a finding rather than an excuse.**
+
+**Foreclosed for area E, and the reason matters.** It cannot be added now: the
+bodies are gone, so the digests cannot be computed retrospectively and inventing
+them would be worse than not having them. **Foreclosed by the transient bodies,
+not by the request budget** — area E used 152 of a 170 cap, so 18 requests were
+unspent. The next pass over this namespace must emit it.
+
+**Blocker:** none, zero requests, for the digest artefact alone — it is written
+during a sweep, not after one. It becomes possible only while a body is in hand,
+which is why it is a property of *running* a sweep rather than of a follow-up.
+
+**Closes when:** any sweep over `/patient/configuration/` commits a per-cell
+digest artefact whose two columns a stranger can re-hash, **or** the area that
+produced it records in prose that its "0 mismatches" claim is **log-level and
+non-re-derivable**, so no later reader mistakes it for a pinned assertion.
+**A negative counts:** if the two digest columns ever disagree on a cell, that is
+a positive finding about the vendor, not a harness artefact.
+
+**Assumptions (INFERRED):** that a value digest is a sufficient equality witness
+here — it is, because every compared cell's bulk side is derivable from the same
+host's bulk document, which **is** re-fetchable unauthenticated in 1 request per
+host, whereas the response side is not. The one case a digest cannot settle is a
+hash collision, which this repo already treats as an acceptable residual for the
+same reason (`docs/09` §5 item 3).
 
 ---
 

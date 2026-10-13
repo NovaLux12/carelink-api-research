@@ -37,12 +37,37 @@ Per-key verdicts, all 69 names per host (full table in `verdicts.tsv`; key-set a
 
 | verdict | `.com` | trials | EU (area W) |
 |---|---|---|---|
-| VALUED-match | **62** | **61** | 61 |
-| NULL-404 | **5** | **6** | 5 |
-| DEDICATED-ROUTE-404 (`captcha`, `default.country`) | **2** | **2** | 2 |
+| VALUED-match | **62** | **61** | **61** |
+| VALUED-quirk | **0** | **0** | **1** — stray `]`, reproduced byte-identical at seq 77 (area W §3, §4) |
+| NULL-404 | **5** | **6** | **5** |
+| DEDICATED-ROUTE-404 (`captcha`, `default.country`) | **2** | **2** | **2** |
 | `captcha.<enabled\|key\|type\|testKey>` | **4 × 404** | **4 × 404** | 4 × 404 |
 | VALUED-mismatch | **0** | **0** | 0 |
 | **top-level key names outside the EU 69** | **0** | **0** | 0 |
+| **column total (69 names + 4 subkeys)** | **73 ✓** | **73 ✓** | **73 ✓** |
+
+**Reading the EU column correctly: EU has 62 valued cells, not 61.** 61 are exact
+matches and the 62nd is the stray-bracket quirk — a `200` whose value equals the
+bulk subtree only after one trailing `]` is dropped (§3). It is a *valued* cell
+carrying a defect, not a match. The quirk verdict has no cell in **this** pass's
+`verdicts.tsv` because the quirk **does not reproduce on either new host**.
+
+So **valued cells per deployment: `.com` 62, EU 62, trials 61** — the
+deployment that differs is trials, and it differs by one because it has one more
+null-valued key. The false reading to avoid: EU's *exact-match* count of 61 sits
+beside trials' *total* of 61 and implies they match, when EU's total is 62.
+
+**Reconciliation rule, so the columns can be checked rather than trusted:** every
+column sums to **73** — 69 bulk names + 4 `captcha` subkeys — and each column's
+source is that pass's own `verdicts.tsv`. Those files are **not the same shape**:
+this pass's is 12 columns and carries `NULL-404` / `DEDICATED-ROUTE-404` /
+`SUBKEY-404` / `VALUED-*` across 146 rows (2 hosts × 73), whereas area W's is
+`key seq code bytes verdict`, 69 rows, no subkey rows, and names its quirk
+`VALUED-QUIRK stray-bracket (reproduced seq77 same-sha)`. Area W's four subkey
+probes are in **its** `results.jsonl` under `c-captcha.*` tags, not in its
+`verdicts.tsv`, so its per-name tally is `61 + 1 + 5 + 2 = 69` and the subkeys
+are counted from the ledger. Anyone re-deriving this table must therefore read
+**both** files, not assume one schema.
 
 **Zero names outside the bulk document, in either direction, on either new host** — the reverse direction that makes the projection claim closes here too.
 
@@ -173,9 +198,23 @@ log's own correction section.
 > this PR's report; the assertion is the guard `AGENTS.md` §6 item 3 asks for \|
 
 **There is no such artefact.** A repo-wide grep for `123/123`, `second code
-path`, `different code path` and `digests agree` returns nothing; the PR carried
-zero comments; the branch adds exactly two Python files, `verdicts.py` and
-`spacing.py`, and neither computes a digest comparison. The row's stated source
+path`, `different code path` and `digests agree` returns **no hit outside this
+file's `## Correction` sections**. ⚠ **That scoping is load-bearing and the
+section earns it the hard way:** as first written the sentence read *"returns
+nothing"* and was **false against the very commit that added it** — a correction
+that quotes the original verbatim *is* the match, so each of those four patterns
+now returns hits, **every one of them inside a `## Correction` section** (this
+file carries two, one per verifier round, and both quote the withdrawal). A reader
+who runs the command unqualified gets hits and must work out unaided that they are
+self-references; worse, they could conclude the artefact exists and the withdrawal
+is false. **Run it as
+`grep -rn '<pattern>' . | grep -v -F 'area-e-perkey-deployments/FINDINGS.md'`
+to get the clean answer.** The scope was checked and narrowed, not deleted —
+`AGENTS.md` §1 requires the sentence either state its scope or go.
+
+The other two checks are unqualified and still hold: **the PR carried zero
+comments**, and **the branch adds exactly two Python files, `verdicts.py` and
+`spacing.py`, and neither computes a digest comparison.** The row's stated source
 was **the PR body making a claim about itself**, which is `AGENTS.md` §6 item 6
 (a citation to a file that does not exist) and §6 item 1 (a claim stated without
 evidence) — **while labelled OBSERVED, the one label that asserts a reviewer can
@@ -247,3 +286,98 @@ hardcode the deployment-specific null set, which is precisely what this pass say
 is wrong (§2). F1, F2 and F3 were therefore **doc-only errors that no CI check
 would have caught**, and they were caught by reading the prose against the ledger
 instead — which is the check that had to happen by hand.
+
+### Round 1's assurance is itself falsified — stated here, not quietly dropped
+
+Round 1's fix round ended with a sentence claiming that **every** number in both
+write-ups had been re-derived from the ledger and that **all now agree**. **N2
+below falsifies that sentence**: §2's EU column did not reconcile, and it is a
+number I had checked the shape of without summing the column. The claim was made
+in good faith and is wrong, so it is corrected here rather than left to be
+rediscovered. **A sweep-wide assurance is itself a claim and needs the same
+evidence as any other** — `AGENTS.md` §1 does not exempt a claim about one's own
+diligence from being true.
+
+## Correction (2026-10-13) — verifier round 2 on PR #45
+
+Three further write-up defects, again with **zero** Medtronic requests and again
+without touching the substance. Recorded here so the round-1 retraction history
+stays readable; corrected in place above.
+
+### N1 — the correction's own grep claim was false against its own commit
+
+§Correction F1 read *"A repo-wide grep for `123/123`, `second code path`,
+`different code path` and `digests agree` **returns nothing**."* **As committed
+it does not:** `123/123` returns **2** hits, `different code path` **2**, `digests
+agree` **2**, `second code path` **1** — every one of them inside the F1 section,
+because **a correction that quotes the original verbatim *is* the match**. The
+sentence was true when written and the commit that added it invalidated it.
+
+This is worse than a stale number, because the command is **named**: a reader who
+runs it gets hits and must work out unaided that they are self-references, and a
+reader who assumes the withdrawal is bogus would be wrong in the opposite
+direction. Now reads **"returns no hit outside this correction section"**, with
+the `grep -v -F` form given so the clean answer is one command away, and with the
+self-reference stated rather than left as a trap. `AGENTS.md` §1: the sentence
+either states its scope or goes.
+
+### N2 — §2's EU column did not reconcile; EU has 62 valued cells, not 61
+
+§2's three-way table summed to **72** for EU against an expected 73, because
+**area W's quirk verdict had no cell in it**. Area W's committed `verdicts.tsv`
+holds 69 rows: `61 VALUED-match + 5 NULL-404 + 2 DEDICATED-ROUTE-404 + 1
+VALUED-QUIRK` — the stray-bracket cell that **this pass's §3 is built around**.
+EU therefore has **62 valued cells** (61 exact + 1 quirk), not 61.
+
+The reader-level damage is the false equivalence: EU's **61** sat beside trials'
+**61** in adjacent columns, implying equal valued-cell counts, when they differ
+by one. The table now carries a `VALUED-quirk` row, a **column total of 73** on
+all three deployments, and the statement that **valued cells are 62 / 62 / 61**
+(EU / `.com` / trials) with trials the one that differs. A **reconciliation rule**
+is recorded so the columns are checkable rather than trusted, and it names the
+trap that made this possible: **the two passes' `verdicts.tsv` files are not the
+same shape** — this pass's is 12 columns with `SUBKEY-404` rows, area W's is
+`key seq code bytes verdict` with none — so anyone re-deriving this table must
+read **both** files plus area W's `results.jsonl` for its four subkey probes.
+
+**The same false equivalence was propagated to `docs/04-configuration.md`**
+(`61 / 62 / 61 VALUED-match`) and is corrected there too. That is the second
+Medtronic-facing file this log's verifier rounds have caught a prose count in.
+
+### N3 — the E pointer in `docs/11` promised non-erasure while the diff erased
+
+`docs/11` carried *"It is left here rather than deleted so the addendum that
+framed it survives"*, copied from area Z's equivalent pointer — where it is
+accurate, because Z's body text does survive above its pointer. For E it was
+false: the same hunk deleted both the `### E.` heading **and** area W's
+`#### Addendum (2026-10-13, from area W): one deployment swept, two remain`, and
+that addendum then existed nowhere in the repository.
+
+**Fixed by restoring area W's addendum verbatim**, not by weakening the sentence —
+`docs/` superseding `findings-log/` is permitted, but a pointer that promises
+non-erasure while erasing is `AGENTS.md` §6 item 5 in miniature, and the addendum
+is the reasoning that produced the area. The restoration carries a dated note
+recording that the close condition was met by this pass and that area W's
+`Assumptions (INFERRED)` line is now **tested rather than assumed**.
+
+### Carried into the successor, because it is a method fix and not a task
+
+The verifier ruled the 0-mismatch comparison **inherent, not a defect** — it
+needs both sides per cell, only the bulk side is committed, and areas W, G and H
+share the property. It also named what would have made the claim checkable
+forever: **a committed per-cell digest artefact**, `sha256` of the canonical
+parsed value and of the resolved bulk subtree, plus the winning `norm`. **One
+line in `verdicts.py`, zero extra requests, digests never values** so `AGENTS.md`
+§7 is satisfied exactly as the bulk-document digests already satisfy it. **It was
+foreclosed for this pass by the transient bodies, not by the request budget**
+(152 of a 170 cap, 18 unspent) — which is precisely why F1 was a fabrication
+rather than an overstatement: there was nothing to confirm the claim with. Recorded
+as a dated addendum under **area F** in `docs/11`.
+
+### Not fixed, and it should not be
+
+`docs/11`'s garbled sentence at the "Every letter A–Z" note — *"…and the
+priorities page's own gate `.github/ISSUE_TEMPLATE/config.yml`"* — is **broken on
+`main`** and is not this PR's defect. This PR corrected only the two counts inside
+it (10 open + 16 closed → 9 + 17), which is the correct scope; rewriting the
+surrounding sentence would be an unrelated edit to a line this pass did not author.
