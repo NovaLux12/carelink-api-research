@@ -1,0 +1,8 @@
+run start: 2026-10-13T08:27:19.426Z tmpbodies=(local-scratch-dir, bodies uncommitted per area A precedent)
+2026-10-13T08:27:19.428Z 2026-10-13T08:27:22.168Z seq=1 host=carelinkhp.minimed.eu tag=hp-absent code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=0f2c5f6257a6fc6af22e4b31309264df4c148e08016c196e1048bdc19a87e32d
+2026-10-13T08:27:22.182Z 2026-10-13T08:27:24.765Z seq=2 host=carelinkhp.minimed.eu tag=hp-root code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=0f2c5f6257a6fc6af22e4b31309264df4c148e08016c196e1048bdc19a87e32d
+2026-10-13T08:27:24.780Z 2026-10-13T08:27:27.607Z seq=3 host=carelinkhp.minimed.eu tag=hp-main code=200 ctype=application/javascript bytes=3397615 sha=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
+2026-10-13T08:27:27.623Z 2026-10-13T08:27:30.358Z seq=4 host=carelink-support.medtronic.eu tag=sup-absent code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=f637c8d0cd4ec6bc70944f7c9083ace6c205c5ecd22ce5da6ed533ece6d9a1bc
+2026-10-13T08:27:30.373Z 2026-10-13T08:27:32.953Z seq=5 host=carelink-support.medtronic.eu tag=sup-root code=200 ctype=text/html; charset=UTF-8 bytes=5518 sha=f637c8d0cd4ec6bc70944f7c9083ace6c205c5ecd22ce5da6ed533ece6d9a1bc
+2026-10-13T08:27:32.967Z 2026-10-13T08:27:35.795Z seq=6 host=carelink-support.medtronic.eu tag=sup-main code=200 ctype=application/javascript bytes=3410666 sha=a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954
+run end: 2026-10-13T08:27:35.812Z
