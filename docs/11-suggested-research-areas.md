@@ -732,6 +732,22 @@ is unknown.
 > *silently*, on a path this repo already pins. That is a bridge-facing coupling and
 > it is now a `docs/10` §1 row.
 
+#### Addendum (2026-10-13, from area P): documented negative on recoverability
+
+Area P exercised its zero-vendor-request path and found that no reproducible mobile
+binary is cited anywhere in the repo; only store metadata exists, which disclaims any
+decompilation. The bundled, hash-verifiable **web** bundles exhibit route literals
+and one client-side `deviceFamily` matching enum, but no request-body field names or
+NGP alarm vocabulary (`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md`).
+So the static-confirmability half of the area stays **unverified**, and the request
+shape remains blocked on an authenticated response or a sourced app binary.
+
+**Successor (attached, not a new letter):**
+- Blocker: a sourced, reproducible mobile artifact, or a clinician token.
+- Closes when: the artifacts above are recorded, or both paths are retired as unanswerable.
+- Assumptions (INFERRED): the vendor web bundle corpus does not represent the mobile client; area G's candidate lists stand as the comparison target.
+
+
 ### R. Reconcile the `deviceFamily` correction against the client consensus
 
 **Added 2026-10-11.** `docs/05` is corrected — `deviceFamily` **is** an API field on
