@@ -89,8 +89,8 @@ flowchart LR
     B -->|"3.9 → 12.0"| E["one document<br/>no Auth0 · cumulus v2"]
     C --> F["the pin<br/>that matters"]
     E --> G["probing again<br/>re-derives this"]
-    style C fill:#2f3b2f,stroke:#6f,stroke-width:2px
-    style E fill:#3b3b2f,stroke:#fd6
+    style C fill:#2f3b2f,stroke:#6f,stroke-width:2px,color:#fff
+    style E fill:#3b3b2f,stroke:#fd6,color:#fff
 ```
 
 ### You can map an API without a token
@@ -107,9 +107,9 @@ flowchart TD
     T -->|"MissingAuthenticationToken"| N["no route — wasted probe"]
     T -->|"Unauthorized + x-ca-err 990"| L["reached the authoriser<br/>the resource EXISTS ✓"]
     T -->|"OPTIONS → CORS *<br/>but GET is 403"| Q2["POST-only<br/>invisible to GET probes"]
-    style X fill:#3b2f2f,stroke:#f66
-    style L fill:#2f3b2f,stroke:#6f
-    style Q2 fill:#2f3b2f,stroke:#6f
+    style X fill:#3b2f2f,stroke:#f66,color:#fff
+    style L fill:#2f3b2f,stroke:#6f,color:#fff
+    style Q2 fill:#2f3b2f,stroke:#6f,color:#fff
 ```
 
 ### The estate
@@ -137,10 +137,10 @@ flowchart TB
     e1 -.-> p
     cfg["/patient/v2/configuration/public<br/>UNAUTHENTICATED · 69 keys"]
     e1 -.-> cfg
-    style s fill:#3b2f2f,stroke:#f66
-    style cfg fill:#2f3b2f,stroke:#6f,stroke-width:2px
-    style p fill:#2f3b2f,stroke:#6f
-    style g fill:#3b3b2f,stroke:#fd6
+    style s fill:#3b2f2f,stroke:#f66,color:#fff
+    style cfg fill:#2f3b2f,stroke:#6f,stroke-width:2px,color:#fff
+    style p fill:#2f3b2f,stroke:#6f,color:#fff
+    style g fill:#3b3b2f,stroke:#fd6,color:#fff
 ```
 
 ---
@@ -230,8 +230,8 @@ flowchart TD
     PR --> CI{"GitHub Actions — research-gate<br/>the same script, plus the mermaid gate"}
     CI -->|"red"| FIX
     CI -->|"green"| HUMAN["**Human merge**<br/>the gate cannot judge whether a claim is true"]
-    style HUMAN fill:#2f3b2f,stroke:#6f,stroke-width:2px
-    style GATE fill:#3b3b2f,stroke:#fd6
+    style HUMAN fill:#2f3b2f,stroke:#6f,stroke-width:2px,color:#fff
+    style GATE fill:#3b3b2f,stroke:#fd6,color:#fff
 ```
 
 Automation owns everything up to the merge: the citation paths, the scrub scan,
