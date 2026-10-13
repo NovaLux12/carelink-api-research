@@ -110,13 +110,20 @@ that the crawl is served, so the row is a completed observation, not a dropped
 failure. ⚠ **Acknowledged, because that narrowing is a judgement and not a fact.**
 `seq 40` and `seq 42` sit on crawls whose serving status is **unknown** — exactly
 the condition that puts `seq 39` and `seq 41` in the table — so a predicate
-stated purely as *"a first-and-only `404` on a crawl whose serving status is
-unestablished"* would admit them and give **six**. They are excluded on the
-narrower ground that a control's subject is the crawl rather than the host, and
-that this pass counts a dropped **control** separately (`seq 25`). **A reader who
-rejects that narrowing should read the number as seven**; nothing else in this
-file depends on the difference, and both readings are left standing rather than
-one picked.
+stated purely as *"a first-and-only **non-200** on a crawl whose serving status is
+unestablished"* would admit them and give **six** (`25`, `31`, `39`, `40`, `41`,
+`42`). **The predicate has to be `non-200` and not `404`, and that is arithmetic
+rather than taste:** `seq 25` is a **504** and `seq 41` a **400**, and both are
+already rows in this table, so a `404`-only predicate admits `31`, `39`, `40`,
+`42` and returns **four** — the table's own count, which would make the narrowing
+look as though it does no work. A `404` remains the API's *absence* answer and a
+`504`/`400` a *failure*; the wider predicate does not make `seq 25` or `seq 41`
+absence answers, it only widens the set of rows that reaches them. They are
+excluded on the narrower ground that a control's subject is the crawl rather
+than the host, and that this pass counts a dropped **control** separately
+(`seq 25`). **A reader who rejects that narrowing should read the number as
+seven**; nothing else in this file depends on the difference, and both readings
+are left standing rather than one picked.
 
 | row | crawl | what it was | why it was dropped |
 |---|---|---|---|
