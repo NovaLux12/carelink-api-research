@@ -1,0 +1,38 @@
+#
+# TRAILING NEWLINE — FIXED 2026-10-13 (verifier round 1, BLOCKING 2).
+# This file originally ended WITHOUT a newline and probe.sh's read loop was
+# `while IFS='|' read -r ...`, which drops the final unterminated line. The
+# line below therefore NEVER RAN and has no row in results.jsonl:
+#     offsetB-cluster-idx-2026-39
+# The newline is now present, the loop now carries a `|| [ -n ... ]` guard,
+# and probe.sh warns to run.log when a query file lacks a trailing newline.
+# Re-running this file as committed would now send that line — it did not
+# run in this pass, and nothing in the findings depends on it.
+# Area M — request set 6: re-derive the earlier pass's byte offsets.
+#
+# The claim issue puts this in scope because "the offsets are the mechanism".
+# COMMONCRAWL §1 records three computed byte ranges:
+#   com,medtronic)      .. com,medtronicdiabetes,origin)  2026-39 cdx-00101.gz  45560954-47031753
+#   com,minimed)        .. com,minimicroled)               2026-39 cdx-00102.gz  741698501-742330673
+#   com,medtronic)      .. com,medtronic,wwwp)             2024-42 cdx-00097.gz   26751110-27650507
+# and states that an EARLIER pass's ranges "landed on alphabetical neighbours".
+#
+# TWO INDEPENDENT TESTS, because one alone could be wrong in the direction that
+# flatters the conclusion:
+#   A  fetch each recorded range verbatim and read its own boundary keys. A
+#      correct range must BEGIN on the recorded lower bound. If the first
+#      record is `com,medtravi)` the offset is wrong, in the way already on
+#      record.
+#   B  binary-search cluster.idx for the same SURT prefixes myself and compare
+#      the offsets I compute against the ones recorded.
+#
+# Bodies stay under bodies/ (gitignored): COMMONCRAWL §9 records 8 058 session
+# identifiers in the 2024-42 range alone, all on one host. Only SURT boundary
+# keys and host-level facts are published, never a URL or a path.
+#
+# tag|role|host|path-and-query|extra curl args
+
+offsetA-r1-com-medtronic-2026-39|offset-reproduction-A|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2026-39/indexes/cdx-00101.gz|-r 45560954-47031753
+offsetA-r2-com-minimed-2026-39|offset-reproduction-A|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2026-39/indexes/cdx-00102.gz|-r 741698501-742330673
+offsetA-r3-com-medtronic-2024-42|offset-reproduction-A|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2024-42/indexes/cdx-00097.gz|-r 26751110-27650507
+offsetB-cluster-idx-2026-39|offset-reproduction-B|data.commoncrawl.org|/cc-index/collections/CC-MAIN-2026-39/indexes/cluster.idx|

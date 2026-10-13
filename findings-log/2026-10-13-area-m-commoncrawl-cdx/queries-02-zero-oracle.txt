@@ -1,0 +1,30 @@
+# Area M — request set 2 of 3: resolve the ZERO ORACLE before measuring any zero.
+#
+# WHY THIS SET EXISTS
+# -------------------
+# Control C did not return "no captures". It returned **HTTP 504,
+# content-type text/html, 7 lines, nginx/1.31.6** — a gateway timeout. Until it
+# is settled whether a 504 is this API's *absence* answer or a *failure*, every
+# zero this pass could report would be indistinguishable from a broken
+# instrument, which is the precise defect this area was opened to correct.
+# So nothing else is sent until the oracle is resolved.
+#
+# Four questions, four probes:
+#   R1  does matchType=host — the exact shape every host candidate will use —
+#       return rows on a host CC is KNOWN to cover?   (positive control, and an
+#       interleaved health check: if this answers 200 while the absent queries
+#       answer 504, the API was healthy at the moment the 504s were produced.)
+#   R2  is the 504 on the fabricated host deterministic, or was it transient?
+#   R3  is the 504 shape specific to medtronic.com, or does any covered domain
+#       give the same answer for an absent host?
+#   R4  does the count instrument (showNumPages) return a clean zero for an
+#       absent host instead of a gateway error?
+#
+# tag|role|host|path-and-query|extra curl args
+
+resolve-R1-matchTypeHost-positive-on-a-known-covered-exact-host|CONTROL-positive|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=www.medtronic.com&output=json&matchType=host&limit=5|
+resolve-R2-repeat-of-the-504-absent-host-verbatim|CONTROL-absent-repeat|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zz-area-m-absent-20261013.medtronic.com&output=json&matchType=host|
+resolve-R3-absent-host-under-a-different-covered-domain|CONTROL-absent-variant|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zz-area-m-absent-20261013.example.com&output=json&matchType=host|
+resolve-R4-absent-host-via-the-count-instrument|CONTROL-absent-count-instrument|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zz-area-m-absent-20261013.medtronic.com&output=json&showNumPages=true|
+resolve-R5-count-instrument-positive-on-a-known-covered-domain|CONTROL-positive|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=example.com&output=json&showNumPages=true&matchType=domain|
+resolve-R6-absent-host-second-fabricated-name-same-domain|CONTROL-absent-variant|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zzq7-area-m-absent-20261013.medtronic.com&output=json&matchType=host|

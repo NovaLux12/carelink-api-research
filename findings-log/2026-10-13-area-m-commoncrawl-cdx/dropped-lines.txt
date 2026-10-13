@@ -1,0 +1,21 @@
+committed query lines vs ledger tags (55 tags in results.jsonl)
+
+  queries-01-reachability-and-controls.txt    5 query lines, 1 never sent  <-- SHORT
+  queries-02-zero-oracle.txt                  6 query lines, 0 never sent
+  queries-03-crawl-sweep.txt                 24 query lines, 1 never sent  <-- SHORT
+  queries-04-follow-the-positive.txt         12 query lines, 1 never sent  <-- SHORT
+  queries-05-other-named-hosts.txt            4 query lines, 1 never sent  <-- SHORT
+  queries-06-offsets.txt                      4 query lines, 1 never sent  <-- SHORT
+  queries-07-retries.txt                      3 query lines, 0 never sent
+  queries-08-final.txt                        1 query lines, 0 never sent
+  queries-09-overshoot-reread.txt             1 query lines, 0 never sent
+
+  TOTAL 60 committed query lines, 55 ledger rows, 5 query lines never sent:
+    control-D-positive-showNumPages-count-instrument   (queries-01-reachability-and-controls.txt)
+    sweep-2018-39-medtronic-com   (queries-03-crawl-sweep.txt)
+    host-carelink-minimed-eu-2022-40   (queries-04-follow-the-positive.txt)
+    rec-2026-34-minimed-eu-records   (queries-05-other-named-hosts.txt)
+    offsetB-cluster-idx-2026-39   (queries-06-offsets.txt)
+
+  A 'never sent' line is a cell that produced NO evidence. It is not
+  an absence, and nothing in FINDINGS.md may rest on one.

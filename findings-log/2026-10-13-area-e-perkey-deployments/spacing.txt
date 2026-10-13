@@ -1,0 +1,34 @@
+Area E — spacing measurement
+declared: 2.5 s sleep inside the per-host flock; repo floor 2.0 s
+counting rule: consecutive pairs in request order, per host; BODY mtime is the authority (docs/09 section 4)
+
+--- carelink.minimed.com ---
+  requests 1..76 (76 rows)
+  mtime series  : 75 gaps, min 2.020 s, max 6.168 s, span 215.2 s
+    under the declared 2.5 s: 2   under the 2.0 s floor: 0
+      seq 3->4: 2.020 s
+      seq 30->31: 2.340 s
+  t_sent series : 75 gaps, min 1.776 s, max 6.168 s, span 215.3 s
+    under the declared 2.5 s: 4   under the 2.0 s floor: 2
+  NEGATIVE durations (t_done < t_sent, impossible): 4 — seq [6, 17, 25, 49]
+  span agreement (mtime vs t_sent): 0.112 s — series is the run's own
+
+--- carelink-trials.minimed.com ---
+  requests 77..152 (76 rows)
+  mtime series  : 75 gaps, min 2.088 s, max 3.228 s, span 207.7 s
+    under the declared 2.5 s: 5   under the 2.0 s floor: 0
+      seq 90->91: 2.271 s
+      seq 117->118: 2.412 s
+      seq 129->130: 2.088 s
+      seq 133->134: 2.370 s
+      seq 145->146: 2.295 s
+  t_sent series : 75 gaps, min 1.770 s, max 3.699 s, span 207.8 s
+    under the declared 2.5 s: 8   under the 2.0 s floor: 2
+  NEGATIVE durations (t_done < t_sent, impossible): 9 — seq [79, 84, 93, 102, 107, 121, 132, 140, 149]
+  span agreement (mtime vs t_sent): 0.071 s — series is the run's own
+
+=== pass total ===
+  bodies: 152   same-host gaps: 150
+  mtime floor (the authority): 2.020 s   under 2.5 s: 7   under 2.0 s: 0
+  t_sent floor (reported alongside): 1.770 s   under 2.5 s: 12   under 2.0 s: 4
+  negative durations across the pass: 13
