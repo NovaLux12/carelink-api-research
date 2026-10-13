@@ -643,6 +643,33 @@ it without reading the body.
   not settled by either of the above.
 - F remains **open**; area count unchanged.
 
+
+#### Addendum (2026-10-13, from `area-f-dedicated-routes`): independent controls-first re-derivation of the dedicated routes on `.com` and `-trials`
+
+Area F's dedicated-route half (Deliverable 3 of the 2026-10-13 pass) stands, but the
+controls behind it had not been re-issued from a clean baseline after the dispatch: both
+controls turn out to reproduce byte-for-byte. This pass re-issues them, controls first per
+host, on the two remaining patient hosts.
+
+**Derived from 10 GETs (2 controls + 3 routes × 2 hosts), cap 14, `results.jsonl` in
+`findings-log/2026-10-13-area-f-dedicated-routes/`.**
+
+- **Controls.** `/patient/configuration/version` and `/patient/configuration/` (root) both
+  404 with 0 bytes and no `content-type` on both hosts — the same shape the earlier pass
+  recorded.
+- **Routes.** All three answer `200 application/json` with the earlier digests:
+  `defaultCountry` 20 B (`a8c04033…`), `recaptcha/key` 58 B (differs by host,
+  `2018cee4…` com vs `a3e59c56…` trials), `messages/en` 22 B (`04868b50…`), with the
+  byte-identical split preserved across `.com` and `-trials` for the first and third.
+- **No `content-type` change, no new 404 shape, and no contradiction of the earlier
+  record.** Area F's substantive conclusion (a third read path lives on every deployment)
+  is corroborated rather than amended.
+- `EU` is not re-probed; its record stays cited from the earlier pass.
+
+Area F remains open: neither the caller nor the reachability question for
+`patient-timeline` moves, and this pass claims no closure. Successors 1 and 2 above stand.
+Area count unchanged.
+
 ## Tier 2 — cheap, moderate value
 
 ### P (closed 2026-10-13) Recover the request schema from the vendor's own app, statically
@@ -1042,6 +1069,27 @@ the 2026-10-08 clinic corpus still rest on its uncommitted per-file ledger. K's
 denominator therefore stays provisional.
 [source: findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md]
 
+#### Addendum (2026-10-13, from area K residual, issue #78): the denominator is now body-verified at 225
+
+**This closes the residual.** The predecessor left the 2026-10-08 clinic sweep's "one
+entry returned the SPA fallback" unexplained and the per-file ledger uncommitted.
+
+**OBSERVED — all 225 map entries resolve as `application/javascript` under the
+name `f.u` emits** (one GET per map entry, 225 distinct digests, zero duplicates,
+zero empty bodies, zero 5518 B fallbacks; host `carelinkhp.minimed.eu`).
+Under those names the corpus is **225** JS chunks. Measurement:
+`findings-log/2026-10-13-area-k-clinic-denominator/results.jsonl` (seq 1–225),
+`spacing.txt` (body-mtime floor 2.561 s, 0 of 224 gaps under 2.5 s).
+
+**INFERRED (bounded)** — the unexplained 5518 B cell is id 2076 fetched under
+its id instead of its emitted name `common.a62bb847b4ea289e.js`, reproducing the
+defect measured on the patient corpus (pool K pass req 2 vs req 4). The negatives
+in the 2026-10-08 record survive (an HTML shell can only add false hits, never
+false misses), and the published conclusions now carry N = 225.
+
+**Successor -> K proper (unchanged):** control-flow mining of the call-sites and
+the state-dependent shape of `system.logbook.entry.validation.config`.
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
@@ -1132,6 +1180,23 @@ inside any crawl window. The crawl after the 2022 date, `CC-MAIN-2022-21`
 **`carelink-stage3.minimed.eu`**. So the family is a **bounded 2020 deployment
 in the Common Crawl record** (OBSERVED, same source, §3b; the host is recorded,
 not probed).
+
+#### Addendum (2026-10-14, from the l79 re-issue, worker seq 19): earliest `/ipro/hcp/*` capture is now **2014-03-10**
+
+The 2026-10-14 re-issue of the seven indeterminate crawls (`findings-log/2026-10-13-area-l-7crawl-reissue`,
+issue #79) added a capture the earlier readings did not have: `carelink.minimed.eu`
+`/ipro/hcp/login.jsf` **200** on `CC-MAIN-2014-10` at **2014-03-10**, confirmed on the same
+crawl by `matchType=host` (worker seqs 21 and 22 — seq 19 was a `504` gateway failure). The two statements above that the family's
+earliest Common Crawl member opened at **2020-05-27 21:29:18** (and, before the round-3 correction,
+**2020-05-25**) are therefore superseded for `CC-MAIN-2014-10` and the crawls that read. They
+are left in place as the dated record of prior readings; this note does not erase them. The
+lower bound in the Common Crawl record is now **2014-03-10**, and the 2013 end
+(`CC-MAIN-2013-20`, `CC-MAIN-2013-48`) remains a readable absence on the domain scope from
+that re-issue. Area L stays open — per-member host/date enumeration is incomplete — and the
+per-crawl supplemental control for three of those crawls is at
+`findings-log/2026-10-13-area-l-7crawl-reissue/SUPPLEMENT-2026-10-14-ipro-early-crawl-controls.md`
+(OBSERVED, [source: findings-log/2026-10-13-area-l-7crawl-reissue/FINDINGS.md F2; ledger seqs 21, 22]).
+
 
 **⚠ CORRECTED 2026-10-13, in this pass's own first draft:** that draft also
 counted the crawl *before* the date, `CC-MAIN-2022-05`, whose `404 No Captures

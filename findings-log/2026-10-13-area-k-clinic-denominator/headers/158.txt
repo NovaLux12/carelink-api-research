@@ -1,0 +1,16 @@
+HTTP/2 200 
+content-type: application/javascript
+date: Tue, 13 Oct 2026 22:52:51 GMT
+content-encoding: br
+etag: W/"c5e-659fa96cd58c0"
+server: Apache/2.4.62 (Red Hat Enterprise Linux) OpenSSL/3.5.5
+cache-control: no-cache, must-revalidate
+access-control-allow-headers: X-System-ID, Content-Type, authorization
+last-modified: Wed, 26 Aug 2026 22:17:47 GMT
+vary: Accept-Encoding
+x-cache: Miss from cloudfront
+via: 1.1 06c7d4eec4ed67aff9aa4659f05ee190.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR5-P7
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: Eb6znCHCsDqw26N8Nr0q_Saq-c1gN02D1Cu7F9dkz7z2pda7OSE7Zg==
+
