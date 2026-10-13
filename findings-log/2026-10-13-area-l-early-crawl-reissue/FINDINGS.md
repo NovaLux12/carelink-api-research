@@ -128,3 +128,13 @@ do not trust the harness's own span check (retired, per `docs/09` §4).
 - [findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md] — §2 "a gateway error carries no information", §3a control pairing.
 - [docs/09-methodology-and-oracles.md] §4 — oracle rules, 2.5 s floor, mtime validation.
 - [docs/11-suggested-research-areas.md] §L — close conditions and the successor addendum.
+
+## Correction (2026-10-13) — earliest `/ipro/hcp/*` capture
+
+The earlier capture-date statement read **`2020-05-25`** (this pass, §3, attached to
+`CC-MAIN-2020-24`, seq 3). The committed `CC-MAIN-2020-24` body (`seq 34` of the
+area-L ledger) opens its `/ipro/hcp/*` members at **`2020-05-27 21:29:18`** (`20200527212918`);
+the `2020-05-25` series in that same body is `/patient/entry.jsp` and
+`/patient/main/login.do`, a different path family. The carrying row is **seq 34**, not
+seq 3. The absence verdict of this pass (all three re-issued crawls return the
+404 discovery-endpoint answer behind per-crawl controls) is unaffected and stands.

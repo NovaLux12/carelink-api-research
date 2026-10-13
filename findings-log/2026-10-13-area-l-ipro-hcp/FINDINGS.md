@@ -750,3 +750,11 @@ python3 spacing.py     # both oracles
 sequence rather than restarting underneath the hand-written debug rows. **Stage 1
 is the only stage that must run first**: it establishes the zero-oracle every
 later zero depends on.
+
+## Correction (2026-10-13) — earliest `/ipro/hcp/*` capture date
+
+The spanning line claimed **2020-05-25 → 2020-12-02**. The rows immediately above it
+in this same append-only record (2020-05-27 21:29:18 …) show the `/ipro/hcp/*`
+family's earliest Common Crawl member is **2020-05-27 21:29:18**. The 2020-05-25 dates
+belong to `/patient/*` paths in that same crawl body. The omission in this log and in
+`docs/11` §L line 1061 is recorded rather than rewritten above.
