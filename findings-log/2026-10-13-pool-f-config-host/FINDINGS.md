@@ -10,10 +10,10 @@ three other workers were running concurrently on the same machine). Three hosts:
 `carelink.minimed.eu`, `carelink.minimed.com`, `carelink-trials.minimed.com`.
 
 Each host received exactly **one** request to each of the two routes below, so
-there are no same-host consecutive pairs in this pass (0 same-host gaps to
-measure; the floor is stated at the mechanism level rather than as a measured
-value). The cross-host gaps in `run.log` are 2.54–2.79 s. Ledger: `results.jsonl`,
-6 rows, one per request.
+each host received two requests (`public` then `messages/en`), so there **are**
+three same-host pairs; their finish→start gaps are 5.449–5.662 s, all above the
+2.5 s floor. Adjacent start gaps across `run.log` are 2.592–2.825 s. Ledger:
+`results.jsonl`, 6 rows, one per request.
 
 Response bodies are transient by design (`AGENTS.md` §7 — no raw captures); this
 pass consumed them while they were in hand and deleted them. The evidence below
