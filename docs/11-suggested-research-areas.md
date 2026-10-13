@@ -602,6 +602,118 @@ observed here demonstrates it. **`ARCHIVE-URLS` was not modified by area M** —
 host attribution added to a findings log another pass owns is a correction that
 pass's owner should make, so it is recorded here instead.
 
+#### Addendum (2026-10-13, from area L, #57): the family is **four members in two crawls**, and the 2013 end is **unanswerable** with this instrument
+
+Area L worked the anchor area M left. It did **not** close area L; this is an
+addendum, and the letter stays open.
+
+**"Three captures" was one crawl's worth.** The family has a **fourth member**
+and a **second crawl**, and the fourth member is not a `.jsf`:
+
+| capture | code | host | path | crawl |
+|---|---|---|---|---|
+| **2020-05-27 21:29:18** | **302** | `carelink.minimed.eu` | **`/ipro/hcp/index.jsp`** ← new | `CC-MAIN-2020-24` |
+| 2020-05-27 21:29:19 | 200 | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | `CC-MAIN-2020-24` |
+| 2020-05-27 21:29:19 | 302 | `carelink.minimed.eu` | `/ipro/hcp/main/home.jsf` | `CC-MAIN-2020-24` |
+| 2020-12-02 03:07:17 | 302 | `carelink.minimed.eu` | `/ipro/hcp/` | `CC-MAIN-2020-50` |
+| 2020-12-02 03:07:17 | 200 | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | `CC-MAIN-2020-50` |
+| 2020-12-02 03:07:17 | 302 | `carelink.minimed.eu` | `/ipro/hcp/main/home.jsf` | `CC-MAIN-2020-50` |
+
+**Four paths · one host · two crawls · two dates spanning 2020-05-25 →
+2020-12-02** (OBSERVED, [source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md
+§2]). Two query shapes agree on the new member — `matchType=domain` and
+`matchType=host` return the identical 7-record set — so it carries the same
+weight as area M's anchor. **Consequences:** the family is
+**`/ipro/hcp/*`, not `/ipro/hcp/*.jsf`** (`index.jsp` is a `.jsp`, and the
+`.jsf` glob does not contain it), and area L's own close condition — "one
+three-capture entry with no siblings" — is **not** met. **The migration fact
+this area exists to recover is confirmed and strengthened**: the retired
+clinician surface ran on `carelink.minimed.eu` and was still being crawled seven
+months into 2020.
+
+**The 2022 end is answered; the 2013 end is withdrawn.** `collinfo.json` lists
+**128 crawls**, and **neither** `2013-05-17` **nor** `2022-05-13` falls inside
+any crawl window. The crawl after the 2022 date, `CC-MAIN-2022-21`
+(2022-05-16 → 2022-05-29), holds **four** `minimed.eu` records and **not one
+`/ipro/hcp/`** — `carelink.minimed.eu` serving `/robots.txt` **403** twice, plus
+`/` and `/robots.txt` on a host name new to this repo,
+**`carelink-stage3.minimed.eu`** — while the crawl before it,
+`CC-MAIN-2022-05`, answers **404 `No Captures found`**. So the family is a
+**bounded 2020 deployment in the Common Crawl record** (OBSERVED, same source,
+§3b; the host is recorded, not probed).
+
+**The 2013 end cannot be settled through the index API at this date**, and the
+reason is worth more than a negative would have been: `CC-MAIN-2013-20`
+(2013-05-18 → 2013-06-20 — **one day** after the recorded date),
+`CC-MAIN-2013-48` and `CC-MAIN-2014-10` each failed the `minimed.eu` query in a
+**different** way (`404`, `400`, `502`/`504`), so the failure mode is
+crawl-dependent and a status code is not an oracle across crawls. Five requests
+were spent and it did not yield an answer (OBSERVED, same source, §3a and §5).
+
+**Blocker:** a request budget against an API that fails **18 of 44** requests
+(41%), against crawls whose failure mode varies. Not access-shaped, and not
+"more research": re-issuing the five indeterminate crawls (`CC-MAIN-2013-20`,
+`-2013-48`, `-2014-10`, `-2015-22`, `-2021-25`) is a fixed, small, mechanical
+list that one pass could finish inside 45 requests.
+
+**Closes when** each of the five indeterminate crawls has produced **either** a
+record set **or** a `404` confirmed by a positive control on that same crawl, so
+the 2013 end resolves to a reading rather than a hole. **A negative counts** —
+and so does a fourth identical failure on a crawl whose positive control
+succeeds, which would make "this crawl cannot be read" the finding.
+
+**Assumptions (INFERRED):** that `/ipro/hcp/*` names one surface over time,
+unchanged from area M's addendum and **still not demonstrated** — a fourth
+member in a second crawl is consistent with one surface and does not prove it,
+since `index.jsp` could equally be a second portal sharing the prefix.
+
+#### Successor to area L (dated addendum to area L, #57): the crawl-scoped control is one-directional, and that is the real blocker on this corpus
+
+`docs/11`'s §"Why there is no area AA" forbids minting a new letter, so this is
+attached to area L.
+
+**What is known.** To read a zero from this API you need a **positive control on
+the same crawl**: that the crawl is served, and that the query shape returns
+data there. Area L sent the obvious version — a crawl-scoped control for
+`example.com` — and **it does not work in one direction** (OBSERVED,
+[source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §5-C2]):
+
+| seq | crawl | `example.com` control | `minimed.eu` | crawl served? |
+|---|---|---|---|---|
+| 44 | `CC-MAIN-2015-06` | **404** | **200, 1 record** | **yes** — `example.com` is simply absent from it |
+| 40 | `CC-MAIN-2013-20` | 404 | 404 | **unknown** |
+| 42 | `CC-MAIN-2013-48` | 404 | 400 | **unknown** |
+| 25 | `CC-MAIN-2014-10` | 504 | 502/504/504 | **unknown** |
+| 26 | `CC-MAIN-2022-21` | **200** | **200, 4 records** | **yes** |
+
+A control **success** proves the crawl is served. A control **failure or `404`
+proves nothing** — the crawl may be perfectly served and lack that host. Area L's
+first draft of the 2013-end section concluded "the crawl is not served" from
+exactly this error and **retracted it**; `seq 44` is the row that breaks it.
+
+**What is missing, and why it matters.** Every negative on an early-era crawl in
+this repo is currently unreadable, and three of them are the only reason the
+2013 end is a hole. `example.com` is not in every crawl, so no host can serve
+as a universal control; a control has to be **a host known to be in that
+specific crawl**, which is not known before the query runs. The corpus's own
+reachability is therefore unmeasured per crawl, and `docs/09` §4 currently
+records only host-level reachability.
+
+**Blocker:** a per-crawl control that is known-covered *for that crawl*.
+Concretely unbuilt: the `cluster.idx`-level or `collinfo.json`-level check that
+would establish, for a named crawl, that its index is served at all — before
+any `minimed.eu` query is sent and before a `404` is allowed to mean anything.
+
+**Closes when** every crawl this repo names in a negative carries a **positive
+control that returned records on that crawl**, or the negative is restated as
+indeterminate. **A negative counts** — and so does establishing that a named
+crawl is unservable, which would convert three holes into a recorded fact.
+
+**Assumptions (INFERRED):** that a `200` on any host proves the crawl is served.
+Plausible from the two `200` control rows and never tested against a crawl known
+to be served but empty, so the instrument is asserted one notch above what was
+observed.
+
 ---
 
 ## How to claim one
