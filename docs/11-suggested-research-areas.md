@@ -300,6 +300,140 @@ entry document in the same run, but no authenticated session confirms a logged-i
 receives it. And that a lazy chunk cannot read the timeline config: **only the eager main
 bundle was swept**, the 211 lazy chunks were not (see the addendum to area K).
 
+#### Addendum (2026-10-13, from area F): the timeline config is read, the stale key is confirmed, and the dedicated routes are not EU-only
+
+**Area F stays open** — this addendum settles four of its addenda and leaves the
+letter's own question ("who calls `patient-timeline`, and can a third-party client
+reach it") untouched. Claim **#55**, 24 of a 26 cap, GET only
+([source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md]).
+
+**Three of the four addendum deliverables are answered, two of them positively.**
+
+1. **The blocker above is gone.** `personal.patient.timeline.config` is an object of
+   **exactly two members, `featureEnabled` and `host`, the same member set on all three
+   deployments** (`OBSERVED`). `featureEnabled` is boolean `true` everywhere; `host` is a
+   deployment-specific `https` string carrying **three distinct digests**. Its **value is
+   deliberately not published**. Both facts are now **pinned** — six assertions in
+   `regression/hurl/05-public-config.check.sh`, **zero extra vendor requests**, since every
+   body it reads is already fetched by that suite's area-E block.
+2. **The two timeline-host keys are reconciled, and the open reading is closed.**
+   `personal.patient.timeline.host` is **not a top-level key in any of the three bulk
+   documents** and its per-key route 404s with 0 bytes on all three (`OBSERVED`, 3 of 3).
+   So the document publishes **exactly one** timeline host, as `…timeline.config.host`, and
+   the bundle's second name is the **stale key**. Area V's alternative — "the vendor
+   publishes a second, unrecorded key" — is **refuted**, on a membership test against the
+   document rather than a status code. The per-key 404 corroborates but cannot carry the
+   claim: on this plane a null-valued key 404s identically to an absent one.
+3. **The EU-only hypothesis for the dedicated routes is refuted.** Area E's addendum above
+   expected "the two dedicated routes are EU-only" as the likely answer. **All three answer
+   `200 application/json` on `.com` and `-trials`** (`OBSERVED`): `defaultCountry` (20 B,
+   byte-identical across the two), `recaptcha/key` (58 B, **different** on each — consistent
+   with the three region-specific keys `scripts/scrub-patterns.txt` already records), and
+   `messages/en` (22 B, byte-identical). **A third read path exists on every deployment, not
+   three of one.** `messages/en` returns **22 B where the recorded `.eu` value
+   `{"messages": []}` is 16 B**, so its shape has changed; the content is **not claimed**,
+   because bodies are transient and no reader should infer "empty" from a 200.
+4. **The per-cell digests area E could not produce retrospectively now exist.**
+   `cell-digests.tsv` in the log carries `sha256(canonical(parsed value))` and
+   `sha256(canonical(resolved bulk subtree))` per cell — **digests, never values**. The
+   projection of `…timeline.config` equals its own host's bulk subtree **3 of 3**, which is
+   the re-derivable form of area E's otherwise log-only "0 mismatches" claim. Every digest is
+   **type-asserted before it is hashed**, and a resolve that returns null writes
+   `NULLRESOLVED` rather than the digest of `None` — `docs/09` §5 item 3.
+
+**Also settled, and it is a trap: this key is a literal dotted name.** Splitting
+`personal.patient.timeline.config` on `.` resolves to `null` on all three deployments while
+the literal key resolves to an object, so a dotted-path walker would have hashed nothing
+against nothing and reported agreement (`OBSERVED`, recorded deliberately as a control).
+
+**And a fifth, negative result about the 404 content-type set:** **9 of 9** 404s in this
+pass carried **no** `content-type` header at all. Within the *same* namespace, area W's
+**absurd** fabricated name returns `text/vnd.a` while this pass's **plausible-shaped**
+unpublished name returns none. **INFERRED, n = 1 per reading:** the discriminator may be the
+*plausibility of the requested name* rather than area W's "control versus real key".
+Assumption: the header tracks the name, not unseen route state. `docs/04`'s standing
+instruction not to discriminate on it is confirmed, with a second independent reason.
+
+**Two corrections to this page's own premises, recorded rather than smoothed over.** The
+claim and the pool brief both named **`/patient/configuration/`** as the bulk document; it is
+the **per-key** namespace, and the bulk document is **`/patient/v2/configuration/public`**
+(`05-public-config.check.sh` fetches exactly that). Used as written, deliverable 1 would have
+returned a 404 and been recorded as "the key is not published" — a false negative produced by
+the brief. And this page's line 178 describes `/patient/configuration/version` and the
+`/patient/configuration/` root as "already tried and 404'd on EU"; **no committed record
+contains either probe** — what the 2026-10-08 pass recorded 404 is the `/patient/v2/`
+siblings, a different namespace. Both controls were therefore **measured per host** instead
+of inherited, which is what made them usable.
+
+#### Successor to area F — does the published `config.host` pointer name the gateway this repo probed?
+
+**Known, labelled.** The object's full member set is recorded and pinned
+(`OBSERVED`, [source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §1]). The
+`host` member is an `https` string of **79 / 76 / 76** characters on `.eu` / `.com` /
+`-trials`, with **three distinct** sha256 digests (`OBSERVED`, same source). The value itself
+is **not published** and its shape is **not claimed**. Separately, this repo records the
+service's host shape as `…eu-central-1…/prod/patient-timeline` (EU) and
+`…us-east-1…/prod/patient-timeline` (US and trials) (`OBSERVED`,
+[source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]), and
+[`07-admin-portal-and-reporting.md`](../07-admin-portal-and-reporting.md) attributes the
+probed `patient-timeline` gateway to this config key.
+
+**Missing, and why it matters.** The measured lengths and the recorded region names
+**disagree**: EU is **three** characters longer than the other two deployments, while
+`eu-central-1` and `us-east-1` differ by **two**. So either something other than the region
+string differs between the EU and US pointers, or one of the two records is wrong. **Neither
+can be checked from what is committed**, because the config value has never been read and
+the 2026-10-08 log abbreviates it with ellipses. Until it is read, the parenthetical
+attribution in `docs/07` is an **unlabelled inference** — and `AGENTS.md` §6 item 1 is a
+claim without evidence, not a stylistic nit.
+
+**Blocker:** the value is only readable **while a response body is in hand**, and bodies are
+transient by design (`AGENTS.md` §7). It cannot be recovered after a sweep, and the value is
+one unauthenticated GET away — so the blocker is a harness, not a token or a budget:
+**3 requests, 1 per patient deployment**, plus the recorded shapes already on disk.
+
+**Closes when:** the value is read on all three deployments and either (a) **matches** the
+recorded shape, or (b) the discrepancy is explained and the wrong record is corrected in
+place with the original kept visible. **A negative counts and is the more likely answer** —
+"the pointer does not name the gateway this repo probed" would be the more consequential
+result, and it closes this.
+
+**Assumptions (INFERRED):** that the 2026-10-08 shape record and the 2026-10-13 measurement
+describe the same field — the 2026-10-08 pass may have read a different deployment's value, or
+an abbreviated form that dropped a character. That the value is safe to publish if it matches
+the recorded shape — it must still be screened against `scripts/scrub-patterns.txt` first, and
+**if it matches any pattern, the digest and the shape go in and the value does not**.
+
+#### Successor to area F — what is in `/patient/configuration/messages/{lang}` now?
+
+**Known, labelled.** The route answers `200 application/json` on `.com` and `-trials`
+(**22 B**, byte-identical by sha256 across the two) and was recorded `200` returning
+`{"messages": []}` (**16 B**) on `.eu` in 2026-10-08 (`OBSERVED`,
+[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md §3];
+[`CONFIG-NAMESPACE-DEEP.md`](../findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md)
+line 90). The live value's **content is not in the ledger**, because bodies are transient.
+
+**Missing, and why it matters.** A **6-byte** difference between a recorded empty array and
+what two deployments serve today is a change in an unauthenticated, client-facing i18n
+endpoint. `docs/04`'s reader currently cannot tell whether a client can rely on this route
+being empty. **It is also the cheapest remaining question in area F** — the bytes are
+already known, only the value is not.
+
+**Blocker:** the value is readable only while a body is in hand. **3 requests**, 1 per
+deployment, or 1 if the `.com` byte-identity with trials is trusted.
+
+**Closes when:** the response is recorded as a **shape** (member list and array length) rather
+than as prose — and if the array is non-empty, **its size and the shape of one entry, never a
+translated string**, since this is customer-facing copy. **A negative counts**: "the array is
+still empty and the 6 bytes are elsewhere in the envelope" closes it, and is worth recording
+precisely because it would mean the recorded 2026-10-08 note is about the wrong thing.
+
+**Assumptions (INFERRED):** that `22` and `16` are comparable byte counts of the same
+envelope — the 2026-10-08 record is a transcription in prose, not a measured
+`content-length`, so it may have counted a differently-formatted rendering of the same empty
+array. **That assumption is the first thing to test**, and a `content-length` header settles
+it without reading the body.
+
 ---
 
 ## Tier 2 — cheap, moderate value
