@@ -614,6 +614,35 @@ it without reading the body.
 
 ---
 
+#### Addendum (2026-10-13, from `pool-f-config-host`): successor evidence for the published pointer and `messages/en`
+
+**Derived from 6 GETs across the three patient deployments, unauthenticated, cap 6/6,
+`results.jsonl` in `findings-log/2026-10-13-pool-f-config-host/`.**
+
+- **Successor 1 (pointer naming).** `personal.patient.timeline.config` is still a
+  two-member object (`featureEnabled`, `host`) with the same member set on all three
+  deployments; `featureEnabled` boolean `true` everywhere. The `host` member remains
+  an `https` string of **79 / 76 / 76** characters with **three distinct digests**
+  (`f81e6648…` / `24ee5564…` / `988acbd7…`), **unchanged** since the
+  2026-10-13 area-F pass. In-process shape classification shows it is an AWS
+  API Gateway host (`.execute-api.`, 10-character gateway id, ending
+  `/prod/patient-timeline`) whose region segment is `eu-central-1` on `.eu` and
+  `us-east-1` on `.com` and `-trials`. The measured 3-character length delta
+  (`79 − 76`) is exactly the difference between `eu-central-1` (13) and
+  `us-east-1` (10), leaving no unexplained characters. So the pointer is
+  **consistent with naming the gateway this repo probed**; the id segment was
+  not compared (it is infrastructure, not published), so this is strong
+  consistency rather than proof. **Raw `host` value not published.**
+- **Successor 2 (`messages/en`).** All three deployments answer `200`,
+  `application/json`, 22 bytes, digest `04868b50…` (byte-identical). Envelope
+  member list is `["messages"]`; the array length is **0** on all three. The
+  16-vs-22-byte difference against the 2026-10-08 record is a formatting
+  difference on the same empty array.
+- Neither successor closes area F: the caller / reachability question for
+  `patient-timeline` is untouched; a third-party client's ability to reach it is
+  not settled by either of the above.
+- F remains **open**; area count unchanged.
+
 ## Tier 2 — cheap, moderate value
 
 ### P. Recover the request schema from the vendor's own app, statically
