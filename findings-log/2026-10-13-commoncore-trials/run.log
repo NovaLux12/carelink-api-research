@@ -1,0 +1,10 @@
+# seq	host	role	method	path	t_queued	t_sent	t_done
+1	commoncore-trials.medtronic.com	RESOLUTION-the-host-the-CSP-names	DNS	-	2026-10-13T15:19:47.437Z	(bound)	(bound)
+2	commoncore-trials.minimed.com	CONTROL-b-sibling-recorded-502	GET	/reports-broker/v1/ocl	2026-10-13T15:21:28.188Z	2026-10-13T15:21:30.693Z	2026-10-13T15:21:31.192Z
+3	commoncore.medtronic.com	RESOLUTION-us-sibling	DNS	-	2026-10-13T15:21:31.237Z	2026-10-13T15:21:33.743Z	2026-10-13T15:21:33.871Z
+4	commoncore.medtronic.com	CONTROL-certainly-absent-same-prefix	GET	/reports-broker/v1/ocl-probe-absent	2026-10-13T15:21:33.893Z	2026-10-13T15:21:36.399Z	2026-10-13T15:21:36.705Z
+5	commoncore.medtronic.com	CANDIDATE-us-sibling	GET	/reports-broker/v1/ocl	2026-10-13T15:21:36.749Z	2026-10-13T15:21:39.257Z	2026-10-13T15:21:39.543Z
+6	commoncore.medtronic.eu	RESOLUTION-eu-sibling	DNS	-	2026-10-13T15:21:39.593Z	2026-10-13T15:21:42.993Z	2026-10-13T15:21:42.325Z
+7	commoncore.medtronic.eu	CANDIDATE-eu-sibling	GET	/reports-broker/v1/ocl	2026-10-13T15:21:42.344Z	2026-10-13T15:21:44.850Z	2026-10-13T15:21:44.962Z
+8	commoncore-trials.medtronic.com	CONTROL-certainly-absent-same-prefix	GET	/reports-broker/v1/ocl-probe-absent	2026-10-13T15:21:45.165Z	2026-10-13T15:21:47.523Z	2026-10-13T15:21:47.719Z
+9	commoncore-trials.medtronic.com	CANDIDATE-the-host-this-area-is-about	GET	/reports-broker/v1/ocl	2026-10-13T15:21:47.764Z	2026-10-13T15:21:50.270Z	2026-10-13T15:21:50.418Z

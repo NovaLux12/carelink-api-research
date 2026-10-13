@@ -1,0 +1,24 @@
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> +time=3 +tries=1 commoncore.medtronic.com A
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 4259
+;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 65494
+;; QUESTION SECTION:
+;commoncore.medtronic.com.	IN	A
+
+;; ANSWER SECTION:
+commoncore.medtronic.com. 300	IN	CNAME	d2te4je11hig0i.cloudfront.net.
+d2te4je11hig0i.cloudfront.net. 60 IN	A	54.230.201.102
+d2te4je11hig0i.cloudfront.net. 60 IN	A	54.230.201.45
+d2te4je11hig0i.cloudfront.net. 60 IN	A	54.230.201.93
+d2te4je11hig0i.cloudfront.net. 60 IN	A	54.230.201.26
+
+;; Query time: 117 msec
+;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)
+;; WHEN: Tue Oct 13 16:21:33 BST 2026
+;; MSG SIZE  rcvd: 160
+
