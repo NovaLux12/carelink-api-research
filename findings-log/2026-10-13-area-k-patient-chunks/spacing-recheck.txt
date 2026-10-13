@@ -1,0 +1,26 @@
+AREA K — independent re-derivation of spacing.txt (zero requests)
+rows=215  hosts=['carelink.minimed.eu']  declared=['2.5']
+
+impossible durations (t_done < t_sent):
+  ok   negative durations: re-derived 16, artefact says 16
+  ok   bodies written before own t_sent: re-derived 22, artefact says 22
+  note: the 22-set contains the 16-set plus [47, 73, 117, 140, 190, 207] — they are different questions
+  ok   same-host gaps: re-derived 214, artefact says 214
+  ok   send: gaps under declared 2.5 s: re-derived 22, artefact says 22
+  ok   send: gaps under 2 s floor: re-derived 7, artefact says 7
+  ok   mtime: gaps under declared 2.5 s: re-derived 0, artefact says 0
+  ok   mtime: gaps under 2 s floor: re-derived 0, artefact says 0
+  ok   mtime: negative gaps: re-derived 0, artefact says 0
+  min/max — send 1.835/35.622  mtime 2.636/35.615
+  ok   mtime floor: re-derived 2.636, artefact says 2.636
+  ok   send floor: re-derived 1.835, artefact says 1.835
+  ok   per-gap max |send-mtime|: re-derived 0.873, artefact says 0.873
+  ok   per-gap gaps disagreeing >0.5 s: re-derived 20, artefact says 20
+  median — spacing.sh's upper-middle element ad[107] = 0.0149s; true median (mean of ad[106],ad[107]) = 0.0145s (ad[106]=0.0130, ad[107]=0.0140)
+
+span  first t_sent->last t_done 648.080s | kernel first->last write 647.799s | diff 0.281s
+  (a two-endpoint check; it cannot detect interior corruption — see §4)
+
+SELF-CHECK
+  checks that FAILED: 0
+  consistent

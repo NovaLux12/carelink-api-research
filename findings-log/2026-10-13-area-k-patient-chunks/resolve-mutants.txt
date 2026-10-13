@@ -1,0 +1,31 @@
+================================================================================================
+RESOLVE.MUTANTS — each capture mutation MUST make resolve.py exit non-zero.
+Applied to throwaway copies; the real captures are never modified. ZERO requests.
+================================================================================================
+
+BASELINE (unmutated captures): exit 0  PASS as required
+
+ok   exit 1   prepend one byte (the blocker-1 mutant)              A-offset read 1 import: module 16746 binds the config module at byte 577: expected '_=o\
+ok   exit 1   read 1 no longer selects .z2                         A-offset read 1: the select of the alias, module 16746 at byte 22252: expected 'select\\
+ok   exit 1   read 2 no longer selects .z2                         A-offset read 2: the select of the alias, module 59567 at byte 70046: expected 'select\\
+ok   exit 1   POST definition: reqUrl not destructured to b        A-offset THE POST DEFINITION: reqUrl destructured to b, b is posted at byte 61803: expec
+ok   exit 1   POST call: reqUrl decoupled from the value           A-offset THE POST CALL: the URL built above is its reqUrl at byte 69866: expected 'getPe
+ok   exit 1   flow: E no longer h.messageEndpoint                  A-offset the value is unpacked: E = h.messageEndpoint at byte 69458: expected 'const L=h
+ok   exit 1   main: dotted key renamed                             B-offset the key constant: guardianCumulusPeriodicAPI = the dotted key at byte 2189121: 
+ok   exit 1   main: selector repointed at another key              B-offset the selector over that key: be = createSelector(f, gt => gt.guardianCumulusPeri
+ok   exit 1   main: export table no longer maps z2 to be           B-offset the key constant: guardianCumulusPeriodicAPI = the dotted key at byte 2189121: 
+ok   exit 1   main: eager bundle gains a .z2 read (A9)             A9: main reads .z2 1 times, expected 0
+ok   exit 1   chunk: a third import of module 4265 (A1)            A1: o(4265) occurs 3 times, expected exactly 2
+ok   exit 1   chunk: truncated below the POST definition           A-offset read 2 import: module 59567 binds the same config module at byte 66107: expecte
+
+------------------------------------------------------------------------------------------------
+CONTROLS — each MUST leave resolve.py exiting zero. A suite with no
+expected-to-PASS case cannot tell a working assertion from an absent one.
+------------------------------------------------------------------------------------------------
+ok   exit 0   append one byte (shifts no cited offset)             
+
+================================================================================================
+12 of 12 mutants caught, 1 of 1 controls behaved.
+Every mutation is caught. resolve.py's 'cannot report a clean run over a body
+that no longer supports the claim' is TESTED here, not asserted.
+================================================================================================

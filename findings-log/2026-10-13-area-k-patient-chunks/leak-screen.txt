@@ -1,0 +1,45 @@
+================================================================================================
+LEAK SCREEN — this pass's .txt / .tsv / .h artefacts against scripts/scrub-patterns.txt
+Committed because docs/09 section 4 records the gate's leak scan reads NO file of
+these extensions, in any mode, --all included. Pattern VALUES are not reprinted.
+================================================================================================
+
+patterns loaded        : 10
+subjects screened      : 950
+subject extensions     : .txt, .tsv, .h   (none of which the gate's leak scan reads)
+self-excluded          : scripts/research-gate.sh, scripts/scrub-patterns.txt
+
+------------------------------------------------------------------------------------------------
+HITS PER PATTERN — the value is never printed
+------------------------------------------------------------------------------------------------
+pattern                                        hits
+AWS VPC endpoint service name                  0
+credential prefixes                            0
+internal .corp host                            0
+internal Grafana/K8s/GitLab/DB/Prometheus host 0
+live jsession values                           0
+live sessionData values                        0
+machine-specific paths                         0
+reCAPTCHA site keys                            0
+reports-broker key fragments                   0
+vendor API key literal                         0
+
+------------------------------------------------------------------------------------------------
+SELF-TEST — a known-bad string must be caught, or this screen cannot be trusted
+------------------------------------------------------------------------------------------------
+ok   machine-specific paths                           probe: 15 chars (value not printed)
+ok   live jsession values                             probe: 21 chars (value not printed)
+ok   internal .corp host                              probe: 13 chars (value not printed)
+ok   internal Grafana/K8s/GitLab/DB/Prometheus host   probe: 25 chars (value not printed)
+  -> every probed pattern fires on its own target, so the zero-hit verdict
+     above is a measurement rather than a silence.
+
+------------------------------------------------------------------------------------------------
+VERDICT: ZERO hits on all 10 patterns across all 950 subjects.
+
+Note what this does and does not establish: it establishes that the scrub list
+does not fire on these files. It does not establish that the list is complete,
+and it cannot — the pattern file itself warns that a pattern which never fires
+is silent, and that a scan proves nothing about a pattern until the pattern has
+been shown to fire on its own target.
+================================================================================================

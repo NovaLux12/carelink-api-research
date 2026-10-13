@@ -500,3 +500,100 @@ valid token cannot be answered without credentials.** Which of `{v11, v12, v13}`
 cumulus leg returns the data the bridge wants is the same class of question — route
 existence is settled, behaviour is not [source:
 findings-log/probe-2026-10-08/recon/VERSION-AXIS.md].
+
+---
+
+## Patient CSR paths hard-coded in the lazy chunks (2026-10-13, area K #56, NEW)
+
+**OBSERVED as code literals. LIVENESS IS UNOBSERVED — nothing was requested.** Read
+this section as a map of what the shipped client *addresses*, not as a map of what the
+server *serves*. Every path below was found by sweeping the **211 patient lazy chunks**
+of `carelink.minimed.eu` for hard-coded API path literals; none was probed, because they
+are outside the area's committed candidate list and probing them would need a
+justification this pass did not have.
+
+⚠ **This namespace was in no `docs/` page before this section.** `/patient/csr` does not
+appear in the discovery document, in the 69-key public config, or in the eager main
+bundle's token set — which is why a sweep of the eager bundles could not have found it.
+
+### The counting rule, because the first figure had none
+
+An **endpoint shape** is one distinct **(HTTP method, path template)** pair. A path
+template is an inline literal beginning `/patient/csr`, or the chunk's `this.baseUrl`
+value concatenated with the template suffix of a `` this.http.<verb>(`${this.baseUrl}…`) ``
+call; `{…}` marks a runtime substitution and is part of the template. Counted **once**
+per distinct pair across the whole corpus. Three decisions move the number, so all three
+are stated:
+
+- **A ternary counts as BOTH branches.** `cond?`/a`:"/b"` is two templates.
+- **A bare `this.baseUrl` is a shape, not an exclusion.** It resolves to the base itself.
+- **A call whose first argument is a bare identifier is EXCLUDED** — the URL comes from
+  the caller. In the safety/notice service that is exactly `downloadFromUrl(t)` and
+  `uploadToS3(t)`, which take an absolute URL; counting them would inflate by two.
+- **A runtime slot's NAME is a minifier artefact** — the same slot is `{t}`, `{o}` and
+  `{c}` in three builds of one service — so slots are renumbered `{1}`, `{2}`, … by
+  position. Without this the three safety/notice chunks never deduplicate and the count
+  triples.
+
+> ⚠ **Corrected 2026-10-13, verification round 2.** The first version of this section
+> tabulated **12 endpoint literals across 7 chunks**. That was a **subset of this pass's
+> own `tables.txt` §T3** — chunk `5750` carries four `/patient/csr` offsets
+> (`[775, 855, 985, 1076]`) and the table named one — and **no counting rule existed to
+> produce it** (`AGENTS.md` §6 items 5 and 7). The error was conservative: it
+> under-counted a positive. The rule above is applied by `patient-csr.py` and yields the
+> figures below.
+
+| method | path template | chunk |
+|---|---|---|
+| `GET` | `/patient/csr/incidents` | `common.…js` |
+| `POST` | `/patient/csr/incidents` | `common.…js` |
+| `GET` | `/patient/csr/incidents/{id}` | `common.…js` |
+| `PUT` | `/patient/csr/incidents/{id}` | `common.…js` |
+| `GET` | `/patient/csr/incidents/configuration?region={region}` | `common.…js` |
+| `GET` | `patient/csr/users?{query}` — **relative, no leading slash** | `common.…js` |
+| `GET` | `/patient/csr/safety/notice/definitions` | `1635`, `8942`, `9807` |
+| `POST` | `/patient/csr/safety/notice/definitions` | the same three |
+| `PUT` | `/patient/csr/safety/notice/definitions/{id}` | the same three |
+| `GET` | `/patient/csr/safety/notice/definitions/{type}/file/url` | the same three |
+| `GET` | `/patient/csr/safety/notice/definitions/{type}/users` | the same three |
+| `GET` | `/patient/csr/safety/notice/definitions/{type}/users/csv` | the same three |
+| `POST` | `/patient/csr/safety/notice/definitions/{id}/notification/date` | the same three |
+| `GET` | `/patient/csr/configuration/whitelisted` | `5109.…js` |
+| `GET` | `/patient/csr/users/me/consent/history` | `6633.…js` |
+| `GET` | `/patient/csr/users/me/notifications/history` | `5750.…js` |
+| `GET` | `/patient/csr/users/me/notifications/history/patients/{id}` | `5750.…js` |
+| `GET` | `/patient/csr/users/me/notifications/history/export/csv` | `5750.…js` |
+| `GET` | `/patient/csr/users/me/notifications/history/patients/{id}/export/csv` | `5750.…js` |
+
+**19 method × path shapes · 16 distinct path templates · 10 raw `/patient/csr` literals
+in 7 chunks · 7 calls excluded as bare-identifier.**
+
+**How they are addressed: hard-coded constants, not config.** In the `common` chunk a
+service sets `this.baseUrl="/patient/csr"` in its constructor and calls
+`this.http.get(`${this.baseUrl}/incidents`)`. In the three `safety/notice` chunks one
+sets `this.baseUrl="/patient/csr/safety/notice/definitions"`. The remaining three inline
+the path. **No config key, no discovery field and no `baseUrl*` pointer is involved** —
+the opposite of the `csr/v2` display-message pointer, which arrives *through* config.
+This is why the sweep's central negative survives: the lazy chunks do not read the
+discovery document, and where they do carry API addresses they are constants.
+
+⚠ **Three distinctions a reader should not collapse.**
+
+1. **Literal ≠ live.** The code would call these paths; whether the routes are routed,
+   and with what status, is **UNOBSERVED in both directions**. Do not read this table as
+   a route inventory.
+2. **`/patient/csr/*` is a different namespace from `/connect/csr/*`.** The latter is
+   the cumulus plane's POST-only `csr/v2` display-message route, probed live on all
+   three cumulus hosts. The former is on the patient host and was **never probed**. The
+   shared `csr` segment is a naming coincidence at this repo's current state of
+   knowledge, **not** evidence that one resolves to the other.
+3. **`baseUrl` in the eager main bundle is a different token.** Area V's two `baseUrl`
+   hits are `this.baseUrl = getBaseCmsUrl()`, a CMS media base. These 30 chunk hits are
+   `this.baseUrl = "/patient/csr…"`. Same identifier, unrelated values — which is
+   exactly why the token needed reading rather than counting.
+
+**Reproduce with:** `python3 patient-csr.py <captures-dir> results.jsonl
+chunks-swept.txt`. It asserts the corpus count against the committed list and exits
+non-zero on disagreement. Output in `patient-csr.txt`, which prints the rule, every raw
+literal with its byte offset, every excluded call, and the resolved shapes
+[source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5, §4a].
