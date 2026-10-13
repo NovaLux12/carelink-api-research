@@ -785,10 +785,20 @@ line anchor in this file was re-resolved against this tree — **14 distinct
 | `docs/10:56`, the *other* live reading | resolves; it did **not** drift |
 | `c1-absent.h:18` (§13a) | the one deliberate non-resolution — it is the *wrong* cite §13a quotes in order to document the error. Left as written. |
 
-**No `docs/` or `README.md` page carries a line anchor into this log** — of the **12**
+**No `docs/` or `README.md` page carries a line anchor into this log** — of the **11**
 citations `docs/` and `README.md` make to this file, **0** are followed by a line
-number; all 12 name a `§` instead — so the drift is confined to this file and **no
-`docs/` repair was needed**.
+number; all 11 name a `§` instead — so the drift is confined to this file and **no
+`docs/` repair was needed**. **Counting rule, because the number is meaningless
+without one: a citation is one markdown link or bracket-quoted path pointing at this
+log, counted once even where it spells the path twice.** The path occurs **12** times
+across **10** lines; exactly **one** of those — `docs/10:45` — is the URL half of a
+link whose link text already carries it, so 12 − 1 = **11**. The anchor half is
+measured separately and is the load-bearing one:
+`grep -rnE 'commoncore-trials/FINDINGS\.md[:#]*[0-9]+' docs/ README.md` returns
+**nothing**. Nine of the 11 name a `§` straight after the path; `docs/11:36` names
+`§2a` on the following line (the line wrapped) and `docs/11:97` names it in the link
+text rather than after the path. Corrected 2026-10-13 — the derivation and the
+superseded wording are in §13l-4.
 
 #### 13l-2. "request block lines 1-7" pointed at the DNS/TLS preamble
 
@@ -810,13 +820,80 @@ names §12 lists — with `grep -ci origin` over lines 52-57 of all six returnin
 `GET`s, so they are not a preflight artefact and not an origin-dependent reflection —
 which is exactly the disposition §12 took, and it stands.
 
-#### 13l-3. The rebase left the four disputed CORS sites byte-unchanged
+#### 13l-3. The rebase left the five disputed CORS sites byte-unchanged
 
 The pointer drift above is a merge artefact, so the sites the merge was *supposed* to
 leave alone were re-checked rather than assumed: **`docs/00:166`, `docs/03:341`,
-`docs/10:56`, and the area X row** are byte-identical to `614db77` (md5 per site —
-and for the area X row that comparison is `614db77:858` against this branch's
-`docs/11:932`, since the rebase is what moved it). The merge is provably correct —
-`git merge-tree --write-tree 8373169 614db77` yields a tree byte-identical to this
-branch's — and **no pin crept into `regression/`**. What moved was a line number, not
-a byte of CORS prose.
+`docs/10:56`, `docs/06:156`, and the area X row** are byte-identical to `614db77` (md5
+per site — and for the area X row that comparison is `614db77:858` against this
+branch's `docs/11:932`, since the rebase is what moved it). `docs/06:156` was added
+to this inventory on 2026-10-13 after the round-5 verifier found it carrying the same
+CORS wording — "a \`GET\` of a discovery payload; 0 non-2xx responses carrying CORS
+anywhere" (md5 `863b149c2170ec6ad769534f75be8b08` at both refs) — it was simply missed
+the first time, so the inventory now names five byte-checked sites rather than four.
+The merge is provably correct — `git merge-tree --write-tree 8373169 614db77` yields a
+tree byte-identical to this branch's — and **no pin crept into `regression/`**. What
+moved was a line number, not a byte of CORS prose.
+
+#### 13l-4. "12 citations" counted string occurrences, not citations (2026-10-13)
+
+§13l-1's closing paragraph said *"of the **12** citations `docs/` and `README.md` make
+to this file, **0** are followed by a line number; all 12 name a `§` instead"*. **The
+superseded wording is quoted here rather than deleted.** `12` is the number of
+**occurrences of the log path as a string**, which is not the number of citations. The
+round-5 verifier counted the same 12 occurrences across the same 10 lines and found
+the discrepancy: **one of them is the URL of a markdown link whose link text already
+carries the path** — `docs/10:45`, `[findings-log/2026-10-13-commoncore-trials/FINDINGS.md §12](https://…/findings-log/2026-10-13-commoncore-trials/FINDINGS.md)`.
+Counted per citation it is **11**, and the corrected number is what §13l-1 now states.
+This is `AGENTS.md` §6 item 7 — a count generalised from a subset, with no counting
+rule recorded — except that here the subset was the whole corpus and the *unit* was
+wrong, which is the same failure wearing a different hat.
+
+**The counting rule, so the number can be re-derived rather than believed.** A
+**citation** is one markdown link or bracket-quoted path that points at this log, and
+it is counted **once** even where it spells the path twice (once in the link text,
+once in the URL). Both halves are checkable with no vendor request:
+
+```bash
+# 12 — occurrences of the path as a string, across 10 lines
+grep -rnoE 'commoncore-trials/FINDINGS\.md' docs/ README.md | wc -l
+# 1 — links that spell it twice; the single instance is docs/10:45
+grep -rnoE '\[[^][]*commoncore-trials/FINDINGS\.md[^][]*\]\([^)]*commoncore-trials/FINDINGS\.md[^)]*\)' \
+  docs/ README.md | wc -l
+# 0 — line anchors into this log: the load-bearing half, and it was already right
+grep -rnE 'commoncore-trials/FINDINGS\.md[:#]*[0-9]+' docs/ README.md   # no output
+```
+
+12 − 1 = **11 citations**. Enumerated, all 11 and each one's `§`:
+
+| site | `§` named |
+|---|---|
+| `docs/00:98` | after the path (`§3a, §2b`) |
+| `docs/01:71` | after the path (`§2a`) |
+| `docs/01:108` | after the path (`§3a`) |
+| `docs/01:109` | after the path (`§2a, §2b, §3b`) |
+| `docs/01:134` | after the path (`§2b, §5`) |
+| `docs/07:240` | after the path (`§2b, §5`) |
+| `docs/07:248` | after the path (`§2b, §3b`) |
+| `docs/10:45` (twice) | after the path (`§12`), and after the path (`§2a, §2b`) |
+| `docs/11:36` | **on the following line** — the line wraps, `§2a` sits at `:37` |
+| `docs/11:97` | **in the link text** — `[§12](…)`, the path appears only in the URL |
+
+**What did not change, and is the reason no `docs/` page was touched.** The two
+halves of the old sentence had different luck: the **"0 are followed by a line
+number"** half was already true and is independently CONFIRMED — the third command
+above returns nothing, so **no `docs/` page carries a stale line anchor into this
+log** and **no `docs/` repair was needed**; the **"all 12 name a `§`"** half was true
+of the set and wrong only about its size. Every one of the 11 names a `§`, which is
+why the conclusion the sentence exists to support stands unchanged.
+
+**Why the two non-obvious rows are spelled out rather than smoothed over.** A reader
+re-deriving "all 11 name a `§`" with a naive "does a `§` follow the path *on the same
+line*" test gets **9**, not 11, and would wrongly conclude the claim is false. `docs/11:36`
+wraps its `§2a` onto `:37`, and `docs/11:97` puts its `§12` in the link *text* with
+the path only in the URL. Both are recorded here so the next re-derivation does not
+have to rediscover them.
+
+**This correction moved no claim, no host, no status and no request.** The pass's
+9 of a 10 cap is untouched: `wc -l results.jsonl` = **9**, one live accounting line
+at `:505`, and §13f's `:654` still quotes the superseded wording it superseded.
