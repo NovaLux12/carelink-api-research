@@ -1,4 +1,4 @@
-import os, json, glob, datetime, sys
+import os, json, glob, datetime, sys, hashlib
 
 LOG = 'findings-log/2026-10-13-commoncore-trials'
 rows = {int(json.loads(l)['seq']): json.loads(l) for l in open(f'{LOG}/results.jsonl')}
@@ -16,7 +16,16 @@ for f in sorted(glob.glob(f'{LOG}/bodies/*.b')):
     mt[int(os.path.basename(f).split('-')[0])] = os.stat(f).st_mtime_ns / 1e9
 for f in sorted(glob.glob(f'{LOG}/headers/*.dns')):
     mt[int(os.path.basename(f).split('-')[0])] = os.stat(f).st_mtime_ns / 1e9
-mt[1] = os.stat(f'{LOG}/attempt1-aborted/01-ct-medtronic-cn.dns').st_mtime_ns / 1e9
+# seq 1's capture exists in two places: headers/ (copied out of the aborted run) and
+# attempt1-aborted/ (the aborted run's own copy). The glob above already picked up
+# the headers/ copy, so the old unconditional override silently preferred the second.
+# An unasserted silent preference is how two copies drift apart unnoticed — assert
+# they are identical, and fail loudly if they ever are not.
+_ab = f'{LOG}/attempt1-aborted/01-ct-medtronic-cn.dns'
+_hd = f'{LOG}/headers/01-ct-medtronic-cn.dns'
+if hashlib.md5(open(_ab, 'rb').read()).hexdigest() != hashlib.md5(open(_hd, 'rb').read()).hexdigest():
+    raise SystemExit(f'FATAL: seq 1 capture differs between {_ab} and {_hd} — '
+                     'the two copies have diverged; the mtime map would be arbitrary')
 recs = sorted(mt.items())
 
 print("The commoncore-trials pass — request spacing measurement")

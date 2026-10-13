@@ -468,9 +468,13 @@ not pinned, and the reason is this pass's own finding:**
 
 **What *is* pinnable, and is not pinned here either:** the DNS fact — three names
 under `medtronic.{com,eu}` CNAME to three distinct CloudFront distributions — is
-stable, but **pinning DNS would add three vendor hosts to the weekly drift sweep's
-request budget**, which crosses `AGENTS.md` §11's boundary for automation. That is a
-maintainer decision, not a research pass's side effect.
+stable, and a maintainer **can** pin it: `AGENTS.md` §11 requires that a new host
+enter a workflow "only after a human added it to the suite", which is precisely the
+step a maintainer would take. **This pass does not take it, because it cannot edit
+`regression/` as a side effect of a research finding** — and because pinning three
+new vendor hosts would change the weekly drift sweep's request budget, which is a
+cost the maintainer should see before it is incurred, not after. That is a
+disposition about *who* makes the call, not a claim that the call is forbidden.
 
 So: **the negative is recorded, unpinnable as a status assertion, and the
 maintainer may add a host-registration check deliberately.** Silence would have been
@@ -557,17 +561,18 @@ inside an unrelated PR. The science above stands; the record around it was fixed
 
 ### It bears directly on two open readings — and supplies the discriminating cell
 
-- `docs/09` §Oracle A carries the caution that CORS on an error is not the same as
-  CORS on a success, and `docs/09` §4's trap table carries the note that a `200`
-  carrying no preflight does exist on `clcloud.*`. **Six non-2xx responses carrying
-  `acao: *` is a fact those readings do not currently contain.**
+- The two live readings are **`docs/10:56`** (whether a `clcloud.*` `200` carries
+  `Access-Control-Allow-Origin`) and the closed area X row at **`docs/11:777`**
+  (its correction, which found a separating `200`-without-CORS cell in the corpus).
+  **Six non-2xx responses carrying `acao: *` is a fact neither reading currently
+  contains.**
 - The unexcluded reading — that CORS on this gateway family is **emitted only on
   `OPTIONS`** — is exactly what these cells speak to, because **these six are bare
-  `GET`s**: `sent_headers` on every row is `User-Agent: carelink-bridge-research/1.0`
-  and **no `Origin` header was sent at all** (zero `Origin` occurrences across the
-  `.v` traces). So this is **not** a preflight artefact and not an
-  origin-dependent reflection. **It is the discriminating cell that reading needs**,
-  and it cuts against it.
+  `GET`s**: the request block in each `.v` trace sent exactly `Host`,
+  `User-Agent`, `Accept` and `Accept-Encoding` and **no `Origin` header**
+  [e.g. `headers/09-ct-medtronic-ocl.v`, request block lines 1-7]. So this is **not**
+  a preflight artefact and not an origin-dependent reflection. **It is the
+  discriminating cell that reading needs**, and it cuts against it.
 
 Both readings are recorded; neither is adopted.
 
@@ -673,7 +678,7 @@ an uncited claim is a deleted claim in this repo. Cites added per signal.
 the single CNAME target; the three-distribution fact is stronger and is now recorded
 in both the log and `docs/01`.
 
-### 13i. Three smaller record defects
+### 13i. Four smaller record defects
 
 - **`probe.sh` could not populate its own DNS fields.** `grep -m1 'status:'` matched
   the dig header line, so `dns_status` held `;; ->>HEADER<<- opcode: QUERY` and
@@ -691,3 +696,49 @@ in both the log and `docs/01`.
   it is **not on the `AGENTS.md` §7 scrub list** — but area I's captures carry the
   same class of value on `main`, so this is a known pattern rather than a new leak.
   Recorded rather than left unexplained.
+
+### 13j. Two defects in §12, found by the round-2 verifier (2026-10-13)
+
+Both in the CORS section added above; **the conclusion is unchanged and neither is
+withdrawn** — only the support was wrong.
+
+1. **A parenthetical that failed its own check.** §12 read *"no `Origin` header was
+   sent at all (zero `Origin` occurrences across the `.v` traces)"*. **The claim is
+   true; the parenthetical is not.** Each `.v` trace has **exactly one**
+   case-insensitive `origin` hit — the response's own
+   `< access-control-allow-origin: *` [e.g. `headers/09-ct-medtronic-ocl.v:69`]. The
+   check as written could never have distinguished "no `Origin` sent" from "an
+   `Origin` arrived and was reflected", because it matched the response header
+   either way. That is `AGENTS.md` §6 item 2 — a check that reads as proof and is
+   not. **Replaced with the evidence that actually discriminates**: the request block
+   itself, which sent exactly `Host`, `User-Agent`, `Accept`, `Accept-Encoding`.
+2. **Two `docs/09` attributions named the wrong document.** §12 credited `docs/09`
+   with "the caution that CORS on an error is not the same as CORS on a success" and
+   with a note that "a `200` carrying no preflight does exist on `clcloud.*`".
+   **`docs/09` says "preflight" exactly once** (line 74, unrelated to CORS) and
+   carries no such caution. **Both readings live in `docs/10:56` and `docs/11:777`**
+   and the citations now say so — `AGENTS.md` §6 item 6.
+
+### 13k. One verifier claim upheld, one corrected (2026-10-13)
+
+**Upheld — the EU same-host pair does not violate the floor.** Round 1 held it did,
+at 1.857 s. Round 2 re-derived all three readings and upheld this pass's withdrawal:
+
+| reading of seq 6→7 | value | verdict |
+|---|---|---|
+| mtime → mtime | **2.638 s** | PASS |
+| `t_queued` → `t_queued` | **2.751 s** | PASS |
+| `t_sent` → `t_sent` | 1.857 s | FAIL — corrupt row, artefact only |
+
+**Round 1's own "mtime → mtime" figure of 2.757 s was the seq 7→8 gap** — a cell it
+structurally could not compute, so it quoted a borrowed one. This pass's `spacing.py`
+now *computes* the EU pair from one mtime map over all nine captures, which is the
+difference between measuring it and filtering it out.
+
+**Corrected — my §11 objection to the DNS pin was slightly overstated.** This pass
+wrote that adding DNS to the suite "crosses `AGENTS.md` §11's boundary for
+automation". More precisely: §11 says a new host enters a workflow **"only after a
+human added it to the suite"**, which is exactly what a maintainer would do to pin
+it. **The disposition is unchanged — a pass that cannot edit `regression/` should not
+make that edit as a side effect — but the reasoning under it is tightened here**, and
+the maintainer's route is named rather than implied to be forbidden.
