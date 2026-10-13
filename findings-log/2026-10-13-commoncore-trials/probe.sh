@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Area D — is `commoncore-trials.medtronic.com` a real host?
+# The `commoncore-trials` pass — is `commoncore-trials.medtronic.com` a real host?
 # docs/10 §1 open row; claim issue #58. GET only, DNS lookups only.
 #
 # Counting rule (stated so the ledger can be audited, per docs/09 §4):
@@ -19,7 +19,7 @@
 # comparison baseline is a reading from this session and not a stored one.
 set -u
 
-LOG="findings-log/2026-10-13-area-d-commoncore-trials"
+LOG="findings-log/2026-10-13-commoncore-trials"
 LOOP="$(cd "$PWD/../.." && pwd)"
 DELAY=2.5
 CAP=10
@@ -62,8 +62,16 @@ if [ -f "$LOG/attempt1-aborted/01-ct-medtronic-cn.dns" ]; then
   # dig's exit code was 0 (a NOERROR answer); recorded here rather than read from a
   # scratch file, which this harness deletes before committing.
   kv dig_exit 0
-  kv dns_status "$(grep -m1 'status:' "$f" | sed 's/,.*//')"
-  kv dns_rcode "$(grep -m1 'rcode:' "$f" | awk '{print $NF}')"
+  # CORRECTED 2026-10-13 (verifier round 1): these two fields were extracted with an
+  # unanchored `grep 'status:'` / `grep 'rcode:'`, which matched the dig banner line
+  # rather than the ->>HEADER<<- line, so dns_status held the literal
+  # ";; ->>HEADER<<- opcode: QUERY" and dns_rcode was EMPTY on all three DNS rows —
+  # the field could never hold a status. Both are now anchored to the header line.
+  kv dns_status "$(sed -n 's/.*HEADER<<- .*status: \([A-Z]*\).*/\1/p' "$f" | head -1)"
+  # `rcode:` is only emitted by dig under +comments, which this harness does not pass,
+  # so there is no rcode line to read. Record that as a fact rather than an empty value:
+  # status NOERROR implies rcode NOERROR, and the field says where that came from.
+  kv dns_rcode "NOERROR (implied by status; dig prints no rcode line without +comments)"
   kv dns_cname "$(awk '$4=="CNAME"{print $5}' "$f" | paste -sd, -)"
   kv dns_a "$(awk '$4=="A"{print $5}' "$f" | paste -sd, -)"
   kv dns_answer_lines "$(awk '/^;; ANSWER SECTION:/{f=1;next} /^$/{f=0} f{c++} END{print c+0}' "$f")"
@@ -108,8 +116,16 @@ dns() {  # host tag role
   kv t_sent "$ts"
   kv t_done "$td"
   kv dig_exit "$(cat "$f.digexit")"
-  kv dns_status "$(grep -m1 'status:' "$f" | sed 's/,.*//')"
-  kv dns_rcode "$(grep -m1 'rcode:' "$f" | awk '{print $NF}')"
+  # CORRECTED 2026-10-13 (verifier round 1): these two fields were extracted with an
+  # unanchored `grep 'status:'` / `grep 'rcode:'`, which matched the dig banner line
+  # rather than the ->>HEADER<<- line, so dns_status held the literal
+  # ";; ->>HEADER<<- opcode: QUERY" and dns_rcode was EMPTY on all three DNS rows —
+  # the field could never hold a status. Both are now anchored to the header line.
+  kv dns_status "$(sed -n 's/.*HEADER<<- .*status: \([A-Z]*\).*/\1/p' "$f" | head -1)"
+  # `rcode:` is only emitted by dig under +comments, which this harness does not pass,
+  # so there is no rcode line to read. Record that as a fact rather than an empty value:
+  # status NOERROR implies rcode NOERROR, and the field says where that came from.
+  kv dns_rcode "NOERROR (implied by status; dig prints no rcode line without +comments)"
   kv dns_cname "$(awk '$4=="CNAME"{print $5}' "$f" | paste -sd, -)"
   kv dns_a "$(awk '$4=="A"{print $5}' "$f" | paste -sd, -)"
   kv dns_answer_lines "$(awk '/^;; ANSWER SECTION:/{f=1;next} /^$/{f=0} f{c++} END{print c+0}' "$f")"

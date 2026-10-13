@@ -1,0 +1,70 @@
+The commoncore-trials pass — request spacing measurement
+Date: 2026-10-13. Declared delay 2.5 s, emitted INSIDE the per-host flock.
+
+ORACLE: kernel-set body-file mtimes at nanosecond resolution (clock-independent),
+per docs/09 section 4, cross-checked against the harness `date` series.
+
+COUNTING RULE (all-rows series): one gap per consecutive pair in request order
+across all 9 captures carrying an mtime (6 HTTP bodies + 3 dig captures)
+= 8 gaps.
+
+COUNTING RULE (same-host series): one gap per consecutive pair WITHIN a host,
+over the same mtime map, in request order. Every host with two or more captures
+contributes its pairs; a host with one capture contributes none. The EU host's
+pair is DNS->GET, so it is only visible if dig captures are in the series.
+
+from   to      gap_s
+   1    2    101.113
+   2    3      2.678
+   3    4      2.833
+   4    5      2.840
+   5    6      2.780
+   6    7      2.638
+   7    8      2.757
+   8    9      2.699
+
+FLOOR  2.638 s     MAX 101.113 s     SPAN 120.339 s
+under the declared 2.5 s: 0
+under the repo floor 2 s: 0
+
+SAME-HOST GAPS — every pair, including DNS->GET pairs (the rule is per host):
+  commoncore-trials.medtronic.com  seq 1->8  117.640 s   [DNS -> GET]
+  commoncore-trials.medtronic.com  seq 8->9    2.699 s   [GET -> GET]
+  commoncore.medtronic.com         seq 3->4    2.833 s   [DNS -> GET]
+  commoncore.medtronic.com         seq 4->5    2.840 s   [GET -> GET]
+  commoncore.medtronic.eu          seq 6->7    2.638 s   [DNS -> GET]
+  same-host floor: 2.638 s over 4 hosts
+
+  CORRECTION (2026-10-13, verifier round 1): an earlier version of this file
+  built the SAME-HOST series from `bodies/*.b` alone, so no DNS row could enter
+  a pair and the EU host's DNS->GET pair was structurally unprintable. It
+  printed 'these are all larger' on a filtered subset — a false clean bill for
+  anyone re-running it. Both series now derive from one mtime map.
+  NOTE the earlier claim that the hidden EU pair VIOLATED the floor: it does
+  not. This mtime series reads 2.638 s, which passes. The 1.857 s figure comes
+  from the corrupt seq-6 date row (DISCLOSURE 1) and is an artefact of the
+  broken clock, not of the spacing.
+
+DISCLOSURE 1 — the date series has a broken row.
+  seq 6: t_done - t_sent = -0.668 s  IMPOSSIBLE (dig had exited before the date)
+  In the date series the seq6->seq7 gap reads 1.857 s, apparently below the
+  >=2 s floor. The mtime series for the same pair reads 2.638 s, which PASSES.
+  The apparent violation is an artefact of that broken row, not a spacing failure.
+
+DISCLOSURE 2 — series validation (docs/09 section 4 requires this).
+  harness span (seq2 t_queued -> seq9 t_done) = 22.230 s
+  mtime   span (seq2 body      -> seq9 body)   = 19.226 s
+  difference                                      = 3.004 s
+  NOT the 'collapsed spread' signature of an untrustworthy series: the difference is
+  the two endpoints that do not coincide (in-lock sleep + connect before the first
+  body write; curl teardown after the last). Per request:
+    seq 2: mtime - t_sent = +0.495 s
+    seq 4: mtime - t_sent = +0.301 s
+    seq 5: mtime - t_sent = +0.283 s
+    seq 7: mtime - t_sent = +0.108 s
+    seq 8: mtime - t_sent = +0.192 s
+    seq 9: mtime - t_sent = +0.144 s
+  All six HTTP rows positive and inside 0.1-0.5 s -> the two series AGREE.
+
+NOTE: an earlier draft of this check printed a 'residual unexplained: 0.000 s'
+line. That was a telescoping identity and evidence of nothing; it is not here.

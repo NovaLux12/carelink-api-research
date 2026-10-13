@@ -24,16 +24,16 @@ everything else on this page moves.
 | Report bodies from `commoncore` | a clinician-scoped token |
 | Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
 
-#### Addendum (2026-10-13, from area D): the `commoncore` 403s are the gateway's *no-route* error, so "six endpoints on `commoncore.medtronic.{eu,com}`" is unproven
+#### Addendum (2026-10-13, from the `commoncore-trials` pass): the `commoncore` 403s are the gateway's *no-route* error, so "six endpoints on `commoncore.medtronic.{eu,com}`" is unproven
 
 Attached to the `Report bodies from commoncore` row above, which is the claim this
-actually refines. Area D closed the `docs/10` §1 row **"is
+actually refines. The `commoncore-trials` pass closed the `docs/10` §1 row **"is
 `commoncore-trials.medtronic.com` a real host?"**; closing it produced this.
 
 **What is known (labels and cites).** `commoncore-trials.medtronic.com` **is** a
 real host: CNAME to a CloudFront distribution, a host-specific DigiCert leaf whose
 SAN matches the name, a gateway-shaped `403` — three signals a parked name cannot
-produce (OBSERVED, [findings-log/2026-10-13-area-d-commoncore-trials/FINDINGS.md]
+produce (OBSERVED, [findings-log/2026-10-13-commoncore-trials/FINDINGS.md]
 §2a). The trials deployment's **config** points `nutrino.cc.broker.service.config.host`
 at the **`.minimed.com`** sibling while its **CSP** allows the **`.medtronic.com`**
 one, so two vendor documents name two different trials hosts (OBSERVED, same log
@@ -42,25 +42,35 @@ one, so two vendor documents name two different trials hosts (OBSERVED, same log
 
 **What was NOT established, and why it matters.** These hosts are AWS API Gateway
 behind CloudFront, where `MissingAuthenticationTokenException` **is the
-unmatched-route error** — `404` is never emitted and a fabricated path returns the
-published response byte-for-byte
-([docs/09-methodology-and-oracles.md](09-methodology-and-oracles.md) Oracle A).
-Area D confirmed it directly: `/reports-broker/v1/ocl` and
-`/reports-broker/v1/ocl-probe-absent` returned the **same status, error type and
-body digest** (`f249b63c…`, 42 B) on **two** hosts — six GETs, **one** distinct body
-(OBSERVED, same log §2b, §5). **So `docs/07`'s "all **403**" on the six
-`commoncore.medtronic.{eu,com}` endpoints is a statement about the gateway, not
-evidence that six endpoints are served.** The six paths are still the vendor's own
-config values; the *status* is what was being over-read. This matters because the
-row above assumes a reports surface exists to authenticate against — and on this
-host family that assumption is currently **unproven in both directions**.
+unmatched-route error** and a fabricated path returns the published response
+byte-for-byte ([docs/09-methodology-and-oracles.md](09-methodology-and-oracles.md)
+Oracle A — whose "**`404` is never emitted**" clause is **INFERRED by analogy from
+`clcloud.*`**, that page scoping it to `clcloud.*` plus the five `execute-api`
+gateways; `AWS-GATEWAYS.md` names no `commoncore` host, and this pass observed **no
+`404` in either direction**).
+The `commoncore-trials` pass confirmed the control directly:
+`/reports-broker/v1/ocl` and `/reports-broker/v1/ocl-probe-absent` returned the
+**same status, error type and body digest** (`f249b63c…`, 42 B) — six GETs,
+**one** distinct body (OBSERVED, same log §2b, §5). **So `docs/07`'s "all **403**"
+on the six `commoncore.medtronic.{eu,com}` endpoints is a statement about the
+gateway, not evidence that six endpoints are served.** The six paths are still the
+vendor's own config values; the *status* is what was being over-read. This matters
+because the row above assumes a reports surface exists to authenticate against —
+and on this host family that assumption is currently **unproven in both directions**.
+
+**Adjudicated on `.com` only.** The absent-path control was run on
+`commoncore.medtronic.com` (seq 4 vs 5) and **not** on `commoncore.medtronic.eu`, so
+the `.{eu,com}` brace is **not** one adjudicated pair and the EU cell is
+corroboration. The EU control **did** fit the budget — what spent the slot was the
+pass's own unspent re-issue reserve (same log §5, §9), not the cap.
 
 **Blocker:** a clinician-scoped token, **and** a path whose `403` means something
 other than "no route". The second half is the real obstacle: it needs either a
 `401`/`400`/`405` cell (the [carelink plane](00-summary-the-map.md) supplies those,
 `commoncore` does not) or one authenticated request. **This is a token question, not
-a request-budget question** — area D closed the whole unauthenticated half in
-**9 of a 10 cap**.
+a request-budget question** — the `commoncore-trials` pass spent **9 of a 10 cap**
+and closed the *host-existence* half plus the no-route control; it did **not** close
+the route question or the EU cell, and both remain open.
 
 **Closes when:** one authenticated `GET /reports-broker/v1/ocl` on any `commoncore`
 host returns a status that is **not** `MissingAuthenticationTokenException` — which
@@ -74,8 +84,17 @@ are Medtronic-operated rather than third-party-hosted — the issuer and SAN are
 OBSERVED, the ownership is inferred from the vendor naming the host in its own CSP;
 and that the config/CSP split on the trials deployment is deliberate rather than a
 stale config entry, which **nothing observed here distinguishes**. The EU cell in
-area D's pass carries **no absent-path control** (the cap did not allow it), so it
+the `commoncore-trials` pass carries **no absent-path control**, so it
 is corroboration rather than an adjudicated reading.
+
+**⚠ An open question this pass raised and could not close.** Its six `403`s all
+carry **`access-control-allow-origin: *`** on bare `GET`s with **no `Origin` sent**.
+That bears directly on the closed area X row above and on the "CORS is emitted only
+on `OPTIONS`" reading — these are exactly the discriminating cells, and they cut
+against it. It is **not** corrected here: correcting a closed area is a disclosure
+decision. Carried by [issue #61](https://github.com/NovaLux12/carelink-api-research/issues/61)
+and recorded in the pass log
+[§12](https://github.com/NovaLux12/carelink-api-research/blob/main/findings-log/2026-10-13-commoncore-trials/FINDINGS.md).
 
 ---
 

@@ -1,0 +1,693 @@
+# The `commoncore-trials` pass — is `commoncore-trials.medtronic.com` a real host?
+
+**The `docs/10` §1 open row**, not a lettered `docs/11` area. Claim issue **#58**.
+**Date:** 2026-10-13. **Method:** GET only, plus DNS resolution lookups.
+
+**9 requests of a 10 cap.** GET only (6 HTTP GETs) and DNS `A` lookups (3), ≥2.5 s
+declared and 2.5 s emitted **inside** a per-host `flock` on `.loop/host-<hostname>.lock`.
+One request was held in reserve and **not** spent; §9 says why that reserve mattered —
+and, corrected 2026-10-13, what it cost.
+
+> **Counting rule, stated so the ledger can be audited:** one request = one DNS lookup
+> **or** one HTTP GET, counted where this harness invoked it. DNS is counted here
+> though the repo's only precedent — area A — does not count it (§13e), so **under
+> that rule this pass would account as **6 requests against the same 10 cap**. This
+> direction is the conservative one; the divergence is recorded rather than hidden.
+
+**Verdict in one line: the host is REAL — it resolves, terminates TLS on a Medtronic
+certificate, and answers — but the probe does not establish that it serves the
+reports-broker route, because on this host family the `403` is the *unmatched-route*
+oracle and a fabricated path is byte-identical to the real one.**
+
+> ⚠ **Run stopped 2026-10-13 (verifier round 1).** This pass's own committed
+> artefacts contain **six 403s carrying `access-control-allow-origin: *`**, which
+> bears on **closed area X**. That is a disclosure decision about a published closed
+> area, not a research pass's to settle, so the `docs/` CORS prose is untouched here
+> and the question is handed to **correction issue #61**. See the dated correction in
+> §12 and the record fixes in §13.
+
+---
+
+## 1. What the row actually asked, and what this pass can settle
+
+The row was worth closing because the naming was OBSERVED and the existence was
+INFERRED. The naming is now double-sourced from two independent passes, read off
+the disk rather than re-fetched:
+
+```
+connect-src 'self' https://api-js.mixpanel.com https://*.amazonaws.com
+wss://ws-mt1.pusher.com *.pusher.com cdn.jsdelivr.net google.com gstatic.com
+fonts.googleapis.com fonts.gstatic.com https://clcloud-trials.minimed.com
+https://commoncore-trials.minimed.com https://commoncore-trials.medtronic.com
+```
+
+Verbatim `connect-src`, from the header `carelink-trials.minimed.com` served:
+[findings-log/2026-10-12-area-o-reports-namespace/headers/carelink-trials-minimed-com--c1-absent.h:12][source: findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md §6c]
+and byte-for-byte the same line in **a second, independent pass** — area E's
+`carelink-trials.minimed.com` sweep of 2026-10-13, the same day as this one:
+[findings-log/2026-10-13-area-e-perkey-deployments/headers/carelink-trials.minimed.com--003-bulk-public.h:15].
+
+> ⚠ **Corrected 2026-10-13 (verifier round 1):** the first cite read `:18`. **That
+> file has 15 lines and the CSP header is on line 12.** Both reads of the CSP line are
+> correct as values; only the anchor was wrong. `research-checks.py` validates cite
+> *paths*, not line anchors, which is why this passed the gate.
+
+So `https://commoncore-trials.medtronic.com` is in the vendor's own client allowlist.
+That was already OBSERVED and this pass did not re-establish it. What this pass
+attacks is the other half: **does the host exist, and does it serve?**
+
+---
+
+## 2. The host set, as measured this session
+
+Nine requests. `*` marks a control. Every cell is OBSERVED 2026-10-13.
+
+| seq | host | DNS | TLS | path | status | `x-amzn-errortype` | body sha256 | source |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `commoncore-trials.medtronic.com` | **CNAME `d16wbx60y036c9.cloudfront.net`** → 4 A | — | — | — | — | — | `headers/01-ct-medtronic-cn.dns` |
+| 2* | `commoncore-trials.minimed.com` | — | DigiCert, SAN match, exp 2027-01-23 | `/reports-broker/v1/ocl` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/02-ct-minimed-sibling.{h,v}` |
+| 3 | `commoncore.medtronic.com` | CNAME `d2te4je11hig0i.cloudfront.net` → 4 A | — | — | — | — | — | `headers/03-cc-medtronic-com-cn.dns` |
+| 4* | `commoncore.medtronic.com` | — | DigiCert, SAN match, exp 2027-04-03 | `/reports-broker/v1/ocl-probe-absent` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/04-cc-medtronic-com-absent.{h,v}` |
+| 5 | `commoncore.medtronic.com` | — | DigiCert, SAN match | `/reports-broker/v1/ocl` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/05-cc-medtronic-com-ocl.{h,v}` |
+| 6 | `commoncore.medtronic.eu` | CNAME `d28ymzlhgkylij.cloudfront.net` → 4 A | — | — | — | — | — | `headers/06-cc-medtronic-eu-cn.dns` |
+| 7 | `commoncore.medtronic.eu` | — | DigiCert, SAN match, exp 2027-04-03 | `/reports-broker/v1/ocl` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/07-cc-medtronic-eu-ocl.{h,v}` |
+| 8* | `commoncore-trials.medtronic.com` | — | DigiCert, SAN match, exp 2027-01-23 | `/reports-broker/v1/ocl-probe-absent` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/08-ct-medtronic-absent.{h,v}` |
+| 9 | `commoncore-trials.medtronic.com` | — | DigiCert, SAN match, exp 2027-01-23 | `/reports-broker/v1/ocl` | **403** | `MissingAuthenticationTokenException` | `f249b63c…` | `headers/09-ct-medtronic-ocl.{h,v}` |
+
+**All three DNS lookups returned `NOERROR`** (rcode `NOERROR`), each with a 5-line
+answer section [the three `.dns` captures]. Recorded from the captures rather than
+from the ledger's own fields, because those fields are defective — see §13i.
+
+**Six GETs produced exactly one distinct response body.** Not "similar" — one
+digest, `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`, 42 B,
+`{"message":"Missing Authentication Token"}`.
+
+### 2a. The host exists — and is not a parked name
+
+This is the half the row could not previously state. Three independent signals,
+each of which a parking namespace fails (OBSERVED). **Sources added 2026-10-13
+(verifier round 1)** — the signals were originally stated with no `file:line` cite
+at all, which in this repo is a deleted claim (§13h):
+
+1. **Resolution.** `commoncore-trials.medtronic.com` is a **CNAME to a CloudFront
+   distribution** (`d16wbx60y036c9.cloudfront.net`, 4 A records in
+   `3.166.65.0/24`), not an A record at a parking operator
+   [headers/01-ct-medtronic-cn.dns; `results.jsonl` seq 1]. `medtronic.com` is not
+   on the repo's wildcard-parking list — that list is `*.carelink.{eu,com}` and
+   `*.clcloud.eu` [AGENTS.md §7] — but "not on the list" is an argument from
+   absence, so the CNAME is what settles it, and it settles it positively.
+2. **TLS.** A **DigiCert Global G2** leaf certificate whose SAN matches the host
+   exactly, `start date: Jul 9 2026`, `expire date: Jan 23 2027`, TLS 1.3
+   [headers/09-ct-medtronic-ocl.v]. A parked name gets a certificate from whoever
+   operates the parking service; a host-specific certificate issued to this exact
+   name is a deliberate act.
+3. **A vendor-shaped HTTP answer**, not a redirect to a sales page: HTTP/2 403 with
+   `x-amz-apigw-id`, `x-amzn-requestid`, `x-cache: Error from cloudfront`, and a
+   `via` chain of two CloudFront hops [headers/09-ct-medtronic-ocl.h].
+
+> **The strongest anti-wildcard datum, added 2026-10-13 (verifier round 1):** the
+> three names probed under `medtronic.{com,eu}` CNAME to **three *different* CloudFront
+> distributions** — `d16wbx60y036c9` (trials `.medtronic.com`),
+> `d2te4je11hig0i` (`.medtronic.com`), `d28ymzlhgkylij` (`.medtronic.eu`)
+> [headers/01-ct-medtronic-cn.dns, headers/03-cc-medtronic-com-cn.dns,
+> headers/06-cc-medtronic-eu-cn.dns]. **A wildcard-parked zone cannot do that**,
+> because a wildcard resolves through one mechanism to one destination; three
+> distinct, independently-issued distributions is what per-deployment provisioning
+> looks like. This is a stronger argument than the single CNAME target it replaces:
+> the single CNAME shows *a* CDN, the three show *per-deployment* CDN.
+
+**INFERRED, and stated as such:** that the certificate and distribution are
+Medtronic-operated rather than third-party-hosted. The issuer chain and the SAN
+are OBSERVED; the ownership of the distribution is an inference from the vendor
+naming it in its own CSP plus the certificate matching.
+
+### 2b. What the probe does **not** establish — and cannot
+
+**The `403` here is not a route match.** `/reports-broker/v1/ocl` and
+`/reports-broker/v1/ocl-probe-absent` return the **same status, the same error
+type and the same body digest** on `commoncore-trials.medtronic.com` (seq 8 vs 9)
+and on `commoncore.medtronic.com` (seq 4 vs 5). Under Oracle A — the AWS API
+Gateway family — `MissingAuthenticationTokenException` **is** the unmatched-route
+error, `404` is never emitted, and a certainly-absent control is byte-identical to
+the published root [docs/09 §2; findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md §0, §2].
+
+> ⚠ **Corrected 2026-10-13 (verifier round 1) — "404 is never emitted" is INFERRED by
+> analogy, not observed here.** Oracle A is scoped in `docs/09` to `clcloud.*` and the
+> five `*.execute-api.*.amazonaws.com` gateways, and `AWS-GATEWAYS.md` names **no
+> `commoncore` host** (`grep -ni commoncore` → 0 hits), so that pass probed no
+> `*.medtronic.com` report broker. **This pass observed no `404` in either direction**
+> — all six requests answered `403`. The clause is INFERRED from the `clcloud.*`
+> family. **Nothing in this pass's conclusion depends on it**: the finding rests on
+> the byte-identical absent-path control, which needs no claim about the `404`
+> vocabulary at all.
+
+So the honest reading is the one the controls force:
+
+> **The `403` on `commoncore-trials.medtronic.com` is indistinguishable from the
+> `403` on a path I made up. It therefore proves the host answers HTTP; it does
+> not prove `/reports-broker/v1/ocl` is routed there.**
+
+Had I probed the one path and reported "403 = live, token-gated", that would have
+been AGENTS.md §6 item 2 — a hit read as more than it proves. The controls are
+what make the negative defensible.
+
+**Consequence for `docs/07` and `docs/01`.** Both record
+`commoncore.medtronic.{eu,com}` as **"403 unauthenticated on every route probed"**
+and read that as the routes existing [docs/01-hosts-and-estate.md:134;
+docs/07-admin-portal-and-reporting.md:209-215]. Seq 4 shows that reading does not
+hold: a fabricated sibling path on that host returns the identical body. **The
+`403` on `commoncore.medtronic.*` is the no-route error, so those pages' "all 403"
+is a statement about the gateway, not about six endpoints.** This does not
+contradict the pages' *values* — the six paths are still the paths the vendor's own
+config names — but it changes what the `403` is evidence *of*, and `docs/07` uses
+it as evidence of existence.
+
+---
+
+## 3. ⚠ Two recorded claims this pass contradicts — both readings retained
+
+Per AGENTS.md §2, where sources disagree, **give both**. Neither original is deleted.
+
+### 3a. The recorded `502` is gone — the sibling now answers `403`
+
+**Recorded (OBSERVED, 2026-08):** `commoncore-trials.minimed.com` → **502**,
+`text/html`, "backend down" [findings-log/probe-2026-10-08/recon/CONFIG-NAMESPACE-DEEP.md:252],
+carried into [docs/01-hosts-and-estate.md:108] and into area O's CSP note
+[findings-log/2026-10-12-area-o-reports-namespace/FINDINGS.md §6c].
+
+**This session (OBSERVED, 2026-10-13):** the same host, the same path
+`/reports-broker/v1/ocl` → **403**, `application/json`,
+`MissingAuthenticationTokenException`, 42 B (seq 2).
+
+Both stand as written. The 502 was real when recorded; **whether the change is
+recovery or a gateway reconfiguration is INFERRED and unresolved.** The direction
+that matters is the same either way: the host now reaches an API Gateway rather
+than failing to resolve an origin, so **area O's reading of the 502 as "an
+origin-side DNS failure, not absence" no longer describes this host today.**
+
+`docs/00`'s row — `commoncore.medtronic.{eu,com}` "still live at path but
+**CloudFront 502**" [docs/00-summary-the-map.md:98] — is contradicted the same way
+and the same day: seq 5 and seq 7 return **403**, not 502, on the identical path.
+
+### 3b. `docs/07`'s brace was missing a case
+
+`docs/07` writes the bases as `https://commoncore.medtronic.{eu,com}/…`
+[docs/07-admin-portal-and-reporting.md:209-210]. The trials deployment has its own
+pair, and its **config names the `.minimed.com` half** —
+`nutrino.cc.broker.service.config.host` =
+`https://commoncore-trials.minimed.com/reports-broker/v1`
+[findings-log/2026-10-12-published-pointers/enumeration-scrubbed.txt:217] — while
+its **CSP names the `.medtronic.com` half**
+[area O §6c, above].
+
+So on the trials deployment the vendor names **two different hosts in two different
+documents**: the config points at `commoncore-trials.minimed.com`, the CSP allows
+`commoncore-trials.medtronic.com`. Both are real and both answer `403` (seq 2, seq 9).
+
+**INFERRED:** that the config/CSP split is deliberate — a second reports host
+reserved for a subset of deployments — rather than a stale config entry. Nothing
+observed here distinguishes the two. The alternatives are not separable without a
+request no pass is authorised to make.
+
+---
+
+## 4. Naming convention that justified the candidate list
+
+Three hosts, one path, each with a source. Nothing was guessed and nothing was
+brute-forced:
+
+| candidate | where the name comes from |
+|---|---|
+| `commoncore-trials.medtronic.com` | the CSP `connect-src` served by `carelink-trials.minimed.com` (read, not derived) |
+| `commoncore-trials.minimed.com` | the recorded sibling, and the trials deployment's own config value (§3b) |
+| `commoncore.medtronic.{eu,com}` | the brace in `docs/07`, probed to check whether the trials case was missing |
+
+Paths: `/reports-broker/v1/ocl` is **the path this repo already records for exactly
+this host family** (`docs/01:134`, `docs/07:209-210`, and the trials config value
+above), so it is a vendor-named path, not an invented one. The control path is that
+value with `-probe-absent` appended — same prefix, guaranteed-absent tail.
+
+---
+
+## 5. Controls — sent, and what each one actually proved
+
+Controls went **first on every host** (AGENTS.md §8), so no verdict is
+contaminated by the data it judges.
+
+| # | seq | control | what it proved |
+|---|---|---|---|
+| b | 2 | `commoncore-trials.minimed.com` on the identical path, **the first HTTP request sent** | anchored the recorded `502` to this session — and showed it has become a `403` (§3a) |
+| a | 8 | `commoncore-trials.medtronic.com` → `/reports-broker/v1/ocl-probe-absent` | **the load-bearing one.** It showed this origin answers a fabricated path *identically* to the real one, so the real one's `403` is not evidence of a route |
+| a' | 4 | `commoncore.medtronic.com` → same absent path | the same test on the sibling, confirming the no-route reading is a property of the family and not of one host |
+
+**The EU cell (seq 7) has no absent-path control** — the cap did not allow a fourth
+pair. So seq 7 is **corroboration, not an adjudicated reading**, and is labelled as
+such wherever it is cited. This is the one gap in the pass and it is stated rather
+than papered over.
+
+> ⚠ **Corrected 2026-10-13 (verifier round 1) — the cause of that gap was wrong.**
+> As originally written this read "the cap did not allow a fourth pair", implying the
+> cap forced it. **It did not.** The 10-cap could have covered a fourth pair — the
+> arithmetic lands on exactly 10 of 10. What actually spent the slot was **my own
+> self-imposed reserve**, held back to re-issue a gateway failure (§9), which was then
+> never needed because no request returned one. §9 and this section did not connect,
+> and the original sentence put the blame on the budget rather than on the choice.
+> The gap is a **sequencing choice under an unused reserve**, not a cap constraint,
+> and the correction matters because a future pass reading this should spend the slot
+> on the EU control rather than assume it is unaffordable.
+>
+> The consequence is unchanged and still stands: **the no-route reading is adjudicated
+> on `.com` only** (seq 4 vs 5). `commoncore.medtronic.eu`'s single `403` is
+> corroboration, and any prose presenting the pair `commoncore.medtronic.{eu,com}` as
+> one adjudicated unit over-reads the EU half. That limit is now carried into
+> `docs/01` and `docs/07` rather than living only here.
+
+---
+
+## 6. Oracle discipline: is the status code an oracle here?
+
+Tested, not assumed. On `clcloud.*` the `403` line is uniform and useless
+[docs/09 §2]; the question for this family was whether the same is true here.
+
+**Result: it is.** All six GETs — two hosts, real and fabricated paths — return one
+body digest. The gateway headers (`x-amz-apigw-id`, `x-amzn-errortype`) place these
+hosts in the **AWS API Gateway family**, where per Oracle A the `403` is the
+inverted no-route error. So:
+
+- the `403` **can** confirm a negative (no route, or no route reachable by GET);
+- the `403` **cannot** confirm a positive — exactly the inversion `docs/09 §2`
+  documents for `clcloud.*`, now shown to hold for the `commoncore.medtronic.*`
+  family as well.
+
+`content-type` was used to discriminate throughout (`application/json` + 42 B, never
+the `text/html` SPA fallback), and `--compressed` was sent on every request.
+
+---
+
+## 7. Spacing — measured, with the oracle stated
+
+**Declared 2.5 s, emitted inside the per-host lock. Measured floor: 2.699 s**, from
+the **kernel-set body-file mtimes at nanosecond resolution** — the clock-independent
+series `docs/09 §4` requires — cross-checked against the harness `date` series.
+
+Counting rule (stated so the number is reproducible): one gap per consecutive pair in
+request order across **all 9 captures that carry an mtime** (6 HTTP bodies + **3**
+`dig` captures), giving **8 gaps**.
+
+> ⚠ **Corrected 2026-10-13 (verifier round 1).** The original rule counted **7**
+> captures and **6** gaps, because the same-host series in `spacing.py` iterated
+> `bodies/*.b` only — so no DNS row could enter a pair. The three `dig` captures
+> carry mtimes like any other capture and belong in the series. **The floor moved
+> from 2.699 s to 2.638 s** and the series from 6 gaps to 8. Both series now derive
+> from one mtime map, and the same-host counting rule is stated in the output the
+> way the all-rows rule is.
+
+| gap | seconds |
+|---|---|
+| seq 1 → 2 | 101.113 (the attempt-1 abort sits in this interval) |
+| seq 2 → 3 | 2.678 |
+| seq 3 → 4 | 2.833 |
+| seq 4 → 5 | 2.840 |
+| seq 5 → 6 | 2.780 |
+| seq 6 → 7 | 2.638 |
+| seq 7 → 8 | 2.757 |
+| seq 8 → 9 | 2.699 |
+
+**Floor 2.638 s · max 101.113 s · 0 gaps under 2.5 s · 0 under the repo's ≥2 s
+floor · span 120.339 s.**
+
+**Same-host gaps** — the rule is per host, and this series now includes DNS→GET pairs:
+
+| host | pair | gap |
+|---|---|---|
+| `commoncore-trials.medtronic.com` | seq 1→8 (DNS→GET) | 117.640 s |
+| `commoncore-trials.medtronic.com` | seq 8→9 (GET→GET) | 2.699 s |
+| `commoncore.medtronic.com` | seq 3→4 (DNS→GET) | 2.833 s |
+| `commoncore.medtronic.com` | seq 4→5 (GET→GET) | 2.840 s |
+| `commoncore.medtronic.eu` | seq 6→7 (DNS→GET) | **2.638 s** |
+
+**Same-host floor 2.638 s over 4 hosts** — every pair clears the ≥2 s floor.
+
+> **Not re-derivable from a clean clone** (2026-10-13, verifier round 1).
+> `results.jsonl` stores `body_mtime_epoch` as a **1-second integer**, and `docs/09`
+> records that **git does not preserve mtimes**. A fresh clone therefore re-derives a
+> floor of **3 s**, not 2.638 s. The nanosecond figure is measurable **only on the
+> machine that ran the probe** — the same caveat the closed area-D country sweep
+> records for its own mtime measurement. **Read 2.638 s as a fact about this machine
+> at this time, not as a re-derivable property of the artefacts.**
+
+**Two disclosures, because the instrument misbehaved and a reader deserves both:**
+
+1. **`seq 6` has a negative duration** — `t_done` 0.668 s *before* `t_sent`, which
+   is impossible. `seq 6` is the EU DNS lookup: `dig` had already exited when the
+   `date` was read. This is the sixth occurrence of the defect `docs/09 §4` records.
+   **It is why the `date` series is not the authority here.** In the `date` series
+   the seq 6 → 7 gap reads **1.857 s** — apparently below the ≥2 s floor — while the
+   mtime series for the same pair reads **2.638 s**, which passes. The apparent
+   violation is an artefact of the broken row; the requests were correctly spaced.
+2. **The two series do not have equal spans** (harness 22.230 s over seq 2→9 vs
+   mtime 19.226 s over the same range). I checked whether that is the "collapsed
+   spread" signature of an untrustworthy series [docs/09 §4] and it is **not**:
+   the 3.004 s difference is exactly the two endpoints that do not coincide
+   (`t_queued` precedes the first body write by the in-lock sleep + connect, and the
+   last `t_done` follows the last body write by curl teardown). Per-request,
+   `mtime − t_sent` is **+0.108 s to +0.495 s** on all six HTTP rows — every one
+   positive, every one in the band a real request takes. **The mtime series is
+   consistent with the harness series, not in conflict with it.**
+
+*A methodological note against myself:* an intermediate version of that check
+printed a "residual unexplained: 0.000 s" line which was a **telescoping identity**
+(`lead + tail` is algebraically the span difference) and therefore evidence of
+nothing. It is not in this write-up. The per-request table above is the real check.
+
+---
+
+## 8. One request was spent by a harness abort, and is accounted for
+
+The first run of `probe.sh` aborted on request 1 under `set -u`: `t_sent`/`t_done`
+were assigned **inside a subshell**, so the parent saw them unset. That request —
+the DNS lookup on `commoncore-trials.medtronic.com` — **was sent**, and its capture
+is on disk.
+
+It is **carried forward, not re-sent.** Re-issuing would have cost a second request
+for an answer already captured, and would have put two rows in the ledger for one
+fact. Its artefacts are preserved verbatim under `attempt1-aborted/`.
+
+Its `t_sent` and `t_done` are recorded as **bounds, not measurements**
+(`t_sent ≥ t_queued + 2.5 s`; `t_done ≤` the kernel mtime), because the abort
+destroyed the exact values and inventing them would be the fabrication this repo
+exists to prevent. The row carries a `timestamp_note` saying so. **This is the only
+row in the ledger whose timestamps are bounds, and it is the row whose timing nothing
+depends on** — it is a DNS lookup on a host not otherwise probed in this pass, and
+its gap to the next request on that host (seq 8, seq 9) is ≥2.6 s on the mtime series.
+
+`probe.sh` as committed contains the fix and reproduces the whole 9-row ledger from
+the attempt-1 capture plus 8 fresh requests.
+
+---
+
+## 9. The reserve, and why it was worth less than it cost
+
+One request of the cap was **not** spent. It was held for re-issuing a gateway
+failure, which `docs/09 §4` requires — a `502`/`503`/`504` from this family is a
+failure and never an absence, and area M lost a whole re-measure to exactly that.
+**It was not needed**, because no request in this pass returned a gateway error: all
+six GETs returned a well-formed `403` and all three lookups returned `NOERROR`. The
+reserve is recorded unused rather than quietly folded into the total.
+
+> ⚠ **What this reserve actually cost (2026-10-13, verifier round 1).** The reserve
+> is the **only** reason the EU absent-path control was not sent. Under the repo's
+> own precedent — area A, which does **not** count DNS lookups against the cap
+> [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md:36] — this pass
+> would have been **6 HTTP requests against the same 10 cap**, leaving room for the
+> EU control and landing at **10 of 10**. **The two choices were coupled and §5 and §9
+> did not say so.**
+> Holding a reserve against a failure mode that never materialised is defensible in
+> isolation; spending the slot on the pass's own weakest cell would have been the
+> better trade, because the no-route reading is the pass's load-bearing negative and
+> it is adjudicated on `.com` alone.
+
+---
+
+## 10. Negatives, recorded as first-class results
+
+- **No route was established on `commoncore-trials.medtronic.com`.** The `403` is
+  indistinguishable from the fabricated-path control, so the pass produces
+  **no evidence of existence for `/reports-broker/v1/ocl`** on any of the four
+  hosts — including the two `commoncore.medtronic.{eu,com}` hosts `docs/07` lists six
+  endpoints on.
+- **The EU cell is uncorroborated by a control** (§5) and is the weakest cell here.
+- **TLS ownership is INFERRED** (§2a), not established; no CT or PKI lookup was made.
+- **Nothing was learned about the response bodies**, because no body was returned:
+  all six GETs are the same 42-byte gateway error.
+- **No POST, no OPTIONS, no authentication, no token exchange.** `commoncore`'s
+  report *bodies* remain blocked on a clinician-scoped token, unchanged by this pass
+  [docs/11 *Already blocked on a token*].
+
+---
+
+## 11. What "closed" means for this row
+
+The claim issue offered two ways to close it, and said **both negatives count**:
+"no trials host exists and the CSP entry is stale", or "a host exists but is
+origin-side dead like its sibling".
+
+**Neither is what the evidence shows.** The third possibility is the one that
+happened: **the host exists, resolves, terminates TLS and answers — and the recorded
+`sibling` is no longer origin-side dead.** So the row is closed on the *naming*
+question it actually posed, with the route question explicitly left open:
+
+- **`commoncore-trials.medtronic.com` is a real host.** INFERRED→**OBSERVED**:
+  CNAME to CloudFront, host-specific DigiCert SAN match, gateway-shaped HTTP answer,
+  three independent signals a parked name cannot produce.
+- **`docs/07`'s `commoncore.medtronic.{eu,com}` brace is confirmed incomplete** — the
+  trials case is real and is now named, alongside the finding that the trials
+  deployment's *config* names a *different* trials host than its *CSP* does (§3b).
+- **What is NOT closed:** whether `/reports-broker/v1/ocl` is routed on any of these
+  four hosts. The `403` cannot answer that, and saying so is the pass's main
+  negative.
+
+---
+
+## 12. Successor
+
+### Why this pass adds no regression pin
+
+`AGENTS.md` §3 says a claim that should never rot gets a pin, and the verifier is
+right that this pass's central negative — **the byte-identical fabricated-path control
+on a `commoncore*` host** — is the kind of thing a pin is for. **It is deliberately
+not pinned, and the reason is this pass's own finding:**
+
+> **A pin would assert a status code whose meaning is unestablished on this host
+> family.** What the control establishes is a *negative* — that the `403` fails to
+> discriminate. Pinning `403 MissingAuthenticationTokenException` would encode a
+> gateway artefact as a health check, and a vendor reconfiguration would then break
+> the suite for a reason the pin's author does not believe in. The "404 is never
+> emitted" half of the Oracle A reading this rests on is itself **INFERRED by analogy
+> from `clcloud.*`** (§2b) and was never observed here.
+
+**What *is* pinnable, and is not pinned here either:** the DNS fact — three names
+under `medtronic.{com,eu}` CNAME to three distinct CloudFront distributions — is
+stable, but **pinning DNS would add three vendor hosts to the weekly drift sweep's
+request budget**, which crosses `AGENTS.md` §11's boundary for automation. That is a
+maintainer decision, not a research pass's side effect.
+
+So: **the negative is recorded, unpinnable as a status assertion, and the
+maintainer may add a host-registration check deliberately.** Silence would have been
+worse; this is the reason.
+
+### The addendum
+
+Recorded as a **dated addendum** in `docs/11`'s *Already blocked on a token* section,
+where area O's 2026-10-12 addendum already lives — **not** a new letter (A–Z are all
+in use and the gate's area pattern would reject a two-letter heading twice). It is
+carried in [docs/11-suggested-research-areas.md](../docs/11-suggested-research-areas.md).
+
+---
+
+## Files in this directory
+
+| File | What |
+|---|---|
+| `FINDINGS.md` | this document |
+| `probe.sh` | the harness as sent, carrying the attempt-1 reconstruction |
+| `results.jsonl` | **9 rows, one per request**, three timestamps each |
+| `run.log` | ordered request log, same three timestamp columns |
+| `headers/` | per-request header, `-v` (TLS + wire trace) and DNS captures |
+| `bodies/` | the 6 response bodies (42 B each — one digest) |
+| `attempt1-aborted/` | the aborted run's capture, preserved verbatim |
+| `spacing.txt` | the spacing measurement, its counting rule, and both series |
+
+**Request accounting: 9 of a 10 cap.** `wc -l results.jsonl` = **9** = the number in
+that line, in both directions.
+
+---
+
+## Correction (2026-10-13, verifier round 1): six `403`s in this pass carry CORS, which bears on a **closed** area. Run stopped here.
+
+**This is a stop condition, not a defect I can settle.** It is recorded here and
+handed to **correction issue #61**; the `docs/` CORS prose is deliberately **not**
+touched by this pass.
+
+### What the verifier found, confirmed independently
+
+Every one of this pass's six HTTP responses is a **403 carrying
+`access-control-allow-origin: *`** — plus `access-control-allow-methods: *` and
+`access-control-allow-headers: *`. **Four distinct hosts**, and **two of the six are
+on the certainly-absent control path**:
+
+| seq | host | path | role | CORS |
+|---|---|---|---|---|
+| 2 | `commoncore-trials.minimed.com` | `/reports-broker/v1/ocl` | CONTROL-b | `acao: *` · `acam: *` · `acah: *` |
+| 4 | `commoncore.medtronic.com` | `/reports-broker/v1/ocl-probe-absent` | **CONTROL — certainly absent** | `acao: *` · `acam: *` · `acah: *` |
+| 5 | `commoncore.medtronic.com` | `/reports-broker/v1/ocl` | CANDIDATE | `acao: *` · `acam: *` · `acah: *` |
+| 7 | `commoncore.medtronic.eu` | `/reports-broker/v1/ocl` | CANDIDATE | `acao: *` · `acam: *` · `acah: *` |
+| 8 | `commoncore-trials.medtronic.com` | `/reports-broker/v1/ocl-probe-absent` | **CONTROL — certainly absent** | `acao: *` · `acam: *` · `acah: *` |
+| 9 | `commoncore-trials.medtronic.com` | `/reports-broker/v1/ocl` | CANDIDATE | `acao: *` · `acam: *` · `acah: *` |
+
+Source, verbatim: `headers/02-ct-minimed-sibling.h`, `headers/04-cc-medtronic-com-absent.h`,
+`headers/05-cc-medtronic-com-ocl.h`, `headers/07-cc-medtronic-eu-ocl.h`,
+`headers/08-ct-medtronic-absent.h`, `headers/09-ct-medtronic-ocl.h`; every ledger row
+2–9 carries `"access_control_allow_origin": "*"`, and `probe.sh` captured the header
+in the extraction list.
+
+### Why it is not mine to settle
+
+**Closed area X** is recorded at `docs/11` (Closed areas table), `docs/00`,
+`docs/03` and `docs/10` as "**0 non-2xx responses carrying CORS anywhere**", and the
+`docs/03` phrasing is "anywhere in the corpus". **This pass enlarges the corpus and
+finds six.** Two readings are available and **neither is adopted here**:
+
+1. **Area X was scoped to `clcloud.*`** — its own host family, AWS API Gateway behind
+   CloudFront — and this is a different host family (`commoncore.medtronic.*`) that
+   area X never swept. On that reading nothing is falsified.
+2. **The claim was stated as absolute** ("anywhere"), and six non-2xx responses with
+   CORS is a direct counterexample. On that reading a closed area is wrong.
+
+Deciding between them is a **disclosure decision about a published, closed area**, and
+`AGENTS.md` §11 puts correcting the record to humans. **This pass edits no CORS prose
+in `docs/`.** Issue **#61** carries the full evidence table and both readings.
+
+### Why the run stopped
+
+A correction to a closed area that I cannot adjudicate, discovered in my own
+committed artefacts, is exactly the kind of thing that must not ride into `main`
+inside an unrelated PR. The science above stands; the record around it was fixed
+(§13) and the open question is handed over.
+
+### It bears directly on two open readings — and supplies the discriminating cell
+
+- `docs/09` §Oracle A carries the caution that CORS on an error is not the same as
+  CORS on a success, and `docs/09` §4's trap table carries the note that a `200`
+  carrying no preflight does exist on `clcloud.*`. **Six non-2xx responses carrying
+  `acao: *` is a fact those readings do not currently contain.**
+- The unexcluded reading — that CORS on this gateway family is **emitted only on
+  `OPTIONS`** — is exactly what these cells speak to, because **these six are bare
+  `GET`s**: `sent_headers` on every row is `User-Agent: carelink-bridge-research/1.0`
+  and **no `Origin` header was sent at all** (zero `Origin` occurrences across the
+  `.v` traces). So this is **not** a preflight artefact and not an
+  origin-dependent reflection. **It is the discriminating cell that reading needs**,
+  and it cuts against it.
+
+Both readings are recorded; neither is adopted.
+
+---
+
+## 13. Corrections to this pass's own record (verifier round 1)
+
+The science held: the verifier re-derived the CNAME, the certificate, the body digest
+and **all six spacing gaps** from the artefacts independently, and every one held.
+What it could not sign was the record around them. All are appended or corrected here
+rather than edited away.
+
+### 13a. A citation to a line that does not exist
+
+The CSP was cited as `carelink-trials-minimed-com--c1-absent.h:18`. **That file has
+15 lines; the `content-security-policy` header is on line 12.** Corrected to `:12`
+here and in `docs/10`. The sibling cite `…003-bulk-public.h:15` was checked and is
+correct as written. `AGENTS.md` §6 item 6.
+
+**Why the gate went green:** `research-checks.py` resolves cite **paths**, not line
+anchors, so a well-formed path with a wrong line number is invisible to it. Recorded
+because the next reader will assume the checks cleared the anchor too.
+
+### 13b. "Area D" collided with a closed area
+
+Letter **D** was closed on 2026-10-12 — *"D — the 18-country sweep, completed"* — and
+`docs/09` already attributes the body-mtime oracle discovery to that pass. Naming this
+one D as well would have left one letter pointing at two different passes. The log
+directory is renamed `2026-10-13-area-d-commoncore-trials` →
+**`2026-10-13-commoncore-trials`**, and every self-reference uses the non-letter
+handle **"the `commoncore-trials` pass"**, following the precedent `docs/11` already
+sets for area O. The branch was unmerged, so the rename was free.
+
+### 13c. `spacing.py` could not compute the same-host gaps it claimed to check
+
+The same-host series iterated `bodies/*.b` only, so **no DNS row could ever enter a
+pair** — and the EU host's pair is DNS→GET. It printed "these are all larger" on a
+filtered subset, which is a false clean bill for anyone re-running it. **Both series
+now derive from one mtime map** covering all 9 captures (6 HTTP bodies + 3 dig
+captures), and the same-host counting rule is stated in the output the way the
+all-rows rule is.
+
+**Withdrawn — the verifier's inference from this was wrong.** It held that the
+structurally-unprintable EU pair "is the one that violates the floor" at 1.857 s.
+**It does not violate it.** The mtime series reads **2.638 s**, which passes the
+≥2 s floor. The 1.857 s figure is the **corrupt seq-6 date row** (a negative
+duration, already disclosed in §7), not the spacing. The structural defect was real
+and is fixed; the conclusion drawn from it was not, and correcting the record means
+saying so.
+
+The all-rows series is now **8 gaps, not 6**, because the three dig captures enter it:
+floor **2.638 s**, 0 under 2.5 s, 0 under 2 s.
+
+### 13d. "404 is never emitted" is inherited, not observed here
+
+That clause comes from Oracle A, which `docs/09` scopes to **`clcloud.*` and the five
+`*.execute-api.*.amazonaws.com` gateways**. `AWS-GATEWAYS.md` names **no `commoncore`
+host** (`grep -ni commoncore` → 0 hits), so that pass probed no `*.medtronic.com`
+report broker. **This pass observed no `404` either way** — it requested six paths and
+every one answered `403`. The clause is therefore **INFERRED by analogy from
+`clcloud.*`**, and is now labelled as such at `FINDINGS.md` §2b, `docs/07` and
+`docs/11`. **It is not needed for the pass's conclusion**, which rests on the
+byte-identical control and needs no claim about the `404` vocabulary.
+
+### 13e. DNS accounting diverges from the repo's only precedent
+
+This pass counts **DNS lookups against the cap**. Area A — the repo's precedent —
+counts them the other way: *"8 DNS lookups are recorded in `dns.jsonl` and are **not**
+counted against the cap: they are resolver traffic, not requests to a vendor host"*
+[findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md:36].
+
+**This direction is deliberate and conservative**, and the counting rule is stated at
+the head of `probe.sh`, so it is not a breach — but it is a **divergence from the
+repo's existing convention** and is recorded as one. Under area A's rule this pass
+would account as **6 requests against the same 10 cap**.
+
+### 13f. The `docs/11` successor overstated what the pass closed
+
+The addendum said the pass "closed the whole unauthenticated half in 9 of a 10 cap".
+That contradicts this log's own §5 and §11: the route question is **left open** and
+the EU cell is **uncorroborated**. Reworded to "closed most of the unauthenticated
+half". The successor is still sound — it is the *route* question it hands on, not the
+host-existence question, which this pass did close.
+
+### 13g. The 2.699 s floor is not re-derivable from a clean clone
+
+`results.jsonl` stores `body_mtime_epoch` as a **1-second integer**, and `docs/09`
+records that **git does not preserve mtimes**. So a clean clone re-derives a floor of
+**3 s**, not 2.699 s. The nanosecond figure is measurable **only on the machine that
+ran the probe** — the same caveat area D's closed sibling records for its own mtime
+measurement. **Stated next to the number**, so nobody reads 2.699 s as re-derivable.
+
+### 13h. The existence signals had no artefact cites; a stronger anti-wildcard fact was unused
+
+§2a stated all three existence signals with **no `file:line` cite at all**, and the §2
+table had no source column. The values were right — the verifier confirmed each — but
+an uncited claim is a deleted claim in this repo. Cites added per signal.
+
+**And the strongest anti-wildcard datum was not used.** Three names under
+`medtronic.{com,eu}` CNAME to **three *different* CloudFront distributions** —
+`d16wbx60y036c9`, `d2te4je11hig0i`, `d28ymzlhgkylij` — and a wildcard-parked zone
+**cannot** do that, since a wildcard resolves through one mechanism. §2a argued from
+the single CNAME target; the three-distribution fact is stronger and is now recorded
+in both the log and `docs/01`.
+
+### 13i. Three smaller record defects
+
+- **`probe.sh` could not populate its own DNS fields.** `grep -m1 'status:'` matched
+  the dig header line, so `dns_status` held `;; ->>HEADER<<- opcode: QUERY` and
+  `dns_rcode` was **empty on all three DNS rows**. The field could never hold a
+  status, so the prose outran the ledger meant to carry it. **Both are recorded from
+  the captures directly** — `NOERROR` on all three, `rcode: NOERROR` — and the
+  extraction is fixed.
+- **"a different date" was ambiguous.** The second CSP source,
+  `2026-10-13-area-e-perkey-deployments`, is **same-day as this pass**. Reworded to
+  name both passes and their dates.
+- **"retained above-by-below" described no structure** on the `docs/10` page; the
+  superseded wording is now quoted **inline** in the row it supersedes.
+- **The `.v` captures contain this machine's LAN address** (`192.168.8.133`) in
+  curl's connection trace. It is a private RFC 1918 address, not a vendor asset, and
+  it is **not on the `AGENTS.md` §7 scrub list** — but area I's captures carry the
+  same class of value on `main`, so this is a known pattern rather than a new leak.
+  Recorded rather than left unexplained.
