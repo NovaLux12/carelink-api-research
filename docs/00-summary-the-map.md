@@ -107,6 +107,25 @@ one of two known documents. Every cell from 3.9 upward is byte-identical except
 the echoed request string (`"config": "android,12.0"`). **The "enum is
 open-ended" note is superseded: there is no undiscovered Auth0+v13 fallback.**
 
+> **There are two version axes, not one — added 2026-10-13 (area Q).** Everything
+> above is the **discovery-path** axis, and it is OBSERVED and ours. A **second,
+> independent axis** runs on the request **body**: `POST
+> {baseUrlCumulus}/display/message` is said to reject a body `appVersion` ≤ 3.6.9
+> with `206 {"message":"Upgrade application"}` and to accept ≥ 3.7, with **no upper
+> bound** — so the path has a ceiling and the body does not. **That half is
+> third-party source material, not this repo's observation, and cannot be settled
+> from outside the project**: a body field needs a POST, and `AGENTS.md` §11 permits
+> no vendor POST beyond the two already-pinned ones. Read it as *a client's report*,
+> labelled SOURCE-PUBLISHED, never as OBSERVED.
+>
+> **The consequence worth carrying: the two constraints intersect in exactly
+> `{3.7, 3.8}`**, and the one client whose source is readable feeds **a single
+> constant** into both axes — correct only because `3.8` is in that window. Raising
+> it to `3.9` breaks the discovery axis silently, while the body gate stays happy.
+> Full treatment, controls and both evidence labels:
+> [`03-discovery-and-versions.md`](03-discovery-and-versions.md) §3a
+> [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md].
+
 ```mermaid
 flowchart LR
     A["android/X.Y cell"] --> B{"which app version?"}
@@ -359,7 +378,7 @@ clinician bundle replicates across **five** hosts, not two.
 |---|---|
 | [`01-hosts-and-estate.md`](01-hosts-and-estate.md) | Host families, deployments, what each is for |
 | [`02-auth-tenants-and-flows.md`](02-auth-tenants-and-flows.md) | The five auth tenants, the code+PKCE flow, the redirect single-point-of-failure |
-| [`03-discovery-and-versions.md`](03-discovery-and-versions.md) | The app-version axis — why only `android/3.6`–`3.8` matter |
+| [`03-discovery-and-versions.md`](03-discovery-and-versions.md) | The app-version axes — why only `android/3.6`–`3.8` matter, and §3a on the **second, body-borne** axis |
 | [`04-configuration.md`](04-configuration.md) | The unauthenticated 69-key config file and the country axis |
 | [`05-devices-and-vocabulary.md`](05-devices-and-vocabulary.md) | 16 device families; why model-matching beats family-matching |
 | [`06-patient-api-surface.md`](06-patient-api-surface.md) | Patient namespaces and the existence oracles |

@@ -193,30 +193,55 @@ while the vendor ships a device it cannot match, which is the shape of a schema
 that static analysis *would* settle — but no one has tried, so the recovery rate
 is unknown.
 
-### Q. The `appVersion` body gate — a second version axis our docs do not describe
-
-**Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path** version
-axis (`android/3.6`–`3.8` → Auth0 + cumulus v13). Third-party source review found a
-**second, independent axis on the request body** that our docs do not cover:
-`POST {baseUrlCumulus}/display/message` rejects `appVersion ≤ 3.6.9` with
-**HTTP 206 `{"message":"Upgrade application"}`** and accepts `≥ 3.7`.
-(SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on PR
-#4711. The *mechanism*, that it is a **body** field, is SOURCE-OBSERVED at xDrip
-`CareLinkClient.java:664` and `CarlosJPV src/carelink/cumulus.ts:146`.)
-
-The two axes are constrained in **opposite** directions: the discovery URL must stay
-**≤ 3.8** (3.9+ falls back to a legacy no-Auth0 config), while the body `appVersion`
-has **no upper bound**. A client can be correct on one axis and broken on the other.
-
-**Why it's ours:** nobody publishes a two-axis compatibility matrix. Every client
-re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
-`discovery.ts` each found one half.
-
-**Closes when:** the two axes are documented together in `docs/03` — **or** recorded as
-community-reported-and-unverifiable, which is a legitimate close.
-
-**Assumptions (INFERRED):** that the body gate and the discovery axis could move
-independently. No client dates either change, so no drift timeline is asserted.
+> **Area Q is CLOSED — see the Closed table at the foot of this page and
+> [`docs/03`](03-discovery-and-versions.md) §3a.** Closed 2026-10-13 on the area's
+> **second** close condition — *recorded as community-reported-and-unverifiable, with
+> the reason* — because the boundary is a **request-body** field and `AGENTS.md` §11
+> permits no vendor POST beyond the two already-pinned public-`client_id` requests.
+> The **mechanism** resolved in code; the **boundary values** did not and cannot be
+> resolved from outside the project. **21 of a 20 cap** — the breach is disclosed in
+> the log's header, not smoothed away.
+>
+> **The area as written, kept verbatim so the correction stays readable.** One of the
+> two claims it rests on no longer holds. **⚠ Withdrawn:** *"corroborated by a xDrip
+> maintainer on PR #4711"*. Read at the artefact, PR #4711's three comments are the
+> boundary table (**by the same author as the README that repeats it**), a question,
+> and an approval that does not restate or retest the boundary values — so the table
+> is **one source stated twice**. **Still stands:** the table is SOURCE-PUBLISHED and
+> author-reported, and the *mechanism* — that `appVersion` is a **body** field — is
+> SOURCE-OBSERVED at `CarlosJPV src/carelink/cumulus.ts:146` @ `0180b89`, which this
+> pass read and which is byte-identical at branch head. **Not re-verified here:** the
+> xDrip half, `CareLinkClient.java:664`. Original text:
+>
+> > **Added 2026-10-11.** `docs/00` and `docs/03` describe the **discovery-path**
+> > version axis (`android/3.6`–`3.8` → Auth0 + cumulus v13). Third-party source
+> > review found a **second, independent axis on the request body** that our docs do
+> > not cover: `POST {baseUrlCumulus}/display/message` rejects `appVersion ≤ 3.6.9`
+> > with **HTTP 206 `{"message":"Upgrade application"}`** and accepts `≥ 3.7`.
+> > (SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on
+> > PR #4711. The *mechanism*, that it is a **body** field, is SOURCE-OBSERVED at
+> > xDrip `CareLinkClient.java:664` and `CarlosJPV src/carelink/cumulus.ts:146`.)
+> >
+> > The two axes are constrained in **opposite** directions: the discovery URL must
+> > stay **≤ 3.8** (3.9+ falls back to a legacy no-Auth0 config), while the body
+> > `appVersion` has **no upper bound**. A client can be correct on one axis and
+> > broken on the other.
+> >
+> > **Why it's ours:** nobody publishes a two-axis compatibility matrix. Every client
+> > re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
+> > `discovery.ts` each found one half.
+> >
+> > **Closes when:** the two axes are documented together in `docs/03` — **or**
+> > recorded as community-reported-and-unverifiable, which is a legitimate close.
+> >
+> > **Assumptions (INFERRED):** that the body gate and the discovery axis could move
+> > independently. No client dates either change, so no drift timeline is asserted.
+>
+> **What the pass added that the area did not ask for:** the two constraints
+> **intersect in exactly `{3.7, 3.8}`**, and the one client whose source is readable
+> feeds **a single constant** into both axes — correct only because `3.8` is in that
+> window, so raising it to `3.9` breaks the discovery axis *silently*, on a path this
+> repo already pins. That is a bridge-facing coupling and it is now a `docs/10` §1 row.
 
 ### R. Reconcile the `deviceFamily` correction against the client consensus
 
@@ -285,6 +310,48 @@ not a research task. It was deliberately **not** actioned by the pass that found
 rule attached, **or** a note records that third-party source stays under existing labels
 and must always be flagged as corroboration. Either closes it; silence does not.
 
+#### Addendum (2026-10-13, from area Q): a second pass, and the label was not the failure — the *count of sources* was
+
+Attached to area S rather than opened as a new letter (every A–Z is in use).
+
+**What was added.** Area Q is the **second** pass in this repo to need these two
+classes, and it produced the same awkwardness the 2026-10-11 pass did. It also
+surfaced something S's framing does not cover, which is the reason this addendum
+exists: **the problem was not the missing label, it was a strength word.**
+
+Area Q's own area text claimed the `appVersion` boundary table was *"corroborated by a
+xDrip maintainer on PR #4711"*. Reading the artefact, PR #4711 has **three** comments:
+the table (by `CarlosJPV` — also the author of the README repeating it), a question,
+and an approval that never restates or retests the boundary values. **The table is
+one source stated twice.** The claim would have been equally wrong had
+SOURCE-OBSERVED/SOURCE-PUBLISHED been classes all along — a label describes the
+*kind* of evidence and says nothing about how many independent sources produced it
+(SOURCE-OBSERVED §4, §7,
+[findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md]).
+
+**What is missing:** a rule that distinguishes **one source, restated** from **two
+independent sources** — and a rule about strength words (*independently*,
+*corroborated*, *confirms*) that says what each requires. Nothing in `AGENTS.md` §2
+or §3 requires checking that.
+
+**Blocker:** it is part of the same **maintainer decision** as area S proper, and it
+cannot be settled by a research pass — the question is what the repo's *rules* should
+say. The audit that would motivate it is not blocked and can be run first (§
+`docs/10` §1, the *corroborated independently* row, which carries the full framing).
+
+**Closes when:** either (a) `AGENTS.md` §2 gains SOURCE-OBSERVED/SOURCE-PUBLISHED
+**and** a statement of what "independently corroborated" requires — different
+authors, different artefacts, neither quoting the other; **or** (b) the decision is to
+keep the existing labels, in which case the rule about independence must still be
+written, because the failure does not depend on the labels. Either closes it; a
+labels-only decision does **not**, which is the point of this addendum.
+
+**Assumptions (INFERRED):** that independence is judged at the level of the
+**person or organisation that ran the measurement**, not the artefact — two files in
+one repository, or one file and a PR comment on it, are one source. This is the
+assumption area Q applied; a maintainer could reasonably define it more strictly, and
+the one confirmed instance (`CarlosJPV`'s table in his README and in his own PR
+comment) would fail under any definition strict enough to matter.
 
 ---
 
@@ -402,6 +469,7 @@ being superseded — never silently. Letters are not reused.
 | J — `login-errors.ts` against the live error surface (addendum: the three advertised Auth0 endpoints) | 2026-10-13 | **One routed, two dangling — uniform across all five tenants, no shadow split.** `/mfa/challenge` answers the preflight `204` + `ACAO: *` + exact `allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS` on all five (the path with no probe result in any source was live); `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five — preflight byte-identical to per-host one-character-different controls (one 10 B digest `0802559db137…` across 15 bodies). POST-only-ness of `/mfa/challenge` is INFERRED from specification, not established — no POST sent, and the six-method list is a second live instance of `docs/09` §4's allow-methods trap. Revocation verdict scoped to the `Auth0` connection name. ⚠ **Correction history preserved:** this addendum was written 2026-10-12 as a GET sweep on area I's then-claim that `registration_endpoint` was absent everywhere; a verifier refuted the premise (the endpoint is live and POST-only) and the addendum was rewritten to empty-body OPTIONS before probing — the original wording is retained in the area-I log, not here. **23 of a 26 cap** (20 curl + 3 live hurl pin-validations), GET + empty-body OPTIONS only, controls first per host, all 5 passed, measured `t_sent` floor **2.395 s** (all gaps ≥ 2 s floor; 2 under the declared 2.5 s and 4 negative durations recorded with no cause asserted). EU cells pinned (exact allow-methods, not contains); counts re-measured 193→199 static, 401→413 execute. Successor: the parent half (bridge `login-errors.ts` taxonomy vs provoked errors) as a new `docs/10` §1 row | [findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md] | #34 |
 | H — the `reportFileNamingSupportedPumpModels` list, entry by entry | 2026-10-13 | **Positive with residue: 214 entries classified, 86 rows matched, 128 not.** The list lives in the **patient** public config (`personal.common.core.report.generation.reportFileNamingSupportedPumpModels`, 69-key document, re-derived live) — not HCP-only as the area premise had it. In code: wire code 129 · display name 71 · bare number 10 · placeholder 4; 82 wire codes matched by family, 47 unmatched by prefix group; placeholders 4/4 matched (all INSTINCT values); bare numbers and display names 0 matched; normalization changes nothing. Anomalies: `MMT-9015` ×2, `Precision Xtra® / Xceed™` ×2, one trailing-space entry matching the map's own padding exactly, ten `MMT-`+bare pairs. Correction attached in `docs/05`: `MMT-8200/8201/8400/8401` are in **both** report lists and **neither** family table. **5 of a 6 cap**, GET only; 3 hp-namespace requests voided by a harness header defect and disclosed as wasted — the close rests on the patient document alone | [findings-log/2026-10-13-area-h-report-naming/FINDINGS.md] | #33 |
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
+| Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** the two constraints **intersect in exactly `{3.7, 3.8}`**, and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 of a 20 cap** — the pass sent 21 requests against claim #43's 20, because `probe-followup.sh` resets `SEQ` and re-issued request 19; **no ledger row was deleted to hide it**. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
 ---
 
 > **Consumer note.** Findings here are consumed by

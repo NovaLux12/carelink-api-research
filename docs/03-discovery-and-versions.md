@@ -124,6 +124,130 @@ currently inert; the pin is protected only by the ADR text and the discovery tes
 Suggested fix, **not applied** (a repo change): gate on `baseUrlCumulus` containing `/v13`
 too [source: PROBE-FINDINGS §3].
 
+## 3a. A second version axis — the request body
+
+> **Added 2026-10-13 (area Q).** Everything in this section is **third-party source
+> material**, read in public repositories at named commits. **None of it is OBSERVED
+> and none of it may be promoted to OBSERVED** — no live vendor response was
+> obtained, and none could be. The two evidence labels used here,
+> **SOURCE-OBSERVED** (`file:line` at a named commit) and **SOURCE-PUBLISHED** (that
+> repository's README / PR / comments), are **not yet `AGENTS.md` §2 classes**;
+> adding them is a maintainer decision and **remains open at
+> [`docs/11`](11-suggested-research-areas.md) area S**. Until it is decided, treat
+> every claim in this section as evidence about **a client**, never about Medtronic
+> [source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §0].
+
+**This page described exactly one version axis until 2026-10-13: the discovery-path
+axis of §3. There are two, they are constrained in opposite directions, and a client
+can satisfy one while failing the other.**
+
+| axis | where the version travels | constraint | class |
+|---|---|---|---|
+| **discovery path** (§3, above) | the URL: `/discover/android/<ver>` | `3.6`–`3.8` → cumulus v13; **`3.9`+ → legacy no-Auth0 config** | **OBSERVED** — ours, 70-cell sweep [VERSION-AXIS §3a, §4] |
+| **request body** | a JSON field `appVersion` in the body of `POST {baseUrlCumulus}/display/message` | **≥ 3.7, no upper bound** | **SOURCE-PUBLISHED** — author-reported, *unverified here* |
+
+They point opposite ways: **the path has a ceiling and the body does not.** A client
+that fixes one has not fixed the other, which is why nobody publishes a compatibility
+matrix and every client re-derives it.
+
+### 3a.1 What is verifiable — the *mechanism*, not the boundary
+
+**SOURCE-OBSERVED**, and it is the load-bearing part: `appVersion` is a **body
+field, not a header**. In `CarlosJPV/carelink-cumulus-bridge` @ `0180b89`,
+`src/carelink/cumulus.ts:143-148` builds the POST body as a JSON object —
+`{ username, role, appVersion: APP_VERSION, os: 'android' }` — and `:146` resolves to
+exactly `appVersion: APP_VERSION,`. The file's own comment at `:131-135` records the
+basis and dates it (*"descubierto por experimentación, 25-08-2026"*). Both pinned
+commit and branch head are **byte-identical** (git blob `448c27b19d53cb87d…`), so
+this cite resolves identically in either revision
+[source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §4].
+
+The **boundary values** are a different kind of claim and are labelled as such:
+`README.md:50-55` tabulates `3.5.0`, `3.6`, `3.6.1`, `3.6.9` → `206 {"message":
+"Upgrade application"}` and `3.7`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0`, `10.0.0` →
+`200`, giving *"≥ 3.7 accepted, ≤ 3.6.9 rejected"*. **SOURCE-PUBLISHED —
+author-reported, and not reproducible from the tree**: the repository commits the
+probe *script* but gitignores its *outputs* (`.gitignore:12` resolves exactly, as
+`cumulus-response*.json`; `:13` `cumulus-hit.json`, under a comment saying those files
+carry personal and health data). The committed script varies only **5 of the 11**
+values the table lists [same source §8.1].
+
+### 3a.2 ⚠ Why this cannot be settled from outside this project
+
+The gate is a **request-body** field. `AGENTS.md` §11 permits no POST to a vendor
+host outside the two already-pinned public-`client_id` requests and states no
+automation may extend it; a GET cannot carry a body. No vendor-published document
+names `appVersion` — checked **offline, zero requests**, against every committed
+config, discovery and archive capture in `findings-log/`, where the string appears
+nowhere. **So there is no pin for it either, and §3a's numbers cannot rot silently
+in the pinned suite** — they are unpinned **by necessity**, and a reader must treat
+them as a client's report rather than as this repo's observation
+[source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §6].
+
+The contrast with §3 is the point, and the two halves must not be blurred: **the
+discovery axis's upper bound is OBSERVED and ours** — `docs/10` §2 records that the
+axis serves exactly two documents past 3.8 — **while the body axis's lower bound is
+third-party-reported and unverifiable here.** Same word "axis", different evidence.
+
+### 3a.3 Derived: the two axes share a **two-value window**, and one client uses a single constant for both
+
+**INFERRED, from the two SOURCE-PUBLISHED constraints above; the assumption is that
+they hold over the ranges the author reports, which is itself unverified.**
+
+Intersecting them — a version string that is on the Auth0+v13 track **and** clears
+the body gate — leaves **`3.7` and `3.8`, and nothing else.**
+
+And the one client whose source is readable does not run two axes at all.
+`cumulus.ts:31` declares `const APP_VERSION = '3.8';` and uses that **one** constant
+in three places: the `.eu` discovery URL (`:34`), the `.com` discovery URL (`:36`) and
+the request body (`:146`). **It is correct only because `3.8` happens to lie in the
+window.**
+
+The failure mode is specific, silent, and worth stating because this page's §3 is
+the reason it bites: bumping that constant to `3.9` to "modernise" satisfies the body
+gate forever (no upper bound) and breaks the discovery axis immediately, landing on
+the legacy no-Auth0 config of §3. **Nothing errors** — the client keeps receiving
+`200`s, from a different and older API. A version knob that is correct on one axis
+and wrong on the other is not a knob, it is a coupling
+[source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §5].
+
+### 3a.4 ⚠ Correction — the boundary table is **one source stated twice**
+
+The 2026-10-11 pass recorded this table as *"corroborated independently by a xDrip
+maintainer in PR #4711"*, and this page's own area text repeated it. **Read at the
+artefact, that is not what the PR contains.** xDrip PR #4711 has **three** comments:
+the boundary table (by `CarlosJPV` — also the author of the README that repeats it),
+a question from `jamorham`, and an approval from `benceszasz`. **The maintainer
+comment approves the PR; it does not restate, retest, or comment on the boundary
+values.**
+
+- **Still stands:** the table is SOURCE-PUBLISHED and author-reported; the *mechanism*
+  is independently verifiable in code (§3a.1); and the PR body independently confirms
+  the value xDrip moved *from* — `3.6.0` → `3.8.0` — with that PR **merged**
+  2026-08-29T11:59:05Z. That is upstream corroboration that `3.8.0` works; it is not
+  corroboration of where the boundary sits.
+- **Withdrawn:** the word *independently*. The original wording stays readable in
+  [findings-log/2026-10-11-third-party-client-sources/FINDINGS.md §3].
+
+This is `AGENTS.md` §6 item 5 in the shape it warns about — derived prose reaching
+further than the table it came from — and it was findable **only** by reading the
+artefact [source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §7].
+
+### 3a.5 Not verified in this pass
+
+The other half of the mechanism — that xDrip also sends `appVersion` as a body field
+— is **not** re-verified here. The 2026-10-11 pass cited a bare filename,
+`CareLinkClient.java:664`; a path reconstructed from its reproduction instructions
+returned `404` on the GitHub API at both the pinned commit and branch head, and the
+package listing shows the file is **not at the package root** (`carelinkfollow/`
+holds three files and three directories — `auth/`, `client/`, `message/`).
+**That is this pass's path-reconstruction error, not evidence that the citation is
+broken**, and nothing is claimed here about what is on that line. Recorded so a later
+reader does not repeat the search
+[source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §3].
+
+---
+
 ## 4. The Auth0 + cumulus-v13 cell matrix
 
 | Cell | Auth0 | cumulus | CLINICAL | Document |

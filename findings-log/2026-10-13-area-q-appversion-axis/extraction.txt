@@ -1,0 +1,167 @@
+==============================================================================
+A. BLOB-SHA DRIFT CONTROL - pinned commit vs branch head, per file
+==============================================================================
+file                       pinned blob sha                              head blob sha                                verdict
+src/carelink/cumulus.ts    448c27b19d53cb87d7bdcfc0a75e7a253c06d846     448c27b19d53cb87d7bdcfc0a75e7a253c06d846     IDENTICAL
+README.md                  430874b042061c486d4d3e83acaf6bcc65c74b8e     430874b042061c486d4d3e83acaf6bcc65c74b8e     IDENTICAL
+src/probe-appversion.ts    7156575d18f936cb8f1516d59879f14edbe6fc20     7156575d18f936cb8f1516d59879f14edbe6fc20     IDENTICAL
+.gitignore                 64a3160f1eba1bcf0d798eb809e9ed90344f4b9e     64a3160f1eba1bcf0d798eb809e9ed90344f4b9e     IDENTICAL
+
+==============================================================================
+B. PINNED COMMITS RESOLVED (assertion, not assumption)
+==============================================================================
+NightscoutFoundation/xDrip @ 366c97a8
+   full sha : 366c97a8de5fe644b20910ab008da98a07391c7b
+   committed: 2026-10-10T17:31:04Z
+   subject  : build: Retrofit 3.0.0 (#4790)
+CarlosJPV/carelink-cumulus-bridge @ 0180b89
+   full sha : 0180b890ff81feb2f7d186d8bf0de4d10c850375
+   committed: 2026-08-26T16:14:58Z
+   subject  : ci: drop GHA cache export
+
+==============================================================================
+C. THE appVersion BODY-FIELD MECHANISM - src/carelink/cumulus.ts:146
+==============================================================================
+--- PINNED 0180b89  (214 lines, blob 448c27b19d53) ---
+   cumulus.ts:146 -> appVersion: APP_VERSION,
+   cumulus.ts:132 -> * sin `appVersion` y `os` en el BODY, el servidor responde
+   cumulus.ts:146 -> appVersion: APP_VERSION,
+--- HEAD   main  (214 lines, blob 448c27b19d53) ---
+   cumulus.ts:146 -> appVersion: APP_VERSION,
+   cumulus.ts:132 -> * sin `appVersion` y `os` en el BODY, el servidor responde
+   cumulus.ts:146 -> appVersion: APP_VERSION,
+
+==============================================================================
+D. THE BOUNDARY TABLE - README.md (the source pass cites :77-80, :86, :95-98)
+==============================================================================
+--- PINNED 0180b89  (252 lines) ---
+   README.md:41 -> HTTP 206
+   README.md:42 -> {"message": "Upgrade application"}
+   README.md:45 -> xDrip+ was sending `appVersion: "3.6.0"`, which Medtronic no longer accepts.
+   README.md:50 -> | `appVersion` | result |
+   README.md:52 -> | `3.5.0`, `3.6`, `3.6.1`, `3.6.9` | 206 `Upgrade application` |
+   README.md:55 -> **Boundary: ≥ 3.7 accepted, ≤ 3.6.9 rejected.** Both `X.Y` and `X.Y.Z` forms work.
+   README.md:68 -> "appVersion": "3.8.0"     // <-- must be >= 3.7
+   README.md:72 -> `appVersion` is a **body field, not a header**. Twelve header variants were tested and all
+   README.md:78 -> > required — it is not. A control request with `appVersion: "3.8.0"` and no `os` field
+   README.md:86 -> | Discovery path `/discover/android/<ver>` | `3.5` → Cumulus **v11**; `3.6`–`3.8` → **v13**; **`3.9`+ falls back to a legacy config** (`/connect/carep
+   README.md:87 -> | Body `appVersion` | must be **≥ 3.7**, no upper bound |
+   README.md:221 -> The `appVersion`/`os` requirement documented here was found by experimentation and, as far
+   README.md:242 -> `appVersion: "3.6.0"` y el servidor exige **≥ 3.7**; si no, responde
+   README.md:243 -> `206 {"message":"Upgrade application"}`. Va en el **cuerpo**, no en cabeceras (probadas doce variantes). El campo `os` es opcional.
+--- HEAD   main  (252 lines) ---
+   README.md:41 -> HTTP 206
+   README.md:42 -> {"message": "Upgrade application"}
+   README.md:45 -> xDrip+ was sending `appVersion: "3.6.0"`, which Medtronic no longer accepts.
+   README.md:50 -> | `appVersion` | result |
+   README.md:52 -> | `3.5.0`, `3.6`, `3.6.1`, `3.6.9` | 206 `Upgrade application` |
+   README.md:55 -> **Boundary: ≥ 3.7 accepted, ≤ 3.6.9 rejected.** Both `X.Y` and `X.Y.Z` forms work.
+   README.md:68 -> "appVersion": "3.8.0"     // <-- must be >= 3.7
+   README.md:72 -> `appVersion` is a **body field, not a header**. Twelve header variants were tested and all
+   README.md:78 -> > required — it is not. A control request with `appVersion: "3.8.0"` and no `os` field
+   README.md:86 -> | Discovery path `/discover/android/<ver>` | `3.5` → Cumulus **v11**; `3.6`–`3.8` → **v13**; **`3.9`+ falls back to a legacy config** (`/connect/carep
+   README.md:87 -> | Body `appVersion` | must be **≥ 3.7**, no upper bound |
+   README.md:221 -> The `appVersion`/`os` requirement documented here was found by experimentation and, as far
+   README.md:242 -> `appVersion: "3.6.0"` y el servidor exige **≥ 3.7**; si no, responde
+   README.md:243 -> `206 {"message":"Upgrade application"}`. Va en el **cuerpo**, no en cabeceras (probadas doce variantes). El campo `os` es opcional.
+
+==============================================================================
+E. THE DISCOVERY-AXIS CEILING - the other half of the two-axis claim
+==============================================================================
+   [PINNED 0180b89] README.md:53 -> | `3.7`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0`, `10.0.0` | **200 OK** |
+   [PINNED 0180b89] README.md:68 -> "appVersion": "3.8.0"     // <-- must be >= 3.7
+   [PINNED 0180b89] README.md:78 -> > required — it is not. A control request with `appVersion: "3.8.0"` and no `os` field
+   [PINNED 0180b89] README.md:86 -> | Discovery path `/discover/android/<ver>` | `3.5` → Cumulus **v11**; `3.6`–`3.8` → **v13**; **`3.9`+ falls back to a legacy config** (`/connect/carep
+   [PINNED 0180b89] README.md:89 -> So the discovery URL must stay at `3.8` while the body value can go higher. If Medtronic
+   [HEAD   main] README.md:53 -> | `3.7`, `3.7.0`, `3.8`, `3.8.0`, `4.0.0`, `10.0.0` | **200 OK** |
+   [HEAD   main] README.md:68 -> "appVersion": "3.8.0"     // <-- must be >= 3.7
+   [HEAD   main] README.md:78 -> > required — it is not. A control request with `appVersion: "3.8.0"` and no `os` field
+   [HEAD   main] README.md:86 -> | Discovery path `/discover/android/<ver>` | `3.5` → Cumulus **v11**; `3.6`–`3.8` → **v13**; **`3.9`+ falls back to a legacy config** (`/connect/carep
+   [HEAD   main] README.md:89 -> So the discovery URL must stay at `3.8` while the body value can go higher. If Medtronic
+
+==============================================================================
+F. ARE THE PROBE OUTPUTS COMMITTED? .gitignore:12
+==============================================================================
+--- PINNED 0180b89 (15 lines) ---
+   .gitignore:1 -> node_modules/
+   .gitignore:2 -> dist/
+   .gitignore:3 -> logindata.json
+   .gitignore:4 -> *.env
+   .gitignore:5 -> https.txt
+   .gitignore:6 -> .idea/
+   .gitignore:7 -> .claude/
+   .gitignore:8 -> 
+   .gitignore:9 -> # Respuestas de la API: contienen DATOS PERSONALES Y DE SALUD
+   .gitignore:10 -> # (nombre, nº de serie del sensor, MAC, histórico de glucosa). Nunca subir.
+   .gitignore:11 -> .env
+   .gitignore:12 -> cumulus-response*.json
+   .gitignore:13 -> cumulus-hit.json
+   .gitignore:14 -> server.log
+   .gitignore:15 -> 
+--- HEAD   main (15 lines) ---
+   .gitignore:1 -> node_modules/
+   .gitignore:2 -> dist/
+   .gitignore:3 -> logindata.json
+   .gitignore:4 -> *.env
+   .gitignore:5 -> https.txt
+   .gitignore:6 -> .idea/
+   .gitignore:7 -> .claude/
+   .gitignore:8 -> 
+   .gitignore:9 -> # Respuestas de la API: contienen DATOS PERSONALES Y DE SALUD
+   .gitignore:10 -> # (nombre, nº de serie del sensor, MAC, histórico de glucosa). Nunca subir.
+   .gitignore:11 -> .env
+   .gitignore:12 -> cumulus-response*.json
+   .gitignore:13 -> cumulus-hit.json
+   .gitignore:14 -> server.log
+   .gitignore:15 -> 
+
+==============================================================================
+G. THE COMMITTED PROBE SCRIPTS - src/probe-appversion.ts
+==============================================================================
+--- PINNED 0180b89 (94 lines) ---
+   probe-appversion.ts:2 -> * El PR #4711 de xDrip+ manda appVersion="3.8.0" (con .0) en el body.
+   probe-appversion.ts:3 -> * Nosotros verificamos "3.8" (sin .0). ¿Acepta el servidor ambos formatos?
+   probe-appversion.ts:5 -> * Si sólo vale "3.8", el PR fallaría y conviene avisar antes de que
+   probe-appversion.ts:8 -> * Uso: npx tsx src/probe-appversion.ts
+   probe-appversion.ts:23 -> /** Valores de appVersion a probar, con os=android siempre presente. */
+   probe-appversion.ts:24 -> const VERSIONS = ['3.7', '3.6.9', '3.6.1', '3.5.0', '10.0.0'];
+   probe-appversion.ts:61 -> console.log('(os="android" en todas; sólo varía appVersion)');
+   probe-appversion.ts:68 -> appVersion: v,
+   probe-appversion.ts:69 -> os: 'android',
+   probe-appversion.ts:75 -> console.log(`appVersion="${v}"`.padEnd(24) + `HTTP ${resp.status}  ` + describe(resp.data));
+   probe-appversion.ts:77 -> console.log(`appVersion="${v}"`.padEnd(24) + 'ERROR ' + (e as Error).message.slice(0, 50));
+   probe-appversion.ts:82 -> const noOs: Record<string, string> = {
+   probe-appversion.ts:85 -> appVersion: '3.8.0',
+   probe-appversion.ts:90 -> console.log('control (3.8.0 SIN os)'.padEnd(24) + `HTTP ${r.status}  ` + describe(r.data));
+--- HEAD   main (94 lines) ---
+   probe-appversion.ts:2 -> * El PR #4711 de xDrip+ manda appVersion="3.8.0" (con .0) en el body.
+   probe-appversion.ts:3 -> * Nosotros verificamos "3.8" (sin .0). ¿Acepta el servidor ambos formatos?
+   probe-appversion.ts:5 -> * Si sólo vale "3.8", el PR fallaría y conviene avisar antes de que
+   probe-appversion.ts:8 -> * Uso: npx tsx src/probe-appversion.ts
+   probe-appversion.ts:23 -> /** Valores de appVersion a probar, con os=android siempre presente. */
+   probe-appversion.ts:24 -> const VERSIONS = ['3.7', '3.6.9', '3.6.1', '3.5.0', '10.0.0'];
+   probe-appversion.ts:61 -> console.log('(os="android" en todas; sólo varía appVersion)');
+   probe-appversion.ts:68 -> appVersion: v,
+   probe-appversion.ts:69 -> os: 'android',
+   probe-appversion.ts:75 -> console.log(`appVersion="${v}"`.padEnd(24) + `HTTP ${resp.status}  ` + describe(resp.data));
+   probe-appversion.ts:77 -> console.log(`appVersion="${v}"`.padEnd(24) + 'ERROR ' + (e as Error).message.slice(0, 50));
+   probe-appversion.ts:82 -> const noOs: Record<string, string> = {
+   probe-appversion.ts:85 -> appVersion: '3.8.0',
+   probe-appversion.ts:90 -> console.log('control (3.8.0 SIN os)'.padEnd(24) + `HTTP ${r.status}  ` + describe(r.data));
+
+==============================================================================
+H. CROSS-HOST BYTE CONTROL - raw.githubusercontent vs api contents
+==============================================================================
+   raw.githubusercontent response: 14 B, b'404: Not Found'
+   -> the cross-check cell could NOT be run: the file path it re-fetched
+      does not exist at the pinned commit (see FINDINGS.md section 2).
+      The control is therefore recorded as INCONCLUSIVE, not as agreement.
+
+==============================================================================
+I. CONTROLS - were the 404s real absences?
+==============================================================================
+   CONTROL certainly-absent REF                       162 B  sha256=5428c4bed7a433a1  b'{"message":"No commit found for the ref deadbeefdeadbeefdeadbeefdeadbe'
+   CONTROL certainly-absent PATH                      127 B  sha256=e45906ce02e79f16  b'{"message":"Not Found","documentation_url":"https://docs.github.com/re'
+   xDrip carelinkfollow/CareLinkClient.java @ pin     127 B  sha256=e45906ce02e79f16  b'{"message":"Not Found","documentation_url":"https://docs.github.com/re'
+   xDrip carelinkfollow/CareLinkClient.java @ master   127 B  sha256=e45906ce02e79f16  b'{"message":"Not Found","documentation_url":"https://docs.github.com/re'
+   raw.githubusercontent same path @ pin               14 B  sha256=d5558cd419c8d46b  b'404: Not Found'

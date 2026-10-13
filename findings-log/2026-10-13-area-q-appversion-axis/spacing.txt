@@ -1,0 +1,78 @@
+==============================================================================
+LEDGER
+==============================================================================
+rows in results.jsonl            : 21
+distinct hosts                   : ['api.github.com', 'raw.githubusercontent.com']
+methods                          : ['GET']
+repeated seq values              : [19]
+   seq=19 issued 2 times, t_sent 2026-10-13T09:47:09.176Z and 2026-10-13T09:47:33.456Z
+
+==============================================================================
+ORACLE A — harness t_sent series
+==============================================================================
+api.github.com             20 rows, 19 gaps, t_sent span  143.688 s
+raw.githubusercontent.com  1 rows, 0 gaps, t_sent span    0.000 s
+   api.github.com             seq  1 ->  2     2.014 s  <-- under declared 2.5
+   api.github.com             seq  2 ->  3     2.779 s
+   api.github.com             seq  3 ->  4     2.807 s
+   api.github.com             seq  4 ->  5     2.907 s
+   api.github.com             seq  5 ->  6     2.938 s
+   api.github.com             seq  6 ->  7     2.786 s
+   api.github.com             seq  7 ->  8     2.767 s
+   api.github.com             seq  8 ->  9     3.572 s
+   api.github.com             seq  9 -> 10     2.281 s  <-- under declared 2.5
+   api.github.com             seq 10 -> 11     2.794 s
+   api.github.com             seq 11 -> 12     2.785 s
+   api.github.com             seq 12 -> 13     2.787 s
+   api.github.com             seq 13 -> 14     2.776 s
+   api.github.com             seq 14 -> 15     2.801 s
+   api.github.com             seq 15 -> 16     2.803 s
+   api.github.com             seq 16 -> 17     2.910 s
+   api.github.com             seq 17 -> 19    71.718 s
+   api.github.com             seq 19 -> 19    24.280 s
+   api.github.com             seq 19 -> 20     3.183 s
+minimum same-host t_sent gap     : 2.014 s
+negative durations (impossible)  : [(1, -0.576), (9, -0.29), (20, -0.369)]
+
+==============================================================================
+ORACLE B — kernel body-mtime series (independent of the harness clock)
+==============================================================================
+ledger rows                       : 21
+distinct body files written       : 20
+host_tags reused by >1 row        : {'19-xd-cgm-listing': [18, 19]}
+   host_tag '19-xd-cgm-listing' was written by ledger rows [18, 19] (indexes); only the LAST write's mtime survives, so
+   the gap between those rows is NOT measurable from the mtime series.
+api.github.com             20 rows [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 19, 20] -> 18 measurable gaps
+raw.githubusercontent.com  1 rows [18] -> 0 measurable gaps
+   api.github.com             seq  1 ->  2     2.799 s
+   api.github.com             seq  2 ->  3     2.807 s
+   api.github.com             seq  3 ->  4     2.907 s
+   api.github.com             seq  4 ->  5     2.937 s
+   api.github.com             seq  5 ->  6     2.787 s
+   api.github.com             seq  6 ->  7     2.765 s
+   api.github.com             seq  7 ->  8     3.052 s
+   api.github.com             seq  8 ->  9     2.800 s
+   api.github.com             seq  9 -> 10     2.791 s
+   api.github.com             seq 10 -> 11     2.789 s
+   api.github.com             seq 11 -> 12     2.789 s
+   api.github.com             seq 12 -> 13     2.775 s
+   api.github.com             seq 13 -> 14     2.797 s
+   api.github.com             seq 14 -> 15     2.806 s
+   api.github.com             seq 15 -> 16     2.910 s
+   api.github.com             seq 16 -> 17     2.870 s
+   api.github.com             seq 17 -> 19    95.736 s
+   api.github.com             seq 19 -> 20     2.776 s
+minimum same-host mtime gap      : 2.765 s
+gaps under 2.5 s                 : 0 of 18
+gaps under the 2 s floor         : 0 of 18
+
+==============================================================================
+SERIES VALIDATION — is oracle B the run's own?
+==============================================================================
+harness t_sent span (seq 1 -> last) :  143.688 s
+kernel mtime span                    :  143.895 s
+difference                           :    0.207 s
+verdict: SERIES B IS THIS RUN'S OWN - trustworthy
+
+NOTE: git does not preserve mtimes. Oracle B is valid on the machine that
+ran the probe and is NOT re-derivable from a clean clone.
