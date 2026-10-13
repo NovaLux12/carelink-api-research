@@ -555,6 +555,86 @@ resolve — verified today for the two sampled ids only, not for all 211; and th
 patient `main`+`runtime` pair is the entry point for those chunks, which the runtime's
 own `f.u` construction implies but this pass did not trace to a loader.
 
+#### Addendum (2026-10-13, from area K): the patient 211 are swept — a positive, and a wrong URL form in the committed list
+
+**This is area K's own addendum above, answered on 2026-10-13 (issue #56). Area K is
+NOT closed** — the clinic half of K is untouched, and the successor below is filed
+against it. 215 of a 230 cap, GET only, one host, `carelink.minimed.eu`.
+
+**The negative holds in full and is now unqualified.** All 211 chunks were fetched —
+**211 distinct digests, 0 duplicates, 0 empty bodies, 2.85 MB** — and every
+pointer-shaped token is **0 across all of them**: `baseUrlPde`, `/connect/pde`,
+`baseUrlCumulus`/`Cms`/`Aem`/`CareLink`, `discover/android`, `clcloud`,
+`api/carepartner`. **No web bundle in the whole patient corpus reads the discovery
+document**, not just the eager ones (OBSERVED,
+[findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5]).
+
+**And the positive the area predicted, on the sibling axis.** Lazy chunk
+`6746.c6795ff7e9ff468d.js` **reads `system.gc.gz.transition.flags` twice** — two
+modules of that chunk, both binding **module id `4265`**, which is defined in the main
+bundle at byte 91298 and whose export table maps `z2:()=>be` to a selector over
+`gt.guardianCumulusPeriodicAPI` = `"system.gc.gz.transition.flags"`. The value read
+flows into the URL that is then POSTed. **Area V's "the client does not follow this
+subtree" is correct for the eager main bundle and refuted for the patient corpus**; the
+measurement is not retracted, the corpus was the limit. **A lazy chunk was exactly
+where the feature-gated call site lived** — both reads sit behind `csrEnabled`.
+
+**A correction to a committed artefact, which is why this addendum exists at all.**
+`chunks.txt` lists chunk `2076` under its **id**; the runtime's `f.u` special-cases
+that one id and emits the **name** `common`. The id form answers **404** (byte-identical
+to the certainly-absent control); the emitted name answers **200** /
+`application/javascript` / 21,157 B. A sweep that trusted the list would have closed
+on "211 cells carry a verdict" with one verdict about a file that does not exist.
+**Re-derive filenames from `f.u` and diff by hash before sweeping a chunk list** —
+`docs/09` §4 now carries this as a trap.
+
+#### Addendum (2026-10-13, from area K): the clinic 224 carry the same URL-form defect — successor
+
+**Derived.** This could not have been written before 2026-10-13: it needs today's
+observation that `f.u` emits one chunk under a *different name*, and nothing in the
+2026-10-08 record connects that to the anomaly it already logged.
+
+**Known, with labels.** The clinic build's runtime carries the **same special case** —
+`f.u = e => (2076===e?"common":e)+"."+{12:"cfb28faf…",40:"9cffbe…",…}` (OBSERVED,
+[findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md:1118]). The clinic sweep
+fetched **224 of a 225-entry map** and recorded **"One entry returned the SPA
+fallback"** (OBSERVED,
+[findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md:13]) — **never explained since**,
+in either the log or `docs/`. The 5518 B fallback is what `carelinkhp.minimed.eu`
+returns for *every* unknown path, so the entry is very likely that one chunk requested
+under its id. The id `2076` is **live**: the clinic app requests it
+(`uploader-instructions → r.e(2076)+r.e(342)`, OBSERVED, `JS-API-SURFACE.md:1128`).
+
+**What is missing, and why it matters.** `docs/10` §2 currently carries "negative in …
+**all 224 lazy chunks**" and the `CHUNK-CORPUS` table is headed "all 224 chunks". If one
+of those 224 bodies is the 5518 B SPA page rather than a chunk, the **denominator is
+misstated by one, in kind**: the corpus is 223 chunks plus one HTML page. The honest
+reading is that this does **not** overturn the negatives — an HTML page can only
+contribute false *hits*, not false misses — so the conclusions stand while the
+denominator does not. That is exactly the `docs/09` §6 item 5 shape: right number, wrong
+scope, propagated.
+
+**Blocker:** the clinic runtime's `2076` **content hash**, which `JS-API-SURFACE.md:1118`
+truncates to `cfb28faf…` — it is in the same committed artefact, so **zero requests to
+re-derive the map** and at most **2** to settle the cell (`/common.<hash>.js` on
+`carelinkhp.minimed.eu`, with `/2076.<hash>.js` as its in-corpus negative twin). Not a
+token, not a budget problem: the map is on disk.
+
+**Closes when:** the 2026-10-08 clinic corpus is re-stated with a **body-verified**
+denominator — every one of the 225 map entries either fetched as
+`application/javascript` under the name `f.u` emits, or recorded as absent — **and**
+the unexplained SPA-fallback entry is either identified as that chunk or shown to be
+something else. The resulting "0 of N" sentence carries the **measured** N.
+**A negative counts:** if `/common.<hash>.js` also 404s on the portal, then the SPA
+entry has another cause and the denominator correction stands on its own.
+
+**Assumptions (INFERRED):** that the clinic runtime's `common` chunk is the source of
+the SPA-fallback entry. The assumption is that the sweep requested the map's filenames
+without applying the `f.u` name substitution — the same mistake the patient list
+records, but **not verified**, because the clinic sweep's per-file ledger is not
+committed. Nothing observed here demonstrates it; the 5518 B page identifies the
+*host family*, not the chunk.
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
