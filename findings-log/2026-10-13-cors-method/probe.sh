@@ -59,6 +59,24 @@
 #      then an unquoted one — and nothing read the file back, so nothing noticed. That is
 #      the same shape as docs/09's "a check that looks like it ran is worse than no check".
 #
+# CORRECTION (2026-10-13, verification round of PR #65) "positive control" was
+# never a control.
+#
+# Cell A was labelled CONTROL-A-positive-recorded-path. It is not a positive control: it
+# returns the same status, the same headers and the same body digest as the absence control,
+# so it cannot discriminate from its own negative and it is a repeat of the negative rather
+# than a control over it. The reasoning that made it look like one was circular -- it proved
+# the 8 cells byte-identical to each other, then cited that identity as the control passing.
+# The role string above is now RECORDED-PATH-not-a-control. **results.jsonl is deliberately
+# NOT rewritten**: it is the record of what was sent and recorded, and the retraction history
+# is the evidence. Its seq 17 and seq 21 rows still read CONTROL-A-positive-recorded-path and
+# that is intentional -- FINDINGS.md 2.1 and 3.2 carry the correction.
+#
+# The same round retracted a second claim this harness encoded in its shape: that a
+# full path x method square per host was worth 4 requests per host. That part still holds,
+# but the justification attached to it (mandatory controls) did not, and FINDINGS.md 5.2 now
+# records it as a trade rather than a rule.
+#
 # The harness was validated end-to-end before attempt 3 with `DRYRUN=1` against names under
 # the reserved `.invalid` TLD: zero vendor traffic, and it is what caught defect 3.
 # ---------------------------------------------------------------------------
@@ -218,13 +236,13 @@ if [ "$H1" != commoncore-trials.medtronic.com ] || [ "$H2" != commoncore.medtron
 fi
 
 # ---- host 1: commoncore-trials.medtronic.com --------------------------------
-out "$H1" A-ocl-GET        GET     /reports-broker/v1/ocl               CONTROL-A-positive-recorded-path
+out "$H1" A-ocl-GET        GET     /reports-broker/v1/ocl               RECORDED-PATH-not-a-control
 out "$H1" B-absent-GET     GET     /reports-broker/v1/ocl-probe-absent CONTROL-B-certainly-absent
 out "$H1" C-absent-OPTIONS OPTIONS /reports-broker/v1/ocl-probe-absent CONTROL-C-the-deciding-cell
 out "$H1" D-ocl-OPTIONS    OPTIONS /reports-broker/v1/ocl               MATCHED-PAIR-completes-the-matrix
 
 # ---- host 2: commoncore.medtronic.com --------------------------------------
-out "$H2" A-ocl-GET        GET     /reports-broker/v1/ocl               CONTROL-A-positive-recorded-path
+out "$H2" A-ocl-GET        GET     /reports-broker/v1/ocl               RECORDED-PATH-not-a-control
 out "$H2" B-absent-GET     GET     /reports-broker/v1/ocl-probe-absent CONTROL-B-certainly-absent
 out "$H2" C-absent-OPTIONS OPTIONS /reports-broker/v1/ocl-probe-absent CONTROL-C-the-deciding-cell
 out "$H2" D-ocl-OPTIONS    OPTIONS /reports-broker/v1/ocl               MATCHED-PAIR-completes-the-matrix
