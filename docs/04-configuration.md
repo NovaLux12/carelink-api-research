@@ -219,16 +219,24 @@ now committed at
 > Both reads are gated on `csrEnabled`.
 >
 > **And the value is used, not merely read.** **THE RUN is bytes 69458–69866** of the
-> same chunk, one unbroken stretch: `E = h.messageEndpoint` → the M2M URL template →
-> `y = …E…` → `getPeriodicDataWithPost({ reqUrl: y, … })`. **The flags subtree selects
-> the URL that is POSTed** [source:
+> same chunk, one unbroken stretch inside **one** webpack module (59567): `E =
+> h.messageEndpoint` → the M2M URL template → `y = …E…` →
+> `getPeriodicDataWithPost({ reqUrl: y, … })`. **The flags subtree selects the URL that
+> is POSTed** [source:
 > findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §4].
 >
-> **The POST is cited, not inferred from its name.** At chunk byte **61803** the method
-> is defined: `getPeriodicDataWithPost({reqUrl:b,…}){return this.http.post(b,{…},{observe:"response"})}`.
-> So `reqUrl: y` destructures to `b`, and `b` is what reaches `this.http.post` — the
-> value read out of the flags selector **is the string handed to the HTTP client**
-> [source: `resolve.txt` §C A8].
+> **The POST is cited, not inferred from its name — and the join between the cite and the
+> call is INFERRED.** At chunk byte **61803** a method is defined:
+> `getPeriodicDataWithPost({reqUrl:b,…}){return this.http.post(b,{…},{observe:"response"})}`.
+> So whatever arrives as `reqUrl` at **that** method destructures to `b`, and `b` is what
+> reaches `this.http.post` (OBSERVED [source: `resolve.txt` §C A8]). **But 61803 resolves
+> to module 43064 (span 61690–62146) and the call at 69866 to module 59567 (span
+> 65786–84396) — disjoint spans, two modules, and nothing asserts the instance relation
+> between them.** The binding is therefore **INFERRED**, on the assumption that webpack
+> module ids are unique within a chunk and that the `connectHttpService` reached in module
+> 59567 is the one module 43064 exports. The claim "the flags value is the string handed
+> to the HTTP client" rests on that join, not on anything this repo has observed closing
+> it.
 >
 > ⚠ **Corrected 2026-10-13, verification round 2 — two offsets in the round-1 version of
 > this note pointed at the evidence rather than the token.** Byte 22260 holds

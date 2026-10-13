@@ -1,3 +1,22 @@
+## Correction (2026-10-13) — regenerated, and why
+
+This file IS regenerable from committed evidence — the screen reads the tree and the
+repo's own `scripts/scrub-patterns.txt`, and sends **zero requests** — so it is
+regenerated rather than annotated:
+
+    cd <repo root> && python3 findings-log/2026-10-13-area-k-patient-chunks/leak-screen.py . \
+        > findings-log/2026-10-13-area-k-patient-chunks/leak-screen.txt
+
+**What moved:** `subjects screened` **950 → 951**. The extra subject is
+`staleness-proof.txt`, added by this pass's post-merge correction. **No pattern fired on
+it** — the zero-hit verdict is unchanged and now covers one more file.
+
+**Counting rule:** every file under the repository root whose extension is `.txt`,
+`.tsv` or `.h`, minus the two self-excluded paths, walked with `os.walk`. It is a count
+of files on disk at the moment of the run, so it moves whenever a pass commits one.
+
+Everything below this rule is the script's own stdout, unmodified.
+
 ================================================================================================
 LEAK SCREEN — this pass's .txt / .tsv / .h artefacts against scripts/scrub-patterns.txt
 Committed because docs/09 section 4 records the gate's leak scan reads NO file of
@@ -5,7 +24,7 @@ these extensions, in any mode, --all included. Pattern VALUES are not reprinted.
 ================================================================================================
 
 patterns loaded        : 10
-subjects screened      : 950
+subjects screened      : 951
 subject extensions     : .txt, .tsv, .h   (none of which the gate's leak scan reads)
 self-excluded          : scripts/research-gate.sh, scripts/scrub-patterns.txt
 
@@ -35,7 +54,7 @@ ok   internal Grafana/K8s/GitLab/DB/Prometheus host   probe: 25 chars (value not
      above is a measurement rather than a silence.
 
 ------------------------------------------------------------------------------------------------
-VERDICT: ZERO hits on all 10 patterns across all 950 subjects.
+VERDICT: ZERO hits on all 10 patterns across all 951 subjects.
 
 Note what this does and does not establish: it establishes that the scrub list
 does not fire on these files. It does not establish that the list is complete,

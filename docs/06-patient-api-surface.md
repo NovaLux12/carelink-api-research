@@ -592,8 +592,27 @@ discovery document, and where they do carry API addresses they are constants.
    `this.baseUrl = "/patient/csr…"`. Same identifier, unrelated values — which is
    exactly why the token needed reading rather than counting.
 
-**Reproduce with:** `python3 patient-csr.py <captures-dir> results.jsonl
-chunks-swept.txt`. It asserts the corpus count against the committed list and exits
-non-zero on disagreement. Output in `patient-csr.txt`, which prints the rule, every raw
-literal with its byte offset, every excluded call, and the resolved shapes
-[source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5, §4a].
+**Reproduce with — and read this before you try, because the corpus is not here.**
+`patient-csr.py` reads the captured response **bodies**. This repository commits the
+215 `.h` **header** files under `findings-log/2026-10-13-area-k-patient-chunks/headers/`
+and **zero bodies** — a chunk body is a Medtronic asset, not evidence. On a clean clone
+`<captures-dir>` therefore cannot be supplied by anyone, and the command below fails
+before it reaches the census:
+
+```
+$ python3 patient-csr.py <captures-dir> results.jsonl chunks-swept.txt
+FATAL: body missing for k-12-c22952a522974f5f-js      # exit 2
+```
+
+**This is stated rather than left implicit: the figures below are reproducible only by a
+reader who already holds the corpus this repository does not.** What *is* reproducible
+from a clean clone is the counting rule's first step — the corpus count is asserted
+against the committed `chunks-swept.txt` (211 entries), and the script exits non-zero if
+those two disagree.
+
+The committed capture is `patient-csr.txt`. It **predates the current script**, so its
+printed rule list is the older one; its header names the script revision it came from,
+records why it cannot be regenerated, and carries the script's digest declaration.
+`patient-csr.py` refuses to run against that artefact unless the declared digest matches
+its own, so the two cannot silently drift apart again
+[source: findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5, §4a, and its Correction (2026-10-13) section].

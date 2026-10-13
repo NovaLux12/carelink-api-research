@@ -1,0 +1,47 @@
+STALENESS / VERDICT PROOF — resolve.py + patient-csr.py, zero requests
+
+A. CONTROL — the committed artefacts pass the guard at their declared digests
+  ok   resolve.txt declares sha256 of resolve.py                  expected a7b0365aea0feb4ec9bcd9962b9d510c30dfa30203054bf052b0497f6edf844f got a7b0365aea0feb4ec9bcd9962b9d510c30dfa30203054bf052b0497f6edf844f
+  ok   patient-csr.txt declares sha256 of patient-csr.py          expected 3894cf079547dbe4ce035310b9b03c971589aa388886e03c4832fc478b829595 got 3894cf079547dbe4ce035310b9b03c971589aa388886e03c4832fc478b829595
+  ok   resolve.py past the guard -> corpus error, not exit 3      expected 1    got 1
+  ok   patient-csr.py past the guard -> corpus error, not exit 3  expected 2    got 2
+
+B. BROKEN self_consistency() — the verdict must be non-zero, not merely printed
+  ok   poisoned copy: --self-test-only exit                       expected 1    got 1
+  ok   poisoned copy: BAD rows printed                            expected 4    got 4
+  ok   poisoned copy: verdict says SELF-TEST FAILED               expected 1    got 1
+  ok   poisoned copy: verdict names self_consistency()            expected 1    got 1
+  ..   the four firing cases are exactly the four that expect fire — a rule that never
+  ..   fires is quiet on all seven, which is why this poison is the right one.
+
+C. ONE MIS-STATED EXPECTATION — proves B is not 'any edit fails'
+  ok   flipped expectation: exit                                  expected 1    got 1
+  ok   flipped expectation: exactly one BAD row                   expected 1    got 1
+
+D. FULL RUN — the same count reaches failures, and failures reaches the exit
+  ..   D1: self_test() returns the count, and the consumer appends it to 'failures'
+  ok   self_test() -> failures.append(...) present                expected 1    got 1
+  ok   the script's exit status is a function of failures         expected 1    got 1
+  ok   self_test()'s return value is the count, not a string      expected 1    got 1
+  ..   D2: the self-test mode exits on the same value, end to end — proof C above IS
+  ..   that exit, and it is the value self_test() returns.
+  ..   NOT PROVEN HERE: a poisoned FULL run, end to end. That needs the corpus, which is
+  ..   not committed. Proven is the wiring in D1 and the exit in C; NOT proven is the two
+  ..   composed. Stated rather than implied.
+
+E. STALE ARTEFACT — a wrong declared digest must exit 3 and name both digests
+  ok   wrong digest: exit                                         expected 3    got 3
+  ok   wrong digest: says STALE                                   expected 1    got 1
+  ok   wrong digest: names the declared one                       expected 1    got 1
+  ok   wrong digest: names the script's own                       expected 1    got 1
+  ok   wrong digest: fires BEFORE the corpus is read              expected 0    got 0
+
+F. UNDECLARED ARTEFACT — no digest line must exit 3, not be trusted silently
+  ok   no digest line: exit                                       expected 3    got 3
+  ok   no digest line: says what is missing                       expected 1    got 1
+  ok   no digest line: names the line it wants                    expected 1    got 1
+  ok   no digest line: prints the sha to use                      expected 1    got 1
+
+SELF-CHECK
+  checks that FAILED: 0
+  consistent

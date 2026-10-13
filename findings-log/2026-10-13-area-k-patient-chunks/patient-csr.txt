@@ -1,3 +1,47 @@
+## Correction (2026-10-13) — this capture PREDATES the script beside it
+
+Everything below this block is a real capture. It is **not** a capture of
+`patient-csr.py` as it stands, and it **cannot be made into one from a clean clone**.
+Stated here rather than in a log entry because the log entry is not what a reader of
+this file opens.
+
+**1. WHICH REVISION PRODUCED IT.** `git log` shows this file and `patient-csr.py` were
+last modified in the **same commit**, `7d0e325`. So the script revision it was generated
+by is the one at `7d0e325` — **INFERRED, not verified**: the run cannot be repeated here,
+so nothing proves the capture came from that revision rather than an earlier one with the
+same output. Reproduce that revision's own digest with
+`git show 7d0e325:findings-log/2026-10-13-area-k-patient-chunks/patient-csr.py | sha256sum`.
+
+**2. WHY IT CANNOT BE REGENERATED.** The script reads response **bodies**. This
+repository commits 215 `.h` **header** files under `headers/` and **zero bodies**. On a
+clean clone:
+
+```
+$ python3 patient-csr.py headers results.jsonl chunks-swept.txt
+FATAL: body missing for k-12-c22952a522974f5f-js
+# exit 2
+```
+
+**3. WHY NO FIGURE BELOW MOVED.** `git diff 7d0e325 -- patient-csr.py` changes no
+collection, no extraction and no dedupe logic: the diff is a `r"""` docstring prefix
+(the module docstring quotes JS template literals, so it carries a `\`` that is an
+invalid Python escape and emitted a `SyntaxWarning` to stderr on every run) plus added
+`w(...)` lines. Rule 7 — slot canonicalisation by position — and rule 8 — `/patient/csr`
+scope — were **already implemented** at `7d0e325` (`canon()`, and the `rule 8` return in
+`resolve()`); only the printed summary lagged. So **every figure below stands**: 19
+shapes, 16 templates, 10 literals in 7 chunks, 7 excluded.
+
+**4. SO WHAT THIS FILE IS *NOT*, in one place.** The rule list below prints **rules 1–5**
+with `rule 5 verbs`. The script prints **rules 1–8**, where `rule 5` is *ternaries* and
+the verb rule is `rule 6`. A reader following this capture's "rule 5" lands on the wrong
+rule — that is the defect, and it is in the script's summary, not in its arithmetic.
+
+**5. STALENESS IS NOW CHECKED, NOT REMEMBERED.** The line below is the digest of
+`patient-csr.py` **as it stands at this revision**; the script compares it against its own
+and exits **3** on a mismatch, before it reads any argument or any body.
+
+SCRIPT-SHA256-AS-OF-THIS-NOTE: 3894cf079547dbe4ce035310b9b03c971589aa388886e03c4832fc478b829595
+
 ====================================================================================================
 /patient/csr CENSUS — counting rule applied, figures re-derived, ZERO requests
 ====================================================================================================

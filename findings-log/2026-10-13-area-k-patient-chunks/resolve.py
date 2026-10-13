@@ -29,11 +29,64 @@ What it asserts, and each assertion is allowed to FAIL:
   A6  every `.z2` occurrence in the chunk resolves to a module that imported 4265.
   A7  the value read flows into the POSTed URL: `h.messageEndpoint` -> `y` ->
       `getPeriodicDataWithPost({reqUrl:y`.
+  A8  the definition at 61803 destructures `reqUrl` to `b` and posts `b`. NOTE the
+      binding from that definition to the CALL at 69866 is INFERRED, not observed —
+      the two sit in different webpack modules and nothing asserts the instance
+      relation. `--self-test-only` exercises the verdict wiring with no corpus.
 Exits non-zero if any assertion fails, so it cannot report a clean run over a
 body that no longer supports the claim.
 """
+## Correction (2026-10-13) — post-merge audit, defects 1/2/4/6: the
+## committed artefact on `main` predates this script; the stale-artefact guard
+## below makes that impossible to ship silently again.
+import hashlib
+import os
 import re
 import sys
+
+# --- STALE-ARTEFACT GUARD --------------------------------------------------------
+# WHY THIS EXISTS. `resolve.txt` is committed but CANNOT be regenerated from a clean
+# clone: this script reads response bodies and the repository commits 215 `.h` header
+# files and zero bodies. That is how a stale artefact reached `main` and stayed there
+# through a whole review cycle — the script emitted a SELF-TEST block and a three-line
+# verdict that the committed capture did not contain, and nothing could notice, because
+# the only way to notice was to run the script.
+#
+# So the script now carries its own SHA-256 and compares it against the one the
+# committed artefact declares. Equal means: any divergence between this script and
+# that artefact has been accounted for on purpose. Different means: the script changed
+# and nobody re-declared the divergence, which is now an error rather than a footnote.
+#
+# It runs BEFORE argv[1] is touched and before any body is read, so it fires on a tree
+# where the corpus is absent — which is the only tree most readers have.
+HERE = os.path.dirname(os.path.abspath(__file__))
+ARTEFACT = os.path.join(HERE, "resolve.txt")
+SCRIPT_SHA256 = hashlib.sha256(
+    open(os.path.abspath(__file__), "rb").read()).hexdigest()
+_DECLARED = re.compile(r"^SCRIPT-SHA256-AS-OF-THIS-NOTE:[ \t]*([0-9a-f]{64})[ \t]*$", re.M)
+
+if os.path.exists(ARTEFACT):
+    _declared = _DECLARED.search(open(ARTEFACT, encoding="utf-8",
+                                      errors="replace").read())
+    if not _declared:
+        sys.stderr.write(
+            "FATAL: resolve.txt carries no `SCRIPT-SHA256-AS-OF-THIS-NOTE: <sha256>`\n"
+            "       line, so this script cannot tell whether it and the committed\n"
+            "       artefact agree. Add the line with this script's own sha256 (%s),\n"
+            "       stating why the artefact has not been regenerated.\n" % SCRIPT_SHA256)
+        raise SystemExit(3)
+    if _declared.group(1) != SCRIPT_SHA256:
+        sys.stderr.write(
+            "FATAL: resolve.txt is STALE.\n"
+            "       artefact declares script sha256 %s\n"
+            "       this script is           %s\n"
+            "       The script changed after the artefact's divergence was last declared.\n"
+            "       Regenerate the artefact if you can; if you cannot, update the\n"
+            "       SCRIPT-SHA256-AS-OF-THIS-NOTE line and say in the artefact why.\n"
+            % (_declared.group(1), SCRIPT_SHA256))
+        raise SystemExit(3)
+
+SELF_TEST_ONLY = "--self-test-only" in sys.argv[1:]
 
 BODIES = sys.argv[1]
 
@@ -81,6 +134,128 @@ MAIN_CITED = [
 failures = []
 out = []
 w = out.append
+
+
+# --- SELF-CONSISTENCY ------------------------------------------------------------
+# WHAT IS ACTUALLY CLAIMED, stated as a rule and then implemented, because the
+# version this replaces claimed one thing and tested another.
+#
+# The comment used to read "Every line above that says FAIL must have produced an
+# entry in `failures`, and every entry in `failures` must be accounted for by
+# something that said FAIL", and the code beneath it tested only that the two
+# collections were not BOTH empty. Two printed FAILs with one recorded entry
+# therefore printed `consistent` — the `if not a8:` defect a second time, a printed
+# verdict with no consequence, in the very block written to close it.
+#
+# COUNTING RULE, recorded because it decides what the check can mean at all.
+# Several assertions append INSIDE A LOOP — A6, A7, A8, and the A-/B-offset
+# sweeps — so ONE printed FAIL line may legitimately correspond to SEVERAL
+# recorded entries, and a raw equality of the two counts would fail a correctly
+# reported run. The correspondence that is both claimed and checkable is therefore
+# DIRECTIONAL, and both directions are now enforced:
+#
+#   (1) every printed FAIL line is backed by at least one recorded entry, and
+#   (2) every recorded entry is backed by at least one printed FAIL line.
+#
+# (1) is the direction the old code could not see at all: it required `failures` to
+# be non-empty, which says nothing about how many. `len(failures) >= len(printed)`
+# is the weakest form of "at least one entry of its own" and it is the form that
+# does not false-positive on the looping assertions.
+#
+# NOT ATTEMPTED, and named rather than glossed: GROUP-level correspondence — proving
+# a given entry belongs to the assertion whose line printed FAIL, rather than to
+# some other failing assertion on the same run. That needs each site to label its
+# own output, which is a change to the assertions themselves and not to this check.
+# Two failing assertions on one run can therefore still pass direction (1) while one
+# of them records nothing of its own. Stated so a reader knows the bound of this
+# check instead of assuming it is tighter than it is.
+
+
+def self_consistency(printed, recorded):
+    """Return the list of correspondence problems between the two collections.
+
+    Pure function of the two counts, so it can be exercised on synthetic inputs
+    below — a check that has only ever run on a clean run has not been shown to
+    fire, which is the defect this block exists to close.
+    """
+    problems = []
+    if printed and not recorded:
+        problems.append("%d line(s) printed FAIL but `failures` is empty — a guard "
+                        "cannot fire" % printed)
+    elif recorded and not printed:
+        problems.append("%d entr(y/ies) recorded but nothing printed FAIL — a "
+                        "failure with no printed verdict" % recorded)
+    elif printed > recorded:
+        problems.append("%d line(s) printed FAIL but only %d entr(y/ies) recorded — "
+                        "at least one printed FAIL has no entry of its own"
+                        % (printed, recorded))
+    return problems
+
+
+# (printed, recorded, should_fire, why). The third case is the one the previous
+# implementation let through; the fourth and fifth are the two directions.
+SELF_TEST_CASES = (
+    (0, 0, False, "both empty — the clean run"),
+    (2, 2, False, "one line per assertion"),
+    (1, 3, False, "one line, three entries: the looping assertions, legitimately"),
+    (2, 1, True,  "TWO printed FAILs, ONE entry — the case the old code called consistent"),
+    (1, 0, True,  "a printed FAIL with nothing recorded"),
+    (0, 1, True,  "an entry with nothing printed"),
+    (3, 2, True,  "three printed FAILs, two entries — the same defect, worse"),
+)
+
+
+def self_test():
+    """Run the correspondence rule on synthetic counts. Returns (lines, n_bad).
+
+    `n_bad` is the count of cases whose behaviour differed from what the rule
+    states, and the caller MUST put it into the verdict. An earlier version
+    printed `BAD` into this table and appended nothing, which is the same
+    print-only verdict this file exists to eliminate, sitting inside the block
+    written to eliminate it — a regression in `self_consistency()` would have
+    printed `BAD` and the script would still have exited 0. `leak-screen-proof.sh`
+    proved the parallel defect in `leak-screen.py`; this is the same defect in
+    the same pass, in a different file, and it survived that proof.
+
+    Returns lines rather than printing them so the same function serves the full
+    run and `--self-test-only`.
+    """
+    lines, bad = [], 0
+    for _printed, _recorded, _should_fire, _why in SELF_TEST_CASES:
+        _r = self_consistency(_printed, _recorded)
+        _fired = bool(_r)
+        if _fired != _should_fire:
+            bad += 1
+        lines.append("  %-4s printed=%d recorded=%d  expect %-6s got %-6s  %s"
+                     % ("ok" if _fired == _should_fire else "BAD", _printed,
+                        _recorded, "fire" if _should_fire else "quiet",
+                        "fire" if _fired else "quiet", _why))
+        if _r:
+            lines.append("         -> %s" % _r[0])
+    return lines, bad
+
+
+if SELF_TEST_ONLY:
+    # The corpus is not committed, so from a clean clone the ONLY part of this
+    # script that can be exercised is the part that needs no corpus. Before this
+    # mode existed, proving the verdict wiring required a 3.4 MB corpus nobody
+    # has — which is why the wiring went unproved for two rounds.
+    _sl, _sb = self_test()
+    print("SELF-TEST — the correspondence rule, on synthetic counts (no corpus involved)")
+    for _l in _sl:
+        print(_l)
+    print("")
+    print("=" * 78)
+    if _sb:
+        print("VERDICT: SELF-TEST FAILED — %d of %d synthetic case(s) did not behave "
+              "as the rule states, so self_consistency() is broken and every verdict "
+              "this script prints is void." % (_sb, len(SELF_TEST_CASES)))
+        print("=" * 78)
+        sys.exit(1)
+    print("VERDICT: SELF-TEST PASS — all %d synthetic cases behave as the rule states."
+          % len(SELF_TEST_CASES))
+    print("=" * 78)
+    sys.exit(0)
 
 
 def anchored(text, off, pat):
@@ -272,6 +447,18 @@ w("")
 # the very same chunk, and it shows what the method does with reqUrl: it destructures
 # it to `b` and passes `b` to this.http.post. That converts a name-based inference
 # into a cite, at zero request cost.
+#
+# ⚠ WHAT IS OBSERVED AND WHAT IS INFERRED, because the section A table prints the
+# module of each offset and the two do not match. Byte 61803 is in module **43064**
+# (span 61690-62146). Byte 69866 — the call site — is in module **59567**
+# (span 65786-84396). Disjoint spans, two different webpack modules, and nothing in
+# this script asserts that `this.connectHttpService` on the module-59567 instance is
+# an instance of the class module 43064 defines. So:
+#   OBSERVED   the definition exists, is anchored at 61803, and does what it says.
+#   INFERRED   that the call at 69866 reaches THAT definition. Assumption: webpack's
+#              module ids are unique within a chunk and the service registered as
+#              `connectHttpService` in module 59567 is the one module 43064 exports.
+#              Not asserted here, and not provable from the bytes this script reads.
 A8_PARTS = [
     ("reqUrl is destructured to b", 61803, r'getPeriodicDataWithPost\(\{reqUrl:b,'),
     ("...and b is what this.http.post receives", 61803,
@@ -288,10 +475,14 @@ for name, off, pat in A8_PARTS:
     w("A8    %-42s @%-6d %s" % (name, off, "ok" if ok else "*** %s" % why))
 w("A8  %-46s %s" % ("BOTH ANCHORED", "PASS" if a8 else "FAIL"))
 w("")
-w("A8  This closes the loop. `reqUrl: y` at 69866 destructures to `b` at 61803, and")
-w("A8  `this.http.post(b, ...)` is the call — so the value read out of the")
-w("A8  system.gc.gz.transition.flags selector is the STRING HANDED TO THE HTTP CLIENT,")
-w("A8  not merely passed to a function with a suggestive name.")
+w("A8  OBSERVED: that definition destructures reqUrl to `b` and posts `b`, so whatever")
+w("A8  arrives as reqUrl is the string handed to the HTTP client -- IF the call at 69866")
+w("A8  reaches it. INFERRED, not observed: the two bytes are in DIFFERENT webpack")
+w("A8  modules (61803 in 43064, span 61690-62146; 69866 in 59567, span 65786-84396 --")
+w("A8  see section A above), and nothing asserts the instance relation between them.")
+w("A8  This does NOT weaken the part of the chain that IS observed: bytes 69458-69866")
+w("A8  are one contiguous run inside module 59567, and E=h.messageEndpoint does reach")
+w("A8  reqUrl:y inside it.")
 w("")
 # THE RUN vs THE WINDOW, named because the first version of this log stated the
 # same claim with three different ranges (69458-69866, 69300-69700, and a slice
@@ -332,60 +523,14 @@ w("    (area V's measurement, re-measured here; it is what makes the chunk read"
 w("     a finding about the LAZY corpus rather than a contradiction of area V)")
 w("")
 
-# --- SELF-CONSISTENCY ----------------------------------------------------------
-# WHAT IS ACTUALLY CLAIMED, stated as a rule and then implemented, because the
-# version this replaces claimed one thing and tested another.
-#
-# The comment used to read "Every line above that says FAIL must have produced an
-# entry in `failures`, and every entry in `failures` must be accounted for by
-# something that said FAIL", and the code beneath it tested only that the two
-# collections were not BOTH empty. Two printed FAILs with one recorded entry
-# therefore printed `consistent` — the `if not a8:` defect a second time, a printed
-# verdict with no consequence, in the very block written to close it.
-#
-# COUNTING RULE, recorded because it decides what the check can mean at all.
-# Several assertions append INSIDE A LOOP — A6, A7, A8, and the A-/B-offset
-# sweeps — so ONE printed FAIL line may legitimately correspond to SEVERAL
-# recorded entries, and a raw equality of the two counts would fail a correctly
-# reported run. The correspondence that is both claimed and checkable is therefore
-# DIRECTIONAL, and both directions are now enforced:
-#
-#   (1) every printed FAIL line is backed by at least one recorded entry, and
-#   (2) every recorded entry is backed by at least one printed FAIL line.
-#
-# (1) is the direction the old code could not see at all: it required `failures` to
-# be non-empty, which says nothing about how many. `len(failures) >= len(printed)`
-# is the weakest form of "at least one entry of its own" and it is the form that
-# does not false-positive on the looping assertions.
-#
-# NOT ATTEMPTED, and named rather than glossed: GROUP-level correspondence — proving
-# a given entry belongs to the assertion whose line printed FAIL, rather than to
-# some other failing assertion on the same run. That needs each site to label its
-# own output, which is a change to the assertions themselves and not to this check.
-# Two failing assertions on one run can therefore still pass direction (1) while one
-# of them records nothing of its own. Stated so a reader knows the bound of this
-# check instead of assuming it is tighter than it is.
-
-
-def self_consistency(printed, recorded):
-    """Return the list of correspondence problems between the two collections.
-
-    Pure function of the two counts, so it can be exercised on synthetic inputs
-    below — a check that has only ever run on a clean run has not been shown to
-    fire, which is the defect this block exists to close.
-    """
-    problems = []
-    if printed and not recorded:
-        problems.append("%d line(s) printed FAIL but `failures` is empty — a guard "
-                        "cannot fire" % printed)
-    elif recorded and not printed:
-        problems.append("%d entr(y/ies) recorded but nothing printed FAIL — a "
-                        "failure with no printed verdict" % recorded)
-    elif printed > recorded:
-        problems.append("%d line(s) printed FAIL but only %d entr(y/ies) recorded — "
-                        "at least one printed FAIL has no entry of its own"
-                        % (printed, recorded))
-    return problems
+# --- SELF-CONSISTENCY ------------------------------------------------------------
+# The rule, its counting rule, `self_consistency()` and `self_test()` are defined at
+# the TOP of this file, above `BODIES = sys.argv[1]`. They moved there so that
+# `--self-test-only` can exercise them on a tree that has no corpus: this script reads
+# bodies the repository does not commit, so before the move the verdict wiring could
+# not be proved without a 3.4 MB corpus nobody has — which is how it stayed unproved
+# through two rounds. What follows is the CONSUMPTION of those definitions on a real
+# run; the definitions themselves are above.
 
 
 printed_fail_lines = [l for l in out if re.search(r"FAIL|\*\*\* NO \*\*\*", l)]
@@ -403,25 +548,20 @@ else:
     w("     NOT checked here; see the counting rule above for what that leaves open.")
 w("")
 
-# Prove the rule above can fail, on synthetic counts. The case named in the comment
-# is the third one and is the one the previous implementation let through.
+# Prove the rule above can fail, on synthetic counts. The third case is the one the
+# previous implementation let through, and the verdict IS the outcome: a case that
+# misbehaves appends to `failures`, so the run exits non-zero. `self_test()` counts
+# those cases and this block is the only place they are consumed.
 w("SELF-TEST — the correspondence rule, on synthetic counts (no corpus involved)")
-for _printed, _recorded, _should_fire, _why in (
-        (0, 0, False, "both empty — the clean run"),
-        (2, 2, False, "one line per assertion"),
-        (1, 3, False, "one line, three entries: the looping assertions, legitimately"),
-        (2, 1, True,  "TWO printed FAILs, ONE entry — the case the old code called consistent"),
-        (1, 0, True,  "a printed FAIL with nothing recorded"),
-        (0, 1, True,  "an entry with nothing printed"),
-        (3, 2, True,  "three printed FAILs, two entries — the same defect, worse"),
-):
-    _r = self_consistency(_printed, _recorded)
-    _fired = bool(_r)
-    w("  %-4s printed=%d recorded=%d  expect %-6s got %-6s  %s"
-      % ("ok" if _fired == _should_fire else "BAD", _printed, _recorded,
-         "fire" if _should_fire else "quiet", "fire" if _fired else "quiet", _why))
-    if _r:
-        w("         -> %s" % _r[0])
+_st_lines, _st_bad = self_test()
+for _l in _st_lines:
+    w(_l)
+if _st_bad:
+    failures.append("SELF-TEST: %d of %d synthetic case(s) did not behave as the rule "
+                    "states — self_consistency() itself is broken, so the verdict above "
+                    "is void" % (_st_bad, len(SELF_TEST_CASES)))
+    w("  -> *** SELF-TEST MISBEHAVED: %d case(s) did not behave as the rule states. "
+      "This is in the VERDICT." % _st_bad)
 w("")
 
 w("=" * 78)
