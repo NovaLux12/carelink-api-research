@@ -338,7 +338,9 @@ per host. So on
 `clcloud.*` **a `200` that carries no preflight exists**, and "carries a preflight" and
 "answers `200`" are **not** the same observation. Area X re-derived it live: **9 further
 `200`-without-CORS responses — every one a `GET` of a discovery payload, across all three
-hosts — and still zero non-2xx responses anywhere in the corpus carrying CORS**
+hosts — and still zero non-2xx responses on `clcloud.*` carrying CORS. (On the separate
+`commoncore*` family, non-2xx responses *do* carry `access-control-allow-origin: *` —
+six captures, PR #59/#65.)**
 ([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
 
 **⚠ But the false premise does not select between the two readings this page offered, and
@@ -610,9 +612,11 @@ superseded by an *identical* build, not by a changed one.
 
 **What the same corpus did settle**, on the neighbouring axis: the patient bundle
 **does** follow `csr.cumulus.periodic.data.endpoints` and POSTs its `display_message`
-field, while naming `system.gc.gz.transition.flags` and never reading it — see
+field, while the *eager* main bundle names `system.gc.gz.transition.flags` and never
+reads it (the lazy chunk `6746` does read it, and the value flows into the URL that is
+then POSTed — the join being INFERRED; see
 [`docs/04`](04-configuration.md) §Which of the two identical CSR pointers the shipped
-client actually follows. **The contrast is the point**: a published pointer a shipped
+client actually follows). **The contrast is the point**: a published pointer a shipped
 client acts on, and one it names but ignores, are now separated by evidence.
 `baseUrlPde` sits outside that distinction entirely — no web bundle names it, because
 none of them reads this document.

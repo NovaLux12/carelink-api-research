@@ -153,7 +153,8 @@ CORS-less `200`s, **four are on `clcloud.*`** — across the three cumulus hosts
 that carries no preflight exists**, and status no longer stands in for CORS presence.
 
 Area X re-derived the cell live on all three hosts: **9 `200`-without-CORS responses, every one
-a `GET` of a discovery payload; 0 non-2xx responses carrying CORS anywhere**
+a `GET` of a discovery payload; 0 non-2xx responses carrying CORS on `clcloud.*`**
+(counter-examples on `commoncore*`: six 403 captures, PR #59/#65)
 ([source: findings-log/2026-10-12-area-x-cors-separation/FINDINGS.md §4]).
 
 **⚠ What is still open is a wider question than this page used to put, and an earlier draft of
