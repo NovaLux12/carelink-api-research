@@ -308,14 +308,45 @@ everything in `docs/02`. It is the ancestor of the current admin surface. Mappin
 changed gives a migration history, and retired endpoints sometimes reveal legacy
 routes still live.
 
-### M. Common Crawl, properly
+#### Addendum (2026-10-13, from area M): the family is anchored on `carelink.minimed.eu`, and Common Crawl holds it
 
-`index.commoncrawl.org` is unreachable from some hosts, and the earlier pass had to
-work around it via `cluster.idx`. **The `*.minimed.eu` / `*.minimed.com` API-set was
-reported as a zero-return for CC**, which is suspicious — CC frequently covers URLs
-Wayback doesn't. Worth a careful pass confirming whether the CC index genuinely has
-nothing, or the byte-range offsets were wrong (a prior pass found its own offsets
-landing on alphabetical neighbours).
+Area M found this while re-deriving a different claim, and it could not have been
+written before that pass ran.
+
+`ARCHIVE-URLS §3` dates `/ipro/hcp/*.jsf` to **2013-05-17 → 2022-05-13** and notes
+the `jsessionid` in the URL, but **names no host**. A second, independent corpus
+now does: **Common Crawl `CC-MAIN-2020-50` (2020-11-23 → 2020-12-06) holds three
+captures of the family on `carelink.minimed.eu` itself**, all at **2020-12-02** —
+`/ipro/hcp/` **302**, `/ipro/hcp/login.jsf` **200**, `/ipro/hcp/main/home.jsf`
+**302** (OBSERVED, [source: findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md
+§3a]). Two query shapes agree on the record set: `matchType=domain` and
+`matchType=host`.
+
+So the retired clinician surface ran **on the patient API host**, not on a
+separate Medtronic domain — which is the migration fact this area exists to
+recover, arriving from a corpus nobody had asked.
+
+**Blocker:** none, and no token. The capture bodies are in Common Crawl and the
+metadata is already in this pass's ledger; the work is reading them, which is
+**zero requests**. The blocker is budget-shaped, not access-shaped — area M spent
+its last request on the host-level confirmation and could not also spend one per
+`/ipro/hcp/*.jsf` path, because this API **fails 28% of its queries**
+([`docs/09`](09-methodology-and-oracles.md) §4) and a sweep of N paths costs
+roughly 1.3 N.
+
+**Closes when** the `/ipro/hcp/*` family is enumerated with a host and a date per
+member, and the `carelink.minimed.eu` anchor is either confirmed across the 2013
+and 2022 ends or explicitly shown to be a single-period deployment.
+**A negative counts** — if the family turns out to be one three-capture entry
+with no siblings, that is the answer and it closes the area.
+
+**Assumptions (INFERRED):** that the 2020-12-02 captures belong to the same
+deployment as `ARCHIVE-URLS`'s 2013–2022 family rather than to a second portal
+sharing the prefix. The assumption is that `/ipro/hcp/*.jsf` names one surface
+over time; it rests on the path shape and the JSF convention, and nothing
+observed here demonstrates it. **`ARCHIVE-URLS` was not modified by area M** — a
+host attribution added to a findings log another pass owns is a correction that
+pass's owner should make, so it is recorded here instead.
 
 ---
 
@@ -402,6 +433,7 @@ being superseded — never silently. Letters are not reused.
 | J — `login-errors.ts` against the live error surface (addendum: the three advertised Auth0 endpoints) | 2026-10-13 | **One routed, two dangling — uniform across all five tenants, no shadow split.** `/mfa/challenge` answers the preflight `204` + `ACAO: *` + exact `allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS` on all five (the path with no probe result in any source was live); `/bc-authorize` and `/oauth/global-token-revocation/connection/Auth0` are unrouted on all five — preflight byte-identical to per-host one-character-different controls (one 10 B digest `0802559db137…` across 15 bodies). POST-only-ness of `/mfa/challenge` is INFERRED from specification, not established — no POST sent, and the six-method list is a second live instance of `docs/09` §4's allow-methods trap. Revocation verdict scoped to the `Auth0` connection name. ⚠ **Correction history preserved:** this addendum was written 2026-10-12 as a GET sweep on area I's then-claim that `registration_endpoint` was absent everywhere; a verifier refuted the premise (the endpoint is live and POST-only) and the addendum was rewritten to empty-body OPTIONS before probing — the original wording is retained in the area-I log, not here. **23 of a 26 cap** (20 curl + 3 live hurl pin-validations), GET + empty-body OPTIONS only, controls first per host, all 5 passed, measured `t_sent` floor **2.395 s** (all gaps ≥ 2 s floor; 2 under the declared 2.5 s and 4 negative durations recorded with no cause asserted). EU cells pinned (exact allow-methods, not contains); counts re-measured 193→199 static, 401→413 execute. Successor: the parent half (bridge `login-errors.ts` taxonomy vs provoked errors) as a new `docs/10` §1 row | [findings-log/2026-10-13-area-j-advertised-endpoints/FINDINGS.md] | #34 |
 | H — the `reportFileNamingSupportedPumpModels` list, entry by entry | 2026-10-13 | **Positive with residue: 214 entries classified, 86 rows matched, 128 not.** The list lives in the **patient** public config (`personal.common.core.report.generation.reportFileNamingSupportedPumpModels`, 69-key document, re-derived live) — not HCP-only as the area premise had it. In code: wire code 129 · display name 71 · bare number 10 · placeholder 4; 82 wire codes matched by family, 47 unmatched by prefix group; placeholders 4/4 matched (all INSTINCT values); bare numbers and display names 0 matched; normalization changes nothing. Anomalies: `MMT-9015` ×2, `Precision Xtra® / Xceed™` ×2, one trailing-space entry matching the map's own padding exactly, ten `MMT-`+bare pairs. Correction attached in `docs/05`: `MMT-8200/8201/8400/8401` are in **both** report lists and **neither** family table. **5 of a 6 cap**, GET only; 3 hp-namespace requests voided by a harness header defect and disclosed as wasted — the close rests on the patient document alone | [findings-log/2026-10-13-area-h-report-naming/FINDINGS.md] | #33 |
 | W — is the per-key projection a complete enumeration path for the 69-key document? | 2026-10-13 | **Negative, and it closes the area: the key sets are identical on EU.** All 69 bulk names probed per-key plus `captcha`'s four flat-name subkeys — **61 VALUED-match**, 5 NULL-404 (every null-valued key), `captcha`/`default.country` 404 via their dedicated routes, **zero names outside the bulk document**. The per-key form is a projection, not an enumeration path — the `docs/04` framing is retired, not extended. **77 of an 84 cap**, GET only, controls first, measured spacing floor **2.574 s** by kernel body-mtimes (0 of 76 gaps under 2.5 s); the harness `date` series shows 3 sub-floor gaps with 3 negative durations, the known corrupt-`t0` class (`docs/09` §4), no cause asserted. **Side-findings:** `personal.common.core.reporting.enabled.countries` does **not** round-trip — its value carries a stray trailing `]` (reproduced byte-identical on re-issue); real-key 404s carry **no `content-type`** while the certainly-absent control carries `text/vnd.a`; the 35 country keys and 69 bulk keys are **disjoint vocabularies**; and the complete 69-name list is committed (`keys.txt`) for the first time. Successor: dated addendum to area E (remaining two deployments) | [findings-log/2026-10-13-area-w-per-key/FINDINGS.md] | #31 |
+| M — is Common Crawl's zero on the API surface real, or was it the method? | 2026-10-13 | **Partially refuted, and the correction is to the METHOD.** Re-derived through the **CDX index API** instead of computed byte offsets, across **six named crawls with dates**, **all four controls first**, both absence oracles established behind their own positive controls. **Refuted:** CC holds **24 records for `minimed.eu` across 5 of the 6 crawls** (8 / 6 / 5 / 2 / 3 in 2018-39 / 2020-50 / 2022-40 / 2025-30 / 2026-39, incl. `/ipro/hcp/login.jsf` **200** on `carelink.minimed.eu` @2020-12-02), and **`medtronic.eu` is non-empty in all 6** — against `COMMONCRAWL §1`'s own table recording `eu,medtronic)` = 0 blocks in the two crawls it used. **Confirmed, for a different reason:** **no captured path in any of the six begins `/patient/` or `/connect/`**, and `clcloud.minimed.eu` / `carelinkhp.minimed.eu` hold **zero**, established by *enumerating* the successful domain responses rather than by their own failed host queries. **So "essentially zero coverage of the API surface" stands; "not one record for any `carelink*` host" does not**, and "in either of two crawls" was a budget artefact — `CC-MAIN-2024-42` really is zero (404 `No Captures found`) and the other five are not. **Offset method, corrected at the mechanism:** of the three byte ranges `COMMONCRAWL §1` records, **one reproduces exactly at both ends, one starts exactly on its bound but overshoots its recorded end into `com,medtryck)`**, and one could not be fetched at all (`503 SlowDown` ×2) — the *opposite* defect from the recorded "alphabetical neighbours" one — and **the first pass's ranges are not re-derivable, because the record names no offsets**. **Side-findings:** the API **failed 17 of 60 (28%)** — 502 / 504 / 400 / 503 — with **0** failures against known-covered hosts, so **one query never settles a zero**; `index.commoncrawl.org` answered **200** here on 2026-10-13 (128 crawls published), recorded as an observation about *this host at this time* and **not generalised**. **60 of a 60 cap**, GET only, **zero requests to any Medtronic host**, measured same-host floor **2.873 s** by kernel body-mtimes, cross-checked at **2.736 s** from `t_sent` (0 gaps under 2.5 s on either oracle). **No `regression/hurl/` pin** — those suites are vendor surfaces and `AGENTS.md` §11 bars one research pass from widening the gate's budget; the rot-prone half is pinned as `docs/09` §4 traps instead. Successor: dated addendum to area L | [findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md] | #44 |
 ---
 
 > **Consumer note.** Findings here are consumed by

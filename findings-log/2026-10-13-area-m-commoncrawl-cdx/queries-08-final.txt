@@ -1,0 +1,18 @@
+# Area M — request set 8: the one request the cap has left.
+#
+# queries-07-retries.txt is left holding only the three lines it actually sent.
+# The fourth line of that file — the host-level confirmation of
+# carelink.minimed.eu on CC-MAIN-2020-50 — was lost the way the other three
+# files' last lines were lost: no trailing newline, so `read` drops it. That
+# cost this pass three re-issued query lines across the run and is recorded in
+# FINDINGS.md rather than smoothed over, because a query silently dropped is
+# the same shape of defect as a request silently unlogged.
+#
+# Why this one: CC-MAIN-2020-50 is the only named crawl whose carelink.minimed.eu
+# captures include /ipro/hcp/login.jsf (200) and /ipro/hcp/main/home.jsf (302).
+# The domain query already establishes those records; this asks the HOST shape
+# for the same crawl, so the positive rests on two query shapes rather than one.
+#
+# tag|role|host|path-and-query|extra curl args
+
+host-carelink-minimed-eu-2020-50|HOST-level-second-shape-on-the-ipro-hpc-crawl|index.commoncrawl.org|/CC-MAIN-2020-50-index?url=carelink.minimed.eu&output=json&matchType=host|

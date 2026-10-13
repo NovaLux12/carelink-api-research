@@ -1,0 +1,16 @@
+requests in run order: 60
+--- harness t_sent series ---
+  data.commoncrawl.org     gaps=  3 min=2.736s max=81.371s under 2.5s=0 under 2.0s=0
+  index.commoncrawl.org    gaps= 55 min=2.875s max=82.651s under 2.5s=0 under 2.0s=0
+  ALL HOSTS  gaps=58 min=2.736s max=82.651s under 2.5s=0 under 2.0s=0
+  span=658.110s
+  requests whose t_done precedes t_sent (impossible): 0 []
+host_tags used by more than one request (bodies overwritten, kernel series cannot separate them): ['reachability', 'resolve-R1-matchTypeHost-positive-on-a-known-covered-exact-host', 'resolve-R2-repeat-of-the-504-absent-host-verbatim', 'resolve-R3-absent-host-under-a-different-covered-domain', 'resolve-R4-absent-host-via-the-count-instrument', 'resolve-R5-count-instrument-positive-on-a-known-covered-domain']
+bodies missing on disk: 0 []
+--- kernel body-mtime series (duplicate-tag pairs excluded) ---
+  data.commoncrawl.org     gaps=  3 min=2.893s max=81.383s under 2.5s=0 under 2.0s=0
+  index.commoncrawl.org    gaps= 43 min=2.873s max=152.906s under 2.5s=0 under 2.0s=0
+  ALL HOSTS  gaps=46 min=2.873s max=152.906s under 2.5s=0 under 2.0s=0
+  span=635.125s
+
+NOTE: git does not preserve mtimes, so the kernel series is valid only on the machine that ran the probe; it is not re-derivable from a clean clone. Both series are reported; neither replaces the other.

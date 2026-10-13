@@ -272,7 +272,7 @@ Recorded so a future pass does not redo them [source: SECURITY-FINDINGS
 | Login-host posture | CORS `*` **with `credentials: false`** (the safe combination); HSTS `max-age=31536000; includeSubDomains`; PKCE `none` rejected |
 | Unauthenticated patient data | everything 401 `InvalidToken`; nothing readable |
 | Internal infra + telemetry | all unreachable from the public internet; Mixpanel session recording `record_sessions_percent: 0` — present, off; no secrets other than F1/F2 |
-| Common Crawl coverage of the API surface | zero captures — a clean negative, not a gap in the sweep [COMMONCRAWL §1] |
+| Common Crawl coverage of the API surface | zero captures of the API surface — a clean negative, and it survives a re-derivation through the index API over 6 named crawls (area M, 2026-10-13). ⚠ The **wider** claim it rested on does not: CC does hold 24 portal captures for `minimed.eu` in 5 of those 6 crawls, including `/ipro/hcp/login.jsf` 200 on `carelink.minimed.eu` @2020-12-02. None of them is `/patient/*` or `/connect/*` (OBSERVED, [source: findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md §3]) [COMMONCRAWL §1] |
 | Cardiac CareLink CVE cluster (CVE-2025-12994/995/996/977, ICSMA-25-205-01) | **not applicable** — Medtronic's own bulletin states it does not affect diabetes CareLink Personal; do not cite as a vulnerability of this surface [POSTURE-0721 R8] |
 
 ## Untested, and the client side

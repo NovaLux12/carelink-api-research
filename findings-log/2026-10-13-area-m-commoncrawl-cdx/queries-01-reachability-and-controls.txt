@@ -1,0 +1,26 @@
+# Area M — request set 1 of 3: reachability, then all four controls, nothing else.
+#
+# tag|role|host|path-and-query|extra curl args
+#
+# The order is the point. The entire finding is a claim about a ZERO, so each
+# instrument this pass uses gets a positive control BEFORE it is used to measure
+# a zero, and a zero is only reported against an instrument that has already
+# been shown to return data on a target it is known to cover.
+#
+# CRAWL: CC-MAIN-2026-39 is named in this repo's own corpus
+# (findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md §1), so it can be
+# requested before collinfo.json has been read — which matters, because naming a
+# crawl from the response we are about to fetch would make the controls depend on
+# the thing they are meant to validate.
+#
+# TWO INSTRUMENTS, TWO POSITIVE CONTROLS:
+#   output=json                -> control A, B (must return rows)
+#   output=json&showNumPages   -> control D (must return a non-zero page count)
+# and one true-zero control on the shape every host-level candidate uses:
+#   matchType=host             -> control C (must return nothing)
+
+reachability|collinfo-inventory|index.commoncrawl.org|/collinfo.json|
+control-A-positive-universal-known-covered-host|CONTROL-positive|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=example.com&output=json&matchType=domain&limit=5|
+control-B-positive-same-crawl-same-shape-on-the-namespace-under-test|CONTROL-positive|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&limit=5|
+control-C-absent-fabricated-host-same-shape-as-host-candidates|CONTROL-absent|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zz-area-m-absent-20261013.medtronic.com&output=json&matchType=host|
+control-D-positive-showNumPages-count-instrument|CONTROL-positive|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&showNumPages=true|
