@@ -81,6 +81,23 @@ The app-version axis looks like a knob. It isn't — it resolves to one of exact
 two documents, so probing a new version number usually re-derives something you
 already have.
 
+> **⚠ And there are two of these dials, not one (2026-10-13).** Everything below is
+> the **discovery-path** dial, and it is observed. A **second, independent** dial
+> rides on the request **body**: `POST {baseUrlCumulus}/display/message` is reported
+> to reject `appVersion ≤ 3.6.9` with `206 {"message":"Upgrade application"}` and to
+> accept `≥ 3.7` with **no upper bound** — so the path has a ceiling and the body
+> does not. **That half is a client's report, not this repo's observation**, and it
+> cannot be settled from outside the project (settling a body field needs a POST, and
+> `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned ones). For the
+> `X.Y` forms the discovery axis has been probed at, the two constraints intersect in
+> exactly **`{3.7, 3.8}`** — `3.7.0` and `3.8.0` clear the body gate, but their
+> discovery-path status is **unobserved**, since no `X.Y.Z` cell was ever probed. One
+> shipped client feeds a
+> **single constant** into both — correct only because `3.8` is in that window, so
+> raising it to `3.9` breaks the discovery path **silently**. Full treatment, with
+> both evidence labels and the reasoning:
+> [`docs/03`](03-discovery-and-versions.md) §3a.
+
 ```mermaid
 flowchart LR
     A["GET /discover/android/X.Y"] --> B{X.Y}
