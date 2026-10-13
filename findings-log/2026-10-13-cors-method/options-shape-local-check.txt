@@ -1,0 +1,18 @@
+# What this harness's OPTIONS request looks like on the wire — verified locally, not against a vendor.
+#
+# The claim being supported: '-X OPTIONS' with no -d, no --data and no stdin sends an EMPTY body,
+# i.e. no Content-Length and no upload. Verified 2026-10-13 against a python http.server bound to
+# 127.0.0.1, so no vendor and no third party was contacted. The 501 is the local server declining
+# OPTIONS; it does not matter — what matters is the request line and the header block below.
+#
+$ curl -sS -v -X OPTIONS -A 'carelink-bridge-research/1.0' -o /dev/null http://127.0.0.1:8799/reports-broker/v1/ocl
+> OPTIONS /reports-broker/v1/ocl HTTP/1.1
+> Host: 127.0.0.1:8799
+> User-Agent: carelink-bridge-research/1.0
+> Accept: */*
+> 
+http_code=501
+#
+# Note what is absent: no content-length, no transfer-encoding, no upload. The vendor's own host
+# negotiates HTTP/2 (ALPN h2), where the same holds — but that is the per-request
+# headers/NN-tag.sent.h capture in this directory, not this note, that says what was sent there.

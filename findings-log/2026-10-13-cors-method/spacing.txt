@@ -1,0 +1,48 @@
+spacing — attempt 3, 8 ledger rows
+counting rule: consecutive pairs in request order, same host only; the cross-host
+pair is reported separately and is not part of the floor.
+
+  kernel body mtime (stat -c %y, ns)
+    6 same-host gaps   min 2.737s   max 2.914s   span 19.651s
+    gaps under the declared 2.5s: 0
+    gaps under the repo floor of 2s: 0
+      seq 17 -> 18  commoncore-trials.medtronic.com 2.754s
+      seq 18 -> 19  commoncore-trials.medtronic.com 2.914s
+      seq 19 -> 20  commoncore-trials.medtronic.com 2.752s
+      seq 21 -> 22  commoncore.medtronic.com       2.737s
+      seq 22 -> 23  commoncore.medtronic.com       2.743s
+      seq 23 -> 24  commoncore.medtronic.com       2.753s
+    cross-host (excluded from the floor): seq 20 -> 21  2.999s
+
+  harness t_sent  (date, ms ISO-8601)
+    6 same-host gaps   min 2.273s   max 3.209s   span 19.546s
+    gaps under the declared 2.5s: 1
+    gaps under the repo floor of 2s: 0
+      seq 17 -> 18  commoncore-trials.medtronic.com 2.648s
+      seq 18 -> 19  commoncore-trials.medtronic.com 2.753s
+      seq 19 -> 20  commoncore-trials.medtronic.com 2.916s
+      seq 21 -> 22  commoncore.medtronic.com       2.999s
+      seq 22 -> 23  commoncore.medtronic.com       3.209s
+      seq 23 -> 24  commoncore.medtronic.com       2.273s
+    cross-host (excluded from the floor): seq 20 -> 21  2.748s
+
+  harness t_done  (date, ms ISO-8601)
+    6 same-host gaps   min 2.496s   max 3.172s   span 19.651s
+    gaps under the declared 2.5s: 1
+    gaps under the repo floor of 2s: 0
+      seq 17 -> 18  commoncore-trials.medtronic.com 3.172s
+      seq 18 -> 19  commoncore-trials.medtronic.com 2.496s
+      seq 19 -> 20  commoncore-trials.medtronic.com 2.752s
+      seq 21 -> 22  commoncore.medtronic.com       2.737s
+      seq 22 -> 23  commoncore.medtronic.com       2.744s
+      seq 23 -> 24  commoncore.medtronic.com       2.752s
+    cross-host (excluded from the floor): seq 20 -> 21  2.998s
+
+  validation of the mtime series, as docs/09 section 4 requires before it is trusted
+    mtime span 19.651s   t_sent span 19.546s   difference +0.105s over 8 requests
+    The two series agree to within a hundredth of a second over the whole run. They
+    are offset by exactly one request duration, not by the sum of them, because a
+    mtime is stamped at body-write time (after the send) while t_sent is stamped
+    before curl is invoked. A divergence proportional to the number of requests would
+    have been the signature of the clock fault docs/09 section 4 describes; this is
+    not that.
