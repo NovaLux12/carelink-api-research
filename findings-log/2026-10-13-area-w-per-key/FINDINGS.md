@@ -92,7 +92,7 @@ rides with the bare-array shape.
 
 ## 5. 404-shape discriminator (OBSERVED)
 
-The certainly-absent control's 404 carries `content-type: text/vnd.a`. **All 12
+The certainly-absent control's 404 carries `content-type: text/vnd.a`. **All 11
 other 404s in this pass** (5 null keys, `captcha`, `default.country`, 4 captcha
 subkeys) carry **no `content-type` header at all**. Do not promote this to an
 oracle — n=1 control shape — but a reader discriminating "never existed" from
@@ -115,7 +115,7 @@ discriminate on that odd content-type" stands.
 | 61 per-key values equal bulk subtrees | OBSERVED | `results.jsonl` seq 4–72; `verdicts.tsv` |
 | 5 null keys 404; captcha/default.country 404; 4 subkeys 404 | OBSERVED | `results.jsonl` seq 1, 4, 7, 12, 21, 42, 58, 71, 73–76; `headers/` |
 | reporting-countries stray `]`, reproduced same-sha | OBSERVED | `results.jsonl` seq 30, 77 |
-| 404 content-type split (control vs real keys) | OBSERVED | `headers/001-control-absent.h` vs the 12 other 404 heads |
+| 404 content-type split (control vs real keys) | OBSERVED | `headers/001-control-absent.h` vs the 11 other 404 heads |
 | country/bulk vocabularies disjoint | OBSERVED (offline) | `keys.txt` × `../2026-10-12-area-d-country-sweep/matrix.tsv` |
 | no per-key name outside the bulk doc | INFERRED from 76 negative cells | this file §3 (assumes the 69+4+1 list exhausts the plausible namespace) |
 | spacing floor 2.574 s; date-series artefacts | OBSERVED | `run.log`; body mtimes in transient `$TMPD` (not committed) |
@@ -124,3 +124,12 @@ Response bodies are transient (`mktemp` dir, not committed) per the run brief;
 digests, sizes and content-types are in `results.jsonl`. No credential, session
 value, or internal hostname appears in this pass. `probe.sh` is the harness as
 sent. Seq 77 (re-issue) was sent separately, by a one-shot invocation of the same shape — `flock` on the same per-host lock, `sleep 2.5` inside, one `curl --compressed` GET of the same URL — with its timestamps recorded into `results.jsonl`/`run.log`/`headers/` to the same schema.
+
+## Correction (2026-10-13) — verifier round 1 on PR #37
+
+**"12 other/real-key 404s" → 11.** The §5 discriminator and the §5 evidence
+table first read 12; the parenthetical enumeration (5 null keys + `captcha` +
+`default.country` + 4 captcha subkeys) sums to 11, and 12 total 404 rows minus
+the 1 control row is 11. Same fix applied to the `docs/04` synthesis line that
+propagated the 12. Original wording retained above in this section; the
+corrected count is 11 everywhere it is stated.

@@ -323,8 +323,8 @@ Every response is a Java-style config envelope:
 - Control: `/patient/configuration/system/zzz.not.a.real.key.zzz` → 404 with
   `content-type: text/vnd.a`, so 404 is a genuine "absent", not a catch-all. Do not
   discriminate on that odd content-type — with one refinement 2026-10-13: the
-  control's 404 carries `text/vnd.a` while all 12 real-key 404s in the area-W
-  sweep (nulls, `captcha`, `default.country`, captcha subkeys) carry **no**
+  control's 404 carries `text/vnd.a` while all 11 real-key 404s in the area-W
+  sweep (nulls, `captcha`, `default.country`, captcha subkeys — first written as 12 in the pass log, corrected 2026-10-13: the enumeration sums to 11) carry **no**
   `content-type` at all. N=1 control shape — not an oracle, but a second header
   to check [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §5].
 - `personal.device.family.to.model.mapping` also answers on `carelink.minimed.com` and is
