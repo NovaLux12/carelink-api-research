@@ -1,0 +1,7 @@
+host	key	seq	norm	sha256_canonical_parsed_value	sha256_canonical_resolved_bulk_subtree	equality
+carelink.minimed.eu	personal.patient.timeline.config	5	envelope-fromjson	a96b7d576ddd656ec481565d42569c0fa69ac898d995d0c5742d396b8abd894d	a96b7d576ddd656ec481565d42569c0fa69ac898d995d0c5742d396b8abd894d	true
+carelink.minimed.eu	personal.patient.timeline.host	6	no-body-to-unwrap	ABSENT		NOT_COMPARED
+carelink.minimed.com	personal.patient.timeline.config	11	envelope-fromjson	f9daee21abcbf4bbe3421a4a3246af1e8dc7769f8f39179c3b7aeb2af22401f6	f9daee21abcbf4bbe3421a4a3246af1e8dc7769f8f39179c3b7aeb2af22401f6	true
+carelink.minimed.com	personal.patient.timeline.host	12	no-body-to-unwrap	ABSENT		NOT_COMPARED
+carelink-trials.minimed.com	personal.patient.timeline.config	20	envelope-fromjson	09233608824780c2d02c0808a4a67aa743c63ba1862b22e487ae3a61921daacd	09233608824780c2d02c0808a4a67aa743c63ba1862b22e487ae3a61921daacd	true
+carelink-trials.minimed.com	personal.patient.timeline.host	21	no-body-to-unwrap	ABSENT		NOT_COMPARED

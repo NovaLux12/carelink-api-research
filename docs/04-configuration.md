@@ -51,7 +51,7 @@ were **Unknown** — not enumerated in any source.
 | device vocabulary | `personal.device.family.to.model.mapping`, `system.settings.transfer.feature.config.device.mapping` | 16 families; `{"BLE780":"780G","CC880":"MiniMed™ Flex"}` — see `05-devices-and-vocabulary.md` |
 | logbook | `logbook.supported.entry.types` (12 types), `logbook.enabled`, `logbook.entries.page.size` (= 30), `system.logbook.entry.validation.config` | validation config is `null` on both patient regions, full schema on trials |
 | device control codes | `csr.control.codes.settings` | `dpml`/`tup`/`lhpro`/`lghpro`/`vex`/`ssd`/`tcc`/`gstpro`/`gstrc` with ranges. **Not** the NGP alarm set — no N-codes |
-| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed. **`csr.cumulus.periodic.data.endpoints` now has its value read for the first time — see [The published pointer set](#the-published-pointer-set)** |
+| disclosed service hosts | `retina.endpoints.config.personal.target_url` (+ `dashboard.base_uri`), `csr.cumulus.periodic.data.endpoints`, `mmm.data.api.url`, `personal.patient.timeline.config.host`, `praas.uri.path.reports.ping`, `nutrino.cc.{broker,metadata}.service.config` | five service families / nine endpoints, all recorded as previously unrecorded and confirmed live; `praas` and the CSR AWS VPC endpoint are internal and not publicly reachable — recorded, not probed. **`csr.cumulus.periodic.data.endpoints` now has its value read for the first time — see [The published pointer set](#the-published-pointer-set)**. **`personal.patient.timeline.config`'s SHAPE is now read for the first time (2026-10-13, area F): exactly two members, `featureEnabled` (boolean, `true`) and `host`, the same member set on all three deployments and pinned.** The **value** of `host` is not new — it was read on 2026-10-08 and published ellipsised ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]). There is no second, top-level `personal.patient.timeline.host` on any of them — see [The timeline config](#the-timeline-config-one-published-pointer-and-one-stale-name)** |
 | **the vendor's own migration switchboard** | **`system.gc.gz.transition.flags`** | **Added 2026-10-12.** Absent from every key list this repo recorded before that date. `displayMessage.useCumulusUrls` = **`true` on all three deployments**, beside a three-way plane dispatch table; five sibling capability booleans are **all `true`**. See [The published pointer set](#the-published-pointer-set) |
 | regional feature flags | `personal.clinical.environment`, `personal.safety.notices.enabled`, `personal.data.csv.export.enable`, `personal.cookie.consent.policy.enabledGlobally`, `personal.dob.validation.enabled`, `personal.mixpanel.analytics.settings.{enabled,token}`, `personal.username.as.email.settings.enabled`, `personal.inpen.supported.countries.enabledGlobally` | see the regional table below |
 | country lists | `personal.common.core.reporting.enabled.countries`, `personal.countries.certification.enabled`, `personal.inpen.supported.countries` | grow over time — see the drift note |
@@ -251,6 +251,76 @@ deployments — a published key that exists and carries nothing. A client that s
 trials only, exactly as this page states — a first reading of the 2026-10-12 pass
 appeared to contradict it and does not. Recorded because the near-miss is the kind of
 thing that otherwise gets written up as a correction of a correct claim.
+
+### The timeline config: one published pointer and one stale name
+
+**Added 2026-10-13 (area F, claim #55).** This is the shape
+[`docs/11`](11-suggested-research-areas.md) area F and its area-V addendum had as
+their blocker: the shipped patient web app gates the Patient-Timeline tab on this
+object, and **nobody had read the object's shape**.
+
+⚠ **What was new, precisely — because "unread" is an easy overstatement.** The
+**object** was not unread: its `host` member's value was read on 2026-10-08 and
+published ellipsised ([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md],
+"Every host below was disclosed only by the config"), which is how `docs/07` and the
+key table above already name this key as the disclosing one. What no pass had read was
+the object's **shape**: **how many members it has**, **what types they carry**, and
+**what `featureEnabled`'s value is**. Both member *names* were already on record — the
+`featureEnabled` string from area V's bundle grep, the `host` in the 2026-10-08 value
+path — so the novelty is **the count and the types**, not the vocabulary. Those are
+what this pass established first, and they are what the addendum below and the six new
+pins are about.
+
+`personal.patient.timeline.config` resolves to an **object of exactly two
+members** — `featureEnabled` and `host` — with the **same member set on all three
+patient deployments** (`OBSERVED`, live bulk document on each host;
+[source: findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 1"]):
+
+| member | type | `.eu` | `.com` | `-trials` |
+|---|---|---|---|---|
+| `featureEnabled` | boolean | `true` | `true` | `true` |
+| `host` | string | 79 chars, `https` | 76 chars, `https` | 76 chars, `https` |
+
+`featureEnabled` carries one shared canonical digest across all three; `host`
+carries **three distinct digests**, so the pointer is deployment-specific and the
+switch is not. **The `host` value is deliberately not published** — it is one
+unauthenticated GET away and this page does not restate it. Whether it names an API
+Gateway, a `carelink.*` host or something else is **not claimed here**.
+
+**There is no second timeline-host key.** The shipped bundle also names a
+**top-level** `personal.patient.timeline.host`, whose constant
+(`personalPatientTimelineHostURL`) occurs once and so has no reader. It is **absent
+from the bulk document on all three deployments**, and its per-key route 404s with
+0 bytes on all three. So the document publishes **exactly one** timeline host, as
+`…timeline.config.host`, and the bundle's other name is a **stale key**
+(`OBSERVED`, 3 of 3; [source:
+findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md "Deliverable 2"]). This closes the
+half-open question area V recorded — "either the bundle names a stale key nothing
+reads, or the vendor publishes a second, unrecorded key" — in favour of the first,
+on the evidence of a **membership test against the document**, not a status code.
+The per-key 404 corroborates; it cannot carry the claim, because on this plane a
+null-valued key 404s identically to an absent one.
+
+**The full member set and the absence of the second key are pinned** in
+`regression/hurl/05-public-config.check.sh`, six assertions, **zero additional
+vendor requests** (every body is already fetched by that suite's area-E block). The
+`host` **value** is deliberately not pinned; `cell-digests.tsv` in the findings log
+carries the per-deployment digests instead.
+
+**Open, and not resolvable from what is committed:** the recorded host shape for this
+service is `…eu-central-1…/prod/patient-timeline` (EU) and
+`…us-east-1…/prod/patient-timeline` (US and trials)
+([source: findings-log/probe-2026-10-08/CROSS-REGION-CONFIG-FINDINGS.md]). The
+measured lengths are 79 / 76 / 76, so **EU is three characters longer than the other
+two, while those recorded region names differ by two.** Either something other than
+the region string differs between the EU and US pointers, or one of the two records
+is wrong — **this page does not say which.** The value *was* read in 2026-10-08 and
+published ellipsised; the abbreviation sits exactly where the region and the
+Gateway id live, which is the segment the discrepancy is about, so the arithmetic is
+the part that does not re-derive from the log. The successor and its 3-request cost
+are recorded in [`docs/11`](11-suggested-research-areas.md) area F. **Whether that
+value may be published is a call for a human holding it, not a pre-committed step
+here.**
 
 ### Credential-shaped values — structure only, comparison held
 
