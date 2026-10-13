@@ -1037,6 +1037,27 @@ the 2026-10-08 clinic corpus still rest on its uncommitted per-file ledger. K's
 denominator therefore stays provisional.
 [source: findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md]
 
+#### Addendum (2026-10-13, from area K residual, issue #78): the denominator is now body-verified at 225
+
+**This closes the residual.** The predecessor left the 2026-10-08 clinic sweep's "one
+entry returned the SPA fallback" unexplained and the per-file ledger uncommitted.
+
+**OBSERVED — all 225 map entries resolve as `application/javascript` under the
+name `f.u` emits** (one GET per map entry, 225 distinct digests, zero duplicates,
+zero empty bodies, zero 5518 B fallbacks; host `carelinkhp.minimed.eu`).
+Under those names the corpus is **225** JS chunks. Measurement:
+`findings-log/2026-10-13-area-k-clinic-denominator/results.jsonl` (seq 1–225),
+`spacing.txt` (body-mtime floor 2.561 s, 0 of 224 gaps under 2.5 s).
+
+**INFERRED (bounded)** — the unexplained 5518 B cell is id 2076 fetched under
+its id instead of its emitted name `common.a62bb847b4ea289e.js`, reproducing the
+defect measured on the patient corpus (pool K pass req 2 vs req 4). The negatives
+in the 2026-10-08 record survive (an HTML shell can only add false hits, never
+false misses), and the published conclusions now carry N = 225.
+
+**Successor -> K proper (unchanged):** control-flow mining of the call-sites and
+the state-dependent shape of `system.logbook.entry.validation.config`.
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
