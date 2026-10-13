@@ -1,0 +1,889 @@
+##############################################################################
+# AREA V offline token census — zero requests, bodies captured 2026-10-13.
+# cs=case-sensitive  ci=case-insensitive (control)  q=complete quoted literal
+##############################################################################
+
+==============================================================================
+== eu-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa (printed here; COMPARED in section 3)
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+PDE                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=1    ci=1    q=1   
+guardianCumulusPeriodicAPI           cs=2    ci=2    q=0   
+csr.cumulus.periodic.data.endpoints  cs=1    ci=1    q=1   
+csrCumulusPeriodicDataAPI            cs=2    ci=2    q=0   
+display_message                      cs=1    ci=1    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=8    ci=8    q=0   
+retina.endpoints.config              cs=1    ci=1    q=1   
+mmm.data.api.url                     cs=1    ci=1    q=1   
+patient-timeline                     cs=5    ci=5    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=3    ci=12   q=1     <-- ci adds 9, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=5    ci=8    q=2     <-- ci adds 3, read §2
+NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, read §2
+
+-- §2 EVERY token with at least one hit, grouped by its maximal enclosing
+   identifier, with the multiplicity and EVERY offset. A hit is a token,
+   not a claim: read the identifier and the surrounding bytes before
+   writing the hit as anything. Nothing is filtered out here.
+
+   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
+           first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'WPDesktop'                        offsets [2887697, 2889198, 2889490]
+           first-hit context: ...10)/i.test(P)?"BlackBerry":ct.includes(P,"IEMobile")||ct.includes(P,"WPDesktop")?"Internet Explorer Mobile":ct.includes...
+      x2   'LoopDetected'                     offsets [3147133, 3147152]
+           first-hit context: ...tiates",Re[Re.InsufficientStorage=507]="InsufficientStorage",Re[Re.LoopDetected=508]="LoopDetected",Re[Re.NotExtended=510]...
+      x2   'getGroupDelayControl'             offsets [1603222, 1607946]
+           first-hit context: ...ions.time-period-label"))," "),e.R7$(3),e.Y8G("formControl",Kt.getGroupDelayControl(rn))("size",Kt.timePeriodControlSize.Medium)("...
+      x2   'isDesktopDevice'                  offsets [1967564, 1974820]
+           first-hit context: ...bIndex===this.LOGS_TAB_INDEX?Ho.W.PUMP:null})}ngOnInit(){this.isDesktopDevice=this.detectDeviceService.isExactlyDesktop(),(0,...
+      x2   'mapDeviceModelName'               offsets [581421, 581727]
+           first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
+
+   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
+           first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'WPDesktop'                        offsets [2887697, 2889198, 2889490]
+           first-hit context: ...10)/i.test(P)?"BlackBerry":ct.includes(P,"IEMobile")||ct.includes(P,"WPDesktop")?"Internet Explorer Mobile":ct.includes...
+      x2   'LoopDetected'                     offsets [3147133, 3147152]
+           first-hit context: ...tiates",Re[Re.InsufficientStorage=507]="InsufficientStorage",Re[Re.LoopDetected=508]="LoopDetected",Re[Re.NotExtended=510]...
+      x2   'getGroupDelayControl'             offsets [1603222, 1607946]
+           first-hit context: ...ions.time-period-label"))," "),e.R7$(3),e.Y8G("formControl",Kt.getGroupDelayControl(rn))("size",Kt.timePeriodControlSize.Medium)("...
+      x2   'isDesktopDevice'                  offsets [1967564, 1974820]
+           first-hit context: ...bIndex===this.LOGS_TAB_INDEX?Ho.W.PUMP:null})}ngOnInit(){this.isDesktopDevice=this.detectDeviceService.isExactlyDesktop(),(0,...
+      x2   'mapDeviceModelName'               offsets [581421, 581727]
+           first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
+
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'baseUrl'                          offsets [2027033, 2027209]
+           first-hit context: ...="us"){return this.cmsService.getBaseCmsUrl().pipe((0,Qi.n)(pe=>(this.baseUrl=pe,this.http.get(`${pe}/media/config/mm...
+
+   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'system.gc.gz.transition.flags'    offsets [2189151]
+           first-hit context: ...hConnect="connect.countriesWithConnect",D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entries.pag...
+
+   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
+           first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
+
+   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'csr.cumulus.periodic.data.endpoints' offsets [2188956]
+           first-hit context: ...odeSettings="csr.control.codes.settings",D.csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints",D.browserCheckSettings="personal.appli...
+
+   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'csrCumulusPeriodicDataAPI'        offsets [93566, 2188929]
+           first-hit context: ...ttings),J=(0,e.Mz)(f,gt=>gt.controlCodeSettings),ne=(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI),fe=(0,e.Mz)(f,gt=>gt.browserCheckSetti...
+
+   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'display_message'                  offsets [3373507]
+           first-hit context: ...rofile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username...
+
+   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — all 8 hit(s) survive a case-SENSITIVE grep (cs=8)
+      x8   '/patient/m2m'                     offsets [1468428, 1468476, 2967821, 3367293, 3367946, 3368243, 3368655, 3373009]
+           first-hit context: ...patient/csr/users/me/email",h="/patient/users/anonymized/me/email",t="/patient/m2m/users/notifications/sms/status",d="/pat...
+
+   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'retina.endpoints.config'          offsets [2189560]
+           first-hit context: ...ries="personal.dashboard.supported.countries",D.retinaEndpointConfig="retina.endpoints.config",D.otcLoginEnabled="personal.sso.otc.en...
+
+   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'mmm.data.api.url'                 offsets [2189269]
+           first-hit context: ...="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="mmm.data.api.url",D.configRefetchSettings="config.refetc...
+
+   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — all 5 hit(s) survive a case-SENSITIVE grep (cs=5)
+      x5   'patient-timeline'                 offsets [1718181, 1719243, 1963408, 1963661, 3340159]
+           first-hit context: ....rXU(We.D),c.rXU(Dt.z))},Gt.\u0275cmp=c.VBU({type:Gt,selectors:[["app-patient-timeline"]],inputs:{reset:"reset"},features:[c.O...
+
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'sourceMappingURL'                 offsets [2850610]
+           first-hit context: ...ubstring(Ue).replace(rt,"$1use strict$2")+"\n";return O&&Me.push("//# sourceMappingURL="+O+"\n"),Me}(P,re),se=new Blob(O,{type...
+
+   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — PARTIAL — 3 of 12 hit(s) survive a case-SENSITIVE grep (cs=3, ci=12); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x5   'guardian'                         offsets [247549, 247758, 254660, 254863, 2505032]
+           first-hit context: ...),e.R7$(),e.SpI(" ",e.bMT(3,17,"report.settings.prefer.pump.data.over.guardian"),"\n"),e.R7$(2),e.Y8G("matLegacyPopove...
+      x3   'GUARDIAN'                         offsets [1723322, 1723332, 2964263]
+           first-hit context: ...={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use str...
+      x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
+           first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
+      x1   'guardianParent'                   offsets [1934651]
+           first-hit context: ...ute.snapshot.data.userLanguage.languageCode:m))}get userName$(){const{guardianParent:m,parentFirstName:j,parentLastName:pe,f...
+      x1   'my_profile_edit_guardian_info'    offsets [2504999]
+           first-hit context: ...dit_personal_info="My profile - Edit personal info",o.my_profile_edit_guardian_info="My profile - Edit guardian info",o.my_profile_edit_two...
+
+   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — PARTIAL — 5 of 8 hit(s) survive a case-SENSITIVE grep (cs=5, ci=8); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x5   'deviceFamily'                     offsets [2964121, 3372241, 3372627, 3372658, 3373116]
+           first-hit context: ...is.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWi...
+      x2   'getDeviceFamily'                  offsets [2964069, 3372209]
+           first-hit context: ...rn G.pipe((0,a.n)(p=>(A=null==p?void 0:p.username,this.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({dev...
+      x1   'lastDeviceFamily'                 offsets [3373160]
+           first-hit context: ...R=sessionStorage.getItem("deviceFamily");return R?V.map(X=>({...X,lastDeviceFamily:R})):V}))}fetchLatestCurrentPatientDetails(...
+
+   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x25  'numberingPlan'                    offsets [271520, 271588, 271867, 271904, 1460297, 1460445, 1460514, 1461181, 1461257, 1461338, 1461431, 1461523, 1461601, 1461688, 1461795, 1461891, 1461968, 1462037, 1462101, 1462432, 1760140, 1760192, 1760522, 1763001, 2736255]
+           first-hit context: ...,o})()},13604:(Je,_e,i)=>{"use strict";function e(a,n){if(a&&n.numberingPlan.nationalPrefixForParsing()){var o=new RegExp("...
+      x18  'selectNumberingPlan'              offsets [12665, 12723, 309507, 1460112, 1460143, 1462343, 1481313, 1481585, 1731908, 1760088, 1762973, 2735527, 2736234, 2736575, 2737371, 2738263, 2769169, 3161756]
+           first-hit context: ...odeSource,mn=xt.countryCallingCode,Mn=xt.number;if(mn)It.selectNumberingPlan(mn);else{if(!Mn||!wt&&!$t)return{};It.selectNumberin...
+      x9   'loadingPromise'                   offsets [834636, 844201, 844430, 845022, 845052, 845083, 845128, 845184, 897450]
+           first-hit context: ...ion gs(r,s){Xi(Sr.Placeholder,s,r[s.index])}function us(r,s,l){r.loadingPromise.then(()=>{r.loadingState===ds.COMPLETE?Xi(Sr...
+      x7   'hasSelectedNumberingPlan'         offsets [13348, 13725, 1462379, 1754623, 1754773, 1754942, 1759566]
+           first-hit context: ...n.countryCallingCodeSource,li=Mn.carrierCode;if(!$t.hasSelectedNumberingPlan()){if(wt.v2)throw new B("INVALID_COUNTRY");return{}}if(!j...
+      x6   'pendingPageScroll'                offsets [1659151, 1661877, 1663569, 1663705, 1663744, 1663767]
+           first-hit context: ... Set(q),this.searchSourceMenuOpen=!1,this.filteredEvents=[],this.pendingPageScroll=null,this.sourceColors=Ai,this.severityIcon=...
+      x5   'incomingParams'                   offsets [974926, 975293, 975317, 975366, 975419]
+           first-hit context: ...=E,this.returnParams={[g.Result]:a.k.Cancel,[g.Expire]:!1},this.incomingParams={returnUrl:"",audiences:null};const c=this.qu...
+      x3   'getNumberingPlanMetadata'         offsets [1460473, 1460819, 1462731]
+           first-hit context: ...wn calling code: ".concat(U));this.numberingPlan=new k(this.getNumberingPlanMetadata(U),this)}else this.numberingPlan=void 0;return th...
+      x3   'missingPlus'                      offsets [1733997, 1748175, 1756789]
+           first-hit context: ...){var We=Re.country,Dt=Re.callingCode;this.international=!1,this.missingPlus=!1,this.IDDPrefix=void 0,this.callingCode=vo...
+      x2   'SwitchingProtocols'               offsets [3144616, 3144641]
+           first-hit context: ...ar ae=function(Re){return Re[Re.Continue=100]="Continue",Re[Re.SwitchingProtocols=101]="SwitchingProtocols",Re[Re.Processing=102...
+      x2   '_draggingPredicate'               offsets [2071102, 2071488]
+           first-hit context: ...PA)([])),(0,e.A)(this,"_globalListeners",void 0),(0,e.A)(this,"_draggingPredicate",m=>m.isDragging()),(0,e.A)(this,"_domNodesToD...
+      x2   'fixMissingPlus'                   offsets [1756156, 1756598]
+           first-hit context: ...(We){return Re.update(We)})||(this.extractIddPrefix(Re)||this.fixMissingPlus(Re)?(this.extractCallingCodeAndNationalSignific...
+      x2   'incomingParameters'               offsets [975077, 975266]
+           first-hit context: ..."return"),S=this.queryParamsService.getByName("audiences");this.incomingParameters={returnUrl:c,audiences:S}}set sessionExpired(...
+      x2   'justLeadingPlus'                  offsets [1753699, 1759354]
+           first-hit context: ...umber(),Gt||(ut=!0))),Gt&&this.inputDigits(Gt,We),{digits:Gt,justLeadingPlus:ut}}},{key:"inputDigits",value:function(Re,We){v...
+      x2   'landingPageFooterText'            offsets [96487, 2189902]
+           first-hit context: ...oid 0:lt.toUpperCase()]))}),Ft=(0,e.Mz)(f,gt=>null==gt?void 0:gt.landingPageFooterText),tn=(0,e.Mz)(t,gt=>null==gt?void 0:gt.cookie...
+      x2   'marketingParams'                  offsets [2886978, 2949877]
+           first-hit context: ...tion(O){(P=ct.getQueryParam(Cn.URL,O)).length&&(re[O]=P)}),re},marketingParams:function(){return ct.extend(ct.info.campaignPa...
+      x2   'reportingPeriod'                  offsets [584330, 636183]
+           first-hit context: ...filter(gn=>Nt[gn]).map(gn=>gn)),patientId:String(this.user.id),reportingPeriod:{from:z()(this.state.periods.value.main.period...
+      x1   'bingpreview'                      offsets [2880855]
+           first-hit context: ...["ahrefsbot","ahrefssiteaudit","amazonbot","baiduspider","bingbot","bingpreview","chrome-lighthouse","facebookexternal","...
+      x1   'noReportingPeriod'                offsets [2669263]
+           first-hit context: ...ckFilterButton"},features:[e.OA$],decls:12,vars:14,consts:[["noReportingPeriod",""],[1,"tc__toolbar"],[1,"toolbar-element"],[3,...
+
+   §2 cross-section check: 0 FAIL(s) across 16 section(s), 51 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+== us-main: 3417255 B  sha256 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa (printed here; COMPARED in section 3)
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+PDE                                  cs=0    ci=25   q=0     <-- ci adds 25, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=1    ci=1    q=1   
+guardianCumulusPeriodicAPI           cs=2    ci=2    q=0   
+csr.cumulus.periodic.data.endpoints  cs=1    ci=1    q=1   
+csrCumulusPeriodicDataAPI            cs=2    ci=2    q=0   
+display_message                      cs=1    ci=1    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=8    ci=8    q=0   
+retina.endpoints.config              cs=1    ci=1    q=1   
+mmm.data.api.url                     cs=1    ci=1    q=1   
+patient-timeline                     cs=5    ci=5    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=3    ci=12   q=1     <-- ci adds 9, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=5    ci=8    q=2     <-- ci adds 3, read §2
+NGP                                  cs=0    ci=94   q=0     <-- ci adds 94, read §2
+
+-- §2 EVERY token with at least one hit, grouped by its maximal enclosing
+   identifier, with the multiplicity and EVERY offset. A hit is a token,
+   not a claim: read the identifier and the surrounding bytes before
+   writing the hit as anything. Nothing is filtered out here.
+
+   'pde': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
+           first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'WPDesktop'                        offsets [2887697, 2889198, 2889490]
+           first-hit context: ...10)/i.test(P)?"BlackBerry":ct.includes(P,"IEMobile")||ct.includes(P,"WPDesktop")?"Internet Explorer Mobile":ct.includes...
+      x2   'LoopDetected'                     offsets [3147133, 3147152]
+           first-hit context: ...tiates",Re[Re.InsufficientStorage=507]="InsufficientStorage",Re[Re.LoopDetected=508]="LoopDetected",Re[Re.NotExtended=510]...
+      x2   'getGroupDelayControl'             offsets [1603222, 1607946]
+           first-hit context: ...ions.time-period-label"))," "),e.R7$(3),e.Y8G("formControl",Kt.getGroupDelayControl(rn))("size",Kt.timePeriodControlSize.Medium)("...
+      x2   'isDesktopDevice'                  offsets [1967564, 1974820]
+           first-hit context: ...bIndex===this.LOGS_TAB_INDEX?Ho.W.PUMP:null})}ngOnInit(){this.isDesktopDevice=this.detectDeviceService.isExactlyDesktop(),(0,...
+      x2   'mapDeviceModelName'               offsets [581421, 581727]
+           first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
+
+   'PDE': 25 hit(s), 7 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [733029, 733047, 733066, 733092, 834961, 834994, 835023, 835044]
+           first-hit context: ...urn"function"==typeof u&&u.propMetadata&&(u=u.propMetadata),u}if(s.propDecorators&&s.propDecorators!==l.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [1840258, 1840750, 1841416, 1845706, 1845875, 1846132]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'WPDesktop'                        offsets [2887697, 2889198, 2889490]
+           first-hit context: ...10)/i.test(P)?"BlackBerry":ct.includes(P,"IEMobile")||ct.includes(P,"WPDesktop")?"Internet Explorer Mobile":ct.includes...
+      x2   'LoopDetected'                     offsets [3147133, 3147152]
+           first-hit context: ...tiates",Re[Re.InsufficientStorage=507]="InsufficientStorage",Re[Re.LoopDetected=508]="LoopDetected",Re[Re.NotExtended=510]...
+      x2   'getGroupDelayControl'             offsets [1603222, 1607946]
+           first-hit context: ...ions.time-period-label"))," "),e.R7$(3),e.Y8G("formControl",Kt.getGroupDelayControl(rn))("size",Kt.timePeriodControlSize.Medium)("...
+      x2   'isDesktopDevice'                  offsets [1967564, 1974820]
+           first-hit context: ...bIndex===this.LOGS_TAB_INDEX?Ho.W.PUMP:null})}ngOnInit(){this.isDesktopDevice=this.detectDeviceService.isExactlyDesktop(),(0,...
+      x2   'mapDeviceModelName'               offsets [581421, 581727]
+           first-hit context: ...CommonCore.map(an=>{var $t;let lt=an.deviceModelAlias;const wt=this.mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{.....
+
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'baseUrl'                          offsets [2027033, 2027209]
+           first-hit context: ...="us"){return this.cmsService.getBaseCmsUrl().pipe((0,Qi.n)(pe=>(this.baseUrl=pe,this.http.get(`${pe}/media/config/mm...
+
+   'system.gc.gz.transition.flags': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'system.gc.gz.transition.flags'    offsets [2189151]
+           first-hit context: ...hConnect="connect.countriesWithConnect",D.guardianCumulusPeriodicAPI="system.gc.gz.transition.flags",D.logbookPageSize="logbook.entries.pag...
+
+   'guardianCumulusPeriodicAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
+           first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
+
+   'csr.cumulus.periodic.data.endpoints': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'csr.cumulus.periodic.data.endpoints' offsets [2188956]
+           first-hit context: ...odeSettings="csr.control.codes.settings",D.csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints",D.browserCheckSettings="personal.appli...
+
+   'csrCumulusPeriodicDataAPI': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'csrCumulusPeriodicDataAPI'        offsets [93566, 2188929]
+           first-hit context: ...ttings),J=(0,e.Mz)(f,gt=>gt.controlCodeSettings),ne=(0,e.Mz)(f,gt=>gt.csrCumulusPeriodicDataAPI),fe=(0,e.Mz)(f,gt=>gt.browserCheckSetti...
+
+   'display_message': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'display_message'                  offsets [3373507]
+           first-hit context: ...rofile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username...
+
+   '/patient/m2m': 8 hit(s), 1 distinct enclosing identifier(s) — all 8 hit(s) survive a case-SENSITIVE grep (cs=8)
+      x8   '/patient/m2m'                     offsets [1468428, 1468476, 2967821, 3367293, 3367946, 3368243, 3368655, 3373009]
+           first-hit context: ...patient/csr/users/me/email",h="/patient/users/anonymized/me/email",t="/patient/m2m/users/notifications/sms/status",d="/pat...
+
+   'retina.endpoints.config': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'retina.endpoints.config'          offsets [2189560]
+           first-hit context: ...ries="personal.dashboard.supported.countries",D.retinaEndpointConfig="retina.endpoints.config",D.otcLoginEnabled="personal.sso.otc.en...
+
+   'mmm.data.api.url': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'mmm.data.api.url'                 offsets [2189269]
+           first-hit context: ...="logbook.entries.page.size",D.captchaSettings="captcha",D.mmmApiUrl="mmm.data.api.url",D.configRefetchSettings="config.refetc...
+
+   'patient-timeline': 5 hit(s), 1 distinct enclosing identifier(s) — all 5 hit(s) survive a case-SENSITIVE grep (cs=5)
+      x5   'patient-timeline'                 offsets [1718181, 1719243, 1963408, 1963661, 3340159]
+           first-hit context: ....rXU(We.D),c.rXU(Dt.z))},Gt.\u0275cmp=c.VBU({type:Gt,selectors:[["app-patient-timeline"]],inputs:{reset:"reset"},features:[c.O...
+
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'sourceMappingURL'                 offsets [2850610]
+           first-hit context: ...ubstring(Ue).replace(rt,"$1use strict$2")+"\n";return O&&Me.push("//# sourceMappingURL="+O+"\n"),Me}(P,re),se=new Blob(O,{type...
+
+   'GUARDIAN': 12 hit(s), 5 distinct enclosing identifier(s) — PARTIAL — 3 of 12 hit(s) survive a case-SENSITIVE grep (cs=3, ci=12); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x5   'guardian'                         offsets [247549, 247758, 254660, 254863, 2505032]
+           first-hit context: ...),e.R7$(),e.SpI(" ",e.bMT(3,17,"report.settings.prefer.pump.data.over.guardian"),"\n"),e.R7$(2),e.Y8G("matLegacyPopove...
+      x3   'GUARDIAN'                         offsets [1723322, 1723332, 2964263]
+           first-hit context: ...={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use str...
+      x2   'guardianCumulusPeriodicAPI'       offsets [93819, 2189123]
+           first-hit context: ...l==an?void 0:an.code)?void 0:lt.toUpperCase())}),be=(0,e.Mz)(f,gt=>gt.guardianCumulusPeriodicAPI),q=(0,e.Mz)(f,gt=>gt.logbookPageSize),a...
+      x1   'guardianParent'                   offsets [1934651]
+           first-hit context: ...ute.snapshot.data.userLanguage.languageCode:m))}get userName$(){const{guardianParent:m,parentFirstName:j,parentLastName:pe,f...
+      x1   'my_profile_edit_guardian_info'    offsets [2504999]
+           first-hit context: ...dit_personal_info="My profile - Edit personal info",o.my_profile_edit_guardian_info="My profile - Edit guardian info",o.my_profile_edit_two...
+
+   'deviceFamily': 8 hit(s), 3 distinct enclosing identifier(s) — PARTIAL — 5 of 8 hit(s) survive a case-SENSITIVE grep (cs=5, ci=8); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x5   'deviceFamily'                     offsets [2964121, 3372241, 3372627, 3372658, 3373116]
+           first-hit context: ...is.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWi...
+      x2   'getDeviceFamily'                  offsets [2964069, 3372209]
+           first-hit context: ...rn G.pipe((0,a.n)(p=>(A=null==p?void 0:p.username,this.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({dev...
+      x1   'lastDeviceFamily'                 offsets [3373160]
+           first-hit context: ...R=sessionStorage.getItem("deviceFamily");return R?V.map(X=>({...X,lastDeviceFamily:R})):V}))}fetchLatestCurrentPatientDetails(...
+
+   'NGP': 94 hit(s), 18 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x25  'numberingPlan'                    offsets [271520, 271588, 271867, 271904, 1460297, 1460445, 1460514, 1461181, 1461257, 1461338, 1461431, 1461523, 1461601, 1461688, 1461795, 1461891, 1461968, 1462037, 1462101, 1462432, 1760140, 1760192, 1760522, 1763001, 2736255]
+           first-hit context: ...,o})()},13604:(Je,_e,i)=>{"use strict";function e(a,n){if(a&&n.numberingPlan.nationalPrefixForParsing()){var o=new RegExp("...
+      x18  'selectNumberingPlan'              offsets [12665, 12723, 309507, 1460112, 1460143, 1462343, 1481313, 1481585, 1731908, 1760088, 1762973, 2735527, 2736234, 2736575, 2737371, 2738263, 2769169, 3161756]
+           first-hit context: ...odeSource,mn=xt.countryCallingCode,Mn=xt.number;if(mn)It.selectNumberingPlan(mn);else{if(!Mn||!wt&&!$t)return{};It.selectNumberin...
+      x9   'loadingPromise'                   offsets [834636, 844201, 844430, 845022, 845052, 845083, 845128, 845184, 897450]
+           first-hit context: ...ion gs(r,s){Xi(Sr.Placeholder,s,r[s.index])}function us(r,s,l){r.loadingPromise.then(()=>{r.loadingState===ds.COMPLETE?Xi(Sr...
+      x7   'hasSelectedNumberingPlan'         offsets [13348, 13725, 1462379, 1754623, 1754773, 1754942, 1759566]
+           first-hit context: ...n.countryCallingCodeSource,li=Mn.carrierCode;if(!$t.hasSelectedNumberingPlan()){if(wt.v2)throw new B("INVALID_COUNTRY");return{}}if(!j...
+      x6   'pendingPageScroll'                offsets [1659151, 1661877, 1663569, 1663705, 1663744, 1663767]
+           first-hit context: ... Set(q),this.searchSourceMenuOpen=!1,this.filteredEvents=[],this.pendingPageScroll=null,this.sourceColors=Ai,this.severityIcon=...
+      x5   'incomingParams'                   offsets [974926, 975293, 975317, 975366, 975419]
+           first-hit context: ...=E,this.returnParams={[g.Result]:a.k.Cancel,[g.Expire]:!1},this.incomingParams={returnUrl:"",audiences:null};const c=this.qu...
+      x3   'getNumberingPlanMetadata'         offsets [1460473, 1460819, 1462731]
+           first-hit context: ...wn calling code: ".concat(U));this.numberingPlan=new k(this.getNumberingPlanMetadata(U),this)}else this.numberingPlan=void 0;return th...
+      x3   'missingPlus'                      offsets [1733997, 1748175, 1756789]
+           first-hit context: ...){var We=Re.country,Dt=Re.callingCode;this.international=!1,this.missingPlus=!1,this.IDDPrefix=void 0,this.callingCode=vo...
+      x2   'SwitchingProtocols'               offsets [3144616, 3144641]
+           first-hit context: ...ar ae=function(Re){return Re[Re.Continue=100]="Continue",Re[Re.SwitchingProtocols=101]="SwitchingProtocols",Re[Re.Processing=102...
+      x2   '_draggingPredicate'               offsets [2071102, 2071488]
+           first-hit context: ...PA)([])),(0,e.A)(this,"_globalListeners",void 0),(0,e.A)(this,"_draggingPredicate",m=>m.isDragging()),(0,e.A)(this,"_domNodesToD...
+      x2   'fixMissingPlus'                   offsets [1756156, 1756598]
+           first-hit context: ...(We){return Re.update(We)})||(this.extractIddPrefix(Re)||this.fixMissingPlus(Re)?(this.extractCallingCodeAndNationalSignific...
+      x2   'incomingParameters'               offsets [975077, 975266]
+           first-hit context: ..."return"),S=this.queryParamsService.getByName("audiences");this.incomingParameters={returnUrl:c,audiences:S}}set sessionExpired(...
+      x2   'justLeadingPlus'                  offsets [1753699, 1759354]
+           first-hit context: ...umber(),Gt||(ut=!0))),Gt&&this.inputDigits(Gt,We),{digits:Gt,justLeadingPlus:ut}}},{key:"inputDigits",value:function(Re,We){v...
+      x2   'landingPageFooterText'            offsets [96487, 2189902]
+           first-hit context: ...oid 0:lt.toUpperCase()]))}),Ft=(0,e.Mz)(f,gt=>null==gt?void 0:gt.landingPageFooterText),tn=(0,e.Mz)(t,gt=>null==gt?void 0:gt.cookie...
+      x2   'marketingParams'                  offsets [2886978, 2949877]
+           first-hit context: ...tion(O){(P=ct.getQueryParam(Cn.URL,O)).length&&(re[O]=P)}),re},marketingParams:function(){return ct.extend(ct.info.campaignPa...
+      x2   'reportingPeriod'                  offsets [584330, 636183]
+           first-hit context: ...filter(gn=>Nt[gn]).map(gn=>gn)),patientId:String(this.user.id),reportingPeriod:{from:z()(this.state.periods.value.main.period...
+      x1   'bingpreview'                      offsets [2880855]
+           first-hit context: ...["ahrefsbot","ahrefssiteaudit","amazonbot","baiduspider","bingbot","bingpreview","chrome-lighthouse","facebookexternal","...
+      x1   'noReportingPeriod'                offsets [2669263]
+           first-hit context: ...ckFilterButton"},features:[e.OA$],decls:12,vars:14,consts:[["noReportingPeriod",""],[1,"tc__toolbar"],[1,"toolbar-element"],[3,...
+
+   §2 cross-section check: 0 FAIL(s) across 32 section(s), 102 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+== hp-main: 3397615 B  sha256 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba (printed here; COMPARED in section 3)
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=5    ci=32   q=0     <-- ci adds 27, read §2
+PDE                                  cs=0    ci=32   q=0     <-- ci adds 32, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=12   ci=12   q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=0    ci=29   q=0     <-- ci adds 29, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=2    ci=2    q=0   
+NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, read §2
+
+-- §2 EVERY token with at least one hit, grouped by its maximal enclosing
+   identifier, with the multiplicity and EVERY offset. A hit is a token,
+   not a claim: read the identifier and the surrounding bytes before
+   writing the hit as anything. Nothing is filtered out here.
+
+   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — PARTIAL — 5 of 32 hit(s) survive a case-SENSITIVE grep (cs=5, ci=32); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x8   'propDecorators'                   offsets [1312749, 1312767, 1312786, 1312812, 1413327, 1413360, 1413389, 1413410]
+           first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [2778434, 2778927, 2779600, 2783927, 2784096, 2784355]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'AppDefault'                       offsets [2351890, 2351909, 2351959]
+           first-hit context: ...x","BleedBox","ArtBox"],pdfVersion:1.4},PrintScaling:{defaultValue:"AppDefault",value:"AppDefault",type:"name",explicitS...
+      x3   'WPDesktop'                        offsets [1828603, 1830101, 1830393]
+           first-hit context: ...10)/i.test(p)?"BlackBerry":it.includes(p,"IEMobile")||it.includes(p,"WPDesktop")?"Internet Explorer Mobile":it.includes...
+      x2   'LoopDetected'                     offsets [3219000, 3219019]
+           first-hit context: ...tiates",Bt[Bt.InsufficientStorage=507]="InsufficientStorage",Bt[Bt.LoopDetected=508]="LoopDetected",Bt[Bt.NotExtended=510]...
+      x2   'WebPDecodeRGBA'                   offsets [2250137, 2261458]
+           first-hit context: ...,268,384,388,392,396],k0=[0,2,8],D1=[8,7,6,4,4,2,2,2,1,1,1,1];this.WebPDecodeRGBA=function(O,K,Te,Ye,mt){var At=f0,Tt=new Gi...
+      x2   'mapDeviceModelName'               offsets [3127720, 3127969]
+           first-hit context: ...{const V=b.CommonCore.map($=>{let q=$.deviceModelAlias;const j=this.mapDeviceModelName($.deviceModel,B);j&&(q=j);const U=$.categ...
+      x1   'WebPDequantizeLevels'             offsets [2223058]
+           first-hit context: ...null!=(Ye=O.ga)&&(Ye.mc=null),O.ga=null,0<O.Ga))return alert("todo:WebPDequantizeLevels"),null}return O.nb+Te*mt}function $l(O,K,T...
+      x1   'dropdead'                         offsets [269182]
+           first-hit context: ...fnbkmlf,ohbaby,gotigers,lindsey1,dragon13,romulus,qazxsw12,zxcvbn1,dropdead,hitman47,snuggle,eleven11,bloopers,357mag,...
+      x1   'hampden'                          offsets [535085]
+           first-hit context: ...c,linkage,lothian,specialises,aggregation,tributes,insurgent,enact,hampden,ghulam,federations,instigated,lyceum,fredr...
+      x1   'helpdesk'                         offsets [293243]
+           first-hit context: ...12,shaka,maldini,suzenet,springst,iiiiii1,yakuza,111111aa,westwind,helpdesk,annamari,bringit,hopefull,hhhhhhh1,saywhat...
+      x1   'herpderp'                         offsets [325138]
+           first-hit context: ...fun,1melissa,tuczno18,bowhunte,gobama,scorch,campeon,bruce2,fudge1,herpderp,bacon1,redsky,blackeye,19966991,19992000,r...
+      x1   'topdevice'                        offsets [326919]
+           first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
+
+   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [1312749, 1312767, 1312786, 1312812, 1413327, 1413360, 1413389, 1413410]
+           first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [2778434, 2778927, 2779600, 2783927, 2784096, 2784355]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'AppDefault'                       offsets [2351890, 2351909, 2351959]
+           first-hit context: ...x","BleedBox","ArtBox"],pdfVersion:1.4},PrintScaling:{defaultValue:"AppDefault",value:"AppDefault",type:"name",explicitS...
+      x3   'WPDesktop'                        offsets [1828603, 1830101, 1830393]
+           first-hit context: ...10)/i.test(p)?"BlackBerry":it.includes(p,"IEMobile")||it.includes(p,"WPDesktop")?"Internet Explorer Mobile":it.includes...
+      x2   'LoopDetected'                     offsets [3219000, 3219019]
+           first-hit context: ...tiates",Bt[Bt.InsufficientStorage=507]="InsufficientStorage",Bt[Bt.LoopDetected=508]="LoopDetected",Bt[Bt.NotExtended=510]...
+      x2   'WebPDecodeRGBA'                   offsets [2250137, 2261458]
+           first-hit context: ...,268,384,388,392,396],k0=[0,2,8],D1=[8,7,6,4,4,2,2,2,1,1,1,1];this.WebPDecodeRGBA=function(O,K,Te,Ye,mt){var At=f0,Tt=new Gi...
+      x2   'mapDeviceModelName'               offsets [3127720, 3127969]
+           first-hit context: ...{const V=b.CommonCore.map($=>{let q=$.deviceModelAlias;const j=this.mapDeviceModelName($.deviceModel,B);j&&(q=j);const U=$.categ...
+      x1   'WebPDequantizeLevels'             offsets [2223058]
+           first-hit context: ...null!=(Ye=O.ga)&&(Ye.mc=null),O.ga=null,0<O.Ga))return alert("todo:WebPDequantizeLevels"),null}return O.nb+Te*mt}function $l(O,K,T...
+      x1   'dropdead'                         offsets [269182]
+           first-hit context: ...fnbkmlf,ohbaby,gotigers,lindsey1,dragon13,romulus,qazxsw12,zxcvbn1,dropdead,hitman47,snuggle,eleven11,bloopers,357mag,...
+      x1   'hampden'                          offsets [535085]
+           first-hit context: ...c,linkage,lothian,specialises,aggregation,tributes,insurgent,enact,hampden,ghulam,federations,instigated,lyceum,fredr...
+      x1   'helpdesk'                         offsets [293243]
+           first-hit context: ...12,shaka,maldini,suzenet,springst,iiiiii1,yakuza,111111aa,westwind,helpdesk,annamari,bringit,hopefull,hhhhhhh1,saywhat...
+      x1   'herpderp'                         offsets [325138]
+           first-hit context: ...fun,1melissa,tuczno18,bowhunte,gobama,scorch,campeon,bruce2,fudge1,herpderp,bacon1,redsky,blackeye,19966991,19992000,r...
+      x1   'topdevice'                        offsets [326919]
+           first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
+
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'baseUrl'                          offsets [2422149, 2422752]
+           first-hit context: ...s,version:m_VERSION,suffix:m_dependency_suffix,receivers:o});const S={baseUrl:"https://pusher.com",urls:{authenticati...
+
+   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — all 12 hit(s) survive a case-SENSITIVE grep (cs=12)
+      x1   'discover'                         offsets [211829]
+           first-hit context: ...,katerina,pass123,andrew1,shaney14,dumbass,osiris,fuck_inside,oakland,discover,ranger1,spanking,lonestar,bingo,meridia...
+      x1   'discovered'                       offsets [449173]
+           first-hit context: ...rporation,rugby,regiment,ohio,appearances,serve,allow,nation,multiple,discovered,directly,scene,levels,growth,elements,a...
+      x1   'discoverer'                       offsets [558582]
+           first-hit context: ...cate,coursework,secreted,counteract,handwritten,foundational,passover,discoverer,decoding,wares,bourgeoisie,playgrounds,...
+      x1   'discoverers'                      offsets [684648]
+           first-hit context: ...s,bellarmine,handedness,holon,introns,movimiento,profitably,lohengrin,discoverers,awash,erste,pharisees,dwarka,oghuz,hash...
+      x1   'discoveries'                      offsets [492201]
+           first-hit context: ...a,nile,assam,shri,currents,suffrage,canadians,mortar,asteroid,bosnian,discoveries,enzymes,sanctioned,replica,hymn,investi...
+      x1   'discovering'                      offsets [491815]
+           first-hit context: ...on,centred,coupe,stirling,freelance,treatise,linguistics,laos,informs,discovering,pillars,encourages,halted,robots,defini...
+      x1   'discovers'                        offsets [469461]
+           first-hit context: ...legedly,releasing,citizenship,observation,stationed,ph.d.,sheep,breed,discovers,encourage,kilometres,journals,performer...
+      x1   'discovery'                        offsets [456020]
+           first-hit context: ...paintings,survived,moth,items,goods,grey,anniversary,criticism,images,discovery,observed,underground,progress,additiona...
+      x1   'rediscover'                       offsets [941540]
+           first-hit context: ...nding,resorting,resists,repulse,repressing,repaying,reneged,refunds,rediscover,redecorated,reconstructive,recommitted,re...
+      x1   'rediscovered'                     offsets [522387]
+           first-hit context: ...ansient,substantive,predatory,sigismund,assassinate,diagrams,arrays,rediscovered,reclamation,spawning,fjord,peacekeeping,s...
+      x1   'rediscovery'                      offsets [581388]
+           first-hit context: ...e,ahmadiyya,euston,bottleneck,computations,terengganu,kalinga,stela,rediscovery,'this,azhar,stylised,karelia,polyethylene...
+      x1   'undiscovered'                     offsets [954784]
+           first-hit context: ...g,unflattering,unfairness,unexpressed,unending,unencumbered,unearth,undiscovered,undisciplined,understan,undershirt,underl...
+
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'sourceMappingURL'                 offsets [1791807]
+           first-hit context: ...ubstring(st).replace(Dt,"$1use strict$2")+"\n";return F&&De.push("//# sourceMappingURL="+F+"\n"),De}(p,k),re=new Blob(F,{type:...
+
+   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x26  'Guardian'                         offsets [3004505, 3004541, 3004608, 3004644, 3004711, 3004747, 3004814, 3004850, 3004917, 3004953, 3006546, 3006575, 3006635, 3006664, 3006721, 3006750, 3006807, 3006836, 3006898, 3006927, 3006987, 3007023, 3007090, 3007126, 3007195, 3007231]
+           first-hit context: ...",shortName:"Enlite Sensor",webDashboardEnabled:!1},"MMT-7811":{name:"Guardian\u2122 Sensor 3",shortName:"Guardian\u21...
+      x1   'guardian'                         offsets [211405]
+           first-hit context: ...i,dkflbvbh,bugger,nimrod,tazman,stranger,newpass,doodle,powder,gotcha,guardian,dublin,slapshot,septembe,147896325,peps...
+      x1   'guardians'                        offsets [505032]
+           first-hit context: ...,tasmanian,canadiens,fumble,refinery,weekdays,unconstitutional,upward,guardians,brownish,imminent,hamas,endorsement,nat...
+      x1   'guardianship'                     offsets [909938]
+           first-hit context: ...ypnotic,hyped,hospitable,hoses,homemaker,hirschmuller,helpers,headset,guardianship,guapo,grubby,granola,granddaddy,goren,g...
+
+   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x1   'deviceFamily'                     offsets [2874214]
+           first-hit context: ...,tags:[],ages:[],diabetesType:[],careTeam:[]},ur={type:De.he.ALL},Xr={deviceFamily:Ut.Ey.all,ageGroups:[Ut.Ey.all]};localS...
+      x1   'deviceFamilyMapping'              offsets [1243187]
+           first-hit context: ...d 0:ma.editableValues)??[]:[]}),fs=(0,e.Mz)(zt,ht=>null==ht?void 0:ht.deviceFamilyMapping),Hr=(0,e.Mz)(zt,ht=>(null==ht?void 0:ht...
+
+   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x11  'reportingPeriod'                  offsets [2956286, 2956321, 2959762, 2962966, 2966200, 2966258, 2970068, 3049072, 3329521, 3329577, 3331387]
+           first-hit context: ...dReportTypes,patientId:null==Zr?void 0:Zr.patientId.toString(),reportingPeriod:null==Zr?void 0:Zr.reportingPeriod,comparisonP...
+      x9   'loadingPromise'                   offsets [1413002, 1422540, 1422766, 1423356, 1423386, 1423417, 1423462, 1423518, 1475393]
+           first-hit context: ...ion im(t,i){zf(no.Placeholder,i,t[i.index])}function y0(t,i,s){t.loadingPromise.then(()=>{t.loadingState===sl.COMPLETE?zf(no...
+      x3   'endTilingPattern'                 offsets [2071793, 2071830, 2071901]
+           first-hit context: ...ndingBox[0],be.boundingBox[3]-be.boundingBox[1],be.matrix)},Ne.endTilingPattern=function(be,pt){gn("endTilingPattern()"),pt.st...
+      x2   'SwitchingProtocols'               offsets [3216483, 3216508]
+           first-hit context: ...ar we=function(Bt){return Bt[Bt.Continue=100]="Continue",Bt[Bt.SwitchingProtocols=101]="SwitchingProtocols",Bt[Bt.Processing=102...
+      x2   'TilingPattern'                    offsets [2071499, 2080697]
+           first-hit context: ...n,Ta[ln]=pt,bo.publish("addPattern",pt)}};Ne.ShadingPattern=eu,Ne.TilingPattern=Wu,Ne.addShadingPattern=function(be,pt){ret...
+      x2   'addShadingPattern'                offsets [2071523, 2071568]
+           first-hit context: ...addPattern",pt)}};Ne.ShadingPattern=eu,Ne.TilingPattern=Wu,Ne.addShadingPattern=function(be,pt){return gn("addShadingPattern()"...
+      x2   'beginTilingPattern'               offsets [2071610, 2071646]
+           first-hit context: ...n(be,pt){return gn("addShadingPattern()"),nu(be,pt),this},Ne.beginTilingPattern=function(be){gn("beginTilingPattern()"),tg(be.bo...
+      x2   'cutOffSegmentsOutsideReportingPeriod' offsets [2960279, 3126991]
+           first-hit context: ...orCalendar(Ro),Ya=this.reportsUtilService.cutOffSegmentsOutsideReportingPeriod({to:Xr,from:Zr},Lr),Mo=this.getAvailabledaysFromSegments(Ya),cc=Arr...
+      x2   'landingPageFooterText'            offsets [2404685, 3297773]
+           first-hit context: ...ttings:(0,f.O)(R["pow.report.generation.settings"],{maxLimit:5}),landingPageFooterText:(0,f.O)(R["pow.landing.page.footer.texts"])}...
+      x2   'loadingPage'                      offsets [1536656, 3115791]
+           first-hit context: ...n])=>(0,ut.H)(this.router.navigateByUrl(`/${w.SbO.login}/${w.SbO.loadingPage}`)).pipe((0,Ot.T)(()=>[ai,Kn]))),(0,o.n)(([a...
+      x2   'marketingParams'                  offsets [1827891, 1890421]
+           first-hit context: ...nction(F){(p=it.getQueryParam(ne.URL,F)).length&&(k[F]=p)}),k},marketingParams:function(){return it.extend(it.info.campaignPa...
+      x2   'reportingPeriodSegments'          offsets [2953819, 2955203]
+           first-hit context: ...tTimelinePeriod:null,highlightedDay:null,timelineSegments:null,reportingPeriodSegments:null,actualVisibleRangeInDays:ep.BW,reportFile...
+      x1   'ShadingPattern'                   offsets [2071479]
+           first-hit context: ...0);pt.id=ln,al[be]=ln,Ta[ln]=pt,bo.publish("addPattern",pt)}};Ne.ShadingPattern=eu,Ne.TilingPattern=Wu,Ne.addShadingPattern=...
+      x1   'bingpreview'                      offsets [1821813]
+           first-hit context: ...["ahrefsbot","ahrefssiteaudit","amazonbot","baiduspider","bingbot","bingpreview","chrome-lighthouse","facebookexternal","...
+      x1   'inpenReportingPeriod'             offsets [2953928]
+           first-hit context: ...eInDays:ep.BW,reportFileFormat:as,patientInpenStatus:null,inpenReportingPeriod:null,isCCEnabled:Es,ccIntegratedTimeRanges:{Cosmos:...
+      x1   'kingpin'                          offsets [214484]
+           first-hit context: ...toria,fuckers,bowler,starbuck,gjkbyf,valhalla,anarchy,blacks,herbie,kingpin,starfish,nokia,loveit,achilles,906090,lab...
+      x1   'kingpins'                         offsets [438553]
+           first-hit context: ...ia,nusrat,euroline,magicone,jimkirk,ameritec,daniel26,sevenn,topazz,kingpins,dima1991,macdog,spencer5,oi812,geoffre,mu...
+      x1   'networkingpe'                     offsets [334419]
+           first-hit context: ...xc,kswiss,anna2000,geniusnet,baby2000,33ds5x,waverly,onlyone4,networkingpe,raven123,blesse,gocards,wow123,pjflkork,juicey,...
+      x1   'pingpong'                         offsets [218280]
+           first-hit context: ...it,robotech,duchess,rctybz,hooter,keywest,18436572,hal9000,mechanic,pingpong,operator,presto,sword,rasputin,spank,bris...
+      x1   'putShadingPatternDict'            offsets [2080544]
+           first-hit context: ...ber>=0&&$t("/"+pt+" "+Ta[pt].objectNumber+" 0 R");bo.publish("putShadingPatternDict"),$t(">>")}}(),function(pt){if(Object.keys(Ta)....
+      x1   'putTilingPatternDict'             offsets [2080817]
+           first-hit context: ...mber<pt&&$t("/"+ln+" "+Ta[ln].objectNumber+" 0 R");bo.publish("putTilingPatternDict"),$t(">>")}}(be.objectOid),function(){if(Objec...
+      x1   'rangpur'                          offsets [671824]
+           first-hit context: ...varun,shuja,khatun,chengde,bushels,lascelles,professionnelle,elfman,rangpur,unpowered,citytv,chojnice,quaternion,stok...
+
+   §2 cross-section check: 0 FAIL(s) across 40 section(s), 170 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+== sup-main: 3410666 B  sha256 a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954 (printed here; COMPARED in section 3)
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=5    ci=32   q=0     <-- ci adds 27, read §2
+PDE                                  cs=0    ci=32   q=0     <-- ci adds 32, read §2
+baseUrl                              cs=2    ci=2    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=12   ci=12   q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=1    ci=1    q=0   
+GUARDIAN                             cs=0    ci=29   q=0     <-- ci adds 29, read §2
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=2    ci=2    q=0   
+NGP                                  cs=0    ci=51   q=0     <-- ci adds 51, read §2
+
+-- §2 EVERY token with at least one hit, grouped by its maximal enclosing
+   identifier, with the multiplicity and EVERY offset. A hit is a token,
+   not a claim: read the identifier and the surrounding bytes before
+   writing the hit as anything. Nothing is filtered out here.
+
+   'pde': 32 hit(s), 13 distinct enclosing identifier(s) — PARTIAL — 5 of 32 hit(s) survive a case-SENSITIVE grep (cs=5, ci=32); the rest are substrings of unrelated identifiers and are NOT references to the token
+      x8   'propDecorators'                   offsets [1313078, 1313096, 1313115, 1313141, 1413660, 1413693, 1413722, 1413743]
+           first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [3161217, 3161710, 3162383, 3166710, 3166879, 3167138]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'AppDefault'                       offsets [2351832, 2351851, 2351901]
+           first-hit context: ...x","BleedBox","ArtBox"],pdfVersion:1.4},PrintScaling:{defaultValue:"AppDefault",value:"AppDefault",type:"name",explicitS...
+      x3   'WPDesktop'                        offsets [1828939, 1830437, 1830729]
+           first-hit context: ...10)/i.test(p)?"BlackBerry":it.includes(p,"IEMobile")||it.includes(p,"WPDesktop")?"Internet Explorer Mobile":it.includes...
+      x2   'LoopDetected'                     offsets [3020924, 3020943]
+           first-hit context: ...tiates",zt[zt.InsufficientStorage=507]="InsufficientStorage",zt[zt.LoopDetected=508]="LoopDetected",zt[zt.NotExtended=510]...
+      x2   'WebPDecodeRGBA'                   offsets [2250078, 2261399]
+           first-hit context: ...,268,384,388,392,396],Z0=[0,2,8],H1=[8,7,6,4,4,2,2,2,1,1,1,1];this.WebPDecodeRGBA=function(O,K,Te,Ye,gt){var Ct=V0,xt=new $i...
+      x2   'mapDeviceModelName'               offsets [2929563, 2929812]
+           first-hit context: ...{const H=b.CommonCore.map($=>{let q=$.deviceModelAlias;const F=this.mapDeviceModelName($.deviceModel,z);F&&(q=F);const V=$.categ...
+      x1   'WebPDequantizeLevels'             offsets [2222999]
+           first-hit context: ...null!=(Ye=O.ga)&&(Ye.mc=null),O.ga=null,0<O.Ga))return alert("todo:WebPDequantizeLevels"),null}return O.nb+Te*gt}function ql(O,K,T...
+      x1   'dropdead'                         offsets [269182]
+           first-hit context: ...fnbkmlf,ohbaby,gotigers,lindsey1,dragon13,romulus,qazxsw12,zxcvbn1,dropdead,hitman47,snuggle,eleven11,bloopers,357mag,...
+      x1   'hampden'                          offsets [535085]
+           first-hit context: ...c,linkage,lothian,specialises,aggregation,tributes,insurgent,enact,hampden,ghulam,federations,instigated,lyceum,fredr...
+      x1   'helpdesk'                         offsets [293243]
+           first-hit context: ...12,shaka,maldini,suzenet,springst,iiiiii1,yakuza,111111aa,westwind,helpdesk,annamari,bringit,hopefull,hhhhhhh1,saywhat...
+      x1   'herpderp'                         offsets [325138]
+           first-hit context: ...fun,1melissa,tuczno18,bowhunte,gobama,scorch,campeon,bruce2,fudge1,herpderp,bacon1,redsky,blackeye,19966991,19992000,r...
+      x1   'topdevice'                        offsets [326919]
+           first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
+
+   'PDE': 32 hit(s), 13 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x8   'propDecorators'                   offsets [1313078, 1313096, 1313115, 1313141, 1413660, 1413693, 1413722, 1413743]
+           first-hit context: ...urn"function"==typeof c&&c.propMetadata&&(c=c.propMetadata),c}if(i.propDecorators&&i.propDecorators!==s.propDecorators){cons...
+      x6   'removeStylesOnCompDestroy'        offsets [3161217, 3161710, 3162383, 3166710, 3166879, 3167138]
+           first-hit context: ...",void 0),(0,e.A)(this,"appId",void 0),(0,e.A)(this,"removeStylesOnCompDestroy",void 0),(0,e.A)(this,"doc",void 0),(0,e.A)(this,"platfo...
+      x3   'AppDefault'                       offsets [2351832, 2351851, 2351901]
+           first-hit context: ...x","BleedBox","ArtBox"],pdfVersion:1.4},PrintScaling:{defaultValue:"AppDefault",value:"AppDefault",type:"name",explicitS...
+      x3   'WPDesktop'                        offsets [1828939, 1830437, 1830729]
+           first-hit context: ...10)/i.test(p)?"BlackBerry":it.includes(p,"IEMobile")||it.includes(p,"WPDesktop")?"Internet Explorer Mobile":it.includes...
+      x2   'LoopDetected'                     offsets [3020924, 3020943]
+           first-hit context: ...tiates",zt[zt.InsufficientStorage=507]="InsufficientStorage",zt[zt.LoopDetected=508]="LoopDetected",zt[zt.NotExtended=510]...
+      x2   'WebPDecodeRGBA'                   offsets [2250078, 2261399]
+           first-hit context: ...,268,384,388,392,396],Z0=[0,2,8],H1=[8,7,6,4,4,2,2,2,1,1,1,1];this.WebPDecodeRGBA=function(O,K,Te,Ye,gt){var Ct=V0,xt=new $i...
+      x2   'mapDeviceModelName'               offsets [2929563, 2929812]
+           first-hit context: ...{const H=b.CommonCore.map($=>{let q=$.deviceModelAlias;const F=this.mapDeviceModelName($.deviceModel,z);F&&(q=F);const V=$.categ...
+      x1   'WebPDequantizeLevels'             offsets [2222999]
+           first-hit context: ...null!=(Ye=O.ga)&&(Ye.mc=null),O.ga=null,0<O.Ga))return alert("todo:WebPDequantizeLevels"),null}return O.nb+Te*gt}function ql(O,K,T...
+      x1   'dropdead'                         offsets [269182]
+           first-hit context: ...fnbkmlf,ohbaby,gotigers,lindsey1,dragon13,romulus,qazxsw12,zxcvbn1,dropdead,hitman47,snuggle,eleven11,bloopers,357mag,...
+      x1   'hampden'                          offsets [535085]
+           first-hit context: ...c,linkage,lothian,specialises,aggregation,tributes,insurgent,enact,hampden,ghulam,federations,instigated,lyceum,fredr...
+      x1   'helpdesk'                         offsets [293243]
+           first-hit context: ...12,shaka,maldini,suzenet,springst,iiiiii1,yakuza,111111aa,westwind,helpdesk,annamari,bringit,hopefull,hhhhhhh1,saywhat...
+      x1   'herpderp'                         offsets [325138]
+           first-hit context: ...fun,1melissa,tuczno18,bowhunte,gobama,scorch,campeon,bruce2,fudge1,herpderp,bacon1,redsky,blackeye,19966991,19992000,r...
+      x1   'topdevice'                        offsets [326919]
+           first-hit context: ...y,hej123,oldtimer,sanpedro,clicker,mollycat,roadstar,golfe,lvbnhbq1,topdevice,a1b2c,sevastopol,calli,milosc,fire911,pin...
+
+   'baseUrl': 2 hit(s), 1 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x2   'baseUrl'                          offsets [2422091, 2422694]
+           first-hit context: ...s,version:m_VERSION,suffix:m_dependency_suffix,receivers:o});const S={baseUrl:"https://pusher.com",urls:{authenticati...
+
+   'discover': 12 hit(s), 12 distinct enclosing identifier(s) — all 12 hit(s) survive a case-SENSITIVE grep (cs=12)
+      x1   'discover'                         offsets [211829]
+           first-hit context: ...,katerina,pass123,andrew1,shaney14,dumbass,osiris,fuck_inside,oakland,discover,ranger1,spanking,lonestar,bingo,meridia...
+      x1   'discovered'                       offsets [449173]
+           first-hit context: ...rporation,rugby,regiment,ohio,appearances,serve,allow,nation,multiple,discovered,directly,scene,levels,growth,elements,a...
+      x1   'discoverer'                       offsets [558582]
+           first-hit context: ...cate,coursework,secreted,counteract,handwritten,foundational,passover,discoverer,decoding,wares,bourgeoisie,playgrounds,...
+      x1   'discoverers'                      offsets [684648]
+           first-hit context: ...s,bellarmine,handedness,holon,introns,movimiento,profitably,lohengrin,discoverers,awash,erste,pharisees,dwarka,oghuz,hash...
+      x1   'discoveries'                      offsets [492201]
+           first-hit context: ...a,nile,assam,shri,currents,suffrage,canadians,mortar,asteroid,bosnian,discoveries,enzymes,sanctioned,replica,hymn,investi...
+      x1   'discovering'                      offsets [491815]
+           first-hit context: ...on,centred,coupe,stirling,freelance,treatise,linguistics,laos,informs,discovering,pillars,encourages,halted,robots,defini...
+      x1   'discovers'                        offsets [469461]
+           first-hit context: ...legedly,releasing,citizenship,observation,stationed,ph.d.,sheep,breed,discovers,encourage,kilometres,journals,performer...
+      x1   'discovery'                        offsets [456020]
+           first-hit context: ...paintings,survived,moth,items,goods,grey,anniversary,criticism,images,discovery,observed,underground,progress,additiona...
+      x1   'rediscover'                       offsets [941540]
+           first-hit context: ...nding,resorting,resists,repulse,repressing,repaying,reneged,refunds,rediscover,redecorated,reconstructive,recommitted,re...
+      x1   'rediscovered'                     offsets [522387]
+           first-hit context: ...ansient,substantive,predatory,sigismund,assassinate,diagrams,arrays,rediscovered,reclamation,spawning,fjord,peacekeeping,s...
+      x1   'rediscovery'                      offsets [581388]
+           first-hit context: ...e,ahmadiyya,euston,bottleneck,computations,terengganu,kalinga,stela,rediscovery,'this,azhar,stylised,karelia,polyethylene...
+      x1   'undiscovered'                     offsets [954784]
+           first-hit context: ...g,unflattering,unfairness,unexpressed,unending,unencumbered,unearth,undiscovered,undisciplined,understan,undershirt,underl...
+
+   'sourceMappingURL': 1 hit(s), 1 distinct enclosing identifier(s) — all 1 hit(s) survive a case-SENSITIVE grep (cs=1)
+      x1   'sourceMappingURL'                 offsets [1792143]
+           first-hit context: ...ubstring(st).replace(Tt,"$1use strict$2")+"\n";return B&&De.push("//# sourceMappingURL="+B+"\n"),De}(p,E),ae=new Blob(B,{type:...
+
+   'GUARDIAN': 29 hit(s), 4 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x26  'Guardian'                         offsets [2806348, 2806384, 2806451, 2806487, 2806554, 2806590, 2806657, 2806693, 2806760, 2806796, 2808389, 2808418, 2808478, 2808507, 2808564, 2808593, 2808650, 2808679, 2808741, 2808770, 2808830, 2808866, 2808933, 2808969, 2809038, 2809074]
+           first-hit context: ...",shortName:"Enlite Sensor",webDashboardEnabled:!1},"MMT-7811":{name:"Guardian\u2122 Sensor 3",shortName:"Guardian\u21...
+      x1   'guardian'                         offsets [211405]
+           first-hit context: ...i,dkflbvbh,bugger,nimrod,tazman,stranger,newpass,doodle,powder,gotcha,guardian,dublin,slapshot,septembe,147896325,peps...
+      x1   'guardians'                        offsets [505032]
+           first-hit context: ...,tasmanian,canadiens,fumble,refinery,weekdays,unconstitutional,upward,guardians,brownish,imminent,hamas,endorsement,nat...
+      x1   'guardianship'                     offsets [909938]
+           first-hit context: ...ypnotic,hyped,hospitable,hoses,homemaker,hirschmuller,helpers,headset,guardianship,guapo,grubby,granola,granddaddy,goren,g...
+
+   'deviceFamily': 2 hit(s), 2 distinct enclosing identifier(s) — all 2 hit(s) survive a case-SENSITIVE grep (cs=2)
+      x1   'deviceFamily'                     offsets [3256997]
+           first-hit context: ...,tags:[],ages:[],diabetesType:[],careTeam:[]},rr={type:De.he.ALL},Ea={deviceFamily:Ht.Ey.all,ageGroups:[Ht.Ey.all]};localS...
+      x1   'deviceFamilyMapping'              offsets [1243187]
+           first-hit context: ...d 0:ma.editableValues)??[]:[]}),ms=(0,e.Mz)(Ut,ft=>null==ft?void 0:ft.deviceFamilyMapping),Kr=(0,e.Mz)(Ut,ft=>(null==ft?void 0:ft...
+
+   'NGP': 51 hit(s), 22 distinct enclosing identifier(s) — case-insensitive ONLY — a case-SENSITIVE grep drops EVERY one (cs=0)
+      x11  'reportingPeriod'                  offsets [2850915, 3131445, 3131501, 3133311, 3352001, 3352036, 3355477, 3358681, 3361915, 3361973, 3365783]
+           first-hit context: ...enerateDownloadId(z,L){const{selectedReportTypes:W,patientId:H,reportingPeriod:$,comparisonPeriod:q,dailyReportDays:F,selecte...
+      x9   'loadingPromise'                   offsets [1413335, 1422873, 1423099, 1423689, 1423719, 1423750, 1423795, 1423851, 1475729]
+           first-hit context: ...ion wm(t,i){op(Qs.Placeholder,i,t[i.index])}function G0(t,i,s){t.loadingPromise.then(()=>{t.loadingState===sl.COMPLETE?op(Qs...
+      x3   'endTilingPattern'                 offsets [2071770, 2071807, 2071878]
+           first-hit context: ...ndingBox[0],be.boundingBox[3]-be.boundingBox[1],be.matrix)},je.endTilingPattern=function(be,mt){yn("endTilingPattern()"),mt.st...
+      x2   'SwitchingProtocols'               offsets [3018407, 3018432]
+           first-hit context: ...ar we=function(zt){return zt[zt.Continue=100]="Continue",zt[zt.SwitchingProtocols=101]="SwitchingProtocols",zt[zt.Processing=102...
+      x2   'TilingPattern'                    offsets [2071476, 2080674]
+           first-hit context: ...n,xa[dn]=mt,vo.publish("addPattern",mt)}};je.ShadingPattern=Vf,je.TilingPattern=xp,je.addShadingPattern=function(be,mt){ret...
+      x2   'addShadingPattern'                offsets [2071500, 2071545]
+           first-hit context: ...addPattern",mt)}};je.ShadingPattern=Vf,je.TilingPattern=xp,je.addShadingPattern=function(be,mt){return yn("addShadingPattern()"...
+      x2   'beginTilingPattern'               offsets [2071587, 2071623]
+           first-hit context: ...n(be,mt){return yn("addShadingPattern()"),lu(be,mt),this},je.beginTilingPattern=function(be){yn("beginTilingPattern()"),Eg(be.bo...
+      x2   'cutOffSegmentsOutsideReportingPeriod' offsets [2928834, 3355994]
+           first-hit context: ...re.to}:b.CommonCore?b.CommonCore:b.Cosmos}cutOffSegmentsOutsideReportingPeriod(b,z){if(null==z||!z.size)return z;const L=new Map;for(const W of z....
+      x2   'landingPageFooterText'            offsets [2404627, 3099697]
+           first-hit context: ...ttings:(0,f.O)(j["pow.report.generation.settings"],{maxLimit:5}),landingPageFooterText:(0,f.O)(j["pow.landing.page.footer.texts"])}...
+      x2   'loadingPage'                      offsets [1536992, 2917634]
+           first-hit context: ...n])=>(0,ht.H)(this.router.navigateByUrl(`/${w.SbO.login}/${w.SbO.loadingPage}`)).pipe((0,It.T)(()=>[oi,Gn]))),(0,o.n)(([o...
+      x2   'marketingParams'                  offsets [1828227, 1890757]
+           first-hit context: ...nction(B){(p=it.getQueryParam(ie.URL,B)).length&&(E[B]=p)}),E},marketingParams:function(){return it.extend(it.info.campaignPa...
+      x2   'reportingPeriodSegments'          offsets [3349534, 3350918]
+           first-hit context: ...tTimelinePeriod:null,highlightedDay:null,timelineSegments:null,reportingPeriodSegments:null,actualVisibleRangeInDays:Wa.BW,reportFile...
+      x1   'ShadingPattern'                   offsets [2071456]
+           first-hit context: ...0);mt.id=dn,al[be]=dn,xa[dn]=mt,vo.publish("addPattern",mt)}};je.ShadingPattern=Vf,je.TilingPattern=xp,je.addShadingPattern=...
+      x1   'bingpreview'                      offsets [1822149]
+           first-hit context: ...["ahrefsbot","ahrefssiteaudit","amazonbot","baiduspider","bingbot","bingpreview","chrome-lighthouse","facebookexternal","...
+      x1   'inpenReportingPeriod'             offsets [3349643]
+           first-hit context: ...eInDays:Wa.BW,reportFileFormat:Uo,patientInpenStatus:null,inpenReportingPeriod:null,isCCEnabled:ys,ccIntegratedTimeRanges:{Cosmos:...
+      x1   'kingpin'                          offsets [214484]
+           first-hit context: ...toria,fuckers,bowler,starbuck,gjkbyf,valhalla,anarchy,blacks,herbie,kingpin,starfish,nokia,loveit,achilles,906090,lab...
+      x1   'kingpins'                         offsets [438553]
+           first-hit context: ...ia,nusrat,euroline,magicone,jimkirk,ameritec,daniel26,sevenn,topazz,kingpins,dima1991,macdog,spencer5,oi812,geoffre,mu...
+      x1   'networkingpe'                     offsets [334419]
+           first-hit context: ...xc,kswiss,anna2000,geniusnet,baby2000,33ds5x,waverly,onlyone4,networkingpe,raven123,blesse,gocards,wow123,pjflkork,juicey,...
+      x1   'pingpong'                         offsets [218280]
+           first-hit context: ...it,robotech,duchess,rctybz,hooter,keywest,18436572,hal9000,mechanic,pingpong,operator,presto,sword,rasputin,spank,bris...
+      x1   'putShadingPatternDict'            offsets [2080521]
+           first-hit context: ...ber>=0&&Xt("/"+mt+" "+xa[mt].objectNumber+" 0 R");vo.publish("putShadingPatternDict"),Xt(">>")}}(),function(mt){if(Object.keys(xa)....
+      x1   'putTilingPatternDict'             offsets [2080794]
+           first-hit context: ...mber<mt&&Xt("/"+dn+" "+xa[dn].objectNumber+" 0 R");vo.publish("putTilingPatternDict"),Xt(">>")}}(be.objectOid),function(){if(Objec...
+      x1   'rangpur'                          offsets [671824]
+           first-hit context: ...varun,shuja,khatun,chengde,bushels,lascelles,professionnelle,elfman,rangpur,unpowered,citytv,chojnice,quaternion,stok...
+
+   §2 cross-section check: 0 FAIL(s) across 48 section(s), 238 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+== eu-runtime: 8268 B  sha256 0dfea208804facf881a79ea9e8758dc6900e74ef174c11ba50250c0a62273722 (printed here; COMPARED in section 3)
+==============================================================================
+baseUrlPde                           cs=0    ci=0    q=0   
+/connect/pde                         cs=0    ci=0    q=0   
+pde                                  cs=0    ci=0    q=0   
+PDE                                  cs=0    ci=0    q=0   
+baseUrl                              cs=0    ci=0    q=0   
+baseUrlCumulus                       cs=0    ci=0    q=0   
+baseUrlCms                           cs=0    ci=0    q=0   
+baseUrlAem                           cs=0    ci=0    q=0   
+baseUrlCareLink                      cs=0    ci=0    q=0   
+discover/android                     cs=0    ci=0    q=0   
+discover                             cs=0    ci=0    q=0   
+clcloud                              cs=0    ci=0    q=0   
+api/carepartner                      cs=0    ci=0    q=0   
+system.gc.gz.transition.flags        cs=0    ci=0    q=0   
+guardianCumulusPeriodicAPI           cs=0    ci=0    q=0   
+csr.cumulus.periodic.data.endpoints  cs=0    ci=0    q=0   
+csrCumulusPeriodicDataAPI            cs=0    ci=0    q=0   
+display_message                      cs=0    ci=0    q=0   
+useCumulusUrls                       cs=0    ci=0    q=0   
+csrDisplayMessageUrl                 cs=0    ci=0    q=0   
+personalDisplayMessageUrl            cs=0    ci=0    q=0   
+carepartnerDisplayMessageUrl         cs=0    ci=0    q=0   
+pullGMInfoFromCumulus                cs=0    ci=0    q=0   
+pullSMSHistoryFromCumulus            cs=0    ci=0    q=0   
+sendDiagnosticLogsToCumulus          cs=0    ci=0    q=0   
+sendPeriodicToCumulus                cs=0    ci=0    q=0   
+sendSMSFromCumulus                   cs=0    ci=0    q=0   
+/patient/m2m                         cs=0    ci=0    q=0   
+retina.endpoints.config              cs=0    ci=0    q=0   
+mmm.data.api.url                     cs=0    ci=0    q=0   
+patient-timeline                     cs=0    ci=0    q=0   
+dialog-lite                          cs=0    ci=0    q=0   
+sourceMappingURL                     cs=0    ci=0    q=0   
+GUARDIAN                             cs=0    ci=0    q=0   
+medicalDeviceFamily                  cs=0    ci=0    q=0   
+deviceFamily                         cs=0    ci=0    q=0   
+NGP                                  cs=0    ci=0    q=0   
+
+-- §2 EVERY token with at least one hit, grouped by its maximal enclosing
+   identifier, with the multiplicity and EVERY offset. A hit is a token,
+   not a claim: read the identifier and the surrounding bytes before
+   writing the hit as anything. Nothing is filtered out here.
+
+   §2 cross-section check: 0 FAIL(s) across 48 section(s), 238 group(s). This one can fail — it compares
+   section 1 with section 2, not a set with its own partition. It is NOT the protection the
+   old guard was claimed to be; §3 is that.
+
+==============================================================================
+§3  PUBLISHED-MULTIPLICITIES GUARD (drift detection, not first-derivation proof)
+==============================================================================
+   header matches expected-multiplicities.HEADER: True
+   ok   5 body digest(s) match the published file
+   ok   238 group(s) match the published multiplicities exactly
+   ok   case-sensitivity class per section (derived from the bytes, not stored):
+        eu-main     pde                                ci       cs=0   ci=25  groups=7
+        eu-main     PDE                                ci       cs=0   ci=25  groups=7
+        eu-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        eu-main     system.gc.gz.transition.flags      cs       cs=1   ci=1   groups=1
+        eu-main     guardianCumulusPeriodicAPI         cs       cs=2   ci=2   groups=1
+        eu-main     csr.cumulus.periodic.data.endpoints cs       cs=1   ci=1   groups=1
+        eu-main     csrCumulusPeriodicDataAPI          cs       cs=2   ci=2   groups=1
+        eu-main     display_message                    cs       cs=1   ci=1   groups=1
+        eu-main     /patient/m2m                       cs       cs=8   ci=8   groups=1
+        eu-main     retina.endpoints.config            cs       cs=1   ci=1   groups=1
+        eu-main     mmm.data.api.url                   cs       cs=1   ci=1   groups=1
+        eu-main     patient-timeline                   cs       cs=5   ci=5   groups=1
+        eu-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        eu-main     GUARDIAN                           partial  cs=3   ci=12  groups=5
+        eu-main     deviceFamily                       partial  cs=5   ci=8   groups=3
+        eu-main     NGP                                ci       cs=0   ci=94  groups=18
+        us-main     pde                                ci       cs=0   ci=25  groups=7
+        us-main     PDE                                ci       cs=0   ci=25  groups=7
+        us-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        us-main     system.gc.gz.transition.flags      cs       cs=1   ci=1   groups=1
+        us-main     guardianCumulusPeriodicAPI         cs       cs=2   ci=2   groups=1
+        us-main     csr.cumulus.periodic.data.endpoints cs       cs=1   ci=1   groups=1
+        us-main     csrCumulusPeriodicDataAPI          cs       cs=2   ci=2   groups=1
+        us-main     display_message                    cs       cs=1   ci=1   groups=1
+        us-main     /patient/m2m                       cs       cs=8   ci=8   groups=1
+        us-main     retina.endpoints.config            cs       cs=1   ci=1   groups=1
+        us-main     mmm.data.api.url                   cs       cs=1   ci=1   groups=1
+        us-main     patient-timeline                   cs       cs=5   ci=5   groups=1
+        us-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        us-main     GUARDIAN                           partial  cs=3   ci=12  groups=5
+        us-main     deviceFamily                       partial  cs=5   ci=8   groups=3
+        us-main     NGP                                ci       cs=0   ci=94  groups=18
+        hp-main     pde                                partial  cs=5   ci=32  groups=13
+        hp-main     PDE                                ci       cs=0   ci=32  groups=13
+        hp-main     baseUrl                            cs       cs=2   ci=2   groups=1
+        hp-main     discover                           cs       cs=12  ci=12  groups=12
+        hp-main     sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        hp-main     GUARDIAN                           ci       cs=0   ci=29  groups=4
+        hp-main     deviceFamily                       cs       cs=2   ci=2   groups=2
+        hp-main     NGP                                ci       cs=0   ci=51  groups=22
+        sup-main    pde                                partial  cs=5   ci=32  groups=13
+        sup-main    PDE                                ci       cs=0   ci=32  groups=13
+        sup-main    baseUrl                            cs       cs=2   ci=2   groups=1
+        sup-main    discover                           cs       cs=12  ci=12  groups=12
+        sup-main    sourceMappingURL                   cs       cs=1   ci=1   groups=1
+        sup-main    GUARDIAN                           ci       cs=0   ci=29  groups=4
+        sup-main    deviceFamily                       cs       cs=2   ci=2   groups=2
+        sup-main    NGP                                ci       cs=0   ci=51  groups=22
+
+   LIMIT, stated so this guard is not over-read twice: it detects DRIFT between
+   the published numbers and the bytes, and the digest rows additionally prove
+   the bytes on disk ARE the published ones. Neither detects a wrong FIRST
+   derivation: the multiplicities AND the digests were both produced by this
+   same pass from these same bundles on 2026-10-13. MODE=--emit re-derives;
+   re-review any diff by hand rather than trusting that it is small.

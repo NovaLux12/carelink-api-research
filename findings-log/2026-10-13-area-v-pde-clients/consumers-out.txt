@@ -1,0 +1,207 @@
+==============================================================================
+§1  PUBLISHED CONFIG KEY CENSUS — patient bundle vs area W's 69 names
+==============================================================================
+# key list: findings-log/2026-10-13-area-w-per-key/keys.txt (69 names)
+# test: the key as a COMPLETE quoted literal ("<key>"). Raw substring
+# counts are printed alongside only to show where they would mislead.
+
+# PRESENT as a quoted literal: 56 of 69
+   q=5   raw=152  captcha   <-- raw-substring count would have misled
+   q=1   raw=1    config.refetch
+   q=1   raw=1    connect.countriesWithConnect
+   q=1   raw=1    csr.control.codes.settings
+   q=1   raw=2    csr.crm.settings   <-- raw-substring count would have misled
+   q=1   raw=1    csr.cumulus.periodic.data.endpoints
+   q=1   raw=1    default.country
+   q=1   raw=1    doppler.cc.trace.service.enable
+   q=1   raw=1    logbook.enabled
+   q=1   raw=1    logbook.entries.page.size
+   q=1   raw=1    logbook.supported.entry.types
+   q=1   raw=1    mmm.data.api.url
+   q=1   raw=1    nutrino.cc.broker.service.config
+   q=1   raw=2    nutrino.cc.metadata.service.config   <-- raw-substring count would have misled
+   q=1   raw=1    outages.nextupdateat
+   q=1   raw=1    patient.application.gender
+   q=1   raw=1    patient.email.regex
+   q=1   raw=1    personal.aggregated.report.interval.config
+   q=1   raw=1    personal.application.browser.check.configuration
+   q=1   raw=1    personal.banner.notifications
+   q=1   raw=1    personal.clinical.environment
+   q=1   raw=1    personal.common.core.report.generation
+   q=1   raw=1    personal.common.core.reporting.enabled.countries
+   q=1   raw=1    personal.cookie.consent.policy
+   q=1   raw=1    personal.countries.certification.enabled
+   q=1   raw=1    personal.countries.with.anonymization
+   q=1   raw=1    personal.cp.follow.limit
+   q=1   raw=1    personal.cp.m2m.enabled
+   q=1   raw=2    personal.crm.settings   <-- raw-substring count would have misled
+   q=1   raw=1    personal.dashboard.supported.countries
+   q=1   raw=1    personal.data.csv.export.enable
+   q=1   raw=1    personal.device.family.to.model.mapping
+   q=1   raw=1    personal.dob.validation.enabled
+   q=1   raw=1    personal.inpen.redirect.url
+   q=1   raw=1    personal.inpen.supported.countries
+   q=1   raw=1    personal.input.validation.params
+   q=1   raw=1    personal.integrations.redirect.scheme.whitelist
+   q=1   raw=1    personal.landing.page.footer.texts
+   q=1   raw=1    personal.last.sync.date.enabled
+   q=1   raw=1    personal.link.carepartner.app.download
+   q=1   raw=1    personal.link.help.system
+   q=1   raw=1    personal.mixpanel.analytics.settings
+   q=1   raw=1    personal.myinsights.supported.countries
+   q=1   raw=1    personal.patient.timeline.config
+   q=1   raw=1    personal.report.generation.settings
+   q=1   raw=1    personal.safety.notices.enabled
+   q=1   raw=2    personal.session.timeout   <-- raw-substring count would have misled
+   q=1   raw=1    personal.sso.otc.enabled
+   q=1   raw=1    personal.third.party.apps
+   q=1   raw=1    personal.udi.number
+   q=1   raw=1    personal.username.as.email.settings
+   q=1   raw=1    retina.endpoints.config
+   q=1   raw=1    safety.notice.domain.whitelist
+   q=1   raw=1    system.gc.gz.transition.flags
+   q=1   raw=1    system.logbook.entry.validation.config
+   q=1   raw=1    system.settings.transfer.feature.config
+
+# ABSENT as a quoted literal (raw-substring count 0 too): 13 of 69
+   q=0    raw=0    country.reports
+   q=0    raw=0    csr.application.browser.check.configuration
+   q=0    raw=0    logbook.reset.time.on.type.change
+   q=0    raw=0    personal.captcha.enable
+   q=0    raw=0    personal.communication.enabled
+   q=0    raw=0    personal.landing.page.background.image
+   q=0    raw=0    personal.linking.request.interval
+   q=0    raw=0    personal.myinsights.banner.supported.devices
+   q=0    raw=0    personal.notification.enabled
+   q=0    raw=0    personal.retina.endpoint.config
+   q=0    raw=0    personal.user.skip.consent.click.mandate
+   q=0    raw=0    praas.uri.path.reports.ping
+   q=0    raw=0    system.auth0.url.whitelist
+
+# NOTE the trap this rule exists for: `captcha` is q=5 / raw=152. A raw
+# census would have reported 152 reasons to believe the captcha config key
+# is used in code. 5 is the honest number.
+
+==============================================================================
+§2  DOES ANY CODE FOLLOW A PUBLISHED POINTER?  (eager main bundle only)
+==============================================================================
+# config-observer module id 4265, bytes 91296..97138
+# exports 70 selectors
+# selector resolution is by hand-checked literal, not by regex: a regex
+# over minified signal-selector factories resolves some selectors to the
+# wrong leaf, and a wrong leaf is worse than an absent one.
+
+--- csr.cumulus.periodic.data.endpoints
+    key constant : csrCumulusPeriodicDataAPI="csr.cumulus.periodic.data.endpoints"  (1 occurrence(s) of the key string)
+    byte offsets : constant assignment @2188929, selector definition @93547
+    selector local 'ne' -> exported as 'cO'
+    property reads of ".cO" in the whole file: 3
+
+--- system.gc.gz.transition.flags
+    key constant : guardianCumulusPeriodicAPI="system.gc.gz.transition.flags"  (1 occurrence(s) of the key string)
+    byte offsets : constant assignment @2189123, selector definition @93800
+    selector local 'be' -> exported as 'z2'
+    property reads of ".z2" in the whole file: 0
+      the substring ".z2" does not occur anywhere in this file.
+
+--- personal.patient.timeline.config
+    key constant : patientTimelineConfig="personal.patient.timeline.config"  (1 occurrence(s) of the key string)
+    byte offsets : constant assignment @2190423, selector definition @96965
+    selector local 'Nt' -> exported as 'bQ'
+    property reads of ".bQ" in the whole file: 3
+
+--- the Patient-Timeline tab gate that consumes personal.patient.timeline.config
+    'patientTimelineConfig$' @ 1966082: ...bMT(7,18,"recent.activity.tabs.Logs"))),t.R7$(2),t.vxM(1===m.currentTabIndex?8:-1),t.R7$(),t.vxM(null!=(b=t.bMT(10,20,m.patientTimelineConfig$))&&b.featureEnabled?9:-1),t.R7$(2),t.vxM(t.bMT(12,22,m.isSettingsTransferFeatureEnabled$)?11:-1)}}function ...
+    'patientTimelineConfig$' @ 1968135: ....isCCTraceEnabled=Ae}),this.store.select(Ws.wm).pipe((0,Oe.pQ)(this.destroyRef)).subscribe(m=>{this.userLocale=m}),this.patientTimelineConfig$=this.store.select(Ri.bQ),this.load(),this.loadLoginSync()}load(){this.filters$.pipe((0,ua.B)(100),(0,De.M)(...
+    'featureEnabled' @ 1490867: ....dialog=et,this.destroyRef=ht}showAboutCookiesIfNeeded(){this.store.select(be.TB).pipe((0,ee.s)(1),(0,J.p)(ge=>!!ge&&ge.featureEnabled&&ge.status===ye.o.NONE),(0,e.n)(ge=>this.dialog.open(p,{autoFocus:!1,restoreFocus:!1,disableClose:!0,hasBackdrop:!1...
+    'featureEnabled' @ 1966110: ...bs.Logs"))),t.R7$(2),t.vxM(1===m.currentTabIndex?8:-1),t.R7$(),t.vxM(null!=(b=t.bMT(10,20,m.patientTimelineConfig$))&&b.featureEnabled?9:-1),t.R7$(2),t.vxM(t.bMT(12,22,m.isSettingsTransferFeatureEnabled$)?11:-1)}}function L0(D,y){if(1&D&&t.nrm(0,"app...
+    'featureEnabled' @ 2203128: ...ing$=po(()=>this.actions.pipe(mc(ol.SS),(0,va.E)(this.store.select(Ri.kZ)),(0,De.M)(([{cookieAnalytics:Ut},Xt])=>{const{featureEnabled:_n,status:Dn}=Ut,kn=Dn===Jm.o.ACCEPTED;Xt&&this.mixpanelService.init(Xt),_n&&kn?this.mixpanelService.optInTracking(...
+
+--- personal.patient.timeline.host (area F addendum)
+    constant D.personalPatientTimelineHostURL assigned at byte 2190453; 1 occurrence(s) of the key, 1 of the constant name
+    NOTE the published key is personal.patient.timeline.config.host (docs/04), not personal.patient.timeline.host.
+
+==============================================================================
+§3  KEY CONSTANTS NAMED BUT NEVER READ
+==============================================================================
+# Two separate counts, because they prove different things:
+#  val  = occurrences of the KEY string. 1 means the key is named once and
+#        nowhere else, i.e. no code can spell it a second time.
+#  name = occurrences of the CONSTANT name. 1 means nothing reads the
+#        constant either; >1 means something does (usually the selector).
+
+# 53 distinct key constants whose VALUE string occurs exactly once:
+val  name  constant -> key
+1    2     configRefetchSettings -> "config.refetch"
+1    3     countriesWithConnect -> "connect.countriesWithConnect"
+1    2     controlCodeSettings -> "csr.control.codes.settings"
+1    2     csrCumulusPeriodicDataAPI -> "csr.cumulus.periodic.data.endpoints"
+1    33    defaultCountry -> "default.country"
+1    2     ccTraceServiceEnabled -> "doppler.cc.trace.service.enable"
+1    1     FSN_ADMIN -> "fsn_admin"
+1    2     logbookEnabled -> "logbook.enabled"
+1    2     logbookPageSize -> "logbook.entries.page.size"
+1    2     logbookSupportedEntryTypes -> "logbook.supported.entry.types"
+1    2     mmmApiUrl -> "mmm.data.api.url"
+1    2     ccBrokerServiceConfig -> "nutrino.cc.broker.service.config"
+1    2     outagesNextUpdateAt -> "outages.nextupdateat"
+1    2     genderSettings -> "patient.application.gender"
+1    3     emailRegex -> "patient.email.regex"
+1    2     csvGropingTime -> "personal.aggregated.report.interval.config"
+1    2     browserCheckSettings -> "personal.application.browser.check.configuration"
+1    2     bannerSettings -> "personal.banner.notifications"
+1    3     isClinical -> "personal.clinical.environment"
+1    2     reportGenerationSettings -> "personal.common.core.report.generation"
+1    2     ccSupportedCountries -> "personal.common.core.reporting.enabled.countries"
+1    2     cookieConsentPolicy -> "personal.cookie.consent.policy"
+1    2     certificationLinkEnabledCountries -> "personal.countries.certification.enabled"
+1    2     anonymizedCountries -> "personal.countries.with.anonymization"
+1    2     cpLinkLimit -> "personal.cp.follow.limit"
+1    3     isM2MEnabled -> "personal.cp.m2m.enabled"
+1    4     dashboardSupportedCountries -> "personal.dashboard.supported.countries"
+1    2     csvExportEnabled -> "personal.data.csv.export.enable"
+1    2     deviceToFamilyMapping -> "personal.device.family.to.model.mapping"
+1    1     personalDobValidation -> "personal.dob.validation.enabled"
+1    2     personalInPenRedirectUrl -> "personal.inpen.redirect.url"
+1    2     personalInPenSupportedCountries -> "personal.inpen.supported.countries"
+1    2     formFieldsAllowedPatterns -> "personal.input.validation.params"
+1    2     integrationWhitelist -> "personal.integrations.redirect.scheme.whitelist"
+1    2     landingPageFooterText -> "personal.landing.page.footer.texts"
+1    2     syncEnabled -> "personal.last.sync.date.enabled"
+1    2     mobileAppDownloadLinks -> "personal.link.carepartner.app.download"
+1    2     helpLink -> "personal.link.help.system"
+1    2     mixpanelSettings -> "personal.mixpanel.analytics.settings"
+1    2     myInsightsSupportedCountries -> "personal.myinsights.supported.countries"
+1    4     patientTimelineConfig -> "personal.patient.timeline.config"
+1    1     personalPatientTimelineHostURL -> "personal.patient.timeline.host"
+1    3     backgroundReportGenerationSettings -> "personal.report.generation.settings"
+1    2     safetyNoticeEnabled -> "personal.safety.notices.enabled"
+1    2     otcLoginEnabled -> "personal.sso.otc.enabled"
+1    2     thirdPartySettings -> "personal.third.party.apps"
+1    2     udiNumber -> "personal.udi.number"
+1    2     usernameAsEmailSettings -> "personal.username.as.email.settings"
+1    3     retinaEndpointConfig -> "retina.endpoints.config"
+1    2     fsnDomainWhitelist -> "safety.notice.domain.whitelist"
+1    2     guardianCumulusPeriodicAPI -> "system.gc.gz.transition.flags"
+1    2     logbookConfiguration -> "system.logbook.entry.validation.config"
+1    2     settingsTransferDeviceMapping -> "system.settings.transfer.feature.config"
+
+# Of those, the ones whose CONSTANT name is also read nowhere are the
+# strongest form: named in the key table and referenced by no code at all.
+# 3 of 53:
+   FSN_ADMIN                          "fsn_admin"
+   personalDobValidation              "personal.dob.validation.enabled"
+   personalPatientTimelineHostURL     "personal.patient.timeline.host"
+
+# SCOPE: the EAGER MAIN BUNDLE. A lazy chunk can still read any of them,
+# and the 211 lazy chunks were not fetched (§4).
+
+==============================================================================
+§4  PATIENT LAZY-CHUNK INVENTORY (from the runtime bundle)
+==============================================================================
+# chunk entries in the runtime map: 211
+# url form: <id>.<hash>.js at the asset ROOT (f.u builds it; .p="" so
+# chunk paths are root-relative, NOT /app/)
+# written: chunks.txt  (211 lines)
+# first 5: 12.c22952a522974f5f.js 40.a88955898736c22e.js 47.5515f8032450b897.js 50.2b6cd1f5da5f1501.js 124.59e41168f3931d61.js
+# last  3: 9799.ae484032a07c9d4f.js 9807.e449c8723c1e900b.js 9864.c6a7e3bef0f118fe.js

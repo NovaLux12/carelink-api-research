@@ -202,6 +202,15 @@ check "the two csr keys agree"              '.["system.gc.gz.transition.flags"][
 # discovery document is asserted to carry no baseUrlCsr in 01-discovery-pin.hurl.
 check "no baseUrlCsr-shaped key exists"     '[keys[] | select(test("baseUrlCsr"))] | length' '0'
 
+# AREA V (2026-10-13): the sibling negative, and the one this page can settle.
+# `baseUrlPde` is published by the DISCOVERY document and is the only published
+# base URL with no route (docs/03 §9a). Area V's corpus finding is that no vendor
+# web bundle reads that document at all — so the only place a PDE-shaped key
+# could plausibly appear as a client instruction is THIS document, and it does
+# not. Pinned so a future appearance is a loud, deliberate event rather than a
+# silent redefinition of where the PDE pointer is published.
+check "no baseUrlPde-shaped key exists"     '[keys[] | select(test("baseUrlPde"))] | length' '0'
+
 # The three-way plane dispatch table, and the master switch already ON.
 # useCumulusUrls=true means the vendor's own client is instructed to address the
 # csr/v2 URL above on this deployment, today.

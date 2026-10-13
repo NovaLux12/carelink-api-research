@@ -507,6 +507,83 @@ between the two POST-only routes durable [findings-log/2026-10-12-published-poin
 > lost between the log and the docs.** Grepping this repo's own logs before writing an
 > area costs nothing and would have caught it.
 
+### 9c. ⚠ No vendor *web* bundle in the corpus reads the discovery document at all
+
+**Added 2026-10-13** (area V, #42). §9a concludes that nothing on the live surface can
+say whether a client intends to use `baseUrlPde`. Area V asked the follow-up — can the
+vendor's **own shipped bundles** say it — and the honest answer is that **this corpus
+does not contain that client**, so the negative below is a statement about a
+*document*, not about a *decision*.
+
+**OBSERVED**, 2026-10-13: four `main.*.js` bundles and one `runtime.*.js` re-fetched
+and grepped exhaustively [source: findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md]:
+
+| token | patient `.eu` | patient `.com` | clinic portal | support portal | patient runtime |
+|---|---|---|---|---|---|
+| `baseUrlPde` | 0 | 0 | 0 | 0 | 0 |
+| `/connect/pde` | 0 | 0 | 0 | 0 | 0 |
+| `pde` (case-sensitive) | **0** | **0** | 5 | 5 | 0 |
+| `baseUrlCumulus` / `baseUrlCms` / `baseUrlAem` / `baseUrlCareLink` | 0 | 0 | 0 | 0 | 0 |
+| `discover/android` | 0 | 0 | 0 | 0 | 0 |
+| **`discover`** | **0** | **0** | **12** | **12** | **0** |
+| `clcloud` / `api/carepartner` | 0 | 0 | 0 | 0 | 0 |
+
+> **⚠ Correction (2026-10-13) — this row was wrong when first published.** Area V's
+> first report stated `discover` was **0 in all five bodies**. It is **12 in each
+> portal build**; the patient bundles and the runtime are **0** as stated. All 12 are
+> zxcvbn password-dictionary words at **identical byte offsets in both builds**
+> (`discover` @211829, `discovered` @449173, `discovery` @456020, `discovers` @469461,
+> `discovering` @491815, `discoveries` @492201, `rediscovered` @522387, `discoverer`
+> @558582, `rediscovery` @581388, `discoverers` @684648, `rediscover` @941540,
+> `undiscovered` @954784). The cause was a hardcoded token filter in the pass's own
+> extraction script, so the hits were counted but never given context —
+> `AGENTS.md` §6 item 2, propagated as §6 item 5. **The conclusion is unchanged and the
+> negative is stronger:** the portal builds carry **17 dictionary-word hits each
+> (12 `discover` + 5 `pde`)** and none is a pointer [source:
+> findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md §Correction (2026-10-13) §A].
+
+**Every hit is accounted for.** The 5 case-sensitive `pde` hits in each portal build
+are substrings of **zxcvbn password-dictionary entries** — `dropdead`, `helpdesk`,
+`herpderp`, `topdevice`, `hampden` at bytes 269182, 293243, 325138, 326919, 535085,
+identically in both builds. They are literals in a password-strength wordlist, **not
+directives**: the same false-hit class `docs/09` §5 records for `ngp`/`guardian` in
+this very bundle. The patient bundle's 25 case-**insensitive** hits are seven
+unrelated identifiers (`propDecorators`, `removeStylesOnCompDestroy`,
+`isDesktopDevice`, `WPDesktop`, `mapDeviceModelName`, `getGroupDelayControl`,
+`LoopDetected`). The only `baseUrl` token in the patient bundle is `this.baseUrl`,
+assigned from `getBaseCmsUrl()` and used to fetch a CMS media file — a different
+`baseUrl`, not a published pointer.
+
+**So the negative is not "no client calls `baseUrlPde`"; it is "no web bundle here
+reads the discovery document at all."** That is the finding, and it is **OBSERVED** — on the tokens that are actually pointer-shaped: `baseUrlPde`, `baseUrlCumulus`, `baseUrlCms`, `baseUrlAem`, `baseUrlCareLink`, `discover/android`, `clcloud` and `api/carepartner` are all **0**, and the bare `discover` token is 12 in each portal build purely as zxcvbn dictionary words (see the correction above).**
+
+**INFERRED — and this is the load-bearing limit, so its assumption is stated:** the
+consumer of this document is a **mobile** client, because the document's own path
+names it — `discover/android/3.6`. No mobile artefact is served by any host probed, so
+**whether any client follows `baseUrlPde` remains unobserved in both directions**, and
+§9a's INFERRED reading is **unchanged and still unresolved**: this pass produced no
+evidence about intent either way.
+
+**Corpus and its boundaries, so the negative is not over-read.** Four eager main
+bundles across three hosts — the patient bundle `main.6595daf83bd6d4b1.js`
+(3,417,255 B, sha256 `0fb4fbd4…`, **byte-identical on `carelink.minimed.eu` and
+`carelink.minimed.com`**) plus the two portal builds, whose digests reproduce areas A
+and G exactly. The **211 lazy chunks are not in this corpus**; their current inventory
+is committed at
+[findings-log/2026-10-13-area-v-pde-clients/chunks.txt](../findings-log/2026-10-13-area-v-pde-clients/chunks.txt)
+and reproduces the 2026-10-08 record — the patient build **has not bumped in five
+days**, so the stale-capture worry the area was filed with turned out to be the
+opposite of the risk: it was superseded by an *identical* build, not by a changed one.
+
+**What the same corpus did settle**, on the neighbouring axis: the patient bundle
+**does** follow `csr.cumulus.periodic.data.endpoints` and POSTs its `display_message`
+field, while naming `system.gc.gz.transition.flags` and never reading it — see
+[`docs/04`](04-configuration.md) §Which of the two identical CSR pointers the shipped
+client actually follows. **The contrast is the point**: a published pointer a shipped
+client acts on, and one it names but ignores, are now separated by evidence.
+`baseUrlPde` sits outside that distinction entirely — no web bundle names it, because
+none of them reads this document.
+
 ### 10. Post-2026-10-10 version-axis work
 
 `recon/VERSION-AXIS.md` (2026-10-10) is the pass behind §2–§8: 70 requests, hard cap

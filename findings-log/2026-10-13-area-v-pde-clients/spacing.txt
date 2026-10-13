@@ -1,0 +1,42 @@
+AREA V — SPACING, two independent series (docs/09 §4)
+rows in results.jsonl: 13
+
+per request:
+  seq  host                          t_sent (inside flock)      dur      mtime-t_sent
+  1    carelink.minimed.eu            2026-10-13T09:44:05.226Z   0.014s     0.010s
+  2    carelink.minimed.eu            2026-10-13T09:44:07.792Z   0.047s     0.043s
+  3    carelink.minimed.eu            2026-10-13T09:44:10.398Z   0.302s     0.296s
+  4    carelink.minimed.eu            2026-10-13T09:44:13.253Z   0.055s     0.050s
+  5    carelink.minimed.com           2026-10-13T09:44:16.118Z   0.267s     0.263s
+  6    carelink.minimed.com           2026-10-13T09:44:21.663Z   0.119s     0.114s
+  7    carelink.minimed.com           2026-10-13T09:44:27.616Z   0.334s     0.329s
+  8    carelinkhp.minimed.eu          2026-10-13T09:44:30.503Z   0.195s     0.191s
+  9    carelinkhp.minimed.eu          2026-10-13T09:44:33.250Z   0.077s     0.072s
+  10   carelinkhp.minimed.eu          2026-10-13T09:44:35.881Z   0.339s     0.334s
+  11   carelink-support.medtronic.eu  2026-10-13T09:44:38.774Z   0.219s     0.215s
+  12   carelink-support.medtronic.eu  2026-10-13T09:44:41.551Z   0.075s     0.071s
+  13   carelink-support.medtronic.eu  2026-10-13T09:44:44.181Z   0.363s     0.358s
+
+same-host gaps (counting rule: one gap per consecutive pair in request order,
+N requests on a host give N-1 gaps — docs/09 §4):
+  carelink.minimed.eu            seq1  ->2    send   2.566s   mtime   2.599s
+  carelink.minimed.eu            seq2  ->3    send   2.606s   mtime   2.859s
+  carelink.minimed.eu            seq3  ->4    send   2.855s   mtime   2.609s
+  carelink.minimed.com           seq5  ->6    send   5.545s   mtime   5.396s
+  carelink.minimed.com           seq6  ->7    send   5.953s   mtime   6.167s
+  carelinkhp.minimed.eu          seq8  ->9    send   2.747s   mtime   2.628s
+  carelinkhp.minimed.eu          seq9  ->10   send   2.631s   mtime   2.893s
+  carelink-support.medtronic.eu  seq11 ->12   send   2.777s   mtime   2.632s
+  carelink-support.medtronic.eu  seq12 ->13   send   2.630s   mtime   2.917s
+
+SERIES VALIDATION (the mtime series is only usable if this holds):
+  harness span  (first t_sent -> last t_done): 39.318s
+  kernel mtime span                          : 39.303s
+  difference                                  : 0.015s
+  verdict                                    : USABLE — spans agree
+
+MEASURED FLOOR
+  SEND  series: n=9 gaps, min 2.566s, max 5.953s, 0 under the declared 2.5s, 0 under the 2s floor
+  MTIME series: n=9 gaps, min 2.599s, max 6.167s, 0 under the declared 2.5s, 0 under the 2s floor
+  negative request durations (impossible; the corrupt-t0 signature, docs/09 §4): none
+  bodies written before their own t_sent (same signature): none
