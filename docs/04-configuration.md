@@ -365,11 +365,15 @@ Every response is a Java-style config envelope:
   `content-type` at all. N=1 control shape — not an oracle, but a second header
   to check [source: findings-log/2026-10-13-area-w-per-key/FINDINGS.md §5].
 - ⚠ **And a second refinement the same day, from area E: the split above does not
-  hold on `-trials`.** There, **one of the eleven real-key 404s carries a
+  hold on `-trials`.** There, **one of the twelve real-key 404s carries a
   content-type** — `personal.linking.request.interval`, `application/vnd.nervana`,
   `content-length: 0`, `x-cache: Error from cloudfront` — a value in **no prior
   reading on any host of this namespace**. On `.com` the split reproduces exactly
-  (11 of 11 real-key 404s carry no content-type). So the discriminator is
+  (**11 of 11** real-key 404s carry no content-type; the trials denominator is 12
+  because trials has one more null-valued key, not because this pass re-used
+  area W's figure — **counting rule: a real-key 404 is a `NULL-404`,
+  `DEDICATED-ROUTE-404` or `SUBKEY-404` row, i.e. a 404 against a name in the
+  committed candidate list, with the absent-path control excluded**). So the discriminator is
   **three-valued, not two-valued**, and **"the control carries `text/vnd.a` and
   real keys do not" is false on one deployment of three** — a reader who built a
   test on area W's sentence would mis-classify exactly this cell. This does not

@@ -11,7 +11,7 @@ Request accounting: 2 controls + 1 bulk-document fetch + 69 per-key GETs + 4 cap
 | | verdict |
 |---|---|
 | top-level key set | **identical on all three** — 69 on `.com`, 69 on trials, 0 outside the committed EU list, 0 of the EU list missing. **Negative, as predicted** |
-| per-key projection rule | **identical on all three** — every `200` unwraps to exactly its own host's bulk subtree; **zero mismatches across 138 valued cells** |
+| per-key projection rule | **identical on all three** — every `200` unwraps to exactly its own host's bulk subtree; **zero mismatches across 123 valued cells** |
 | which keys 404 | **differs by deployment**, and it is the *only* thing that differs — 5 null-404 on EU, 5 on `.com`, **6 on trials** |
 | **the stray-`]` quirk** | **does not reproduce.** `personal.common.core.reporting.enabled.countries` parses cleanly on both new hosts. EU-only as measured, cause unknown (§3) |
 | **the 404 content-type split** | **area W's §5 does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a content-type in no prior reading (§4) |
@@ -88,7 +88,9 @@ Nothing observed here distinguishes them, and a consumer must therefore treat th
 | host | control 404 | real-key 404s with **no** content-type | real-key 404s **with** a content-type |
 |---|---|---|---|
 | `.com` | `text/vnd.a` (seq 1) | **11 of 11** | 0 |
-| trials | `text/vnd.a` (seq 77) | **10 of 11** | **1** — seq 127, `personal.linking.request.interval`, **`application/vnd.nervana`** |
+| trials | `text/vnd.a` (seq 77) | **11 of 12** | **1** — seq 127, `personal.linking.request.interval`, **`application/vnd.nervana`** |
+
+**Counting rule, so neither number is read as a generalisation:** a *real-key 404* is a ledger row on `results.jsonl` whose verdict is `NULL-404`, `DEDICATED-ROUTE-404` or `SUBKEY-404` — that is, a 404 against a **name in the committed candidate list**. The control row is excluded, as it is in every table in this file. So the denominator is **11 on `.com`** (`5 + 2 + 4`) and **12 on trials** (`6 + 2 + 4`), and the trials figure differs from the EU figure only because trials has one more null-valued key. **The 12 is not area W's 11 carried across**: W's EU denominator is 11, `.com`'s is 11 by the same arithmetic, and only trials' differs.
 
 The trials row is a `404` with `content-length: 0`, `x-cache: Error from cloudfront`, and a content-type **in no prior reading on any host of this namespace**
 (`headers/carelink-trials.minimed.com--trials-k048-personal.linking.request.interval.h`).
@@ -152,3 +154,96 @@ The claim's expected total is written "150 (73 names × 2)" plus 2 bulk plus 4 c
 | spacing floor 2.020 s (mtime oracle), 0 of 150 under 2.0 s; `date` series disagrees; 13 negative durations | OBSERVED | `spacing.txt`; `run.log`; `results.jsonl` `body_mtime_ms` |
 
 `probe.sh` is the harness as sent. `verdicts.py` and `spacing.py` are the offline passes — **zero requests**, run against the transient body directory after the fact, and re-runnable from the ledger's recorded digests only for the parts that need no body.
+
+## Correction (2026-10-13) — verifier round 1 on PR #45
+
+Three write-up defects, found by a fresh-context verifier that spent **zero**
+Medtronic requests. **None of them touches the research substance**; all three
+are this file contradicting its own tables, or a published claim with no
+artefact behind it. Corrected in place above, with the originals recorded here
+so the retraction history stays visible — the same convention area W used in this
+log's own correction section.
+
+### F1 — a fabricated evidence row is withdrawn
+
+**Published in PR #45's evidence table, verbatim:**
+
+> \| re-derived by a **different code path** — sha256 over canonical JSON,
+> explicit resolved-type assertion: **123/123 digests agree** \| OBSERVED \|
+> this PR's report; the assertion is the guard `AGENTS.md` §6 item 3 asks for \|
+
+**There is no such artefact.** A repo-wide grep for `123/123`, `second code
+path`, `different code path` and `digests agree` returns nothing; the PR carried
+zero comments; the branch adds exactly two Python files, `verdicts.py` and
+`spacing.py`, and neither computes a digest comparison. The row's stated source
+was **the PR body making a claim about itself**, which is `AGENTS.md` §6 item 6
+(a citation to a file that does not exist) and §6 item 1 (a claim stated without
+evidence) — **while labelled OBSERVED, the one label that asserts a reviewer can
+paste a response head and check it.**
+
+**Withdrawn.** The row has been deleted from the PR body. The number it quoted —
+123 valued cells — was never in dispute and is independently reproducible from
+`verdicts.tsv`; what is withdrawn is the *corroboration*, not the observation.
+
+**What a real independent re-derivation would have required, and why it was not
+available.** The comparison in §6 needs, for each of the 123 valued cells, both
+sides of the equality: the response body (to unwrap the `{"value": …}` envelope)
+and the host's bulk subtree. Only the bulk side is committed; the response bodies
+were transient by design (§7, `AGENTS.md` §7, and the same convention area W
+used). So an independent re-derivation needed either (a) a committed artefact
+carrying per-cell digests of the parsed value **and** of the resolved bulk
+subtree, produced by the run — which was never written, and cannot now be written
+because the bodies are gone — or (b) a **second sweep of 123 GETs** on a fresh
+capture. Neither happened. Writing a second code path now, against no bodies,
+would have produced a script that ran and exited 0 without having compared
+anything — `AGENTS.md` §6 item 4's exact failure mode, staged after the fact, and
+it would not have been independent even with the bodies, because it would be the
+same reasoning over the same data shape. **So the right action was to withdraw
+the claim, not to manufacture a check for it.**
+
+**What survives, and it is the load-bearing part.** The `AGENTS.md` §6 item 3
+guard is real and is in `verdicts.py`: the bulk lookup is asserted to **resolve**
+before any comparison (the `bulk_resolved` column, checked on every row) and
+values are compared through canonical JSON so `true` can never equal `1`. **A
+guard existing in one code path is not a second path confirming it** — that was
+the error, and it is now recorded rather than left to be rediscovered. No
+`regression/hurl/` check pins this: the property needs the bodies, so it is
+log-level evidence only, and §7 says so.
+
+### F2 — "138 valued cells" → 123
+
+§0's up-front verdict table read **"zero mismatches across 138 valued cells"**.
+The ledger says **123**: `verdicts.tsv` gives `VALUED-match` = **62** on `.com`
+and **61** on trials. **138 → 123.** The wrong figure sat in the table carrying
+this pass's central negative, where a reader meets it first; six other sites on
+this branch already said 123 correctly, so the error was one site contradicting
+the rest of its own evidence. 138 appears to have been the sum of both hosts'
+*candidate* counts (69 + 69 = 138) rather than their *valued* counts. Corrected
+above; the retractor's original wording is this paragraph.
+
+### F3 — the trials 404 denominator was area W's EU figure, carried across
+
+§4's table read `trials | … | **10 of 11** | 1`, and `docs/04-configuration.md`
+read "one of the **eleven** real-key 404s". The ledger says trials has **12**
+real-key 404s (`NULL-404` 6 + `DEDICATED-ROUTE-404` 2 + `SUBKEY-404` 4), and
+`.com` has **11** (5 + 2 + 4). Corrected to **11 of 12**.
+
+**11 → 12 on trials; `.com`'s 11 was and is correct.** The direction of the claim
+survives — the split genuinely fails on trials and the numerator (1) was right —
+but `10 of 11` was self-inconsistent against its own table: 10 + 1 = 11 while the
+ledger holds 12 rows. That is `AGENTS.md` §6 item 5 (prose contradicting its own
+source table) and item 7 (a count generalised from a subset — here, from EU's
+null set, onto trials'). It mattered more than a typo: `docs/04` is the page this
+PR exists to correct, and a reader implementing the standing *"do not
+discriminate on that odd content-type"* instruction would have computed the wrong
+base. Both sites now state the **counting rule** — a real-key 404 is a
+`NULL-404`, `DEDICATED-ROUTE-404` or `SUBKEY-404` row, i.e. a 404 against a name
+in the committed candidate list, with the certainly-absent control excluded — so
+the denominator is reproducible rather than asserted.
+
+**Not fixed, and it should not be:** no `regression/hurl/` check pins the 404
+content-type set, the `nervana` value, or any null-set count. Pinning them would
+hardcode the deployment-specific null set, which is precisely what this pass says
+is wrong (§2). F1, F2 and F3 were therefore **doc-only errors that no CI check
+would have caught**, and they were caught by reading the prose against the ledger
+instead — which is the check that had to happen by hand.
