@@ -4,6 +4,7 @@
 **Claim:** area P (`docs/11-suggested-research-areas.md` §"P. Recover the request schema from the vendor's own app, statically")
 **Verdict:** **Negative on recoverability.** No reproducible mobile-app binary is in the repository or anywhere cited by it. The two vendor web bundles that *are* reproducible by digest expose route strings and one client-side matching enum, but not the authenticated request-body field names (`markers[]` per-entry fields, NGP alarm vocabulary). The request-shape half of the token-blocked rows in `docs/10-open-questions.md` (lines 38-39, 46, 77) remains unverified by this pass. A documented negative is the stated legitimate close.
 **Tooling (read-only):** `grep` 3.12, `python3` 3.14.8, `sha256sum` 0.10.0, `git` 2.53.0. **Zero vendor health-surface requests. Zero POST anywhere.**
+**Requests:** 0 of a 0 cap; no vendor GET performed; ≥2s spacing rule stated in applicable terms (vacuous for this static pass).
 
 ## 1. What I looked for
 
