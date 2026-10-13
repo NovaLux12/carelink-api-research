@@ -1,0 +1,8 @@
+probe start: 2026-10-13T08:28:33Z
+2026-10-13T08:28:36Z seq=1 host=carelinkhp.minimed.eu role=CONTROL-absent-hp http=000412 exit=0
+2026-10-13T08:28:38Z seq=2 host=carelinkhp.minimed.eu role=CONTROL-live-hp http=000412 exit=0
+2026-10-13T08:28:42Z seq=3 host=carelink.minimed.eu role=CONTROL-absent-patient http=404 exit=0
+2026-10-13T08:28:44Z seq=4 host=carelinkhp.minimed.eu role=CANDIDATE-report-generation http=000412 exit=0
+2026-10-13T08:28:49Z seq=5 host=carelink.minimed.eu role=CANDIDATE-patient-public-config http=200 exit=0
+probe end: 2026-10-13T08:28:49Z
+5 of a 6 cap. GET only. sleep 2.5 s inside each per-host flock.
