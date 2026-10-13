@@ -973,20 +973,50 @@ convenience that expires, and mark it "as of this commit" when you carry one. Th
 generalisation matters more than the instance: **do not write a `docs/11` line anchor as
 a live pointer at all.**
 
-**The sweep, re-resolved against this tree.** Counting rule: one distinct
+**The sweep, re-resolved against this tree.** **The counting rule is stated with its
+exclusion, because a bare total is what this log has now got wrong twice.** One distinct
 `file:line` target, repo shorthand expanded (`docs/11` → `docs/11-*.md`, bare
 `*.h`/`*.b` → the single matching capture), each resolved to a string and asserted
 non-blank before it is called a resolution — `AGENTS.md` §6 item 3, and the reason a
 first pass at this sweep reported **21** "unresolved" targets that were in fact shorthand
 expansions never attempted.
 
+**Two totals, because the rule admits two, and a reader has to know which they are
+re-deriving.**
+
+| rule | what it counts | total | in range, non-blank |
+|---|---|---|---|
+| **R1 — as written** | every distinct target, **including the four this section introduces** | **34** | **32** |
+| **R2 — excluding targets whose *every* citation lies inside this section** | the four dropped are `docs/00:170`, `docs/08:275`, `docs/10:64`, `docs/11:1090` | **30** | **28** |
+
+`docs/11:1102` is **not** among the four dropped: it is cited here *and* in §12, §13j,
+§13l-1 and §13l-3, so it survives R2 — which is why R2 is 30 and not 26.
+
+**R1 is the figure to re-derive against the file as committed.** This table's first
+draft stated R2's **30** while applying R1's rule with no exclusion clause: the sweep was
+run *before* this section was appended, and this section's own four references then moved
+the number. That is `AGENTS.md` §6 item 7 a second time — a count taken from a subset,
+in the section written to prevent it. **Neither total moves when this correction is
+applied**, because writing it introduces no `file:line` string that was not already a
+target; that stability is the property the first draft lacked, and it is the reason the
+rule now names its exclusion instead of relying on one.
+
 | sweep | result |
 |---|---|
-| **30** distinct `file:line` targets | **28 resolve in range and non-blank. Zero resolve to the wrong content** |
+| **34** distinct `file:line` targets (R1) | **32 resolve in range and non-blank. Zero resolve to the wrong content** |
 | `docs/11` targets, **before** this correction | **3** resolved in range but not to area X: `932` (**live, 5 citations — rotted**), plus `777` and `858`, which are *historical* statements about refs `8373169` and `614db77` and are correct as such |
 | `docs/11` targets, **after** | **0** rotted. `777`, `858`, `932`, `1102` are each checked **at their own ref** — all four resolve to the area X row, which is the whole problem stated in one line: true, then not, then true again |
 | `carelink-trials-minimed-com--c1-absent.h:18` (`:594`, §13a) | out of range — the file has **15** lines. The one deliberate non-resolution: it is the *wrong* cite §13a quotes to document the error. Left as written |
 | `c1-absent.h:18` (`:806`) | not a pointer — it is the sweep table *naming* §13a's deliberate non-resolution |
+
+**A verifier pass reported that capture as 14 lines. It has 15 — and §13a is right.**
+The file ends `\n\n`, so the pass's own `rstrip('\n')` consumed the trailing blank line
+before it counted; `wc -l` and a byte-level split both give **15**. **§13a's "That file
+has 15 lines" is correct and is deliberately left exactly as written** — the 14 was the
+reader's bug, not a defect in the record, and "fixing" §13a to match it would replace a
+true claim with a false one. Line 18 is out of range at either count, so the deliberate
+non-resolution stands either way. Recorded because a correct claim here has been
+"corrected" into a wrong one before, and this one must not be.
 
 **What did not change, and was re-checked rather than assumed.** All five CORS-wording
 sites are byte-identical to `origin/main` on this tree (`docs/00:166`,
