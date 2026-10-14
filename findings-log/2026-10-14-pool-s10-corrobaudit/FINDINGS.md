@@ -14,8 +14,24 @@ Coherence words (`consistent with`, `supports`, `agrees with`, `not
 contradicted by`) describe agreement, not multiplicity and never upgrade.
 
 Scan: grep across `docs/` + `findings-log/` (excluding lane outputs and the
-independence-rule findings itself). 16 matches across the eight target files (see list below); the
-surviving candidates audited below.
+independence-rule findings itself). 16 matches across the eight target files
+(see list below); the surviving candidates audited below.
+
+Counting rule (reproducible): case-insensitive grep for the seven named phrases;
+each matching *claim* (not a quotation of a correction or a rule citation) counted once;
+independence then assessed per AGENTS.md §2.1. Previously this paragraph said
+"18 occurrences" in error — that was an unreconciled figure; the corrected count is
+16 claim-hits across the eight target files below, recurring 24 times in total
+once the independence-rule findings file is included.
+
+Files audited (the eight target files):
+`docs/03-discovery-and-versions.md`, `docs/10-open-questions.md`,
+`docs/11-suggested-research-areas.md`,
+`findings-log/2026-10-11-third-party-client-sources/FINDINGS.md`,
+`findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md`,
+`findings-log/2026-10-13-commoncore-trials/FINDINGS.md`,
+`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md`,
+`findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md`.
 
 ## Audit table
 
@@ -32,7 +48,7 @@ surviving candidates audited below.
 
 - Strength-word scan returned 16 matches of the seven named phrases across the eight target files; the same phrases recur 24 times in total once the independence-rule findings file is included, where they are themselves the subject rather than claims.
 - Genuine third-party claims carrying a strength word: 6 (#1–4 plus cross-references).
-- Of those, 1 already withdrawn (appVersion, area Q); 2 need a relabel (#2, #3); 1 is supportable with the artefact committed (#4); 1 is an allowed coherence use (#5's scope allows); 1 inherits #2.
+- Of those, 1 already withdrawn (appVersion, area Q); 2 need a relabel (#2, #3); 1 (#4) is **not yet supportable** (no xDrip commit named; downgraded to SOURCE-PUBLISHED); 1 is an allowed coherence use (#5's scope allows); 1 inherits #2.
 - Under §2.1, every one of the 6 is **one OR two sources at most**, and none reached the independent-source count threshold on the basis of the same author's second artefact alone. #4 (#4) is the only candidate for true independence, and even there our verb is "verified" not "observed" — the evidence class stays SOURCE-PUBLISHED at most.
 
 ## What this closes
