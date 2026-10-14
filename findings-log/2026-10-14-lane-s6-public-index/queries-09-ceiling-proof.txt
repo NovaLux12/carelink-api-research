@@ -54,7 +54,8 @@
 #
 #  2 REPRODUCIBILITY OF A LARGE NON-ROUND RESPONSE. Every claim about the
 #    ceiling rests on small responses being reproducible and large ones not.
-#    The small half is already shown four times over. This is the large half:
+#    The small half is already shown THREE times over (412 B at seq 2/78, 35226 B
+#    at seq 1/77, 19301 B at seq 61/105). This is the large half:
 #    if seq 68's query answers 1864922 B / 11522 records again, the rule holds
 #    on both sides. If it answers something else, then non-round is not a
 #    completeness signal either and the rule above is wrong.

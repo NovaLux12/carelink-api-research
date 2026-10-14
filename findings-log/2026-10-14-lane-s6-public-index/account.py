@@ -145,6 +145,10 @@ def main() -> int:
     argv = [a for a in sys.argv[1:] if not a.startswith("--")]
     if argv:
         LEDGER = os.path.abspath(argv[0])
+        if os.path.isdir(LEDGER):
+            print(f"account.py: {LEDGER} is a directory; pass the results.jsonl file",
+                  file=sys.stderr)
+            return 2
         if not os.path.exists(LEDGER):
             print(f"account.py: no such ledger: {LEDGER}", file=sys.stderr)
             return 2
@@ -258,7 +262,13 @@ def main() -> int:
     print("  http status            " + "  ".join(f"{k}:{v}" for k, v in out["by_http_status"].items()))
     print("  information class      " + "  ".join(f"{k}:{v}" for k, v in out["by_information_class"].items()))
     print()
-    print(f"  WHOLE LEDGER ({total} rows, seq 1-{rows[-1]['seq']}) -- includes the earlier attempt")
+    foreign = LEDGER != os.path.join(HERE, "results.jsonl")
+    if foreign:
+        print(f"  FOREIGN LEDGER ({os.path.basename(os.path.dirname(LEDGER))}) -- this is NOT")
+        print("  the lane's own results.jsonl, so the sequence-boundary split and the")
+        print("  prior-pass comparison below do not apply to it.")
+    print(f"  WHOLE LEDGER ({total} rows, seq 1-{rows[-1]['seq']})"
+          + ("" if foreign else " -- includes the earlier attempt"))
     print(f"    min gap, harness t_sent            {out['spacing_harness_min_s']} s")
     print(f"    harness gaps under 2.5 s           {len(under)}")
     if out["kernel_bodies_available"]:
@@ -287,8 +297,11 @@ def main() -> int:
         print(f"    gaps under 2.5 s                   {len([g for g in tp_h if g[0] < 2.5])} of {len(tp_h)}")
         print(f"    rows where t_done precedes t_sent  "
               f"{out['this_pass_rows_with_t_done_before_t_sent']}")
-        print("    => the three sub-floor gaps and the five inverted rows above are ALL")
-        print("       in the earlier attempt. This pass is clean on every check.")
+        if foreign:
+            print("    (sequence-boundary split suppressed: a foreign ledger has none)")
+        else:
+            print("    => the three sub-floor gaps and the five inverted rows above are ALL")
+            print("       in the earlier attempt. This pass is clean on every check.")
     print()
     print("  VERDICT: the two spacing oracles are reported together on purpose. If")
     print("  they disagree the harness series is the suspect (docs/09 section 4);")
@@ -302,6 +315,10 @@ def main() -> int:
         print(f"      seq {d['seq']:>4}  {d['body_bytes']:>9} B = {d['kib']:>8} KiB"
               f"  records={d['record_count']}  hosts={d['distinct_host_count']}")
     print(f"  not on a boundary                      {len(ok200) - len(whole)}")
+    if ok200:
+        big = max(ok200, key=lambda r: r["body_bytes"])
+        print(f"  largest successful response           {big['body_bytes']} B"
+              f" ({big['body_bytes']/1024:.1f} KiB, seq {big['seq']})")
     print()
     print("  This is a CORRELATION over the rows observed on this ledger, not a proven")
     print("  mechanism. Nothing measured here separates a proxy byte cap, a server")

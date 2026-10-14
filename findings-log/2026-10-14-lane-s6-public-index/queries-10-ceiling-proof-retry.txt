@@ -16,6 +16,8 @@
 # the ceiling unconfirmed on this cell. Both are publishable outcomes; neither
 # is a wasted request.
 #
-# DELAY=15 after a 300 s cooldown. Two prior attempts at this cell answered 504.
+# DELAY=15 after a ~300 s cooldown. One prior attempt at this cell answered 504 (seq
+# 149); seq 74 was a 200 carrying 203 records, not a failed attempt. [CORRECTED: this
+# file originally said 'Two prior attempts'.]
 s6fin3-2022-40-narrow|ceiling-proof-narrow-2nd-try|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
 

@@ -2,7 +2,9 @@
 #
 # The API answered 74 of the 143 requests so far with a gateway 502/504, which
 # is a failure carrying no information in either direction (docs/10's own rule).
-# Retrying all 24 unanswered path-prefix cells would burn the remaining budget
+# [CORRECTED 2026-10-14: this originally said 'all 24 unanswered path-prefix cells'. The ledger
+# has 25 of 30 answering 502/504.]
+# Retrying all 25 unanswered path-prefix cells would burn the remaining budget
 # on a 20% yield, so this round is five queries, each with a reason:
 #
 #  1 ANCHOR. seq 118 recorded `medtronic.eu/oauth2/` on 2026-39 as a 404 true
