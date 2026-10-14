@@ -1,0 +1,6 @@
+method	branch	normalized_path	n_chunks	verbatim
+GET	single	hcp/countries/dialCodes	1	hcp/countries/dialCodes
+GET	single	{1}?locale={2}	1	${hl.XwT}?locale=${A}
+POST	single	/hcp/sso/auth/otc/send	1	/hcp/sso/auth/otc/send
+POST	single	hcp/patients/checkPhoneNumber	1	hcp/patients/checkPhoneNumber
+POST	single	{1}?{2}	1	${G}?${I.toString()}

@@ -1,0 +1,33 @@
+{
+  "by_method": {
+    "delete": 0,
+    "get": 1,
+    "patch": 0,
+    "post": 3,
+    "put": 0
+  },
+  "by_method_sum": 4,
+  "corpus_bytes": 4374660,
+  "corpus_manifest_sha256": "9a4b86947b2cc2a9ea4bea7f13ed1501dab23de2522f928befbe0e8840d39d73",
+  "csr_pairs": 0,
+  "distinct_pairs": 4,
+  "http_call_sites_total": 101,
+  "n_chunk_files": 225,
+  "pairs_with_interpolation": 1,
+  "pairs_with_leading_slash": 1,
+  "pairs_without_interpolation": 3,
+  "pairs_without_leading_slash": 3,
+  "resolved_sites_rows": 0,
+  "sites_with_baseurl_resolved_path": 0,
+  "sites_with_constant_resolved_path": 0,
+  "sites_with_literal_path": 4,
+  "sites_with_unresolved_variable_path": 97,
+  "ternary_branch_rows": 0,
+  "ternary_sites": 0,
+  "unresolved_by_method": {
+    "delete": 3,
+    "get": 29,
+    "post": 62,
+    "put": 3
+  }
+}
