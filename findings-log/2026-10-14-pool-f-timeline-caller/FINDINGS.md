@@ -1906,18 +1906,36 @@ over `git diff 7d915b8 HEAD` returns **0 on all ten**"* was **false — it retur
 **And it was TWO, not one.** Searching the diff for **all ten** controls literally —
 not the one the verifier named — found a **second** leak: the reCAPTCHA control. That
 one escaped the scan only by luck: its pattern is anchored `^…$`, and the control sits
-mid-line inside a table cell, so `^` cannot reach it. **In `--all` mode, where the gate
-`cat`s whole files, a control at the start of a line would have fired.** A latent
-hazard whose severity depends on another pattern's anchoring and on gate mode is not a
-control; it is a coin toss.
+mid-line inside a table cell, so `^` cannot reach it.
+
+⚠ **CORRECTED 2026-10-15 (round 12) — this paragraph blamed GATE MODE, and that was
+wrong.** I wrote that *"`--all` mode … a control at the start of a line WOULD have
+fired"*, implying the severity depended on the mode. **Both gate modes are
+line-oriented `grep`** — `diff` mode builds `ADDED` from `git diff -U0 | grep '^+' |
+grep -v '^+++'`, `--all` mode from `cat "$f"`, and **both then feed the same
+`grep -cEi`** — so the mode changes *which lines are read*, never *whether `^` can
+reach a token*. Measured, on the reCAPTCHA pattern
+`^6L[A-Za-z0-9_-]{2}buor[A-Za-z]{4}[0-9A-Za-z_-]{10,}$`: at line start → **1**; mid-line
+→ **0**. **Anchoring was the sole cause, and the mode was never part of it.** Again
+`§6` mode 2 — **a claim about what a matcher does, asserted without running the
+matcher** — and again in the paragraph whose subject is a matcher defect.
 
 **Fixed by assembling controls at runtime from fragments**, in a new
 [`controls.py`](controls.py) in this log directory, whose fragments are split so that
 **no line of it — and no concatenation of adjacent fragments — matches the net it
 exercises.** The R10e table now records the three failures **by shape, not by value**,
 so the log carries no control at all. **Verified, not asserted: the scan over
-`git diff 7d915b8 HEAD` now returns 0 on all ten**, with `controls.py` itself in the
-subject list.
+`git diff 7d915b8 HEAD` now returns 0 on all ten** — and the reason is **not** what I
+said it was here last round. I wrote that "`controls.py` itself [is] in the subject
+list". **`research-gate.sh` chooses its subjects with an extension filter covering
+`.md`, `.yml`, `.yaml`, `.sh` and `.hurl`, so `.py` is excluded in `diff` mode and in
+`--all` mode alike, and this file is never read by the gate at all.** The
+fragment-splitting is good hygiene and is kept; **it is not what makes the gate green.**
+What makes it green is that **no live match is written anywhere the gate reads** — and
+that is **12 of this PR's 33 changed files**. The other **21** added files —
+`results.jsonl`, `run.log`, `grep-out.txt` and all seventeen `headers/*.h` — are outside
+the gate's subject filter entirely, **`results.jsonl` included**, so the gate has never
+read the ledger this whole pass rests on.
 
 ### R11b — the rule, and why round 10's rule did not catch this
 
@@ -1972,3 +1990,87 @@ ref, and reproduced exactly.
 round. All eleven subject counts unchanged; the edited sites are inside
 `## Correction (…)` sections and therefore E1-excluded. The E1 negative itself is
 untouched and was not re-litigated.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 12. **The blocking finding is genuinely fixed — the gate returns 0 on all ten nets
+on all three of its paths, against the committed head.** Three new findings, and **one
+of them is a regression on the property last round sold**, which is worth more than the
+two that are not.
+
+**Base for every diff and sweep: `7d915b8`.** `origin/main` used for nothing.
+
+### R12a — my checker disagreed with the gate while agreeing with me
+
+**The regression.** `controls.py` took a `ref` for its subject list and then read the
+files with `open()` — the **working tree**. Demonstrated, and reproduced here:
+
+```
+controls.py 7d915b8 342c192   ->  TOTAL HITS: 0   exit 0
+git show 342c192:…/FINDINGS.md | grep -cE '(grafana|…)\.minimed\.'  ->  1
+```
+
+**An exit code that disagrees with the gate is worse than prose**, and last round I
+sold exactly that property and then shipped a checker that violated it. **Fixed:** every
+byte scanned now comes from `git cat-file -p <ref>:<path>`, so **a scan of an arbitrary
+ref is a scan of that ref**. The scanner's header now states this, and the `ref` it is
+given is the thing it reads.
+
+### R12b — two-directional evidence, because a checker that only ever says "clean" is the bug I just fixed
+
+A verifier that has only ever returned zero proves nothing. **Both directions, against
+the committed tree:**
+
+| invocation | result | exit |
+|---|---|---:|
+| `controls.py 7d915b8 342c192` — the commit that carries the live net-#5 match | `TOTAL HITS: 1`, naming the net | **1** |
+| `controls.py 7d915b8 HEAD` | `TOTAL HITS: 0`, `CLEAN on every net` | **0** |
+
+**The planted-failure direction is the one that matters**, and it is the one that would
+have caught R12a. It is now in the record rather than implied.
+
+### R12c — `controls.py` is not what makes the gate green, and the gate reads 12 of 33 files
+
+I wrote last round that `controls.py` was *"itself in the subject list"*. **It is not
+read by the gate at all**: the subject filter is an **extension** filter — `.md`, `.yml`,
+`.yaml`, `.sh`, `.hurl` — so `.py` is excluded in `diff` mode and in `--all` mode alike.
+The fragment-splitting is hygiene and stays; **it is not the mechanism.**
+
+> **The larger fact, and it is worth stating plainly: of this PR's 33 changed files the
+> gate reads 12.** The other **21 added files** — `results.jsonl`, `run.log`,
+> `grep-out.txt` and all seventeen `headers/*.h` — are outside its subject filter, so
+> **the gate has never read the ledger this entire pass rests on.** What keeps the gate
+> green is only that **no live match is written anywhere the gate reads**. Widening the
+> filter is a maintainer decision (the trap row already says so), and **nothing here
+> depends on it**: the scanner applies the gate's own filter to the same file list, and
+> prints both counts.
+
+### R12d — the `--all`-mode mechanism was wrong, and running the matcher is what showed it
+
+I wrote that *"`--all` mode … a control at the start of a line WOULD have fired"*, which
+implied gate mode changed whether a `^`-anchored net could reach a token. **It does not.**
+Both modes are line-oriented `grep`: `diff` mode builds `ADDED` from
+`git diff -U0 | grep '^+' | grep -v '^+++'`, `--all` mode from `cat "$f"`, and **both
+then feed the same `grep -cEi`**. Measured on the reCAPTCHA pattern: **at line start → 1;
+mid-line → 0.** **Anchoring was the sole cause; the mode was never part of it.**
+Corrected above with the measurements in place — **`§6` mode 2 again, in the paragraph
+whose subject is a matcher defect**, which is the third time this pass has made a claim
+about a matcher without running it.
+
+### R12e — the trailing byte, and why this one was mine
+
+`controls.py` ended `0x29`, not `0x0a`. **Four other files in the diff end non-`0a` and
+are pre-existing and unchanged; `controls.py` was new at that commit**, so it was the
+only one I introduced — and it **contradicted my own sweep row**, which reports a trailing
+byte of `0a`. No checker enforces this; that is precisely why a report is worth having.
+Fixed, and verified at the commit for every file this round touched.
+
+### R12f — nothing measurable moved
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. All eleven subject counts unchanged; every edited site is inside a
+`## Correction (…)` section and therefore E1-excluded. Both digest methods reproduce at
+`cd9b79a` and head.
