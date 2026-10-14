@@ -285,12 +285,68 @@ in the clinic bundle, not in the clinic's 224 lazy chunks, not in the public con
 in any `hcp/configuration/public/*` key. The accumulating negative is complete
 [source: findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md].
 
+**Correction (2026-10-14, lane S5).** The *server/config* negative above still holds:
+no vendor surface names an alarm code. But one reproducible *client* artefact does carry
+an NGP-specific mapping — the connect monitor component in lazy chunk
+`k-6746-c6795ff7e9ff468d-js.b` (101,594 B) canonicalises 137 raw `lastAlarm.code`
+strings to 62 canonical codes, with two excluded (`"00-1"`, `"121"`) and a pump-model
+gate (`MMT-1809/1810/1818`). That is an alias table, not a definition table: the
+human-readable names come from i18n keys `connect.ble.<code>` and no such key exists
+in the 215-chunk corpus. See
+[findings-log/2026-10-14-area-s5-ngp-alarm-vocabulary-static/FINDINGS.md].
+
 ## The field name is settled; the value is not
 
 `deviceFamily` appears as an HTTP **call-site field name** in the lazy-chunk corpus —
 independent corroboration of the field *name*, not its *value*. What that field's value
 looks like on the wire still needs a token [source:
 findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
+
+## Correction — 2026-10-14 — `deviceFamily` and `medicalDeviceFamily` are one axis
+
+The two field names have been tracked here as separate discriminators with partly
+overlapping vocabularies. **They are not separate on the wire.** The patient client
+assigns one from the other, in `parseJsonData` (lazy chunk
+`k-6746-c6795ff7e9ff468d-js.b`, definition at byte 74,236):
+
+```js
+parseJsonData(i, v) { const n = {};
+  n.deviceFamily = i.medicalDeviceFamily,
+  n.isGuardian = "GUARDIAN" === n.deviceFamily,
+  …
+```
+
+So `deviceFamily` is the **reported family under a second name**, not an independent
+discriminator (OBSERVED, client source; the same chunk is hash-pinned in
+[source: findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md] §6).
+
+Two consequences:
+
+1. Any argument that "two independent sources agree on the casing" is over-counting: the
+   client enum and the third-party clients are reading one value under two names, not
+   corroborating two independent fields.
+2. The token **`NGP`** is a `deviceFamily` value the vocabulary table above does not list
+   — the client compares it directly at **four** sites in the same chunk: bytes 76,304
+   (gates alarm-code formatting), 78,359 (gates last-bolus fields), 83,893 (compares
+   `medicalDeviceFamily` directly, independently corroborating point 1) and 87,564
+   (`this.isNGP="NGP"===K.deviceFamily`). **OBSERVED.** This is a *client-side* comparison
+   value; the server's own NGP vocabulary remains token-gated (`docs/10` #38, #39).
+
+The five-token enum above is still the client matcher set. `NGP` is compared by equality
+rather than through `startsWith`, so it sits outside that matcher — which is consistent
+with a Guardian-era device reaching that code by a different route.
+
+**Also resolved:** the casing correction `timecapUnscrewed` → `timeCapUnscrewed` is real
+but was mis-stated. Both forms exist, with different jobs: **`timecapUnscrewed`** (42
+corpus occurrences) is a *form-control* name — `form.addControl("timecapUnscrewed", …)`,
+`isShowControlError("timecapUnscrewed","required")` — and **`timeCapUnscrewed`** (5) is the
+*wire* field, assigned `this.capUnscrewDateConversion()`. The lowercase form is not an
+error; it was being read as a wire field when it is a control name. Same for
+`sensorInsertionLocation` and `adhesivetapeLocation`, whose wire keys are
+`sensorInsertionInfo.sensorLocation` and `adhesiveAndTapeInfo.sensorLocation` (OBSERVED,
+lazy chunk `k-9799-ae484032a07c9d4f-js.b`: the serialiser is the `if(this.form.valid)`
+statement at bytes 80,919–84,159, but the 42 control-name occurrences live at
+30,424–98,733, so no single window holds both halves of the distinction).
 
 ## Guidance
 
