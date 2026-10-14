@@ -316,9 +316,9 @@ Two consequences:
    client enum and the third-party clients are reading one value under two names, not
    corroborating two independent fields.
 2. The token **`NGP`** is a `deviceFamily` value the vocabulary table above does not list
-   — the client compares it directly at **four** sites in the same chunk: bytes 76,305
-   (gates alarm-code formatting), 78,360 (gates last-bolus fields), 83,894 (compares
-   `medicalDeviceFamily` directly, independently corroborating point 1) and 87,565
+   — the client compares it directly at **four** sites in the same chunk: bytes 76,304
+   (gates alarm-code formatting), 78,359 (gates last-bolus fields), 83,893 (compares
+   `medicalDeviceFamily` directly, independently corroborating point 1) and 87,564
    (`this.isNGP="NGP"===K.deviceFamily`). **OBSERVED.** This is a *client-side* comparison
    value; the server's own NGP vocabulary remains token-gated (`docs/10` #38, #39).
 

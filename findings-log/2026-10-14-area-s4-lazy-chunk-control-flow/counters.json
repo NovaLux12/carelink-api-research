@@ -7,8 +7,8 @@
     "put": 14
   },
   "by_method_sum": 144,
-  "corpus_bytes": 6300855,
-  "corpus_manifest_sha256": "3f0830115d428e023fe2362118e4c4a6d385329fd4ffbd927e8de3886869ed87",
+  "corpus_bytes": 6300854,
+  "corpus_manifest_sha256": "344e82837a67543ab77386c5f01ff568284c4e010bcf2723c80e8d155d343377",
   "csr_pairs": 26,
   "distinct_pairs": 144,
   "http_call_sites_total": 233,

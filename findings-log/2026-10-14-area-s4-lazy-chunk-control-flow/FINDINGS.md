@@ -52,14 +52,38 @@ statement named**. The one exception is marked where it occurs: §4's statement 
 given as a **half-open range** `[80919, 84159)`, because it is an extent rather than a
 token position. An earlier draft mixed the two without saying so.
 
-**Identity oracle.** sha256 over the sorted `sha256  filename` manifest of all 215
-bodies: `3f0830115d428e023fe2362118e4c4a6d385329fd4ffbd927e8de3886869ed87`.
+**Identity oracle.** sha256 over the `sha256  filename` manifest of all 215 bodies, in
+filename order, joined with newlines and no trailing newline:
+
+```
+344e82837a67543ab77386c5f01ff568284c4e010bcf2723c80e8d155d343377    6,300,854 bytes
+```
 
 | artefact | bytes | sha256 | verifies |
 |---|---|---|---|
 | patient bundle | 3,417,255 | `0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa` | yes |
 | clinic hp bundle | 3,397,615 | `2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba` | yes |
 | chunk `k-9799-ae484032a07c9d4f-js.b` | 176,766 | `713cd95f8371f7b21a63b5d76f035bd03fb94205aa7aa04a5fe8f41550ba8880` | yes |
+| chunk `k-6746-c6795ff7e9ff468d-js.b` | **101,594** | `eee8093c0cc1829a7ca4ae4a34dbc23c7494d8b6576b21945398c6cd0f9c7bc9` | yes — **see §11c** |
+
+⚠ **Chunk `6746` is pinned here only as of this revision, and that is the whole point.**
+Every other artefact above carries a digest this pass checked, but `6746` — the chunk
+carrying 13 of the offsets quoted in §5 and §6 — carried none for two rounds. A third
+party therefore could not tell a correct corpus from a corrupt one without trusting a copy
+on disk. It does now. §11c records what that cost.
+
+**The corpus is checkable without trusting any copy.** The 2026-10-13 sweep already
+committed one authoritative `body_sha256` + `body_bytes` per body, 215 rows, in
+[source: findings-log/2026-10-13-area-k-patient-chunks/results.jsonl]. `verify-corpus.py`,
+committed beside this document, checks a candidate corpus against that ledger and exits
+non-zero on any mismatch:
+
+```
+$ python3 verify-corpus.py <corpus-dir>     # 0 requests
+bodies: 215   ledger rows: 215   matched: 215   MISMATCHED: 0   missing: 0
+total bytes: 6300854
+manifest sha256: 344e82837a67543ab77386c5f01ff568284c4e010bcf2723c80e8d155d343377
+```
 
 **Composition — "215 lazy chunks" is imprecise.** The 211-entry
 `chunks-swept.txt` maps 1:1 onto 211 lazy chunk bodies. The four further bodies are:
@@ -112,8 +136,8 @@ Sequence, verbatim:
   `attributes[<form-control-name>]`, skipping `entryTs`, `additionalTime`,
   `minutesTime`, `comment`.
 - `BLOOD_KETONES` and `HBA1C` coerce their measurement field with
-  `.toString().replace(",", ".")` — a decimal-comma → decimal-point re-encoding on the
-  wire.
+  `.toString().replace(",",".")` at byte 81,657 — a decimal-comma → decimal-point
+  re-encoding on the wire.
 - State-dependent branches:
 
 | entry type | wire object | fields (form control → wire key) |
@@ -185,9 +209,9 @@ or a wordlist entry. Re-measured per-hit, that is **wrong on the one hit that ma
 | 3 | `…,biomarkers,…` | password wordlist |
 | 4 | `…,markers,reconciliation,…` | password wordlist |
 
-Hit 1 is the right-hand side `i.markers` at byte **77,985** of
+Hit 1 is the right-hand side `i.markers` at byte **77,984** of
 `k-6746-c6795ff7e9ff468d-js.b` (the left-hand `n.unfilteredEventMarkers` begins at
-77,960). It is the assignment of a
+77,959). It is the assignment of a
 response field onto the client's view model. `unfilteredEventMarkers` occurs **7**
 times in total, all in that chunk.
 
@@ -211,7 +235,7 @@ for (const ue in i.unfilteredEventMarkers) {
 | `index` | integer slot; timestamp is `anchor − (287 − index) × 300000 ms` | OBSERVED |
 | `type` | string, dispatched on | OBSERVED |
 | `value` | numeric, clamped by the consumer (§5.2) | OBSERVED |
-| `deliverySuspended` | boolean; the corpus reads it exactly **once**, at byte 71,063 | OBSERVED |
+| `deliverySuspended` | boolean; the corpus reads it exactly **once**, at byte 71,062 | OBSERVED |
 
 `index > 287` is dropped in the **BLE branch** of `getMarkersBasedOnType`, **except**
 for `LOW_GLUCOSE_SUSPENDED`, which is retained past the window. The non-BLE branch has
@@ -220,14 +244,14 @@ no such guard. Stated per-branch because the earlier phrasing made it unconditio
 
 ### 5.2 Marker type vocabulary — 11 tokens, OBSERVED
 
-Webpack module **56358** at byte 65,423 of the same chunk:
+Webpack module **56358** at byte 65,422 of the same chunk:
 
 ```
 CALIBRATION, AUTO_BASAL_DELIVERY, AUTO_MODE_STATUS, TIME_CHANGE,
 BG_READING, BG, INSULIN, MEAL, LOW_GLUCOSE_SUSPENDED, EXERCISE, OTHER
 ```
 
-`getMarkersBasedOnType` (byte 80,428) switches on **9** of the 11. `AUTO_BASAL_DELIVERY`
+`getMarkersBasedOnType` (byte 80,427) switches on **9** of the 11. `AUTO_BASAL_DELIVERY`
 and `AUTO_MODE_STATUS` occur exactly twice each in the corpus — the declaration itself —
 so they are **declared but never handled** and fall to `default`, which contributes a
 value of `0`. That is an honest distinction: the enum is an 11-token superset of the
@@ -247,7 +271,7 @@ value of `0`. That is an honest distinction: the enum is an 11-token superset of
 | **time change** | (in the insulin/385.2 group) | **`TIME_CHANGE` → 400** |
 
 The non-BLE calibration floor is `sgBelowLimit + 1`, not `sgBelowLimit`
-(`W=C.value>385.2?385.2:C.value<O+1?O+1:C.value`, byte 81,344, where `O=c.sgBelowLimit||40`).
+(`W=C.value>385.2?385.2:C.value<O+1?O+1:C.value`, byte 81,343, where `O=c.sgBelowLimit||40`).
 
 A consumer switching on `BG_READING` alone silently drops every Guardian/legacy marker;
 switching on `BG` alone drops every BLE one. This is a **client-side** divergence in
@@ -296,8 +320,8 @@ earlier draft of this pass reproduced without attributing.
 
 ### 6.2 The correction — the two "axes" are one
 
-`parseJsonData` in `k-6746-c6795ff7e9ff468d-js.b` (definition at byte 74,236; the
-assignment itself, `n.deviceFamily=i.medicalDeviceFamily`, at byte 74,266) opens:
+`parseJsonData` in `k-6746-c6795ff7e9ff468d-js.b` (definition at byte 74,235; the
+assignment itself, `n.deviceFamily=i.medicalDeviceFamily`, at byte 74,265) opens:
 
 ```js
 parseJsonData(i, v) { const n = {};
@@ -321,10 +345,10 @@ in the earlier draft, not to area P (which only ever claimed a casing candidate)
 
 | byte | code | notes |
 |---|---|---|
-| 76,305 | `"NGP"===n.deviceFamily){… n.sLastAlarmCode = …` | gates alarm-code formatting |
-| 78,360 | `"NGP"==n.deviceFamily){const y=i.lastBolus; … n.sLastBolusDate/Time` | gates **last-bolus** fields, not alarm codes |
-| 83,894 | `"NGP"==i.medicalDeviceFamily && (h("activeInsulin") || …)` | compares the **reported** field name directly — independent corroboration of §6.2 |
-| 87,565 | `this.isNGP="NGP"===K.deviceFamily;` | sets the `isNGP` flag; 87,559 is the `isNGP` identifier itself |
+| 76,304 | `"NGP"===n.deviceFamily){… n.sLastAlarmCode = …` | gates alarm-code formatting |
+| 78,359 | `"NGP"==n.deviceFamily){const y=i.lastBolus; … n.sLastBolusDate/Time` | gates **last-bolus** fields, not alarm codes |
+| 83,893 | `"NGP"==i.medicalDeviceFamily && (h("activeInsulin") || …)` | compares the **reported** field name directly — independent corroboration of §6.2 |
+| 87,564 | `this.isNGP="NGP"===K.deviceFamily;` | sets the `isNGP` flag; 87,559 is the `isNGP` identifier itself |
 
 So the routing discriminator's observed value set is at least
 `BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN, NGP`. This bears on the NGP rows
@@ -494,15 +518,21 @@ committed file, not from memory:
 | class | count | examples |
 |---|---|---|
 | bare-base calls (`this.baseUrl`) | 6 | the two rows `docs/06` counts as shapes |
-| dotted constant refs | 8 | `e.SI` ×3, `fp.rx`, `g._m`, `Ke.B2`, `S.B2`, `S.No`, `w.Bp` |
-| `this.url` / `this.createUrlForReport(...)` | 3 | a report URL builder |
-| bare local identifiers (minified params) | 41 | `j`, `p`, `V`, `t`, … |
+| dotted constant refs | **9** (6 distinct names) | `e.SI` ×3, `S.B2` ×2, and `Ke.B2`, `S.No`, `fp.rx`, `g._m`, `w.Bp` |
+| `this.url` / `this.createUrlForReport(...)` | 3 | `this.url` ×2, `this.createUrlForReport(H,B)` ×1 |
+| remainder — bare minified identifiers | 39 | `j`, `p`, `V`, `t`, … |
+| remainder — one concatenation | 1 | `` X+`?uuid=${$}` `` |
 
-None of the eight constants resolves. `e.SI` never resolves **structurally**: the
+The columns sum to **6 + 9 + 3 + 39 + 1 = 58**. Classified mechanically from the committed
+`unresolved.tsv`; an earlier draft of this section claimed 8 and 41 for the second and
+fourth rows, which do not sum with the rows either side of them.
+
+None of the nine constant sites resolves. `e.SI` never resolves **structurally**: the
 constant pattern requires a leading `.`, and the corpus writes `,SI:"31234567",`. An
 earlier draft called that string "an Angular internal" — that attribution was an
 unlabelled INFERRED guess and is **deleted** here, because nothing in the corpus
-identifies what `SI` is. The other seven are absent from the retained corpus.
+identifies what `SI` is. The other five distinct names are absent from the retained
+corpus.
 
 An earlier draft also listed `fp.YV` here. It is not unresolved: the site is
 `` `${m}${fp.YV}` ``, a template literal, so it is counted in `pairs.tsv` as shape
@@ -563,7 +593,7 @@ defects were found; none was a vendor-surface change, all were analysis defects.
 | # | draft claim | status on re-measurement |
 |---|---|---|
 | 1 | citation window 80,919 → 81,960 is "one uninterrupted statement" | **cite wrong** — true extent 80,919 → 84,159; the cited window holds none of the branches the section described |
-| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,985; negative retracted (§5) |
+| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,984; negative retracted (§5) |
 | 3 | 146 pairs, 90 GET / 50 POST / 21 PUT / 9 DELETE | **not reproducible and internally inconsistent** — the parts sum to 170, not 146. Measured 144 under a recorded rule (§7) |
 | 4 | (first commit) 141 pairs, 90/47/6/7/1 | **not reproducible**, and its parts sum to 151, not 141 |
 | 5 | routing `deviceFamily` and reported `medicalDeviceFamily` are two axes overlapping on `GUARDIAN` | **wrong** — the client assigns one from the other (§6.2) |
@@ -682,6 +712,84 @@ comma coercion, the conditional-children logic, the 42/5 casing split, the corpu
 chain, and the 17-of-19 `/patient/csr` cross-check — all re-derived independently and all
 holding.
 
+## 11c. Correction (2026-10-14) — third verifier round: the corpus was corrupt, and the offsets were all wrong
+
+Round 3 reviewed `b73d9ba1957fb7e25d445030a9f2812235ef9fb5` and returned **NOT CLEAN**
+with two blocking findings. The first one is the most serious defect this pass ever
+committed, and it invalidates a correction the previous round believed it had made.
+
+**B6 — every byte offset quoted from chunk `6746` was off by exactly +1, and §11b's claim
+that the sweep had closed that was false.** Thirteen offsets, all landing one byte past
+the start of the token named.
+
+The cause is not arithmetic. The corpus directory this pass had been reading from holds a
+**corrupt body**: `k-6746-c6795ff7e9ff468d-js.b` at **101,595 bytes with a spurious
+leading `X`**, where the captured body is **101,594 bytes** with no `X`. Every offset in
+that chunk shifted by the one byte at the front.
+
+**How it was caught, and why it took three rounds.** The authoritative digest was already
+committed — the 2026-10-13 sweep wrote one `body_sha256` + `body_bytes` per body into
+[source: findings-log/2026-10-13-area-k-patient-chunks/results.jsonl], 215 rows. Round 3's
+verifier compared its corpus against that ledger, found a 1-byte discrepancy, and inferred
+from three converging observations that the builder's copy was the corrupt one. **It was
+right.** Running the ledger over all 215 bodies:
+
+| corpus | matches ledger | mismatches |
+|---|---|---|
+| the copy this pass read | 214 / 215 | `k-6746-…-js.b` — 101,595 B, `0e633b3e…`, want 101,594 B, `eee8093c…` |
+| a second copy, same defect | 214 / 215 | the same file |
+| the ledger-matching corpus | **215 / 215** | none |
+
+`results.jsonl` seq 145 settles it independently of any local copy: `body_bytes: 101594`,
+`body_sha256: eee8093c0cc1829a7ca4ae4a34dbc23c7494d8b6576b21945398c6cd0f9c7bc9`, and the
+capture's own `etag: W/"18cda-659f36cf22f00"` — `0x18cda` = 101,594.
+
+**The fix is structural, not a re-run.** `verify-corpus.py` is committed beside this
+document. It checks any candidate corpus against the ledger and exits non-zero naming
+what does not match. §2 now pins chunk `6746`'s digest explicitly, because it is the chunk
+carrying 13 of the offsets and it carried no digest for two rounds — which is precisely
+why a corrupt copy was indistinguishable from a good one. **A pass that quotes byte
+offsets must pin the digests of the files it quotes offsets from.**
+
+**What the corruption did *not* touch.** Re-running the extractor on the ledger-verified
+corpus reproduces `pairs.tsv`, `unresolved.tsv` and `resolved-constants.tsv`
+**byte-identically**, and every derived counter is unchanged: 233 sites, 144 shapes,
+72/49/14/9, 99/45, 4 ternary sites, 26 `/patient/csr`, 21 resolved rows,
+154 + 20 + 1 + 58 = 233. Only `corpus_bytes` (6,300,855 → **6,300,854**) and the manifest
+oracle (`3f083011…` → **`344e8283…`**) change. The 17-of-19 cross-check is unaffected.
+
+| corrected offset | was |
+|---|---|
+| module `56358` 65,422 · `deliverySuspended` 71,062 · `parseJsonData` 74,235 · `n.deviceFamily=…` 74,265 | 65,423 / 71,063 / 74,236 / 74,266 |
+| `"NGP"` sites 76,304 / 78,359 / 83,893 / 87,564 · `isNGP` 87,558 | 76,305 / 78,360 / 83,894 / 87,565 / 87,559 |
+| `n.unfilteredEventMarkers` 77,959 · `i.markers` 77,984 | 77,960 / 77,985 |
+| `getMarkersBasedOnType` 80,427 · clamp `W=C.value>…` 81,343 | 80,428 / 81,344 |
+
+All 13 re-verified against the ledger-matching body. No offset in `k-main.b`, chunk `9799`
+or chunk `5750` was affected — those were exact throughout, because those files were not
+corrupt.
+
+**B7 — §7.3's unresolved-class breakdown was wrong in two rows.** It claimed 8 dotted
+constant refs and 41 bare identifiers; `unresolved.tsv` holds **9** and **40** (39 bare
+identifiers plus one concatenation, `` X+`?uuid=${$}` ``). The row's own example column
+enumerated nine sites under a count of eight, so the contradiction was visible without
+opening the file, and the column total still landed on 58, which is why it survived two
+readings. Fixed, and the breakdown is now classified mechanically from the committed TSV.
+
+**Non-blocking, also fixed:** §12 now lists `docs/06` among the pages this pass updates;
+§3's matcher offset stays at 2,964,121 (the `deviceFamily` token, exact under the §2
+convention); and §4's rendering of the coercion now matches the corpus bytes —
+`.replace(",",".")`, no space, at byte 81,657.
+
+**The round-3 finding about the round-1 finding is the one worth keeping.** §11b claimed
+the offset sweep closed B5. It had not: it moved six offsets by one and then asserted
+closure, and it mis-described its own value ("77,984 was the `=`" — 77,983 is the `=`).
+Round 3 re-derived thirteen offsets from a different corpus and found the systematic
+error that two prior rounds of self-checking could not, because **every check this pass
+ran was against the same corrupt bytes.** A verification loop over one input validates the
+logic, not the input. That is why the corpus is now checked against a committed ledger
+rather than against itself.
+
 ---
 
 ## 12. Sources cited
@@ -694,6 +802,6 @@ holding.
 - [source: findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md] — clinic-portal call-site field names
 - `extract-call-sites.py` — the counting rule, same directory
 - bundles: patient `0fb4fbd4…` (3,417,255 B), clinic hp `2a7fa8e7…` (3,397,615 B)
-- docs pages updated by this pass: `docs/05`, `docs/10`, `docs/11`
+- docs pages updated by this pass: `docs/05`, `docs/06`, `docs/10`, `docs/11`
 
 Evidence classes: OBSERVED, PUBLISHED, INFERRED as defined in AGENTS.md §2.
