@@ -39,7 +39,7 @@ hole remains on the commoncrawl host. The L successor's other half — a
 path-level (ipro/hcp) audit on the crawls that do carry `minimed.eu` records —
 is unchanged; this pass did not touch the path question and does not claim to.
 
-Gateway failures encountered: 3 (504×2, 502×1) and each was retried; all
+Gateway failures encountered: 5 (504×3, 502×2) and each was retried; all
 retries succeeded, so no cell is left as "unretryable failure".
 
 Evidence table
