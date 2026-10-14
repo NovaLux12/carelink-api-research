@@ -113,7 +113,7 @@ That makes this a weaker claim than it first read, and the weaker claim is the t
 
 ## 4. The field-width invariance test — valid, but only where the response completes
 
-`fl=` selects which fields each record carries. It cannot change which records **match**. So for one fixed `(crawl, url)` pair, issuing the same query at three field widths gives three counts that must be equal unless a ceiling intervenes — narrower records are smaller, so more of them fit under any ceiling.
+`fl=` selects which fields each record carries. It cannot change which records **match**. So for one fixed `(crawl, url)` pair, issuing the same query at three field widths should give three equal counts unless a ceiling intervenes — and on the one cell where this ran to completion only **two** of the three widths came back, the narrow one (seq 104) answering 504 — narrower records are smaller, so more of them fit under any ceiling.
 
 **Demonstrated on a cell that completes** (OBSERVED, `CC-MAIN-2015-48 / medtronic.eu`):
 
@@ -122,8 +122,9 @@ That makes this a weaker claim than it first read, and the weaker claim is the t
 | 61 | `url,timestamp,status,mimetype` | **132** | 19 301 | no |
 | 105 | `url,timestamp,status,mimetype` | **132** | 19 301 | no |
 | 92 | `url,timestamp,status,mimetype,digest,filename,offset,length` | **132** | 49 350 | no |
+| 104 | `url` (narrow) | — | — | **504** — gateway failure, carries no information |
 
-Three widths, a **2.56× spread in response size, one record count**, and the medium query reproduced **byte-for-byte** across two issues **20.5 min apart** (seq 61 `t_sent` 23:45:38.258Z → seq 105 00:06:07.713Z). No ceiling at this size.
+**Two** widths across three issues, a **2.56× spread in response size, one record count**, and the medium query reproduced **byte-for-byte** across two issues **20.5 min apart** (seq 61 `t_sent` 23:45:38.258Z → seq 105 00:06:07.713Z). No ceiling at this size.
 
 **⚠ The test does not work where truncation bites, and this pass demonstrated why.** On `CC-MAIN-2026-39 / medtronic.com` the *narrower* field set returned **fewer** records than the wider one (5 108 and 10 942 vs 11 522) — the opposite of what a ceiling predicts. Width-invariance is therefore **not** usable as a truncation detector on this API on its own, and a first draft of this section treated it as one. The whole-KiB test in §2 is the detector; the width test is corroboration, and only on a cell that completes.
 
@@ -145,7 +146,7 @@ Of the 37, these five **appear in no file in this repository as it stood before 
 | `bakkeninvitation.medtronic.com` | Reads as a one-off campaign/micro-site, not a product surface. |
 | `kappasigmasnlist.medtronic.com` | Reads as a generated list artefact; no repo context. |
 
-Also present and **already in the corpus at `origin/main`**, listed here so the new list is not mistaken for a complete novelty claim: `americas.connect.medtronic.com` (a `connect.`-namespace host — `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md` §4c already records it as a Wayback recursion artefact) and `diabetesresoursesportal.medtronic.com` (already in `RECON-SUBDOMAINS.md:318`, and notable only because the vendor misspells *resources* in the hostname). Both return **1 file** at `origin/main` under the counting rule above.
+Also present and **already in the corpus at `origin/main`**, listed here so the new list is not mistaken for a complete novelty claim: `americas.connect.medtronic.com` (a `connect.`-namespace host — `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md` **§7 item 5**, line 408, records it as a Wayback recursion artefact; **§4c** of that file is about `connect.medtronic.com`'s REST surface and never mentions it) and `diabetesresoursesportal.medtronic.com` (already in `RECON-SUBDOMAINS.md:318`, and notable only because the vendor misspells *resources* in the hostname). Both return **1 file** at `origin/main` under the counting rule above.
 
 > **⚠ Scope limit, stated because it is the limit of the instrument.** Presence in a crawl index means a Common Crawl crawler **encountered the name** during 2026-09-04 → 2026-09-17. It does **not** mean the host resolves today, that it is operated by Medtronic, or that it is part of any deployment this repo probes. Per `AGENTS.md` §7, `*.carelink.*` and `*.clcloud.*` are wildcard parking DNS and ~50 collected names in this corpus are known false positives; nothing here was resolved, because resolving them would mean contacting vendor infrastructure, which is **0 requests** by design. These five names are **candidates for a future DNS-only check**, not assets.
 
