@@ -678,9 +678,11 @@ here verbatim. That split is this repository's own practice and not a convenienc
 Correction section repaired its §9 Files row in place *and*
 recorded the repair; area M's log rewrote a false sentence in place under a dated
 `⚠ CORRECTED` marker; area Q withdrew a strength word in place and said so. The rule
-being honoured is `AGENTS.md` §3's — *"Corrections are appended … the superseded
-wording stays visible"* — read with §1's, that a claim you cannot source is
-**deleted rather than softened**. Leaving a false attribution standing in prose
+being honoured is `AGENTS.md` §3's — *"Do not edit an existing dated doc — add a
+new one, or a `## Correction (YYYY-MM-DD)` section inside it. Append-only is
+deliberate: the retraction history* is evidence"* — read with §1's, that a claim you
+cannot source is **deleted rather than softened**. ⚠ **The wording this correction
+previously carried here was FABRICATED** — see R3b. Leaving a false attribution standing in prose
 until the end of the document would leave `moom4261` readable as this pass's
 finding for a further 300 lines. **Append-only is preserved: every superseded
 wording is quoted below, and no claim has been deleted without its retraction.**
@@ -1464,11 +1466,20 @@ sentence was written** — see **R2a**, because this sentence, by naming the str
 *"The log's only `docs/09` line-cite"* was **false**: `docs/09:205` also appears **×4**.
 The supportable claim is the exhaustive one, and it is stronger:
 
-> **EVERY `docs/09:NNN` cite in this log sits inside a `## Correction (…)` section** —
-> `docs/09:195` ×2, `docs/09:203` ×1, `docs/09:205` ×4, `docs/09:64` ×4, `docs/09:65` ×1 —
-> **so rule E1 excludes all of them and there are ZERO E1-live `docs/09:NNN` cites.**
-> Checked per cite by resolving its enclosing `## ` heading, not by reading back the
-> sentence that made the claim.
+> **ZERO `docs/09:NNN` cites in this log are E1-live.** Checked by enumerating
+> every occurrence of the pattern `docs/09:<digits>` **in this file only** and resolving
+> each occurrence's enclosing `## ` heading.
+>
+> **No multiplicity figure is published, deliberately.** A previous version of this
+> claim carried one, and it was wrong twice over — it mixed **this log's** occurrences
+> with **tree-wide** counts of other passes' artefacts (`docs/09:64` ×4 and
+> `docs/09:65` ×1 occur in **other passes' files**, which rule **E2** excludes, and in
+> this log they appear **only inside the enumeration that asserted them**). And a
+> multiplicity here would be **self-referential**: every round's correction restates
+> the enumeration, so each restatement adds occurrences of the very tokens being counted.
+> **The negative claim is the whole claim**, it is mechanically checkable in one command,
+> and **a count would add nothing but a number that moves when I write the next
+> correction.**
 
 The nearest neighbour of the kind this round was chasing is **`docs/09:195`** (the gzip
 row carrying *"196 B 404s"*), at `FINDINGS.md:1072` — **also** E1-excluded. A sweep that
@@ -1628,7 +1639,8 @@ introduction to `ba36c0e`, this pass's own round-7 commit, and a tree-wide
 
 > **A sentence that DENIES a string supplies that string**, which makes every later
 > tree-wide check for its absence **unable to fail** — the mirror image of `docs/09`
-> §4's *"a check that cannot fail is not evidence."* A grep for `docs/09:203` can no
+> §4's *"a number that cannot fail is not evidence, however small it comes
+out."* A grep for `docs/09:203` can no
 > longer return zero, so it is no longer a test of anything; **the surviving test is
 > E1-exclusion**, which is per-cite and mechanical.
 
@@ -1637,3 +1649,110 @@ fail** — after the bare count (`§6` mode 7), the fixed point (round 6), and t
 markdown-escaped pipe (here). **The common shape: a claim about the record that is
 checked by reading the record's own prose.** Every one of them was caught by a verifier
 and not by me.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 9. **Both items from the last round hold on their load-bearing conclusions** —
+the runnable-cell fix CONFIRMS, the E1-exclusion negative CONFIRMS, and the
+`git log -S` attribution CONFIRMS. **Two new defects surfaced while checking them, both
+in correction prose, and both are the same shape: a claim about the record that was
+never compared with the record.**
+
+**Base for every diff and sweep this round: `7d915b8`.** `origin/main` used for
+nothing.
+
+### R1c — mixed-scope multiplicity, and the method that missed it
+
+**The withdrawn claim.** It read *"**every** `docs/09:NNN` cite in this log sits inside
+a `## Correction (…)` section"* and then enumerated five tokens — `docs/09:195` ×2,
+`docs/09:203` ×1, `docs/09:205` ×4, **`docs/09:64` ×4**, **`docs/09:65` ×1**.
+
+**Two of those five belong to a different scope than the sentence states.**
+`docs/09:64` and `docs/09:65` occur in this log **only inside the enumeration that
+asserted them**; their real occurrences are **tree-wide, in other passes' artefacts**,
+which rule **E2** excludes by name. Measured here at this commit: `docs/09:64` appears
+**2** times in this log and **both** are the claim's own enumeration line.
+
+> **⚠ THE METHOD MISS, WHICH IS THE PART WORTH KEEPING.** "Verified per cite by
+> resolving each one's enclosing `## ` heading" **tests E1-exclusion, not multiplicity.**
+> Those are two different claims and they need two different checks: E1-exclusion asks
+> *where does each one live*, and multiplicity asks *how many are there*. **The first
+> check passed and was reported as though it were the second** — and it cannot fail on
+> a token that is not a cite at all. **A claim about how many something exists needs its
+> own enumeration over its own stated scope.**
+
+**The fix is to publish no multiplicity at all**, and that is a deliberate narrowing
+rather than a re-count: the load-bearing claim is the **negative** — **zero E1-live
+`docs/09:NNN` cites** — which is mechanically checkable in one command. **A count would
+add nothing**, and would be **self-referential**: every round's correction restates the
+enumeration, so each restatement adds occurrences of the very tokens being counted.
+**That is the same shape as `docs/09:203` below, caught a second time.**
+
+### R3b — TWO fabricated quotations, not one
+
+The verifier found `:1631` quoting `docs/09` §4 as *"a **check** that cannot fail is not
+evidence."* `docs/09:203` reads **"a number that cannot fail is not evidence, however
+small it comes out"** — and `grep -c 'cannot fail' docs/09` = **1**, so the word
+changed from *number* to *check* and the trailing clause was dropped. **Corrected
+verbatim.**
+
+**The sweep the verifier asked for then found a second one I had not been told about,
+in the same class.** `:681` quoted `AGENTS.md` §3 as *"Corrections are appended … the
+superseded wording stays visible"* — and **`grep -c superseded AGENTS.md` = 0**. The
+phrase is **not in `AGENTS.md` at all**; it is from a *brief*, not from the rulebook.
+That is **worse than the `docs/09` case**, because the attribution named the
+repository's own governing document. **Corrected verbatim** to what §3 actually says:
+*"Do not edit an existing dated doc — add a new one, or a `## Correction (YYYY-MM-DD)`
+section inside it. Append-only is deliberate: the retraction history is evidence."*
+
+> **The sweep, and what it found.** Every `*"…"*` span in this log whose surrounding
+> context **names a committed file** was extracted (36 spans) and probed against that
+> file, normalising markdown markers and collapsing whitespace. **17 initially failed**,
+> and **reading them — not counting them — left ZERO**:
+>
+> - **2 were real fabrications**: the two above, both fixed.
+> - **1 was a detector gap**: `:202` *"Neither is browser-callable"* **is** in
+>   `docs/00-summary-the-map.md`, but split across a **line break**, which is the same
+>   trap as this repo's count site — a raw grep cannot see it, a whitespace-collapsing
+>   matcher can.
+> - **1 resolved to the very log this area was retracted for**: `:524`'s span sentence
+>   is verbatim in `findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md`, which
+>   is why `docs/09` §4 retired the check.
+> - **the rest** are quotations of **this log's own superseded wording**, of a
+>   **verifier brief**, or regex artefacts where a span ran across a heading.
+>
+> ⚠ **The detector's own limits, so the "ZERO" is not read as more than it is:** it keys
+> on `*"…"*` only, so a quotation written with different delimiters is **invisible to
+> it**, and it attributes by **nearest named file**, which is a heuristic. **This is a
+> sweep that reduces 20 candidates to 2 defects; it is not proof that no quotation in
+> this log is wrong.** What would be needed for that is the same thing it needed at the
+> start: **read every hit.**
+
+### R5c — the verifier's five gaps, run here so the next verifier reads only my changes
+
+| gap | result |
+|---|---|
+| **eleven subject counts**, end-to-end programmatic, at this commit | **3 / 5 / 4 / 2 / 7 / 13 / 6 / 16 / 9 / 4 / 3** — **all eleven match** the published figures, over a 12-file set at base `7d915b8` |
+| **merge-hazard table at all three refs** | `7d915b8` 5 open `FRSKL` / 21 / `5+21` @L1554 / cfg 5 · `270d06f` 4 `FRKL` / 22 / `4+22` @L1517 / cfg 4 · head 4 `RSKL` / 22 / `4+22` @L1702 / cfg 4 — **all three internally consistent** (`open == prose == cfg`, `closed == prose`, `N+M == 26`). Merged truth: **3 open (R K L) / 23 closed** |
+| **five artefact digests** at `cd9b79a` and head | `results.jsonl` `dba9f9f243f55dfd` · `run.log` `24b2df751d47ef68` · `grep-out.txt` `ae872d12972464db` · `headers/` tree `a1375242809f19f3` · `headers/` bytes `61c4c64cc818e731` — **all five identical, 17 blobs** |
+| **PR body: mtime wording + whole-body stale sweep** | the disclaimer is present; **every** retracted value sweeps clean — `moom4261` ×1 **is the quoted retraction inside the round-5 audit note, not a live claim**; `independently`, `docs/11:214`, `docs/11:209`, `240-243`, `48.95`, `51.57`, `0.0151`, `tail of`, `two tokens are not build-invariant`, `216 assertions` all **0** |
+| **trailing byte; setext risks** | trailing byte `0a`. Sweeping **every** `.md`/`.hurl` in the diff for `---` candidates found **29** and **1 real risk** — `docs/11:1794`, **pre-existing at `7d915b8`**, reproduced by my Closed-row insertion. **One blank line inserted; 0 real risks now** |
+
+### R4b — the pre-existing setext risk, and why this file is where it lives
+
+`docs/11`'s Closed table ended with `| P — … |` immediately followed by `---`, with no
+blank line. At base `7d915b8` that is line 1645, and it is **not mine** — but **my row
+was inserted directly above it and reproduced the shape**, so a reader of my diff sees
+the ambiguity at my line. **One blank line, and the render is unambiguous.** Recorded
+because the class is the same one that has bitten this pass three times: **a structural
+detail that depends on a line break, checked by a human reading the text rather than by a
+mechanical test.**
+
+### R9b — nothing measurable moved
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. All eleven subject counts **unchanged** after these edits, because every edited
+site is inside a `## Correction (…)` section and E1 excludes it.
