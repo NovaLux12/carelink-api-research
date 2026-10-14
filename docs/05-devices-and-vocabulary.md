@@ -285,6 +285,16 @@ in the clinic bundle, not in the clinic's 224 lazy chunks, not in the public con
 in any `hcp/configuration/public/*` key. The accumulating negative is complete
 [source: findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md].
 
+**Correction (2026-10-14, lane S5).** The *server/config* negative above still holds:
+no vendor surface names an alarm code. But one reproducible *client* artefact does carry
+an NGP-specific mapping — the connect monitor component in lazy chunk
+`k-6746-c6795ff7e9ff468d-js.b` (101,594 B) canonicalises 137 raw `lastAlarm.code`
+strings to 62 canonical codes, with two excluded (`"00-1"`, `"121"`) and a pump-model
+gate (`MMT-1809/1810/1818`). That is an alias table, not a definition table: the
+human-readable names come from i18n keys `connect.ble.<code>` and no such key exists
+in the 215-chunk corpus. See
+[findings-log/2026-10-14-area-s5-ngp-alarm-vocabulary-static/FINDINGS.md].
+
 ## The field name is settled; the value is not
 
 `deviceFamily` appears as an HTTP **call-site field name** in the lazy-chunk corpus —
