@@ -121,7 +121,9 @@ Three widths, a **2.56× spread in response size, one record count**, and the me
 
 **OBSERVED** (seq 68, `CC-MAIN-2026-39` / `medtronic.com`, 11 522 records, 1 864 922 B, **37 distinct hosts**, byte count not on a KiB boundary so not a truncation candidate).
 
-Of the 37, these **appear in no file in this repository**:
+Of the 37, these five **appear in no file in this repository as it stood before this branch**.
+
+> **Counting rule** (it is in code terms rather than prose, per `AGENTS.md` §6 item 7): `git grep -il <name> $(git rev-parse origin/main)` over **all** tracked files — not a subset of extensions. An earlier check of this claim used `grep --include='*.md' --include='*.hurl' --include='*.sh'`, which would have hidden a match in a `.tsv` or `.json`; the five were re-checked with `git grep` over every tracked file at `origin/main` (`b528a0f`) and all five return **0 files**. The wording is "as it stood before this branch" and not "in no file", because at this branch's own head three of the five do appear — in this document and in the `docs/11` row that cites it.
 
 | host | why it is interesting |
 |---|---|
@@ -131,7 +133,7 @@ Of the 37, these **appear in no file in this repository**:
 | `bakkeninvitation.medtronic.com` | Reads as a one-off campaign/micro-site, not a product surface. |
 | `kappasigmasnlist.medtronic.com` | Reads as a generated list artefact; no repo context. |
 
-Also present and **already in the corpus**, listed here so the new list is not mistaken for a complete novelty claim: `americas.connect.medtronic.com` (a `connect.`-namespace host — `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md` §4c already records it as a Wayback recursion artefact) and `diabetesresoursesportal.medtronic.com` (already in `RECON-SUBDOMAINS.md:318`, and notable only because the vendor misspells *resources* in the hostname).
+Also present and **already in the corpus at `origin/main`**, listed here so the new list is not mistaken for a complete novelty claim: `americas.connect.medtronic.com` (a `connect.`-namespace host — `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md` §4c already records it as a Wayback recursion artefact) and `diabetesresoursesportal.medtronic.com` (already in `RECON-SUBDOMAINS.md:318`, and notable only because the vendor misspells *resources* in the hostname). Both return **1 file** at `origin/main` under the counting rule above.
 
 > **⚠ Scope limit, stated because it is the limit of the instrument.** Presence in a crawl index means a Common Crawl crawler **encountered the name** during 2026-09-04 → 2026-09-17. It does **not** mean the host resolves today, that it is operated by Medtronic, or that it is part of any deployment this repo probes. Per `AGENTS.md` §7, `*.carelink.*` and `*.clcloud.*` are wildcard parking DNS and ~50 collected names in this corpus are known false positives; nothing here was resolved, because resolving them would mean contacting vendor infrastructure, which is **0 requests** by design. These five names are **candidates for a future DNS-only check**, not assets.
 
