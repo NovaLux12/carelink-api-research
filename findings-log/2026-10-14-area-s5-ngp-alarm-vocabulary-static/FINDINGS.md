@@ -77,8 +77,8 @@ const e = {
 };
 ```
 
-Recovered from that component's `init()` method (value-exact; the TSV flattens
-one documented branch — see Correction item 2):
+Recovered from that component's `init()` method (value-exact; the §2 prose bullets
+below flatten one documented branch — see Correction item 2):
 
 - `this.isNGP = "NGP" === K.deviceFamily;`
 - `H = K.sLastAlarmCode;` (already the UI's zero-padded string for NGP, otherwise
@@ -115,8 +115,12 @@ already carried by area P; the alias map itself is code the client actually runs
 - **Human-readable alarm meanings.** The client resolves the (possibly canonicalised)
   code through `this.translateService.instant(`connect.ble.${code}`)` / the
   `connect.ble.<code>` i18n key. A literal search of all 215 chunk files in the same
-  corpus returned **0 hits** for `connect.ble.` (and 0 for `connect.ble.002` and kin),
-  and only `connect.ble.` as a runtime template string appears at all. The message
+  corpus found **no definition** of that key and **no concrete `connect.ble.<digit>`
+  form** (`connect.ble.[0-9]` → 0). The bare literal `connect.ble.` does occur — **4
+  times, in exactly one chunk**, the one this pass names — and every occurrence is a
+  runtime template of the form `connect.ble.${...}`. An earlier version of this
+  section reported the literal as "0 hits", which was false; see Correction item 3.
+  The message
   bundles that define those keys are not in the reproducible corpus, so the
   code→meaning table remains token-gated on a real device report or an i18n asset
   delivery. The numbers themselves (002…870) plus the two excluded (`00-1`, `121`)
@@ -140,8 +144,10 @@ already carried by area P; the alias map itself is code the client actually runs
      consumes.
   2. counted object properties with Node (`Object.keys`, 137) and cross-checked against
      a hand count of distinct CSV tokens in the same string.
-  3. confirmed no `connect.ble.` definition exists in the 215-file chunk corpus
-     (`grep -R`, 0 hits).
+  3. confirmed no `connect.ble.` **definition** and no concrete `connect.ble.<digit>`
+     key exists in the 215-file chunk corpus: the bare literal occurs 4x in exactly
+     one file, all four runtime templates (`grep -ral 'connect\\.ble\\.'` → 1 file;
+     `grep -rao 'connect\\.ble\\.[0-9]'` → 0).
   4. confirmed the chunk file used is byte-for-byte the one area P referenced at
      the same byte range (size 101,594; runtime-map name `k-6746-c6795ff7e9ff468d-js.b`).
 
@@ -168,13 +174,14 @@ an authenticated `POST hcp/configuration/application` for the meaning side.
 ## Correction (2026-10-14)
 
 The pass's §1 sentence said "three excluded codes" where every other surface (the
-quoted control flow at line 86, the PR body, and `docs/05` line 292) says two:
+quoted control flow at lines 86-87 (the bullet and its quoted code), the PR body,
+and `docs/05` line 292) says two:
 `"00-1"` and `"121"` (the early-return set `["00-1","121"]`). The committed TSV
 contains neither `00-1` nor `121`, so the correct count is **two**.
 
 **How this was corrected, stated exactly:** the original wording was corrected
-**in place** on this unmerged branch (`306ca01` → `32fc642`) — the superseded
-sentence is quoted here in this section so the change remains auditable, but
+**in place** on this unmerged branch (`306ca01` → `32fc642`) — the contested
+phrase is quoted here in this section so the change remains auditable, but
 nothing above preserves it in place, because it was never published: the file
 does not exist on `main` (`git cat-file -e origin/main:…` fails), so no published
 record was altered or lost. This is why an in-place edit is permissible here and
@@ -187,14 +194,24 @@ pin.
    numeric literals in the source (`100:`, `103:`) and are rendered quoted in the
    TSV here. No value differs; the fidelity claim is corrected to "value-exact,
    quoting normalised".
-2. **"simplified only by whitespace" understates the transformation.** The TSV
-   flattens a branch: for input `062` on a gated pump the source emits
-   `connect.ble.062`, while this table records the flattened `null`. 136 of 137
-   inputs are identical under both readings; that one cell is the documented
-   divergence and is left visible rather than reconciled.
-3. **The corpus figure carries two different denominators and the rule was not
-   recorded.** `211` is the lazy-chunk count from `runtime-map.txt`; `215` is the
-   file count of the on-disk corpus `k-chunk-bodies/`, which additionally holds
-   `k-main.b` (3,417,255 B), `k-runtime.b` (8,268 B), the emitted `common` chunk
-   and a negative twin (196 B, a 404). Both numbers are correct under their own
-   rule; the negative in §4 holds over the **superset** of 215.
+2. **"simplified only by whitespace" understates the transformation.** The §2 prose
+   bullets (not `alarm-code-map.tsv`, which is a two-column input→canonical table
+   containing no `null` and no `connect` string) flatten a branch: for input `062`
+   on a gated pump the source emits `connect.ble.062`, while those bullets record
+   the flattened `null`. Comparison basis: the §2 prose rendering against the source
+   object over all **137** inputs, gated and ungated — **136 of 137 identical**,
+   the one divergence being input `062` (the other twelve `062` mappers are nulled
+   by the trailing guard regardless). Naming the basis matters: compared
+   name-key-to-name-key the figure would be 112/137, so the number is only true of
+   the prose reading. The cell is left visible rather than reconciled.
+3. **The corpus figure carries two different denominators, and the rule was not
+   recorded.** `211` is the lazy-chunk count re-derived from `runtime-map.txt`;
+   `215` is the file count of the on-disk corpus `k-chunk-bodies/`, which holds
+   those 211 plus `k-main.b` (3,417,255 B), `k-runtime.b` (8,268 B), the emitted
+   `common` chunk, and `k-negative-twin.b` (196 B, a 404) — 211 + 4 = 215. Both
+   numbers are correct under their own rule. The **negative** is stated over the
+   215-file superset, but its warrant is the concrete-key count, not a literal
+   count: `connect.ble.<digit>` → 0 and no definition exists, while the bare
+   literal `connect.ble.` appears 4x in the one chunk this pass names. An earlier
+   version of this item endorsed a "0 hits" reading of that literal, which was
+   false; the restatement above replaces it.
