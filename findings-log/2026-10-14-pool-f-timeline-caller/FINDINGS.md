@@ -992,19 +992,27 @@ reporting "1 further false claim" from it gave a zero the reader had no way to t
 mention of each across the whole diff — this log, `docs/`, and **every `.sh`** —
 using the subject itself as the query, and assert the mentions agree:
 
+**Figures re-derived under the rule immediately below, at base `7d915b8`:**
+
 | subject | query | mentions | agreement |
 |---|---|---:|---|
-| `m2m` offsets | `387460` | 10 | **agree** — every mention either gives the single value or states it per build and identical |
-| `baseUrl` offsets | `2422149` `2422752` `2422091` `2422694` | 10 | **agree** — per-build labelled; 2 are the quoted superseded wording |
-| `personal.` offsets | all 8 values | 7 | **agree** — every one in the per-build table, row 16, or the counting rule |
-| `cum2me` **byte values** | `387458` `387463` | 6 | **agree**; 1 is the quoted superseded wording |
-| `cum2me` **as a string** | `cum2me` | 13 | **agree**; includes the 2 raw `grep-out.txt` dump rows |
-| `403` body digest | `f249b63cb2fc` | 14 | **agree** — every occurrence a consistent prefix of the one full value |
-| `500` body digest | `660f19c0` | 7 | **agree** — same |
-| `timeline` census | `\b196\b` | 21 | **agree on subject**; 2 are a different subject |
-| signature count | `\b74\b` | 13 | **agree on subject**; 3 are a different subject |
-| `BLOCK 7` range | `240-24[23]` | 11 | **agree** on `:240-242`; 2 describe the defect |
-| `docs/11` letter cites | `docs/11…:(209|214|221|222)` | 8 | **agree** on `:221`/`:222`; 2 describe the defect |
+| `m2m` offsets | `387460` | 3 | **agree** — each gives the single value or states it per build and identical |
+| `baseUrl` offsets | `2422149` `2422752` `2422091` `2422694` | 5 | **agree** — every one per-build labelled |
+| `personal.` offsets | all 8 values | 4 | **agree** — the §6.4 per-build table, the counting rule, and two derivations |
+| `cum2me` **byte values** | `387458` `387463` | 2 | **agree** |
+| `cum2me` **as a string** | `cum2me` | 7 | **agree** — includes the 2 raw `grep-out.txt` dump rows |
+| `403` body digest | `f249b63cb2fc` | 13 | **agree** — every occurrence a consistent prefix of the one full value |
+| `500` body digest | `660f19c0` | 6 | **agree** — same |
+| `timeline` census | `\b196\b` | 16 | **agree on subject**; a few are a different subject, listed at R4 |
+| signature count | `\b74\b` | 9 | **agree on subject**; same |
+| `BLOCK 7` range | `240-24[23]` | 4 | **agree** on `:240-242` |
+| `docs/11` letter cites | `docs/11…:(209|214|221|222)` | 3 | **agree** on `:221`/`:222` |
+
+**The counts fell, and that is the correction working.** Quoted superseded wording is
+**evidence, not a claim** — `AGENTS.md` §3 requires it to stay visible, and a claim is
+what the sweep is checking. Excluding it from the count is what makes the count stable
+under the act of recording the correction; **excluding it from the record would be
+`§1`'s deletion with the sign reversed**, and is not done.
 
 ⚠ **⚠ CORRECTED 2026-10-15 (round 5) — this table originally published counts of
 8 / 9 / 4 / 5 / 13 / 6 / 17 / 10 / 8 / 6 with NO counting rule, and those figures are
@@ -1014,16 +1022,40 @@ without a rule is: **a number nobody else can reproduce** (`docs/09` §4, and th
 pass's own `§6` mode 7). **The counting rule, written down so this table is
 checkable rather than merely readable:**
 
-> **A MENTION is one LINE** of a file that **(a)** is listed by
-> `git diff --name-only origin/main`, **(b)** ends `.md` / `.sh` / `.hurl` / `.txt`,
-> **(c)** is **not** under `findings-log/probe-2026-10-08/`,
-> `findings-log/2026-10-12-published-pointers/` or any `findings-log/2026-13*/`
-> directory — those are **other passes' artefacts**, verified pre-existing — and
+> **BASE — pinned, because `main` moves.** The file set is
+> `git diff --name-only 7d915b8 HEAD`, where **`7d915b8` is this branch's merge base**
+> — its parent at branch time. **`origin/main` is NOT the base and must not be used as
+> one**: it moved to `270d06f` (area S merged) *while this branch was open*, so an
+> `origin/main`-keyed file set picks up that pass's artefacts and every count below
+> changes. **A count whose file set is a function of a moving ref is not a count.**
+>
+> **EXCLUSIONS.**
+> **(E1) Correction sections are excluded from the subject set — and kept in the
+> record.** A section runs from a `## Correction (…)` heading to the next `^## `
+> heading or EOF, and every line inside it is excluded. **The reason is
+> generalisable, not mechanical: a correction section *quotes* the subjects it
+> corrects**, because `AGENTS.md` §3 requires the superseded wording to stay visible.
+> **Including quoted history in the count makes the count a fixed point that the act
+> of recording the correction moves** — appending this pass's own R2/R3 prose added
+> exactly +2 to `m2m`, +1 to `cum2me`-bytes and +5 to `cum2me`-string, so the figures
+> published at `08472e5` were correct at `2573474` and wrong at the commit that
+> published them. **The exclusion is from the COUNT, never from the RECORD**: the
+> quoted wording is what makes the correction auditable, and deleting or hiding it to
+> make a number stable would be `§1`'s deletion with the sign reversed.
+> **(E2)** Lines in any `findings-log/probe-2026-10-08/`,
+> `findings-log/2026-10-12-published-pointers/` or `findings-log/2026-10-13*/`
+> directory — **other passes' artefacts**, verified byte-pre-existing. *(The glob was
+> written `2026-13*/` in the first version of this rule, which matches nothing; it is
+> `2026-10-13*/`, and it is currently inert either way because the three directories
+> are excluded by name above it.)*
+>
+> **THE RULE.** A **MENTION** is one **LINE**, outside every exclusion above, of a file
+> that **(a)** is listed by `git diff --name-only 7d915b8 HEAD`, **(b)** ends
+> `.md` / `.sh` / `.hurl` / `.txt`, **(c)** is not under a path named in **(E2)**, and
 > **(d)** contains at least one of the subject's identifying literals, matched
-> **case-sensitively** with `grep -E`. **One line is at most ONE mention** however
-> many times the literal appears on it. **A line matching two subjects counts once for
-> EACH.** Files are read from the **working tree** (= PR head content), never from
-> `origin/main`.
+> **case-sensitively** with `grep -E`. **One line is at most ONE mention** however many
+> times the literal appears on it. **A line matching two subjects counts once for EACH.**
+> Files are read from the **working tree** (= PR head content), never from `origin/main`.
 
 Under that rule the four subjects the verifier also counted come out at
 **`m2m` 10, `baseUrl` 10, `personal.` 7** — **identical to its figures** — and the
@@ -1256,3 +1288,136 @@ committed context dump's `offset + 45` rule with the 45-byte left context assert
 first. **Had the sweep counted that block, its `≤12` figure would have been wrong in
 the same direction as a `head`-truncation artefact — which is what the census in §6.5
 already documents.**
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 6. Two findings, both about the counting rule, and the second one is the more
+valuable thing in this round because it is **not about this pass at all**.
+
+### R1 — the count was a fixed point the correction moved, and it is now stable
+
+**The superseded wording.** The rule read *"Files are read from the **working tree**
+(= PR head content), never from `origin/main`"* and published `m2m` **10**,
+`baseUrl` **10**, `cum2me`-bytes **6**, `cum2me`-string **13**. **Every one of those
+figures was correct at `2573474` and wrong at `08472e5`** — the commit that published
+them. This pass's own R2/R3 prose **quotes** `387460`, `387458`, `387463` and
+`cum2me`, because `AGENTS.md` §3 requires superseded wording to stay visible, and
+**appending the correction added exactly +2, +1 and +5 to those subjects.** So the
+count was a fixed point the act of recording it moved: **narrowed from round 5's
+"a count nobody can reproduce" to "a count nobody can reproduce twice".**
+
+**I took the second route the verifier recommended, and the reason is that the first
+does not survive contact with the next round.** Restating the figures at HEAD would
+publish a correct number that the *next* correction devalues identically. **So the
+rule itself is amended**, with the exclusion and the reason both on the record:
+
+> **(E1) Correction sections are excluded from the subject set — and kept in the
+> record.** **The reason is generalisable: a correction section *quotes* the subjects
+> it corrects, because `AGENTS.md` §3 requires the superseded wording to stay visible.
+> Including quoted history in the count makes the count a fixed point that recording the
+> correction moves.** **The exclusion is from the COUNT, never from the RECORD** —
+> quoted wording is what makes a correction auditable, and hiding it to stabilise a
+> number would be `§1`'s deletion with the sign reversed.
+
+**Every figure is re-derived under the amended rule and republished above.** They fall
+— `m2m` 10 → **3**, `baseUrl` 10 → **5**, `personal.` 7 → **4**, `cum2me`-bytes 6 → **2**,
+`cum2me`-string 13 → **7** — because most of what the old counts were measuring **was
+quoted history**.
+
+⚠ **The amendment is PROVEN, not asserted.** A **decoy correction section** dense with
+every one of the subject literals was appended and the counts re-run:
+
+```
+BEFORE the decoy:  m2m 3   baseUrl 5   personal. 4   cum2me_bytes 2   cum2me_string 7
+AFTER  the decoy:  m2m 3   baseUrl 5   personal. 4   cum2me_bytes 2   cum2me_string 7
+STABLE UNDER ITS OWN CORRECTION: True
+```
+
+The decoy was then removed and the file restored. **A count that cannot be moved by
+recording a correction about it is the property round 6 asked for**, and this is the
+evidence.
+
+**All 18 surviving mentions were then read, not counted** — the discipline this repo
+keeps teaching — and **every one agrees**: `m2m` 387460 in both builds everywhere;
+`baseUrl` per-build labelled everywhere; `personal.` in the §6.4 table and row 16;
+`cum2me` 387458–387463 and "middle" everywhere; and the two raw `grep-out.txt` rows are
+the committed context dump itself, which is evidence and is kept.
+
+### R2 — the base is now pinned, and it is preventative here rather than corrective — stated as such
+
+The rule's file set is `git diff --name-only <base> HEAD`. **`origin/main` moved from
+this branch's merge base `7d915b8` to `270d06f` while the branch was open**, so an
+`origin/main`-keyed file set is a function of a moving ref: it is **12 files** under
+`7d915b8` and **14** under `270d06f`, the two extra being area S's `docs/03` and
+`docs/05`. The rule now names **`7d915b8` explicitly**.
+
+**Honest scope of that fix, because the verifier did not ask me to overstate it:** for
+these five subjects the counts are **identical under both bases** — area S's files
+happen to contain none of the literals. **So pinning the base is preventative, not
+corrective here.** The general form is what matters: **a count whose file set is a
+function of a moving ref cannot be reproduced at a later date**, and it is `docs/09`
+§4's *"a number that cannot fail is not evidence"* in its purest form — a count that
+would change if anyone else happened to merge something.
+
+### R3 — the malformed glob, in the rule and in the message
+
+The rule wrote `findings-log/2026-13*/`, which **matches no directory**; the correct
+form is **`findings-log/2026-10-13*/`**. It was **inert** — the three directories are
+excluded by name above it either way — but a rule containing a glob that matches
+nothing is a rule a reader will copy. Corrected in the rule; **this commit's message
+carries the correct form**, and the two now agree.
+
+### R4 — two numerals, and the other subject each of them also is
+
+Recording the limits of the method that produced the table, since a table without them
+reads cleaner than it is. Under the amended rule `196` has **16** mentions and `74` has
+**9**, and **not every one is this pass's subject**: `docs/09`'s gzip row carries
+*"196 B 404s"* and `docs/04` carries *"34 for 74 countries"* — **body sizes and a
+country count that share a numeral with a census and a signature count.** Both
+**verified pre-existing** on `7d915b8`; neither edited. **A subject sweep says "here is
+everywhere this subject appears"; it does not say "every one of these is the same
+claim", and a numeral is not a unique identifier.**
+
+### R5 — ⚠ THE MERGE HAZARD NOBODY ASKED FOR, MEASURED ON ALL THREE REFS
+
+**`origin/main` moved to `270d06f` (area S merged) and that merge touched three files
+this pass also changed** — `docs/09`, `docs/10`, `docs/11`. **No textual conflict to
+resolve here, and none is resolved here.** But the arithmetic is the finding:
+
+| ref | open headings | Closed rows | prose | `config.yml` |
+|---|---|---:|---|---:|
+| `7d915b8` base | F R S K L (5) | 21 | 5 + 21 | 5 |
+| `270d06f` main, **area S merged** | **F** R K L (4) | 22 | **4 + 22** | **4** |
+| `08472e5` this branch, **area F closed** | R **S** K L (4) | 22 | **4 + 22** | **4** |
+
+**Two independent closures from one base each computed the same count — "4 open plus 22
+closed" — by closing a DIFFERENT letter.** Each branch is internally consistent and
+correct for its own closure. **The merge of the two yields 3 open and 23 closed**,
+because F *and* S are closed — while the merged text will still carry **4 + 22** in
+`docs/11`'s prose and **4** in `config.yml`, since only one of two identical edits to
+each of those lines can survive.
+
+> **⚠ FOR THE MERGE QUEUE, and deliberately not fixed here.** Reconciling a merge of
+> two closures means recomputing **all three sites together** — `docs/11`'s heading
+> count, its Closed-table row count, its "N open plus M closed" prose and
+> `config.yml` — to **3 open plus 23 closed**. **Taking whichever of the two identical
+> prose lines git selects is wrong by one in the same direction on both surfaces**, and
+> `research-checks.py`'s `check_prose_counts` will fail the result, which is that check
+> working. **The generalisable form: two closures from one base collide on the count,
+> not on the text**, so a count is not a merge-safe value the way the row it annotates
+> is.
+
+### R6 — nothing measurable moved
+
+All four evidence artefacts remain **byte-identical to `7d915b8`**'s ancestor
+`cd9b79a`. `wc -l results.jsonl` is **17**, matching **"17 of a 40 cap"**. No vendor
+request this round. `regression/hurl/` untouched since `cd9b79a`, so no pin can have
+moved — `git diff cd9b79a -- regression/` is empty.
+
+**Measurement bases used in this round, stated so an auditor can repeat them:** the
+subject sweep and the R5 table read `git diff --name-only 7d915b8 HEAD`; the artefact
+identity check compares `cd9b79a`; `research-checks.py` and `measure_assertions.py`
+read the **working tree**. **`origin/main` was used for nothing.**
