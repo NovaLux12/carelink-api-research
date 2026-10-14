@@ -1,0 +1,4 @@
+inv2-CC-MAIN-2013-48-minimed-eu|inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=minimed.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype|
+inv2-CC-MAIN-2013-48-minimed-com|inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=minimed.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|
+inv2-CC-MAIN-2013-48-medtronic-eu|inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype|
+inv2-CC-MAIN-2013-48-medtronic-com|inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|

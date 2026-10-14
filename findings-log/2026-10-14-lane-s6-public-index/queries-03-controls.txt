@@ -1,0 +1,13 @@
+# Controls, sent FIRST and read before any candidate. Nothing else goes out
+# until all three have answered, because every finding in this pass is a claim
+# about a COUNT.
+#
+#  1  reachability  -- is the host answering at all today
+#  2  CONTROL-A     -- a host CC certainly covers, so a count > 0 is a real count
+#  3  CONTROL-B     -- a TRUE zero, so a count of 0 is a real zero and not a
+#                      syntax artefact. `.invalid` is reserved by RFC 2606 and
+#                      can never resolve, so this cannot be a false negative
+#                      caused by the target actually existing.
+s6-ctl-collinfo|CONTROL-reachability|index.commoncrawl.org|/collinfo.json|--max-time 60
+s6-ctl-positive|CONTROL-covered-host|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=example.com&output=json&matchType=domain&fl=url,timestamp,status&limit=5|--max-time 60
+s6-ctl-absent|CONTROL-true-zero|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=s6ctlabsent987notarealhost.invalid&output=json&matchType=domain&fl=url,timestamp,status&limit=5|--max-time 60

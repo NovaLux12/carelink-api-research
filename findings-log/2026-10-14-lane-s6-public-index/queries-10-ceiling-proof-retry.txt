@@ -1,0 +1,16 @@
+# One request. The 32 KiB cell, narrowed.
+#
+# seq 74 read 203 records for CC-MAIN-2022-40 / medtronic.com in EXACTLY 32768
+# bytes = 32.0 KiB. seq 149 tried the same cell with a narrower field set and
+# the API answered 504. A 504 is a failure and carries no information, so the
+# cell is still an untested floor.
+#
+# Narrow records are strictly smaller than medium records, so under any byte
+# ceiling the narrow query must return at least as many records. More than 203
+# therefore demonstrates the published 203 is a floor. Exactly 203 would leave
+# the ceiling unconfirmed on this cell. Both are publishable outcomes; neither
+# is a wasted request.
+#
+# DELAY=15 after a 300 s cooldown. Two prior attempts at this cell answered 504.
+s6fin3-2022-40-narrow|ceiling-proof-narrow-2nd-try|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
+

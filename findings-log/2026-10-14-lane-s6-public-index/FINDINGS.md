@@ -1,0 +1,232 @@
+# Area S6 — Common Crawl public host/path inventory, and the byte ceiling that was silently flooring every count
+
+**Date:** 2026-10-14 · **Claim issue:** [#95](https://github.com/NovaLux12/carelink-api-research/issues/95)
+**Area:** `docs/10` open questions — the truncation/completeness row (area L's `INFERRED` line) and area M's host inventory gap.
+**Scope:** `index.commoncrawl.org` CDX index API only. `data.commoncrawl.org` was allowed by the probe and **never used** — 0 requests.
+
+---
+
+## Accounting
+
+| item | value |
+|---|---|
+| **Requests sent** | **151 of a 400 cap** — 76 from the earlier attempt on this claim, 75 from this pass. Every number in this document is recomputed from `results.jsonl` by `account.py`; none is typed by hand. |
+| Method | **GET only.** Every one of the 151 rows carries `"method": "GET"`. No POST, no OPTIONS, no authentication, no token exchange. |
+| Hosts contacted | **`index.commoncrawl.org` only.** No other host appears in any row. |
+| **Requests to any Medtronic host** | **0.** No vendor DNS, no vendor TLS, no vendor HTTP. This is what makes the pass safe to run beside other workers. |
+| Declared delay | **≥ 2.5 s per host**, `sleep` **inside** `flock .loop/host-index.commoncrawl.org.lock`. Raised to 7–15 s for later rounds via `S6_DELAY` — see §7. |
+| **Measured same-host gap floor, this pass** | **2.941 s** (harness `t_sent`), **3.123 s** (kernel body-mtime oracle). **0 of 74 gaps below the declared 2.5 s.** |
+| Ledger | `results.jsonl`, **151 rows, 151 unique `host_tag`s**, one row per request, `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601. `curl_exit` is 0 on all 151. |
+| Bodies committed | **none.** Each body was reduced in code (`derive.py`) to bytes + sha256 + record count + the **distinct hostnames** it mentions. Raw bodies are written under `$S6_SCRATCH`, **outside the repository** — see §8. |
+
+`account.py` prints `151 of a 400 cap`; `wc -l results.jsonl` is 151. Both agree.
+
+> **On the 400s.** 32 rows answered **HTTP 400**. 31 of them are the earlier attempt's fault and are described in §8; they are kept in the ledger and in the accounting above rather than deleted, because `findings-log/` is append-only and the wasted requests are part of the record.
+
+---
+
+## 1. Controls — sent first, and read before any candidate
+
+The findings below are claims about **counts**, so no count was read until the instrument had returned both a known-positive and a known-zero.
+
+| # | seq | query | answer | verdict |
+|---|---|---|---|---|
+| **reachability** | 77 | `GET /collinfo.json` | **200**, 35 226 B, **128 crawl indexes** published, newest `CC-MAIN-2026-39` | passed |
+| **A — covered host** | 78 | `url=example.com&matchType=domain&limit=5` on `CC-MAIN-2026-39` | **200**, **5 records**, 2 hosts | passed |
+| **B — true zero** | 79 | `url=s6ctlabsent987notarealhost.invalid&matchType=domain&limit=5` | **404** `{"message": "No Captures found for: …"}` | passed |
+
+**OBSERVED.** Control B's target is under the RFC 2606 reserved `.invalid` TLD and cannot resolve, so its 404 is a real absence rather than a miss. Control A returned 5 records on the same crawl, so the API was demonstrably serving records at that moment.
+
+**The control pair also fixes the shape of an absence on this API** (OBSERVED, seq 79): a true zero is **`404` + `{"message": "No Captures found for: …"}`**. Every negative in §6 was read against that shape and its `body_sha256` differs from a gateway page's.
+
+**Reproduction of the control, one hour apart** (OBSERVED): seq 1 and seq 77 are both 35 226 B; seq 2 and seq 78 are both 412 B. Byte-identical. The instrument is reproducible at small sizes — which §4 turns out to be the property that makes the large sizes meaningful.
+
+---
+
+## 2. HEADLINE — this API truncates record responses, and the truncation is detectable from the byte count alone
+
+**OBSERVED.** Two *identical* requests against the same cell, one hour apart:
+
+| seq | `fl=` | records | bytes | KiB | whole-KiB? | hosts reached |
+|---|---|---|---|---|---|---|
+| 102 | `url` | 5 108 | 655 360 | 640.0 | **YES** | 2 |
+| 145 | `url` | 10 942 | 1 228 800 | 1200.0 | **YES** | 24 |
+| 68 | `url,timestamp,status,mimetype` | 11 522 | 1 864 922 | 1821.2 | no | 37 |
+
+A published Common Crawl crawl index does not change between two queries an hour apart. **Therefore at least one of seq 102 and seq 145 was cut short**, and the only thing that differs between the two requests is nothing — same URL, same crawl, same `matchType`, same `fl`.
+
+**The truncation is a SURT-ordered prefix, not a random sample** (OBSERVED): seq 145's host set contains **every host seq 102 carried, plus 22 that sort earlier in SURT order**, and is missing 13 that sort later (`mix.`, `news.`, `oab.`, `signin.`, `synchromed2battery.`, `wwwp.` …). It stops part-way through the host list, at a round byte count.
+
+**The detector.** Across the whole ledger, of the **29** successful `200` answers, **exactly three have a byte count that is an exact multiple of 1024** — and all three are the ones that stop part-way through the host set:
+
+| seq | bytes | KiB | cell |
+|---|---|---|---|
+| 74 | 32 768 | 32.0 | `CC-MAIN-2022-40` / `medtronic.com` |
+| 102 | 655 360 | 640.0 | `CC-MAIN-2026-39` / `medtronic.com` |
+| 145 | 1 228 800 | 1200.0 | `CC-MAIN-2026-39` / `medtronic.com` |
+
+The other 26 are on no boundary at all (e.g. 1 864 922, 49 350, 19 301, 41, 40).
+
+> **A Common Crawl record response whose byte count is an exact multiple of 1024 was cut short. A response whose byte count is not, ran to completion.**
+>
+> This is a *correlation over 29 observations with 3 positives*, not a proven mechanism. The mechanism is **not established** and no cause is asserted — a proxy byte ceiling, a server-side emit-budget, and a client-side read cutoff all fit, and nothing measured here separates them.
+
+**Why it matters, and what it invalidates.** Every count this repo has taken from Common Crawl above ~1 800 bytes was, until now, treated as a measurement. On this evidence each of those numbers is a **lower bound** unless its byte count is not a whole number of KiB. A reader can now audit any committed CC row with one arithmetic test.
+
+**Corroboration from a second instrument** (OBSERVED, `showNumPages`):
+
+| seq | cell | `pages` | `blocks` |
+|---|---|---|---|
+| 83 | `CC-MAIN-2022-40` / `medtronic.com` | **3** | 14 |
+| 88 | `CC-MAIN-2026-39` / `medtronic.com` | 1 | 5 |
+| 93 | `CC-MAIN-2015-48` / `medtronic.eu` | 1 | 1 |
+
+`CC-MAIN-2022-40 / medtronic.com` is **the only cell in the ledger where `pages` is not 1**, and it is **the cell whose response is exactly 32 KiB**. `docs/10` records that `pages`/`pageSize` is not a record count and under-reports by ≥400×, so `pages: 3` does not mean "3 × 5 = 15 records". What it does support is directional: the API itself says this cell spans more than one page, which is what a truncated response looks like from underneath.
+
+---
+
+## 3. CORRECTION — a published count is a floor, not a measurement
+
+**OBSERVED.** `CC-MAIN-2022-40 / medtronic.com` was published at **203 records** (seq 74) by the earlier attempt on this claim, and that figure is carried into `docs/10`'s area-M row. Its response was **exactly 32 768 bytes = 32.0 KiB**.
+
+By §2's detector that response was cut short. **203 is therefore a lower bound and must not be read as the size of the set.** It is also the only cell reporting `pages: 3`.
+
+**Three attempts were made to convert this from a floor into a demonstration, and all three failed** (OBSERVED): seq 149 and seq 151 re-issued the cell with a narrower field set and seq 150 re-issued the medium one — **502/504/504**. A gateway failure carries no information in either direction, so **the ceiling on this cell is unconfirmed** and it stays a floor. Recorded as failed rather than quietly dropped.
+
+**What would settle it** (one request): re-issue `CC-MAIN-2022-40-index?url=medtronic.com&matchType=domain&fl=url`. Narrow records are strictly smaller than medium records, so under any byte ceiling a narrow query must return **at least** as many records. More than 203 demonstrates the floor; exactly 203 leaves the ceiling unconfirmed on this cell.
+
+---
+
+## 4. The field-width invariance test — valid, but only where the response completes
+
+`fl=` selects which fields each record carries. It cannot change which records **match**. So for one fixed `(crawl, url)` pair, issuing the same query at three field widths gives three counts that must be equal unless a ceiling intervenes — narrower records are smaller, so more of them fit under any ceiling.
+
+**Demonstrated on a cell that completes** (OBSERVED, `CC-MAIN-2015-48 / medtronic.eu`):
+
+| seq | `fl=` | records | bytes | whole-KiB? |
+|---|---|---|---|---|
+| 61 | `url,timestamp,status,mimetype` | **132** | 19 301 | no |
+| 105 | `url,timestamp,status,mimetype` | **132** | 19 301 | no |
+| 92 | `url,timestamp,status,mimetype,digest,filename,offset,length` | **132** | 49 350 | no |
+
+Three widths, a **2.56× spread in response size, one record count**, and the medium query reproduced **byte-for-byte** across two issues an hour apart. No ceiling at this size.
+
+**⚠ The test does not work where truncation bites, and this pass demonstrated why.** On `CC-MAIN-2026-39 / medtronic.com` the *narrower* field set returned **fewer** records than the wider one (5 108 and 10 942 vs 11 522) — the opposite of what a ceiling predicts. Width-invariance is therefore **not** usable as a truncation detector on this API on its own, and a first draft of this section treated it as one. The whole-KiB test in §2 is the detector; the width test is corroboration, and only on a cell that completes.
+
+---
+
+## 5. Host inventory — five `medtronic.com` host names the repo does not carry
+
+**OBSERVED** (seq 68, `CC-MAIN-2026-39` / `medtronic.com`, 11 522 records, 1 864 922 B, **37 distinct hosts**, byte count not on a KiB boundary so not a truncation candidate).
+
+Of the 37, these **appear in no file in this repository**:
+
+| host | why it is interesting |
+|---|---|
+| `synchromed2battery.medtronic.com` | Named for the **SyncMed 2 insulin pump**, a discontinued product line. Still present in the newest published crawl index. |
+| `e-thoth.medtronic.com` | Unexplained single-word label; no repo context. |
+| `oab.medtronic.com` | Three-letter label; no repo context. |
+| `bakkeninvitation.medtronic.com` | Reads as a one-off campaign/micro-site, not a product surface. |
+| `kappasigmasnlist.medtronic.com` | Reads as a generated list artefact; no repo context. |
+
+Also present and **already in the corpus**, listed here so the new list is not mistaken for a complete novelty claim: `americas.connect.medtronic.com` (a `connect.`-namespace host — `findings-log/probe-2026-10-08/recon/cc/COMMONCRAWL-URLS.md` §4c already records it as a Wayback recursion artefact) and `diabetesresoursesportal.medtronic.com` (already in `RECON-SUBDOMAINS.md:318`, and notable only because the vendor misspells *resources* in the hostname).
+
+> **⚠ Scope limit, stated because it is the limit of the instrument.** Presence in a crawl index means a Common Crawl crawler **encountered the name** during 2026-09-04 → 2026-09-17. It does **not** mean the host resolves today, that it is operated by Medtronic, or that it is part of any deployment this repo probes. Per `AGENTS.md` §7, `*.carelink.*` and `*.clcloud.*` are wildcard parking DNS and ~50 collected names in this corpus are known false positives; nothing here was resolved, because resolving them would mean contacting vendor infrastructure, which is **0 requests** by design. These five names are **candidates for a future DNS-only check**, not assets.
+
+---
+
+## 6. Path-prefix inventory — four anchored negatives, one unanchored
+
+`matchType=prefix` asks for paths beginning with a given prefix. The candidate list is bounded and derived from repo artefacts (`AGENTS.md` §8): `/patient/` and `/connect/` are the two prefixes area M already named; `/ipro/`, `/hcp/` and `/oauth2/` come from this lane's brief and the path vocabulary in `docs/06`/`docs/07`. Two host groups, three crawls — 30 queries, listed in full in `queries-07-path-prefix.txt`.
+
+**The instrument was degraded during this round: 25 of 30 answered 502/504.** A gateway failure is not an absence, so **25 cells are unmeasured**, not negative.
+
+The five that answered, all `404` true-zero (`{"message": "No Captures found for: …"}`, seq 118/129/136/137/139):
+
+| seq | crawl / host | prefix | anchored? |
+|---|---|---|---|
+| 129 | 2022-40 / `medtronic.com` | `/connect/` | **yes** — same cell holds 203 records (seq 74) |
+| 139 | 2013-48 / `medtronic.com` | `/connect/` | **yes** — same cell holds 112 records (seq 65) |
+| 136 | 2013-48 / `medtronic.eu` | `/ipro/` | **yes** — same cell holds 112 records (seq 65) |
+| 137 | 2013-48 / `medtronic.eu` | `/hcp/` | **yes** — same cell holds 112 records (seq 65) |
+| 118 | 2026-39 / `medtronic.eu` | `/oauth2/` | **❌ NO** — no row has ever returned a positive for this cell |
+| — | 2026-39 / `medtronic.com` | `/connect/`, `/patient/` | **unmeasured** — seq 119, 120 answered 504 |
+
+**OBSERVED:** `/connect/` is absent from `medtronic.com` in both crawls where the question could be asked, and each of those absences sits inside a cell proven non-empty — so it is a real absence, not an empty cell.
+
+**⚠ The seq 118 negative is UNANCHORED and must not be cited as one.** No row in the ledger has returned a positive for `medtronic.eu` on `CC-MAIN-2026-39`. A `404` on a cell never shown to hold anything is weak evidence. The one query that would anchor it — `CC-MAIN-2026-39-index?url=medtronic.eu&matchType=domain` — was sent as seq 144 and answered **504**. Three further attempts (seq 146, 147, 148) on the adjacent `/connect/` and `/patient/` cells also answered 504.
+
+This is consistent with, and does not disturb, area M's finding that no captured path in its six crawls begins `/patient/` or `/connect/` — it reproduces two of that claim's cells with a positive control on each, and adds nothing against it.
+
+---
+
+## 7. Methods — delay, spacing, and two oracles
+
+**Delay enforcement.** `sleep 2.5` runs **inside** `flock .loop/host-index.commoncrawl.org.lock`. A sleep outside the lock lets other workers queue and then fire together inside one window, which is worse than no lock.
+
+**Measured spacing, this pass** (OBSERVED, recomputed by `account.py`):
+
+- harness `t_sent` series, minimum **2.941 s**, **0 of 74 gaps below 2.5 s**;
+- kernel body-mtime oracle, minimum **3.123 s**;
+- **0 overlapping request intervals**; `host_seq` strictly increasing; `curl_exit` 0 on every row.
+
+**Delay was raised mid-pass** (`S6_DELAY=7/10/12/15`, with 200–300 s cooldowns) because the API degraded sharply: **81 of 151 answers were 502/504**, and at a fixed 2.5 s the yield was 8 of 15 in the first completeness round and **0 of 8** in the next. Raising the delay is the honest fix; retrying faster is what gets a caller throttled. Every raised-delay row is in the ledger with its real `t_sent`.
+
+**Two spacing oracles, reported together on purpose.** `account.py` prints both and does not prefer either. The harness series is what the probe *claims*; the kernel series is the mtime of the body file, which `curl` wrote, so it cannot be an assertion the harness makes about itself. `docs/09` §4's rule is that where they disagree, the harness series is the suspect.
+
+**Defects in the earlier attempt on this claim — disclosed, not smoothed over:**
+
+1. **31 requests wasted on a malformed query.** `queries-02-inventory.txt` wrote `\&` between parameters, which reached the API as a format named `json\`. All 31 answered **HTTP 400** with body `{"message":"output=json\ not supported"}` (seq 4–34, one sha256). The later per-crawl files used bare `&` and worked. **Cost: 31 of the 400 cap, and 31 rows in the ledger that measure nothing.** Kept, not deleted.
+2. **Five rows record `t_done` before `t_sent`** (seq 4, 5, 21, 27, 28), which is impossible under the script's own documented order (sleep → `date` → curl → `date`). **Cause not established.** A plausible mechanism — the script being edited while `bash` was still reading it, since `bash` reads scripts incrementally — is **INFERRED and unverified**, and is not offered as an explanation.
+3. **Three harness gaps below the declared 2.5 s** (seq 5→6 at 2.484 s, 21→22 at 2.376 s, 28→29 at 2.390 s). The kernel oracle puts the minimum at **2.916 s** and shows **no overlap**, so the requests were not actually closer than the declared delay — but the harness series disagrees with the oracle and the disagreement is recorded rather than resolved in the harness's favour.
+
+All three defects are confined to `seq ≤ 28`, i.e. to the earlier attempt. **This pass's own 75 rows are clean on every one of these checks.**
+
+**Fixes made before this pass sent anything**, in `probe.sh`:
+- the ledger row is now appended **inside** the flock, so a row cannot carry another request's timestamps (defect 2's mechanism);
+- tags are asserted **unique against the existing ledger** before a request is sent, and a duplicate aborts rather than silently overwriting;
+- the row writer is a separate file (`record.py`) rather than a heredoc inside the `flock -c` string — the first attempt inlined it, one unescaped `"` in the Python made the whole critical section exit 127, and the request was correctly refused with no row written;
+- `derive.py --selftest` passes, so the host-only projection that keeps response text out of the repository is falsifiable.
+
+---
+
+## 8. Response-handling policy
+
+`AGENTS.md` §7: Common Crawl captures carry `jsessionid_*` values in URL paths and pre-Auth0 authorize URLs whose `sessionData` is a plaintext-base64 JWS. **No response body is committed anywhere in this directory.** Each body is reduced, in code, to byte count + sha256 + record count + the **distinct hostnames** it mentions. A hostname is the leftmost label of a URL and cannot carry a path, a query string or a session parameter. Raw bodies and timestamp scratch are written under `$S6_SCRATCH`, **outside the repository** (default `${TMPDIR:-/tmp}/carelink-s6-lane-scratch`), because two genuine CC responses here are 1.86 MB and 1.2 MB and the gate's hygiene check globs `findings-log/` for anything over 1 MiB. The committed artefacts in this directory are `probe.sh`, `record.py`, `derive.py`, `account.py`, the query files, `run.log`, `headers/`, `results.jsonl` and this document.
+
+Bodies were read locally during the pass to derive facts — the byte counts and the `showNumPages`/`page=1` bodies quoted above — and **no body text is reproduced in this document beyond the four shortest API status sentences** (`No Captures found for:`, `Page 1 invalid:`, `output=json\ not supported`, and the `{"pages":…}` counters), none of which is a capture.
+
+---
+
+## 9. What is NOT established
+
+- **The mechanism of the ceiling.** A proxy byte cap, a server emit-budget and a client read-cutoff all fit the observations. Nothing measured here separates them. **No cause asserted.**
+- **Whether the ceiling is a fixed constant.** Three different boundaries were observed — 32.0, 640.0 and 1200.0 KiB — so **it is not a fixed size**. What sets it is unknown.
+- **`CC-MAIN-2022-40 / medtronic.com` beyond "≥203".** Three attempts, all 502/504.
+- **The `2026-39 / medtronic.eu` `/oauth2/` absence.** Unanchored; the anchoring query answered 504.
+- **25 of the 30 path-prefix cells.** Gateway failures, not absences.
+- **Whether any of §9's host names resolves.** Zero vendor requests by design.
+- **Whether the 11 522-record `medtronic.com` set is itself complete.** Its byte count is not on a KiB boundary, which is the detector passing — but the detector is a correlation over 29 observations, not a proof, and `pages: 1` + `Last Page = 0` are the API's accounting of a set that is being cut off *below* the layer those oracles observe.
+
+## 10. Successors
+
+1. **Re-issue the two cells that would settle this** (1–2 requests): `CC-MAIN-2022-40/medtronic.com` and `CC-MAIN-2026-39/medtronic.com`, at a long delay, when the API is healthy. Both are in `queries-09`/`queries-10` and need no new query text.
+2. **Audit every committed CC row in this repo with the whole-KiB test** — one arithmetic test per row. `account.py` already does it for this ledger; it has not been run over areas M and L's ledgers.
+3. **A DNS-only pass over the five §5 host names**, which is vendor traffic and therefore **outside this lane's zero-request scope**.
+
+---
+
+## Files in this directory
+
+| file | what it is |
+|---|---|
+| `FINDINGS.md` | this document |
+| `probe.sh` | the probe. GET-only, host allowlist, per-host `flock`, ≥2.5 s inside the lock, cap 400, duplicate-tag refusal |
+| `record.py` | appends one ledger row, called **inside** the lock |
+| `derive.py` | reduces a body to host-only facts; `--selftest` is falsifiable |
+| `account.py` | recomputes every number in this document from `results.jsonl` |
+| `results.jsonl` | 151 rows, one per request |
+| `run.log` | per-request log line with the three timestamps |
+| `queries-0*.txt` | every query sent, with the reasoning for the candidate lists |
+| `headers/` | response headers (no bodies) |
+| `bodies/`, `ts/` | **not in this directory and not in the repository.** Raw response text and timestamp scratch live under `$S6_SCRATCH` (default `${TMPDIR:-/tmp}/carelink-s6-lane-scratch`), because two genuine CC responses in this pass are **1.86 MB** and **1.2 MB** and the gate's hygiene check globs `findings-log/` for anything over 1 MiB. `probe.sh`, `record.py` and `account.py` all take the location from `S6_SCRATCH`. **Consequence, stated because it is a real limit:** the kernel body-mtime spacing oracle is **not re-derivable from a clean clone** — git does not preserve mtimes (the same caveat area D records), so the load-bearing spacing figure is the millisecond `t_sent` series, which reproduces from `results.jsonl` alone. |

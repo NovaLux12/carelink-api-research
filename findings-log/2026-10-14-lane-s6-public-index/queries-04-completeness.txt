@@ -1,0 +1,56 @@
+# THE COMPLETENESS TEST — is an un-limited record query actually complete?
+#
+# docs/10 carries area L's answer, which is that a `limit` truncates FROM THE
+# TAIL, that the `showNumPages` count cell under-reports by >=400x and is not a
+# record count, and that an un-limited query is corroborated by the API's own
+# "Last Page is 0". What it does NOT show is that the un-limited response is
+# the whole set at a size where a byte ceiling could bite. The stated
+# assumption is that the absent `limit` is what makes those sets complete
+# "rather than their being small" — and the largest set anyone has read here is
+# ~2000 records.
+#
+# `fl=` chooses WHICH FIELDS a record carries. It cannot change WHICH RECORDS
+# match. So at three field widths, on one fixed (crawl, url) pair:
+#
+#   narrow  fl=url                                                  ~40 B/rec
+#   medium  fl=url,timestamp,status,mimetype                        ~160 B/rec
+#   wide    fl=url,timestamp,status,mimetype,digest,filename,
+#           offset,length                                          ~330 B/rec
+#
+# Three equal counts => no byte ceiling, set is complete.
+# Three unequal counts => the response is byte-capped and every one of those
+# counts is a floor, not a measurement.
+#
+# Why CC-MAIN-2022-40 on medtronic.com is the cell to attack: the previous pass
+# recorded it at EXACTLY 32768 bytes (2^15) with 203 records. An exact power of
+# two is what a byte ceiling looks like. If it is capped, `narrow` returns MORE
+# than 203 records and the earlier cell was a floor.
+#
+# Targets, each with its reason:
+#   2022-40/medtronic.com  the exactly-32768-byte set above
+#   2026-39/medtronic.com  the largest set read so far (11522 records, 1.86 MB)
+#   2015-48/medtronic.eu   a SMALL set (132 records) as the contrast case: if
+#                          small sets are invariant and big ones are not, the
+#                          difference is size, not query shape.
+#
+# showNumPages and page=1 are area L's two oracles, re-run here so the
+# invariance result is corroborated by the same instruments area L used.
+#
+# NOTE: these ampersands are literal. The previous pass wrote 31 queries with
+# `\&`, which reached the API as a format named `json\` and came back
+# {"message":"output=json\ not supported"} 31 times.
+s6cmp-2022-40-medtronic-com-narrow|completeness-narrow|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 120
+s6cmp-2022-40-medtronic-com-medium|completeness-medium|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 120
+s6cmp-2022-40-medtronic-com-wide|completeness-wide|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype,digest,filename,offset,length|--max-time 120
+s6cmp-2022-40-medtronic-com-numpages|completeness-count-oracle|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&showNumPages=true&matchType=domain|--max-time 120
+s6cmp-2022-40-medtronic-com-page1|completeness-lastpage-oracle|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=1|--max-time 120
+s6cmp-2026-39-medtronic-com-narrow|completeness-narrow|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 120
+s6cmp-2026-39-medtronic-com-medium|completeness-medium|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 120
+s6cmp-2026-39-medtronic-com-wide|completeness-wide|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype,digest,filename,offset,length|--max-time 120
+s6cmp-2026-39-medtronic-com-numpages|completeness-count-oracle|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&showNumPages=true&matchType=domain|--max-time 120
+s6cmp-2026-39-medtronic-com-page1|completeness-lastpage-oracle|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&page=1|--max-time 120
+s6cmp-2015-48-medtronic-eu-narrow|completeness-narrow|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url|--max-time 120
+s6cmp-2015-48-medtronic-eu-medium|completeness-medium|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 120
+s6cmp-2015-48-medtronic-eu-wide|completeness-wide|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype,digest,filename,offset,length|--max-time 120
+s6cmp-2015-48-medtronic-eu-numpages|completeness-count-oracle|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&showNumPages=true&matchType=domain|--max-time 120
+s6cmp-2015-48-medtronic-eu-page1|completeness-lastpage-oracle|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&page=1|--max-time 120

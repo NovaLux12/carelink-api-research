@@ -1,0 +1,52 @@
+# PATH-PREFIX INVENTORY — bounded candidate list, derived from repo artefacts.
+#
+# WHY THIS LIST (AGENTS.md section 8: bounded, justified, reasoning recorded)
+# -------------------------------------------------------------------------
+# /patient/ and /connect/ are the two prefixes area M already named when it
+# concluded "not one path in any of the six crawls begins /patient/ or
+# /connect/". Re-testing those two is a direct check on an existing claim.
+# /ipro/, /hcp/ and /oauth2/ come from this lane's brief and from the path
+# vocabulary this repo already carries in docs/06 and docs/07.
+# Two host groups (medtronic.eu, medtronic.com), three crawls spanning the
+# whole published range this pass touches (newest 2026-39, mid 2022-40, oldest
+# 2013-48). 5 x 2 x 3 = 30 queries. No wordlist, no wildcard, no DNS.
+#
+# matchType=prefix asks for paths beginning with the given prefix, which is the
+# narrowest form the API offers and returns few records or none -- so these are
+# cheap and are the queries most likely to survive the throttle that is eating
+# the heavy whole-domain ones.
+#
+# A hit here is a genuine finding about the API surface. A miss is NOT a
+# coverage claim on its own: area M measured this API answering 502/504 on
+# 28% of its requests, and a 502/504 is a failure, never an absence. Only a
+# 200 or a 404 "No Captures found" carries information.
+s6path-2026-39-medtronic-euconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-eupatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-euipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-euhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-euoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-comconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-compatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-comipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-comhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2026-39-medtronic-comoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-euconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.eu/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-eupatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.eu/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-euipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.eu/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-euhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.eu/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-euoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.eu/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-comconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-compatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-comipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-comhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2022-40-medtronic-comoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-euconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-eupatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-euipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-euhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-euoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.eu/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-comconnect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-compatient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-comipro|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com/ipro/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-comhcp|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com/hcp/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
+s6path-2013-48-medtronic-comoauth2|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2013-48-index?url=medtronic.com/oauth2/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 90
