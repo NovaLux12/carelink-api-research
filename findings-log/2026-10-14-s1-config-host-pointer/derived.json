@@ -1,0 +1,32 @@
+[
+  {
+    "host": "carelink.minimed.eu",
+    "region_segment": "eu-central-1",
+    "host_raw_sha256": "f81e6648a6d9f9385be6da3e7280ad437ac108229fca4045a022cbfcb9100d00",
+    "gateway_id_sha256_observed": "bfda4356d5d11b06c6490b308f3ef3d335689848b488b5b46e5edd77cb44acc3",
+    "gateway_id_sha256_from_published_record": "bfda4356d5d11b06c6490b308f3ef3d335689848b488b5b46e5edd77cb44acc3",
+    "gateway_id_matches_published_record": true,
+    "published_record": "findings-log/2026-10-12-published-pointers/enumeration-scrubbed.txt:121",
+    "masked_shape": "https://<REDACTED_ID>.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline"
+  },
+  {
+    "host": "carelink.minimed.com",
+    "region_segment": "us-east-1",
+    "host_raw_sha256": "24ee55644de5944b93e3f1c290ba1836df3540e1eaaf23afcf9efc0e95073689",
+    "gateway_id_sha256_observed": "30a035af8015213e807ce10e5afcb014609caaab03e0aa4409e447de16fae856",
+    "gateway_id_sha256_from_published_record": "30a035af8015213e807ce10e5afcb014609caaab03e0aa4409e447de16fae856",
+    "gateway_id_matches_published_record": true,
+    "published_record": ":187",
+    "masked_shape": "https://<REDACTED_ID>.execute-api.us-east-1.amazonaws.com/prod/patient-timeline"
+  },
+  {
+    "host": "carelink-trials.minimed.com",
+    "region_segment": "us-east-1",
+    "host_raw_sha256": "988acbd7f2894c56a9ce102e448ef128217a22cf1fa554d284d22843d1a5a47e",
+    "gateway_id_sha256_observed": "f11b68e547c4fabc58811b9ddc0eaba9115bc5a66a7e8e05c801a6a6c69cf9c1",
+    "gateway_id_sha256_from_published_record": "f11b68e547c4fabc58811b9ddc0eaba9115bc5a66a7e8e05c801a6a6c69cf9c1",
+    "gateway_id_matches_published_record": true,
+    "published_record": ":245",
+    "masked_shape": "https://<REDACTED_ID>.execute-api.us-east-1.amazonaws.com/prod/patient-timeline"
+  }
+]

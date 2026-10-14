@@ -673,6 +673,20 @@ it without reading the body.
   **consistent with naming the gateway this repo probed**; the id segment was
   not compared (it is infrastructure, not published), so this is strong
   consistency rather than proof. **Raw `host` value not published.**
+
+  **Correction (2026-10-14, from lane S1, issue #90).** The id segment *was*
+  compared on all three deployments by hashing it while the bulk document was in
+  hand, without publishing it: `bfda4356…` (`.eu`) / `30a035af…` (`.com`) /
+  `f11b68e5…` (`.trials`). Each equals the SHA-256 of the 10-character
+  gateway id published for the same deployment's `patient-timeline` gateway in
+  [`findings-log/2026-10-12-published-pointers/enumeration-scrubbed.txt`](../findings-log/2026-10-12-published-pointers/enumeration-scrubbed.txt)
+  lines 121 / 187 / 245, so the 2026-10-13 “strong consistency rather than
+  proof” sentence is superseded: the pointer carries the *same gateway id* as
+  the probed gateway, not merely the same shape. It still names a
+  *per-deployment* gateway, not one shared id. See
+  [`findings-log/2026-10-14-s1-config-host-pointer/FINDINGS.md`](../findings-log/2026-10-14-s1-config-host-pointer/FINDINGS.md)
+  §Deliverable 1. Nothing here makes F's caller/reachability sub-question any
+  less open.
 - **Successor 2 (`messages/en`).** All three deployments answer `200`,
   `application/json`, 22 bytes, digest `04868b50…` (byte-identical). Envelope
   member list is `["messages"]`; the array length is **0** on all three. The
