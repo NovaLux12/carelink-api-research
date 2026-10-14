@@ -89,7 +89,8 @@ INFERRED and still rest on one source.
   was withdrawn, and survives in prose as
   `author-reported (one source), mechanism verifiable in code`
   [source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §7].
-- **A premise that survived two verifier rounds without being checked (area Y,
+- **A premise that survived three verifier-quality arithmetic-repair rounds
+  without being checked (area Y,
   candidate Y-1, withdrawn).** This pass initially claimed `docs/03:38` was only
   two-host evidenced, then repaired its arithmetic through three rounds before
   checking the premise itself; area X's tracked ledger then refuted the premise
