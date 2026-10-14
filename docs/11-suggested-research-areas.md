@@ -1115,6 +1115,36 @@ false misses), and the published conclusions now carry N = 225.
 **Successor -> K proper (unchanged):** control-flow mining of the call-sites and
 the state-dependent shape of `system.logbook.entry.validation.config`.
 
+#### Addendum (2026-10-14, pool K control-flow pass): call sites and write payload settled
+
+The K-proper successor above is partially advanced by the pool K lane (issue #103),
+static only, 0 vendor requests. Recovered from the shipped client corpus
+(patient bundle `0fb4fbd4…` and lazy chunk `k-9799-ae484032a07c9d4f-js.b`,
+digest pinned):
+
+- **Call-site request shapes** — `GET /patient/logbookEntry/filled` and the
+  paginated `/patient/logbookEntry` (repeated `type` query param); `POST` and
+  `PUT /patient/logbookEntry` with a verbatim body; `DELETE
+  /patient/logbookEntry/{id}` with no body; `GET /patient/logbookEntry/last`.
+  `addEntry`/`editEntry` pass the built object straight to `http.post`/`http.put`,
+  so the wire body is exactly the constructed `result`.
+  [source: `findings-log/2026-10-14-pool-k-controlflow/FINDINGS.md` §2]
+- **State-dependent write payload** — `attributes` is `null` for the typed
+  entries, each of which instead carries its own nested object (sensor
+  insertion: `sensorLocation`, `otherSensorLocation`, `timeCapUnscrewed`;
+  sensor removal: `sensorLocation`, `otherSensorLocation`, `removalType`,
+  `removalReason`, `removalDescription`; …). `attributes` is populated from the
+  generic form controls for untyped entries.
+  [source: `findings-log/2026-10-14-pool-k-controlflow/FINDINGS.md` §3]
+- **Casing corrections** (already in area P, re-anchored to the submission site):
+  `timecapUnscrewed` → `timeCapUnscrewed`; `sensorInsertionLocation` is a form
+  control name serialised as `sensorInsertionInfo.sensorLocation`.
+- **Still token-gated:** read-side echo casing of `/patient/logbookEntry`, and
+  the field set of `system.logbook.entry.validation.config`.
+- **Remaining work:** `docs/10` row 46 (read-side casing + read `GET
+  hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
+  issue #103 is L (positive control, 0–2 GETs).
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
