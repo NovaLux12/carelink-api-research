@@ -921,6 +921,31 @@ comment) would fail under any definition strict enough to matter.
 
 ## Tier 3 — digging further for its own sake
 
+#### Addendum (2026-10-14, pool lane S, issue #105): proposed independence rule
+
+Not closed — the S close condition asks for the rule to be **in force**, and this
+pass proposes rather than decides it. The rule is drafted in
+`AGENTS.md` §2.1 (Counting sources — when "independent" is allowed): a source is
+identified by the person or organisation that produced the measurement, not by
+the artefact count; two sources are independent only where all three of
+*different authors*, *different artefacts*, *neither quoting the other* hold;
+and the strength words (`independently`, `corroborated`, `confirms`,
+`verifies independently`, `double-sourced`) are permitted only where that count
+is ≥ 2, otherwise deleted and restated as `reported by <author> at
+<artefact> (one source)`. Coherence words (`consistent with`, `supports`,
+`agrees with`, `not contradicted by`) describe agreement, not multiplicity, and
+never upgrade into corroboration.
+
+`AGENTS.md` §2's three classes stand unchanged; SOURCE-OBSERVED / SOURCE-PUBLISHED
+remain corroboration descriptors, not ranks (option (b) of this addendum's own
+text). The crafted pass:
+[source: findings-log/2026-10-14-area-s-independence-rule/FINDINGS.md].
+
+**What remains:** the audit behind `docs/10` §1 row 59 (every "corroborated
+independently" claim in the 2026-10-11 pass and in this repo's third-party-
+sourced cells), which the rule above is a prerequisite for rather than a
+substitute. That row tracks the audit; this area tracks the rule.
+
 ### K. The chunk corpus, for real this time
 
 224 lazy chunks are mined for endpoints and field names. **They were never mined for
@@ -1328,6 +1353,33 @@ any host proves the crawl is served.
 Plausible from the two `200` control rows and never tested against a crawl known
 to be served but empty, so the instrument is asserted one notch above what was
 observed.
+
+#### Addendum (2026-10-14, pool L #104): the seven named crawls now carry per-crawl controls
+
+The blocker above is now **operationally lifted for the seven crawls named in that
+pass** — each of `CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`,
+`-2021-04`, `-2021-25` and `-2022-05` now carries a `200`-with-records positive
+control on that exact crawl (`commoncrawl.org` direct succeeded on six of
+the seven: seqs 3, 4 and 7 on first attempt; seqs 15, 16 and 17 on retry;
+CC-MAIN-2021-25's commoncrawl.org attempts at seqs 6 and 18 both returned
+504 and were covered by `google.com` seq 11 (200 / 5 records). `google.com`
+returned records on the four crawls whose commoncrawl.org first attempt
+gateway-failed (CC-MAIN-2013-20, -2013-48, -2021-04, -2021-25). The `cluster.idx`-level "is this crawl served at all"
+check remains **unbuilt** and is not claimed; the per-host controls are the substitute,
+and a gateway failure on one host is recorded as carrying no information in either
+direction (consistently with §5-C2 of the ipro pass).
+
+Concretely, the CDX accounting is now pinned for five no-limit commoncrawl.org
+queries (`CC-MAIN-2013-20` 9 records; `-2013-48` 465; `-2014-10` 37; `-2015-22`
+24; `-2022-05` 134), each corroborated complete by its own
+`Page 1 invalid: First Page is 0, Last Page is 0` (seqs 12, 13, 14, 19, 20).
+
+**What does not change:** no minimed.eu probe was sent in this pass, so the
+existing readable-absence verdicts on `CC-MAIN-2013-20`, `-2013-48`, `-2021-04`
+and `-2022-05` stand exactly as recorded, now behind a control that returned
+records on that crawl.
+
+[source: findings-log/2026-10-14-pool-l-crawlcontrol/FINDINGS.md; issue #104]
 
 ---
 
