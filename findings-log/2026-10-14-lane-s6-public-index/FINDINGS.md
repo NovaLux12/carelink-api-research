@@ -67,6 +67,8 @@ A published Common Crawl crawl index does not change between two queries an hour
 
 The other 26 are on no boundary at all (e.g. 1 864 922, 49 350, 19 301, 41, 40).
 
+**The counting rule for that detector lives in code, not in this paragraph.** `account.py` computes it and prints it as the `WHOLE-KiB TRUNCATION DETECTOR` block, so the claim is re-derivable from the committed ledger by running one command rather than by trusting the sentence above (`AGENTS.md` §6 item 7 — a count generalised without a recorded counting rule is how 44 became 93).
+
 > **A Common Crawl record response whose byte count is an exact multiple of 1024 was cut short. A response whose byte count is not, ran to completion.**
 >
 > This is a *correlation over 29 observations with 3 positives*, not a proven mechanism. The mechanism is **not established** and no cause is asserted — a proxy byte ceiling, a server-side emit-budget, and a client-side read cutoff all fit, and nothing measured here separates them.
