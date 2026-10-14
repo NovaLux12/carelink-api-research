@@ -2,9 +2,19 @@
 #
 # WHY THIS LIST (AGENTS.md section 8: bounded, justified, reasoning recorded)
 # -------------------------------------------------------------------------
-# /patient/ and /connect/ are the two prefixes area M already named when it
-# concluded "not one path in any of the six crawls begins /patient/ or
-# /connect/". Re-testing those two is a direct check on an existing claim.
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION — this file originally read that
+# "/patient/ and /connect/ are the two prefixes area M already named ... Re-testing
+# those two is a direct check on an existing claim." That was wrong on the namespace.
+# Area M's claim is scoped to `minimed.eu` ("across every capture recovered for
+# minimed.eu in all six crawls, not one path begins /patient/ or /connect/"), and it
+# never enumerated a path on `medtronic.*` at all — its only record-form queries
+# there are `limit=5` controls. This sweep covers `medtronic.eu` and `medtronic.com`
+# ONLY and has no `minimed.eu` cell, so it reproduces none of area M's cells: it is a
+# new negative on a different namespace, not a check on his claim.
+#
+# The two prefixes named below are still the right ones to test -- they are the two
+# this repo's API surface actually uses -- but they are derived from docs/06 and
+# docs/07, NOT from area M's cell set.
 # /ipro/, /hcp/ and /oauth2/ come from this lane's brief and from the path
 # vocabulary this repo already carries in docs/06 and docs/07.
 # Two host groups (medtronic.eu, medtronic.com), three crawls spanning the

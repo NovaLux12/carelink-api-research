@@ -15,7 +15,7 @@
 | Hosts contacted | **`index.commoncrawl.org` only.** No other host appears in any row. |
 | **Requests to any Medtronic host** | **0.** No vendor DNS, no vendor TLS, no vendor HTTP. This is what makes the pass safe to run beside other workers. |
 | Declared delay | **≥ 2.5 s per host**, `sleep` **inside** `flock .loop/host-index.commoncrawl.org.lock`. Raised to 7–15 s for later rounds via `S6_DELAY` — see §7. |
-| **Measured same-host gap floor, this pass** | **2.941 s** (harness `t_sent`), **3.123 s** (kernel body-mtime oracle). **0 of 74 gaps below the declared 2.5 s.** Both figures are for **seq 77–151 only**; `account.py` prints this pass and the whole ledger separately, because they differ — the whole-ledger floor is **2.376 s** with 3 sub-floor gaps, all in the earlier attempt. |
+| **Measured same-host gap floor, this pass** | **2.941 s** (harness `t_sent`), **3.123 s** (kernel body-mtime oracle — **not re-derivable from a clean clone**: git does not preserve mtimes and the raw bodies live outside the repository; the `t_sent` figure is the one that reproduces from `results.jsonl` alone). **0 of 74 gaps below the declared 2.5 s.** Both figures are for **seq 77–151 only**; `account.py` prints this pass and the whole ledger separately, because they differ — the whole-ledger floor is **2.376 s** with 3 sub-floor gaps, all in the earlier attempt. |
 | Ledger | `results.jsonl`, **151 rows, 151 unique `host_tag`s**, one row per request, `t_queued`/`t_sent`/`t_done` at millisecond UTC ISO-8601. `curl_exit` is 0 on all 151. |
 | Bodies committed | **none.** Each body was reduced in code (`derive.py`) to bytes + sha256 + record count + the **distinct hostnames** it mentions. Raw bodies are written under `$S6_SCRATCH`, **outside the repository** — see §8. |
 
@@ -177,7 +177,7 @@ The five that answered, all `404` true-zero (`{"message": "No Captures found for
 
 Anchoring queries that failed: seq 144; seq 146, 147, 148 on the adjacent `/connect/` and `/patient/` cells. **All 504.**
 
-This is consistent with, and does not disturb, area M's finding that no captured path in its six crawls begins `/patient/` or `/connect/`. It reproduces one of that claim's cells with a positive control on it, and adds nothing against it.
+⚠ **This sweep is on a DIFFERENT namespace from area M's claim, and reproduces NONE of its cells.** Area M's statement is verbatim: *"Across **every** capture recovered for `minimed.eu` in **all six** crawls, **not one path begins `/patient/` or `/connect/`"* — scoped to **`minimed.eu`**. This pass swept only `medtronic.eu` and `medtronic.com`; it has **no `minimed.eu` cell at all**. Area M never enumerated a path on either `medtronic.*` host either — its only record-form queries there are **controls** (`limit=5`, plus absent-host controls), the rest being `showNumPages` block counts. So what this section establishes is a **new negative on a namespace its predecessor did not read**: `/connect/` absent from `medtronic.com` on 2022-40, `/ipro/` and `/hcp/` absent from `medtronic.eu` on 2013-48. It is **neither a reproduction nor a refutation** of area M's `minimed.eu` claim, and adds nothing against it — the two pass over different hosts.
 
 ---
 
@@ -188,7 +188,7 @@ This is consistent with, and does not disturb, area M's finding that no captured
 **Measured spacing, this pass** (OBSERVED, recomputed by `account.py`):
 
 - harness `t_sent` series, minimum **2.941 s**, **0 of 74 gaps below 2.5 s**;
-- kernel body-mtime oracle, minimum **3.123 s**;
+- kernel body-mtime oracle, minimum **3.123 s** — **not re-derivable from a clean clone**: git does not preserve mtimes and the raw bodies live outside the repository; the `t_sent` figure is the one that reproduces from `results.jsonl` alone;
 - **0 overlapping request intervals**; `host_seq` strictly increasing; `curl_exit` 0 on every row.
 
 **Delay was raised mid-pass** (`S6_DELAY=7/10/12/15`, with 200–300 s cooldowns) because the API degraded sharply: **81 of 151 answers were 502/504**, and at a fixed 2.5 s the informational yield collapsed across rounds. (An earlier draft cited "8 of 15" and "0 of 8"; those two figures were not reproducible under any counting rule stated here and are withdrawn. The reproducible statement is the one above: 81 of 151 answers carried no information, and per-round yields are read off the ledger's own `queries-0*.txt` ranges — seq 80–94, 95–105, 106–113, 114–143.) Raising the delay is the honest fix; retrying faster is what gets a caller throttled. Every raised-delay row is in the ledger with its real `t_sent`.
