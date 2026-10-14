@@ -593,6 +593,37 @@ discovery document, and where they do carry API addresses they are constants.
    `this.baseUrl = "/patient/csr…"`. Same identifier, unrelated values — which is
    exactly why the token needed reading rather than counting.
 
+### ⚠ Whole-corpus reconciliation (2026-10-14, area S4) — 26 shapes, not 19
+
+A later pass swept the **whole** corpus for every `http.*` call site rather than the CSR
+namespace alone, under a counting rule with four stated decisions (receiver test;
+literal first argument in all three forms; `${this.baseUrl}` resolved only within its own
+chunk and only when unambiguous; minifier slot names renumbered by position). Full rule
+and outputs: [source:
+findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md §7].
+
+| relation to the 19-row table above | count |
+|---|---|
+| reproduced **exactly** | **17** |
+| left unresolved by that rule (the **bare-base** rows — `GET`/`POST` on `…/safety/notice/definitions` with no suffix, which pass `this.baseUrl` as an identifier, not a literal) | 2 |
+| **new** shapes the table above does not list | 9 |
+
+The nine: `GET /patient/csr/admin/info`, `GET /patient/csr/users/me/account`,
+`PUT /patient/csr/users/me/account/reactivate`, `PUT /patient/csr/users/me/profile`,
+`POST /patient/csr/users/reset/password/link`, `GET patient/csr/snapshot`,
+`POST patient/csr/getTrace`, and `GET`/`POST patient/csr/v2/control/codes`.
+**26 `/patient/csr` shapes** in total.
+
+**This is a scope difference, not a contradiction, and the table above is not withdrawn.**
+That sweep was confined to the CSR namespace by one receiver style; the whole-corpus rule
+reaches CSR call sites sitting in unrelated chunks. The two rules also disagree, on the
+record, about bare `this.baseUrl`: the rule above counts it as a shape, the whole-corpus
+rule leaves it unresolved. Both positions are kept.
+
+⚠ **Literal ≠ live, unchanged.** None of the nine was probed. They are what the shipped
+client *addresses*, not what the server *serves* — the same caveat that governs the
+other three distinctions in this section.
+
 **Reproduce with — and read this before you try, because the corpus is not here.**
 `patient-csr.py` reads the captured response **bodies**. This repository commits the
 215 `.h` **header** files under `findings-log/2026-10-13-area-k-patient-chunks/headers/`
