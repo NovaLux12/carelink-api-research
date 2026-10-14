@@ -611,6 +611,19 @@ abbreviated in a way that dropped a character. Nothing above assumes the value i
 
 #### Successor to area F — what is in `/patient/configuration/messages/{lang}` now?
 
+#### Addendum (2026-10-14, swarm lane S2, issue #91) — this successor is **CLOSED**: the array is empty and the 6 bytes are formatting
+
+**Recorded as a shape, not prose, and deliberately without the value.** `GET /patient/configuration/messages/en` answers `200 application/json`, **22 B**, one sha256 (`04868b50…`) **byte-identical on all three** patient deployments; the envelope member list is `["messages"]` and the array length is **0** on every one (`OBSERVED`, 6 of a 6 cap, controls first per host: [source: findings-log/2026-10-14-area-s2-messages-en/FINDINGS.md]; `results.jsonl` seq 2 / 4 / 6).
+
+**The 16-vs-22 byte delta is a formatting difference on the same empty array** — the canonical, newline-free rendering of `{"messages":[]}` is **15 B** (`sha256 5e4ce7b3…`), so the 2026-10-08 note's "16 B" was a transcription of a differently-formatted rendering of an empty array, not a different value. That is the **negative** this successor asked for, and it is worth recording precisely because it means the 2026-10-08 record was about the wrong thing.
+
+**The `INFERRED` assumption above is now tested rather than assumed:** `22` and `16` are comparable byte counts of the same envelope, and the array was empty all along. **No customer-facing copy is published** — an empty array has none, and the pass deliberately recorded shape only.
+
+**What this does not settle.** Nothing about *why* the endpoint is empty on all three deployments (an i18n feature flag, a decommissioned path, or a build artefact is **not** established, and no claim is made). Area F's own question — who calls `patient-timeline`, and whether a third-party client can reach it — is untouched by this row.
+
+**Successor, derived from this pass:** the **positive control** used here (`GET /patient/v2/configuration/public`, 24 479–31 698 B, **69 top-level keys** on all three) is the cheapest liveness oracle in the patient namespace, and it is not currently pinned anywhere. A drift sweep that reads the bulk document anyway could assert the key count per deployment at **zero extra requests**. Closes when that count is pinned for all three deployments; a negative (the count already drifts) counts. **Assumptions (INFERRED):** that the 69-key figure is stable rather than build-specific — area E measured the same 69-name vocabulary across deployments on 2026-10-13, so this is corroboration of an existing claim rather than a new one, and the successor's value is the *pin*, not the count.
+
+
 **Known, labelled.** The route answers `200 application/json` on `.com` and `-trials`
 (**22 B**, byte-identical by sha256 across the two) and was recorded `200` returning
 `{"messages": []}` (**16 B**) on `.eu` in 2026-10-08 (`OBSERVED`,
@@ -948,6 +961,31 @@ comment) would fail under any definition strict enough to matter.
 
 ## Tier 3 — digging further for its own sake
 
+#### Addendum (2026-10-14, pool lane S, issue #105): proposed independence rule
+
+Not closed — the S close condition asks for the rule to be **in force**, and this
+pass proposes rather than decides it. The rule is drafted in
+`AGENTS.md` §2.1 (Counting sources — when "independent" is allowed): a source is
+identified by the person or organisation that produced the measurement, not by
+the artefact count; two sources are independent only where all three of
+*different authors*, *different artefacts*, *neither quoting the other* hold;
+and the strength words (`independently`, `corroborated`, `confirms`,
+`verifies independently`, `double-sourced`) are permitted only where that count
+is ≥ 2, otherwise deleted and restated as `reported by <author> at
+<artefact> (one source)`. Coherence words (`consistent with`, `supports`,
+`agrees with`, `not contradicted by`) describe agreement, not multiplicity, and
+never upgrade into corroboration.
+
+`AGENTS.md` §2's three classes stand unchanged; SOURCE-OBSERVED / SOURCE-PUBLISHED
+remain corroboration descriptors, not ranks (option (b) of this addendum's own
+text). The crafted pass:
+[source: findings-log/2026-10-14-area-s-independence-rule/FINDINGS.md].
+
+**What remains:** the audit behind `docs/10` §1 row 59 (every "corroborated
+independently" claim in the 2026-10-11 pass and in this repo's third-party-
+sourced cells), which the rule above is a prerequisite for rather than a
+substitute. That row tracks the audit; this area tracks the rule.
+
 ### K. The chunk corpus, for real this time
 
 224 lazy chunks are mined for endpoints and field names. **They were never mined for
@@ -1116,6 +1154,36 @@ false misses), and the published conclusions now carry N = 225.
 
 **Successor -> K proper (unchanged):** control-flow mining of the call-sites and
 the state-dependent shape of `system.logbook.entry.validation.config`.
+
+#### Addendum (2026-10-14, pool K control-flow pass): call sites and write payload settled
+
+The K-proper successor above is partially advanced by the pool K lane (issue #103),
+static only, 0 vendor requests. Recovered from the shipped client corpus
+(patient bundle `0fb4fbd4…` and lazy chunk `k-9799-ae484032a07c9d4f-js.b`,
+digest pinned):
+
+- **Call-site request shapes** — `GET /patient/logbookEntry/filled` and the
+  paginated `/patient/logbookEntry` (repeated `type` query param); `POST` and
+  `PUT /patient/logbookEntry` with a verbatim body; `DELETE
+  /patient/logbookEntry/{id}` with no body; `GET /patient/logbookEntry/last`.
+  `addEntry`/`editEntry` pass the built object straight to `http.post`/`http.put`,
+  so the wire body is exactly the constructed `result`.
+  [source: `findings-log/2026-10-14-pool-k-controlflow/FINDINGS.md` §2]
+- **State-dependent write payload** — `attributes` is `null` for the typed
+  entries, each of which instead carries its own nested object (sensor
+  insertion: `sensorLocation`, `otherSensorLocation`, `timeCapUnscrewed`;
+  sensor removal: `sensorLocation`, `otherSensorLocation`, `removalType`,
+  `removalReason`, `removalDescription`; …). `attributes` is populated from the
+  generic form controls for untyped entries.
+  [source: `findings-log/2026-10-14-pool-k-controlflow/FINDINGS.md` §3]
+- **Casing corrections** (already in area P, re-anchored to the submission site):
+  `timecapUnscrewed` → `timeCapUnscrewed`; `sensorInsertionLocation` is a form
+  control name serialised as `sensorInsertionInfo.sensorLocation`.
+- **Still token-gated:** read-side echo casing of `/patient/logbookEntry`, and
+  the field set of `system.logbook.entry.validation.config`.
+- **Remaining work:** `docs/10` row 46 (read-side casing + read `GET
+  hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
+  issue #103 is L (positive control, 0–2 GETs).
 
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
@@ -1356,6 +1424,33 @@ Plausible from the two `200` control rows and never tested against a crawl known
 to be served but empty, so the instrument is asserted one notch above what was
 observed.
 
+#### Addendum (2026-10-14, pool L #104): the seven named crawls now carry per-crawl controls
+
+The blocker above is now **operationally lifted for the seven crawls named in that
+pass** — each of `CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`,
+`-2021-04`, `-2021-25` and `-2022-05` now carries a `200`-with-records positive
+control on that exact crawl (`commoncrawl.org` direct succeeded on six of
+the seven: seqs 3, 4 and 7 on first attempt; seqs 15, 16 and 17 on retry;
+CC-MAIN-2021-25's commoncrawl.org attempts at seqs 6 and 18 both returned
+504 and were covered by `google.com` seq 11 (200 / 5 records). `google.com`
+returned records on the four crawls whose commoncrawl.org first attempt
+gateway-failed (CC-MAIN-2013-20, -2013-48, -2021-04, -2021-25). The `cluster.idx`-level "is this crawl served at all"
+check remains **unbuilt** and is not claimed; the per-host controls are the substitute,
+and a gateway failure on one host is recorded as carrying no information in either
+direction (consistently with §5-C2 of the ipro pass).
+
+Concretely, the CDX accounting is now pinned for five no-limit commoncrawl.org
+queries (`CC-MAIN-2013-20` 9 records; `-2013-48` 465; `-2014-10` 37; `-2015-22`
+24; `-2022-05` 134), each corroborated complete by its own
+`Page 1 invalid: First Page is 0, Last Page is 0` (seqs 12, 13, 14, 19, 20).
+
+**What does not change:** no minimed.eu probe was sent in this pass, so the
+existing readable-absence verdicts on `CC-MAIN-2013-20`, `-2013-48`, `-2021-04`
+and `-2022-05` stand exactly as recorded, now behind a control that returned
+records on that crawl.
+
+[source: findings-log/2026-10-14-pool-l-crawlcontrol/FINDINGS.md; issue #104]
+
 ---
 
 ## How to claim one
@@ -1441,6 +1536,30 @@ is as good as a real area, and the honest reading is that this repository has ex
 area namespace.** Extending the gate's area pattern to `AA`-style headings is a maintainer
 decision, not a side effect of a research pass — same reasoning as the gate's own pattern in
 [`docs/09`](09-methodology-and-oracles.md) §4.
+
+#### Addendum (2026-10-14, from issue #102): dedicated-route envelopes on `.com` and `-trials` — byte-identical, language-independent
+
+**Derived from 14 GETs across two patient deployments, cap 14/14, controls first,**
+`findings-log/2026-10-14-area-f-dedicated-routes-succession/FINDINGS.md`.
+
+- **All three dedicated routes answer `200 application/json` on both**
+  `carelink.minimed.com` and `carelink-trials.minimed.com` (controls:
+  `/patient/configuration/version` and `/patient/configuration/` both `404` with
+  an empty body on both hosts — 4 of 14).
+- **Envelopes.** `defaultCountry` → `{"value": <2-char>}` (20 B, same digest
+  on both hosts); `recaptcha/key` → `{"value": <40-char>}` (58 B, **different**
+  digest per host, consistent with the per-host reCAPTCHA keys already on
+  record); `messages/{en,fr,de}` → `{"messages": []}` (22 B, **identical
+  digest across both hosts and all three languages**). No language-dependent
+  content was observed; the empty array is not an `en`-only artefact.
+- **A negative.** No additional 404 shape was produced by this pass — the two
+  controls 404 with no `content-type` on both hosts only — so the three-valued
+  404 content-type set stays as area E recorded it; this pass does not extend
+  it. No regression pin moved.
+
+**Successor (per issue #102):** a pinned cell-digest artefact in any future
+per-key sweep (0 requests), so the "0 mismatches" line becomes re-hashable.
+**Assumptions (INFERRED):** none beyond the quoted addendum claims.
 
 ## Closed areas
 
