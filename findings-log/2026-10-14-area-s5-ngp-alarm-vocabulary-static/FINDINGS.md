@@ -41,7 +41,8 @@ introduced, per AGENTS.md §8 and §11.
 
 ## 2. What was recovered — the NGP alarm code canonicalisation map
 
-Module `68095` defines a component-local constant (verbatim source from the chunk):
+Module `68095` defines a component-local constant (value-exact transcription from
+the chunk; numeric keys are quoted here that the source leaves unquoted):
 
 ```js
 const e = {
@@ -76,8 +77,8 @@ const e = {
 };
 ```
 
-Recovered from that component's `init()` method (verbatim, simplified only by
-whitespace):
+Recovered from that component's `init()` method (value-exact; the TSV flattens
+one documented branch — see Correction item 2):
 
 - `this.isNGP = "NGP" === K.deviceFamily;`
 - `H = K.sLastAlarmCode;` (already the UI's zero-padded string for NGP, otherwise
@@ -167,8 +168,33 @@ an authenticated `POST hcp/configuration/application` for the meaning side.
 ## Correction (2026-10-14)
 
 The pass's §1 sentence said "three excluded codes" where every other surface (the
-quoted control flow on line 85, the PR body, and `docs/05` line 291) says two:
+quoted control flow at line 86, the PR body, and `docs/05` line 292) says two:
 `"00-1"` and `"121"` (the early-return set `["00-1","121"]`). The committed TSV
-contains neither `00-1` nor `121`, so the correct count is **two**. The original
-phrasing was over-stated by one; it is retained above and corrected here rather
-than deleted. The "three" did not affect any count, code, or pin.
+contains neither `00-1` nor `121`, so the correct count is **two**.
+
+**How this was corrected, stated exactly:** the original wording was corrected
+**in place** on this unmerged branch (`306ca01` → `32fc642`) — the superseded
+sentence is quoted here in this section so the change remains auditable, but
+nothing above preserves it in place, because it was never published: the file
+does not exist on `main` (`git cat-file -e origin/main:…` fails), so no published
+record was altered or lost. This is why an in-place edit is permissible here and
+would not be on a published claim. The "three" did not affect any count, code, or
+pin.
+
+**Three further verifier findings, accepted and recorded (2026-10-14).**
+
+1. **"verbatim source" was an overstatement.** 64 of the 137 keys are unquoted
+   numeric literals in the source (`100:`, `103:`) and are rendered quoted in the
+   TSV here. No value differs; the fidelity claim is corrected to "value-exact,
+   quoting normalised".
+2. **"simplified only by whitespace" understates the transformation.** The TSV
+   flattens a branch: for input `062` on a gated pump the source emits
+   `connect.ble.062`, while this table records the flattened `null`. 136 of 137
+   inputs are identical under both readings; that one cell is the documented
+   divergence and is left visible rather than reconciled.
+3. **The corpus figure carries two different denominators and the rule was not
+   recorded.** `211` is the lazy-chunk count from `runtime-map.txt`; `215` is the
+   file count of the on-disk corpus `k-chunk-bodies/`, which additionally holds
+   `k-main.b` (3,417,255 B), `k-runtime.b` (8,268 B), the emitted `common` chunk
+   and a negative twin (196 B, a 404). Both numbers are correct under their own
+   rule; the negative in §4 holds over the **superset** of 215.
