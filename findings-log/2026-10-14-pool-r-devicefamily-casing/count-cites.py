@@ -17,9 +17,11 @@ this exists to prevent is 44 published as 93, and a second pass's own claim of
        it corrects, because `AGENTS.md` §3 requires superseded wording to stay
        visible. Counting those quotations makes the number a FIXED POINT THAT
        RECORDING THE CORRECTION MOVES — appending a correction that quotes three
-       cites changes the cite count by three, so the published figure describes
-       the previous commit. That is precisely the defect C14 corrects: this file
-       spent three rounds publishing the previous commit's number.
+       NEW cites changes the cite count by three, so the published figure
+       describes the previous commit. That is precisely the defect **C17**
+       corrects (C14 is unrelated — it is the reproducibility finding about the
+       three scripts): this file spent three rounds publishing the previous
+       commit's number, 23 / 29 / 31 / 28 / 30 script-side.
 
        THE EXCLUSION IS FROM THE COUNT, NEVER FROM THE RECORD. Hiding quoted
        wording to stabilise a number would be `AGENTS.md` §1's deletion with the

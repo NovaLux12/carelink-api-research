@@ -688,7 +688,7 @@ with `printf '\n' >> FINDINGS.md`."*
 
 At the commit making that statement the file **does** end with a newline. The
 **past-tense diagnosis is accurate**: `git show c267d65:…/FINDINGS.md | tail -c 1`
-returns `2e` (`.`), while the current file's last byte is `0a`. ⚠ **The second half of this sentence is WITHDRAWN — see `## Correction (2026-10-15)`, item C10.** It was true when written at `6fe6ffb` and was falsified by a later edit that removed the newline again, so this file no longer asserts its own trailing byte anywhere; the durable form is a measurement with a command attached, not a stated state. ⚠ **BOTH the "no longer asserts … anywhere" claim and "the durable form" are WITHDRAWN — see `## Correction (2026-10-15)`, item C14.** The universal claim was false when written: the file asserted its own byte at two other places. The file now carries **no UNMARKED** present-tense byte claim, which is a bounded claim about a swept class — not the open-ended one this sentence made. Kept verbatim per `AGENTS.md` §3. The original text
+returns `2e` (`.`), while the file's last byte **was** `0a` at `6fe6ffb`. ⚠ **Both present-tense clauses of this sentence — originally *"the current file's last byte is `0a`"* and *"this file no longer asserts its own trailing byte anywhere"* — are WITHDRAWN.** The first at `b06d7d6` (see item C10): it was true at `6fe6ffb` and was falsified by a later edit that removed the newline again. The second at `b1386e6` (see **item C18**): it was already false when written, because at `cc513f9` the file asserted its own byte at two other places. **Both clauses are kept verbatim in this record per `AGENTS.md` §3 and both are restated above in past tense, anchored to the commit each was true at.** What was true at `b1386e6` is the narrower, bounded claim: **no UNMARKED present-tense byte claim of the swept class.** The original text
 of this document never had a trailing newline; C5's own blank-line repair added
 one. So the advice, followed literally now, would inject a spurious blank line.
 
@@ -739,9 +739,13 @@ sentences resting on it — *"a file that now **does** end with one, should supp
 nothing"* and *"appending unconditionally has now been wrong once, in the other
 direction"*.
 
-**The byte was `2e`, and still is.** ⚠ **"and still is" is WITHDRAWN — see
-`## Correction (2026-10-15)`, item C13.** It was accurate when written: the three routes
-below agree, and every one of them reads `2e` **at `a1c4dd6`**, the commit those routes were
+> **Verbatim, withdrawn:** *"The byte was `2e`, and still is."* ⚠ **That sentence
+> asserted a present-tense state and is WITHDRAWN at `b1386e6` — see
+> `## Correction (2026-10-15)`, item C13.** It is quoted rather than restated
+> because `AGENTS.md` §3 requires the superseded wording to stay visible; it is
+> **not** a claim this document makes. It was accurate when written: the three
+> routes below agree, and every one of them reads `2e` **at `a1c4dd6`**, the
+> commit those routes were
 run against. The file's last byte was `0a` **at `cc513f9`** (measured; do not read it off this sentence). The measurement stands; its unanchored
 present tense does not, and the two are kept apart here rather than merged.
 
@@ -910,12 +914,13 @@ of *this file does/is/has/now/contains*, *the current file*, *and still is*,
 | *"Appending unconditionally **has now been** wrong"* | past perfect about the past | **true** — left alone |
 | C10's quotations of C8 | framed as *"C8's text **read**"* | correctly historical — left alone |
 | *"The byte was `2e`, **and still is**"* | present tense, unanchored | **FALSE and unmarked** — now carries a withdrawal marker pointing here |
-| *"so this file **no longer asserts its own trailing byte anywhere**"* (inside C8) | a **universal** claim, and a search term of this very sweep | **FALSE and unmarked — and OMITTED from the first version of this table.** See C14 |
-| *"this file's last byte is `0a`"* (in this section's own marker) | present tense, unanchored to a commit | **true but unanchored — same shape as the `run.log` row above; de-anchored** |
-| *"The file's last byte is now `0a`"* (in this section's own marker) | present tense, unanchored to a commit | **true but unanchored — de-anchored** |
+| *"so this file **no longer asserts its own trailing byte anywhere**"* (inside C8) | a **universal** claim, and a search term of this very sweep | **FALSE and unmarked — and omitted from the FIRST version of this table.** Marked at `b1386e6`; see **C18** |
+| *"this file's last byte is `0a`"* — **inside C5's marker**, not this section's | present tense, unanchored to a commit | **true but unanchored — same shape as the `run.log` row above; converted to past tense and anchored at `cc513f9` in round 7** |
+| *"The file's last byte is now `0a`"* — **inside C10's marker**, not this section's | present tense, unanchored to a commit | **true but unanchored — converted to past tense and anchored at `cc513f9` in round 7** |
 
-**The sweep did not see its own output.** `no longer asserts` is listed above as a
-search term of this sweep, and the table it produced omitted the file's only
+**The sweep did not see its own output.** In the FIRST version of the table above,
+`no longer asserts` appeared as a search term of this sweep, and the table it
+produced omitted the file's only
 occurrence of that term. Two of the three rows this correction adds were written
 *by this sweep* and then escaped it for the same reason the first two did: they
 were produced after the enumeration ran. **A sweep's result table is itself an
@@ -1118,25 +1123,29 @@ or the stability it appears to demonstrate is an artefact of deduplication.*
 
 Four defects, one cause.
 
-**1. The universal claim.** Inside C8: *"so this file no longer asserts its own
-trailing byte anywhere"*. Unscoped, unmarked, and **false at `cc513f9`** — the file
-asserted its own byte at two other places. The existing withdrawal marker on that
-sentence covers only *"the current file's last byte is `0a`"*; it does not reach
-this tail. **Marked**, not deleted: the record is kept per `AGENTS.md` §3 and the
-marker says what is bounded and true instead — **no UNMARKED present-tense byte
-claim of the swept class**, which is a far smaller claim than the one withdrawn.
+**1. The universal claim.** C8 contained: *"so this file no longer asserts its own
+trailing byte anywhere"* — unscoped, unmarked, and **false at `cc513f9`**, where the
+file still asserted its own byte at two other places. The withdrawal marker that
+existed on that sentence at `cc513f9` covered only the earlier clause *"the current
+file's last byte is `0a`"* and **did not reach this tail**. **Marked**, not deleted:
+the record is kept per `AGENTS.md` §3 and the marker states the narrower claim that
+was true at `b1386e6` — **no UNMARKED present-tense byte claim of the swept
+class** — which is far smaller than the claim withdrawn.
 
-**2. Two self-introduced claims.** C13's own withdrawal markers assert *"this
-file's last byte is `0a`"* and *"The file's last byte is now `0a`"*. Both are true
-**at the moment of writing** and both are unanchored — the same shape as the
-`run.log` claim C13 de-anchored in the same pass. Both are now anchored to the
-commit they were measured against, with the instruction *"measure it; do not read
-it off this sentence"* attached.
+**2. Two self-introduced claims — mis-attributed to C13 in the first version of
+this paragraph.** They live in **C5's** marker (*"this file's last byte is `0a`"*)
+and **C10's** marker (*"The file's last byte is now `0a`"*), not in C13's. At
+`b1386e6` both read that way in the present tense and neither was anchored — the
+same shape as the `run.log` claim C13 de-anchored in the same pass. Both were
+rewritten at `b1386e6` into past tense anchored to `cc513f9`, the commit they were
+measured against, carrying the instruction *"measure it; do not read it off this
+sentence"*.
 
-**3. The sweep did not see its own output.** C13's table lists `no longer asserts`
-among the search terms of the by-construction sweep — **and omits the file's only
-occurrence of that term.** Two of the rows this correction adds were written *by
-that sweep* and then escaped it, for exactly the reason the first two escaped:
+**3. The sweep did not see its own output.** At `b1386e6` the C13 table listed
+`no longer asserts` among the search terms of the by-construction sweep — **and
+omitted the file's only occurrence of that term.** Two of the rows this correction
+added were written *by* that sweep and then escaped it, for exactly the reason the
+first two escaped:
 they were produced after the enumeration ran.
 
 **The step that was missing, now stated as part of the construction:**
@@ -1153,3 +1162,114 @@ The verdict (negative — the casing stays unobserved), the union (**21**), the 
 (**27**), `run.log` and its rule, the ledger (`results.jsonl` **0** rows against
 **`0 of a 0 cap`**), `config.yml`, and rounds 1–5's fixes, all re-verified rather
 than assumed. No claim, retraction or sentence is deleted anywhere in this round.
+
+---
+
+## Correction (2026-10-15)
+
+**Seventh round.** Items from the seventh `carelink-verifier` round on PR #127 at
+`b1386e6`. One of round 6's findings — the cite count and its stability proof — is
+**confirmed closed**: 22 / 0 / 0 at the commit, the amended/pre-amendment table
+reproduced with machine-selected novel literals, and `count-cites.py` shown to fail
+three ways. The other was open, and its **escape mechanism** is the subject of this
+correction.
+
+### C19 — the CONSTRUCTION RULE, and the conversion that ends the class
+
+Seven rounds, one pattern: **every surviving finding was a present-tense claim
+about the artefact, written by the correction that fixed the previous one.** The
+table omission was closed in round 6, and that fix then generated fresh prose in
+the class it had just eliminated. Sweeping is not what fails — a sweep cannot see
+prose written *after* it runs — so this round stops sweeping the class and
+**removes it**.
+
+> **THE CONSTRUCTION RULE, from here.** This findings-log contains **no
+> present-tense self-state claims at all.** Every statement about what the file
+> *is* is **past tense, anchored to a named commit** — "at `b1386e6` the file ended
+> `0a`", never "the file's last byte is `0a`". A correction describes **what was
+> true at a commit**; it does not describe the present. This makes the class empty
+> by construction rather than by sweep, which is the only thing that has worked.
+
+**Why this is a construction and not another sweep.** Seven sweeps each closed the
+instances they could see and were followed by new instances in the prose that
+fixed them. A rule that constrains *what may be written* binds future writes too;
+a rule that *looks for what was written* binds only the past. The difference is the
+whole seven rounds.
+
+**What the conversion preserves, and why.** `AGENTS.md` §3 requires superseded
+wording to stay visible, so the withdrawn sentences are **not deleted**. They are
+converted from **assertion** to **quotation** — marked verbatim and withdrawn —
+which is the one form that satisfies both rules at once: the wording stays
+readable, and the document no longer *makes* the claim. That distinction is the
+substance of this correction.
+
+**Eight sites converted, covering ten present-tense claims.** Two further sites
+(`:560`, `:747`) were **already compliant** — past tense and anchored to
+`cc513f9` — and were verified and left alone rather than touched. Every remaining
+detector hit in the file is now one of three permitted forms: a past-tense
+anchored statement, an explicit verbatim quotation of withdrawn wording, or the
+sweep's own term list.
+
+| site | before | after |
+|---|---|---|
+| C8's two clauses | *"the current file's last byte is `0a`"* · *"this file no longer asserts its own trailing byte anywhere"* | past tense, anchored to `6fe6ffb`; the originals quoted inside the withdrawal, both marked withdrawn |
+| C10's *"The byte was `2e`, and still is."* | **asserted in bold** | verbatim quotation, marked withdrawn at `b1386e6` |
+| C13 table, row 1 | present tense, attributed to *"this section's own marker"* | attributed to **C5**; verdict recast as past + anchored |
+| C13 table, row 2 | present tense, attributed to *"this section's own marker"* | attributed to **C10**; verdict recast as past + anchored |
+| C13, the sweep's own blind spot | *"`no longer asserts` **is listed above** as a search term"* | *"In the **FIRST version** of the table above, `no longer asserts` **appeared** as a search term"* |
+| C18 §1 | *"The existing withdrawal marker … **covers only** … **it does not reach** this tail"* — present tense and false at this commit | *"the withdrawal marker that **existed** on that sentence **at `cc513f9`** … and **did not reach** this tail"* |
+| C18 §2 | *"C13's own withdrawal markers **assert** … **Both are now anchored**"* | attribution corrected to **C5 and C10**; recast as *"At `b1386e6` both read that way … Both **were rewritten** at `b1386e6`"* |
+| C18 §3 | *"C13's table **lists** … and **omits** the file's only occurrence"* — present tense and false at this commit | *"**At `b1386e6`** the C13 table **listed** … and **omitted**"* |
+
+### C20 — the counting rule's rationale pointed at the wrong finding
+
+`count-cites.py`'s R-C1b rationale read *"That is precisely the defect **C14**
+corrects"*. **C14 is the reproducibility finding** — none of the three scripts ran
+as its own docstring said — and has nothing to do with the cite count. The defect
+is documented at **C17**. A reader following the rule's own justification landed on
+the wrong section, which is the failure mode this file spent seven rounds on: the
+cross-reference was written from memory and never resolved.
+
+Corrected to name **C17**, with **C14 explicitly ruled out in the same sentence**
+and the script-side history (`23 / 29 / 31 / 28 / 30`) recorded so the rule carries
+its own evidence.
+
+### C21 — four markers pointed at the wrong finding
+
+Same defect, in the tracked surface. The withdrawal markers on `:691` and `:913`
+both pointed at **C14**; the universal claim is documented at **C18** and the cite
+count at **C17**. **A reader following the marker this round was written to add
+would have landed on the reproducibility section and found nothing.** Both now
+point at **C18**. Two further sentences — the de-anchored pair — were attributed to
+**C13** and live in **C5** and **C10**; both attributions corrected.
+
+The generalisable form, which is the same as C20's: **a cross-reference is a
+citation, and citations are asserted against `AGENTS.md` §1, not written from
+memory.** `count-cites.py` counts cites; it does not check that a correction-item
+reference resolves to the item that documents the claim. That check is not added
+here, and the reason is worth stating: it would need to parse prose for
+cross-references, and a rule that cannot fail is not a rule.
+
+### C22 — the PR body's correction count was stale again, in the untracked surface
+
+The PR body said **five** dated `## Correction (2026-10-15)` sections; the file
+carried **six** after the previous round's append, and carries **seven** after this
+one. It has now been stale in that box twice (four → five → seven).
+
+**This is the same lag C17 found inside the log**, in a surface no checker reads:
+a number about an artefact, not re-derived when the artefact moves, describing the
+*previous* commit. Corrected to **seven**, and — the part that matters — the box now
+carries the **command that derives it**, so the next reader can check rather than
+trust:
+
+```
+grep -c '^## Correction (2026-10-15)$' findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md
+```
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the sum
+(**27**), `run.log` and its rule, `count-cites.py`'s figure (**22**, failures 0),
+the ledger (`results.jsonl` **0** rows against **`0 of a 0 cap`**), and rounds 1–6's
+fixes, all re-verified rather than assumed. No claim, retraction or sentence is
+deleted anywhere in this round: every withdrawal is a quotation, not a removal.
