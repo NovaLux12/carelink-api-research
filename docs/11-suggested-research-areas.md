@@ -1237,6 +1237,52 @@ digest pinned):
   hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
   issue #103 is L (positive control, 0–2 GETs).
 
+#### Addendum (2026-10-15, from pool L continuation, claim #126): **the window census is complete — 0 of 84 unread — and the family has dates in 2017, 2019, 2020 and 2021**
+
+**188 requests** of the 200 authorised in round 2 (area total **228 of a 240 cap**),
+GET only, `index.commoncrawl.org` alone, **zero requests to any Medtronic host**.
+**60 of 188 rows failures** (502 ×33, 504 ×24, 400 ×3 — 32%), **54 retries each
+with its own row, header capture and three timestamps**; `t_sent` floor **3.536 s**
+and kernel-mtime floor **4.156 s** over 187 gaps, **0 under 3.5 s and 0 under the
+`>=2 s` floor on either clock**, both series committed in `spacing.txt`. Two
+negative durations (`t_done` before `t_sent` — impossible, `docs/09` §4's
+corrupt-`t0` class, **no cause asserted**), and both clocks agree the spacing was
+honoured at those positions.
+
+**The census is done.** `collinfo.json` publishes **128** indexes, **84** overlap
+2013-05-17 → 2022-05-13, and across all three passes of this area **every one now
+carries a verdict**: **65 RECORD · 10 ABSENCE · 1 INDETERMINATE** (`-2014-23`) ·
+**0 FAILURE** · 8 read by an earlier pass under a row schema this area's reader
+does not parse · **0 UNREAD**. `census-84.txt` carries all 128 rows with each
+verdict and the pass it came from.
+
+**Eight more crawls carry `/ipro/hcp/*` — 28 members, 2017-06-26 → 2021-09-28** —
+dates the corpus previously had **nothing** for: `CC-MAIN-2017-26` (6 members, two
+crawl passes of the same three paths on one day), `-2019-35` (3), `-2019-47` (3),
+`-2020-45` (6, two dates eleven days apart), `-2021-17` (1),
+`-2021-21` (4), `-2021-31` (2), `-2021-39` (3). **Two paths are new to every
+corpus:** `/ipro/hcp/privacy.jsf` (**403**, 2021-04-20) and
+`/ipro/hcp/login.jsf?bhcp=1` (**200**, 2021-05-06) — the login page captured in
+its *queried* form. `CC-MAIN-2021-31` holds the area's only `/ipro/hcp/*` cells
+answering **403**.
+
+**This corrects the correction.** The predecessor's pass refuted a "bounded 2020
+deployment" reading; **that reading failed the same way** — it read a *sparse*
+sweep as a *bounded* one. The statement the completed census supports is the
+**negative**, and it is a census now rather than a spread:
+**`/ipro/hcp/` is absent from 65 of the 84 in-window crawls**, and from **56 of the
+64** this pass read. **The family is not a 2014-and-2020 artifact**: it was being
+captured in 2014, 2017, 2019 (×2), 2020 (×3), 2021 (×4) and 2022, on one host,
+`carelink.minimed.eu`, across **six paths**.
+
+**What this does not do.** The claim is still **"absent from every crawl this pass
+could read"**, and **"absent from Common Crawl" stays disclaimed**: **41 of the 128
+published indexes lie outside the window**, this area has read exactly **one** of
+them, and that one — `CC-MAIN-2022-27` — carried a member. **A member outside the
+window has already refuted the window's sufficiency once.** The eight `403`
+bodies are unread. `cluster.idx` is still unbuilt. **`CC-MAIN-2018-05`**, which the
+first pass selected and never enqueued, is in this pass's queue and answered.
+
 #### Addendum (2026-10-15, from pool L #126): the census pass — two new crawls, both ends now carried by captures, and area L **closes**
 
 **40 of a 40 cap**, GET only, **`index.commoncrawl.org` alone, zero requests to
@@ -1397,21 +1443,49 @@ cannot be read is recorded as unservable rather than left as a hole.
 availability are independent signals, and that a served index with an empty result
 is distinguishable from an unserved one. Neither is demonstrated.
 
-**S-L2 — the census read 9 of the 72 unread in-window crawls.** Same two-cell
-shape (per-crawl positive control, then `minimed.eu` `matchType=domain`,
+**S-L2 — the window census is COMPLETE; what remains is the window itself.**
+**0 of the 84 in-window crawls are unread** after the 2026-10-15 continuation, so
+this successor is no longer "read more crawls". Same two-cell shape
+(per-crawl positive control, then `minimed.eu` `matchType=domain`, `output=json`,
+**no `limit`**) was the right one and it worked **188 requests against a
+predicted 211** — the corrected per-crawl cost below, budgeted conservatively.
+**What is left:** **41 of the 128 published indexes lie outside
+2013-05-17 → 2022-05-13**, this area has read exactly **one** of them, and that
+one carried a member. **Blocker:** budget, and the fact that the window is a choice
+inherited from `ARCHIVE-URLS`'s two dates. **Closes when** either that
+justification is re-examined, or those 41 crawls are read too. **A member outside
+the window is the valuable cell** — one has already been found. (per-crawl positive control, then `minimed.eu` `matchType=domain`,
 `output=json`, **no `limit`**), continuing with the **64** unread in-window
 crawls, in dated batches, against `data.commoncrawl.org` only if a second lock is
 held. The crawl list is derived from `GET /collinfo.json`, never guessed.
-**Budget the 2.4–3.2 requests per crawl this pass actually cost — not 2, and the
-figure is derived rather than estimated.** *Counting rule: every `results.jsonl`
-row whose crawl is one of the nine first-read crawls, ÷ 9.* **Measured 29 ÷ 9 =
-3.22.** Derived: the row failure rate on those 29 rows is `p = 0.448`, so
-`E[attempts per query]` at `MAXRETRY=2` is `(1−p)(1+p+p²) + 3p³ = 1.180`, and two
-queries per crawl → **2.36**. The measured figure is the higher one because **two
-of the nine exhausted a control host** (`-2014-23` across two hosts, `-2022-27`
-across three attempts). ⚠ **An earlier draft of this successor carried "roughly
-1.6 requests per crawl". It had no derivation, matches nothing on disk, and is
-withdrawn** — the nearest committed figure is area M's "roughly 1.3 N" at 28%.
+**Budget 3.3 requests per crawl — not 2 — and take the figure from
+`budget.py`, not from prose.** *Counting rule: every `results.jsonl` row whose
+crawl is one of the nine first-read crawls, ÷ 9.*
+
+| | figure | how |
+|---|---|---|
+| **measured** | **3.22** | 29 rows on the nine ÷ 9 crawls |
+| **derived** | **3.30** | row failure rate on those 29 rows `p = 13/29 = 0.448`; `probe.sh` sends `N = min(Geom(p), MAXRETRY+1) = min(Geom(p),3)`, so `E[N] = 1 + p + p² = 1.649`; two queries per crawl → **3.30** |
+
+**⚠ The expectation formula this successor used to carry was wrong, and the error
+inverted the sentence attached to it.** It read
+`(1−p)(1+p+p²) + 3p³`, which expands to **`1 + 2p³`** — an expectation that
+*falls* as the failure rate rises. The inner polynomial must be `1 + 2p + 3p²`;
+`(1−p)(1+2p+3p²) + 3p³` is the same value, `1 + p + p²`. The published
+consequence — "the measured figure exceeds the derived one" — was **backwards**:
+under the corrected algebra the derived **3.30 exceeds the measured 3.22** by
+2.4%. **Three figures are withdrawn from this successor in turn: "roughly 1.6"
+(no derivation at all), "2.4–3.2" (a wrong floor, since 2.4 came from the broken
+formula), and the sentence explaining why the measured number was the higher one.**
+What survives is the arithmetic above, computed in `budget.py` so it cannot drift
+from the prose again. **Checked against a large sample.** The 2026-15 continuation measured **2.94**
+rows per crawl (188 ÷ 64) against a **2.84** derived prediction at its own failure
+rate — **11% below the prediction, the correct direction for a budget.**
+**Assumption (INFERRED):** that `p`, measured as the *marginal* row failure rate,
+is the per-attempt failure probability a query actually faces; the observed mean
+attempts per query (**1.43** predecessor, **1.45** continuation) sits below the
+model's **1.65** / **1.42**, so the model is conservative and the divergence is
+recorded rather than reconciled.
 **Blocker:** budget, against an API that fails 28–41% of its queries.
 **Closes when** every in-window crawl carries a classified cell, or the sweep stops
 with the remainder named. **A negative (no `/ipro/hcp/` anywhere else) counts** —
@@ -1419,6 +1493,19 @@ and so does a positive, which is what this pass found twice.
 **Assumptions (INFERRED):** that a `/ipro/hcp/` record in one crawl predicts
 nothing about the next; nothing here tests that, and the two 2020 crawls holding
 records with four empty crawls between them is consistent with either reading.
+
+**S-L4 — one reader for the area's ledgers.** Three passes of this area wrote
+**three row schemas** — free-text `role` values in the 2026-10-13 passes,
+`ipro_hcp_urls` / `ipro_hcp_members` in one of them, `ipro_hcp` in the two newer —
+so **8 of the 84 in-window crawls cannot be re-derived by any script in the tree**
+and `census-84.txt` labels them `older-schema` rather than reading them by eye.
+This is `docs/11`'s area-Y defect — *the corpus is two sources, not one* — arriving
+as a **schema change** rather than a missing file. **Blocker:** none, zero
+requests. **Closes when** one script reads every area-L ledger and produces the
+census with no manual reading, and the corpus is two sources in the sense that
+addendum means. **Assumptions (INFERRED):** that the three schemas carry the same
+facts — the free-text roles look like the same queries under other names, but that
+is a reading of strings, not a demonstrated equivalence.
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the

@@ -585,3 +585,157 @@ sees a new document* — reproduced here on a pass that had every intention of
 complying. **Not fixed here:** widening the gate's own patterns is a maintainer
 decision (`docs/09` §4, and `AGENTS.md` §11 on a pass not extending the gate).
 Recorded so the next reader does not take that `ok` as evidence about this file.
+
+
+## Correction (2026-10-15) — verification round 2: the expectation formula was wrong and inverted its own conclusion, and the in-window characterisation was never swept
+
+Round 2 returned **NOT CLEAN** on `078dd38`. It re-derived the census, the
+12/8/64 split, the two-opposite-error correction, the out-of-window finding,
+`spacing.txt`, `crawl-window.txt` and the C10 finding exactly, and called C10 the
+most valuable thing in the diff. Six items. **Two of them are corrections to the
+corrections**, which is the failure mode `docs/09` §4 names: *derived prose
+contradicting its own source table, then propagating*. Zero requests so far in
+this section; the budget this area now holds is spent by the continuation pass
+whose log is `findings-log/2026-10-15-pool-l-ipro-census-cont/`.
+
+### C1 — the expectation formula was wrong, and it inverted the sentence attached to it
+
+`FINDINGS.md:487` and `derive.py` §5 both printed
+
+> `E[attempts/query]` at `MAXRETRY=2` is `(1−p)(1+p+p²) + 3p³ = 1.180`
+
+**`probe.sh:81` sends `N = min(Geom(p), MAXRETRY+1) = min(Geom(p), 3)`, so by the
+tail-sum rule `E[N] = 1 + p + p²`.** The inner polynomial must be `1 + 2p + 3p²`;
+`(1−p)(1+2p+3p²) + 3p³` is the same value. **The published form expands to
+`1 + 2p³` — an expectation that FALLS as the failure rate rises, which cannot be
+right**, and it was carried into `docs/11` as successor **S-L2's blocker figure**,
+the number a third party budgets from.
+
+| | figure | how |
+|---|---|---|
+| **measured** | **3.22** | 29 rows on the nine first-read crawls ÷ 9 |
+| **derived (corrected)** | **3.30** | `p = 13/29 = 0.448`; `E[N] = 1 + p + p² = 1.649`; × 2 queries |
+| published (broken) | 2.36 | from `1 + 2p³` |
+
+**And the sentence attached to it was backwards.** `FINDINGS.md:489` /
+`docs/11:1410` read *"the measured figure exceeds the derived one because two of
+the nine crawls exhausted a control host"*. Under the corrected algebra the
+**derived 3.30 exceeds the measured 3.22 by 2.4%** — the exact opposite.
+Cross-check: the observed mean attempts per query over the whole 40-row ledger is
+**1.43** against the **1.65** the model predicts, so the model is the
+conservative one.
+
+**Three figures are withdrawn in turn: "roughly 1.6" (no derivation), "2.4–3.2"
+(a floor produced by the broken formula), and the sentence explaining why the
+measured number was higher.** What survives is **3.3 requests per crawl**,
+budgeted conservatively. `derive.py` §5 is **corrected at source** rather than
+left wrong in a shipped script; every figure is computed by
+`findings-log/2026-10-15-pool-l-ipro-census-cont/budget.py` so prose quoting it
+cannot drift again.
+
+**One mechanism is worth recording.** `check_append_only` screens **every** file
+under `findings-log/` — `scripts/research-checks.py:471-480` branches on diff
+status, not extension — so a Python file can only be modified by carrying a
+`^## Correction \(\d{4}-\d{2}-\d{2}\)` marker, which in Python means a markdown
+heading inside a docstring. That is a workaround, not an endorsement; the check
+arguably wants scoping to `.md`, which is a maintainer decision (`docs/09` §4)
+and is **not** taken here.
+
+### C2 — `docs/10` row 64 still said "63", two clauses after its own correction
+
+Round 1 fixed the arithmetic in that cell's middle clause and left the successor
+count live and unmarked further along the same cell: *"…the remaining **63**
+crawls (S-L2)"*, while the clause before it read **64 unread**. Corrected to
+"**64 in-window** crawls (S-L2) — **not 63**", with the staleness named in the
+sentence rather than quietly overwritten. **The lesson is the one this log has now
+paid twice:** a correction that fixes a number and does not then re-read the whole
+sentence it sits in leaves the error adjacent, not removed.
+
+### C3 — S-L2's headline described 9 in-window crawls five lines before saying 64
+
+`docs/11:1400` read **"the census read 9 of the 72 unread in-window crawls"**,
+five lines from "continuing with the **64** unread in-window crawls". Only **8**
+were in window: `CC-MAIN-2022-27` is not, which is the fact this log's own C9
+introduced. **It is a fourth instance of the same error**, in the successor this
+pass wrote to fix it, and it is recorded here as such rather than as a new defect.
+
+### C4 — the full list of stale in-window / out-of-window characterisations
+
+C9 above names line numbers generically. **Here is every one**, so the next reader
+can check rather than search. Pass-1 log, body (pre-correction):
+
+| line | what it said | correct value |
+|---|---|---|
+| 218 | `still unread after this pass \| 63` | **64** |
+| 237 | "all nine selected ids sit well inside the window either way" | **eight** do; `CC-MAIN-2022-27` does not |
+| 317 | "**9 of the 72** unread in-window crawls were attempted" | **8 of the 72** in window, plus 1 out |
+| 319 | "**63 remain unread**" | **64** |
+| 340 | evidence map: "72 unread before this pass; 63 after" | "…; **64** after" |
+
+And two **inside the round-1 corrections themselves**:
+
+| line | what it said | correct value |
+|---|---|---|
+| 375 | "**63** remain unread, not 67" (stated as the corrected figure) | **64** |
+| 388 | "crawl names it selected were all genuinely in the window" | **eight** of the nine were |
+
+**Line 237 and line 388 are the same false claim stated twice**, in a body and
+then in the correction that was supposed to have caught it — which is `AGENTS.md`
+§2.1's *one source, stated twice* arriving through a different door, and §6 item 5
+again. **Corrected in `docs/11` and `docs/10` in place; corrected here because this
+file is append-only.**
+
+### C5 — C6's replacement figures rested on timestamps committed nowhere
+
+C6 replaced an OBSERVED claim — *"within sixteen minutes"* —
+with *"span 1 h 41 m 52 s, max consecutive gap 0:52:07"* — derived from five
+timestamps that **existed nowhere in the tree**: seq 39's `body_head` is 300
+characters and carries only `20220703140102`, and the other four appeared **only
+inside the correction text**. `derive.py` §8 said so in as many words.
+
+**Fixed by committing the data**, the same move that fixed C4's substantive half:
+`findings-log/2026-10-15-pool-l-ipro-census-cont/seq39-timestamps.txt` carries the
+five `timestamp` values and their host-relative paths, plus the span and the
+maximum gap recomputed from them by a stated counting rule. **No record bodies, no
+headers, no full URLs** — nothing that could carry a session value.
+
+### C6 — line 36 overclaimed, exactly as C4's did
+
+`FINDINGS.md:36` reads *"All 40 rows are re-derivable from these files; `derive.py`
+re-prints every table below."* After C4 the **ledger** claims are true, but §8 of
+`derive.py` prints a **notice**, not a table, when `$L_BODIES` is unset. Narrowed
+in the correction that C4 already made for the substantive half; recorded here so
+the line is not read as a blanket guarantee. **The gap between what a re-derivation
+tool prints and what a sentence about it promises is the same gap `docs/09` §4
+records as "a check that cannot fail"** — a green line about the wrong thing.
+
+### C7 — the continuation pass ran, and it closes the census this pass left open
+
+The 200-request budget authorised in round 2 was spent as
+`findings-log/2026-10-15-pool-l-ipro-census-cont/`: **188 requests** of the 200,
+GET only, `index.commoncrawl.org` alone, **zero Medtronic requests**, 54 retries
+each with its own row and header capture, `t_sent` floor **3.536 s** and kernel
+mtime floor **4.156 s**, both series committed in that pass's `spacing.txt`.
+
+**It read all 64 crawls the queue held, and the window census is now complete:
+0 of the 84 in-window crawls are unread.** Eight of them carry `/ipro/hcp/*` —
+**28 members spanning 2017-06-26 → 2021-09-28**, dates this area had nothing for,
+including `/ipro/hcp/privacy.jsf` and `/ipro/hcp/login.jsf?bhcp=1`, two paths new
+to every corpus. **`CC-MAIN-2018-05`, the selection this pass left unenqueued, is
+in that queue and answered.**
+
+Two consequences for the figures this log published, both already corrected in
+`docs/11` and `docs/10`:
+
+- **The family is not a 2014-and-2020 artifact.** With 2017, 2019 (twice), 2020
+  and 2021 (four times) all carrying captures, the "bounded 2020 deployment"
+  reading this log helped refute was wrong in the same way — it read a *sparse*
+  sweep as a *bounded* one. **The stronger statement the sweep now supports is the
+  negative: `/ipro/hcp/` is absent from 65 of the 84 in-window crawls.**
+- **The hole stays open and is now stated differently.** 41 of the 128 published
+  indexes lie outside the window; this area has read exactly **one** of them, and
+  that one — `CC-MAIN-2022-27` — carried a member. **A member outside the window
+  has already refuted the window's sufficiency once.**
+
+**Not restated here:** the family member table now lives in the continuation's
+`census-84.txt` and `derive.py`, which read both this pass's ledger and that one.

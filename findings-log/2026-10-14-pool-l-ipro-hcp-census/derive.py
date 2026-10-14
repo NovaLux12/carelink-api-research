@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 """derive.py — re-derive every number in FINDINGS.md from the committed tree. Zero requests.
 
+## Correction (2026-10-15) — §5's expectation formula was wrong; fixed here at source
+
+Round 2 found §5 printing `(1-p)(1+p+p^2) + 3p^3`, which expands to `1 + 2p^3` --
+an expectation that FALLS as the failure rate rises. The correct inner polynomial
+is `1 + 2p + 3p^2`; `E[N] = 1 + p + p^2` for `N = min(Geom(p), MAXRETRY+1)`.
+The formula below is corrected and the published figure it feeds (2.36) is
+withdrawn -- see Correction (2026-10-15) §C1 of this log, and
+`../2026-10-15-pool-l-ipro-census-cont/budget.py`, which computes every part of it
+from a ledger rather than restating it.
+
+This dated heading is the mechanism by which the file could be edited at all:
+`check_append_only` (`scripts/research-checks.py:471-480`) screens EVERY file under
+`findings-log/`, not markdown only, so a modification must carry a
+`^## Correction \(\d{4}-\d{2}-\d{2}\)` marker or the gate fails it. Putting a
+markdown heading inside a Python docstring to satisfy it is a workaround, not an
+endorsement -- the check arguably wants scoping to `.md`, which is a maintainer
+decision (`docs/09` section 4) and is not taken here.
+
     python3 derive.py
 
 Reads ONLY files in this directory (`results.jsonl`, `spacing.txt`,
@@ -153,16 +171,24 @@ rn = [r for r in ROWS if crawl_of(r) in newly]
 print('ledger rows on the %d newly-read crawls : %d' % (len(newly), len(rn)))
 print('  by role                                 : %s' % dict(collections.Counter(r['role'] for r in rn)))
 print('  by status                               : %s' % dict(collections.Counter(r['http_status'] for r in rn)))
-p = len([r for r in rn if r['http_status'] not in ('200', '404')]) / len(rn)
-e = (1 - p) * (1 + p + p * p) + 3 * p ** 3
-print('MEASURED  %d / %d = %.2f requests per newly-read crawl' % (len(rn), len(newly), len(rn) / len(newly)))
-print('DERIVED   row failure rate p = %.3f; E[attempts per query] at MAXRETRY=2 is' % p)
-print('          (1-p)(1+p+p^2) + 3p^3 = %.3f;  two queries per crawl -> %.2f'
-      % (e, 2 * e))
-print('          (the measured figure exceeds it because two of the nine crawls exhausted')
-print('           a control host: -2014-23 and -2022-27)')
-print('  publish %.1f-%.1f, not 2. The "1.6" an earlier draft of this log carried had no' % (2 * e, len(rn) / len(newly)))
-print('  derivation and matches nothing on disk; it is withdrawn.')
+fails_n = [r for r in rn if r['http_status'] not in ('200', '404')]
+p = len(fails_n) / len(rn)
+# CORRECTED 2026-10-15 (round 2). probe.sh sends N = min(Geom(p), MAXRETRY+1) =
+# min(Geom(p), 3), so by the tail-sum rule E[N] = 1 + p + p^2. The formula this
+# block used to carry, (1-p)(1+p+p^2) + 3p^3, expands to 1 + 2p^3 -- which falls
+# as p rises, and cannot be an expectation.
+tail = 1 + p + p * p
+inner = 1 + 2 * p + 3 * p * p
+wrong = (1 - p) * (1 + p + p * p) + 3 * p ** 3
+print('MEASURED  %d rows / %d crawls = %.2f requests per newly-read crawl' % (len(rn), len(newly), len(rn) / len(newly)))
+print('DERIVED   p = %d/%d = %.3f (row failure rate on those rows)' % (len(fails_n), len(rn), p))
+print('          E[N] = 1 + p + p^2                      = %.4f   <- correct (tail-sum)' % tail)
+print('          = (1-p)(1+2p+3p^2) + 3p^3              = %.4f' % ((1 - p) * inner + 3 * p ** 3))
+print('          published (1-p)(1+p+p^2) + 3p^3        = %.4f   <- WRONG, == 1 + 2p^3' % wrong)
+print('          two queries per crawl -> %.2f requests/crawl (derived)' % (2 * tail))
+print('  the DERIVED figure exceeds the MEASURED one by %.1f%% -- the opposite of what this' % (100 * (2 * tail - len(rn) / len(newly)) / (len(rn) / len(newly))))
+print('  block used to print. "1.6" (no derivation) and "2.4-3.2" (a floor from the broken')
+print('  formula) are both withdrawn. See ../2026-10-15-pool-l-ipro-census-cont/budget.py.')
 
 print()
 print('=== 6. crawl window — from the committed crawl-window.txt ===')
