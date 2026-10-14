@@ -10,6 +10,11 @@
 # What it does do is re-derive the candidate vocabulary from committed artefacts,
 # so the denominator this pass publishes is checkable from a clean clone.
 #
+# Safe to run from ANY working directory: DIR is derived from this script's own
+# location, and count-candidates.py resolves its paths against the repository
+# root found by walking up from ITSELF. Verified from the repo root, from this
+# directory, and from a clean `git archive` export.
+#
 # Method space: GET was the only method available to this project (AGENTS.md §8).
 # It was NOT used — there is no request. The word appears here only because the
 # accounting format requires the method to be named, as in the 2026-10-11
@@ -32,6 +37,14 @@ CAP=0
 
 : > "$OUT"
 
+# Build into a scratch file and move it into place ONLY on success. A child that
+# fails must never leave a truncated ledger behind: a half-written run.log is
+# indistinguishable from a short run, which is the defect this guard exists to
+# stop (round 5: running this script from its own directory produced an 8-line
+# run.log holding an error message).
+TMP="$DIR/.run.log.tmp"
+trap 'rm -f "$TMP"' EXIT
+
 {
   echo "# run.log — area R, pool run 2026-10-14"
   echo "# host: none (no vendor host is contacted by this pass)"
@@ -42,7 +55,14 @@ CAP=0
   echo "# --- offline re-derivation begins (no network syscall is issued below) ---"
   python3 "$DIR/count-candidates.py"
   echo "# --- offline re-derivation ends ---"
-} > "$LOG" 2>&1
+} > "$TMP" 2>&1 || {
+  echo "probe.sh: count-candidates.py failed; run.log left untouched" >&2
+  cat "$TMP" >&2
+  exit 1
+}
+
+mv "$TMP" "$LOG"
+trap - EXIT
 
 rows=$(grep -c . "$OUT" || true)
 if [ "$rows" -ne 0 ]; then

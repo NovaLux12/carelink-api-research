@@ -32,6 +32,10 @@ this exists to prevent is 44 published as 93, and a second pass's own claim of
 Zero network access. Reads only files tracked in this repository.
 
   python3 count-cites.py
+
+Safe to run from ANY working directory — the repo root, this file's own
+directory, or a clean `git archive` export of the branch. Paths are resolved
+against the repository root located by walking up from THIS FILE.
 """
 
 import glob
@@ -41,6 +45,24 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SELF = os.path.join(HERE, 'FINDINGS.md')
+
+
+def repo_root():
+    """Locate the repository root by walking up from THIS FILE, not from the
+    working directory, so the documented invocation works from anywhere
+    (AGENTS.md §10)."""
+    d = HERE
+    for _ in range(8):
+        if os.path.isdir(os.path.join(d, 'findings-log')):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    sys.exit('PATH MISS: cannot locate the repository root from ' + HERE)
+
+
+ROOT = repo_root()
 
 # R-C2: a path with an extension, then :line or :line-line, inside backticks.
 EXT_CITE = re.compile(r'`([A-Za-z0-9._/-]+\.(?:md|py|txt|sh|log)):(\d+)(?:-\d+)?`')
@@ -66,7 +88,7 @@ def resolve(path):
     for pre in RESOLVE_PREFIXES:
         cand = os.path.normpath(os.path.join(HERE, pre, path)) if pre \
             else os.path.normpath(os.path.join(HERE, path))
-        for base in (os.getcwd(), HERE):
+        for base in (ROOT, HERE):
             full = os.path.normpath(os.path.join(base, pre, path)) if pre \
                 else os.path.normpath(os.path.join(base, path))
             if os.path.isfile(full):
@@ -96,7 +118,7 @@ def main():
             if target is None:
                 failures.append((short, line, 'unknown short form'))
                 continue
-            rp = os.path.normpath(os.path.join(os.getcwd(), target))
+            rp = os.path.normpath(os.path.join(ROOT, target))
             if not os.path.isfile(rp):
                 failures.append((short, line, 'unresolved'))
                 continue
@@ -110,8 +132,8 @@ def main():
     print('CITES (R-C5: distinct resolved targets):')
     for path, line in sorted(cites):
         L = open(path, encoding='utf-8', errors='replace').read().splitlines()
-        path = os.path.relpath(path, os.getcwd())
-        rel = os.path.relpath(path, os.getcwd())
+        path = os.path.relpath(path, ROOT)
+        rel = os.path.relpath(path, ROOT)
         if line > len(L):
             failures.append((rel, line, 'out of range'))
             continue

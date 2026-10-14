@@ -8,10 +8,12 @@ contact_links:
     about: Evidence classes, the never-publish rules, and the traps.
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
-    # 5, computed, not inherited. P closed by this same branch; the remaining open
-    # letters are F R S K L.
+    # 4, computed, not inherited. P and R closed by this same branch; the remaining
+    # open letters are F S K L.
     # research-checks.py counts ^### [A-Z]. headings in docs/11 and is the arbiter;
-    # on the merged page it reads F R S K L.
+    # on the merged page it reads F S K L. The value above and this comment are
+    # one claim — the checker reads only the value, so a stale comment here would
+    # silently misdescribe the arbiter's own input.
     about: 4 open areas, each with a stated blocker and a definition of done.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml

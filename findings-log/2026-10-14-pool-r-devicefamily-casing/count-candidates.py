@@ -11,6 +11,11 @@ Zero network access. Reads only files tracked in this repository.
 
   python3 count-candidates.py
 
+Safe to run from ANY working directory — the repo root, this file's own
+directory, or a clean `git archive` export of the branch. Paths are resolved
+against the repository root located by walking up from THIS FILE, never from
+os.getcwd().
+
 THE COUNTING RULE, stated before the count (AGENTS.md §6 item 7 — 44 became 93
 because no rule was recorded):
 
@@ -47,8 +52,31 @@ because no rule was recorded):
      on the wire. This script cannot promote anything.
 """
 
+import os
 import re
 import sys
+
+# Paths in this file are repository-root-relative. Anchor them on the SCRIPT'S
+# OWN LOCATION, not on the working directory, so the documented invocation works
+# from anywhere — including from this file's own directory, which is what
+# AGENTS.md §10 means by "re-run your probe from what you wrote down". Verified
+# from the repo root, from this directory, and from a clean `git archive` export.
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def repo_root():
+    d = HERE
+    for _ in range(8):
+        if os.path.isdir(os.path.join(d, 'findings-log')):
+            return d
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    sys.exit('PATH MISS: cannot locate the repository root from ' + HERE)
+
+
+ROOT = repo_root()
 
 # ---- anchors: (source id, file, 1-based first line, 1-based last line) --------
 A = {
@@ -100,7 +128,7 @@ SETS = ('S-MAP', 'S-ENUM', 'S-CLIENT')
 def load(sid):
     path, lo, hi = A[sid]
     try:
-        lines = open(path, encoding='utf-8').read().splitlines()
+        lines = open(os.path.join(ROOT, path), encoding='utf-8').read().splitlines()
     except OSError:
         sys.exit(f'ANCHOR MISS: {sid} -> {path} does not exist')
     if len(lines) < hi:

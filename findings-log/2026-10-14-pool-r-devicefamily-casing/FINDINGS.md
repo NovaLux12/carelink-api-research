@@ -374,7 +374,7 @@ the harness output. `AGENTS.md` §2 requires that where sources disagree you giv
 both and never pick one silently; this was not a disagreement between sources, it
 was a stale derived artefact asserting a second number without saying so.
 
-**Fix: regenerated, not hand-edited.** `run.log` is now the output of
+**Fix: regenerated, not hand-edited.** `run.log` is the output of
 `probe.sh`, which wraps the current `count-candidates.py` between its two marker
 lines, and the committed file's body is byte-identical to a fresh run of that
 script. The regeneration issues **no network request** — `probe.sh` has no
@@ -555,7 +555,10 @@ which it has (two of them).
 **The durable lesson, which is why this is recorded rather than just patched.**
 Two passes, two occurrences, one cause: **this file does not end with a newline,
 so every append to it must supply one.** A successor touching this directory
-should start with `printf '\n' >> FINDINGS.md` rather than discovering it again.
+should start with `printf '\n' >> FINDINGS.md` rather than discovering it again. ⚠ **The present-tense half of this sentence is WITHDRAWN — see
+`## Correction (2026-10-15)`, item C13.** It was true when written and is false now:
+this file's last byte is `0a`. It is kept verbatim, as C8's parallel sentences are, because
+deleting it would destroy a retraction record. **Measure, never assert** — see C10.
 
 ---
 
@@ -736,7 +739,11 @@ sentences resting on it — *"a file that now **does** end with one, should supp
 nothing"* and *"appending unconditionally has now been wrong once, in the other
 direction"*.
 
-**The byte was `2e`, and still is.** Three independent routes, all agreeing:
+**The byte was `2e`, and still is.** ⚠ **"and still is" is WITHDRAWN — see
+`## Correction (2026-10-15)`, item C13.** It was accurate when written: the three routes
+below agree, and every one of them reads `2e` **at `a1c4dd6`**, the commit those routes were
+run against. The file's last byte is now `0a`. The measurement stands; its unanchored
+present tense does not, and the two are kept apart here rather than merged.
 
 ```
 tail -c 1 FINDINGS.md | xxd                             → 2e
@@ -870,3 +877,158 @@ from rounds 1–3, all re-verified rather than assumed. The six line cites into
 `docs/` and `run.log` were deliberately **not** converted to anchors: that would
 mean more in-place rewrites of committed lines immediately before merge, trading a
 real `AGENTS.md` §3 cost for a risk window that closes at merge.
+
+
+---
+
+## Correction (2026-10-15)
+
+**Fifth round.** Items from the fifth `carelink-verifier` round on PR #127 at
+`b06d7d6`. Four findings, and **three of the four were one defect class that had
+already been named twice in this file and then survived anyway.**
+
+### C13 — the self-state claim survived twice, because the sweep was an enumeration instead of a construction
+
+C10 withdrew this file's present-tense trailing-byte claim. A claim of that shape
+can only be hunted **by construction**: *every sentence that makes a present-tense
+state claim about this artefact — its trailing byte, its line count, its file
+list, what it contains.* Enumerating the sentences I happened to remember is what
+let two survivors through, and one of them was the sentence the whole withdrawal
+was written about.
+
+The class, enumerated from the construction rather than from recall — every match
+of *this file does/is/has/now/contains*, *the current file*, *and still is*,
+*no longer asserts*, *is now the*:
+
+| line | the claim | verdict at `b06d7d6` |
+|---|---|---|
+| `run.log is now the output of probe.sh` | true but unanchored to a commit | **de-anchored** — "is the output of" is a statement about a regeneration, dated by the commit that did it |
+| *"this file has **no trailing newline at the end of its original text**"* | past-tense and scoped to the **original** text | **true as scoped** — left alone |
+| *"this file does not end with a newline, so every append to it must supply one"* | present tense, unscoped | **FALSE and unmarked** — now carries a withdrawal marker pointing here |
+| C8's quotation of that sentence | framed as *"C5's durable lesson **read**"* | correctly historical — left alone |
+| C8's state claim | already marked WITHDRAWN at C10 | left alone |
+| *"Appending unconditionally **has now been** wrong"* | past perfect about the past | **true** — left alone |
+| C10's quotations of C8 | framed as *"C8's text **read**"* | correctly historical — left alone |
+| *"The byte was `2e`, **and still is**"* | present tense, unanchored | **FALSE and unmarked** — now carries a withdrawal marker pointing here |
+
+Both survivors are **kept verbatim with the marker appended**, exactly as the two
+C8 sentences are, because deleting a retraction record is the one thing
+`AGENTS.md` §3 exists to prevent. The markers say what is true now and point here;
+they do not erase what was said then.
+
+**The second survivor is the instructive one.** *"The byte was `2e`, and still
+is"* was **correct when written** — the three routes printed beneath it do agree,
+and every one of them reads `2e` **at `a1c4dd6`**, the commit they were run
+against. The failure was never the measurement; it was the unanchored *"and still
+is"*, which converts a dated observation into an open-ended claim about an
+artefact that keeps being edited. **A measurement is not a property.** Stating
+*what was measured, against which commit* survives every later edit; stating
+*what is true* does not.
+
+**This file no longer carries an unmarked present-tense self-state claim.** That
+sentence is bounded on purpose: it is about *this class of sentence*, not about
+every future edit, and it is the kind of claim C13 exists to distrust. What is
+true at any commit is measured, not asserted — and the byte is measured with
+
+```
+tail -c 1 findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md | xxd
+```
+
+run against the file **as it will be committed**, which is the only point at which
+the answer is the answer.
+
+### C14 — REPRODUCIBILITY: none of the three scripts ran as its own docstring said
+
+`AGENTS.md` §10 requires that a stranger can *"re-run your probe from what you
+wrote down"*, and each script's docstring said to run it by bare filename. Run
+from its own directory — which is what that instruction means — **all three
+failed**:
+
+```
+count-cites.py     → 33 cite(s) failed to resolve        (exit 1)
+probe.sh           → exit 1, ANCHOR MISS on S-MAP
+count-candidates.py→ exit 1, ANCHOR MISS on S-MAP
+```
+
+**`probe.sh` also destroyed the ledger.** It built `run.log` with a redirect, so
+the failing child left an **8-line** `run.log` holding an error message where the
+real 68-line transcript had been — a half-written ledger is indistinguishable
+from a short run, which is the exact failure C1 was written about. `run.log` was
+restored from the commit and regenerated.
+
+Two root causes, one per language:
+
+- `count-candidates.py` opened its anchors with bare repo-relative paths, so they
+  resolved against the working directory.
+- `count-cites.py`'s short-form resolver used `os.path.join(os.getcwd(), target)`
+  with no fallback, while its `resolve()` — a few lines above — already tried two
+  bases. One function knew better and the other did not.
+
+**Fix.** All three now anchor on their **own location**: each Python script walks
+up from `__file__` to the directory containing `findings-log/` and resolves every
+path against that, and `probe.sh` derives `DIR` from `BASH_SOURCE` (already
+correct) and now builds `run.log` **into a temporary file, moving it into place
+only on success** — a failing child can no longer truncate the ledger. Each
+docstring states that the script is safe from **any** working directory.
+
+**Proved from three directories**, all three scripts, all identical:
+
+| cwd | `count-cites.py` | `probe.sh` | `count-candidates.py` |
+|---|---|---|---|
+| repository root | exit 0 · 28 cites · 0 failures | exit 0 | exit 0 · 21 / 27 |
+| its own directory | exit 0 · 28 cites · 0 failures | exit 0 | exit 0 · 21 / 27 |
+| clean `git archive` export, `.git` absent | exit 0 · 28 cites · 0 failures | exit 0 | exit 0 · 21 / 27 |
+
+### C15 — the arbiter's own documentation contradicted the value beside it
+
+`.github/ISSUE_TEMPLATE/config.yml` shipped `about: 4 open areas` directly beneath
+a comment reading *"5, computed, not inherited… the remaining open letters are F R
+S K L."* — five, enumerating five letters, including **R**, which this branch
+closes. The diff was one line; the comment was three lines that no check reads.
+
+`research-checks.py` passes because it compares the **`about:` value** against
+`docs/11` and never reads the comment — so the comment had been free to rot
+silently, and it rotted. It matters beyond this PR because the comment is the
+arbiter's own description of the arbiter's input, and it carries across every
+merge in the queue.
+
+**Rewritten to what this branch actually ships** — `4`, letters **F S K L**,
+with the reason the comment and the value are one claim recorded next to it. The
+ground truth was re-derived from `docs/11` rather than carried over: four
+`^### [A-Z]. ` headings, `F S K L`.
+
+### C16 — one PR-body cite did not resolve; the sweep found six
+
+The flagged cite carried no `findings-log/` prefix while its two siblings in the
+same clause did. Sweeping **every** cite in the PR body against the **commit
+path** — `git cat-file -e <rev>:<path>`, not `find -name`, which would have
+"confirmed" a path that does not exist at that revision — found **six** failures,
+not one:
+
+| cite | defect |
+|---|---|
+| `medtronic-carelink-2026-07-21/03-data-model-and-gaps.md:96` | missing `findings-log/` prefix — **the flagged one** |
+| `2026-10-11-third-party-client-sources/FINDINGS.md:69` | missing `findings-log/` prefix |
+| `2026-10-13-area-p-static-schema/FINDINGS.md:149` | missing `findings-log/` prefix |
+| `…/PATIENT-APP-VOCABULARY.md:18-19` | ellipsis shorthand — not a resolvable path |
+| `…/family-map-verbatim.txt:1-16` | ellipsis shorthand |
+| `…area-s4-lazy-chunk-control-flow/FINDINGS.md:353-354` | ellipsis shorthand |
+
+All six repaired; the body now resolves **10 of 10** against the commit path. The
+same sweep over the three `docs/` pages this branch touched found **zero** misses
+in this branch's diff and **three** pre-existing at base (`DRIFT-AND-NEW`,
+`JS-API-SURFACE` twice), which are recorded and **not** fixed here — importing
+another pass's correction into this diff is the same mistake as touching
+`docs/05`'s `OBSERVED` label, and both belong to whoever owns those pages.
+
+**One of this branch's own `docs/11` cites** — a bare
+`APP-EMULATION-RESEARCH.md:384-385` — was caught by the same sweep and given its
+full `findings-log/probe-2026-10-08/` prefix.
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the sum
+(**27**), the counting rules in both scripts and their non-zero exits, the
+ledger's *content* (`results.jsonl` **0** rows against **`0 of a 0 cap`**), and
+rounds 1–4's fixes, all re-verified rather than assumed. The two C8 sentences
+and the two C13 sentences are annotated, not deleted, for the reason given above.
