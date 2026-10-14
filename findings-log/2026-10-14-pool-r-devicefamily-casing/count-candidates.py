@@ -167,10 +167,20 @@ def main():
     for tok in sorted(u):
         print(f'  {tok:<16} {",".join(prov[tok])}')
     total = sum(len(members[s]) for s in SETS)
+    # Two DIFFERENT quantities, previously conflated under one label:
+    #   duplicates      = occurrences beyond first appearance (total - union)
+    #   shared_distinct = distinct strings appearing in two or more sources
+    # They are 6 and 5 here, because SIMPLERA is in all three sources and so
+    # contributes 2 occurrences while contributing 1 distinct string.
+    duplicates = total - len(u)
+    shared_distinct = sorted(t for t, srcs in prov.items() if len(srcs) > 1)
     print()
     print(f'UNION SIZE (the published number) = {len(u)}')
-    print(f'sum of the admitted sources      = {total}  '
-          f'(NOT the answer; {total - len(u)} shared string(s))')
+    print(f'sum of the admitted sources      = {total}  (NOT the answer)')
+    print(f'  difference = {total} - {len(u)} = {duplicates} shared OCCURRENCE(s) '
+          f'— appearances beyond first mention, NOT distinct strings')
+    print(f'  distinct strings in >=2 sources = {len(shared_distinct)}: '
+          f'{", ".join(shared_distinct)}')
     print()
     print('OVERLAPS:')
     for i, a in enumerate(SETS):

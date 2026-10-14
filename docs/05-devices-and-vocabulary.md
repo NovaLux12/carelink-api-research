@@ -451,9 +451,23 @@ denominator is re-derivable from a clean clone:
   OBSERVED on the wire**, and this rule promotes nothing.
 
 > **Union = 21 candidate value strings.** The three admitted sources hold 27
-> strings between them, and the 6-string difference is shared tokens — `SIMPLERA`
-> in all three, and the five enum tokens re-observed by area S4. **27 is not the
+> strings between them. The difference of **6** is duplicate **occurrences** —
+> appearances beyond first mention, across **5** distinct shared tokens (`BLE`,
+> `BLE_X`, `GUARDIAN`, `SIMPLERA`, `SIMPLERA_X`; `SIMPLERA` is in all three
+> sources, so it contributes 2 occurrences and 1 string). **27 is not the
 > answer.**
+>
+> ⚠ **What is and is not pinned here, stated rather than left to be discovered.**
+> The regression suite guards **only the map axis** —
+> `regression/hurl/05-public-config.check.sh` pins `family count is 16`, and this
+> pass re-derived that 16 independently and agrees. **Nothing pins the union 21,
+> the sum 27, or the `S-CLIENT-DTO` exclusion.** Those rest on the re-derivation
+> script and on this note. A pin was weighed and declined: a new `check` site
+> moves the static count and every site that states it, and `docs/09` §4 records
+> that changing a gate's own pattern in the same PR the gate passed is a
+> maintainer decision rather than a research pass's side effect. **The stated
+> limit: the suite's `16` guards a *count* on the map axis, not the *set* of 21 —
+> and a count is not a set.**
 >
 > | Source | n | Cite |
 > |---|---:|---|

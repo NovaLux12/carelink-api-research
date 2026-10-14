@@ -3,7 +3,7 @@
 # method: GET (not used — no request was made)
 # inter-request delay: >=2s (vacuous at 0 requests)
 # cap: 0
-# started: 2026-10-14T23:01:27Z
+# started: 2026-10-14T23:04:55Z
 # --- offline re-derivation begins (no network syscall is issued below) ---
 COUNTING RULE R-1..R-5 — see the docstring of this script.
 
@@ -36,7 +36,9 @@ UNION (R-4: each string once):
   SIMPLERA_X       S-ENUM,S-CLIENT
 
 UNION SIZE (the published number) = 21
-sum of the admitted sources      = 27  (NOT the answer; 6 shared string(s))
+sum of the admitted sources      = 27  (NOT the answer)
+  difference = 27 - 21 = 6 shared OCCURRENCE(s) — appearances beyond first mention, NOT distinct strings
+  distinct strings in >=2 sources = 5: BLE, BLE_X, GUARDIAN, SIMPLERA, SIMPLERA_X
 
 OVERLAPS:
   S-MAP & S-ENUM: ['SIMPLERA']

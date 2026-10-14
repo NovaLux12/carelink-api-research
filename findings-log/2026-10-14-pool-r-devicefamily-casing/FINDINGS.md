@@ -332,6 +332,7 @@ rather than producing a number — a count that cannot fail is not evidence
 
 No credential, session value, patient identifier or internal hostname appears in
 any file this pass added, and none was read, handled or recorded at any point.
+
 ---
 
 ## Correction (2026-10-15)
@@ -418,3 +419,137 @@ remains **21, not 23**.
 attribution at the line that holds it. The `docs/05` citations were corrected in
 place (canonical docs supersede), and this section keeps the original wording
 visible above.
+
+---
+
+## Correction (2026-10-15)
+
+**Second round.** Items from the second `carelink-verifier` round on PR #127 at `805211e`:
+the C2 cite correction reaching two canonical sites of three, and a label that counted
+occurrences as strings.
+
+Two items from the second `carelink-verifier` round on PR #127, at `805211e`.
+Neither changes the verdict, the union, or any figure this pass publishes. The
+first is a miss on my own round-1 fix, recorded as such rather than smoothed
+over; the second is a labelling defect one layer below the one that was blocking
+in round 1. Prior wording stays visible throughout (`AGENTS.md` §3).
+
+### C3 — the C2 cite correction reached 2 of 3 canonical sites
+
+Round 1's C2 fixed the attribution cite in `docs/05` (two places) and in
+`count-candidates.py`. **It missed `docs/11`'s Closed-table row for this very
+area**, which still read:
+
+> `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `APP-EMULATION-RESEARCH.md:384-385`,
+> which attributes it to "xDrip's message classes" with **no `file:line` and no
+> named commit**
+
+Measured on the committed artefact: `:384-385` contains **zero** occurrences of
+"xDrip". `:349` is the section heading carrying the phrase; `:384` is the
+`deviceFamily` sub-heading; `:385` is the token line. So the row cited a range
+that does not contain the phrase it attributed to it — `AGENTS.md` §6 item 6 —
+and it was the **canonical Closed-table row**, the one a reader is most likely
+to reach for the verdict. That is the same defect class as C2, in the most
+consequential location.
+
+**Why it survived round 1:** C2 was fixed by editing the sites *I noticed while
+writing*, and the Closed-table row was written in the same pass but read back
+only for its numbers. A citation fix that is scoped by recall rather than by a
+sweep is a citation fix that will miss one again.
+
+**Fix, and the sweep that should have accompanied C2.** `docs/11`'s row now
+separates the two cites the way `docs/05` does — **`:349`** for the heading that
+carries the attribution, **`:384-385`** for the token list. Every `384-385`
+occurrence in the tree was then enumerated and classified rather than assumed:
+
+| site | what the range is cited for | verdict |
+|---|---|---|
+| `docs/05:303` | the committed line the vocabulary was re-derived to (the tokens) | correct |
+| `docs/05:466` | where the tokens sit, with `:349` named alongside for the heading | correct |
+| `count-candidates.py:73` | prints **both** cites apart in the NOT-ADMITTED block | correct |
+| `run.log:47` | the same, as the script's output | correct |
+| `docs/11:1712` | **the phrase** | **wrong — fixed** |
+| `FINDINGS.md:65` | the four DTO tokens | correct |
+| `FINDINGS.md:157` | the phrase | wrong in the original; C2 above names and corrects it, and append-only forbids editing it in place |
+| `FINDINGS.md:357`, `:403`, `:416` | C1/C2 **describing** the defect | correct |
+| `docs/09:195` | **README line numbers** in the "A count the gate's regex cannot see" trap row — not this artefact at all | unrelated, verified, untouched |
+
+Two of those rows are this file's own append-only text, so they keep the defect
+visible with the correction attached rather than being rewritten. That is the
+`AGENTS.md` §3 rule doing its job: a reader of `:157` can see what was believed,
+and a reader of C2 can see why it changed.
+
+### C4 — `6 shared string(s)` counted occurrences, not strings
+
+`run.log`, `count-candidates.py` and §3 above all printed
+`6 shared string(s)`, derived as `total − len(u)` = 27 − 21 = **6**. Those are
+**6 duplicate *occurrences*** beyond first mention. The number of **distinct**
+strings appearing in two or more sources is **5**: `BLE`, `BLE_X`, `GUARDIAN`,
+`SIMPLERA`, `SIMPLERA_X`. The two differ because `SIMPLERA` is in **all three**
+admitted sources — 2 occurrences, 1 string.
+
+Nothing contradicted anything: the adjacent `OVERLAPS` block prints the exact
+pairwise intersections, and `docs/05` phrased the difference as "the 6-string
+difference". But a parenthesised label reading `shared string(s)` invites 6 to
+be read as a string count, which is **the same defect class as C2 and C3, one
+layer down** — a number whose label does not say what the number counts. For a
+pass whose entire subject is a counting rule, that is not a cosmetic slip.
+
+**Fix.** The two quantities are now computed as two quantities and printed as
+two, with the reason they differ:
+
+```
+UNION SIZE (the published number) = 21
+sum of the admitted sources      = 27  (NOT the answer)
+  difference = 27 - 21 = 6 shared OCCURRENCE(s) — appearances beyond first mention, NOT distinct strings
+  distinct strings in >=2 sources = 5: BLE, BLE_X, GUARDIAN, SIMPLERA, SIMPLERA_X
+```
+
+`run.log` was **regenerated through `probe.sh`**, not hand-edited — the round-1
+lesson again: nothing compares `run.log` against this prose, which is exactly
+why CI could not catch either defect. The regeneration issues **no network
+request** (`probe.sh` has no `curl`/`wget`/`nc` and no host list;
+`count-candidates.py` imports only `re` and `sys`), the accounting is unchanged
+at **0 of a 0 cap** with `results.jsonl` at **0** rows, and **no request row was
+added**.
+
+**Two places in §3 above are superseded**, and both are left in place because this
+directory is append-only:
+
+1. the **quoted output block** (the line reading
+   `sum of the admitted sources = 27 (NOT the answer; 6 shared strings)`) — now
+   stale output, reproduced above from the pre-fix transcript; and
+2. the **prose sentence** immediately below it, which reads *"six shared
+   strings, which is exactly the arithmetic that makes 44 become 93"*. That
+   sentence carries the **same ambiguous unit** as the label did, in prose rather
+   than in a parenthesised note, which is why it is named here separately: it is
+   **6 duplicate occurrences across 5 distinct strings**, and the arithmetic
+   point it makes stands either way.
+
+The regenerated `run.log` in this directory is the authoritative copy of the
+script's output. Both passages are dated by the commit that produced them, which
+is the point of keeping them.
+
+**What actually fixed C4.** Not the wording — the labelling discipline. A number
+whose unit is not printed next to it is an invitation to misread it, and the unit
+here was the whole subject of the pass.
+### C5 — a whitespace-only fix to the C1 join, disclosed because it touches an already-committed line
+
+Appending C1 in round 1 introduced the same join defect this round found again:
+this file has **no trailing newline at the end of its original text**, so the
+appended region landed with `---` directly after the sentence *"…at any point."*
+In CommonMark a `---` immediately beneath a paragraph line is a **setext heading
+underline**, not a thematic break — so that separator rendered as a second-level
+heading carrying the sentence's text.
+
+**Fixed by inserting one blank line.** No wording was changed, added or removed,
+and no claim was touched — this is the one deviation from strict append-only in
+this correction, and it is disclosed rather than done quietly, because the rule
+exists to stop wording being erased and a blank line erases nothing. The gate's
+`check_append_only` still sees the file as `M` with a dated Correction heading,
+which it has (two of them).
+
+**The durable lesson, which is why this is recorded rather than just patched.**
+Two passes, two occurrences, one cause: **this file does not end with a newline,
+so every append to it must supply one.** A successor touching this directory
+should start with `printf '\n' >> FINDINGS.md` rather than discovering it again.
