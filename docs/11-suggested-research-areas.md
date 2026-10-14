@@ -763,7 +763,7 @@ the census is in the log §6.5; a right-context pattern returns **189** and that
 is a defect of the pattern, not a count.
 
 **3. The letter's reachability half: closed NEGATIVE for GET, unauthenticated.**
-The **`BLOCK 7` cells that had never run** (`AWS-GATEWAYS.md` §7) ran: `v1/events` on
+The **`BLOCK 7` cells that had never run** ([`AWS-GATEWAYS.md`](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md):240-242) ran: `v1/events` on
 all three deployments, `logbook` on one, plus the `v1` prefix root. **All 11 of 11
 `patient-timeline` cells** answer `403 MissingAuthenticationTokenException`, 42 B, one
 digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which

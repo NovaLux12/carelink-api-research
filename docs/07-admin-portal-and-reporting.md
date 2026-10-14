@@ -312,7 +312,7 @@ Two separate questions are now closed, and one is explicitly **not**. 17 request
 40 cap, GET only, ≥2.5 s same-host, **controls first on every host** [source:
 findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md].
 
-**1. The `BLOCK 7` cells that had never run are negative.** `AWS-GATEWAYS.md` §7 records
+**1. The `BLOCK 7` cells that had never run are negative.** [AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md):240-242 records
 that they never happened — an accidental re-run ate the last four budget slots. They ran
 here: `GET /prod/patient-timeline/v1/events` on all three `patient-timeline` deployments,
 and `GET /prod/patient-timeline/logbook` on the EU one, plus the `v1` prefix root.

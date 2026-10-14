@@ -92,7 +92,7 @@ prior passes have now made this exact mistake in the other direction.
 
 ## 3. BLOCK 7, which had never run — verdict
 
-`AWS-GATEWAYS.md` §7 records that BLOCK 7 *"never ran"*: an accidental re-run
+[AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md):240-242 records that BLOCK 7 *"never ran"*: an accidental re-run
 consumed the last four budget slots. Those four cells ran here, with the
 controls that make them mean something.
 
@@ -147,7 +147,7 @@ is unrouted"* from *"everything under `v1` is unrouted"*. Both readings answer
 and it changes no verdict.
 
 **Neither vocabulary was extended.** The claim is explicit that the
-`dialog-lite` list must not be extended — `AWS-GATEWAYS.md` §6 records that
+`dialog-lite` list must not be extended — [AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md) §6 records that
 enumeration there is *"informationally empty by construction"* — and the seven
 `patient-timeline` noun/verb candidates (`events, entries, items, list, query,
 range, params`) were all already run on all three regions on 2026-10-10, so
@@ -175,7 +175,7 @@ route exists. What it does establish is the same two facts the log recorded on
 least one path segment below the stage root, and the integration raises on every
 invocation.**
 
-**The digest is new.** `AWS-GATEWAYS.md` §3 recorded the routed-and-failed body
+**The digest is new.** [AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md) §3 recorded the routed-and-failed body
 as 36 B but published no digest for it; `660f19c0…` is this pass's measurement,
 so it is offered as a value to re-check against rather than as a reproduction.
 
@@ -183,7 +183,7 @@ so it is offered as a value to re-check against rather than as a reproduction.
 the **stage root level** (`/prodous/<uuid>`), not inside the `dialog-lite/v1`
 prefix. That is the correct control for the oracle question — *is an absent path
 distinguishable?*, answer no — but it is **not** the same cell as
-`AWS-GATEWAYS.md` §10 row 2 (`/prodous/dialog-lite/v1/<uuid>`), so this pass does
+[AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md) §10 row 2 (`/prodous/dialog-lite/v1/<uuid>`), so this pass does
 not re-derive that one, and says so rather than counting it as reproduced.
 
 **Still unknown, unchanged:** *why* the backend raises (`docs/10`, "Why does
@@ -198,7 +198,7 @@ not re-derive that one, and says so rather than counting it as reproduced.
 
 **Zero of 15 carry any `access-control-*` header, and zero carry `Server`,
 `Via`, `X-Cache`, `X-Amz-Cf-Id`, `Set-Cookie`, `Allow` or `Vary`.** This
-reproduces `AWS-GATEWAYS.md` §3 exactly (0 of 90, 2026-10-10) on a different
+reproduces [AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md) §3 exactly (0 of 90, 2026-10-10) on a different
 date, across both families, and it leaves area F's premise — *"Neither is
 browser-callable"* — untouched **as an observation about headers**.
 
@@ -278,17 +278,31 @@ earlier**, and no reason is offered for that difference.
 
 Hand-checked, not counted (`grep-out.txt` carries the context):
 
-- **`m2m`, 1 hit, at byte 387460.** Area F's own text proposes looking for "a
-  `m2m` / `gc` call pattern" ([`docs/11`](../../docs/11-suggested-research-areas.md)
-  :214). The single `m2m` byte sequence in either build is the **tail of
-  `cum2me`**, whose own bytes are 387458–387463, so the token is the word's
-  **third through fifth characters** — its middle, not its tail — inside a
-  leaked-password dictionary — the
-  same blob that holds the `discover` and `pde` hits area V documented. The
-  premise carries its own false-positive trap and it fires on the first token
-  tried.
-- **`baseUrl`, 2 hits, at bytes 2422149 and 2422752, both builds.** Both sit in
-  an **embedded Pusher JS SDK** (`baseUrl:"https://pusher.com"`,
+- **`m2m`, 1 hit per body (2 across both), at byte 387460 in each.** Area F's own
+  text proposes looking for "a `m2m` / `gc` call pattern"
+  ([`docs/11`](../../docs/11-suggested-research-areas.md):222). The single `m2m`
+  byte sequence in either build is the **third through fifth characters of
+  `cum2me`**, whose own bytes are 387458–387463 — inside a leaked-password
+  dictionary, the same blob that holds the `discover` and `pde` hits area V
+  documented. The premise carries its own false-positive trap and it fires on the
+  first token tried.
+
+  ⚠ **The token is not fictional, and a reader must not take the false hit that way.**
+  `/patient/m2m/connect/data/gc/patients/{username}` is a **live, pinned route** on the
+  patient plane — [`regression/hurl/04-deep-surface.hurl`](../../regression/hurl/04-deep-surface.hurl):96
+  asserts `GET …/patient/m2m/connect/data/gc/patients/probe-user` → `HTTP 401` with
+  `$.error.type == "InvalidToken"`, and `:102` asserts the `/last24hours` suffix shape
+  → `404`. **So `m2m`/`gc` is a real call pattern on this vendor's surface and this
+  pass's corpus finding is about something narrower: `m2m` as a three-character
+  *substring* is unusable as a corpus token, because one occurrence in 3.4 MB of
+  minified vendor code is a leaked-password word.** The live route is on
+  `carelink.minimed.eu`, which is **outside this claim's host set** and was **not
+  probed here** — the pinned assertion above is quoted from the suite, not re-derived
+  by this pass. **Not a contradiction, a scoping distinction, and worth stating
+  because the opposite reading is the obvious one to reach.**
+- **`baseUrl`, 2 hits per body (4 across both), at bytes 2422149 and 2422752 in
+  the clinic build and 2422091 and 2422694 in the support build.** Every one of
+  the four sits in an **embedded Pusher JS SDK** (`baseUrl:"https://pusher.com"`,
   `authenticationEndpoint`, `docs/channel…`). Not a CareLink API base. Area V's
   counterpart finding for the patient build was different and is not repeated
   here: its two `baseUrl` hits are `getBaseCmsUrl()`, a CMS media base.
@@ -450,8 +464,8 @@ to confirm; it is not claimed here.
 | 11 | Zero of 15 gateway responses carry any `access-control-*`; header set is exactly six keys | OBSERVED | `headers/003`…`headers/017`; §5 |
 | 12 | Both portal bundles reproduce their pinned anchors in full (3 397 615 B / `2a7fa8e7…`; 3 410 666 B / `a054555a…`) | OBSERVED | `results.jsonl` seq 1–2; §6.1 |
 | 13 | `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both config-key spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and all five gateway ids are **0 in both builds** | OBSERVED | `grep-out.txt` token tables; `grep.sh` |
-| 14 | `m2m` = 1 hit, at byte 387460, inside `cum2me` (bytes 387458–387463) — its third through fifth characters | OBSERVED | `grep-out.txt` context dump; derivation in C5 |
-| 15 | `baseUrl` = 2 hits at bytes 2422149 / 2422752, both inside an embedded Pusher SDK | OBSERVED | `grep-out.txt` context dump |
+| 14 | `m2m` = 1 hit **per body** (2 across both), at byte **387460 in the clinic build and 387460 in the support build** — identical — inside `cum2me` (bytes 387458–387463), its third through fifth characters | OBSERVED | `grep-out.txt` context dump; derivation in C4 |
+| 15 | `baseUrl` = 2 hits **per body** (4 across both) — **clinic build 2422149 / 2422752, support build 2422091 / 2422694**, i.e. **not build-invariant**, all four inside an embedded Pusher SDK | OBSERVED | `grep-out.txt` context dump; per-build split in C5 |
 | 16 | `personal.` = 4 hits at bytes 2403157 / 2762844 / 3238864 / 3239490, **none** a key of the 69-name patient document | OBSERVED | `grep-out.txt`; offsets tabulated at §6.4 |
 | 17 | `timeline` 66 + `Timeline` 126 + `TIMELINE` 4 = **196** occurrences, 74 signatures, none naming the service | OBSERVED | `grep-out.txt` census, counting rule at §6.5 |
 | 18 | There is **no caller** for either service in either portal build, and **no proxy can exist** there because neither build reads the patient config document | OBSERVED for the two build facts; **INFERRED** for the "no proxy" consequence | §6.2, §6.4 |
@@ -462,7 +476,7 @@ to confirm; it is not claimed here.
 
 **Independent-source count, per `AGENTS.md` §2.1.** Rows 4, 6, 9, 10 and 11
 restate measurements whose author is this pass (me) and whose prior published
-figures are the 2026-10-10 pass (`AWS-GATEWAYS.md`). That is **two authors**
+figures are the 2026-10-10 pass ([AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md)). That is **two authors**
 (`CarlosJPV` recorded the original sweep; this pass measured it again today) but
 **the same artefact shape** — the new ledger is not a different *kind* of
 evidence, and the reading above it reproduces a value rather than establishing a
@@ -612,9 +626,9 @@ changes; the unit does.
 - **The `README.md` count site the gate cannot read** (verifier round 1, blocking
   item 1) was a **`docs/`-level defect in this PR, not in the log**, so it is
   corrected in `README.md` itself and the pattern was **not** widened — a
-  maintainer decision, per `docs/09` §4's standing note. `README.md:205`-style
-  **quoted history inside a trap row was deliberately left at its historical
-  value**, because changing it would falsify the record of the trap itself. A
+  maintainer decision, per [`docs/09`](../../docs/09-methodology-and-oracles.md) §4's
+  standing note. **The trap row *"A count the gate's regex cannot see"* at
+  [`docs/09:205`](../../docs/09-methodology-and-oracles.md) — quoted history — was deliberately left at its historical `147`**, because changing it would falsify the record of the trap itself. A
   re-scan for a number separated from its phrase by a line break returns **0**
   invisible sites across `README.md`, `docs/*.md`, `AGENTS.md`,
   `CONTRIBUTING-research.md` and `config.yml`.
@@ -643,7 +657,8 @@ changes; the unit does.
 Four items, three of them errors in figures this log published, and all four
 **repaired in place in the body of the log** with the superseded wording preserved
 here verbatim. That split is this repository's own practice and not a convenience:
-`AWS-GATEWAYS.md`'s Correction section repaired its §9 Files row in place *and*
+[AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md)'s
+Correction section repaired its §9 Files row in place *and*
 recorded the repair; area M's log rewrote a false sentence in place under a dated
 `⚠ CORRECTED` marker; area Q withdrew a strength word in place and said so. The rule
 being honoured is `AGENTS.md` §3's — *"Corrections are appended … the superseded
@@ -783,3 +798,156 @@ part that was missing; the edit is unchanged.
   `./scripts/research-gate.sh --no-suite` — **that flag does not exist**, so the full
   live suite ran and made **13 requests on hosts outside this claim's set**. Those
   requests are **not** cited as evidence for any claim here.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 3 of verification, six items. **Two of them were incomplete repairs of my
+own round-2 corrections** — the corrections were right and the sweep that should
+have found every instance of them did not happen. That is the whole finding here,
+so the record of *what the sweep was* is given first, because a correction that
+fixes the cited line and leaves the next one is the same defect three rounds
+running.
+
+**The heading above is deliberately bare.** `check_append_only`'s Correction test
+is anchored at the closing paren — `^## Correction \(\d{4}-\d{2}-\d{2}\)\)` — so
+round 1's and round 2's longer headings did not match it. This one does, so the
+file would satisfy the gate's `M` arm **if that arm ever ran**; it still will not
+here, because the gate's three-dot diff classifies this file `A` within the
+branch range. **The earlier headings are not being changed to match** — `docs/09`
+§4 says the regex is too strict and headings should not be bent to satisfy it.
+
+### The sweep, and what it found beyond the flagged lines
+
+Per instruction, each item was treated as a **class** and searched for
+mechanically across this pass's whole diff, not patched at the cited line. Three
+residues were found that no item named:
+
+| sweep | query | result beyond the flagged lines |
+|---|---|---|
+| **build-invariance claims** | `both builds` / `in both builds` / `identical in both` / `given once` / `either build` over every added line | **1 further false claim**, §6.3's `baseUrl` bullet (item 1). Every other hit is a legitimate use about the **literal counts**, which *are* build-invariant — `m2m` 1 per body and `baseUrl` 2 per body in both |
+| **superseded predicates** | `the tail of` / `not its tail` / `not the tail` over every added line | **1 further residue**, §6.3's `m2m` bullet (item 2). The only other hit is C4's own heading, which must keep the phrase to name what it retracts |
+| **`file:NNN` line cites** | every `path.md:NNN`, `path.hurl:NNN`, `path.sh:NNN` and `§N` cite in **this log** — the whole file, since it is new — each resolved against the **head tree**, never against `origin/main` | **2 further defects, both introduced by earlier rounds of mine**: (a) `README.md:205`, cited in round 2's C4, is *"reliable and family-matching is a guess"* — the `147` trap row is at **`docs/09:205`** and I had **transposed the filename**; (b) `AWS-GATEWAYS.md:240-243` **over-reaches by one line**, since `:243` is a different bullet (*"No authorizer discrimination test"*) and the BLOCK-7 claim is `:240-242`. Both corrected. The remaining cites — `docs/11:222`, `README.md:404`, `04-deep-surface.hurl:96`/`:102`, `enumeration-scrubbed.txt` 83/121/155/187/245, and every `AGENTS.md` §1/§2/§3/§6/§7/§8 and `docs/09` §2/§4/§5 — **all resolve to what they are cited for** |
+
+### R1 — §6.3's `baseUrl` bullet still asserted build-invariance (BLOCKING)
+
+**The superseded wording, verbatim.** *"**`baseUrl`, 2 hits, at bytes 2422149 and
+2422752, both builds.**"* — which contradicted the paragraph **13 lines above it**,
+C5's own table, and the verifier's independent measurement.
+
+**The clause is deleted, not reworded into something still false** (`AGENTS.md`
+§1). The bullet now gives all four offsets **labelled per build**, which is also
+item R4's fix applied where the false claim actually lived. **No cause is asserted
+for the 58 bytes**, as C5 already had it.
+
+### R2 — §6.3's `m2m` bullet kept the retracted predicate (BLOCKING)
+
+**The superseded wording, verbatim.** *"The single `m2m` byte sequence in either
+build is the **tail of `cum2me`**, whose own bytes are 387458–387463, so the token
+is the word's **third through fifth characters** — its middle, not its tail —
+inside a leaked-password dictionary"*.
+
+Round 2 fixed the **word** and left the sentence's own **predicate** in place,
+then negated it three words later. Self-negating, so no reader is misled — and
+still a defect, because `§1` requires deletion rather than self-negation. The
+clause is deleted. What remains states the position and nothing else: the single
+`m2m` byte sequence **is the third through fifth characters of `cum2me`**, bytes
+387458–387463. `m2m` is characters 3–5 of a 6-character word; **"the tail" was
+always the claim C4 exists to retract.**
+
+### R3 — the `docs/11` cite pointed at the wrong line (MINOR)
+
+`FINDINGS.md:283` cited `docs/11:214`. At the head tree, `:214` reads *"addenda
+below are preserved in place and unedited…"* and **`:222`** reads *"server-side
+proxy in the portal bundle, or a `m2m` / `gc` call pattern from…"*. **`:222` now.**
+This cite **anchors the whole false-positive argument** — it is the line that
+proposes the `m2m` probe — and the gate cannot see the defect, because the path
+resolves and only the line is wrong. §6 mode 6: never cite from memory.
+
+### R4 — §9 rows 14 and 15 now label their unit (MINOR)
+
+Row 15 was OBSERVED and true but gave one build's offsets unlabelled, which is the
+per-build/cross-build ambiguity C5 exists to kill. **Both rows now state `per
+body` with the across-both total, and all four offsets labelled by build.** Row 14
+additionally now says the `m2m` offset **is** build-invariant, which it is, so the
+two rows no longer read as contradicting each other about the same property.
+
+### R5 — `m2m`/`gc` is a live pinned route, and the false hit is narrower than it looks (INFORMATIONAL)
+
+`/patient/m2m/connect/data/gc/patients/{username}` is **live and pinned**:
+`regression/hurl/04-deep-surface.hurl:96` asserts
+`GET …/patient/m2m/connect/data/gc/patients/probe-user` → `HTTP 401` with
+`$.error.type == "InvalidToken"`, and `:102` asserts the `/last24hours` suffix shape
+→ `404`. A reader of §6.3 alone could take this pass's one dictionary-word hit as
+saying the pattern is noise. **It does not, and the distinction is now recorded at
+the point of the claim:** `m2m`/`gc` is a real call pattern on this vendor's
+surface, and what this pass measured is that **`m2m` as a three-character substring
+is unusable as a corpus token** — one occurrence in 3.4 MB of minified vendor code
+is a leaked-password word. **Not a contradiction.** The pinned route is on
+`carelink.minimed.eu`, **outside this claim's host set and not probed here**; the
+assertion is quoted from the suite, not re-derived by this pass.
+
+### R6 — `AWS-GATEWAYS.md` is now cited with its path everywhere (INFORMATIONAL)
+
+Seven prose mentions of `` `AWS-GATEWAYS.md` `` had no path, so none was
+independently checkable as written. **All seven now carry
+`findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md`** — §7, §6, §3 (twice), §10,
+the header-set claim, and this pass's own independence-count discussion — and the
+BLOCK-7 cite is tightened to `:240-242` per the sweep above.
+
+### R7 — nothing measurable moved, and the two verdicts that went this pass's way stand
+
+- **All four evidence artefacts remain byte-identical to `cd9b79a`** —
+  `results.jsonl`, `run.log`, `headers/`, `grep-out.txt` — verified by digest, so
+  no measurement from any round has changed. **`wc -l results.jsonl` is still 17**,
+  matching **"17 of a 40 cap"**. `t_sent` floor **2.239 s** over **10 gaps**, **0**
+  under the 2 s floor; **seq 9 at −0.552 s**; **196** census over **74** signatures;
+  **11 of 11** and **4 of 4** cell splits; **0 of 15** gateway rows carrying
+  `Access-Control-*`; **0** 404s. **No vendor request was issued this round.**
+- **The median stays `0.0112 s`** (unrounded `0.011234`, mean of the two central
+  sorted elements for even `n=10`). Neither `0.0110` nor the brief's "table cap of
+  `0.0115`" reproduces from this ledger, and the disagreement remains recorded in
+  C6 rather than resolved in the brief's favour.
+- **The in-place-repair argument stands**, and so does its limit: the verifier
+  confirmed all three precedents at hunk level and recorded that the pattern
+  **does not excuse a repair that stops half-way** — which is R1 and R2, and the
+  reason this correction leads with the sweep rather than with the six items.
+
+
+---
+
+## Correction (2026-10-15) — R8, a second sweep pass, and what it found
+
+**The sweep table above was not the end of the sweep, and saying so is the point.**
+Re-running the same three classes with the file glob widened from this log's `.md`
+to **every file in this pass's diff** — `.sh` included — found **three further
+residues of classes already flagged**, none named by any of the six items:
+
+| residue | location | class | fix |
+|---|---|---|---|
+| `(docs/11:214)` | `grep.sh:43`, in the comment explaining **why `m2m` is on the token list** | R3's wrong-line class — the **same wrong line**, in the sibling script that defines the token | now `docs/11:222`; `bash -n` clean, and no request, token, gate or output changes |
+| `AWS-GATEWAYS.md` §7, no path | `docs/07:315` | R6's bare-filename class, **in a canonical page** | path given, range tightened to `:240-242` |
+| `AWS-GATEWAYS.md` §7, no path | `docs/11:766`, in this pass's own closing addendum | R6's bare-filename class, **in this pass's own prose** | path given, range tightened to `:240-242` |
+
+**Two adjacent mentions were deliberately NOT touched**, and the reason is the
+boundary a sweep has to respect:
+
+- `docs/07:237`, `docs/11:49` and `docs/11:1697` also read `AWS-GATEWAYS.md` with
+  no path. **Verified pre-existing on `origin/main`** — the third sits at
+  `origin/main`'s line 1550 and only *shifted* when this pass edited the page, so
+  its content is not this pass's. **Another pass's prose is not this pass's to
+  edit**, and `findings-log/` is append-only besides.
+- `findings-log/2026-10-13-commoncore-trials/FINDINGS.md:136` is **another pass's
+  log**, verified byte-unchanged by this PR. Left alone for the same reason.
+
+**The lesson, stated because it is the one this pass earned the hard way.** Items
+R1 and R2 were **not** new errors — they were **incomplete sweeps of errors this
+pass had already found and corrected correctly**. The correction was right; the
+search that should have found every instance of the shape was not run. Three rounds
+in, the residue rate had gone: round 1 fixed the cited lines, round 2 fixed the
+cited lines *and* a class, round 3 fixed the cited lines, a class, and — only after
+being told to — the whole file set behind the class. **A sweep with a narrower glob
+than the diff is not a sweep**, and the honest measure of one is whether it found
+anything the reviewer did not already list.

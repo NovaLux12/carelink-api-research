@@ -40,7 +40,7 @@
 #                                      155/187/245 -- a caller must name one
 #   prodous                             the dialog-lite stage prefix
 #   m2m                                 the call pattern area F's own text names
-#                                      (docs/11:214) -- included PRECISELY
+#                                      (docs/11:222) -- included PRECISELY
 #                                      because it is expected to false-hit
 #   baseUrl                             shape probe: does either build read a
 #                                      CareLink API base from config at all?
