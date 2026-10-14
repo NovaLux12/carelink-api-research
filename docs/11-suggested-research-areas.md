@@ -1237,271 +1237,176 @@ digest pinned):
   hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
   issue #103 is L (positive control, 0–2 GETs).
 
-### L. Recovery of the retired `ipro/hcp` JSF surface
+#### Addendum (2026-10-15, from pool L #126): the census pass — two new crawls, both ends now carried by captures, and area L **closes**
 
-The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
-everything in `docs/02`. It is the ancestor of the current admin surface. Mapping what
-changed gives a migration history, and retired endpoints sometimes reveal legacy
-routes still live.
+**40 of a 40 cap**, GET only, **`index.commoncrawl.org` alone, zero requests to
+any Medtronic host**, ≥ 3.5 s held inside `flock`, measured `t_sent` spacing
+floor **4.272 s** over 39 gaps (0 under 3.5 s, 0 under the `>=2 s` floor, 0
+negative durations; kernel-mtime oracle 4.035 s, 0 under 3.5 s). **15 of 40 rows
+were failures** (502 ×10, 504 ×3, 400 ×2 — 38%), and **a retry is a request**:
+12 rows are retries. Evidence:
+[source: findings-log/2026-10-14-pool-l-ipro-hcp-census/FINDINGS.md].
 
-#### Addendum (2026-10-13, from area M): the family is anchored on `carelink.minimed.eu`, and Common Crawl holds it
+**Every cell below is classified under the counting rule that governs this page:**
+*a cell is readable as an absence only if some row for that crawl answered 200.*
+A failure is labelled a failure and is never smoothed into an absence.
 
-Area M found this while re-deriving a different claim, and it could not have been
-written before that pass ran.
-
-`ARCHIVE-URLS §3` dates `/ipro/hcp/*.jsf` to **2013-05-17 → 2022-05-13** and notes
-the `jsessionid` in the URL, but **names no host**. A second, independent corpus
-now does: **Common Crawl `CC-MAIN-2020-50` (2020-11-23 → 2020-12-06) holds three
-captures of the family on `carelink.minimed.eu` itself**, all at **2020-12-02** —
-`/ipro/hcp/` **302**, `/ipro/hcp/login.jsf` **200**, `/ipro/hcp/main/home.jsf`
-**302** (OBSERVED, [source: findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md
-§3a]). Two query shapes agree on the record set: `matchType=domain` and
-`matchType=host`.
-
-So the retired clinician surface ran **on the patient API host**, not on a
-separate Medtronic domain — which is the migration fact this area exists to
-recover, arriving from a corpus nobody had asked.
-
-**Blocker:** none, and no token. The capture bodies are in Common Crawl and the
-metadata is already in this pass's ledger; the work is reading them, which is
-**zero requests**. The blocker is budget-shaped, not access-shaped — area M spent
-its last request on the host-level confirmation and could not also spend one per
-`/ipro/hcp/*.jsf` path, because this API **fails 28% of its queries**
-([`docs/09`](09-methodology-and-oracles.md) §4) and a sweep of N paths costs
-roughly 1.3 N.
-
-**Closes when** the `/ipro/hcp/*` family is enumerated with a host and a date per
-member, and the `carelink.minimed.eu` anchor is either confirmed across the 2013
-and 2022 ends or explicitly shown to be a single-period deployment.
-**A negative counts** — if the family turns out to be one three-capture entry
-with no siblings, that is the answer and it closes the area.
-
-**Assumptions (INFERRED):** that the 2020-12-02 captures belong to the same
-deployment as `ARCHIVE-URLS`'s 2013–2022 family rather than to a second portal
-sharing the prefix. The assumption is that `/ipro/hcp/*.jsf` names one surface
-over time; it rests on the path shape and the JSF convention, and nothing
-observed here demonstrates it. **`ARCHIVE-URLS` was not modified by area M** — a
-host attribution added to a findings log another pass owns is a correction that
-pass's owner should make, so it is recorded here instead.
-
-#### Addendum (2026-10-13, from area L, #57): the family is **four members in two crawls**, and the 2013 end is **unanswerable** with this instrument
-
-Area L worked the anchor area M left. It did **not** close area L; this is an
-addendum, and the letter stays open.
-
-**"Three captures" was one crawl's worth.** The family has a **fourth member**
-and a **second crawl**, and the fourth member is not a `.jsf`:
-
-| capture | code | host | path | crawl |
+| crawl | control (seq · status) | probe (seq · status · records) | `/ipro/hcp/` | **verdict** |
 |---|---|---|---|---|
-| **2020-05-27 21:29:18** | **302** | `carelink.minimed.eu` | **`/ipro/hcp/index.jsp`** ← new | `CC-MAIN-2020-24` |
-| 2020-05-27 21:29:19 | 200 | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | `CC-MAIN-2020-24` |
-| 2020-05-27 21:29:19 | 302 | `carelink.minimed.eu` | `/ipro/hcp/main/home.jsf` | `CC-MAIN-2020-24` |
-| 2020-12-02 03:07:17 | 302 | `carelink.minimed.eu` | `/ipro/hcp/` | `CC-MAIN-2020-50` |
-| 2020-12-02 03:07:17 | 200 | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | `CC-MAIN-2020-50` |
-| 2020-12-02 03:07:17 | 302 | `carelink.minimed.eu` | `/ipro/hcp/main/home.jsf` | `CC-MAIN-2020-50` |
+| `CC-MAIN-2013-20` | 8 · 200 | 9 · 404 | 0 | **readable absence** (host scope) |
+| **`CC-MAIN-2014-15`** | 12 · 200 | 15 · **200 · 4** | **4** | **record — new crawl** |
+| `CC-MAIN-2014-23` | 16 · 400 · 17 · 502 · 18 · 502 · 40 · 502 | 19 · 404 | 0 | **INDETERMINATE** |
+| `CC-MAIN-2015-11` | 20 · 200 | 21 · 200 · 1 | 0 | record, no ipro |
+| `CC-MAIN-2016-07` | 22 · 200 | 23 · 200 · 1 | 0 | record, no ipro |
+| `CC-MAIN-2017-09` | 24 · 200 | 25 · 200 · 6 | 0 | record, no ipro |
+| `CC-MAIN-2019-04` | 26 · 200 | 28 · 200 · 12 | 0 | record, no ipro |
+| `CC-MAIN-2020-05` | 29 · 504 · 30 · 200 | 31 · 200 · 3 | 0 | record, no ipro |
+| `CC-MAIN-2020-50` | 6 · 502 · **7 · 200** | 7 · 200 · 5 | **3** | **record** (area M's anchor, reproduced) |
+| `CC-MAIN-2021-04` | 10 · 200 | 11 · 404 | 0 | **readable absence** (host scope) |
+| `CC-MAIN-2021-10` | 32 · 200 | 33 · 200 · 3 | 0 | record, no ipro |
+| `CC-MAIN-2022-05` | 2 · 504 · **3 · 200** | 4 · 404 | 0 | **readable absence** — the disputed cell |
+| **`CC-MAIN-2022-27`** | 34–36 · 502 ×3 | 39 · **200 · 9** | **1** | **record — new crawl, control failed** |
 
-**Four paths · one host · two crawls · two dates spanning 2020-05-25 →
-2020-12-02** (OBSERVED, [source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md
-**Correction (2026-10-13).** The earliest **`/ipro/hcp/*`** member of that same
-crawl body is **2020-05-27 21:29:18**, not 2020-05-25; the 2020-05-25
-strings in that body are `/patient/*` records. The absence verdict of the
-2026-10-13 re-issue is unaffected.
+**Three results, in the order they matter.**
 
-§2]). Two query shapes agree on the new member — `matchType=domain` and
-`matchType=host` return the identical 7-record set — so it carries the same
-weight as area M's anchor. **Consequences:** the family is
-**`/ipro/hcp/*`, not `/ipro/hcp/*.jsf`** (`index.jsp` is a `.jsp`, and the
-`.jsf` glob does not contain it), and area L's own close condition — "one
-three-capture entry with no siblings" — is **not** met. **The migration fact
-this area exists to recover is confirmed and strengthened**: the retired
-clinician surface ran on `carelink.minimed.eu` and was still being crawled seven
-months into 2020.
+**1. The one contradictory cell is settled, and the disagreement was a
+control-ordering artefact.** On `CC-MAIN-2022-05` the control answered **504**,
+then **200 with 5 records** on retry, and the `minimed.eu` domain probe sent
+immediately after returned **404** `No Captures found for: minimed.eu`. Under the
+counting rule that is a **readable absence**. **Both prior readings were true of
+their own ledgers and neither was true of the crawl, and neither is retracted:**
+the 7crawl pass's Correction records that *its own* two re-issued controls
+returned `504`, and pool-L ran a `200`-with-records control but **sent no minimed
+probe** and carried its cover across to one it never asked. What moved the cell
+is neither ledger alone — it is a control and a probe **on one crawl, in one pass,
+in that order** (OBSERVED, seqs 2–4).
 
-**The 2022 end is answered by one crawl; the 2013 end is withdrawn.** `collinfo.json`
-lists **128 crawls**, and **neither** `2013-05-17` **nor** `2022-05-13` falls
-inside any crawl window. The crawl after the 2022 date, `CC-MAIN-2022-21`
-(2022-05-16 → 2022-05-29), holds **four** `minimed.eu` records and **not one
-`/ipro/hcp/`** — `carelink.minimed.eu` serving `/robots.txt` **403** twice, plus
-`/` and `/robots.txt` on a host name new to this repo,
-**`carelink-stage3.minimed.eu`**. So the family is a **bounded 2020 deployment
-in the Common Crawl record** (OBSERVED, same source, §3b; the host is recorded,
-not probed).
+**2. `/ipro/hcp/*` reaches 2022-07-03, so the "bounded 2020 deployment" reading
+is refuted.** `CC-MAIN-2022-27` holds
+`carelink.minimed.eu` `/ipro/hcp/index.jsp` at **`20220703140927`**, **HTTP 200**
+(OBSERVED, seq 39). The 2022 end is now carried by a **capture**, 51 days *past*
+the 2022-05-13 date `ARCHIVE-URLS §3` records — and past `CC-MAIN-2022-21`, the
+crawl the earlier reading rested on, whose window (2022-05-16 → 2022-05-29)
+simply precedes it. The earlier reading was not wrong about that crawl; it was
+not the nearest crawl that carries the family. **Caveat, stated not smoothed:**
+the control gateway-failed 3× here, so this cell is a record behind no succeeded
+control — which costs nothing, because a record needs no absence oracle and seq
+39 is a `200` on that exact crawl.
 
-#### Addendum (2026-10-14, from the l79 re-issue, worker seq 19): earliest `/ipro/hcp/*` capture is now **2014-03-10**
+**3. `CC-MAIN-2014-15` holds four `/ipro/hcp/login.jsf` captures, all April 2014,
+all HTTP 200** — `20140417041651`, `20140423143329`, `20140424054803`,
+`20140424231208` (OBSERVED, seq 15). This is the densest cell in the corpus for
+this family and the only one holding repeated captures of one path on one crawl.
+**INFERRED:** that repeated captures mean a live surface to a crawler — the
+records are the observation, the reading is not.
 
-The 2026-10-14 re-issue of the seven indeterminate crawls (`findings-log/2026-10-13-area-l-7crawl-reissue`,
-issue #79) added a capture the earlier readings did not have: `carelink.minimed.eu`
-`/ipro/hcp/login.jsf` **200** on `CC-MAIN-2014-10` at **2014-03-10**, confirmed on the same
-crawl by `matchType=host` (worker seqs 21 and 22 — seq 19 was a `504` gateway failure). The two statements above that the family's
-earliest Common Crawl member opened at **2020-05-27 21:29:18** (and, before the round-3 correction,
-**2020-05-25**) are therefore superseded for `CC-MAIN-2014-10` and the crawls that read. They
-are left in place as the dated record of prior readings; this note does not erase them. The
-lower bound in the Common Crawl record is now **2014-03-10**, and the 2013 end
-(`CC-MAIN-2013-20`, `CC-MAIN-2013-48`) remains a readable absence on the domain scope from
-that re-issue. Area L stays open — per-member host/date enumeration is incomplete — and the
-per-crawl supplemental control for three of those crawls is at
-`findings-log/2026-10-13-area-l-7crawl-reissue/SUPPLEMENT-2026-10-14-ipro-early-crawl-controls.md`
-(OBSERVED, [source: findings-log/2026-10-13-area-l-7crawl-reissue/FINDINGS.md F2; ledger seqs 21, 22]).
+**The family as the corpus now reads it — four paths · one host · five crawls ·
+an observed span of 2014-03-10 → 2022-07-03** (both new ends from this pass):
 
-
-**⚠ CORRECTED 2026-10-13, in this pass's own first draft:** that draft also
-counted the crawl *before* the date, `CC-MAIN-2022-05`, whose `404 No Captures
-found` it called a readable absence. **It is not one.** `CC-MAIN-2022-05` returned
-no `200` on either of its two rows (`504`, then `404`), so no positive control
-stands behind that `404` on that crawl, and by this repo's own rule — a `404`
-means *absent* only once a positive control has returned records **on that same
-crawl** — it is **indeterminate**, not empty. **The 2022 end rests on
-`CC-MAIN-2022-21` alone**, which is served and returned records. `CC-MAIN-2021-04`
-was mislabelled the same way. **Counting rule for the column:** readable only if
-some row for that crawl answered `200`; **seven of the fourteen crawls touched
-here fail that test** ([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md
-§3b, §6]).
-
-**The 2013 end cannot be settled through the index API at this date**, and the
-reason is worth more than a negative would have been: `CC-MAIN-2013-20`
-(2013-05-18 → 2013-06-20 — **one day** after the recorded date),
-`CC-MAIN-2013-48` and `CC-MAIN-2014-10` each failed the `minimed.eu` query in a
-**different** way (`404`, `400`, `502`/`504`), so the failure mode is
-crawl-dependent and a status code is not an oracle across crawls. Five requests
-were spent and it did not yield an answer (OBSERVED, same source, §3a and §5).
-
-⚠ **CORRECTED 2026-10-13, in this pass's own prose:** the draft also said
-`CC-MAIN-2013-48` "was given **one** attempt where its neighbours were given two
-and three". **`results.jsonl` does not support it.** `CC-MAIN-2013-20` and
-`CC-MAIN-2013-48` have **identical** request records — one `minimed.eu` attempt
-and one crawl-scoped control each — and `CC-MAIN-2014-10` got three
-`minimed.eu` attempts. **Six crawls in total have a single `minimed.eu`
-attempt**, of which two are un-re-issued *failures* returning `404`
-(`CC-MAIN-2013-20`, `CC-MAIN-2021-04`) and three were first-try `200`s that
-needed no re-issue. **The honest account is uneven discipline, not a considered
-choice** (OBSERVED): `2013-48` was not treated more carefully than `2013-20` —
-both were given exactly **one** `*minimed.eu*` attempt and neither was re-issued,
-so the budget, not the answer shape, is what distinguishes them. They answered
-differently: a bare **`400`** against a **`404`**, the API's absence answer.
-**Three
-of the seven indeterminate crawls were asked once**, so for those the hole is
-partly a budget artefact rather than a demonstrated property of the API
-([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §1 round-2
-correction, §6]).
-
-**Blocker:** a request budget against an API that fails **18 of 44** requests
-(41%), against crawls whose failure mode varies. Not access-shaped, and not
-"more research": re-issuing the **seven** indeterminate crawls
-(`CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`, `-2021-04`, `-2021-25`,
-`-2022-05`) is a fixed, small, mechanical list that one pass could finish inside
-45 requests. **Three of those seven were only asked once**, which makes the list
-cheaper and more valuable than it looks — see the dated correction above.
-
-**Closes when** each of the seven indeterminate crawls has produced **either** a
-record set **or** a `404` confirmed by a positive control on that same crawl, so
-the 2013 end resolves to a reading rather than a hole. **A negative counts** —
-and so does a repeated failure on a crawl whose positive control succeeds, which
-would make "this crawl cannot be read" the finding.
-
-**Assumptions (INFERRED):** that `/ipro/hcp/*` names one surface over time,
-unchanged from area M's addendum and **still not demonstrated** — a fourth
-member in a second crawl is consistent with one surface and does not prove it,
-since `index.jsp` could equally be a second portal sharing the prefix.
-
-**Also INFERRED, and it was previously left in an OBSERVED sentence here rather
-than here (correction, round 4):** that a `404` "reads like a finding" while a
-`400` reads like a failure to be retried, and that this difference in apparent
-result-ness is what left `CC-MAIN-2021-04` and `-2013-20` un-re-issued.
-**Assumption:** that the re-issue decision here is driven by an answer's shape
-rather than by its ledger classification. `results.jsonl` records a `role` per row
-and no reason for any of these — its only `note` sits on the four debug rows and
-records the delay defect — while `run.log` records sends only, so **nothing in
-the pass observes an operator or a decision**. This is a reading of the shape of
-the gap in the ledger, not a claim about why anyone acted, and the OBSERVED
-version above ("the budget, not the answer shape, is what distinguishes the two
-rows") stands without it
-([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §1 round-2
-correction, §1 round-4 correction]).
-
-#### Successor to area L (dated addendum to area L, #57): the crawl-scoped control is one-directional, and that is the real blocker on this corpus
-
-`docs/11`'s §"Why there is no area AA" forbids minting a new letter, so this is
-attached to area L.
-
-**What is known.** To read a zero from this API you need a **positive control on
-the same crawl**: that the crawl is served, and that the query shape returns
-data there. Area L sent the obvious version — a crawl-scoped control for
-`example.com` — and **it does not work in one direction** (OBSERVED,
-[source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md §5-C2]):
-
-| seq | crawl | `example.com` control | `minimed.eu` | crawl served? |
+| timestamp | host | path | status | crawl |
 |---|---|---|---|---|
-| 44 | `CC-MAIN-2015-06` | **404** | **200, 1 record** | **yes** — `example.com` is simply absent from it |
-| 40 | `CC-MAIN-2013-20` | 404 | 404 | **unknown** |
-| 42 | `CC-MAIN-2013-48` | 404 | 400 | **unknown** |
-| 25 | `CC-MAIN-2014-10` | 504 | 502/504/504 | **unknown** |
-| 26 | `CC-MAIN-2022-21` | **200** | **200, 4 records** | **yes** |
+| 2014-03-10 | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | 200 | `CC-MAIN-2014-10` (prior) |
+| **2014-04-17 → 04-24 (×4)** | `carelink.minimed.eu` | `/ipro/hcp/login.jsf` | **200** | **`CC-MAIN-2014-15`** |
+| 2020-05-27 (×3) | `carelink.minimed.eu` | `index.jsp`, `login.jsf`, `main/home.jsf` | 302 / 200 / 302 | `CC-MAIN-2020-24` (prior) |
+| 2020-12-02 (×3) | `carelink.minimed.eu` | `/`, `login.jsf`, `main/home.jsf` | 302 / 200 / 302 | `CC-MAIN-2020-50` (prior, reproduced seq 7) |
+| **2022-07-03** | `carelink.minimed.eu` | `/ipro/hcp/index.jsp` | **200** | **`CC-MAIN-2022-27`** |
 
-A control **success** proves the crawl is served. A control **failure or `404`
-proves nothing** — the crawl may be perfectly served and lack that host. Area L's
-first draft of the 2013-end section concluded "the crawl is not served" from
-exactly this error and **retracted it**; `seq 44` is the row that breaks it.
+**The 2013 end stays an absence and stays an absence.** `CC-MAIN-2013-20` and
+`-2013-48` are readable absences, the host-scope cells on `-2013-20` and
+`-2021-04` are now readable absences too (each behind its own control), and
+nothing observed contradicts them. **That discharges
+`2026-10-13-area-l-early-crawl-reissue/FINDINGS.md:107-111`** — the third time
+the same shape has been run is this time the run that promoted it.
 
-**What is missing, and why it matters.** Every negative on an early-era crawl in
-this repo is currently unreadable, and **three** of them (`CC-MAIN-2013-20`,
-`-2013-48`, `-2014-10`) are the reason the 2013 end is a hole — **seven** in total
-failed the `200`-on-that-crawl test. **`example.com` was measured absent from one
-crawl** (`CC-MAIN-2015-06`, `seq 44`), which is enough to break it as a control.
-**INFERRED: that no host can serve as a universal control** — one crawl's absence
-of one host is not a demonstration about every host in every crawl, and that step
-is not taken here. What is established is narrower and sufficient: the control
-actually used (`example.com`) does not work, so a control has to be **a host known
-to be in that specific crawl**, which is not known before the query runs. The
-corpus's own reachability is therefore unmeasured per crawl, and `docs/09` §4
-currently records only host-level reachability.
+**⚠ The standing INFERRED is unchanged and this pass makes it more load-bearing,
+not less.** That `/ipro/hcp/*` names **one** surface over time is **still not
+demonstrated**. The 2022 member is a **`.jsp`** and the 2014 members are
+**`.jsf`**; the 2020-05 member is a `.jsp` sitting on the same host as the `.jsf`
+members, so the shape does not split the family — but one path prefix across
+eight years and two server-side technologies (JSF and JSP), on a host that also
+serves the patient
+portal, is exactly what two corpora agreeing on a string does not establish.
+**Assumption:** a shared path prefix implies a shared deployment.
 
-**Blocker:** a per-crawl control that is known-covered *for that crawl*.
-Concretely unbuilt: the `cluster.idx`-level or `collinfo.json`-level check that
-would establish, for a named crawl, that its index is served at all — before
-any `minimed.eu` query is sent and before a `404` is allowed to mean anything.
+**A third distinct failure shape joins 502/504/503 on this API:** a Python **400**
+carrying `ConnectionResetError` (seq 16) *and* one carrying `RemoteDisconnected`
+(seq 38), on two different crawls, in one run. `CC-MAIN-2014-23` took **four**
+control rows across two control hosts and never produced a `200`, so its `404`
+carries no absence weight — **the cell is indeterminate, and that is the finding,
+not a gap to be written around.**
 
-**Closes when** every crawl this repo names in a negative carries a **positive
-control that returned records on that crawl**, or the negative is restated as
-indeterminate. **A negative counts** — and so does establishing that a named
-crawl is unservable, which would convert holes into a recorded fact — **seven**
-of them at the time of writing ([source: findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md
-§6]).
+**⚠ This pass retracted its own crawl-window count, and the prior pass was
+right.** Its first arithmetic compared `collinfo.json`'s dashed ISO timestamps
+against a dashless bound, and `-` (`0x2D`) sorts below `0` (`0x30`) — so **every
+2013 crawl silently dropped out of the window** and it published 87 where the
+answer is **84**, reproducing
+`2026-10-13-area-l-ipro-hcp/FINDINGS.md:313-317` exactly. The full mechanism is in
+the log's Correction section: `AGENTS.md` §6 item 3, a comparison that silently
+returns the wrong value and raises nothing. No probe, control, cell or verdict was
+affected; only the denominator moved, and it moved **toward** the prior figure.
 
-**Assumptions (INFERRED):** that no host can serve as a universal control —
-reasoned from `example.com` being absent from **one** measured crawl
-(`CC-MAIN-2015-06`, `seq 44`), not demonstrated across hosts; and that a `200` on
-any host proves the crawl is served.
-Plausible from the two `200` control rows and never tested against a crawl known
-to be served but empty, so the instrument is asserted one notch above what was
-observed.
+**Why the area closes.** Its close condition was *"the `/ipro/hcp/*` family is
+enumerated with a host and a date per member, and the `carelink.minimed.eu` anchor
+is either confirmed across the 2013 and 2022 ends or explicitly shown to be a
+single-period deployment"* — plus, in claim #126, that every cell is classified as
+record / count-absence / **failure** / indeterminate. Both hold: every member has a
+host and a date, the 2022 end is now a capture rather than an absence, and all 13
+cells are classified with failures labelled as failures. **A negative counts, and
+it counted here**: in **8 of the 9 crawls this pass read, `/ipro/hcp/` did not
+appear at all.**
 
-#### Addendum (2026-10-14, pool L #104): the seven named crawls now carry per-crawl controls
+**What closure does not mean.** This is **not** "absent from Common Crawl."
+`collinfo.json` publishes **128** crawl indexes, **84** overlap the
+2013-05-17 → 2022-05-13 window, **12** had been read by a prior area-L pass, so
+**72** were unread when this pass started; it attempted **9** and **63 remain
+unread**, one selected crawl (`CC-MAIN-2018-05`) never sent because the cap was
+reached. The claim is **"absent from every crawl this pass could read"**, and the
+hole in the broader claim stays open and stated.
 
-The blocker above is now **operationally lifted for the seven crawls named in that
-pass** — each of `CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`,
-`-2021-04`, `-2021-25` and `-2022-05` now carries a `200`-with-records positive
-control on that exact crawl (`commoncrawl.org` direct succeeded on six of
-the seven: seqs 3, 4 and 7 on first attempt; seqs 15, 16 and 17 on retry;
-CC-MAIN-2021-25's commoncrawl.org attempts at seqs 6 and 18 both returned
-504 and were covered by `google.com` seq 11 (200 / 5 records). `google.com`
-returned records on the four crawls whose commoncrawl.org first attempt
-gateway-failed (CC-MAIN-2013-20, -2013-48, -2021-04, -2021-25). The `cluster.idx`-level "is this crawl served at all"
-check remains **unbuilt** and is not claimed; the per-host controls are the substitute,
-and a gateway failure on one host is recorded as carrying no information in either
-direction (consistently with §5-C2 of the ipro pass).
+#### Successors to area L (dated, in place — this page cannot mint a letter)
 
-Concretely, the CDX accounting is now pinned for five no-limit commoncrawl.org
-queries (`CC-MAIN-2013-20` 9 records; `-2013-48` 465; `-2014-10` 37; `-2015-22`
-24; `-2022-05` 134), each corroborated complete by its own
-`Page 1 invalid: First Page is 0, Last Page is 0` (seqs 12, 13, 14, 19, 20).
+**S-L1 — the `cluster.idx`-level "is this crawl served at all" check remains
+unbuilt, and this pass gives it a second failure to work on.** The instrument that
+would turn "this crawl failed" into a statement about the crawl rather than about
+the query: for a named crawl, establish from `cluster.idx` or `collinfo.json` that
+its index is served at all, **before** any `minimed.eu` query is sent and before a
+`404` is allowed to mean anything.
+**Blocker:** none — a read of a published index, not a vendor surface.
+**Closes when** every crawl a pass names in a negative carries a served/unserved
+verdict from `cluster.idx` *as well as* from the CDX API, and a named crawl that
+cannot be read is recorded as unservable rather than left as a hole.
+`CC-MAIN-2014-23` is the named target: **four control rows, two control hosts, no
+`200`** (OBSERVED, this pass seqs 16–18, 40).
+**Assumptions (INFERRED):** that `cluster.idx` availability and CDX-API
+availability are independent signals, and that a served index with an empty result
+is distinguishable from an unserved one. Neither is demonstrated.
 
-**What does not change:** no minimed.eu probe was sent in this pass, so the
-existing readable-absence verdicts on `CC-MAIN-2013-20`, `-2013-48`, `-2021-04`
-and `-2022-05` stand exactly as recorded, now behind a control that returned
-records on that crawl.
+**S-L2 — the census is 9 crawls of 72.** Same two-cell shape (per-crawl positive
+control, then `minimed.eu` `matchType=domain`, `output=json`, **no `limit`**),
+continuing with the **63** unread in-window crawls, in dated batches, against
+`data.commoncrawl.org` only if a second lock is held. The crawl list is derived
+from `GET /collinfo.json`, never guessed, and **a budget that must survive a 38%
+failure rate means roughly 1.6 requests per crawl, not 2.**
+**Blocker:** budget, against an API that fails 28–41% of its queries.
+**Closes when** every in-window crawl carries a classified cell, or the sweep stops
+with the remainder named. **A negative (no `/ipro/hcp/` anywhere else) counts** —
+and so does a positive, which is what this pass found twice.
+**Assumptions (INFERRED):** that a `/ipro/hcp/` record in one crawl predicts
+nothing about the next; nothing here tests that, and the two 2020 crawls holding
+records with four empty crawls between them is consistent with either reading.
 
-[source: findings-log/2026-10-14-pool-l-crawlcontrol/FINDINGS.md; issue #104]
+**S-L3 — the census denominator needs a check, because this pass shipped a wrong
+one and only a re-derivation caught it.** A one-command verifier for the
+crawl-window count, run against `collinfo.json` with the comparison asserted on
+its resolved type rather than on a string's byte order — the same lesson
+`AGENTS.md` §6 item 3 records for a hash over a `None` lookup.
+**Blocker:** none, zero requests.
+**Closes when** the window count is derived by code that cannot silently drop a
+boundary year, and the count in prose names the rule it was measured under.
+**Assumptions (INFERRED):** that a reusable check is worth more here than the
+number it checks.
+
+[source: findings-log/2026-10-14-pool-l-ipro-hcp-census/FINDINGS.md]
 
 ---
 
@@ -1551,7 +1456,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 5 open plus 21 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 4 open plus 22 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -1641,6 +1546,7 @@ being superseded — never silently. Letters are not reused.
 | S6 — Common Crawl public host/path inventory, and is a domain result set complete? | 2026-10-14 | **The completeness half is answered and it is a negative: this API truncates, so a large Common Crawl record count is a LOWER BOUND whenever its byte count is an exact multiple of 1024.** ⚠ Scoped deliberately: the detector has been run over **this lane's ledger only**. Whether other passes' committed counts are floors is **unmeasured** — `docs/10` row 65 carries that as the open successor. An earlier draft of this row said "every large count in this repo", which the row it points at contradicts. The **identical** query — `CC-MAIN-2026-39-index?url=medtronic.com&matchType=domain&fl=url` — answered **5 108 records at exactly 655 360 B (640.0 KiB)** and, **18.8 min later**, **10 942 records at exactly 1 228 800 B (1200.0 KiB)**. The second is a strict superset of the first (every host the first carried, plus 22 more, each sorting earlier in SURT order than every one of the 13 still unreached). A published crawl index does not change between two queries 18.8 min apart, so **at least one was cut short**. ⚠ **but it is NOT a SURT-ordered prefix and that claim is withdrawn**: its furthest host is `www.medtronic.com` at rank 36 of 37 while **12 of the 13 unreached hosts sort before it** — under the canonical SURT key, in which the apex sorts before its subdomains; the numerals are **not** convention-invariant and `FINDINGS.md` §2 states the rule. The conclusion rests only on the byte-identical query returning different counts at two 1024 boundaries; **what produced that ordering is not established**. **Detector (OBSERVED): a record response whose byte count is an exact multiple of 1024 was truncated** — exactly 3 of the ledger's 29 successful answers sit on a whole-KiB boundary (32.0 / 640.0 / 1200.0 KiB) and all three fail to run to completion (for the 32.0 KiB cell that is INFERRED from `pages: 3`, not observed); the other 26 sit on none, and the small ones reproduce byte-for-byte (412 B, 35 226 B, 19 301 B each appear twice, identical). One arithmetic test now audits any committed CC row. **A count in THIS LANE'S OWN ledger is a floor, not a correction to the corpus:** `CC-MAIN-2022-40 / medtronic.com` = **203 records (seq 74)** was **never published** — `git grep '203 records'` at `origin/main` returns **0 hits**, area M's published figure for that cell is `blocks: 14`, and seq 74 belongs to this lane's own earlier attempt, which lands in this same PR. An earlier draft of this row called it "area M's" and "a published figure"; both were wrong and are corrected here. Only **two** re-issues (seq 149, 151) touched that cell; seq 150 re-issued a different one. All three answered **504**, so the ceiling there is **unconfirmed** and the figure stands as a floor. **Method correction to this row's own successor premise:** the field-width invariance test is **not** a truncation detector here — a *narrower* `fl` returns *fewer* records, the opposite of a ceiling; it corroborates only where the response completes (`2015-48 / medtronic.eu`: 132 records at both 19 301 B and 49 350 B, a 2.56× size spread, medium reproduced byte-for-byte). **Mechanism and bound of the ceiling: NOT established** — a proxy cap, a server emit-budget and a client read-cutoff all fit; no cause asserted. **Host inventory:** the 11 522-record `medtronic.com` set on `CC-MAIN-2026-39` (37 hosts, byte count not on a KiB boundary) carries **five host names absent from every tracked file at `origin/main`** — `synchromed2battery.` (label reads as the retired *SyncMed 2* line — **INFERRED, no repo source;** `git grep -i synchromed origin/main` is 0 hits), `e-thoth.`, `oab.`, `bakkeninvitation.`, `kappasigmasnlist.` — which are **candidates for a DNS-only pass, not assets** (counting rule: `git grep -il <name> origin/main` over **all** tracked files, not a subset of extensions — 0 files each; the wording is "absent at main", not "nowhere": at this head all five appear in **2 files each** — `FINDINGS.md` and `results.jsonl` — and **none** in this row, which uses abbreviated forms): presence in a crawl index means a crawler *encountered the name*, not that it resolves or is operated. **Path prefixes:** `/connect/` absent from `medtronic.com` on 2022-40 is **anchored** — that cell is proven non-empty (203 records, seq 74). ⚠ **This is a NEW negative, not a reproduction of area M's claim**: area M's `/patient/` + `/connect/` finding is scoped to **`minimed.eu`** ("across **every** capture recovered for `minimed.eu`"), while this sweep covered only `medtronic.eu` and `medtronic.com` and has **no `minimed.eu` cell**. Area M never enumerated a path on either `medtronic.*` host either — its only record-form queries there are `limit=5` controls. The two pass over different hosts, so this reproduces **none** of area M's cells. The second `/connect/` absence, `medtronic.com` on 2013-48, is **UNANCHORED**; an earlier draft of this row called it anchored on the 112 records of seq 65, which is `medtronic.eu`, not `medtronic.com`. `/ipro/` and `/hcp/` absent from `medtronic.eu` on 2013-48 are anchored, on seq 65. **25 of 30 path-prefix cells answered 502/504 and are unmeasured, not negative**. Three of the five answers are **anchored** (a record-form query on the same cell returned 200). Two are **UNANCHORED** and must not be cited as absences: `2026-39 / medtronic.eu` `/oauth2/` (seq 118) and `2013-48 / medtronic.com` `/connect/` (seq 139) — for the latter the only domain query on that cell is seq 66, which answered 504. Sequences 65 and 66 are the whole of this lane's coverage of **those two cells** — one per host group, not two on `medtronic.com`. **151 of a 400 cap**, GET only, **zero requests to any Medtronic host**, controls first and all three passed (covered host → 5 records, RFC 2606 `.invalid` → 404 true zero), measured same-host floor **2.941 s** (`t_sent`) / **3.123 s** (kernel body-mtime oracle — **not re-derivable from a clean clone**: git does not preserve mtimes and the raw bodies live outside the repository; the `t_sent` figure is the one that reproduces from `results.jsonl` alone), 0 of 74 gaps under 2.5 s, no overlap, **`curl_exit` was hardcoded to 0 on all 151 rows and is not a measurement** — see `FINDINGS.md` §7. **Disclosed defects in the earlier attempt on this claim:** **30 requests wasted** on `\&`-escaped ampersands (all 30 answered 400 `{"message":"output=json\ not supported"}`) and **5 rows recording `t_done` before `t_sent`**, cause not established; both are confined to seq ≤ 28 and this pass's own 75 rows are clean on every check. **No `regression/hurl/` pin** — the suites are vendor surfaces and `AGENTS.md` §11 bars one research pass from widening the gate's budget; the rot-prone half is the whole-KiB test, which is pure arithmetic over a committed ledger | [findings-log/2026-10-14-lane-s6-public-index/FINDINGS.md] | #95 |
 | E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
 | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** for the `X.Y` forms the discovery axis has been probed at, the two constraints **intersect in exactly `{3.7, 3.8}`** (`3.7.0`/`3.8.0` clear the body gate but are **unobserved** on the discovery path — no `X.Y.Z` cell was ever probed), and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 requests against a cap of 20** — the overrun is **one** request, because `probe-followup.sh` sets `SEQ=18` rather than reading the ledger and was run twice, re-issuing request 19; **no ledger row was deleted to hide it**. **The cap was restated to 21 by owner authorisation on 2026-10-13, after the pass**, so the log's accounting line reads `21 of a 21 cap` with the declared 20 kept readable in its `## Correction (2026-10-13)`. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
+| L — recovery of the retired `ipro/hcp` JSF surface, and the census under it | 2026-10-15 | **Positive twice, negative seven times, and the 2022 end is now a capture rather than an absence — which refutes the "bounded 2020 deployment" reading this area carried.** **40 of a 40 cap**, GET only, **`index.commoncrawl.org` alone, zero requests to any Medtronic host**, ≥ 3.5 s inside `flock`, measured `t_sent` floor **4.272 s** over 39 gaps (0 under 3.5 s, 0 under the `>=2 s` floor, 0 negative durations; kernel-mtime oracle 4.035 s). **13 crawls, every cell classified** under the counting rule — a cell reads as an absence only if some row for that crawl answered `200`, and a failure is labelled a failure: **9 records / 3 readable absences / 1 indeterminate**, with **15 of 40 rows failures** (502 ×10, 504 ×3, 400 ×2 — 38%) and **12 retries, each a request and each with a row**. **New:** `CC-MAIN-2014-15` holds **four** `/ipro/hcp/login.jsf` captures, all April 2014, all **200** (2014-04-17 / 04-23 / 04-24 ×2) — the densest cell in the corpus and the only one with repeated captures of one path on one crawl; `CC-MAIN-2022-27` holds `/ipro/hcp/index.jsp` @ **2022-07-03** **200**, **past** the 2022-05-13 archive end and past `CC-MAIN-2022-21` (window 2022-05-16 → 2022-05-29), the crawl the old reading rested on. **The disputed `CC-MAIN-2022-05` cell is settled:** control 504 → **200 / 5 records** → `minimed.eu` **404** immediately after, in one pass — a readable absence; **both prior readings stand unretracted** (the 7crawl Correction records that *its own* re-issued controls 504'd; #104 ran a control but sent no probe). Host-scope cells on `-2013-20` and `-2021-04` promoted to readable absences, discharging `early-crawl-reissue:107-111`. **The negative:** in **8 of the 9** crawls read, `/ipro/hcp/` did not appear at all. **`CC-MAIN-2014-23` is indeterminate** — four control rows, two control hosts, no `200` — and a third failure shape joins 502/504/503: a Python `400` carrying `ConnectionResetError` **and** one carrying `RemoteDisconnected`. **⚠ This pass retracted its own denominator:** comparing dashed ISO timestamps against a dashless bound dropped every 2013 crawl (`-` `0x2D` < `0` `0x30`), publishing 87 where the answer is **84**, reproducing `area-l-ipro-hcp:313-317` exactly — `AGENTS.md` §6 item 3, caught only by re-derivation; no probe, cell or verdict was affected. **Not claimed:** "absent from Common Crawl" — **63 of the 84** in-window crawls remain unread. Successors S-L1 (`cluster.idx` served-ness), S-L2 (the remaining census) and S-L3 (a denominator check) are dated addenda above | [findings-log/2026-10-14-pool-l-ipro-hcp-census/FINDINGS.md] | #126 |
 | P — recover the request schema from the vendor's own app, statically | 2026-10-13 | **Partial positive, asks (a) and (b); documented negative on the validation-config field set.** Static pass over the hash-pinned patient bundle `0fb4fbd4…` (3,417,255 B), both portal bundles (`2a7fa8e7…` / `a054555a…`) and its 211 lazy chunks, **0 requests**: (a) per-entry logbook submission payload recovered in lazy chunk `k-9799-ae484032a07c9d4f-js.b` — `entryTs`, `type`, `id`, `comment`, `sensorInsertionInfo { sensorLocation, otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation, otherSensorLocation, removalType, removalReason, removalDescription }`, plus `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, dynamic `attributes`; **casing correction `timecapUnscrewed` → `timeCapUnscrewed`**, and `sensorInsertionLocation` is a form-control, serialized as `sensorInsertionInfo.sensorLocation`. (b) `deviceFamily` routing-discriminator casing = client enum `{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }` (bundle module 45559 / byte 1,723,245, compared at byte 2,964,121) — candidates for area R, still client-side. (c) **negative**: `system.logbook.entry.validation.config` occurs only as a route literal (offsets 2,768,979 / 2,769,017) and once in the patient config-key registry (`D.logbookConfiguration`, offset 2,190,314; selector `yt` at 96,883), with no field set. `alarmCode` occurs 0 times in patient + portals + 211 chunks. Compensating: NGP `lastAlarm.code` is a **number** on the wire (chunk byte 76,314 / 87,560), settling the shape half of `docs/10` row 39. Prior negative `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md` preserved as pass 1 | [findings-log/2026-10-13-area-p-static-schema/FINDINGS.md] | #80 |
 ---
 

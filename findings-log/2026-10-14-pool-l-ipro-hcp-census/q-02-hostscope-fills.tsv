@@ -1,0 +1,4 @@
+control	CTRL-2013-20	/CC-MAIN-2013-20-index?url=google.com&output=json&matchType=domain&limit=5	ctrl-2013-20-google
+probe-host	IPRO-2013-20	/CC-MAIN-2013-20-index?url=carelink.minimed.eu&output=json&matchType=host	host-2013-20
+control	CTRL-2021-04	/CC-MAIN-2021-04-index?url=google.com&output=json&matchType=domain&limit=5	ctrl-2021-04-google
+probe-host	IPRO-2021-04	/CC-MAIN-2021-04-index?url=carelink.minimed.eu&output=json&matchType=host	host-2021-04
