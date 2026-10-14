@@ -1253,9 +1253,19 @@ own `f.u` and diffed **by hash**; the `2076 === e ? "common" : e` special case w
 read out of the source, and a control confirmed the id-form 404s — docs/09 trap 3
 satisfied rather than assumed.
 
-**`system.logbook.entry.validation.config` is RECOVERED — area P's negative is
-refuted for this build.** The route constant is in the eager main bundle, but the
-**call site is in lazy chunk `9481.6977c1a7bd7461f8`** (module 79481):
+**`system.logbook.entry.validation.config` is RECOVERED — which COMPLETES area P's
+negative rather than refuting it.** Area P scoped its claim to *"the reproducible,
+hash-verifiable web corpus"* and stated the route literal is followed *"by the
+next module; there is no adjacent field definition"*. Both halves hold: `C40` has
+**zero property reads** in the eager bundle (0 of 6 logbook constants do; 111 of
+188 routes do). P was **right about what it searched**; its corpus was incomplete.
+Per the same rule area Z's measurement was kept after a sweep narrowed it — *a
+measurement and the inference drawn from it are separate artefacts* — the correct
+label here is **completion**, and the earlier "refuted" wording in this addendum
+and in the commit subject is withdrawn.
+
+The route constant is in the eager main bundle, but the **call site is in lazy
+chunk `9481.6977c1a7bd7461f8`** (module 79481):
 `getLogBookConfig(){return this.http.get($.C40).pipe(catchError(()=>of({})))}`
 (byte 6,673), stored verbatim as `logbookConfiguration` (byte 15,295) and read
 **36 times** as `selectedEntryConfiguration`. The document is an object **keyed by
@@ -1290,11 +1300,18 @@ ids share a content hash**. Arithmetic stated and checked: patient
 `2+3+0+0+0=5`.
 
 **Disclosed rather than smoothed:** on the `t_sent` series, **30 gaps fall under
-the declared 2.5 s and 5 under the repo's 2.0 s floor** (min 1.766 s), while the
-kernel body-mtime series shows **0 under either** (min 2.635 s). The two disagree,
-which is the docs/09 trap-13 harness-`date` artefact; **no cause is asserted** and
-the mtime figure is **not re-derivable from a clean clone** (git does not preserve
-mtimes). Gaps are named by seq pair in the log.
+the declared 2.5 s and 5 under the repo's 2.0 s floor** (min 1.766 s). A kernel
+body-mtime series was recorded alongside and shows 0 under either — **and it
+cannot settle the question**, because `mtime_gap == t_sent_gap + Δlatency` with
+Δlatency swinging by up to 0.895 s, which is larger than the margin under test;
+in all five sub-floor cases a +0.65…+0.90 s latency swing is precisely what lifts
+the mtime gap above 2.6 s. **Both series are reported and neither is the
+authority; no cause is asserted.** `body_mtime_ns` also sits a constant
+**3600.000 s** ahead of `t_sent` on a self-consistent clock, whose provenance is
+**unexplained** — the offset cancels in gaps, so the figures stand, but it is not
+accounted for. **The mtime figures ARE re-derivable from a clean clone**, because
+`results.jsonl` commits `body_mtime_ns` for all 231 rows; an earlier draft of this
+addendum said otherwise and was wrong. Gaps are named by seq pair in the log.
 
 **Three instrument defects the pass found in itself**, recorded because a check
 that cannot fail is not evidence: a literal detector whose quote-parity flipped
@@ -1304,18 +1321,48 @@ zero patterns, and printed `PASS`** — now exits non-zero below five parsed
 patterns. It also confirms a known-published vendor API key compiled into the
 bundle at main byte 3,323,593 is **not** reproduced in any artefact.
 
-**A route-delta negative.** Across the corpus the set of `hcp/*` route literals is
-**168 shared with the eager main bundle, 1 chunk-only
-(`hcp/sso/auth/otc/send`), 0 main-only** — and that one is already recorded at
-`docs/07` line 47, which attributes it to a lazy chunk. So `docs/07` line 46
-("all API definitions live in the eager main bundle") **holds**, with the single
-exception the same page already names.
+**A route-delta negative — and a correction to an earlier draft of this very
+addendum.** Counting rule: a route literal is a `hcp/…` or `/hcp/…` string
+appearing inside a quoted span, extracted with a **parity-free** anchor
+(`"([^"]*hcp/[^"]*)"`) rather than a raw `grep` over raw bytes, because a raw
+grep flips quote-parity after the first escaped quote (docs/09 §5 false-hit
+class; the same defect is recorded in this pass's own `FINDINGS.md` §5.1).
+Set difference is computed under `LC_ALL=C sort -u` — an unsorted `comm` warns
+and returns a wrong answer without failing.
+
+| set | count |
+|---|---|
+| distinct `hcp/` literals in the **eager main bundle** | **184** |
+| distinct `hcp/` literals across all **225 lazy chunks** | **3** |
+| **shared** | **0** |
+| **chunk-only** | **3** — `hcp/countries/dialCodes`, `hcp/patients/checkPhoneNumber`, `/hcp/sso/auth/otc/send` |
+| **main-only** | **184** |
+
+**⚠ This addendum's first draft published "168 shared, 1 chunk-only, 0
+main-only". That was wrong in all three figures, and the reason matters more
+than the numbers.** It was measured while the sweep was **mid-flight at 115 of
+231 cells**, over a corpus directory that was still being written to. Reporting a
+set difference computed over a partially-fetched corpus is `AGENTS.md` §6 item 7
+— a count generalised from a subset — and the direction of the error is the
+dangerous one: a partial corpus makes the chunk side look *richer* than it is,
+because routes not yet fetched cannot be counted as missing. The verifier caught
+it; the correction is kept visible rather than smoothed over.
+
+The substantive conclusion is **unchanged and stronger**: the lazy chunks carry
+essentially no route literals of their own. They route through the constant table
+in the main bundle — which is the same mechanism behind §4c's 220-unresolved
+figure, and the reason the endpoint differential is not reportable. The three
+chunk-only literals are not new endpoints: `docs/07` line 47 already attributes
+`/hcp/sso/auth/otc/send` to a lazy chunk, and lines 47–48 name the other two as
+new literals the chunks contributed.
 
 #### Successor to area K — do the 15 `hcp/configuration/public/*` keys answer?
 
 **Derived from what this pass saw.** The client's own route table carries **15**
-keys under `hcp/configuration/public/` (main bundle, module 97298, offsets
-2761878–2769023), and **`docs/07` publishes no per-key verdict for any of them** —
+keys under `hcp/configuration/public/` (eager main bundle, **module 66703** —
+which begins at byte 2,759,689 and owns the export map for these constants;
+offsets 2,761,878–2,769,023), and **`docs/07` publishes no per-key verdict for
+any of them** —
 it publishes the oracle (line 180) and one worked control pair, not which keys
 exist. So "the client calls these" is OBSERVED while "these answer" is unmeasured.
 

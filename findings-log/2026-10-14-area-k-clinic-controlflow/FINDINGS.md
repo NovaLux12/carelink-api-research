@@ -3,7 +3,7 @@
 **Date:** 2026-10-14 · **Claim issue:** #121 · **Host probed:** `carelinkhp.minimed.eu` (clinic portal, one host only)
 **Probe mode:** read-only GET. No POST, no token exchange, no auth header, no cookie, no port scan, no DNS brute force, no wordlist.
 **Scheduling:** exclusive host lock `.loop/host-carelinkhp.minimed.eu.lock`; `sleep 2.5` held **inside** the lock before every request; `TS_SENT` emitted inside the lock immediately before `curl` execs.
-**Byte-offset convention:** 0-indexed, start-inclusive, pointing at the start of the token or statement named (S4 §2's convention, reused so the two passes' offsets mean the same thing).
+**Byte-offset convention:** 0-indexed, start-inclusive. ⚠ **Corrected 2026-10-14 after independent verification:** an earlier version of this line claimed every offset points "at the start of the token or statement named". Several do not — e.g. `getLogBookConfig` is cited at 6,673 but begins at 6,756 (+83), and `getUrlWithPatientId` is cited at 6,657 but is defined at 6,678 (+21); seven more drift −33…−40. The offsets are reproducible and were each re-checked at the byte by the verifier against the hash-pinned body, so the findings stand; what was wrong is the *convention* claim, not the measurements. Offsets below are as-recorded, and a reader re-deriving one should expect a small negative or positive drift rather than an exact start.
 
 Every figure below is re-derivable from the artefacts in this directory. Where a number is quoted from another pass it is quoted from that pass's **committed counter file**, never from the prose that summarises it — the error S4 §7.1 records.
 
@@ -103,7 +103,7 @@ Response bodies were written to a scratch directory **outside the repository** a
 
 ## 2. The primary target: `system.logbook.entry.validation.config`
 
-**This is the pass's main result, and it is POSITIVE. Area P's recorded negative is refuted for the clinic build.**
+**This is the pass's main result, and it is POSITIVE. It COMPLETES area P's recorded negative for the clinic build; it does not refute it. Area P scoped its claim to "the reproducible, hash-verifiable web corpus" and stated the route literal is "followed by the next module; there is no adjacent field definition" — both hold, and the consumer is in a different file (see §5 and the barrel-hop note). P was correct about what it searched; its corpus was incomplete. The word "refuted" used earlier in this pass, in the commit subject and in the `docs/11` addendum, is withdrawn: a measurement and the inference drawn from it are separate artefacts, which is the rule area Z's measurement was kept under after a later sweep narrowed it.**
 
 Area P recorded that the clinic and support bundles each contain the route literal only — `"hcp/configuration/public/system.logbook.entry.validation.config"` at offsets 2,768,979 / 2,769,017 — with no adjacent field definition, validator or default. That measurement was taken on the **eager main bundle**. The clinic build is a different webpack build and it puts the *consumer* in a lazy chunk.
 
@@ -298,7 +298,7 @@ The logbook entry is inserted **only when `we` is truthy**, immediately before t
 
 ### 3i. How the clinic build addresses its routes — OBSERVED
 
-Eager main bundle, module 66703 (the route table): **180 `hcp/`-prefixed route literals**; **21** carry a `((param))` template; **exactly 1** carries a query string (`hcp/configuration/public/user-identifier-settings?countryCode=((countryCode))`). Substitution is a single `String.replace` per call site — 15 such sites, offsets 2,405,549 and 3,016,707–3,188,583 — so a route carrying two `((…))` markers would only get its first replaced. All four `/logbook/entries*` routes carry `((patientId))`, and chunk 9481's helper at offset 6,657 does the same substitution.
+Eager main bundle, module 66703 (the route table): **180 `hcp/`-prefixed route literals**; **20 distinct** carry a `((param))` template across **23 occurrences** (corrected 2026-10-14 after independent verification — an earlier "21" counted occurrences under a rule that was never stated, `AGENTS.md` §6 item 7); **exactly 1** carries a query string (`hcp/configuration/public/user-identifier-settings?countryCode=((countryCode))`). Substitution is a single `String.replace` per call site — 15 such sites, offsets 2,405,549 and 3,016,707–3,188,583 — so a route carrying two `((…))` markers would only get its first replaced. The **three** `/logbook/entries*` routes (`entries`, `entries/filled`, `entries/last`) carry `((patientId))` — corrected from "all four", which miscounted a fourth route that carries no such marker — and chunk 9481's helper at offset 6,657 does the same substitution.
 
 This is the mechanism behind §3 of the cross-client differential: **the clinic client resolves every route through an exported-constant table; the patient client inlines literals.**
 
@@ -403,6 +403,56 @@ Recorded because each is the class `AGENTS.md` §6 item 2 describes, and each wa
 1. **A literal detector that inverted every label after the first escape.** `mine.py`'s first implementation scanned global `"…"` spans. It reported 4 of the bundle's known route literals as bare code and labelled a 4-character run `,jn=` as a literal — somewhere upstream one quote was consumed as a *closing* quote where it opened a literal, flipping the parity of every subsequent span, and **nothing reported the flip**: the spans simply became the gaps. Caught by `mine.py self-test`, which was written before the answers were believed. Fixed by a local-evidence label that needs no parity (if the nearest preceding unescaped quote is a closer, no literal can contain the hit). The dead implementation is left in place as `_quote_spans()` with a docstring saying why not to reinstate it. `self-test` now passes **6 of 6**: two synthetic positives and two synthetic negatives (provable by construction, so a detector that labels everything "literal" cannot pass), two real-bundle positives, one absent-token negative.
 2. **A scrub check that read no patterns and printed PASS.** `scrub-check.sh` resolved the repo root one level too high, found no `scrub-patterns.txt`, iterated zero patterns, and printed `scrub-check: PASS`. A dead net reporting clean. Fixed, and the script now **exits non-zero if the pattern file is unreadable or fewer than five patterns parse**, because the previous version had a note about this class and the note was not the fix.
 3. **The uppercase-extension control read as a chunk.** C6's row is the one an automated reader would mistake for a swept cell. It carries `id: null` and a `C6-` role, and `crosscheck.py` counts only `SWEEP-` rows as swept — but the distinction is stated here too, because a reviewer should not have to derive it.
+
+---
+
+## 5a. Correction (2026-10-14) — first independent verification round
+
+A fresh-context verifier reviewed this pass at SHA `031023a` and returned **NOT
+CLEAN**. Its substantive findings were accepted and corrected here; this section
+records them because the retraction history is the evidence (§3).
+
+**Accepted and corrected:**
+
+1. **The route-delta figure was false.** An earlier draft of the `docs/11`
+   addendum published "168 shared, 1 chunk-only, 0 main-only". Measured on the
+   **complete** corpus the correct set difference is **0 shared, 3 chunk-only, 184
+   main-only**. Cause: the figure was computed while the sweep was mid-flight at
+   **115 of 231 cells**, over a directory still being written to. A partial
+   corpus inflates the "shared" figure, because routes not yet fetched cannot be
+   counted as absent. This is `AGENTS.md` §6 item 7 — a count generalised from a
+   subset — and the error ran in the dangerous direction.
+2. **"Refuted" → "completes".** See §2 and the withdrawal at the head of this
+   document. Area P was correct for what it searched.
+3. **The mtime series is not the spacing authority.** `probe.sh`'s comment claimed
+   it was. `mtime_gap == t_sent_gap + Δlatency` with Δlatency up to 0.895 s — larger
+   than the margin under test — so it cannot exonerate a short `t_sent` gap. The
+   comment is corrected in place and both series are now reported with neither
+   elevated to authority.
+4. **`body_mtime_ns` carries an unexplained constant 3600.000 s offset** from
+   `t_sent` on a self-consistent clock. Provenance not established; the offset
+   cancels in gaps so the reported figures stand, but it is not accounted for.
+5. **Offset convention overstated** — see the corrected convention at the head.
+   The measurements themselves were re-verified at the byte against the
+   hash-pinned body and stand.
+6. **"21 templates" → 20 distinct / 23 occurrences**; **"four logbook routes" →
+   three.** Both re-derived on the corpus.
+7. **A citation naming the wrong module.** The `docs/11` successor attributed
+   offsets 2,761,878–2,769,023 to module 97298; they are in **module 66703**
+   (which begins at byte 2,759,689). Fixed. A citation that resolves but says
+   something else is worse than a broken one.
+8. **"Not re-derivable from a clean clone" was wrong** for the mtime series —
+   `results.jsonl` commits `body_mtime_ns` for all 231 rows and the verifier
+   re-derived it with zero requests.
+9. **The `corpus/full` set is 228 files = 225 chunks + main + runtime + one HTML
+   SPA shell.** The SPA shell is deliberate (the analogue of S4's 404 page) but
+   §4c's table quotes the file count without the composition. Noted rather than
+   changed, since the shell can only add false hits.
+
+**Disputed and declined:** the verifier proposed that `docs/06`'s OpenAPI negative
+be re-examined. That is a **separate area with its own claim lifecycle** and is
+filed as a successor in `docs/11`, not actioned here — §11 permits a pass to
+propose, not to spend another area's budget.
 
 ---
 
