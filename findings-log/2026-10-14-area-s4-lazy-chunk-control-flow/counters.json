@@ -1,0 +1,26 @@
+{
+  "by_method": {
+    "delete": 9,
+    "get": 72,
+    "patch": 0,
+    "post": 49,
+    "put": 14
+  },
+  "by_method_sum": 144,
+  "corpus_bytes": 6300855,
+  "corpus_manifest_sha256": "3f0830115d428e023fe2362118e4c4a6d385329fd4ffbd927e8de3886869ed87",
+  "distinct_pairs": 144,
+  "http_call_sites_total": 232,
+  "n_chunk_files": 215,
+  "pairs_with_interpolation": 44,
+  "pairs_without_interpolation": 100,
+  "sites_with_literal_path": 155,
+  "sites_with_resolved_variable_path": 20,
+  "sites_with_unresolved_variable_path": 57,
+  "unresolved_by_method": {
+    "delete": 1,
+    "get": 31,
+    "post": 21,
+    "put": 4
+  }
+}

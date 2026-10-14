@@ -917,7 +917,45 @@ assumption area Q applied; a maintainer could reasonably define it more strictly
 the one confirmed instance (`CarlosJPV`'s table in his README and in his own PR
 comment) would fail under any definition strict enough to matter.
 
----
+#### Addendum (2026-10-14, from area S4): the patient corpus mined for control flow — and the negative it retracts
+
+**Area K is NOT closed.** The clinic half of K remains untouched. This answers only the
+patient side, and the headline is a retraction rather than a closure. **0 requests**, all
+local substring analysis over the 211 retained patient chunk bodies plus main, runtime,
+one `id`→name variant, and one 196-byte HTTP 404 control body.
+
+**The prediction this area made was right, and the negative it inherited was wrong.**
+Area P had recorded that no `markers` wire property exists in the patient corpus. The
+client does read one: `n.unfilteredEventMarkers = i.markers`, from which it reads
+`index`, `type`, `value` and `deliverySuspended`, and dispatches on an **11-token** enum
+in which **9** tokens are handled. Worse for anyone pinning a vocabulary, the two
+rendering branches **disagree on the spelling of a glucose reading** — BLE matches
+`BG_READING`, non-BLE matches `BG` — so a consumer matching one spelling silently drops
+the other. `docs/10` row 46 is updated accordingly and stays open, because this is the
+periodic connect-data surface, not the logbook-entries endpoint that row is blocked on.
+
+**Three further corrections, all from re-measurement rather than from a new probe:**
+
+1. **`deviceFamily` and `medicalDeviceFamily` are one axis.** `parseJsonData` assigns
+   `n.deviceFamily = i.medicalDeviceFamily`, so the "two independent sources agree on the
+   casing" argument over-counts its own evidence. `NGP` is also a `deviceFamily` value
+   the vocabulary table omits. Corrected in `docs/05`.
+2. **`timecapUnscrewed` vs `timeCapUnscrewed`** are both correct and were being conflated:
+   the lowercase form is a **form-control** name (42 corpus occurrences), the capital-C
+   form is the **wire** field (5). The casing correction stands; the reasoning behind it
+   did not.
+3. **The endpoint inventory needed a counting rule before it needed a number.** Two
+   earlier figures (141, 146) for this same corpus were each internally inconsistent —
+   their per-method parts did not sum to their stated totals. Measured under a rule with
+   four stated decisions: **144 shapes** (72 GET / 49 POST / 14 PUT / 9 DELETE / 0 PATCH).
+   The rule **reproduces 17 of the 19** `/patient/csr` shapes `docs/06` published
+   independently, which is why it is trusted rather than merely asserted; the remaining
+   difference is recorded in `docs/06`.
+
+**Closes when:** unchanged from the parent area — the clinic 224 are still unmined for
+control flow, so K stays open on that half regardless of what this addendum settles.
+
+
 
 ## Tier 3 — digging further for its own sake
 
