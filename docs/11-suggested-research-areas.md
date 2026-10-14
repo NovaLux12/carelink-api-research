@@ -861,7 +861,17 @@ is not stable across builds, so deviceFamily wire strings are candidates, not
 confirmed live values.
 
 
-### R. Reconcile the `deviceFamily` correction against the client consensus
+### R (closed 2026-10-14) Reconcile the `deviceFamily` correction against the client consensus
+
+> **CLOSED 2026-10-14 — on the area's second close condition, and the close is a
+> negative.** Issue [#124](https://github.com/NovaLux12/carelink-api-research/issues/124),
+> **0 requests of a 0 cap**, ledger committed
+> ([findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md]). The value's
+> casing stays **unobserved**, `docs/05` now records that with the reason, and the
+> candidate set it will be matched against is reconciled under a counting rule.
+> Verdict, evidence and closing issue: the Closed table below. The original area
+> text is kept, unedited, under this heading; where the pass corrected it, the
+> correction is in the row, not silently absorbed into the area.
 
 **Added 2026-10-11.** `docs/05` is corrected — `deviceFamily` **is** an API field on
 `/patient/monitor/data`, agreed by three independent clients at named commits. What
@@ -908,6 +918,52 @@ token) counts.
 
 **Assumptions (INFERRED):** that the routing field and reported-family field
 stay distinct; that table strings are the wire vocabulary.
+
+> ⚠ **The first of those two assumptions is REFUTED** (area S4, and area R's own
+> audit). The routing field and the reported-family field are **one axis** — the
+> patient client assigns `n.deviceFamily = i.medicalDeviceFamily` — so a fourth
+> match axis is needed ahead of G's three: the **client's own comparison set**
+> (`BLE`, `BLE_X`, `SIMPLERA`, `SIMPLERA_X`, `GUARDIAN`, `NGP`). A future
+> response matching **none of the four** is itself the finding.
+> [findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md] §6
+
+#### Addendum (2026-10-14, from area R, issue #124): two successors, because R closes on a negative and a negative leaves work
+
+Attached to closed area R rather than opened under a new letter — every letter
+A–Z is in use, and a two-letter heading is invisible to this page's own count
+(**Why there is no area AA**, below). **0 requests of a 0 cap**;
+[findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md].
+
+**1. The read-side echo casing of the recovered logbook keys.** Area P and area S4
+recovered the **write** payload verbatim, and S4 settled `timeCapUnscrewed` as the
+wire form against the form-control name `timecapUnscrewed`. Nothing establishes
+that the **read** response echoes any of these keys, and S4 explicitly flags the
+submission shape as *not* shown to be the `logbook/entries` response shape.
+
+- **Blocker:** a clinician token. `GET hcp/patients/{patientId}/logbook/entries` is
+  patient-scoped and is deliberately not requested by this project.
+- **Closes when:** one such response is read with key-names-only logging, **or** a
+  note records that read-side casing is unobtainable under this project's
+  constraints. **A negative counts.**
+- **Assumptions (INFERRED):** that the read path echoes the write schema rather
+  than a divergent one — **nothing on disk shows either.**
+
+**2. Whether the `_*` suffixes (`BLE_X`, `SIMPLERA_X`) are a transport axis, a
+model axis, or a build discriminator.** The enum declares four `_X`-suffixed
+variants and **no committed artefact reads the suffix** — it is declared, never
+consumed. A declared-but-unread enum member is exactly the shape that rots
+quietly, because the declaration looks like a specification.
+
+- **Blocker:** a client artefact that **branches** on the suffix rather than only
+  declaring it. None is on disk; the patient bundle and its lazy chunks were
+  swept (area K, 211 chunks) and the enum is module `45559` of the **main**
+  bundle.
+- **Closes when:** one call site is found that branches on the suffix, or a note
+  records the suffix as undocumented-and-unused. **A negative counts.**
+- **Assumptions (INFERRED):** that the suffix carries semantics rather than being
+  a build or A/B discriminator — the repo holds **no** evidence either way, and
+  the client's own matcher is a `startsWith` prefix test, which is consistent
+  with both readings.
 
 ### S. Two more evidence classes for third-party source material
 
@@ -1551,7 +1607,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 5 open plus 21 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 4 open plus 22 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -1642,6 +1698,8 @@ being superseded — never silently. Letters are not reused.
 | E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
 | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** for the `X.Y` forms the discovery axis has been probed at, the two constraints **intersect in exactly `{3.7, 3.8}`** (`3.7.0`/`3.8.0` clear the body gate but are **unobserved** on the discovery path — no `X.Y.Z` cell was ever probed), and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 requests against a cap of 20** — the overrun is **one** request, because `probe-followup.sh` sets `SEQ=18` rather than reading the ledger and was run twice, re-issuing request 19; **no ledger row was deleted to hide it**. **The cap was restated to 21 by owner authorisation on 2026-10-13, after the pass**, so the log's accounting line reads `21 of a 21 cap` with the declared 20 kept readable in its `## Correction (2026-10-13)`. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
 | P — recover the request schema from the vendor's own app, statically | 2026-10-13 | **Partial positive, asks (a) and (b); documented negative on the validation-config field set.** Static pass over the hash-pinned patient bundle `0fb4fbd4…` (3,417,255 B), both portal bundles (`2a7fa8e7…` / `a054555a…`) and its 211 lazy chunks, **0 requests**: (a) per-entry logbook submission payload recovered in lazy chunk `k-9799-ae484032a07c9d4f-js.b` — `entryTs`, `type`, `id`, `comment`, `sensorInsertionInfo { sensorLocation, otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation, otherSensorLocation, removalType, removalReason, removalDescription }`, plus `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, dynamic `attributes`; **casing correction `timecapUnscrewed` → `timeCapUnscrewed`**, and `sensorInsertionLocation` is a form-control, serialized as `sensorInsertionInfo.sensorLocation`. (b) `deviceFamily` routing-discriminator casing = client enum `{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }` (bundle module 45559 / byte 1,723,245, compared at byte 2,964,121) — candidates for area R, still client-side. (c) **negative**: `system.logbook.entry.validation.config` occurs only as a route literal (offsets 2,768,979 / 2,769,017) and once in the patient config-key registry (`D.logbookConfiguration`, offset 2,190,314; selector `yt` at 96,883), with no field set. `alarmCode` occurs 0 times in patient + portals + 211 chunks. Compensating: NGP `lastAlarm.code` is a **number** on the wire (chunk byte 76,314 / 87,560), settling the shape half of `docs/10` row 39. Prior negative `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md` preserved as pass 1 | [findings-log/2026-10-13-area-p-static-schema/FINDINGS.md] | #80 |
+| R — reconcile the `deviceFamily` correction against the client consensus | 2026-10-14 | **Negative, on the area's second close condition: the value's casing stays UNOBSERVED, and `docs/05` now says so with the reason.** **0 requests of a 0 cap** — no vendor host was touched and no request of any kind was made, because a zero-request pass cannot have an oracle and this one did not manufacture one. Three findings, and the second is the one that mattered: (1) **The reconciled candidate set is 21 strings under a counting rule stated before the number** (three admitted sources hold 27 between them; the 6-string difference is shared tokens, and the sum is printed beside the union so it cannot be mistaken for it). Every member is *extracted from a committed artefact at a named `file:line`*, so the denominator is re-derivable from a clean clone and an anchor that stops resolving exits non-zero. (2) **One of the three candidate vocabularies the area inherited fails the provenance bar the pass sets for itself** — `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `APP-EMULATION-RESEARCH.md:384-385`, which attributes it to "xDrip's message classes" with **no `file:line` and no named commit**, so `CGM` and `CC` are **not admitted** and the union is **21, not 23**; the repair is one cite, since the 2026-10-11 pass read xDrip at `366c97a8`. (3) **The three vocabularies are not one vocabulary with disagreements** — the 16 map tokens are a *published identifier axis*, the client's 5 enum + `NGP` a *prefix-matched routing classification*, and the third-party four a *product-role DTO enum*; measured overlaps are `{SIMPLERA}`, **none**, and `{GUARDIAN}` respectively, so under the client's five `startsWith` tests `CGM`/`CC` match nothing and under the third-party four `BLE`/`SIMPLERA` match nothing (INFERRED, assumptions stated). **The audit re-counted every surviving `deviceFamily` claim against `AGENTS.md` §2.1 and one was deleted outright**: `docs/05`'s "appears as a call-site field name in the lazy-chunk corpus — independent corroboration of the field name" rested on a source that records that token as **0** across the 224 chunks in its own measure table, attributes its real evidence to a different artefact with no `file:line` and no digest, and whose 224 chunk bodies are **not committed** (independent count **0** — `AGENTS.md` §1 deletes the claim, §2.1 deletes the word). Two more re-labelled: `docs/05`'s "the vendor's bundles do not contain" is **false** (the patient lazy chunk carries `medicalDeviceFamily` at byte 83,893), and `docs/10` row 37's `(GUARDIAN, MINIMED, PARADIGM)` loses **`MINIMED`/`PARADIGM`** — their only occurrence in the repository was the one uncited line they came from, which the row was quoting back at itself — and moves from OBSERVED to **SOURCE-OBSERVED**, since no client read here is a live response. `GUARDIAN` survives, sourceable twice. **What would change the verdict:** one authenticated `GET /patient/monitor/data`, key-names-only, value verbatim, matched against four axes (client comparison set, model code, display name, 16 map tokens); **a value matching none of the four is itself the finding**. Two successors filed under the area: read-side echo casing, and whether the `_X` suffixes mean anything | [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] | #124 |
+
 ---
 
 > **Consumer note.** Findings here are consumed by

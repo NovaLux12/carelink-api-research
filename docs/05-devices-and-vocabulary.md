@@ -249,13 +249,34 @@ Decisive negatives in that bundle for the patient-side `deviceFamily` question:
 > patient-filter object — **not an API field**"*.
 >
 > **That inference is refuted.** Three independent client implementations, each
-> written against the live API and each read at a named commit, agree on a two-field
-> split that the vendor's bundles do not contain:
+> written against the live API and each read at a named commit — `nightscout/
+> nightscout-connect` @ `4dde1ec`, `NightscoutFoundation/xDrip` @ `366c97a8`
+> (tag `2026.10.10`), `CarlosJPV/carelink-cumulus-bridge` @ `0180b89`; three
+> distinct authors, three distinct repositories, none quoting another, so the
+> independent count is **3** under `AGENTS.md` §2.1 — declare two field names,
+> and agree on which name each of them reads from which payload:
 >
-> | Payload | Field | Cite |
+> | Payload (as the client reads it) | Field | Cite |
 > |---|---|---|
 > | `/patient/monitor/data` | **`deviceFamily`** — the routing discriminator | `nightscout-connect` `index.js:587`; xDrip `message/MonitorData.java:5`; `CarlosJPV` `src/types/carelink.ts:29-34` |
 > | Cumulus / ble data payload | **`medicalDeviceFamily`** — the reported family | `nightscout-connect` `index.js:179,194`; xDrip `message/RecentData.java:102`; `CarlosJPV` `src/types/carelink.ts:33` |
+>
+> ⚠ **Corrected 2026-10-14 (area R).** This cell originally read *"a two-field
+> split **that the vendor's bundles do not contain**"*. Two things about that
+> sentence no longer stand.
+>
+> 1. **The bundles clause is false.** The *clinic* bundle does not contain
+>    `medicalDeviceFamily` — that half is what `docs/05`'s own negative measured,
+>    and it stands. But the **patient** bundle's lazy chunk
+>    `k-6746-c6795ff7e9ff468d-js.b` contains it at byte **83,893**, among four
+>    sites, in a hash-pinned chunk
+>    ([findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md §6.3]).
+>    "The vendor's bundles" was too broad to be true.
+> 2. **"Two fields" was an inference, not a finding.** The vendor's own client
+>    assigns one from the other — the same correction, below — so what the three
+>    clients corroborate is that **each declares two names in its own types**, not
+>    that the wire carries two fields. Third-party source stays corroboration
+>    (`AGENTS.md` §2.1): **no live response in this repository shows either name.**
 >
 > **Why the original claim was wrong.** The corpus scan was correct *about the
 > bundles* — `deviceFamily` really does appear twice in the patient portal's own
@@ -278,6 +299,17 @@ recorded elsewhere as `GUARDIAN`/`NGP`/`CGM`/`CC` — **INFERRED**, carried forw
 earlier round and not re-derived here [source:
 findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md].
 
+**Correction (2026-10-14, area R).** That vocabulary has now been re-derived to a
+committed line — `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`,
+whose own heading attributes it to *"xDrip's message classes"* — and it names **no
+`file:line` and no named commit** for the xDrip revision it was read from, so it
+is **not usable as SOURCE-OBSERVED** (`AGENTS.md` §2.1) and its two strings this
+repository cannot otherwise account for, `CGM` and `CC`, are **not admitted** into
+the candidate set below. The repair is one cite: the 2026-10-11 pass read xDrip at
+`366c97a8` (tag `2026.10.10`), and a `file:line` at that commit admits the set. The
+same artefact notes that **none of its four tokens contains `BLE` or `SIMPLERA`**
+(`:386`), which is the disagreement the candidate set exists to record.
+
 ## NGP alarm codes — absent from every artefact held
 
 Not in the patient bundle (its three apparent matches are Samsung user-agent strings), not
@@ -295,12 +327,37 @@ human-readable names come from i18n keys `connect.ble.<code>` and no such key ex
 in the 215-chunk corpus. See
 [findings-log/2026-10-14-area-s5-ngp-alarm-vocabulary-static/FINDINGS.md].
 
-## The field name is settled; the value is not
+## The field name: reported by three clients, observed on no response
 
-`deviceFamily` appears as an HTTP **call-site field name** in the lazy-chunk corpus —
-independent corroboration of the field *name*, not its *value*. What that field's value
-looks like on the wire still needs a token [source:
-findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md].
+> ⚠ **Heading corrected 2026-10-14 (area R).** It read "The field name is
+> settled; the value is not". **"Settled" over-stated what this page can carry**:
+> three third-party clients declare the name and the vendor's own client assigns it
+> internally, but **no live response in this repository shows it**
+> (`AGENTS.md` §2.1 — third-party source stays corroboration). The value, by
+> contrast, is not merely unsettled: it is **unobserved**, which is a stronger and
+> more useful statement than "not known".
+>
+> ⚠ **Deleted 2026-10-14 (area R) — the sentence this heading carried.** It read:
+> *"`deviceFamily` appears as an HTTP **call-site field name** in the lazy-chunk
+> corpus — independent corroboration of the field *name*, not its *value*"*
+> [source: `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`].
+>
+> **Its only source disagrees with itself.** That file's measure table records
+> `deviceFamily`-style tokens across "all 224 chunks" as **0** (`:29`), while two
+> paragraphs later it places `deviceFamily` among those chunks' 89 call-site field
+> names (`:68-69`, `:89-94`). The only `deviceFamily` evidence it attributes at all
+> is to a **different artefact** — the patient portal's 3.4 MB main bundle at the
+> domain root (`:122-126`) — with **no `file:line` and no digest** for it. The
+> 224 chunk bodies are **not committed** (`git ls-files
+> findings-log/probe-2026-10-08/` returns 24 files, all markdown), so the
+> disagreement cannot be resolved offline. Both words go: the claim
+> (`AGENTS.md` §1) and the strength word with it (`AGENTS.md` §2.1 — an
+> independent count of **0**).
+>
+> **What replaces it** is the section below: the matcher enum and the four `NGP`
+> comparison sites, both OBSERVED in digest-pinned vendor artefacts at named byte
+> offsets. That is a stronger footing than the deleted sentence had, and it is
+> about the **field the vendor's own client reads**, which is the question.
 
 ## Correction — 2026-10-14 — `deviceFamily` and `medicalDeviceFamily` are one axis
 
@@ -347,6 +404,116 @@ error; it was being read as a wire field when it is a control name. Same for
 lazy chunk `k-9799-ae484032a07c9d4f-js.b`: the serialiser is the `if(this.form.valid)`
 statement at bytes 80,919–84,159, but the 42 control-name occurrences live at
 30,424–98,733, so no single window holds both halves of the distinction).
+
+## Close — 2026-10-14 (area R): the value's casing stays **unobserved**, and here is why
+
+**This is the second of area R's two close conditions, and it is a negative.**
+The first — one authenticated `monitor/data` response recording the key-name and
+its value's casing verbatim — is permanently blocked. The second is this note.
+
+**The verdict: the casing of a `deviceFamily` value is UNOBSERVED.** No artefact
+in this repository shows one on the wire. **Reason: every candidate source is
+either client-side or config-side**, and the only surface that would settle it —
+one authenticated `GET /patient/monitor/data` — is token-gated
+(`VALIDATION-RUNBOOK` Tier 1). Area R made **0 requests of a 0 cap**; it did not
+manufacture an oracle, because a zero-request pass cannot have one
+([source: findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md]).
+
+**What would change it.** Exactly one thing: one authenticated `GET
+/patient/monitor/data` response, logged **key-names-only**, with the value pasted
+**verbatim** and not paraphrased. No amount of further client archaeology closes
+it, and this section is the demonstration: area R mined every committed artefact
+this repository holds and moved the answer by zero.
+
+### The candidate set, and the counting rule that produced it
+
+**Counting rule, stated before the number** (`AGENTS.md` §6 item 7 — the failure
+this rule exists to prevent is 44 published as 93). It lives in
+`findings-log/2026-10-14-pool-r-devicefamily-casing/count-candidates.py`, and
+every member is extracted from a committed artefact at a named `file:line`, so the
+denominator is re-derivable from a clean clone:
+
+- **R-1 unit** — one candidate *value string*, exact and case-sensitive. Not a
+  model, not a device, not a display name.
+- **R-2 membership** — admitted only if a committed artefact records the string as
+  (a) a key of `personal.device.family.to.model.mapping`; (b) a member of the
+  patient bundle's `deviceFamily` matcher enum; (c) a string the patient client
+  compares that field against; or (d) a value a named third-party client declares,
+  **where that artefact carries a `file:line` at a named commit**.
+- **R-3 exclusions** — model codes and display names are the **match table**, not
+  members (counted separately); `deviceType` values are excluded *as* `deviceType`;
+  a string whose only citation is not `file:line`-at-named-commit is **not
+  counted**, and its withdrawal is printed rather than swallowed.
+- **R-4 duplicates** — a string in two sets is counted **once**; the sum is printed
+  beside the union so the difference stays visible.
+- **R-5 scoping** — the union counts client/config-side strings. **No member is
+  OBSERVED on the wire**, and this rule promotes nothing.
+
+> **Union = 21 candidate value strings.** The three admitted sources hold 27
+> strings between them, and the 6-string difference is shared tokens — `SIMPLERA`
+> in all three, and the five enum tokens re-observed by area S4. **27 is not the
+> answer.**
+>
+> | Source | n | Cite |
+> |---|---:|---|
+> | the 16 published family tokens | 16 | `findings-log/2026-10-13-area-h-report-naming/family-map-verbatim.txt:1-16` |
+> | the client matcher enum | 5 | `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md:18-19` (byte-anchored: area P, module `45559`, byte 1,723,245) |
+> | the client's comparison set, incl. `NGP` | 6 | [findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md] §6.3 |
+>
+> **One declared vocabulary is NOT admitted, and that is a finding.** The
+> third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` sits at
+> `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, which
+> attributes it to *"xDrip's message classes"* with **no `file:line` and no named
+> commit**, so it fails **R-2(d)**. Admitting it would make the union **23, not
+> 21** — the two extra strings being `CGM` and `CC`. The repair is one cite: the
+> 2026-10-11 pass read xDrip at **`366c97a8`** (tag `2026.10.10`).
+>
+> **Named withdrawals:** `MINIMED` and `PARADIGM` (the only other reported values,
+> cited once at `findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69`
+> with no `file:line` and no per-client attribution — **withdrawn from the docs,
+> see the correction on `docs/10` row 37**); `BLE_MINIMED` (cited to a PR number,
+> not a commit); `Ut.Ey.all` (a *filter* key, not a family value); and the
+> `deviceType` set `CC`/`COSMOS`/`COSMOS_WHITELISTED`/`DEVICE`.
+
+### Are these three vocabularies even the same kind of thing? — **INFERRED**
+
+**They are two kinds of thing, not one vocabulary with disagreements**
+(INFERRED; the reasoning and its assumptions are set out in full at
+[findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] §2):
+
+1. the **16 map tokens** are a *published identifier axis* — keys of a vendor
+   config mapping;
+2. the **client's 5 enum + `NGP`** are a *routing classification* the vendor's own
+   app compares against, five of them by `startsWith`, which constrains only a
+   value's leading characters;
+3. the **third-party 4** are that client's *own* product-role DTO enum.
+
+Measured overlaps: map ∩ client = `{SIMPLERA}`; map ∩ third-party = **none**;
+client ∩ third-party = `{GUARDIAN}`. Two consequences a matcher must be built
+for: under the client's five `startsWith` tests, **`CGM` and `CC` match nothing**,
+and under the third-party four, **`BLE` and `SIMPLERA` match nothing**. The
+disagreement is structural, not a spelling drift.
+
+### What a future wire value must be matched against — four ways, strongest first
+
+Area G's addendum named three (model code, display name, the patient map's 16
+family tokens). The fourth is first because it is the only one the vendor's own
+code compares:
+
+1. **the client's own comparison set** — `BLE`, `BLE_X`, `SIMPLERA`,
+   `SIMPLERA_X`, `GUARDIAN`, `NGP`. A value matching none of these would fail the
+   vendor's own routing;
+2. **the model code** — 87 codes (78 `MMT-*` + 9 `SKU-*`), whole-file census 80
+   `MMT-*`. The path that works under *either* reading of the Flex problem;
+3. **the display name** — 87 pairs, because Medtronic spells the marketing name
+   in a third shape (`SIMPLERA_SYSTEM` the enum, `"Simplera™ system"` the value);
+4. **the patient map's 16 family tokens** — the published axis, and the only set a
+   vendor document names.
+
+**Match on more than one axis and record which matched**: whichever matches names
+the casing convention, and *a value matching none of the four is itself the
+finding* — it would be a fifth vocabulary, and the one the Flex problem has been
+waiting for since 2026-10-08.
 
 ## Guidance
 

@@ -12,7 +12,7 @@ contact_links:
     # letters are F R S K L.
     # research-checks.py counts ^### [A-Z]. headings in docs/11 and is the arbiter;
     # on the merged page it reads F R S K L.
-    about: 5 open areas, each with a stated blocker and a definition of done.
+    about: 4 open areas, each with a stated blocker and a definition of done.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
     about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.
