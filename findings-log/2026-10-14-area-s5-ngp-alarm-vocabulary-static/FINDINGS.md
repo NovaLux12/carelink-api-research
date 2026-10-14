@@ -200,16 +200,39 @@ pin.
    on a gated pump the source emits `connect.ble.062`, while those bullets record
    the flattened `null`. Comparison basis: the §2 prose rendering against the source
    object over all **137** inputs, gated and ungated — **136 of 137 identical**,
-   the one divergence being input `062` (the other twelve `062` mappers are nulled
-   by the trailing guard regardless). Naming the basis matters: compared
-   name-key-to-name-key the figure would be 112/137, so the number is only true of
-   the prose reading. The cell is left visible rather than reconciled.
+   the one divergence being input `062` on a gated pump.
+
+   **Why the other twelve `062` mappers still agree — corrected.** Thirteen inputs
+   map to `062`; the other twelve are elements of the trailing guard list
+   `["070","071","072","108","114","786","787","788","799","806","825","828"]`.
+   An earlier version of this item said all twelve are "nulled by the trailing
+   guard regardless". That is **false for three of them** — `806`, `825` and `828`
+   are also members of the 24-code list, so on a gated pump that list branch first
+   rewrites `H = "062"`; the guard then tests the **rewritten** `H`, which matches
+   neither `0 == +H` nor any member of the guard list, so the name key survives as
+   `connect.ble.062`. Those three agree with the prose for that different reason,
+   not because the guard nulls them (source: chunk bytes 87,590-88,290).
+
+   **The 112/137 figure, with both sides named.** It compares the source's **final
+   emitted name key** against the table's **canonical code treated as a name key**
+   (`null` when the canonical is `062`). That divergence set is
+   `LIST24 ∪ {062}` = 25 inputs, hence 112 of 137. It is not the same measurement
+   as the 136/137 above and must not be quoted as if it were.
 3. **The corpus figure carries two different denominators, and the rule was not
    recorded.** `211` is the lazy-chunk count re-derived from `runtime-map.txt`;
    `215` is the file count of the on-disk corpus `k-chunk-bodies/`, which holds
-   those 211 plus `k-main.b` (3,417,255 B), `k-runtime.b` (8,268 B), the emitted
-   `common` chunk, and `k-negative-twin.b` (196 B, a 404) — 211 + 4 = 215. Both
-   numbers are correct under their own rule. The **negative** is stated over the
+   **212** `*-js.b` chunk files (**212 distinct digests**) plus three non-chunk
+   files: `k-main.b` (3,417,255 B), `k-runtime.b` (8,268 B) and `k-negative-twin.b`
+   (196 B). The 211 map entries account for 211 of those 212 chunk files — the
+   emitted `common` chunk is one of them (`runtime-map.txt` line 82, inside the
+   derived block of 211), fetched under its emitted name
+   `k-fu-_common-206e355a4a593fbd-js.b`. The **212th** chunk file is
+   `k-2076-206e355a4a593fbd-js.b` (196 B), byte-identical to `k-negative-twin.b`
+   (shared digest `80c3fe2a…`, a 404 page) — the id-form twin of the `common`
+   chunk. So **215 = 211 map entries + {id-form twin, `k-main.b`, `k-runtime.b`,
+   `k-negative-twin.b`}**. An earlier version of this item named "the emitted
+   `common` chunk" as an extra, which double-counted it and would have left a
+   re-deriver one file short. The **negative** is stated over the
    215-file superset, but its warrant is the concrete-key count, not a literal
    count: `connect.ble.<digit>` → 0 and no definition exists, while the bare
    literal `connect.ble.` appears 4x in the one chunk this pass names. An earlier
