@@ -58,9 +58,25 @@ print('rows in ledger            %d' % len(ROWS))
 print('status codes              %s' % dict(collections.Counter(r['http_status'] for r in ROWS)))
 print('failure rows              %d of %d (%.0f%%)   [502/504/503/400 — never an absence]'
       % (len(fails), len(ROWS), 100 * len(fails) / len(ROWS)))
-print('retry rows                %d   (a retry is a request, and has its own row)'
-      % sum(1 for r in ROWS if re.search(r'-r\d+$', r['attempt_tag'])))
-print('logical queries           %d' % len({r['path'] for r in ROWS}))
+# COUNTING RULE (round 3, finding 3): rows are in request order; the FIRST row carrying a
+# given path is that logical query, and every later row with the same path is a RE-ISSUE of
+# it. `-rN` is a LABEL the harness puts on its own retries; it is not the same thing as a
+# re-issue -- the second sweep (q-02) re-issued five already-attempted paths under fresh,
+# un-suffixed tags. Counting `-rN` alone undercounts, which is what round 2 published.
+_seen = set()
+_first = [r for r in ROWS if not (r['path'] in _seen or _seen.add(r['path']))]
+_reissued = [r for r in ROWS if r not in _first]
+_suf = [r for r in _reissued if re.search(r'-r\d+$', r['attempt_tag'])]
+_unsuf = [r for r in _reissued if not re.search(r'-r\d+$', r['attempt_tag'])]
+print('DECOMPOSITION of %d rows (the three parts must sum to it):' % len(ROWS))
+print('   logical queries        %3d   first row carrying each path' % len(_first))
+print('   re-issues, -rN tagged  %3d   the harness own retry of a path in THIS sweep' % len(_suf))
+print('   re-issues, no -rN tag  %3d   a path re-issued by a LATER sweep under a fresh tag%s'
+      % (len(_unsuf), '' if not _unsuf else ''))
+if _unsuf:
+    print('     -> seqs %s  (q-02-retry-novdict.tsv, the five no-verdict cells)' % [r['seq'] for r in _unsuf])
+print('   SUM                    %3d   %s' % (len(_first) + len(_suf) + len(_unsuf),
+                                              'ADDS UP' if len(_first) + len(_suf) + len(_unsuf) == len(ROWS) else 'DOES NOT ADD UP'))
 print('jsessionid values         %d redacted' % sum(r.get('jsessionid_redacted', 0) for r in ROWS))
 print('largest response          %d B' % max(r['body_bytes'] for r in ROWS))
 print('Medtronic hosts contacted 0   (every path in this ledger begins /CC-MAIN- or /collinfo.json)')
@@ -142,22 +158,87 @@ for label, rs in (('this pass', ROWS), ('predecessor', PROWS)):
 print('  see budget.py for the same arithmetic with exact rational arithmetic.')
 
 print()
-print('=== 6. the area-wide census — from the committed census-84.txt ===')
-rule()
+print('=== 6. the area-wide census ===')
+rule('=')
+print('  TWO INDEPENDENT ROUTES, compared below so this block can DISAGREE with the file:')
+print('    A) re-derive every verdict from the six area-L ledgers, from scratch;')
+print('    B) read what census-84.txt committed. If A and B differ, that is a finding, and it')
+print('       is printed as one. Round 3 finding 2: an earlier version of this block copied')
+print('       census-84.txt and then re-derived over an empty set, so it could not fail.')
+
+LEDGERS = sorted(glob.glob('../2026-10-1[34]-area-l-*/results.jsonl')) + \
+          ['../2026-10-14-pool-l-ipro-hcp-census/results.jsonl', 'results.jsonl']
+lrows = []
+for L in LEDGERS:
+    with open(L) as fh:
+        lrows += [json.loads(l) for l in fh if l.strip()]
+lby = collections.defaultdict(list)
+for r in lrows:
+    c = crawl_of(r)
+    if c:
+        lby[c].append(r)
+AV = {}
+for c, rs in lby.items():
+    probe = [r for r in rs if r.get('role') in ('probe-domain', 'probe-host', 'control-positive')]
+    if not probe:
+        AV[c] = 'older-schema'
+        continue
+    any200 = any(r['http_status'] == '200' for r in rs)
+    p = probe[-1]['http_status']
+    AV[c] = ('RECORD' if p == '200' else ('ABSENCE' if p == '404' and any200
+             else ('INDETERMINATE' if p == '404' else 'FAILURE')))
+
 c84 = open(os.path.join(HERE, 'census-84.txt')).read().split('\n')
-rows84 = [l.split('\t') for l in c84 if l.startswith('CC-MAIN-')]
-for l in c84:
-    if l.startswith(('published indexes', 'in window', '  RECORD', '  ABSENCE',
-                      '  INDETERMINATE', '  FAILURE', '  older-schema', '  UNREAD',
-                      'crawls carrying')):
-        print('  ' + l)
-inv = [l.split('\t') for l in c84 if l.strip() and not l.startswith('#')]
-win = [r for r in inv if len(r) == 5 and r[3] == 'yes']
-print()
-print('  re-derived from the 128 committed id/from/to rows:')
+file_rows = [l.split('\t') for l in c84 if l.startswith('CC-MAIN-')]
+# every row of this file is 8 fields (id/from/to/in_window/verdict/members/dates/pass);
+# the tally lines below it are 1-3 fields. Round 3 finding 2: this filter was `len==5`,
+# which matched NOTHING, so the re-derivation silently ran over an empty set.
+inv = [r for r in file_rows if len(r) >= 5]
+BV = {r[0]: r[4] for r in inv}
+BWIN = {r[0]: (r[3] == 'yes') for r in inv}
+
 LO, HI = '2013-05-17T00:00:00', '2022-05-13T00:00:00'
-w = [r for r in win if r[1] <= HI and r[2] >= LO]
-dash = [r for r in win if r[1][:8] <= '20220513' and r[2][:8] >= '20130517']
-print('    published %d | in window %d | the dashless-bound variant would say %d'
-      % (len(win), len(w), len(dash)))
-print('    UNREAD in window: %d' % sum(1 for r in w if r[4] == 'UNREAD'))
+win = [r for r in inv if r[1] <= HI and r[2] >= LO]
+before = [r for r in inv if r[2] < LO]
+after = [r for r in inv if r[1] > HI]
+
+print()
+print('  A) re-derived from the %d committed id/from/to rows:' % len(inv))
+print('     published %d | IN window %d | OUTSIDE %d'
+      % (len(inv), len(win), len(inv) - len(win)))
+print('       entirely BEFORE the window (to < %s)  %3d  %s'
+      % (LO, len(before), ' '.join(r[0] for r in before)))
+print('       entirely AFTER  the window (from > %s) %3d' % (HI, len(after)))
+dash = [r for r in inv if r[1][:8] <= '20220513' and r[2][:8] >= '20130517']
+print('     the DASHLESS-bound variant would say %d, not %d -- see Correction C9'
+      % (len(dash), len(win)))
+
+print()
+print('  B) verdicts re-derived from the ledgers (A) vs read from census-84.txt:')
+ac = collections.Counter(AV[r[0]] for r in win if r[0] in AV)
+print('     A: in-window verdicts   %s' % dict(sorted(ac.items())))
+unread_a = [r[0] for r in win if r[0] not in AV]
+print('     A: in-window with NO verdict derivable from a ledger  %d  %s'
+      % (len(unread_a), ' '.join(unread_a)))
+disagree = [r[0] for r in win if AV.get(r[0], 'older-schema') != BV.get(r[0], 'older-schema')]
+print('     A vs B disagreements  %d  %s'
+      % (len(disagree), 'NONE — the file matches the ledgers' if not disagree
+         else ' '.join('%s: A=%s B=%s' % (c, AV.get(c), BV.get(c)) for c in disagree)))
+winrec = [r for r in win if BV.get(r[0]) == 'RECORD']
+carry = [r for r in winrec if int(r[5]) > 0]
+absent = [r for r in win if BV.get(r[0]) == 'ABSENCE'] + [r for r in winrec if int(r[5]) == 0]
+absent_ids = {r[0] for r in absent}
+print()
+print('  THE HEADLINE, re-derived rather than copied:')
+print('     /ipro/hcp/ readably absent in %d of the %d in-window crawls' % (len(absent), len(win)))
+print('       = %d ABSENCE cells + %d RECORD cells carrying no member'
+      % (len([r for r in win if BV.get(r[0]) == 'ABSENCE']), len([r for r in winrec if int(r[5]) == 0])))
+print('     UNREAD in window  %d' % len(unread_a))
+print('     the complement of the absent set, by verdict: %s'
+      % dict(sorted(collections.Counter(
+          BV.get(r[0], '?') for r in win if r[0] not in absent_ids).items())))
+print()
+print('  out-of-window cells carrying a verdict (should be exactly the one read on purpose):')
+for r in inv:
+    if not BWIN[r[0]] and BV.get(r[0]) not in (None, '-'):
+        print('     %-16s %-10s members=%s dates=%s' % (r[0], BV[r[0]], r[5], r[6]))

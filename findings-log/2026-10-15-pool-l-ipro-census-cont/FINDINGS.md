@@ -253,3 +253,192 @@ no manual reading, and the corpus is two sources in the sense `docs/11`'s area-Y
 addendum means it. **Assumptions (INFERRED):** that the three schemas carry the
 same facts — the free-text roles look like the same queries under other names, but
 that is a reading of strings, not a demonstrated equivalence.
+
+
+## Correction (2026-10-15) — verification round 3: a cited figure the script could not emit, a re-derivation over an empty set, a count that did not add up, and a window figure that was a third short
+
+Round 3 returned **NOT CLEAN** on `4c585cd` and **confirmed the measurement**:
+the census, the 28 members, the spacing, the two negative durations, the host and
+method discipline, the scrub, and the out-of-window refutation were all
+independently re-derived and stood. What was broken was the layer that *publishes*
+those numbers — a cited figure the cited script could not produce, a re-derivation
+that ran over an empty set and so could not fail, a ledger decomposition that did
+not sum, and two stale counts. **Zero new requests.** Every figure below is
+re-derived by `budget.py` and `derive.py`, both of which were changed first.
+
+### R3-1 — `3.30` was hand-typed, and `budget.py` could not produce it
+
+`FINDINGS.md:67`, `:68`, `:192`, `:199` and the evidence-map row at `:220` all
+published **3.30**, and cited `budget.py` as the source. **`budget.py` computed `p`
+over the whole predecessor ledger** — 40 rows, 15 failures, `p = 0.375` — and
+printed **3.0312**. Its only argument was whole ledger *files*, so it could not be
+given the 29-row population the published figure used. **The claim that these
+figures were "now computed by `budget.py` so prose cannot drift from the algebra"
+did not hold for this figure: the population had drifted, not just the prose.**
+
+**Fixed at source.** `budget.py` now takes a **named population** and prints the
+rule with the number:
+
+```
+budget.py --population s-l2
+  THE PUBLISHED S-L2 FIGURE  every predecessor-ledger row whose crawl is one of the
+  9 crawls that pass FIRST READ (…); the 3 re-probed prior-read crawls and the 1
+  anchor reproduction are excluded
+     population 29 rows over 9 crawls | p = 13/29 = 0.448276
+     E[N] = 1 + p + p^2 = 1.649227   ->  2 queries x 1.649227 = 3.2985 requests/crawl
+     MEASURED 3.2222 requests/crawl | model ABOVE the measurement by 2.4%
+```
+
+**`3.2985` is what the script emits**, and the published **3.30** is that figure
+rounded. `64 × 3.2985 = 211.1` rows predicted — so the "211" in the prose was
+`64 × 3.30` typed by hand and **happened to be right**; it is now derived, and it
+would move if the population moved.
+
+**A consequence round 3 forced that round 2 did not: "the model is conservative"
+does not generalise.** The sign of (derived − measured) depends on `p`:
+
+| population | p | derived | measured | direction |
+|---|---|---|---|---|
+| S-L2 (29 rows) | 0.4483 | 3.2985 | 3.2222 | derived **ABOVE** by 2.4% |
+| this pass (188) | 0.3191 | 2.8420 | 2.9375 | derived **BELOW** by 3.3% |
+| both (228) | 0.3289 | 2.8743 | 2.9610 | derived **BELOW** by 2.9% |
+
+The model is conservative only near the failure rate it was fitted on and slightly
+optimistic at the lower rate this pass met. **A single population cannot license a
+claim about the error's sign**, so both directions are now printed with every
+figure and no prose asserts one.
+
+### R3-2 — `derive.py` §6 re-derived over an **empty set** and could not fail
+
+**This was fixed before anything else, because while it stood every census figure
+downstream of that script was unverified.** §6 filtered `census-84.txt` rows on
+`len(r) == 5 and r[3] == 'yes'`. Measured field-widths in that file: **2 × 1-field,
+7 × 2, 2 × 3, 128 × 8 — zero 5-field rows exist.** So `win` was always `[]` and
+the block printed *"published 0 | in window 0 | UNREAD in window: 0"* — **it would
+have printed `0` whatever the census said**, including the headline `0 of 84
+unread`. Worse, §6 printed census lines copied verbatim from `census-84.txt` and
+then "re-derived" them from that same file: **the script could not disagree with
+the file it was checking.**
+
+**Fixed both ways.** The filter is `len(r) >= 5`, and §6 now runs **two independent
+routes** and compares them:
+
+- **A)** every verdict re-derived from scratch out of the six area-L ledgers;
+- **B)** the verdicts read from `census-84.txt`.
+
+A disagreement is printed as a disagreement. **Current result: 0 disagreements**,
+and the block independently recovers **published 128 · in window 84 · outside 44 ·
+UNREAD 0**, which is the same set of numbers the verifier reached by hand.
+
+### R3-3 — the 188 rows did not decompose, and the counting rule was unstated
+
+`derive.py` counted rows whose `attempt_tag` matches `-rN` → **54**, and that was
+published as *the* retry count. **188 rows − 129 distinct paths = 59.** The gap is
+the second sweep (`q-02-retry-novdict.tsv`), which re-issued five already-attempted
+paths under **fresh, un-suffixed tags** — seq **178, 181, 182, 185, 188**. So a
+subset was presented as the total, with no rule stated.
+
+**`-rN` is a label the harness puts on its own retries; it is not the same thing as
+a re-issue.** The counting rule is now stated and the decomposition adds up:
+
+| | count | rule |
+|---|---|---|
+| logical queries | **129** | the **first** row carrying a given path |
+| re-issues, `-rN`-tagged | **54** | a later row for a path, tagged by this sweep's own retry logic |
+| re-issues, **no** `-rN` tag | **5** | a path re-issued by a **later** sweep under a fresh tag — seqs 178, 181, 182, 185, 188 |
+| **SUM** | **188** | **ADDS UP** |
+
+The same rule applied to the predecessor's ledger gives **28 + 12 + 0 = 40**, so
+the area total decomposes too: **157 logical · 66 `-rN` · 5 un-suffixed = 228**.
+
+### R3-4 — "41 of 128 outside the window" is **44**
+
+**41 is the count entirely *after* the window.** Measured: **44** outside = **41**
+entirely-after (2022-06 onward) **+ 3** entirely-before (`CC-MAIN-2008-2009`,
+`CC-MAIN-2009-2010`, `CC-MAIN-2012`) — and the sentence claimed **both** eras while
+citing 41. `128 − 84 = 44`.
+
+Corrected in `FINDINGS.md:178` and `:244`, in `docs/11` (three places) and in
+`docs/10`. Same shape as round 2's 63/64 sweep: a number that was right for a
+narrower population, published for a wider one.
+
+### R3-5 — "Five distinct paths now" is **six**, and the "19 remainder" named 18
+
+`FINDINGS.md:145` read *"**Five distinct paths now** … `/ipro/hcp/`,
+`/ipro/hcp/index.jsp`, `/ipro/hcp/login.jsf`, `/ipro/hcp/main/home.jsf`, plus
+`/ipro/hcp/privacy.jsf` — **six**, counting the bare prefix"*. The colon-list
+carried five items, `privacy.jsf` makes six, and **the bare prefix is already
+inside the five**, so "counting the bare prefix" was a false reconciliation. From
+the ledgers the union is **6**: the predecessor had `/ipro/hcp/`, `index.jsp`,
+`login.jsf`, `main/home.jsf`; this pass adds `login.jsf?bhcp=1` and `privacy.jsf`.
+**"Six" was right; the subject was wrong.** This is the **fifth** instance of the
+stale-count-word shape round 2 was commissioned to sweep — in the successor
+written to fix four others.
+
+`FINDINGS.md:163`'s *"19 remainder"* parenthetical named **18** and dropped
+`CC-MAIN-2014-23`, the one cell whose absence is genuinely unread. Corrected, and
+now derived rather than narrated:
+
+```
+absent in 65 of the 84 in-window crawls
+  = 10 ABSENCE cells + 55 RECORD cells carrying no member
+complement (19) = 10 RECORD carrying members + 8 older-schema + 1 INDETERMINATE
+```
+
+### R3-6 — the `## Correction` heading was justified by a **false** premise
+
+The `derive.py` docstring said the dated heading *"is the mechanism by which the
+file could be edited at all"*, because `check_append_only`
+(`scripts/research-checks.py:471-480`) screens every file under `findings-log/`
+with no extension filter. **The first half is true; the conclusion is false.** The
+diff that check reads is three-dot, every file in this pass's directory is status
+`A`, and **`A` matches neither the `D` arm nor the `M` arm** — so no file was read
+and **the regex was never evaluated**. **The gate did not force a Python file to
+contain markdown; a person chose to put it there.** The heading is kept — it is
+what a reader and the check would both look for, and the day this merges the file
+may become status `M` at which point the check *would* read it — but it is now
+described as a **promise rather than a licence**. Scoping the check to `.md`
+remains a maintainer decision and is still not taken here.
+
+Also fixed: the docstring's `\(\d{4}` sat in a **non-raw** string and emitted
+`SyntaxWarning: "\(" is an invalid escape sequence` on every run. It is now a raw
+string; `python3 -W error::SyntaxWarning derive.py` is silent.
+
+### R3-7 — the sweeps round 3 did not reach
+
+- **"absent from Common Crawl"** — **three** occurrences in `docs/11` and **one** in
+  `docs/10`; all four are disclaimers, not claims, and each now sits beside the
+  corrected **44**. Verified, not assumed.
+- **The `403` INFERRED** — `FINDINGS.md` labelled it (that part the verifier
+  confirmed). **`docs/11` described the same cells without the label**, and neither
+  did the PR body. Both now carry it: *that the 2021 `403`s mark the surface
+  closing rather than a crawler meeting a gate is INFERRED and nothing observed
+  separates the readings; the `403` is the archived status of a capture, not a
+  probe result.*
+- **`CC-MAIN-2018-05` in isolation** — the pages said it was "in the queue and
+  answered" without naming the verdict. It is a **readable absence**: control
+  `commoncrawl.org` **200 / 5 records** (seq 82), `minimed.eu` domain **404**
+  `No Captures found for: minimed.eu` (seq 83), one attempt each, no retry.
+- **The three-schema claim behind the 8 `older-schema` rows** — the labelling is
+  stated and was verified; what was **not** verified is that no published figure
+  rests on a cell read by eye. **Checked and clean**: every in-window number
+  (`65 of 84`, `0 UNREAD`, the 44/3/41 split) comes from `derive.py` route **A**,
+  which reads ledgers mechanically. The 8 `older-schema` cells are counted as
+  *neither absent nor present* — they are in the complement, never in the absent
+  set. **This is stated as a bound, not a proof of equivalence between the three
+  schemas**, which remains INFERRED and is S-L4.
+- **The "both credits in the config.yml comment" claim** — that claim was about the
+  `origin/main` conflict and is **unchanged and still correct**: 3 open (`F R K`)
+  plus 23 closed, both closures credited. **Not acted on** — the merge queue's,
+  not this pass's.
+
+### What did not change
+
+The measurement. 188 rows; 64 crawls classified **57 RECORD / 7 ABSENCE / 0
+INDETERMINATE / 0 FAILURE**; `/ipro/hcp/` absent in **56 of those 64**; **28
+members across 8 crawls, 2017-06-26 → 2021-09-28**; the area-wide census
+**65 of 84 absent, 0 unread**; spacing floors **3.536 s** (`t_sent`) and
+**4.156 s** (kernel mtime) with 0 gaps under 3.5 s or 2.0 s; exactly 2 negative
+durations; **zero Medtronic requests**; GET only; `index.commoncrawl.org` only.
+The claim is still **"absent from every crawl this pass could read"** and
+**"absent from Common Crawl"** stays disclaimed.

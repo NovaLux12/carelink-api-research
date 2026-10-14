@@ -739,3 +739,51 @@ Two consequences for the figures this log published, both already corrected in
 
 **Not restated here:** the family member table now lives in the continuation's
 `census-84.txt` and `derive.py`, which read both this pass's ledger and that one.
+
+### C8 — round 3: the same three figures, restated from the scripts rather than from memory
+
+Round 3 confirmed this log's measurement and found the *publishing layer* broken.
+Two of the three fixes touch figures this log published, so they are recorded here
+as well as in the continuation's correction. **Zero new requests.**
+
+**The budget figure.** This log's C1 corrected the algebra to `E[N] = 1 + p + p²`
+and published **3.30** citing `budget.py` — but `budget.py` was computing `p` over
+the **whole 40-row ledger** and printing **3.0312**, and had no way to be given the
+29-row population the published figure used. **`budget.py` now takes a named
+population** (`--population s-l2`: every row whose crawl is one of the **nine**
+crawls this pass FIRST READ) and emits **3.2985**, which is the published 3.30
+rounded. **`derive.py` §5 now prints the same number with its population rule**, so
+the two cannot drift again.
+
+**A correction to this log's C1 that round 3 forced.** C1 said the corrected model
+is "conservative". It is conservative **only** at the failure rate it was fitted on:
+
+| population | p | derived | measured | direction |
+|---|---|---|---|---|
+| S-L2 (29 rows) | 0.4483 | 3.2985 | 3.2222 | derived **ABOVE** by 2.4% |
+| the continuation (188) | 0.3191 | 2.8420 | 2.9375 | derived **BELOW** by 3.3% |
+| both ledgers (228) | 0.3289 | 2.8743 | 2.9610 | derived **BELOW** by 2.9% |
+
+**A single population cannot license a claim about the error's sign.** No prose in
+this repo asserts one now.
+
+**The re-derivation over an empty set.** This log's `derive.py` §6 filtered
+`crawl-window.txt` rows on `len(r) == 5`; that file's rows are **5** fields, so it
+worked here. **The continuation's §6 had the same class of bug** against
+`census-84.txt`, whose rows are **8** fields — it re-derived over an empty set and
+printed `0` whatever the census said. Fixed there, and recorded here because it is
+the same defect recurring in the script that inherited this log's method.
+
+**The `## Correction` heading in this file's `derive.py`.** This log's C1 said the
+dated heading was "the mechanism by which the file could be edited at all". **That
+was false**: `check_append_only` does screen every file under `findings-log/` with
+no extension filter, but the diff it reads is three-dot and every file here is
+status `A`, which matches neither arm — **so the check never read the file and the
+regex was never evaluated.** The gate did not force a Python file to contain
+markdown; a person put it there. Corrected in the docstring, along with a
+`SyntaxWarning` the non-raw `\(\d{4}` emitted on every run.
+
+**Not corrected here, and unchanged:** the ledger (40 rows), the census cells, the
+spacing floors, `CC-MAIN-2022-05`'s readable absence, `CC-MAIN-2014-23`'s
+indeterminacy, the two-opposite-error account of the 87 → 84, and the claim that
+`/ipro/hcp/*` is one surface over time — still **INFERRED and undemonstrated**.

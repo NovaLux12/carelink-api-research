@@ -11,13 +11,21 @@ withdrawn -- see Correction (2026-10-15) §C1 of this log, and
 `../2026-10-15-pool-l-ipro-census-cont/budget.py`, which computes every part of it
 from a ledger rather than restating it.
 
-This dated heading is the mechanism by which the file could be edited at all:
-`check_append_only` (`scripts/research-checks.py:471-480`) screens EVERY file under
-`findings-log/`, not markdown only, so a modification must carry a
-`^## Correction \(\d{4}-\d{2}-\d{2}\)` marker or the gate fails it. Putting a
-markdown heading inside a Python docstring to satisfy it is a workaround, not an
-endorsement -- the check arguably wants scoping to `.md`, which is a maintainer
-decision (`docs/09` section 4) and is not taken here.
+Why this dated heading is here, stated accurately (round 3, finding 6)
+
+`check_append_only` (`scripts/research-checks.py:471-480`) does screen EVERY file
+under `findings-log/`, with no extension filter -- that part of the round-1 note
+was right. **But on this branch the check never fired and never read this file.**
+The diff it reads is three-dot (`origin/main...HEAD`), every file in this pass's
+directory is status `A`, and `A` matches neither the `D` arm nor the `M` arm. **So
+nothing was screening this file, and the heading was not a licence -- it was a
+promise.** It is kept because it is the form a reader and the check would both
+look for, and because the day this is merged the file may well become status `M`,
+at which point the check WOULD read it. The honest statement is: **the gate did
+not force a Python file to contain markdown; a person chose to put it there.**
+
+Scoping the check to `.md` remains a maintainer decision (`docs/09` section 4) and
+is still not taken here.
 
     python3 derive.py
 
@@ -188,7 +196,16 @@ print('          published (1-p)(1+p+p^2) + 3p^3        = %.4f   <- WRONG, == 1 
 print('          two queries per crawl -> %.2f requests/crawl (derived)' % (2 * tail))
 print('  the DERIVED figure exceeds the MEASURED one by %.1f%% -- the opposite of what this' % (100 * (2 * tail - len(rn) / len(newly)) / (len(rn) / len(newly))))
 print('  block used to print. "1.6" (no derivation) and "2.4-3.2" (a floor from the broken')
-print('  formula) are both withdrawn. See ../2026-10-15-pool-l-ipro-census-cont/budget.py.')
+print('  formula) are both withdrawn.')
+print()
+print('  ROUND 3, FINDING 1 -- the figure S-L2 is budgeted on must be EMITTED, not typed.')
+print('  The block above reproduces it from this ledger, and the population rule is:')
+print('    every row in this ledger whose crawl is one of the %d crawls this pass FIRST' % len(newly))
+print('    READ. The %d rows below are that population; the %d re-probed prior-read rows and' % (len(rn), len(ROWS) - len(rn)))
+print('    the anchor reproduction are excluded.')
+print('    -> %.4f requests per crawl, and budget.py emits the same number under the rule'
+      % (2 * tail))
+print('       named `--population s-l2`. Run it; do not copy this line.')
 
 print()
 print('=== 6. crawl window — from the committed crawl-window.txt ===')
