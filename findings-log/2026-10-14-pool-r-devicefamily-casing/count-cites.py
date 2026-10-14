@@ -7,6 +7,24 @@ this exists to prevent is 44 published as 93, and a second pass's own claim of
 
   R-C1 SUBJECT. Only `*.md` files in THIS directory. Not docs/, not README, not
        other passes' logs.
+
+  R-C1b CORRECTION SECTIONS ARE EXCLUDED FROM THE COUNT, NEVER FROM THE RECORD.
+       The subject text is each file **up to its first
+       `## Correction (YYYY-MM-DD)` heading**. Everything from that heading to the
+       end is excluded.
+
+       WHY, and this is the whole reason: a correction section QUOTES the subjects
+       it corrects, because `AGENTS.md` §3 requires superseded wording to stay
+       visible. Counting those quotations makes the number a FIXED POINT THAT
+       RECORDING THE CORRECTION MOVES — appending a correction that quotes three
+       cites changes the cite count by three, so the published figure describes
+       the previous commit. That is precisely the defect C14 corrects: this file
+       spent three rounds publishing the previous commit's number.
+
+       THE EXCLUSION IS FROM THE COUNT, NEVER FROM THE RECORD. Hiding quoted
+       wording to stabilise a number would be `AGENTS.md` §1's deletion with the
+       sign reversed — the wording stays on disk, stays greppable, and stays part
+       of the record; it simply is not an input to this one measurement.
   R-C2 UNIT. One cite = one `path:line` or `path:line-line` token occurring
        inside backticks, where `path` carries a file extension. A path with no
        line number is NOT a cite (it is a source pointer, counted separately
@@ -64,6 +82,12 @@ def repo_root():
 
 ROOT = repo_root()
 
+# R-C1b: everything from the first dated correction heading onward is quoted
+# history and is excluded from the COUNT (never from the record). See the
+# docstring for why a self-referential count is a fixed point that recording the
+# correction moves.
+CORRECTION_SPLIT = re.compile(r'^## Correction \(\d{4}-\d{2}-\d{2}\).*$', re.M)
+
 # R-C2: a path with an extension, then :line or :line-line, inside backticks.
 EXT_CITE = re.compile(r'`([A-Za-z0-9._/-]+\.(?:md|py|txt|sh|log)):(\d+)(?:-\d+)?`')
 # R-C4: the sweep table's short forms.
@@ -104,6 +128,8 @@ def main():
 
     for f in subjects:
         t = open(f, encoding='utf-8', errors='replace').read()
+        # R-C1b: count the findings, not the record of findings about findings
+        t = CORRECTION_SPLIT.split(t, 1)[0]
         for path, line in EXT_CITE.findall(t):
             rp = resolve(path)
             if rp is None:

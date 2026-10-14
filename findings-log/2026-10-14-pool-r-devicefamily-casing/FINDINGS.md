@@ -557,7 +557,7 @@ Two passes, two occurrences, one cause: **this file does not end with a newline,
 so every append to it must supply one.** A successor touching this directory
 should start with `printf '\n' >> FINDINGS.md` rather than discovering it again. ⚠ **The present-tense half of this sentence is WITHDRAWN — see
 `## Correction (2026-10-15)`, item C13.** It was true when written and is false now:
-this file's last byte is `0a`. It is kept verbatim, as C8's parallel sentences are, because
+this file's last byte was `0a` **at `cc513f9`** (measure it; do not read it off this sentence). It is kept verbatim, as C8's parallel sentences are, because
 deleting it would destroy a retraction record. **Measure, never assert** — see C10.
 
 ---
@@ -688,7 +688,7 @@ with `printf '\n' >> FINDINGS.md`."*
 
 At the commit making that statement the file **does** end with a newline. The
 **past-tense diagnosis is accurate**: `git show c267d65:…/FINDINGS.md | tail -c 1`
-returns `2e` (`.`), while the current file's last byte is `0a`. ⚠ **The second half of this sentence is WITHDRAWN — see `## Correction (2026-10-15)`, item C10.** It was true when written at `6fe6ffb` and was falsified by a later edit that removed the newline again, so this file no longer asserts its own trailing byte anywhere; the durable form is a measurement with a command attached, not a stated state. The original text
+returns `2e` (`.`), while the current file's last byte is `0a`. ⚠ **The second half of this sentence is WITHDRAWN — see `## Correction (2026-10-15)`, item C10.** It was true when written at `6fe6ffb` and was falsified by a later edit that removed the newline again, so this file no longer asserts its own trailing byte anywhere; the durable form is a measurement with a command attached, not a stated state. ⚠ **BOTH the "no longer asserts … anywhere" claim and "the durable form" are WITHDRAWN — see `## Correction (2026-10-15)`, item C14.** The universal claim was false when written: the file asserted its own byte at two other places. The file now carries **no UNMARKED** present-tense byte claim, which is a bounded claim about a swept class — not the open-ended one this sentence made. Kept verbatim per `AGENTS.md` §3. The original text
 of this document never had a trailing newline; C5's own blank-line repair added
 one. So the advice, followed literally now, would inject a spurious blank line.
 
@@ -742,7 +742,7 @@ direction"*.
 **The byte was `2e`, and still is.** ⚠ **"and still is" is WITHDRAWN — see
 `## Correction (2026-10-15)`, item C13.** It was accurate when written: the three routes
 below agree, and every one of them reads `2e` **at `a1c4dd6`**, the commit those routes were
-run against. The file's last byte is now `0a`. The measurement stands; its unanchored
+run against. The file's last byte was `0a` **at `cc513f9`** (measured; do not read it off this sentence). The measurement stands; its unanchored
 present tense does not, and the two are kept apart here rather than merged.
 
 ```
@@ -815,7 +815,7 @@ counted too, because a regex on file extensions misses them · R-C5 distinct
 resolved targets, counted once · R-C6 every cite must resolve, exist, and be
 **non-blank**).
 
-> **CITE COUNT = 28. Failures = 0.** Two further figures are reported beside it
+> **CITE COUNT = 28. Failures = 0.** ⚠ **SUPERSEDED — see `## Correction (2026-10-15)`, item C17.** This figure was correct when measured and was **devalued by the commit that recorded it**, because the rule counted the correction sections that quote cites. Under the amended rule **R-C1b** the count is **22**. The number is kept because deleting it would remove the record of the mistake; the rule, not the restatement, is the fix. Two further figures are reported beside it
 > and are **not** added to it — the path-only source-pointer count (R-C2) and the
 > self-referential count (R-C3) — and **both are left to the script to print
 > rather than restated here**, because a figure this file prints about this
@@ -910,6 +910,17 @@ of *this file does/is/has/now/contains*, *the current file*, *and still is*,
 | *"Appending unconditionally **has now been** wrong"* | past perfect about the past | **true** — left alone |
 | C10's quotations of C8 | framed as *"C8's text **read**"* | correctly historical — left alone |
 | *"The byte was `2e`, **and still is**"* | present tense, unanchored | **FALSE and unmarked** — now carries a withdrawal marker pointing here |
+| *"so this file **no longer asserts its own trailing byte anywhere**"* (inside C8) | a **universal** claim, and a search term of this very sweep | **FALSE and unmarked — and OMITTED from the first version of this table.** See C14 |
+| *"this file's last byte is `0a`"* (in this section's own marker) | present tense, unanchored to a commit | **true but unanchored — same shape as the `run.log` row above; de-anchored** |
+| *"The file's last byte is now `0a`"* (in this section's own marker) | present tense, unanchored to a commit | **true but unanchored — de-anchored** |
+
+**The sweep did not see its own output.** `no longer asserts` is listed above as a
+search term of this sweep, and the table it produced omitted the file's only
+occurrence of that term. Two of the three rows this correction adds were written
+*by this sweep* and then escaped it for the same reason the first two did: they
+were produced after the enumeration ran. **A sweep's result table is itself an
+output of the sweep and must be checked against the sweep's own terms** — that is
+now a step in the construction, not an afterthought.
 
 Both survivors are **kept verbatim with the marker appended**, exactly as the two
 C8 sentences are, because deleting a retraction record is the one thing
@@ -1032,3 +1043,113 @@ The verdict (negative — the casing stays unobserved), the union (**21**), the 
 ledger's *content* (`results.jsonl` **0** rows against **`0 of a 0 cap`**), and
 rounds 1–4's fixes, all re-verified rather than assumed. The two C8 sentences
 and the two C13 sentences are annotated, not deleted, for the reason given above.
+
+---
+
+## Correction (2026-10-15)
+
+**Sixth round.** Items from the sixth `carelink-verifier` round on PR #127 at
+`cc513f9`. Two blocking findings, and the verifier's summary of them is the right
+one: **the same two defects round 5 raised, reduced but not closed.** Both are
+recorded below with the fixes; the second is the one worth reading twice.
+
+### C17 — BLOCKING: the published cite count was the PREVIOUS COMMIT's number
+
+`count-cites.py` printed **30** against a published **28**, at `cc513f9`, in every
+medium including a clean export of the commit. The history is not a rounding
+drift — it is a lag:
+
+| revision | script said | file published |
+|---|---:|---|
+| `c267d65` | 23 | — |
+| `6fe6ffb` | 29 | — |
+| `a1c4dd6` | 31 | "23 cites" |
+| `b06d7d6` | 28 | "23 cites" |
+| `cc513f9` | **30** | **"28"** |
+
+**I was publishing the previous commit's number.** The figure C12 introduced was
+correct when written and devalued by the very commit that introduced it — which is
+precisely the claim C12 existed to establish.
+
+**The cause is structural, and it is not a bug in the arithmetic.** The script
+scans files that include `FINDINGS.md`, and `FINDINGS.md` is the file that
+*records the count* **and** contains correction prose that *quotes cites*. So
+appending a correction moves the count: **a self-referential count is a fixed
+point that recording the correction moves.** No amount of care in re-deriving it
+can fix that; the measurement and the record are the same file.
+
+**Fix: amend the RULE, do not restate the NUMBER.** Restating publishes a correct
+figure that the next correction devalues identically — which is what round 5
+watched happen three times. `count-cites.py` gains **R-C1b**:
+
+> **Correction sections are excluded from the COUNT, never from the RECORD.** The
+> subject text is each file up to its first `## Correction (YYYY-MM-DD)` heading.
+>
+> **Why:** a correction section *quotes the subjects it corrects*, because
+> `AGENTS.md` §3 requires superseded wording to stay visible. Counting those
+> quotations makes the number a fixed point that recording the correction moves.
+>
+> **The exclusion is from the COUNT, never from the RECORD.** Hiding quoted wording
+> to stabilise a number would be `AGENTS.md` §1's deletion with the sign reversed.
+> The wording stays on disk, stays greppable, and stays part of the record; it
+> simply is not an input to this one measurement.
+
+**Re-derived under the amended rule: `CITE COUNT = 22`, failures 0.** Every other
+figure this pass publishes — the union, the sum, the overlaps, the exclusion list —
+comes from `run.log`, which no correction quotes, so none of them move.
+
+**Stability proved, not asserted.** In a scratch copy under a temporary directory,
+never the worktree:
+
+| rule | pre-decoy | after appending a correction quoting **7 novel cites** | verdict |
+|---|---:|---:|---|
+| **amended (R-C1b)** | 22 | **22** | **stable** |
+| pre-amendment (same script, split removed) | 30 | **37** | **moved by 7 — the defect** |
+
+The decoy was a `## Correction (2026-10-15)` section quoting seven `file:line`
+literals not otherwise cited, so it could not be absorbed by R-C5's
+deduplication. Removing the decoy returned the figure to its baseline, and the
+real append recorded here moves it **0**. *A first attempt at this proof used
+seven cite literals that were already in the count, and so moved nothing under
+either rule — it proved nothing. The decoy has to be dense with **new** literals
+or the stability it appears to demonstrate is an artefact of deduplication.*
+
+### C18 — BLOCKING: the universal claim survived, and the sweep never saw its own output
+
+Four defects, one cause.
+
+**1. The universal claim.** Inside C8: *"so this file no longer asserts its own
+trailing byte anywhere"*. Unscoped, unmarked, and **false at `cc513f9`** — the file
+asserted its own byte at two other places. The existing withdrawal marker on that
+sentence covers only *"the current file's last byte is `0a`"*; it does not reach
+this tail. **Marked**, not deleted: the record is kept per `AGENTS.md` §3 and the
+marker says what is bounded and true instead — **no UNMARKED present-tense byte
+claim of the swept class**, which is a far smaller claim than the one withdrawn.
+
+**2. Two self-introduced claims.** C13's own withdrawal markers assert *"this
+file's last byte is `0a`"* and *"The file's last byte is now `0a`"*. Both are true
+**at the moment of writing** and both are unanchored — the same shape as the
+`run.log` claim C13 de-anchored in the same pass. Both are now anchored to the
+commit they were measured against, with the instruction *"measure it; do not read
+it off this sentence"* attached.
+
+**3. The sweep did not see its own output.** C13's table lists `no longer asserts`
+among the search terms of the by-construction sweep — **and omits the file's only
+occurrence of that term.** Two of the rows this correction adds were written *by
+that sweep* and then escaped it, for exactly the reason the first two escaped:
+they were produced after the enumeration ran.
+
+**The step that was missing, now stated as part of the construction:**
+
+> **A sweep's result table is itself an output of the sweep, and must be checked
+> against the sweep's own search terms.** A by-construction sweep whose table omits
+> the class's only occurrence has not been constructed. Re-running the same terms
+> over the finished document — and over the table itself — is part of the sweep,
+> not a later verification step.
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the sum
+(**27**), `run.log` and its rule, the ledger (`results.jsonl` **0** rows against
+**`0 of a 0 cap`**), `config.yml`, and rounds 1–5's fixes, all re-verified rather
+than assumed. No claim, retraction or sentence is deleted anywhere in this round.
