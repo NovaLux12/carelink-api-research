@@ -1415,6 +1415,30 @@ area namespace.** Extending the gate's area pattern to `AA`-style headings is a 
 decision, not a side effect of a research pass — same reasoning as the gate's own pattern in
 [`docs/09`](09-methodology-and-oracles.md) §4.
 
+#### Addendum (2026-10-14, from issue #102): dedicated-route envelopes on `.com` and `-trials` — byte-identical, language-independent
+
+**Derived from 14 GETs across two patient deployments, cap 14/14, controls first,**
+`findings-log/2026-10-14-area-f-dedicated-routes-succession/FINDINGS.md`.
+
+- **All three dedicated routes answer `200 application/json` on both**
+  `carelink.minimed.com` and `carelink-trials.minimed.com` (controls:
+  `/patient/configuration/version` and `/patient/configuration/` both `404` with
+  an empty body on both hosts — 4 of 14).
+- **Envelopes.** `defaultCountry` → `{"value": <2-char>}` (20 B, same digest
+  on both hosts); `recaptcha/key` → `{"value": <40-char>}` (58 B, **different**
+  digest per host, consistent with the per-host reCAPTCHA keys already on
+  record); `messages/{en,fr,de}` → `{"messages": []}` (22 B, **identical
+  digest across both hosts and all three languages**). No language-dependent
+  content was observed; the empty array is not an `en`-only artefact.
+- **A negative.** No additional 404 shape was produced by this pass — the two
+  controls 404 with no `content-type` on both hosts only — so the three-valued
+  404 content-type set stays as area E recorded it; this pass does not extend
+  it. No regression pin moved.
+
+**Successor (per issue #102):** a pinned cell-digest artefact in any future
+per-key sweep (0 requests), so the "0 mismatches" line becomes re-hashable.
+**Assumptions (INFERRED):** none beyond the quoted addendum claims.
+
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
