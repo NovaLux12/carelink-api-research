@@ -680,7 +680,7 @@ recorded the repair; area M's log rewrote a false sentence in place under a date
 `⚠ CORRECTED` marker; area Q withdrew a strength word in place and said so. The rule
 being honoured is `AGENTS.md` §3's — *"Do not edit an existing dated doc — add a
 new one, or a `## Correction (YYYY-MM-DD)` section inside it. Append-only is
-deliberate: the retraction history* is evidence"* — read with §1's, that a claim you
+deliberate: the retraction history *is* evidence"* — read with §1's, that a claim you
 cannot source is **deleted rather than softened**. ⚠ **The wording this correction
 previously carried here was FABRICATED** — see R3b. Leaving a false attribution standing in prose
 until the end of the document would leave `moom4261` readable as this pass's
@@ -1640,7 +1640,7 @@ introduction to `ba36c0e`, this pass's own round-7 commit, and a tree-wide
 > **A sentence that DENIES a string supplies that string**, which makes every later
 > tree-wide check for its absence **unable to fail** — the mirror image of `docs/09`
 > §4's *"a number that cannot fail is not evidence, however small it comes
-out."* A grep for `docs/09:203` can no
+out"* — the source has no terminal period. A grep for `docs/09:203` can no
 > longer return zero, so it is no longer a test of anything; **the surviving test is
 > E1-exclusion**, which is per-cite and mechanical.
 
@@ -1673,8 +1673,16 @@ a `## Correction (…)` section"* and then enumerated five tokens — `docs/09:1
 **Two of those five belong to a different scope than the sentence states.**
 `docs/09:64` and `docs/09:65` occur in this log **only inside the enumeration that
 asserted them**; their real occurrences are **tree-wide, in other passes' artefacts**,
-which rule **E2** excludes by name. Measured here at this commit: `docs/09:64` appears
-**2** times in this log and **both** are the claim's own enumeration line.
+which rule **E2** excludes by name.
+
+⚠ **No count of them is published here, and none was ever stable.** A figure for this
+claim kept moving — it read `2` at `ef2502e` and `5` at `1f172f1`, and neither was
+right beyond its own commit — **because every round's correction restates the claim and
+so adds occurrences of the very tokens being counted.** **That is the self-referential
+hazard the sentence above describes, reproduced inside the sentence that describes it,
+and the fix is the same as last round's: publish the negative, not the number.** The
+negative — **zero E1-live `docs/09:NNN` cites** — is already stated above and re-derives
+at `0` from any commit.
 
 > **⚠ THE METHOD MISS, WHICH IS THE PART WORTH KEEPING.** "Verified per cite by
 > resolving each one's enclosing `## ` heading" **tests E1-exclusion, not multiplicity.**
@@ -1706,7 +1714,7 @@ phrase is **not in `AGENTS.md` at all**; it is from a *brief*, not from the rule
 That is **worse than the `docs/09` case**, because the attribution named the
 repository's own governing document. **Corrected verbatim** to what §3 actually says:
 *"Do not edit an existing dated doc — add a new one, or a `## Correction (YYYY-MM-DD)`
-section inside it. Append-only is deliberate: the retraction history is evidence."*
+section inside it. Append-only is deliberate: the retraction history *is* evidence."*
 
 > **The sweep, and what it found.** Every `*"…"*` span in this log whose surrounding
 > context **names a committed file** was extracted (36 spans) and probed against that
@@ -1714,10 +1722,18 @@ section inside it. Append-only is deliberate: the retraction history is evidence
 > and **reading them — not counting them — left ZERO**:
 >
 > - **2 were real fabrications**: the two above, both fixed.
-> - **1 was a detector gap**: `:202` *"Neither is browser-callable"* **is** in
->   `docs/00-summary-the-map.md`, but split across a **line break**, which is the same
->   trap as this repo's count site — a raw grep cannot see it, a whitespace-collapsing
->   matcher can.
+> - **1 was a detector gap, and its mechanism was wrong in the first version of this
+>   bullet**: `:202`'s *"Neither is browser-callable"* **is** in
+>   `docs/00-summary-the-map.md`, at `:206`, **on one line and mid-line**. The cause is
+>   **CASE alone** — the source reads `**neither is browser-callable**`, lowercase, and
+>   the quotation capitalised it. Measured: `grep -c 'Neither is browser-callable'` → **0**;
+>   `grep -ci` → **1**. **This bullet previously blamed a line break and said a
+>   whitespace-collapsing matcher rescues it — both false**: collapsing whitespace alone
+>   still returns **0**, because case is unchanged by it, and the phrase was never
+>   split. **The `**` emphasis around it is not a mechanism either**, since `grep` does
+>   not see emphasis at all. **A claim about what a matcher does, asserted without
+>   running the matcher** — `§6` mode 2, inside the one bullet whose entire purpose is
+>   to characterise matcher behaviour.
 > - **1 resolved to the very log this area was retracted for**: `:524`'s span sentence
 >   is verbatim in `findings-log/2026-10-13-area-f-timeline-config/FINDINGS.md`, which
 >   is why `docs/09` §4 retired the check.
@@ -1739,7 +1755,7 @@ section inside it. Append-only is deliberate: the retraction history is evidence
 | **merge-hazard table at all three refs** | `7d915b8` 5 open `FRSKL` / 21 / `5+21` @L1554 / cfg 5 · `270d06f` 4 `FRKL` / 22 / `4+22` @L1517 / cfg 4 · head 4 `RSKL` / 22 / `4+22` @L1702 / cfg 4 — **all three internally consistent** (`open == prose == cfg`, `closed == prose`, `N+M == 26`). Merged truth: **3 open (R K L) / 23 closed** |
 | **five artefact digests** at `cd9b79a` and head | `results.jsonl` `dba9f9f243f55dfd` · `run.log` `24b2df751d47ef68` · `grep-out.txt` `ae872d12972464db` · `headers/` tree `a1375242809f19f3` · `headers/` bytes `61c4c64cc818e731` — **all five identical, 17 blobs** |
 | **PR body: mtime wording + whole-body stale sweep** | the disclaimer is present; **every** retracted value sweeps clean — `moom4261` ×1 **is the quoted retraction inside the round-5 audit note, not a live claim**; `independently`, `docs/11:214`, `docs/11:209`, `240-243`, `48.95`, `51.57`, `0.0151`, `tail of`, `two tokens are not build-invariant`, `216 assertions` all **0** |
-| **trailing byte; setext risks** | trailing byte `0a`. Sweeping **every** `.md`/`.hurl` in the diff for `---` candidates found **29** and **1 real risk** — `docs/11:1794`, **pre-existing at `7d915b8`**, reproduced by my Closed-row insertion. **One blank line inserted; 0 real risks now** |
+| **trailing byte; setext risks** | trailing byte `0a`. Sweeping **every** `.md`/`.hurl` in the diff for `---` candidates found **1 real risk** — the Closed table's last row followed immediately by `---`, **pre-existing at `7d915b8`** and reproduced by my Closed-row insertion. **One blank line inserted; 0 real risks now.** **No candidate COUNT is published**, for the reason in R1c: this log appends a `---` of its own every round, so a count moves with every correction. **The load-bearing half is the RISK count, which is a property of the diff's prose and does not move** |
 
 ### R4b — the pre-existing setext risk, and why this file is where it lives
 
@@ -1756,3 +1772,105 @@ mechanical test.**
 `wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
 round. All eleven subject counts **unchanged** after these edits, because every edited
 site is inside a `## Correction (…)` section and E1 excludes it.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 10. **None of the findings touched the load-bearing claim** — the E1 negative
+re-derives at **0**, both repaired quotations resolve, the setext fix created no new
+risk, the five digests match across 17 blobs, and the PR body sweeps clean. **Three
+defects and two one-character cosmetics, all of them the same class: a figure about this
+log, published in this log.**
+
+**Base for every diff and sweep this round: `7d915b8`.** `origin/main` used for nothing.
+
+### R10a — the round's rule, adopted as a rule and not as a patch
+
+> **No figure about this log goes in this log. A negative is stable; a count is not.**
+> If a number is load-bearing, the sentence is about **a named commit**, not about this
+> one. If it is not load-bearing, it is deleted.
+
+That is now stated as a rule because **both remaining defects were instances of it**,
+and one of them was the rule's own violation **inside the paragraph that explains the
+rule**:
+
+| figure | at `ef2502e` | at `1f172f1` | at this commit | load-bearing? |
+|---|---:|---:|---:|---|
+| `docs/09:64` occurrences in this log | 2 | **5** | moves again | **no** — the claim is the negative |
+| `---` candidates in the diff | 29 | **30** | moves again | **no** — this log appends a `---` every round |
+
+**Both figures are DELETED, not restated**, and the sentence about each now says why.
+Restating either at this commit would produce exactly the defect being fixed: a correct
+number that the next round's append invalidates.
+
+### R10b — the third `---` count was inside the setext row, and the *risk* count is the stable half
+
+The setext row reported **29** candidates. Its **substantive half confirmed exactly** —
+**1 real risk, pre-existing at `7d915b8`, 0 after the blank line** — and that half is
+**a property of the diff's prose, so it does not move.** Kept. **The candidate count is
+the self-referential half**: every round appends a `---` of its own, so the number
+changes with the act of recording it. **Deleted.**
+
+### R10c — the mechanism was wrong: CASE alone, not a line break
+
+The bullet said `:202`'s *"Neither is browser-callable"* was in `docs/00` *"but split
+across a line break"* and that *"a whitespace-collapsing matcher can"* see it. **All
+three sub-claims were false**, and **I had not run the matcher I was describing.**
+Measured, at `docs/00-summary-the-map.md:206`, which is **one line, mid-line**:
+
+```
+grep -c  'Neither is browser-callable'      -> 0
+grep -ci 'neither is browser-callable'      -> 1     the ONLY thing that matters
+tr '\n' ' ' | grep -c  (case-sensitive)     -> 0     whitespace collapse alone does NOT help
+```
+
+The source reads **`**neither is browser-callable**`** — **lowercase `n`**, inside bold.
+**So: the mechanism is CASE, and nothing else.** A line break was never involved; the
+`**` is not a mechanism either, because `grep` does not see emphasis; and collapsing
+whitespace cannot help because it leaves case untouched.
+
+> **This is `§6` mode 2 inside the one bullet whose entire purpose is to characterise
+> matcher behaviour** — a claim about what a matcher does, asserted without running the
+> matcher. **The same shape as this pass's unrunnable table cell and its two fabricated
+> quotations: a claim about the record, never compared with the record.**
+
+### R10d — the two cosmetics, because a quotation is a quotation
+
+- **The terminal period.** `docs/09` reads *"—however small it comes out"* with **no
+  full stop**; my quote had the period **inside** the quotation marks. **Moved out**, and
+  the sentence now says why it is outside.
+- **The shifted asterisk.** `AGENTS.md` reads *"the retraction history \*is\* evidence"*;
+  my copy read *"retraction history\* is evidence"* — one character left, which leaves a
+  **stray asterisk that could italicise the wrong span**. Restored. **The same quotation
+  appears twice** in the log — once repaired in round 9 and once quoted inside that
+  round's own correction — and **both** were carrying the error; **both fixed.**
+
+### R10e — the leak scan's controls, and three that did not fire
+
+The verifier was right to insist on controls **derived from the regexes**: **three of my
+first ten did not fire**, and I would have read that as three dead nets rather than three
+mis-shaped controls.
+
+| pattern | first control | why it failed | corrected |
+|---|---|---|---|
+| reCAPTCHA site keys | `6LbuorABCD…` | regex is `^6L` **+ 2 chars** + `buor` + … — the 2 chars were missing | `6LzzbuorABCD0123456789` |
+| AWS VPC endpoint service name | `vpce-0123456789abcdefg…` | **16** hex not 17, and `g` is **not hex** | `vpce-0123456789abcdef0-…` |
+| internal Grafana/K8s/GitLab/DB/Prometheus host | `grafana.minimed.example` | the regex needs **three** labels plus a **trailing dot**: `(name)\.[label]\.(minimed\|medtronic)\.` — mine had two and no dot | `grafana.eu-1.minimed.` |
+
+**All ten nets are now proven live against their own regexes before the scan runs.**
+The scan itself over `git diff 7d915b8 HEAD` returns **0 on all ten.**
+
+> **The generalisable form, and it is the fifth instance in this pass: a control that
+> does not fire is ambiguous between "the net is dead" and "the control is wrong", and
+> the ambiguity always resolves the way that is most flattering.** The three nets were
+> not dead. **A validation that cannot distinguish its own two failure modes is not a
+> validation** — which is `docs/09` §4's *"a number that cannot fail is not evidence"*
+> applied to the checker rather than to the claim.
+
+### R10f — nothing measurable moved
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. All eleven subject counts unchanged, every edited site being inside a
+`## Correction (…)` section and therefore E1-excluded.
