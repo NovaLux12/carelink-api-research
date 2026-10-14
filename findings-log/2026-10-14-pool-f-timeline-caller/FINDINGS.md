@@ -1853,11 +1853,18 @@ The verifier was right to insist on controls **derived from the regexes**: **thr
 first ten did not fire**, and I would have read that as three dead nets rather than three
 mis-shaped controls.
 
-| pattern | first control | why it failed | corrected |
-|---|---|---|---|
-| reCAPTCHA site keys | `6LbuorABCD…` | regex is `^6L` **+ 2 chars** + `buor` + … — the 2 chars were missing | `6LzzbuorABCD0123456789` |
-| AWS VPC endpoint service name | `vpce-0123456789abcdefg…` | **16** hex not 17, and `g` is **not hex** | `vpce-0123456789abcdef0-…` |
-| internal Grafana/K8s/GitLab/DB/Prometheus host | `grafana.minimed.example` | the regex needs **three** labels plus a **trailing dot**: `(name)\.[label]\.(minimed\|medtronic)\.` — mine had two and no dot | `grafana.eu-1.minimed.` |
+**The corrected controls are NOT WRITTEN HERE, and that is the whole point of this
+row.** A control written into a file the net scans **is itself a match**, so a table of
+controls is a table of violations — see R11b. They are **assembled at runtime from
+fragments** by `controls.py`, whose header carries the recipe and whose fragments are
+split so no line of it concatenates into a live match. The three that failed are recorded
+**by shape, not by value**:
+
+| net | what my first control got wrong | the shape the regex actually demands |
+|---|---|---|
+| reCAPTCHA site keys | omitted the **two characters** the regex requires between its `6L` prefix and the fixed segment that follows | a prefix, **exactly 2** arbitrary chars, a fixed 4-letter segment, 4 letters, then 10+ chars — **anchored `^…$`**, so a control fires only if it is the **whole** line |
+| AWS VPC endpoint service name | **16** hex digits where the regex wants **17**, and one character that is **not hex** | a fixed prefix, **exactly 17** hex, a dash, 8 alphanumerics, then a fixed four-label suffix — **unanchored** |
+| internal Grafana/K8s/GitLab/DB/Prometheus host | built with **two** labels and **no trailing dot** | a name from a fixed list, a label, a domain from a two-item list, then a **trailing dot** — **unanchored**, so it matches **anywhere** on a line |
 
 **All ten nets are now proven live against their own regexes before the scan runs.**
 The scan itself over `git diff 7d915b8 HEAD` returns **0 on all ten.**
@@ -1874,3 +1881,94 @@ The scan itself over `git diff 7d915b8 HEAD` returns **0 on all ten.**
 `wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
 round. All eleven subject counts unchanged, every edited site being inside a
 `## Correction (…)` section and therefore E1-excluded.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 11. **One blocking finding, and it is a different kind from every previous
+round's.** Nine of ten prior rounds' findings were claims about the record that were
+never compared with the record. **This one is a record that trips the net it was
+written to demonstrate** — a defect no amount of care about wording could have caught,
+because it is not a wording defect.
+
+**Base for every diff and sweep: `7d915b8`.** `origin/main` used for nothing.
+
+### R11a — I wrote a live match into the diff, and my "0 on all ten" claim was FALSE
+
+**The blocker.** At `342c192` this log carried two corrected controls **as literal
+strings**, and one of them is a live match for net #5. So the claim *"The scan itself
+over `git diff 7d915b8 HEAD` returns **0 on all ten**"* was **false — it returned 1.**
+`research-gate.sh` would have printed `!! internal Grafana/K8s/GitLab/DB/Prometheus host
+— 1 hit(s). DO NOT COMMIT.`, set `FAIL=1`, and turned CI `gate` red.
+
+**And it was TWO, not one.** Searching the diff for **all ten** controls literally —
+not the one the verifier named — found a **second** leak: the reCAPTCHA control. That
+one escaped the scan only by luck: its pattern is anchored `^…$`, and the control sits
+mid-line inside a table cell, so `^` cannot reach it. **In `--all` mode, where the gate
+`cat`s whole files, a control at the start of a line would have fired.** A latent
+hazard whose severity depends on another pattern's anchoring and on gate mode is not a
+control; it is a coin toss.
+
+**Fixed by assembling controls at runtime from fragments**, in a new
+[`controls.py`](controls.py) in this log directory, whose fragments are split so that
+**no line of it — and no concatenation of adjacent fragments — matches the net it
+exercises.** The R10e table now records the three failures **by shape, not by value**,
+so the log carries no control at all. **Verified, not asserted: the scan over
+`git diff 7d915b8 HEAD` now returns 0 on all ten**, with `controls.py` itself in the
+subject list.
+
+### R11b — the rule, and why round 10's rule did not catch this
+
+Round 10 adopted *"no figure about this log goes in this log"*. That rule was real and
+it did not catch this, **because a control string is not a figure.** The rule that does:
+
+> **A correction that demonstrates a detector is live must not write a live match into
+> any file that detector scans.**
+
+**The structural reason is a gap in the gate, and it is worth recording rather than
+working around:** `research-gate.sh` exempts **exactly two** paths from its leak scan —
+itself, and `scripts/scrub-patterns.txt`. **There is no exemption for `findings-log/`
+at all**, which is right in general and wrong for a pass whose subject *is* the nets.
+The fix is not a wider exemption; it is **never writing the value**.
+
+### R11c — the habit, which is the part that generalises
+
+Round 10 fixed **R10c** — *"a claim about what a matcher does, asserted without running
+the matcher"* — and in **the very next subsection** committed the identical shape
+against a **different** matcher, while reporting that net as proven live.
+
+> **Verifying a net fires is reading back the intended target. Reporting the scan clean
+> is composing the net with the diff. The first is not the second, and only the second
+> is what the gate does.** A pass can do the first perfectly, ten times, and still be
+> one `printf` away from a red gate.
+
+**Both are now done by `controls.py`, separately and in that order**, and the second is
+the exit status rather than a line of prose. A checker whose result is prose can be
+asserted; a checker whose result is an exit code cannot.
+
+### R11d — the `headers/` tree digest, now with its method
+
+**A digest published without a stated method is not independently re-derivable** — its
+own neighbour, and the verifier could not reproduce `a1375242809f19f3…` by five
+plausible methods because the label *"tree digest"* says nothing about *which* hash or
+*which command*. **The two published values are these, and both reproduce exactly:**
+
+| value | method | reproduces at `cd9b79a` and at head |
+|---|---|---|
+| `a1375242809f19f3b5053fe718f040b54a9e3a6d` | **git tree hash** — `git rev-parse <ref>:findings-log/2026-10-14-pool-f-timeline-caller/headers` | **yes, identical** |
+| `61c4c64cc818e731a89a692ef8bd0ea145ae7fb1e174d2907f9289a12eda0f04` | **sha256 of the concatenated blob bytes** — `git ls-tree -r --name-only <ref> <path> \| sort`, then `git cat-file -p` each and pipe to `sha256sum` | **yes, identical** |
+
+They are **different digests of different things** — the first covers names, modes and
+blob ids; the second covers the bytes a reader would reassemble — which is why both are
+published, and why neither alone would have been enough. The other three digests
+(`results.jsonl`, `run.log`, `grep-out.txt`) are plain `sha256sum` of the blob at each
+ref, and reproduced exactly.
+
+### R11e — nothing measurable moved
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. All eleven subject counts unchanged; the edited sites are inside
+`## Correction (…)` sections and therefore E1-excluded. The E1 negative itself is
+untouched and was not re-litigated.
