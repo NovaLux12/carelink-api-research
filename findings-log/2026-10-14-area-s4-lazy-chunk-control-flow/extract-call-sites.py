@@ -24,7 +24,7 @@ stated because each one moves the number.
         `patient/logbookEntry/${w}`              template, may interpolate
       A rule that requires the leading slash silently drops 45 pairs.
       A ternary in first-argument position contributes BOTH branches, labelled,
-      because the client selects at runtime (`cond?"A":"B"`, 3 sites).
+      because the client selects at runtime (`cond?"A":"B"`, 4 sites).
 
   D3. `${this.baseUrl}` IS RESOLVED ONLY WITHIN ITS OWN CHUNK, and only when
       that chunk contains exactly ONE `this.baseUrl="literal"` assignment.
@@ -156,7 +156,8 @@ def main():
             consts[m.group(1)].add(m.group(2))
 
     pairs = defaultdict(lambda: {"chunks": set(), "verbatim": set()})
-    sites_total = sites_literal = sites_resolved = sites_unresolved = 0
+    sites_total = sites_literal = sites_baseurl = sites_constant = 0
+    sites_unresolved = 0
     unresolved_by_method = defaultdict(int)
     unresolved = []
     resolved_sites = []
@@ -176,15 +177,20 @@ def main():
                 got = [(chunk_base + p[len("${this.baseUrl}"):], b, "baseUrl")
                        for p, b, _ in got]
                 kind = "baseUrl"
+            elif got and all(o.startswith("const:") for _, _, o in got):
+                # A dotted enum constant, not a literal. Counted separately so the
+                # literal column means what its name says.
+                kind = "constant"
             if got:
                 for path, branch, origin in got:
-                    key = (m.group("m"), normalize_slots(path), branch)
-                    pairs[key]["chunks"].add(name)
-                    pairs[key]["verbatim"].add(path)
+                    pairs[(m.group("m"), normalize_slots(path), branch)]["chunks"].add(name)
+                    pairs[(m.group("m"), normalize_slots(path), branch)]["verbatim"].add(path)
                 if kind == "literal":
                     sites_literal += 1
+                elif kind == "constant":
+                    sites_constant += 1
                 else:
-                    sites_resolved += 1
+                    sites_baseurl += 1
                 if got[0][2] != "literal":
                     resolved_sites.append(
                         {"chunk": name, "method": m.group("m"),
@@ -224,7 +230,9 @@ def main():
         "n_chunk_files": len(files),
         "http_call_sites_total": sites_total,
         "sites_with_literal_path": sites_literal,
-        "sites_with_resolved_variable_path": sites_resolved,
+        "sites_with_baseurl_resolved_path": sites_baseurl,
+        "sites_with_constant_resolved_path": sites_constant,
+        "resolved_sites_rows": len(resolved_sites),
         "sites_with_unresolved_variable_path": sites_unresolved,
         "unresolved_by_method": dict(unresolved_by_method),
         "distinct_pairs": len(pairs),

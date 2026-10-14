@@ -185,9 +185,9 @@ or a wordlist entry. Re-measured per-hit, that is **wrong on the one hit that ma
 | 3 | `…,biomarkers,…` | password wordlist |
 | 4 | `…,markers,reconciliation,…` | password wordlist |
 
-Hit 1 is the right-hand side `i.markers` at byte **77,984** of
+Hit 1 is the right-hand side `i.markers` at byte **77,985** of
 `k-6746-c6795ff7e9ff468d-js.b` (the left-hand `n.unfilteredEventMarkers` begins at
-77,962). It is the assignment of a
+77,960). It is the assignment of a
 response field onto the client's view model. `unfilteredEventMarkers` occurs **7**
 times in total, all in that chunk.
 
@@ -247,7 +247,7 @@ value of `0`. That is an honest distinction: the enum is an 11-token superset of
 | **time change** | (in the insulin/385.2 group) | **`TIME_CHANGE` → 400** |
 
 The non-BLE calibration floor is `sgBelowLimit + 1`, not `sgBelowLimit`
-(`W=C.value>385.2?385.2:C.value<O+1?O+1:C.value`, byte 81,366, where `O=c.sgBelowLimit||40`).
+(`W=C.value>385.2?385.2:C.value<O+1?O+1:C.value`, byte 81,344, where `O=c.sgBelowLimit||40`).
 
 A consumer switching on `BG_READING` alone silently drops every Guardian/legacy marker;
 switching on `BG` alone drops every BLE one. This is a **client-side** divergence in
@@ -297,7 +297,7 @@ earlier draft of this pass reproduced without attributing.
 ### 6.2 The correction — the two "axes" are one
 
 `parseJsonData` in `k-6746-c6795ff7e9ff468d-js.b` (definition at byte 74,236; the
-assignment itself at byte 74,268) opens:
+assignment itself, `n.deviceFamily=i.medicalDeviceFamily`, at byte 74,266) opens:
 
 ```js
 parseJsonData(i, v) { const n = {};
@@ -321,9 +321,9 @@ in the earlier draft, not to area P (which only ever claimed a casing candidate)
 
 | byte | code | notes |
 |---|---|---|
-| 76,306 | `"NGP"===n.deviceFamily){… n.sLastAlarmCode = …` | gates alarm-code formatting |
-| 78,361 | `"NGP"==n.deviceFamily){const y=i.lastBolus; … n.sLastBolusDate/Time` | gates **last-bolus** fields, not alarm codes |
-| 83,895 | `"NGP"==i.medicalDeviceFamily && (h("activeInsulin") || …)` | compares the **reported** field name directly — independent corroboration of §6.2 |
+| 76,305 | `"NGP"===n.deviceFamily){… n.sLastAlarmCode = …` | gates alarm-code formatting |
+| 78,360 | `"NGP"==n.deviceFamily){const y=i.lastBolus; … n.sLastBolusDate/Time` | gates **last-bolus** fields, not alarm codes |
+| 83,894 | `"NGP"==i.medicalDeviceFamily && (h("activeInsulin") || …)` | compares the **reported** field name directly — independent corroboration of §6.2 |
 | 87,565 | `this.isNGP="NGP"===K.deviceFamily;` | sets the `isNGP` flag; 87,559 is the `isNGP` identifier itself |
 
 So the routing discriminator's observed value set is at least
@@ -390,6 +390,7 @@ contribute 8 branch rows to `pairs.tsv`:
 | POST | `/patient/users/me/validate/password/compliance` | `/patient/validate/password/compliance` |
 | POST | `` /patient/m2m/sms/sendTestSms/${encodeURIComponent(A)} `` | `/patient/sms/sendTestSms` |
 | GET | `` /patient/csr/users/me/notifications/history/patients/${encodeURIComponent(a)} `` | `/patient/csr/users/me/notifications/history` |
+| GET | `` …/patients/${encodeURIComponent(a)}/export/csv `` | `…/notifications/history/export/csv` |
 
 The first is a flag-dependent choice between a patient-scoped and a legacy path — a
 client-side routing fact that reading either route would never reveal.
@@ -411,7 +412,7 @@ literal is still emitted alongside in `pairs.tsv`, so nothing is lost by normali
 ### 7.1 Measured result
 
 ```
-233 http call sites → 155 literal-path + 20 resolved-variable + 58 UNRESOLVED
+233 http call sites → 154 literal + 20 baseUrl-resolved + 1 constant-resolved + 58 UNRESOLVED
 144 distinct (method, path) shapes = 72 GET + 49 POST + 14 PUT + 9 DELETE + 0 PATCH
 ```
 
@@ -420,9 +421,11 @@ literal is still emitted alongside in `pairs.tsv`, so nothing is lost by normali
 | metric | value | source |
 |---|---|---|
 | HTTP call sites (D1 receiver-matched) | 233 | `counters.json` |
-| sites with a literal first-argument path | 155 | `counters.json` |
-| sites resolved from a variable under D3 | 20 | `resolved-constants.tsv` |
+| sites with a literal first-argument path | 154 | `counters.json` |
+| sites resolved under D3 (`${this.baseUrl}`, within-chunk guard) | 20 | `resolved-constants.tsv` |
+| sites resolved from a uniquely-defined enum constant | 1 | `resolved-constants.tsv` |
 | sites whose path is a variable — **not guessed** | 58 | `counters.json` |
+| rows in `resolved-constants.tsv` | 21 | `counters.json` |
 | **distinct shapes** | **144** | `pairs.tsv`, `counters.json` |
 | shapes with / without a leading slash | 99 / 45 | `counters.json` |
 | ternary sites / branch rows | 4 / 8 | `counters.json` |
@@ -437,13 +440,22 @@ literal is still emitted alongside in `pairs.tsv`, so nothing is lost by normali
 > this table were added to the script in response, so the number cannot drift from the
 > prose again.
 
-The single enum-constant resolution is `POST T.S.PATIENT_REPORTS_SENSOR_HISTORY` →
+`resolved-constants.tsv` has **21 data rows** — 20 from the D3 `this.baseUrl` family,
+all resolving to `/patient/csr/incidents` or `/patient/csr/safety/notice/definitions`,
+and 1 from an enum constant. The constant is `POST T.S.PATIENT_REPORTS_SENSOR_HISTORY` →
 `patient/reports/sensor-history`, defined at byte 1,532,586 of the main bundle and used
 at byte 2,211,303 of the same file — so that path came from the **eager** bundle, not
 from any lazy chunk. Constant resolution is allowed only for a dotted constant whose
-leaf name is defined exactly once in the corpus. The other 19 entries in
-`resolved-constants.tsv` are the D3 `this.baseUrl` family, all resolving to
-`/patient/csr/incidents` or `/patient/csr/safety/notice/definitions`.
+leaf name is defined exactly once in the corpus.
+
+**A label that was wrong and is now right.** An earlier version counted the
+constant-resolved site inside `sites_with_literal_path`, because the counter was keyed on
+"did the harvester produce something" rather than on *how*. The constant has its own
+column now, which is why the literal count is **154** and the four columns sum exactly:
+
+```
+154 literal  +  20 baseUrl-resolved  +  1 constant-resolved  +  58 unresolved  =  233
+```
 
 ### 7.2 The rule reproduces `docs/06`'s independent `/patient/csr` measurement
 
@@ -461,7 +473,7 @@ this corpus. `docs/06` published **19** `/patient/csr` method × path shapes on
 The two not reproduced are the **bare-base** rows — `GET` and `POST` on
 `/patient/csr/safety/notice/definitions` with no suffix. Those calls pass
 `this.baseUrl` itself as the first argument, an identifier rather than a literal, so D2
-does not admit them and they fall into the unresolved 57. `docs/06` resolved them by a
+does not admit them and they fall into the unresolved **58**. `docs/06` resolved them by a
 deliberate decision this rule does not make: *"a bare `this.baseUrl` is a shape, not an
 exclusion."* **Both rules are recorded; neither is withdrawn.**
 
@@ -476,11 +488,25 @@ caveat — *literal ≠ live* — applies unchanged to all nine: none was probed
 
 ### 7.3 The 58 unresolved sites are a finding, not a gap in the work
 
-They are dominated by a report URL builder (`this.createUrlForReport(…)`), the bare-base
-calls above, and constants (`g._m`, `Ke.B2`, `fp.rx`, `S.No`, `fp.YV`) whose definitions
-are **not in the retained corpus**. One apparent resolution is a false positive and is
-called out so nobody re-derives it: `SI:"31234567"` is an Angular internal, not an
-endpoint.
+Composed exactly as `unresolved.tsv` records them — this breakdown is read off the
+committed file, not from memory:
+
+| class | count | examples |
+|---|---|---|
+| bare-base calls (`this.baseUrl`) | 6 | the two rows `docs/06` counts as shapes |
+| dotted constant refs | 8 | `e.SI` ×3, `fp.rx`, `g._m`, `Ke.B2`, `S.B2`, `S.No`, `w.Bp` |
+| `this.url` / `this.createUrlForReport(...)` | 3 | a report URL builder |
+| bare local identifiers (minified params) | 41 | `j`, `p`, `V`, `t`, … |
+
+None of the eight constants resolves. `e.SI` never resolves **structurally**: the
+constant pattern requires a leading `.`, and the corpus writes `,SI:"31234567",`. An
+earlier draft called that string "an Angular internal" — that attribution was an
+unlabelled INFERRED guess and is **deleted** here, because nothing in the corpus
+identifies what `SI` is. The other seven are absent from the retained corpus.
+
+An earlier draft also listed `fp.YV` here. It is not unresolved: the site is
+`` `${m}${fp.YV}` ``, a template literal, so it is counted in `pairs.tsv` as shape
+`{1}{2}` with the constant left unexpanded. Corrected.
 
 ---
 
@@ -537,7 +563,7 @@ defects were found; none was a vendor-surface change, all were analysis defects.
 | # | draft claim | status on re-measurement |
 |---|---|---|
 | 1 | citation window 80,919 → 81,960 is "one uninterrupted statement" | **cite wrong** — true extent 80,919 → 84,159; the cited window holds none of the branches the section described |
-| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,984; negative retracted (§5) |
+| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,985; negative retracted (§5) |
 | 3 | 146 pairs, 90 GET / 50 POST / 21 PUT / 9 DELETE | **not reproducible and internally inconsistent** — the parts sum to 170, not 146. Measured 144 under a recorded rule (§7) |
 | 4 | (first commit) 141 pairs, 90/47/6/7/1 | **not reproducible**, and its parts sum to 151, not 141 |
 | 5 | routing `deviceFamily` and reported `medicalDeviceFamily` are two axes overlapping on `GUARDIAN` | **wrong** — the client assigns one from the other (§6.2) |
@@ -587,12 +613,12 @@ and citation, not of the vendor surface.
 | # | verifier finding | status |
 |---|---|---|
 | 1 | "34 shapes carry no leading slash" — the committed `pairs.tsv` says **45**, and the script's own docstring already said 45 | fixed; the figure is now read from `counters.json`, which gained the leading-slash counters so the prose cannot drift from the output again |
-| 2 | `markers` is at byte 77,987, not 77,962 | fixed — 77,962 is the *left-hand* `n.unfilteredEventMarkers`; the right-hand `i.markers` is at **77,984** |
+| 2 | `markers` is at byte 77,987, not 77,962 | fixed in two steps — §11b records the second: `77,984` was the `=`, the `i.markers` expression is at **77,985**, and the left-hand `n.unfilteredEventMarkers` at **77,960** |
 | 3 | §6.3 quoted the text at byte 76,306 under a citation of 78,361, which holds last-bolus fields; and `docs/05` propagated it | fixed — all four `NGP` sites are now tabulated with what each actually gates, and `docs/05` corrected |
 | 4 | "232 vs 233" was a **regex bug**, not a scope note: `(?:_?http\|HttpClient\|httpClient)` cannot match `_httpClient.` | fixed — `(?:_?http(?:Client)?\|HttpClient)`; site total is **233**, and the prose had been written to match the bug |
 | 5 | "all four outputs are committed" — three were | fixed — `resolved-constants.tsv` is now committed |
 | 6 | "three sites" for ternaries — there are **4** (8 branch rows) | fixed, and the count is now emitted by the script |
-| 7 | offsets 65,622→**65,423**, 70,908→**71,063**, 81,679→**81,668** | first two fixed; the third is a **disagreement, not an error** — 81,679 is the `p.` token this document cites and 81,668 is the enclosing `if(`. The byte convention is now declared in §2 so the two cannot be confused again |
+| 7 | offsets 65,622→**65,423**, 70,908→**71,063**, 81,679→**81,668** | first two fixed; the third is a **disagreement, not an error** — 81,679 is the `p.` token this document cites and the enclosing `if(` is at **81,676** (§11b corrects 81,668, which was the verifier's own error carried into this sentence). The byte convention is now declared in §2 so the two cannot be confused again |
 | 8 | minor: non-BLE calibration clamps to **`sgBelowLimit + 1`** not `sgBelowLimit`; `index > 287` is a **BLE-branch-only** guard; the §4 window holds **0 of the 42** lowercase casing occurrences | all three fixed |
 | 9 | gate exit 0 — INCONCLUSIVE **by abstention** | not a defect in this pass. The gate runs `05-public-config.check.sh`, which makes live vendor requests; the verifier declined to spend them. The offline half (`scripts/research-checks.py`) was run and passes. Recorded as the verifier left it, rather than answered in its place |
 
@@ -605,6 +631,56 @@ The most useful thing it said was that the retraction itself is sound —
 `markers` really was a wire read, the enum analysis is exact, `deviceFamily =
 medicalDeviceFamily` is exact at both offsets, and the 17-of-19 `/patient/csr`
 cross-check is a genuine independent validation of the counting rule.
+
+## 11b. Correction (2026-10-14) — second verifier round, and what it cost
+
+Round 2 reviewed `57b0288444633761b397a2f608237dec7da2f059` and returned **NOT CLEAN**
+again, with five blocking findings. It **conceded one of its own round-1 findings** (the
+`81,679` offset — the verifier was wrong; this document's value is the `p.` token) and
+**resolved** the round-1 abstention on the gate by spending 3 of its 10 requests
+(`./scripts/research-gate.sh` → GATE PASS, 84 passed / 0 failed).
+
+That is the honest shape of two rounds: the builder was right once, wrong eight times,
+and the failures moved rather than disappeared.
+
+| # | round-2 finding | status |
+|---|---|---|
+| B1 | the **PR body** at the new head was stale — 34, 232, 57, and the old offsets in five evidence rows | fixed; the body is regenerated from the same counters |
+| B2 | `resolved-constants.tsv` has **21** rows but was cited for 20, and "the other 19" against 20 baseUrl entries; `sites_with_literal_path` counted the constant site as a literal | fixed — the constant now has its own counter column, so **154 + 20 + 1 + 58 = 233** sums exactly, and `resolved_sites_rows` is emitted by the script |
+| B3 | §7.2 still said "unresolved **57**" — the pre-fix figure | fixed → 58 |
+| B4 | the ternary table listed **three** sites directly beneath the words "**Four** sites" | fixed — the fourth row (`…/patients/{id}/export/csv`, `k-5750-d7bef840102da905-js.b` byte 763, the
+`http.get(a?` call) is now in the table, and the script's docstring said 3 too |
+| B5 | the §2 byte convention was **violated by seven of this document's own offsets**, two of them introduced while recording the round-1 fix | fixed — every offset below now points at the start of the token it names |
+
+**Offsets corrected in this round**, each re-measured:
+
+| token | was | now |
+|---|---|---|
+| `i.markers` | 77,984 (the `=`) | **77,985** |
+| `n.unfilteredEventMarkers` (LHS) | 77,962 | **77,960** |
+| `"NGP"` site 1 / 2 / 3 | 76,306 / 78,361 / 83,895 | **76,305 / 78,360 / 83,894** |
+| clamp ternary `W=C.value>…` | 81,366 | **81,344** |
+| `n.deviceFamily=i.medicalDeviceFamily` | 74,268 | **74,266** |
+| enclosing `if(` for the disturbance branch | 81,668 *(verifier's own error, carried in)* | **81,676** |
+
+The lesson recorded here, because it recurred: **adding a number to `counters.json` is
+not the same as making the prose read from it.** Round 1's fix moved the leading-slash
+figure into a counter; round 2 found three figures still hand-carried — a TSV row count,
+a table row count, and a stale `57` — in the same sections. Every figure in §7 is now
+either read from `counters.json` or enumerated in full beside it.
+
+**Non-blocking, also fixed:** `fp.YV` removed from §7.3 (it is not unresolved — it is
+counted as shape `{1}{2}`); the "Angular internal" attribution for `SI` deleted as an
+unlabelled INFERRED guess, with the reason it never resolves given instead; and the
+half-open range convention for §4's statement extent, which the verifier called a genuine
+improvement worth keeping.
+
+**On the substance there is nothing further outstanding.** The verifier's own summary of
+what it could not break: the retraction, the 11-token enum and its 9 handled members, the
+BLE/non-BLE divergence, `deviceFamily = medicalDeviceFamily`, the 7-type nulled list, the
+comma coercion, the conditional-children logic, the 42/5 casing split, the corpus identity
+chain, and the 17-of-19 `/patient/csr` cross-check — all re-derived independently and all
+holding.
 
 ---
 
