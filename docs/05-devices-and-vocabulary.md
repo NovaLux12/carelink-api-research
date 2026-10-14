@@ -316,10 +316,11 @@ Two consequences:
    client enum and the third-party clients are reading one value under two names, not
    corroborating two independent fields.
 2. The token **`NGP`** is a `deviceFamily` value the vocabulary table above does not list
-   — the client compares it directly at two sites (bytes 87,559 and 78,361 of the same
-   chunk), `"NGP" === deviceFamily`, gating NGP-specific alarm handling. **OBSERVED.**
-   This is a *client-side* comparison value; the server's own NGP vocabulary remains
-   token-gated (`docs/10` #38, #39).
+   — the client compares it directly at **four** sites in the same chunk: bytes 76,306
+   (gates alarm-code formatting), 78,361 (gates last-bolus fields), 83,895 (compares
+   `medicalDeviceFamily` directly, independently corroborating point 1) and 87,565
+   (`this.isNGP="NGP"===K.deviceFamily`). **OBSERVED.** This is a *client-side* comparison
+   value; the server's own NGP vocabulary remains token-gated (`docs/10` #38, #39).
 
 The five-token enum above is still the client matcher set. `NGP` is compared by equality
 rather than through `startsWith`, so it sits outside that matcher — which is consistent
@@ -333,7 +334,9 @@ corpus occurrences) is a *form-control* name — `form.addControl("timecapUnscre
 error; it was being read as a wire field when it is a control name. Same for
 `sensorInsertionLocation` and `adhesivetapeLocation`, whose wire keys are
 `sensorInsertionInfo.sensorLocation` and `adhesiveAndTapeInfo.sensorLocation` (OBSERVED,
-lazy chunk `k-9799-ae484032a07c9d4f-js.b`, bytes 80,919–84,159).
+lazy chunk `k-9799-ae484032a07c9d4f-js.b`: the serialiser is the `if(this.form.valid)`
+statement at bytes 80,919–84,159, but the 42 control-name occurrences live at
+30,424–98,733, so no single window holds both halves of the distinction).
 
 ## Guidance
 

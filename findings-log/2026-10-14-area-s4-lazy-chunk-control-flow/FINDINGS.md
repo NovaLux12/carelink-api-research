@@ -46,6 +46,12 @@ second published negative, and a reproducible endpoint inventory.**
 
 Every figure below is a local substring scan over bytes whose identity is pinned here.
 
+**Byte-offset convention, declared because it was previously left implicit:** offsets
+are **0-indexed and start-inclusive**, and point at the **start of the token or
+statement named**. The one exception is marked where it occurs: §4's statement extent is
+given as a **half-open range** `[80919, 84159)`, because it is an extent rather than a
+token position. An earlier draft mixed the two without saying so.
+
 **Identity oracle.** sha256 over the sorted `sha256  filename` manifest of all 215
 bodies: `3f0830115d428e023fe2362118e4c4a6d385329fd4ffbd927e8de3886869ed87`.
 
@@ -87,8 +93,8 @@ Both are quoted verbatim in §6. **OBSERVED.**
 ## 4. Logbook submission control flow
 
 **Source:** `k-9799-ae484032a07c9d4f-js.b`, sha256 as §2.
-**Statement extent: bytes 80,919 → 84,159** (3,240 B), located by brace-matching from
-`if(this.form.valid){`.
+**Statement extent: bytes 80,919 → 84,159**, a **half-open range `[80919, 84159)`**
+(3,240 B), located by brace-matching from `if(this.form.valid){`.
 
 > **Correction to the citation, not to the claim.** The earlier draft cited
 > 80,919 → 81,960. That window ends mid-`physicalDisturbanceType` and contains **none**
@@ -140,6 +146,14 @@ contexts separates them cleanly:
 There are also `timecapUnscrewed_minutesTime` and `timecapUnscrewed_additionalTime`
 controls. **OBSERVED.**
 
+⚠ **The §4 window does not contain this evidence.** The 42 lowercase occurrences span
+bytes **30,424–98,733** of the chunk — the control is declared in a *different* module
+from the one that serialises it — and **0 of them** fall inside §4's statement extent
+`[80919, 84159)`. Of the 5 capital-C occurrences (65,606 / 76,826 / 82,579 / 127,510 /
+127,580) only **one** (82,579) is inside that window. An earlier draft cited the window
+for the casing distinction; it does not support it, and the wider spans are given here
+instead. **OBSERVED.**
+
 So the casing correction recorded by area P stands — but stated correctly: the
 lowercase form is **not wrong**, it is the control name. What was wrong was reading it
 as the wire field. `docs/10` row 46 lists the lowercase token among "call-site fields",
@@ -171,7 +185,9 @@ or a wordlist entry. Re-measured per-hit, that is **wrong on the one hit that ma
 | 3 | `…,biomarkers,…` | password wordlist |
 | 4 | `…,markers,reconciliation,…` | password wordlist |
 
-Hit 1 is at byte 77,962 of `k-6746-c6795ff7e9ff468d-js.b`. It is the assignment of a
+Hit 1 is the right-hand side `i.markers` at byte **77,984** of
+`k-6746-c6795ff7e9ff468d-js.b` (the left-hand `n.unfilteredEventMarkers` begins at
+77,962). It is the assignment of a
 response field onto the client's view model. `unfilteredEventMarkers` occurs **7**
 times in total, all in that chunk.
 
@@ -195,14 +211,16 @@ for (const ue in i.unfilteredEventMarkers) {
 | `index` | integer slot; timestamp is `anchor − (287 − index) × 300000 ms` | OBSERVED |
 | `type` | string, dispatched on | OBSERVED |
 | `value` | numeric, clamped by the consumer (§5.2) | OBSERVED |
-| `deliverySuspended` | boolean; the corpus reads it exactly **once**, at byte 70,908 | OBSERVED |
+| `deliverySuspended` | boolean; the corpus reads it exactly **once**, at byte 71,063 | OBSERVED |
 
-`index > 287` is dropped **except** for `LOW_GLUCOSE_SUSPENDED`, which is retained past
-the window.
+`index > 287` is dropped in the **BLE branch** of `getMarkersBasedOnType`, **except**
+for `LOW_GLUCOSE_SUSPENDED`, which is retained past the window. The non-BLE branch has
+no such guard. Stated per-branch because the earlier phrasing made it unconditional.
+**OBSERVED.**
 
 ### 5.2 Marker type vocabulary — 11 tokens, OBSERVED
 
-Webpack module **56358** at byte 65,622 of the same chunk:
+Webpack module **56358** at byte 65,423 of the same chunk:
 
 ```
 CALIBRATION, AUTO_BASAL_DELIVERY, AUTO_MODE_STATUS, TIME_CHANGE,
@@ -225,8 +243,11 @@ value of `0`. That is an honest distinction: the enum is an 11-token superset of
 | low-glucose suspend | `"LOW_GLUCOSE_SUSPENDED"` → skipped | `LOW_GLUCOSE_SUSPENDED` → skipped |
 | exercise / insulin | `"EXERCISE"`, `"INSULIN"` → 385.2 | `EXERCISE`, `INSULIN` → 385.2 |
 | **glucose reading** | **`"BG_READING"`** | **`BG`** |
-| calibration | `"CALIBRATION"` → clamp 41–385.2 | `CALIBRATION` → clamp to `sgBelowLimit`–385.2 |
+| calibration | `"CALIBRATION"` → clamp 41–385.2 | `CALIBRATION` → clamp to **`sgBelowLimit + 1`**–385.2 |
 | **time change** | (in the insulin/385.2 group) | **`TIME_CHANGE` → 400** |
+
+The non-BLE calibration floor is `sgBelowLimit + 1`, not `sgBelowLimit`
+(`W=C.value>385.2?385.2:C.value<O+1?O+1:C.value`, byte 81,366, where `O=c.sgBelowLimit||40`).
 
 A consumer switching on `BG_READING` alone silently drops every Guardian/legacy marker;
 switching on `BG` alone drops every BLE one. This is a **client-side** divergence in
@@ -295,14 +316,15 @@ in the earlier draft, not to area P (which only ever claimed a casing candidate)
 
 ### 6.3 `NGP` is a `deviceFamily` value the draft missed
 
-Two sites in the same chunk compare it directly (`k-6746-c6795ff7e9ff468d-js.b`,
-bytes 87,559 and 78,361):
+**Four** `NGP` comparison sites exist in `k-6746-c6795ff7e9ff468d-js.b`, all
+0-indexed byte offsets:
 
-```js
-this.isNGP = "NGP" === K.deviceFamily;
-…
-if (n.connectType === I.v.BLE && "NGP" === n.deviceFamily) { … sLastAlarmCode … }
-```
+| byte | code | notes |
+|---|---|---|
+| 76,306 | `"NGP"===n.deviceFamily){… n.sLastAlarmCode = …` | gates alarm-code formatting |
+| 78,361 | `"NGP"==n.deviceFamily){const y=i.lastBolus; … n.sLastBolusDate/Time` | gates **last-bolus** fields, not alarm codes |
+| 83,895 | `"NGP"==i.medicalDeviceFamily && (h("activeInsulin") || …)` | compares the **reported** field name directly — independent corroboration of §6.2 |
+| 87,565 | `this.isNGP="NGP"===K.deviceFamily;` | sets the `isNGP` flag; 87,559 is the `isNGP` identifier itself |
 
 So the routing discriminator's observed value set is at least
 `BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN, NGP`. This bears on the NGP rows
@@ -330,26 +352,38 @@ which moves the number:
 
 **D1 — receiver.** A call site counts only when the receiver is `http`, `_httpClient`
 or `httpClient` (the injected Angular `HttpClient`). The corpus holds **1,139**
-`.get(/.post(/.put(/.delete(` occurrences; **233** are HTTP. The rest share those five
-method names as collection lookups — `form.get` 161, `this.get` 37, `Vt.get` 27,
-`headers.get` 15, `cookieService.get` 14, `injector.get` 11, `map.get` 10,
-`cookieService.delete` 5. Counting `.get(` without D1 is the AGENTS.md §6 item-2 trap,
-and is how the earlier drafts produced figures reproducible under no stated rule at all.
+`.get(/.post(/.put(/.delete(` occurrences; **233** are HTTP. The leading ones share those
+five method names as collection lookups — `form.get` 161, `this.get` 37, `Vt.get` 27,
+`headers.get` 15, `cookieService.get` 14, `map.get` 10, `injector.get` 11,
+`cookieService.delete` 5, `_injector.get` 9, `paramMap.get` 4 — and the list continues
+past those ten; the figure is a floor, not a total, and is labelled as such here rather
+than presented as "the rest". Counting `.get(` without D1 is the AGENTS.md §6 item-2
+trap, and is how the earlier drafts produced figures reproducible under no stated rule at
+all.
+
+> **D1 had a real bug, found by the independent verifier and now fixed.** The first
+> version of the receiver pattern was `(?:_?http|HttpClient|httpClient)`, in which the
+> `_?http` branch is followed by `\.` and therefore **cannot** match `_httpClient.` One
+> real call site (`k-main.b`, `this._httpClient.get(…)`) was silently dropped, giving 232
+> where there are 233. It is now `(?:_?http(?:Client)?|HttpClient)`. The 144 headline was
+> unaffected — that site's first argument is a variable, so it lands in the unresolved
+> column — but the site total was wrong and the prose had been written to match the bug.
 
 **D2 — the first argument is a literal**, in any of three forms, all of which count:
 
 | form | example | pairs |
 |---|---|---|
-| leading slash | `"/patient/users/me"` | 110 |
-| **no leading slash** | `"patient/logbookEntry"` | 34 |
+| leading slash | `"/patient/users/me"` | 99 |
+| **no leading slash** | `"patient/logbookEntry"` | 45 |
 | template, may interpolate | `` `patient/logbookEntry/${w}` `` | (counted above) |
 
-34 shapes carry **no leading slash** — the client sends them relative and an interceptor
+45 shapes carry **no leading slash** — the client sends them relative and an interceptor
 prefixes the base URL. Any rule that requires a leading `/` drops them silently; the
 earlier drafts' rule did exactly that.
 
 **Conditional paths.** A ternary in first-argument position contributes **both**
-branches, each labelled, because the client selects at runtime. Three sites:
+branches, each labelled, because the client selects at runtime. **Four** sites, which
+contribute 8 branch rows to `pairs.tsv`:
 
 | method | then-branch | else-branch |
 |---|---|---|
@@ -377,28 +411,39 @@ literal is still emitted alongside in `pairs.tsv`, so nothing is lost by normali
 ### 7.1 Measured result
 
 ```
-232 http call sites → 155 literal-path + 20 resolved-variable + 57 UNRESOLVED
+233 http call sites → 155 literal-path + 20 resolved-variable + 58 UNRESOLVED
 144 distinct (method, path) shapes = 72 GET + 49 POST + 14 PUT + 9 DELETE + 0 PATCH
 ```
 
 **Method arithmetic is stated so it can be checked: 72 + 49 + 14 + 9 = 144.**
 
-| metric | value |
-|---|---|
-| HTTP call sites (D1 receiver-matched) | 232 |
-| sites with a literal first-argument path | 155 |
-| sites resolved from a variable under D3 | 20 |
-| sites whose path is a variable — **not guessed** | 57 |
-| **distinct shapes** | **144** |
-| shapes with / without a leading slash | 110 / 34 |
-| shapes with / without interpolation | 44 / 100 |
-| PATCH | 0 — no `http.patch` call site exists anywhere in the corpus |
+| metric | value | source |
+|---|---|---|
+| HTTP call sites (D1 receiver-matched) | 233 | `counters.json` |
+| sites with a literal first-argument path | 155 | `counters.json` |
+| sites resolved from a variable under D3 | 20 | `resolved-constants.tsv` |
+| sites whose path is a variable — **not guessed** | 58 | `counters.json` |
+| **distinct shapes** | **144** | `pairs.tsv`, `counters.json` |
+| shapes with / without a leading slash | 99 / 45 | `counters.json` |
+| ternary sites / branch rows | 4 / 8 | `counters.json` |
+| `/patient/csr` shapes (§7.2) | 26 | `counters.json` |
+| shapes with / without interpolation | 44 / 100 | `counters.json` |
+| PATCH | 0 — no `http.patch` call site exists anywhere in the corpus | `counters.json` |
+
+> **Every figure in that table is read out of the committed `counters.json`, which
+> `extract-call-sites.py` writes.** An earlier draft of this pass carried
+> 110/34 by hand against a committed output that said 99/45 — AGENTS.md §6 item 5, in
+> the one section whose thesis is that the rule lives in a script. The counters that feed
+> this table were added to the script in response, so the number cannot drift from the
+> prose again.
 
 The single enum-constant resolution is `POST T.S.PATIENT_REPORTS_SENSOR_HISTORY` →
 `patient/reports/sensor-history`, defined at byte 1,532,586 of the main bundle and used
 at byte 2,211,303 of the same file — so that path came from the **eager** bundle, not
 from any lazy chunk. Constant resolution is allowed only for a dotted constant whose
-leaf name is defined exactly once in the corpus.
+leaf name is defined exactly once in the corpus. The other 19 entries in
+`resolved-constants.tsv` are the D3 `this.baseUrl` family, all resolving to
+`/patient/csr/incidents` or `/patient/csr/safety/notice/definitions`.
 
 ### 7.2 The rule reproduces `docs/06`'s independent `/patient/csr` measurement
 
@@ -429,7 +474,7 @@ namespace by one receiver style, whereas D1–D4 sweep every `http.*` receiver i
 whole corpus and so reach CSR call sites sitting in unrelated chunks. `docs/06`'s own
 caveat — *literal ≠ live* — applies unchanged to all nine: none was probed.
 
-### 7.3 The 57 unresolved sites are a finding, not a gap in the work
+### 7.3 The 58 unresolved sites are a finding, not a gap in the work
 
 They are dominated by a report URL builder (`this.createUrlForReport(…)`), the bare-base
 calls above, and constants (`g._m`, `Ke.B2`, `fp.rx`, `S.No`, `fp.YV`) whose definitions
@@ -459,7 +504,7 @@ re-matched here.
 2. Whether `markers[]` appears on the **logbook entries** response. §5 settles the
    periodic connect-data surface only.
 3. The server's **NGP** vocabulary. §6.3 is a client-side comparison value only.
-4. The 57 variable-path call sites (§7.2).
+4. The 58 variable-path call sites (§7.3).
 
 ---
 
@@ -492,7 +537,7 @@ defects were found; none was a vendor-surface change, all were analysis defects.
 | # | draft claim | status on re-measurement |
 |---|---|---|
 | 1 | citation window 80,919 → 81,960 is "one uninterrupted statement" | **cite wrong** — true extent 80,919 → 84,159; the cited window holds none of the branches the section described |
-| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,962; negative retracted (§5) |
+| 2 | `markers` occurs zero times as a wire property | **false** — `i.markers` is read at byte 77,984; negative retracted (§5) |
 | 3 | 146 pairs, 90 GET / 50 POST / 21 PUT / 9 DELETE | **not reproducible and internally inconsistent** — the parts sum to 170, not 146. Measured 144 under a recorded rule (§7) |
 | 4 | (first commit) 141 pairs, 90/47/6/7/1 | **not reproducible**, and its parts sum to 151, not 141 |
 | 5 | routing `deviceFamily` and reported `medicalDeviceFamily` are two axes overlapping on `GUARDIAN` | **wrong** — the client assigns one from the other (§6.2) |
@@ -525,8 +570,41 @@ not a claim, and it is noted here rather than deleted silently.
 
 **Where area P is wrong**, for the record, since it is merged and append-only: area P's
 "verbatim" snippet renders one branch as `p.PHYSICAL_DISTURBANCE`. The token in the
-chunk is **`p.SENSOR_PHYSICAL_DISTURBANCE`** (byte 81,679 of chunk 9799), as §4's table
-uses it. Area P's own recovery is otherwise confirmed.
+chunk is **`p.SENSOR_PHYSICAL_DISTURBANCE`** (`p.` at byte 81,679; the bare
+`SENSOR_PHYSICAL_DISTURBANCE` token at 81,681; the enclosing `if(` at 81,668), as §4's
+table uses it. Area P's own recovery is otherwise confirmed.
+
+## 11a. Correction (2026-10-14) — first verifier round, on this document's own draft
+
+An independent `carelink-verifier` reviewed the draft of this document at SHA
+`7f4a5babd902a0c3242a8c180a4ca912ca4fa207` and returned **NOT CLEAN** with nine
+blocking findings. It used **0 of its 10-request budget** — every finding came from
+re-deriving against the corpus on disk, not from the network, and none passed through
+this document's wording. All nine were re-derived independently before being accepted;
+all nine held. They are fixed above, and they were all defects of this pass's analysis
+and citation, not of the vendor surface.
+
+| # | verifier finding | status |
+|---|---|---|
+| 1 | "34 shapes carry no leading slash" — the committed `pairs.tsv` says **45**, and the script's own docstring already said 45 | fixed; the figure is now read from `counters.json`, which gained the leading-slash counters so the prose cannot drift from the output again |
+| 2 | `markers` is at byte 77,987, not 77,962 | fixed — 77,962 is the *left-hand* `n.unfilteredEventMarkers`; the right-hand `i.markers` is at **77,984** |
+| 3 | §6.3 quoted the text at byte 76,306 under a citation of 78,361, which holds last-bolus fields; and `docs/05` propagated it | fixed — all four `NGP` sites are now tabulated with what each actually gates, and `docs/05` corrected |
+| 4 | "232 vs 233" was a **regex bug**, not a scope note: `(?:_?http\|HttpClient\|httpClient)` cannot match `_httpClient.` | fixed — `(?:_?http(?:Client)?\|HttpClient)`; site total is **233**, and the prose had been written to match the bug |
+| 5 | "all four outputs are committed" — three were | fixed — `resolved-constants.tsv` is now committed |
+| 6 | "three sites" for ternaries — there are **4** (8 branch rows) | fixed, and the count is now emitted by the script |
+| 7 | offsets 65,622→**65,423**, 70,908→**71,063**, 81,679→**81,668** | first two fixed; the third is a **disagreement, not an error** — 81,679 is the `p.` token this document cites and 81,668 is the enclosing `if(`. The byte convention is now declared in §2 so the two cannot be confused again |
+| 8 | minor: non-BLE calibration clamps to **`sgBelowLimit + 1`** not `sgBelowLimit`; `index > 287` is a **BLE-branch-only** guard; the §4 window holds **0 of the 42** lowercase casing occurrences | all three fixed |
+| 9 | gate exit 0 — INCONCLUSIVE **by abstention** | not a defect in this pass. The gate runs `05-public-config.check.sh`, which makes live vendor requests; the verifier declined to spend them. The offline half (`scripts/research-checks.py`) was run and passes. Recorded as the verifier left it, rather than answered in its place |
+
+The verifier's seven-failure-modes audit returned HITs on modes 1, 2, 5 and 7 — claims
+without evidence, a grep that hit without proving, derived prose contradicting its own
+source table, and a count presented as a total when it was a partial list. Every one of
+those is the same category as the seven in the table above, which is the point: the pass
+that corrected the inherited draft then reproduced four of the same failure modes itself.
+The most useful thing it said was that the retraction itself is sound —
+`markers` really was a wire read, the enum analysis is exact, `deviceFamily =
+medicalDeviceFamily` is exact at both offsets, and the 17-of-19 `/patient/csr`
+cross-check is a genuine independent validation of the counting rule.
 
 ---
 

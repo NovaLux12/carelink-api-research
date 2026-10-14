@@ -58,7 +58,7 @@ from collections import defaultdict
 CORPUS = os.environ.get("S4_CORPUS") or (sys.argv[1] if len(sys.argv) > 1 else "")
 OUT = os.environ.get("S4_OUT") or (sys.argv[2] if len(sys.argv) > 2 else "")
 
-RECEIVERS = r"(?:_?http|HttpClient|httpClient)"
+RECEIVERS = r"(?:_?http(?:Client)?|HttpClient)"
 METHODS = ("get", "post", "put", "delete", "patch")
 
 # D1: receiver + method + opening paren. The argument text is then extracted by
@@ -230,8 +230,16 @@ def main():
         "distinct_pairs": len(pairs),
         "by_method": {m: by_method.get(m, 0) for m in METHODS},
         "by_method_sum": sum(by_method.get(m, 0) for m in METHODS),
-        "pairs_with_interpolation": sum(1 for k in pairs if "{" in k[1] and k[1] != "{}"),
+        # Prose figures must be read from here, never hand-carried: an earlier
+        # draft of this pass stated a leading-slash split that contradicted its
+        # own committed pairs.tsv (AGENTS.md SS6 item 5).
+        "pairs_with_leading_slash": sum(1 for k in pairs if k[1].startswith("/")),
+        "pairs_without_leading_slash": sum(1 for k in pairs if not k[1].startswith("/")),
+        "ternary_branch_rows": sum(1 for k in pairs if k[2] != "single"),
+        "ternary_sites": sum(1 for k in pairs if k[2] != "single") // 2,
+        "pairs_with_interpolation": sum(1 for k in pairs if "{" in k[1]),
         "pairs_without_interpolation": sum(1 for k in pairs if "{" not in k[1]),
+        "csr_pairs": sum(1 for k in pairs if "patient/csr" in k[1]),
     }
     with open(os.path.join(OUT, "counters.json"), "w") as fh:
         json.dump(counters, fh, indent=2, sort_keys=True)
