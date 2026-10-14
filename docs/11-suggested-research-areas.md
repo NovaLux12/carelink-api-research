@@ -745,8 +745,9 @@ pinned anchors in full (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…`
 `personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`,
 `clcloud`, `carelink.minimed` — and **each of the five 10-character gateway ids**
 (`OBSERVED`). The reason is larger than the absence, and it settles the "look for a
-server-side proxy in the portal bundle" half of the letter: **`personal.` is 4 hits and
-not one is a key of the 69-name patient document**, while `hcp/patients` is 42 and
+server-side proxy in the portal bundle" half of the letter: **`personal.` is 4 hits
+per build, and not one of the eight is a key of the 69-name patient document** (the
+four literals are the same in each build; the byte offsets differ), while `hcp/patients` is 42 and
 `hcp/configuration/public/` 15 — **neither build reads the patient configuration
 document at all**, so the pointer is unreachable from that code and no proxy can exist
 there to follow it. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the

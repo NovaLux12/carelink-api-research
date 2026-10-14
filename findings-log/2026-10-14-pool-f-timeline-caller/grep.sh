@@ -2,7 +2,9 @@
 # grep.sh — the offline half of the area F pass (corpus grep), zero requests.
 #
 # WHAT IT ANSWERS. Area F's letter question is "how does the portal call
-# patient-timeline / dialog-lite?" (docs/11-suggested-research-areas.md:209).
+# patient-timeline / dialog-lite?" -- asked verbatim at
+# docs/11-suggested-research-areas.md:221 ("So: how does the portal call them?"),
+# with its close condition at :227. (The `### F.` heading is at :209.)
 # The only way to get that far from outside is to read the vendor's own portal
 # builds. Area V did this for the PATIENT bundle on 2026-10-13; nobody had ever
 # done it for the two PORTAL builds, which is the gap this pass closes.

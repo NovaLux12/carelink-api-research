@@ -270,11 +270,11 @@ application's own vocabulary.
 Counted **per body**, because `grep-out.txt` reports per body and a cross-build
 total beside a per-build figure is the unit error this pass's own correction C3
 exists to prevent: `m2m` is **1 per body** (2 across both), `baseUrl` is **2 per
-body** (4 across both). **The two tokens are not build-invariant**, so their offsets are
-tabulated separately rather than given once: `m2m` is at **387460 in both** builds,
-while `baseUrl` is at **2422149 / 2422752 in the clinic build and 2422091 /
-2422694 in the support build** — the support build's two offsets sit **58 bytes
-earlier**, and no reason is offered for that difference.
+body** (4 across both). **Their byte offsets are tabulated per build, because they do
+not agree across builds**: `m2m` is at **387460 in the clinic build and 387460 in
+the support build** — the same — while `baseUrl` is at **2422149 / 2422752 in the
+clinic build and 2422091 / 2422694 in the support build**, the support build's two
+sitting **58 bytes earlier**. **No reason is offered for that difference.**
 
 Hand-checked, not counted (`grep-out.txt` carries the context):
 
@@ -309,14 +309,30 @@ Hand-checked, not counted (`grep-out.txt` carries the context):
 
 ### 6.4 The negative that is larger than the one asked for
 
-**OBSERVED.** `personal.` occurs **4 times** in each build, and **none of the
-four is a key of the patient bulk document**:
+**OBSERVED.** `personal.` occurs **4 times in each build** (8 across both), and
+**none of the eight is a key of the patient bulk document**.
 
-| offset | literal | what it is |
-|---:|---|---|
-| 2403157 | `pow.personal.link.gdpr.warning` | an **HCP** config key |
-| 2762844 | `hcp/configuration/public/pow.invite.to.personal.uri` | an **HCP** config route |
-| 3238864, 3239490 | `patient.liked.to.personal.header` | a UI i18n string, twice |
+**The offsets are NOT the same in the two builds**, so they are tabulated per build.
+**Counting rule, so both columns can be re-derived from `grep-out.txt` by hand:** the
+committed context dump is `.{0,45}<token>.{0,45}`, so the **left context is a fixed 45
+bytes** and **token byte = context offset + 45**, with a window of `45 + len(token) +
+45` — **99 bytes for the 9-character `personal.`**, against 93 for the 3-character
+`m2m`. Reading the four `personal.` rows out of each body's section of `grep-out.txt`
+gives:
+
+| literal | what it is | clinic offset | support offset |
+|---|---|---:|---:|
+| `pow.personal.link.gdpr.warning` | an **HCP** config key | 2403157 | 2403099 |
+| `hcp/configuration/public/pow.invite.to.personal.uri` | an **HCP** config route | 2762844 | 2762882 |
+| `patient.liked.to.personal.header` | a UI i18n string, **twice per build** | 3238864 · 3239490 | 3040788 · 3041414 |
+
+**The literals are identical across the two builds; only the offsets move.** The last
+two differ most — clinic has them near 3 238 000 and support near 3 040 000, i.e. the
+i18n table sits in a different place in each bundle — and **no cause is asserted for
+that**, since the bundles are different builds of different lengths. Only the
+minifier's own identifiers differ in the surrounding text (`R[…]` vs `j[…]`,
+`Oe=` vs `se=`), which is what a reader would expect from two separately minified
+builds and is not load-bearing.
 
 **Zero of the 69 published patient config keys appear in either portal build.**
 `/patient/` is 0, `carelink.minimed` is 0, `clcloud` is 0, `api/carepartner` is
@@ -466,7 +482,7 @@ to confirm; it is not claimed here.
 | 13 | `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both config-key spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and all five gateway ids are **0 in both builds** | OBSERVED | `grep-out.txt` token tables; `grep.sh` |
 | 14 | `m2m` = 1 hit **per body** (2 across both), at byte **387460 in the clinic build and 387460 in the support build** — identical — inside `cum2me` (bytes 387458–387463), its third through fifth characters | OBSERVED | `grep-out.txt` context dump; derivation in C4 |
 | 15 | `baseUrl` = 2 hits **per body** (4 across both) — **clinic build 2422149 / 2422752, support build 2422091 / 2422694**, i.e. **not build-invariant**, all four inside an embedded Pusher SDK | OBSERVED | `grep-out.txt` context dump; per-build split in C5 |
-| 16 | `personal.` = 4 hits at bytes 2403157 / 2762844 / 3238864 / 3239490, **none** a key of the 69-name patient document | OBSERVED | `grep-out.txt`; offsets tabulated at §6.4 |
+| 16 | `personal.` = **4 hits per build** (8 across both) — **clinic 2403157 / 2762844 / 3238864 / 3239490, support 2403099 / 2762882 / 3040788 / 3041414**, i.e. **not build-invariant**; the four **literals** are the same in each and **none** is a key of the 69-name patient document | OBSERVED | `grep-out.txt` context dumps for both bodies; per-build table and counting rule at §6.4 |
 | 17 | `timeline` 66 + `Timeline` 126 + `TIMELINE` 4 = **196** occurrences, 74 signatures, none naming the service | OBSERVED | `grep-out.txt` census, counting rule at §6.5 |
 | 18 | There is **no caller** for either service in either portal build, and **no proxy can exist** there because neither build reads the patient config document | OBSERVED for the two build facts; **INFERRED** for the "no proxy" consequence | §6.2, §6.4 |
 | 19 | If a web caller exists at all it is in none of the three builds this repo has read | **INFERRED** (stated as a corpus claim, not a claim about every client) | §6.6 |
@@ -829,7 +845,7 @@ residues were found that no item named:
 |---|---|---|
 | **build-invariance claims** | `both builds` / `in both builds` / `identical in both` / `given once` / `either build` over every added line | **1 further false claim**, §6.3's `baseUrl` bullet (item 1). Every other hit is a legitimate use about the **literal counts**, which *are* build-invariant — `m2m` 1 per body and `baseUrl` 2 per body in both |
 | **superseded predicates** | `the tail of` / `not its tail` / `not the tail` over every added line | **1 further residue**, §6.3's `m2m` bullet (item 2). The only other hit is C4's own heading, which must keep the phrase to name what it retracts |
-| **`file:NNN` line cites** | every `path.md:NNN`, `path.hurl:NNN`, `path.sh:NNN` and `§N` cite in **this log** — the whole file, since it is new — each resolved against the **head tree**, never against `origin/main` | **2 further defects, both introduced by earlier rounds of mine**: (a) `README.md:205`, cited in round 2's C4, is *"reliable and family-matching is a guess"* — the `147` trap row is at **`docs/09:205`** and I had **transposed the filename**; (b) `AWS-GATEWAYS.md:240-243` **over-reaches by one line**, since `:243` is a different bullet (*"No authorizer discrimination test"*) and the BLOCK-7 claim is `:240-242`. Both corrected. The remaining cites — `docs/11:222`, `README.md:404`, `04-deep-surface.hurl:96`/`:102`, `enumeration-scrubbed.txt` 83/121/155/187/245, and every `AGENTS.md` §1/§2/§3/§6/§7/§8 and `docs/09` §2/§4/§5 — **all resolve to what they are cited for** |
+| **`file:NNN` line cites** | every `path.md:NNN`, `path.hurl:NNN`, `path.sh:NNN` and `§N` cite in **this log** — the whole file, since it is new — each resolved against the **head tree**, never against `origin/main` | **2 further defects, both introduced by earlier rounds of mine**: (a) `README.md:205`, cited in round 2's C4, is *"reliable and family-matching is a guess"* — the `147` trap row is at **`docs/09:205`** and I had **transposed the filename**; (b) `AWS-GATEWAYS.md:240-243` **over-reaches by one line**, since `:243` is a different bullet (*"No authorizer discrimination test"*) and the BLOCK-7 claim is `:240-242`. ⚠ **CORRECTED 2026-10-15 (round 4) — this row then closed with "Both corrected", and that sentence was FALSE AS WRITTEN.** (a) was genuinely corrected. **(b) was not**: the same over-reaching range stood at **`probe.sh:79`** in the sibling harness **in the same directory, 176 lines from the occurrence this sweep did fix**, and the row asserted a completeness it had not checked. **A sweep that reports what it fixed must not also report what it believes it fixed everywhere** — those are two different claims and the second is the one that goes stale. (b) is corrected now, in `probe.sh`, and the class was re-swept by enumerating every `file:NNN` range in **every `.sh`** in the diff and **reading each target range**, not matching its string. The remaining cites — `docs/11:222`, `README.md:404`, `04-deep-surface.hurl:96`/`:102`, `enumeration-scrubbed.txt` 83/121/155/187/245, and every `AGENTS.md` §1/§2/§3/§6/§7/§8 and `docs/09` §2/§4/§5 — **all resolve to what they are cited for** |
 
 ### R1 — §6.3's `baseUrl` bullet still asserted build-invariance (BLOCKING)
 
@@ -951,3 +967,131 @@ cited lines *and* a class, round 3 fixed the cited lines, a class, and — only 
 being told to — the whole file set behind the class. **A sweep with a narrower glob
 than the diff is not a sweep**, and the honest measure of one is whether it found
 anything the reviewer did not already list.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 4 of verification, three items, and the first two are **not new errors** — they
+are **the same failure round 3 was told to fix, made once more**. The correction
+below therefore leads with the *method* change, because the method is the fix.
+
+### The method, changed: sweep by subject, not by phrase
+
+Round 3's sweep declared its own vocabulary at the table above:
+`both builds` / `in both builds` / `identical in both` / `given once` / `either
+build`. **Not one of those strings occurs in the line it needed to find** — the class
+is named "build-invariance claims" and the query list does not contain the word
+*build-invariant*. **So that sweep could not have found `FINDINGS.md:273`.** It was
+not a search that came up empty; it was a search that could not ask the question, and
+reporting "1 further false claim" from it gave a zero the reader had no way to trust.
+
+**What this round did instead.** Enumerate the **subjects**, then gather **every**
+mention of each across the whole diff — this log, `docs/`, and **every `.sh`** —
+using the subject itself as the query, and assert the mentions agree:
+
+| subject | mentions | agreement |
+|---|---:|---|
+| `m2m` offsets (`387460`) | 8 | **agree** — every mention either gives the single value or states it per build and identical |
+| `baseUrl` offsets (`2422149` `2422752` `2422091` `2422694`) | 9 | **agree** — per-build labelled; 2 of the 9 are the quoted superseded wording |
+| `personal.` offsets (8 values) | **4** (was 8 sites, now 4) | **agree** — all four in the per-build table and row 16 |
+| `cum2me` bytes (`387458`–`387463`) | 5 | **agree**; 1 is the quoted superseded wording |
+| `403` body digest (`f249b63cb2fc…`) | 13 | **agree** — every occurrence a consistent prefix of the one full value |
+| `500` body digest (`660f19c0…`) | 6 | **agree** — same |
+| `timeline` census (`196`) | 17 | **agree on subject**; 2 are a different subject (§V4 below) |
+| signature count (`74`) | 10 | **agree on subject**; 3 are a different subject |
+| `BLOCK 7` range | 8 | **agree** on `:240-242`; 2 describe the defect |
+| `docs/11` letter cites | 6 | **agree** on `:221`/`:222`; 2 describe the defect |
+
+⚠ **The boundary of this method too, recorded so the table is not read as cleaner
+than it is: a NUMERAL IS NOT A UNIQUE IDENTIFIER.** Querying subjects `196` and `74`
+returned three hits that are **not this pass's census or signature count** —
+`docs/09:195` (*"including both 196 B 404s"*, a body size), `docs/11:1127`
+(*"one 196-byte HTTP 404 control body"*), `docs/04:648` (*"34 for 74 countries"*).
+All three **verified pre-existing on `origin/main`** and none was edited. So this
+method is better than phrase-sweeping — it asks the question, and it found four
+defects no item named — but it still needs each hit **read**, not counted. **A subject
+sweep says "here is every place this subject appears"; it does not say "every one of
+these is the same claim".** Both halves are needed, and the second half is the one
+that does not scale, which is the honest limit of this record.
+
+### R1 — `FINDINGS.md:273` contradicted itself one line down
+
+**The superseded wording, verbatim.** *"**The two tokens are not build-invariant**, so
+their offsets are tabulated separately rather than given once: `m2m` is at **387460 in
+both** builds, while …"*
+
+The clause is **deleted**. It was contradicted by the very next line, by C5's table,
+and by row 14; and the round-3 defence of it — that other hits were *"a legitimate use
+about the LITERAL COUNTS"* — did not reach it, because the next clause is *"so their
+**offsets**"*. On the counts reading it is false too: `m2m` is 1 per build and
+`baseUrl` 2 per build, so both are build-invariant. **The replacement says what is
+true and only that**: the two tokens' **byte offsets** do not agree across builds, and
+which one agrees is named.
+
+### R2 — `probe.sh:79`, and a sweep row that claimed a completeness it had not checked
+
+`probe.sh:79` still read `AWS-GATEWAYS.md:240-243`. `:243` is a different bullet
+(*"No authorizer discrimination test"*); the BLOCK-7 bullet is **`:240-242`**. Now
+corrected, with its path.
+
+⚠ **The worse half of this item is the one inside this log.** The round-3 sweep table
+closed with *"Both corrected"* — and **that sentence was false as written.** `probe.sh`
+was **176 lines from the occurrence the sweep did fix, in the same directory, in the
+same diff**, and the row asserted a completeness nobody had checked. **A sweep that
+reports what it fixed must not also report what it believes it fixed everywhere**; those
+are two different claims, and the second is the one that goes stale. The row now carries
+a dated correction of its own.
+
+**The class was re-swept properly** — every `file:NNN` range in **every `.sh`** in the
+diff enumerated, and **each target range read** rather than its string matched. That
+found the two `probe.sh` ranges and one further defect below.
+
+### R3 — the `personal.` offsets: INCONCLUSIVE resolved, and it was the unit error again
+
+The verifier stopped mid-check here and recorded it as inconclusive rather than
+clean. **Resolved by derivation from `grep-out.txt`, and the conclusion held — but the
+presentation did not.**
+
+**Counting rule, so both columns re-derive by hand.** The committed context dump is
+`.{0,45}<token>.{0,45}`, so the **left context is a fixed 45 bytes** and **token byte =
+context offset + 45**, window = `45 + len(token) + 45`. Reading the four `personal.`
+rows out of each body's section:
+
+| literal | what it is | clinic | support |
+|---|---|---:|---:|
+| `pow.personal.link.gdpr.warning` | an **HCP** config key | 2403157 | 2403099 |
+| `hcp/configuration/public/pow.invite.to.personal.uri` | an **HCP** config route | 2762844 | 2762882 |
+| `patient.liked.to.personal.header` | a UI i18n string, **twice per build** | 3238864 · 3239490 | 3040788 · 3041414 |
+
+**The offsets are NOT build-invariant** — the fourth is 3 040 788 in support against
+3 238 864 in clinic, ~198 000 bytes apart — and the old table was **clinic-only with
+no build named**, which is the unit error C3 and C5 exist to kill. **But the
+conclusion survives**, and that is what the derivation was for: **the four literals
+are identical in both builds** (`pow.personal…`, `pow.invite.to.personal.uri`,
+`patient.liked.to.personal.header` ×2), differing only in the minifier's own
+identifiers around them (`R[…]` vs `j[…]`, `Oe=` vs `se=`). **So none of the eight is
+a key of the 69-name patient document, in either build.** **No cause is asserted** for
+the offset difference; the bundles are different builds of different lengths.
+
+**Fixed in six places, all found by the subject sweep and not by any item:**
+§6.4 (table rebuilt per build, counting rule stated), §9 row 16, `docs/00`, `docs/04`,
+`docs/10` and `docs/11` — the last five all said *"4 hits"* with **no build named**,
+which is the same defect one level up from the offsets.
+
+### R4 — one further defect the subject sweep found, in no item
+
+`grep.sh:5` cited `docs/11-suggested-research-areas.md:209` for *"the letter question"*.
+`:209` is the **`### F.` heading** — a title, not a question. The question is asked
+verbatim at **`:221`** (*"So: how does the portal call them?"*) with its close
+condition at **`:227`**. Now cited to `:221`, with `:209` named as the heading. **Same
+class as R2** — a cite that resolves and points at the wrong line — found only because
+this round enumerated `file:NNN` in the `.sh` files rather than in the log alone.
+
+### R5 — nothing measurable moved
+
+All four evidence artefacts remain **byte-identical to `cd9b79a`**
+(`results.jsonl`, `run.log`, `headers/`, `grep-out.txt`). `wc -l results.jsonl` is
+**17**, matching **"17 of a 40 cap"**. No vendor request was issued this round.
+`regression/hurl/` untouched, so the counting rule is unchanged: **217 / 431**.

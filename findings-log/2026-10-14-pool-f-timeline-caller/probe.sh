@@ -11,7 +11,8 @@
 #
 # CONTROLS FIRST PER HOST (claim #123): on every gateway, the published root
 # is asked before any data cell, and the certainly-absent control UUID
-# 9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6 (AWS-GATEWAYS.md:67-70) is asked
+# 9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6
+# (findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md:67-70) is asked
 # immediately after it, so the "same envelope" reading is established in this
 # ledger rather than cited from 2026-10-10.
 #
@@ -76,7 +77,7 @@ CELLS=(
   "bundle-clinic|corpus-clinic-bundle|https://carelink.medtronic.eu/main.fb5f8cb7eb60c4d5.js"
   "bundle-support|corpus-support-bundle|https://carelink-support.medtronic.com/main.759cddab23085086.js"
   # B. patient-timeline EU -- controls, then the BLOCK-7 cells that never ran
-  #    (AWS-GATEWAYS.md:240-243).
+  #    (findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md:240-242).
   "pt-eu-root|control-plausible-root|https://$PT_EU/prod/patient-timeline/"
   "pt-eu-absent|control-certainly-absent-uuid|https://$PT_EU/prod/patient-timeline/$ABS"
   "pt-eu-v1root|block7-v1-prefix-root|https://$PT_EU/prod/patient-timeline/v1/"

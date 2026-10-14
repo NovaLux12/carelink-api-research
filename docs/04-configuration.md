@@ -405,8 +405,9 @@ here.**
 `a054555a0f22176e…`) were re-fetched on their content-hashed asset names and both
 reproduce their pinned anchors in full, so the corpus is the corpus. In **both**,
 `personal.patient.timeline.config` is **0 hits**, `patient-timeline` is **0**, and —
-the finding — **`personal.` is 4 hits and not one of the four is a key of this
-69-name document**, while `/patient/` and `carelink.minimed` are 0 and the builds'
+the finding — **`personal.` is 4 hits per build and not one of the eight is a key
+of this 69-name document** (the four literals are the same in each build; the byte
+offsets differ), while `/patient/` and `carelink.minimed` are 0 and the builds'
 named API surface is the clinician `hcp/*` namespace. **Neither portal build reads
 this document at all**, so the pointer cannot be reached from that code and no
 server-side proxy can exist in those builds to reach it (OBSERVED for the corpus
