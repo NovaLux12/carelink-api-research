@@ -1006,7 +1006,7 @@ using the subject itself as the query, and assert the mentions agree:
 | `timeline` census | `\b196\b` | 16 | **agree on subject**; a few are a different subject, listed at R4 |
 | signature count | `\b74\b` | 9 | **agree on subject**; same |
 | `BLOCK 7` range | `240-24[23]` | 4 | **agree** on `:240-242` |
-| `docs/11` letter cites | `docs/11(.{0,200}):(209\|214\|221\|222)` — **runnable, not schematic**; see R1a | 3 | **agree** on `:221`/`:222` |
+| `docs/11` letter cites | *no regex in this cell* — **the runnable ERE is in R1a below**; a markdown cell cannot hold it unescaped and `\|` is a **literal** pipe to `grep -E` | 3 | **agree** on `:221`/`:222` |
 
 **The counts fell, and that is the correction working.** Quoted superseded wording is
 **evidence, not a claim** — `AGENTS.md` §3 requires it to stay visible, and a claim is
@@ -1458,10 +1458,20 @@ chars, so `.{0,45}`, `.{0,200}` and unbounded all return **3**. The cell publish
 **200** because it is a number a reader can trust to be non-clipping, and the claim
 does not depend on where the bound sits.
 
-**On the competing 4th hit** (`docs/09:203`): **there is no such mention.** The log's
-only `docs/09` line-cite in that area is **`docs/09:195`** (the gzip row carrying
-*"196 B 404s"*), it sits at `FINDINGS.md:1072`, and that line is **inside a
-`## Correction (…)` section** — so **rule E1 excludes it**, by design. A sweep that
+**On the competing 4th hit** (`docs/09:203`): **no mention of it existed when this
+sentence was written** — see **R2a**, because this sentence, by naming the string,
+**put it in the log**. ⚠ **This claim was written too broadly and is narrowed here.**
+*"The log's only `docs/09` line-cite"* was **false**: `docs/09:205` also appears **×4**.
+The supportable claim is the exhaustive one, and it is stronger:
+
+> **EVERY `docs/09:NNN` cite in this log sits inside a `## Correction (…)` section** —
+> `docs/09:195` ×2, `docs/09:203` ×1, `docs/09:205` ×4, `docs/09:64` ×4, `docs/09:65` ×1 —
+> **so rule E1 excludes all of them and there are ZERO E1-live `docs/09:NNN` cites.**
+> Checked per cite by resolving its enclosing `## ` heading, not by reading back the
+> sentence that made the claim.
+
+The nearest neighbour of the kind this round was chasing is **`docs/09:195`** (the gzip
+row carrying *"196 B 404s"*), at `FINDINGS.md:1072` — **also** E1-excluded. A sweep that
 returns it had E1 off. **Same shape as the round-4 record: a numeral or a filename
 that looks like the subject without being it**, which is why R4's own limit note
 ("a subject sweep says *here is everywhere this subject appears*, not *every one of
@@ -1545,3 +1555,85 @@ useless to a verifier, and the wording has to say which it is.
 round. All eleven subject counts **re-run after R1a's edit** and are **unchanged** —
 the edited cell is inside a `## Correction (…)` section, so **E1 excludes it**, which is
 the second proof that the exclusion is doing its job rather than decorating the rule.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 8. **One blocking wording defect and one non-blocking overclaim.** Items 2, 3
+and 4 of the previous round are **CLEAN** and are not re-litigated — the merge table at
+all three refs, all five digests, and the mtime-oracle disclaimer were each reproduced
+unaided.
+
+**Base for every diff and sweep this round: `7d915b8`.** `origin/main` used for
+nothing.
+
+### R1b — the cell could not run, and the fix is to take the regex OUT of the cell
+
+**The defect, reproduced on raw source.** The cell published
+`` `docs/11(.{0,200}):(209\|214\|221\|222)` `` with the pipes **backslash-escaped**,
+which is mandatory inside a markdown table cell — and in ERE `\|` is a **literal**
+pipe, so the cell's own string demanded the literal text `(209|214|221|222)`:
+
+```
+grep -cE 'docs/11(.{0,200}):(209\|214\|221\|222)' FINDINGS.md  ->  0, exit 1
+grep -cE 'docs/11(.{0,200}):(209|214|221|222)'   FINDINGS.md  ->  6, exit 0
+```
+
+**A probe that silently returns nothing and reads as agreement** — `AGENTS.md` §6
+mode 3's exact shape, and **the runnable spelling existed only in the prose at R1a,
+never in the cell the finding was about.**
+
+**I took the first of the two offered routes — reword the cell to defer to R1a —
+rather than merely dropping the words "runnable, not schematic".** Dropping the label
+would leave a cell that still *looks* like a query and is not one, which is the same
+trap in softer form: a reader would still paste it. **The cell now carries no regex at
+all:**
+
+> | `docs/11` letter cites | *no regex in this cell* — **the runnable ERE is in R1a
+> below**; a markdown cell cannot hold it unescaped and `\|` is a **literal** pipe to
+> `grep -E` | 3 | **agree** on `:221`/`:222` |
+
+**Checked across the whole table, not just this cell:** every remaining regex cell
+(`\b196\b`, `\b74\b`, `240-24[23]`, `387460`, `f249b63cb2fc`, `660f19c0`, `cum2me`,
+`387458`, `387463`) carries **no pipe** and therefore **runs as written in raw source**
+— verified by executing each cell's own string with `grep -cE` and requiring **exit 0**:
+**0 cells fail**. The one escaped pipe left anywhere in a table cell is the `` `\|` ``
+inside the sentence *explaining* this defect, which is prose about the trap rather than
+a query.
+
+**The published figure is unchanged at `3`, and must not move.** Re-run under the
+amended rule: `FINDINGS.md:284`, `grep.sh:6`, `grep.sh:45`.
+
+### R2a — the overclaim, and what checking it properly turned up instead
+
+**The withdrawn wording.** *"The log's only `docs/09` line-cite in that area is
+`docs/09:195`"* was **false under the broad reading**: `docs/09:205` also appears
+**×4**, at lines 648, 806, 849 and 1271.
+
+**Replaced with the exhaustive claim, which is stronger and is checkable:** **every
+`docs/09:NNN` cite in this log sits inside a `## Correction (…)` section** —
+`docs/09:195` ×2, `docs/09:203` ×1, `docs/09:205` ×4, `docs/09:64` ×4, `docs/09:65` ×1 —
+**so rule E1 excludes all of them and there are ZERO E1-live `docs/09:NNN` cites.**
+Verified **per cite, by resolving each one's enclosing `## ` heading**, not by reading
+back the sentence that made the claim.
+
+⚠ **And the check surfaced something about the previous round that belongs here rather
+than being quietly dropped.** R1a asserted *"there is no such mention"* about
+`docs/09:203`. **That was true when written and false the moment it was written** —
+**naming a string puts it in the file.** `git log -S'docs/09:203'` dates the
+introduction to `ba36c0e`, this pass's own round-7 commit, and a tree-wide
+`git grep` now returns the hit **forever**. So:
+
+> **A sentence that DENIES a string supplies that string**, which makes every later
+> tree-wide check for its absence **unable to fail** — the mirror image of `docs/09`
+> §4's *"a check that cannot fail is not evidence."* A grep for `docs/09:203` can no
+> longer return zero, so it is no longer a test of anything; **the surviving test is
+> E1-exclusion**, which is per-cite and mechanical.
+
+**This is the fourth surface in this pass to have taught me something about how claims
+fail** — after the bare count (`§6` mode 7), the fixed point (round 6), and the
+markdown-escaped pipe (here). **The common shape: a claim about the record that is
+checked by reading the record's own prose.** Every one of them was caught by a verifier
+and not by me.
