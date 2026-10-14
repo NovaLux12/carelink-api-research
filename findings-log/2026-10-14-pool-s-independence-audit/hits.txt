@@ -194,3 +194,44 @@ docs/11-suggested-research-areas.md:1643  [corroborated]
     | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:
 
 --- 71 occurrences across 52 matching lines in 14 in-scope files ---
+
+
+==============================================================
+DENOMINATOR — measured against origin/main 7d915b8, so the figure stated in
+FINDINGS.md section 1 can be read off this file without running anything.
+Counting rule: FINDINGS.md section 0. Pattern: probe.sh / hits.py.
+Columns: file | occurrences | matching lines (both, because they are not the
+same figure - `grep -c` counts lines).
+==============================================================
+
+--- corrected pattern (word boundary on; the correction of section 0-M) ---
+README.md                                    2     2
+docs/00-summary-the-map.md                   0     0
+docs/01-hosts-and-estate.md                  0     0
+docs/02-auth-tenants-and-flows.md            0     0
+docs/03-discovery-and-versions.md            8     6
+docs/04-configuration.md                     1     1
+docs/05-devices-and-vocabulary.md            2     2
+docs/06-patient-api-surface.md               0     0
+docs/07-admin-portal-and-reporting.md        2     2
+docs/08-security-findings.md                 0     0
+docs/09-methodology-and-oracles.md           4     3
+docs/10-open-questions.md                   14     7
+docs/11-suggested-research-areas.md         35    26
+docs/RESEARCH-SESSION.md                     0     0
+TOTAL in scope (corrected)                  68    49
+
+--- superseded pattern (no left word boundary) = what the first count said ---
+TOTAL in scope (superseded)                 71    52
+overcount                                    3     3   <- `disagrees with` matching `agrees with`
+    at README.md:412, docs/10:47 and docs/11:1632. Three lines, three occurrences.
+
+--- AGENTS.md: rule text, excluded from the population by rule section 0-S ---
+AGENTS.md                                   14     7
+
+Occurrences are counted left-to-right, non-overlapping, longest-alternative-first,
+so `corroborated independently` is ONE occurrence and `not contradicted by` is one.
+The eleven strings are transcribed verbatim from AGENTS.md section 2.1. They are exact
+strings, not inflections -- see FINDINGS.md section 0 for the measured coverage limit.
+Zero of the fourteen in-scope files is wrong: docs/00, 01, 02, 06, 08 and RESEARCH-SESSION
+contain none of the eleven.

@@ -189,10 +189,11 @@ Against `origin/main` at `7d915b8`. Re-derive with `bash probe.sh`, or
 | **`docs/*.md` + `README.md`** (in scope) | **68** | **49** |
 | **`AGENTS.md`** (rule text, §0-S exclusion) | 14 | 7 |
 
-Per file, in scope, corrected pattern:
+Per file, in scope, corrected pattern, at `origin/main`:
 
 | file | occurrences | lines |
 |---|---|---|
+| `README.md` | 2 | 2 |
 | `docs/00-summary-the-map.md` | 0 | 0 |
 | `docs/01-hosts-and-estate.md` | 0 | 0 |
 | `docs/02-auth-tenants-and-flows.md` | 0 | 0 |
@@ -203,29 +204,59 @@ Per file, in scope, corrected pattern:
 | `docs/07-admin-portal-and-reporting.md` | 2 | 2 |
 | `docs/08-security-findings.md` | 0 | 0 |
 | `docs/09-methodology-and-oracles.md` | 4 | 3 |
-| `docs/10-open-questions.md` | 15 | 8 |
-| `docs/11-suggested-research-areas.md` | 36 | 27 |
+| `docs/10-open-questions.md` | 14 | 7 |
+| `docs/11-suggested-research-areas.md` | 35 | 26 |
 | `docs/RESEARCH-SESSION.md` | 0 | 0 |
-| `README.md` | 3 | 3 |
+| **total** | **68** | **49** |
+
+The same table is committed at `hits.txt`, measured against `origin/main`
+rather than recomputed by hand, so the denominator is readable without running
+anything.
 
 **Six of the fourteen in-scope files carry zero.** That is a real denominator,
 not a sampling artefact: `docs/00`, `docs/01`, `docs/02`, `docs/06`, `docs/08`
 and `docs/RESEARCH-SESSION.md` contain none of the eleven phrases.
 
-### §1a — after the corrections, the count goes **up**, and that is correct
+### §1a — after the corrections, and why the occurrence count is the wrong metric
 
 | | occurrences | matching lines |
 |---|---|---|
 | `origin/main` | 68 | 49 |
-| after this pass's edits | 71 | 51 |
+| after this pass's edits | **63** | **44** |
 
-**The population grew by 3 occurrences on 2 lines.** `AGENTS.md` §3 and
-`CONTRIBUTING` step 6 require the superseded wording to stay readable next to
-its correction, so each correction block necessarily re-prints the words it
-withdraws. **The count of withdrawn strength words is the number that matters
-and it went down: 13 occurrences of a strength word were removed from live
-claim text** (§4). A pass that drove the occurrence count to zero would have
-had to delete the retraction history, which is the one thing it must not do.
+Per file, the direction is **not** uniform, and the split is the useful part:
+
+| file | before | after | delta |
+|---|---|---|---|
+| `README.md` | 2 | 2 | 0 |
+| `docs/03` | 8 | 9 | **+1** |
+| `docs/05` | 2 | 2 | 0 |
+| `docs/09` | 4 | 4 | 0 |
+| `docs/10` | 14 | 21 | **+7** |
+| `docs/11` | 35 | 22 | **−13** |
+| total | 68 | 63 | **−5** |
+
+**`docs/10` rose by 7 while `docs/11` fell by 13, and neither number measures the
+work.** A correction that names the words it withdraws has to quote them
+(`AGENTS.md` §3, `CONTRIBUTING` step 6), so the correction blocks are themselves
+phrase-dense; and closing area S deleted a block that was almost entirely
+`AGENTS.md` §2.1's own word list, which the counting rule excludes from
+*claims* but cannot exclude from *occurrences*.
+
+**The metric that moved the right way is the one in §4: 13 strength-word
+occurrences were withdrawn from live claim text.** Reporting the occurrence
+count as progress would have been the 44→93 failure in a new costume — the
+denominator would have gone the "right" way for a reason that had nothing to
+do with the claim.
+
+**⚠ And the first draft of this section got it backwards.** It read *"the
+population grew by 3"* — because it compared the **uncorrected** `origin/main`
+(71/52) against the **corrected** working tree (71/51), mixing two patterns in
+one subtraction. The arithmetic caught it when the §1 table was rebuilt from the
+corrected pattern and its parts stopped summing. Recorded rather than fixed in
+silence, because a denominator that has been compared across two rules is not a
+denominator, and the repo has a correction history for exactly this
+(§6 item 7).
 
 ---
 
@@ -377,8 +408,8 @@ here, and the two bodies carry dates within days of each other.
 
 **13 strength-word occurrences were withdrawn from live claim text, across 12
 lines in 6 files.** Every one keeps its original wording readable beside it
-(`AGENTS.md` §3, `CONTRIBUTING` step 6) — that is why the occurrence count went
-**up** by 3 (§1a).
+(`AGENTS.md` §3, `CONTRIBUTING` step 6) — which is why the *occurrence* count is
+the wrong progress metric and the per-file direction is not uniform (§1a).
 
 | file | line | withdrawn |
 |---|---|---|
