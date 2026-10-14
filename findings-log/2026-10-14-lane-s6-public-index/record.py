@@ -9,7 +9,7 @@ the row schema is readable as Python and is not re-quoted per shell.
 
 Usage (all positional, all required):
   record.py <results.jsonl> <seq> <host_seq> <host> <tag> <role> <path> \
-            <http_status> <body_bytes> <sha256> <t_queued> <t_sent> <t_done>
+            <http_status> <body_bytes> <sha256> <t_queued> <t_sent> <t_done> <curl_exit>
 
 The derived facts are read from <results_dir>/ts/<tag>.facts, which derive.py
 wrote from the body while the lock was still held. If that file is missing or
@@ -36,11 +36,11 @@ WITHHELD = ("<withheld-by-policy: raw CDX/JSON text carries session material; "
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 14:
-        print(f"record.py: expected 13 args, got {len(argv) - 1}", file=sys.stderr)
+    if len(argv) != 15:
+        print(f"record.py: expected 14 args, got {len(argv) - 1}", file=sys.stderr)
         return 2
     (_, results, seq, host_seq, host, tag, role, path,
-     status, nbytes, sha, t_queued, t_sent, t_done) = argv
+     status, nbytes, sha, t_queued, t_sent, t_done, exit_) = argv
 
     # derive.py wrote <tag>.facts and the header projection <tag>.cf into the
     # scratch tree while the lock was held. That tree lives OUTSIDE the
@@ -76,7 +76,13 @@ def main(argv: list[str]) -> int:
         "path": path,
         "role": role,
         "http_status": status,
-        "curl_exit": 0,
+        # curl's real exit status, passed in by the caller. This was HARDCODED to 0
+        # in the first version, which made every row's curl_exit 0 BY CONSTRUCTION
+        # rather than by measurement -- a check that cannot fail. The ledger's own
+        # stderr caught it: headers/s6cmp-2026-39-medtronic-com-numpages.err (seq 88)
+        # carries `curl: (18) transfer closed with outstanding read data remaining`
+        # on a row the ledger had recorded as a clean exit 0.
+        "curl_exit": int(exit_),
         "body_bytes": int(nbytes),
         "body_sha256": sha,
         "disc_headers": disc,

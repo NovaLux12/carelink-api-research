@@ -293,7 +293,8 @@ def main() -> int:
         print(f"    min gap, harness t_sent            "
               f"{round(min(g[0] for g in tp_h), 3) if tp_h else None} s")
         print(f"    min gap, kernel body mtime oracle  "
-              f"{round(kmin, 3) if kmin is not None else 'UNAVAILABLE (bodies outside the repo)'} s")
+              + (f"{round(kmin, 3)} s" if kmin is not None
+                 else "UNAVAILABLE (bodies outside the repo)"))
         print(f"    gaps under 2.5 s                   {len([g for g in tp_h if g[0] < 2.5])} of {len(tp_h)}")
         print(f"    rows where t_done precedes t_sent  "
               f"{out['this_pass_rows_with_t_done_before_t_sent']}")

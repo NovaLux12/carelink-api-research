@@ -176,6 +176,11 @@ print(n+1)")
     curl -sS --compressed $extra \
       -D '$OUT/headers/$tag.h' -o '$SCRATCH/bodies/$tag.b' \
       -w '%{http_code}' '$url' > '$SCRATCH/ts/$tag.code' 2>'$OUT/headers/$tag.err'
+    # curl's REAL exit status. Captured here because record.py used to hardcode 0,
+    # which made every row's curl_exit 0 by construction instead of by measurement --
+    # a check that cannot fail. The ledger's own stderr proved it: seq 88 carries
+    # `curl: (18) transfer closed with outstanding read data remaining`.
+    curl_exit=\$?
     date -u +%FT%T.%3NZ > '$SCRATCH/ts/$tag.done'
     code=\$(cat '$SCRATCH/ts/$tag.code' 2>/dev/null || echo 000)
     [ -n \"\$code\" ] || code=000
@@ -202,7 +207,8 @@ print(n+1)")
       > '$SCRATCH/ts/$tag.cf' || : > '$SCRATCH/ts/$tag.cf'
     python3 '$OUT/record.py' '$OUT/results.jsonl' '$SEQ' '$host_seq' '$host' '$tag' \
              '$role' '$path' \"\$code\" \"\$nbytes\" \"\$sha\" '$t_queued' \
-             \"\$(cat '$SCRATCH/ts/$tag.sent')\" \"\$(cat '$SCRATCH/ts/$tag.done')\"
+             \"\$(cat '$SCRATCH/ts/$tag.sent')\" \"\$(cat '$SCRATCH/ts/$tag.done')\" \
+             \"\$curl_exit\"
   "
   local flock_exit=$?
   if [ "$flock_exit" -ne 0 ]; then
