@@ -18,7 +18,6 @@ response whose byte count is not, ran to completion (correlation only).
 | 2026-10-13-area-l-7crawl-reissue | 13 | 0 | — |
 | 2026-10-13-area-l-early-crawl-reissue | 3 | 0 | — |
 | 2026-10-13-area-l-ipro-hcp | 15 | 0 | 15 200s; t_sent null on 4 debug rows; account.py aborts in spacing() but the detector count (0 boundary) is derivable. |
-| 2026-10-13-area-l-ipro-early-crawl-supplement | 2 | 0 | — |
 | 2026-10-13-area-m-commoncrawl-cdx | 38 | 0 | — |
 | 2026-10-14-area-l-ipro-early-crawl-supplement | 2 | 0 | — |
 | 2026-10-14-pool-l-crawlcontrol | 10 | 0 | — |
