@@ -584,6 +584,19 @@ abbreviated in a way that dropped a character. Nothing above assumes the value i
 
 #### Successor to area F — what is in `/patient/configuration/messages/{lang}` now?
 
+#### Addendum (2026-10-14, swarm lane S2, issue #91) — this successor is **CLOSED**: the array is empty and the 6 bytes are formatting
+
+**Recorded as a shape, not prose, and deliberately without the value.** `GET /patient/configuration/messages/en` answers `200 application/json`, **22 B**, one sha256 (`04868b50…`) **byte-identical on all three** patient deployments; the envelope member list is `["messages"]` and the array length is **0** on every one (`OBSERVED`, 6 of a 6 cap, controls first per host: [source: findings-log/2026-10-14-area-s2-messages-en/FINDINGS.md]; `results.jsonl` seq 2 / 4 / 6).
+
+**The 16-vs-22 byte delta is a formatting difference on the same empty array** — the canonical, newline-free rendering of `{"messages":[]}` is **15 B** (`sha256 5e4ce7b3…`), so the 2026-10-08 note's "16 B" was a transcription of a differently-formatted rendering of an empty array, not a different value. That is the **negative** this successor asked for, and it is worth recording precisely because it means the 2026-10-08 record was about the wrong thing.
+
+**The `INFERRED` assumption above is now tested rather than assumed:** `22` and `16` are comparable byte counts of the same envelope, and the array was empty all along. **No customer-facing copy is published** — an empty array has none, and the pass deliberately recorded shape only.
+
+**What this does not settle.** Nothing about *why* the endpoint is empty on all three deployments (an i18n feature flag, a decommissioned path, or a build artefact is **not** established, and no claim is made). Area F's own question — who calls `patient-timeline`, and whether a third-party client can reach it — is untouched by this row.
+
+**Successor, derived from this pass:** the **positive control** used here (`GET /patient/v2/configuration/public`, 24 479–31 698 B, **69 top-level keys** on all three) is the cheapest liveness oracle in the patient namespace, and it is not currently pinned anywhere. A drift sweep that reads the bulk document anyway could assert the key count per deployment at **zero extra requests**. Closes when that count is pinned for all three deployments; a negative (the count already drifts) counts. **Assumptions (INFERRED):** that the 69-key figure is stable rather than build-specific — area E measured the same 69-name vocabulary across deployments on 2026-10-13, so this is corroboration of an existing claim rather than a new one, and the successor's value is the *pin*, not the count.
+
+
 **Known, labelled.** The route answers `200 application/json` on `.com` and `-trials`
 (**22 B**, byte-identical by sha256 across the two) and was recorded `200` returning
 `{"messages": []}` (**16 B**) on `.eu` in 2026-10-08 (`OBSERVED`,
