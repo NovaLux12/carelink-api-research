@@ -406,6 +406,33 @@ measured**, and one probe of the namespace root would settle it or refute it. Th
 on a no-route error would be handled by the same code path as an `Origin` on a routed one —
 **untested**, and the two are not interchangeable.
 
+#### Addendum (2026-10-13, from swarm lane S3, issue #92): halves (a) and (c) close; half (b) stands
+
+**What changed.** The #61 addendum above named three halves. Two were reachable
+unauthenticated, and both are now closed
+([findings-log/2026-10-13-s3-commoncore-origin-cors/FINDINGS.md]).
+Half (a) — third host (`commoncore-trials.minimed.com`): the full square matches the
+two #61 hosts byte-for-byte, same `MissingAuthenticationTokenException`,
+`ACAO`/`ACAM`/`ACAH` all `*`, body digest `f249b63c…`. The no-route envelope is
+stage-level on the `commoncore*` family, not host-specific. Half (c) — `Origin`
+varied on every cell of one host: status, every `access-control-*` header, `Vary`,
+`Allow`, and the body digest are unchanged; the gateway stamps per-request AWS
+ids on every response and does not echo `Origin`, and `Vary: Origin` is absent on
+all 12 cells. So `OPTIONS` + `ACAO: *` on this stage is still not proof of a
+routed resource, and `*` is not an `Origin` echo
+([findings-log/2026-10-13-s3-commoncore-origin-cors/FINDINGS.md §3, §4]).
+Measured spacing floor 2.731 s (10 same-host gaps, 0 under 2.5 s).
+12 of a 12 cap, GET + empty-body OPTIONS only, no POST.
+
+**What is still missing.** Half (b) — a matched cell — is unchanged: it needs a
+`commoncore*` path this stage actually routes, which on the record exists only
+behind a clinician-scoped token, so it stays in the blocked table row
+"Report bodies from `commoncore`". One probe of the namespace root would settle
+it; this lane did not spend it.
+
+**F's own count of open successor space is unchanged:** one blocked row remains,
+and no new letter is minted (all A-Z are in use).
+
 #### Addendum (2026-10-13, from area V): the shipped patient bundle names a timeline host that is not published
 
 **Derived:** none of this was knowable before 2026-10-13 — area V re-fetched the patient
