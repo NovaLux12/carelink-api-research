@@ -1237,6 +1237,103 @@ digest pinned):
   hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
   issue #103 is L (positive control, 0–2 GETs).
 
+#### Addendum (2026-10-14, issue #121): the clinic 225 are swept — and area P's negative is refuted for that build
+
+**Area K is NOT closed.** This is the clinic half only, and the cross-client
+differential it was meant to settle is **not settled** — see the refusal below.
+
+**231 of a 231 cap**, GET only, one host (`carelinkhp.minimed.eu`), **0 requests
+to any other host** [source:
+`findings-log/2026-10-14-area-k-clinic-controlflow/FINDINGS.md`].
+
+**The corpus did not drift.** 225 of 225 cells returned `application/javascript`,
+225 distinct body digests, 0 duplicates, and **0 of 225 differ** from the
+sha256s recorded on 2026-10-13. The map was re-derived from the live runtime's
+own `f.u` and diffed **by hash**; the `2076 === e ? "common" : e` special case was
+read out of the source, and a control confirmed the id-form 404s — docs/09 trap 3
+satisfied rather than assumed.
+
+**`system.logbook.entry.validation.config` is RECOVERED — area P's negative is
+refuted for this build.** The route constant is in the eager main bundle, but the
+**call site is in lazy chunk `9481.6977c1a7bd7461f8`** (module 79481):
+`getLogBookConfig(){return this.http.get($.C40).pipe(catchError(()=>of({})))}`
+(byte 6,673), stored verbatim as `logbookConfiguration` (byte 15,295) and read
+**36 times** as `selectedEntryConfiguration`. The document is an object **keyed by
+entry type**, carrying `sensorLocations.options[]`/`freeText[]`, `types`,
+`doseUnits.options[]`, `questions[].label`/`.children[].conditionValue`.
+
+**Why area P could not have found it:** in the eager bundle the constant has **0**
+property reads outside re-export maps (0 of 6 logbook constants do; 111 of 188
+routes do). The control flow lives in a lazy chunk. **This is the same lesson area
+K already taught about the patient corpus, on the other half of the corpus.**
+
+**Semantics recovered, values token-gated.** `types` presence makes `removalReason`
+required (byte 82,617); `freeText[].triggerOption` selects the conditional
+validation on `removalDescription` (byte 99,642); `conditionValue` gates a child
+question (`o===i.conditionValue?0:-1`, byte 101k region). The **values** inside the
+document are not published and not claimed.
+
+**⚠ A negative that is the useful part: the client cannot tell an empty config
+from a failed fetch.** Its own fallback is `of({})`. So a `200` carrying `{}` would
+be **equally consistent with a swallowed auth failure** and must not be recorded as
+"the schema is empty". Any future sweep of that route must distinguish the two.
+
+**The cross-client differential is NOT reported, deliberately.** S4's committed
+`extract-call-sites.py` was run unmodified against the clinic corpus, and it
+resolves **220 of 225** clinic call sites as unresolved versus **58 of 233**
+patient sites — because the clinic routes through a constant table
+(`$.C40`, `$.lwO`, …) where the patient build inlines literals. Comparing the
+surviving **5** clinic shapes against the patient's **144** would be meaningless,
+so it is not done. The builds were proven distinct first: **0 of 145 shared chunk
+ids share a content hash**. Arithmetic stated and checked: patient
+`154+20+1+58=233` and `72+49+14+9+0=144`; clinic `5+0+0+220=225` and
+`2+3+0+0+0=5`.
+
+**Disclosed rather than smoothed:** on the `t_sent` series, **30 gaps fall under
+the declared 2.5 s and 5 under the repo's 2.0 s floor** (min 1.766 s), while the
+kernel body-mtime series shows **0 under either** (min 2.635 s). The two disagree,
+which is the docs/09 trap-13 harness-`date` artefact; **no cause is asserted** and
+the mtime figure is **not re-derivable from a clean clone** (git does not preserve
+mtimes). Gaps are named by seq pair in the log.
+
+**Three instrument defects the pass found in itself**, recorded because a check
+that cannot fail is not evidence: a literal detector whose quote-parity flipped
+after the first escape (self-test now 6/6, including an absent-token negative);
+and **a `scrub-check.sh` that resolved the repo root one level too high, iterated
+zero patterns, and printed `PASS`** — now exits non-zero below five parsed
+patterns. It also confirms a known-published vendor API key compiled into the
+bundle at main byte 3,323,593 is **not** reproduced in any artefact.
+
+**A route-delta negative.** Across the corpus the set of `hcp/*` route literals is
+**168 shared with the eager main bundle, 1 chunk-only
+(`hcp/sso/auth/otc/send`), 0 main-only** — and that one is already recorded at
+`docs/07` line 47, which attributes it to a lazy chunk. So `docs/07` line 46
+("all API definitions live in the eager main bundle") **holds**, with the single
+exception the same page already names.
+
+#### Successor to area K — do the 15 `hcp/configuration/public/*` keys answer?
+
+**Derived from what this pass saw.** The client's own route table carries **15**
+keys under `hcp/configuration/public/` (main bundle, module 97298, offsets
+2761878–2769023), and **`docs/07` publishes no per-key verdict for any of them** —
+it publishes the oracle (line 180) and one worked control pair, not which keys
+exist. So "the client calls these" is OBSERVED while "these answer" is unmeasured.
+
+**Blocker:** a bounded list already on disk, needing no invention. **19 requests**
+(15 keys + positive control `personal/media/config/eu` → 401 + absent control
+`zzz.this.does.not.exist.zzz` + case control `CSU.CONTROL.CODES.SETTINGS` vs
+`cua.control.codes.settings`), GET only, one host, controls first.
+
+**Closes when:** all 15 carry a verdict under `docs/07`'s own oracle, **and**
+`system.logbook.entry.validation.config`'s response is recorded as a **shape**
+(members and value types), never as raw content. **A negative counts** — "not
+published, and here is the exact reason" closes it. **The `of({})` ambiguity above
+is the trap:** a `200` carrying `{}` is not evidence of an empty schema.
+
+**Assumptions (INFERRED):** that the 15 keys in the client's route table are the
+complete public config set the clinic app uses. A client may call a subset, so a
+404 on a key the client calls would be drift, not absence.
+
 ### L. Recovery of the retired `ipro/hcp` JSF surface
 
 The archives hold a clinician portal from 2013–2022 (`/ipro/hcp/*.jsf`) that predates
