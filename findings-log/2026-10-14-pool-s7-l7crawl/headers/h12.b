@@ -1,0 +1,1 @@
+{"urlkey": "eu,minimed,carelink)/", "timestamp": "20150529180650", "url": "http://carelink.minimed.eu/", "mime": "text/html", "status": "200", "digest": "2LDBQGDINO2TFPTQRBENEYBVYXZ5Z2ZZ", "length": "630", "offset": "38250431", "filename": "crawl-data/CC-MAIN-2015-22/segments/1432207930259.97/warc/CC-MAIN-20150521113210-00060-ip-10-180-206-219.ec2.internal.warc.gz"}
