@@ -63,7 +63,8 @@ Offsets in `k-main.b`:
 - `addEntry(w)` POST literal at **3,000,146**;
 - `editEntry(w)` PUT literal at **3,000,207**;
 - `deleteEntry(w)` DELETE template at **3,000,269**;
-- preceding GET builders end at **3,000,145** (byte index of the first `h` in `addEntry`).
+- preceding GET builders end at **3,000,145** (the index immediately before `http.post`,
+  which starts at byte 3,000,146).
 
 Evidence class: **OBSERVED** — string literals in a reproducible, digest-pinned
 bundle, compared against the same literals already reported by the 2026-10-08
