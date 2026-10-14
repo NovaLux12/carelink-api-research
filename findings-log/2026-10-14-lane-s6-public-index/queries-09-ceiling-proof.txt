@@ -1,26 +1,46 @@
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION — the comments below are kept
+# verbatim as written BEFORE the pass ran, because AGENTS.md section 3 makes the
+# retraction history part of the evidence. Three of their statements did not
+# survive their own ledger and are corrected in place below, not deleted:
+#   B1/B2  the "an hour apart" figure (actual: 18.8 min) and the "stops before 13
+#         that sort later" prefix story (refuted: 12 of the 13 sort BEFORE the
+#         furthest host seq 145 reached).
+#   B3    "the published figure" — seq 74 was never published; it is this
+#         lane's own earlier attempt and lands in this same PR.
+#   B4    "28 successful answers" / "The other 25" — the ledger says 29 and 26.
+# The QUERY LINES below are unmodified: they are what was actually sent, and
+# FINDINGS.md sections 2 and 3 carry the corrected reading.
 # ROUND 9 — two requests, chosen because each can convert an inference into a
 # demonstration.
 #
 # WHAT THE LEDGER NOW SHOWS (account.py, seq 1-148)
 #
 #  A Common Crawl record response whose byte count is an exact multiple of 1024
-#  was cut short. Exactly three of the 28 successful answers in this ledger are
-#  on a whole-KiB boundary, and all three are the ones that stop part-way
-#  through the host set:
+#  was cut short. Exactly three of the 29 successful answers in this ledger are
+#  on a whole-KiB boundary, and all three are the ones that do not run to
+#  completion (for the 32.0 KiB cell that is INFERRED from `pages: 3`, not
+#  observed -- it carries one host and the full set was never observed):
 #
 #     seq  74   32.0 KiB    203 records   1 host    2022-40 / medtronic.com
 #     seq 102  640.0 KiB   5108 records   2 hosts   2026-39 / medtronic.com
 #     seq 145 1200.0 KiB  10942 records  24 hosts   2026-39 / medtronic.com
 #
-#  The other 25 are on no boundary at all, and the ones small enough to re-issue
+#  The other 26 are on no boundary at all, and the ones small enough to re-issue
 #  reproduced BYTE-FOR-BYTE: 412 B twice (seq 2, 78), 35226 B twice (seq 1, 77),
 #  19301 B twice (seq 61, 105). A response that truncates cannot reproduce.
 #
 #  seq 68 and seq 145 are the same cell. seq 145 carries every host seq 102
-#  carried plus 22 that sort earlier in SURT order, and stops before 13 that
-#  sort later. Both stop at a round byte count. A published crawl index does not
-#  change between two queries an hour apart, so at least one of the two was
-#  cut short.
+#  carried plus 22 more, and every one of those 22 sorts earlier in SURT order
+#  than every one of the 13 still unreached -- 0 violating pairs across the 22x13
+#  comparison. ⚠ BUT IT IS NOT A PREFIX: under the canonical SURT key (apex
+#  before its subdomains) seq 145's furthest host is `www.medtronic.com` at RANK
+#  36 OF 37, while 12 of the 13 unreached sort BEFORE it -- only `wwwp.` sorts
+#  after. So it skipped 12 and continued past them. What produced that ordering is
+#  NOT established and no mechanism is asserted. Both responses nevertheless stop
+#  at a round byte count, and a published crawl index does not change between two
+#  queries 18.8 MIN apart (seq 102 t_sent 00:05:04.956Z -> seq 145 t_sent
+#  00:23:51.277Z, measured from the committed ledger), so at least one of the two
+#  was cut short.
 #
 # THE TWO REQUESTS
 #
@@ -28,8 +48,8 @@
 #    2022-40/medtronic.com. That cell is also the only one in the whole ledger
 #    whose showNumPages reports pages=3 rather than pages=1 (seq 83). If a
 #    NARROW field set -- smaller records, so strictly more of them fit under any
-#    ceiling -- returns MORE than 203, then 203 was a floor and the published
-#    figure is wrong as a measurement. This is the single request that turns
+#    ceiling -- returns MORE than 203, then 203 was a floor and the figure is
+#    wrong as a measurement. (It was NEVER published; see the banner.) This is the single request that turns
 #    "lower bound" into "demonstrably incomplete".
 #
 #  2 REPRODUCIBILITY OF A LARGE NON-ROUND RESPONSE. Every claim about the

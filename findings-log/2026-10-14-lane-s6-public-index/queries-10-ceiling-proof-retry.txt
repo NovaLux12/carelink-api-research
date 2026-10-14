@@ -1,3 +1,8 @@
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION — "the published 203" below was
+# never published. Seq 74 belongs to this lane's own earlier attempt and lands in
+# this same PR; `git grep '203 records'` at origin/main returns 0 hits, and area
+# M's published figure for that cell is `blocks: 14`. This is a self-correction
+# inside this PR, not a correction to the corpus. The QUERY LINE is unmodified.
 # One request. The 32 KiB cell, narrowed.
 #
 # seq 74 read 203 records for CC-MAIN-2022-40 / medtronic.com in EXACTLY 32768
@@ -7,7 +12,7 @@
 #
 # Narrow records are strictly smaller than medium records, so under any byte
 # ceiling the narrow query must return at least as many records. More than 203
-# therefore demonstrates the published 203 is a floor. Exactly 203 would leave
+# therefore demonstrates the 203 is a floor. Exactly 203 would leave
 # the ceiling unconfirmed on this cell. Both are publishable outcomes; neither
 # is a wasted request.
 #

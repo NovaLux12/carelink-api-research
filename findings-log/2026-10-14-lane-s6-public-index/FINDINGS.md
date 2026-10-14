@@ -21,7 +21,7 @@
 
 `account.py` prints `151 of a 400 cap`; `wc -l results.jsonl` is 151. Both agree.
 
-> **On the 400s.** 32 rows answered **HTTP 400**. **30** of them carry the earlier attempt's escaped-ampersand fault and are described in §8; the other two are this pass's `page=1` oracle, a different query shape with a different body digest. All 32 are kept in the ledger and in the accounting above rather than deleted, because `findings-log/` is append-only and the wasted requests are part of the record.
+> **On the 400s.** 32 rows answered **HTTP 400**. **30** of them carry the earlier attempt's escaped-ampersand fault and are described in §7; the other two are this pass's `page=1` oracle, a different query shape with a different body digest. All 32 are kept in the ledger and in the accounting above rather than deleted, because `findings-log/` is append-only and the wasted requests are part of the record.
 
 ---
 
@@ -59,7 +59,7 @@ A published Common Crawl crawl index does not change between two queries 18.8 mi
 
 - seq 145's host set is a **strict superset** of seq 102's — every host seq 102 carried, plus 22 more.
 - **Every** host seq 145 added sorts **earlier** in SURT order than **every** host it still did not reach. That relation holds with **0 violating pairs** across the 22 × 13 comparison.
-- ⚠ **But the response is NOT a SURT-ordered prefix, and the earlier claim that it was is withdrawn.** Ordering the 37 hosts of seq 68 by SURT key, seq 145's furthest-reached host is `www.medtronic.com` at **rank 36 of 37**, while **12 of the 13 unreached hosts sort strictly before it** — `mix.`, `myprofile.`, `news.`, `newsroom.`, `oab.`, `professional.`, `signin.`, `surveys.`, `synchromed2battery.`, `www.perfusion.`, `www.ptm.`, `www.stmeded.`. Only `wwwp.` sorts after it. So the response **skipped 12 hosts and then continued past them**, which is not what a cut-at-the-boundary prefix looks like. seq 102 fails the same test (its 2 hosts are ranks 1 and 36). **What produced this ordering is not established and no mechanism is asserted.**
+- ⚠ **But the response is NOT a SURT-ordered prefix, and the earlier claim that it was is withdrawn.** *(Ordering rule, recorded because the numerals depend on it: SURT key = `",".join(reversed(labels))`, so the apex sorts **before** its subdomains. Under the also-common `+ "/"` recipe the apex sorts last and the ranks below become 35 and 37; the load-bearing relation — 12 unreached hosts sorting before the furthest one reached — is invariant to the choice.)* Ordering the 37 hosts of seq 68 by that key, seq 145's furthest-reached host is `www.medtronic.com` at **rank 36 of 37**, while **12 of the 13 unreached hosts sort strictly before it** — `mix.`, `myprofile.`, `news.`, `newsroom.`, `oab.`, `professional.`, `signin.`, `surveys.`, `synchromed2battery.`, `www.perfusion.`, `www.ptm.`, `www.stmeded.`. Only `wwwp.` sorts after it. So the response **skipped 12 hosts and then continued past them**, which is not what a cut-at-the-boundary prefix looks like. seq 102 fails the same test (its 2 hosts are ranks 1 and 36). **What produced this ordering is not established and no mechanism is asserted.**
 
 **The conclusion does not rest on the ordering story.** It rests on the two facts that survive independently: the queries are byte-identical, and they returned different record counts (5 108 vs 10 942) at byte counts that are both exact multiples of 1024.
 
@@ -101,13 +101,11 @@ The other 26 are on no boundary at all (e.g. 1 864 922, 49 350, 19 301, 41, 40).
 
 By §2's detector that response was cut short. **203 is therefore a lower bound and must not be read as the size of the set.** It is also the only cell reporting `pages: 3`.
 
-> ⚠ **This is a self-correction inside this PR, NOT a correction to the corpus — and an earlier draft of this section got that wrong.** It was headed "CORRECTION — a *published* count" and attributed the 203 figure to area M. It is not area M's. Seq 74 sits at `seq ≤ 76`, i.e. in **this lane's own earlier attempt**, which lands in this same diff. At `origin/main` (`b528a0f`) area M's record-form query for that cell answered **504** (area M seq 32); its only `200` for the cell was a `showNumPages` call (area M seq 46, sha `cb7e934a…`), and the figure area M's `FINDINGS.md` §3b publishes for that cell is **`blocks: 14`** — not a record count. `git grep '203 records'` across `docs/` and `findings-log/` at `b528a0f` returns **0 hits**. **No published document in this repo carries 203, and `docs/10`'s area-M row never did.**
+> ⚠ **This is a self-correction inside this PR, NOT a correction to the corpus — and an earlier draft of this section got that wrong.** It was headed "CORRECTION — a *published* count" and attributed the 203 figure to area M. It is not area M's. Seq 74 sits at `seq ≤ 76`, i.e. in **this lane's own earlier attempt**, which lands in this same diff. At `origin/main` (`b528a0f`) **area M never issued a record-form query for that cell at all**: its only two attempts were `showNumPages` calls — area M seq 32, which answered **504**, and area M seq 46, which answered **200** with sha `cb7e934a…`. The figure area M's `FINDINGS.md` §3b publishes for that cell is therefore **`blocks: 14`** — not a record count. `git grep '203 records'` across `docs/` and `findings-log/` at `b528a0f` returns **0 hits**. **No published document in this repo carries 203, and `docs/10`'s area-M row never did.**
 
 That makes this a weaker claim than it first read, and the weaker claim is the true one: it corrects a number **inside this branch's own ledger**, not one in the record.
 
 **Three attempts were made to convert the floor into a demonstration, and all three failed** (OBSERVED): **seq 149 and seq 151** re-issued the 2022-40 cell with a narrower field set and **seq 150** re-issued the *medium* `CC-MAIN-2026-39 / medtronic.com` query — a **different cell**, so only two of the three touched the cell in question. All three answered **504** (an earlier draft wrote "502/504/504"; there is no 502 among them). A gateway failure carries no information in either direction, so **the ceiling on this cell is unconfirmed** and it stays a floor. Recorded as failed rather than quietly dropped.
-
-**What would settle it** (one request): re-issue `CC-MAIN-2022-40-index?url=medtronic.com&matchType=domain&fl=url`. Narrow records are strictly smaller than medium records, so under any byte ceiling a narrow query must return **at least** as many records. More than 203 demonstrates the floor; exactly 203 leaves the ceiling unconfirmed on this cell.
 
 **What would settle it** (one request): re-issue `CC-MAIN-2022-40-index?url=medtronic.com&matchType=domain&fl=url`. Narrow records are strictly smaller than medium records, so under any byte ceiling a narrow query must return **at least** as many records. More than 203 demonstrates the floor; exactly 203 leaves the ceiling unconfirmed on this cell.
 
@@ -137,7 +135,7 @@ Three widths, a **2.56× spread in response size, one record count**, and the me
 
 Of the 37, these five **appear in no file in this repository as it stood before this branch**.
 
-> **Counting rule** (it is in code terms rather than prose, per `AGENTS.md` §6 item 7): `git grep -il <name> $(git rev-parse origin/main)` over **all** tracked files — not a subset of extensions. An earlier check of this claim used `grep --include='*.md' --include='*.hurl' --include='*.sh'`, which would have hidden a match in a `.tsv` or `.json`; the five were re-checked with `git grep` over every tracked file at `origin/main` (`b528a0f`) and all five return **0 files**. the wording is "as it stood before this branch" and not "in no file", because at this branch's own head **all five** appear in **2 files each** — this document and `results.jsonl` (`distinct_hosts`) — under a literal FQDN grep. `docs/11` carries them in abbreviated form (`synchromed2battery.`), which a FQDN grep does not match.
+> **Counting rule** (it is in code terms rather than prose, per `AGENTS.md` §6 item 7): `git grep -il <name> $(git rev-parse origin/main)` over **all** tracked files — not a subset of extensions. An earlier check of this claim used `grep --include='*.md' --include='*.hurl' --include='*.sh'`, which would have hidden a match in a `.tsv` or `.json`; the five were re-checked with `git grep` over every tracked file at `origin/main` (`b528a0f`) and all five return **0 files**. The wording is "as it stood before this branch" and not "in no file", because at this branch's own head **all five** appear in **2 files each** — this document and `results.jsonl` (`distinct_hosts`) — under a literal FQDN grep. `docs/11` carries them in abbreviated form (`synchromed2battery.`), which a FQDN grep does not match.
 
 | host | why it is interesting |
 |---|---|
@@ -224,7 +222,7 @@ Bodies were read locally during the pass to derive facts — the byte counts and
 
 - **The mechanism of the ceiling.** A proxy byte cap, a server emit-budget and a client read-cutoff all fit the observations. Nothing measured here separates them. **No cause asserted.**
 - **Whether the ceiling is a fixed constant.** Three different boundaries were observed — 32.0, 640.0 and 1200.0 KiB — so **it is not a fixed size**. What sets it is unknown.
-- **`CC-MAIN-2022-40 / medtronic.com` beyond "≥203".** Three attempts, all 502/504.
+- **`CC-MAIN-2022-40 / medtronic.com` beyond "≥203".** Two re-issues of this cell (seq 149, 151) plus one of a different cell (seq 150); **all three answered 504**, and there is no 502 among them.
 - **The `2026-39 / medtronic.eu` `/oauth2/` absence.** Unanchored; the anchoring query answered 504.
 - **25 of the 30 path-prefix cells.** Gateway failures, not absences.
 - **Whether any of the five §5 host names resolves.** Zero vendor requests by design.
