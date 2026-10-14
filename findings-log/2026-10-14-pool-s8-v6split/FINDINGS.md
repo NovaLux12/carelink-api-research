@@ -34,10 +34,16 @@ because sends were 2.5 s apart by construction.
 
 - **The split still holds**: `v6/discover/android/3.6` is `403` on `.eu`/`.com`
   and `200` on `-trials`.
-- **The trials cell is not the catch-all.** Its body (10053 B, `1aab9bb1…`) is
-  not byte-identical to the absent control on the same host (10069 B,
-  `a5c9ddf8…`); it is a real document, not a fallback. The 16-byte gap
-  separates them.
+- **Trials cell bytes vs. the fabricated arm.** The v6 cell (10053 B,
+  `1aab9bb1…`) and the fabricated-tail arm (10069 B, `a5c9ddf8…`) differ by
+  exactly 16 bytes, and that 16-byte difference is byte-for-byte the echoed path
+  segment (`"android,3.6"` → `"android,absent-probe-413306"`). Substitution of
+  any tail reproduces the other body exactly, so the route is a **templated
+  response** on this host. Consequently the two bodies **do not** prove that the
+  v6 cell is a distinct document or that the fabricated arm is an SPA fallback
+  — byte size alone cannot separate them. What remains solid from this control:
+  both arms are `200` and both differ from the 42 B no-route digest used on
+  `.eu`/`.com`.
 - The two non-trials 403 cells reproduce the no-route digest verbatim.
 
 ## Evidence table
