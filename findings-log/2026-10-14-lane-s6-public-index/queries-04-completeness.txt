@@ -36,9 +36,10 @@
 # showNumPages and page=1 are area L's two oracles, re-run here so the
 # invariance result is corroborated by the same instruments area L used.
 #
-# NOTE: these ampersands are literal. The previous pass wrote 31 queries with
+# NOTE: these ampersands are literal. The previous pass wrote 30 queries with
 # `\&`, which reached the API as a format named `json\` and came back
-# {"message":"output=json\ not supported"} 31 times.
+# {"message":"output=json\ not supported"} 30 times (seq 4-30 and 32-34;
+# seq 31 is a 502, so the range holds 30 rows, not 31).
 s6cmp-2022-40-medtronic-com-narrow|completeness-narrow|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 120
 s6cmp-2022-40-medtronic-com-medium|completeness-medium|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 120
 s6cmp-2022-40-medtronic-com-wide|completeness-wide|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype,digest,filename,offset,length|--max-time 120

@@ -1,3 +1,9 @@
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION -- the yield figures in the comment
+# below did not survive the ledger and are corrected in place; the QUERY LINES are
+# unmodified, because they are what was actually sent.
+#   round 1 (seq 80-94, queries-04, delay 2.5 s): 9 of 15 answered 502/504, not 8.
+#   round 2 (seq 95-105, queries-05, delay 8 s):  9 of 11 answered 504, not 4.
+#   Counts are from results.jsonl, per-status.
 # ROUND 3 — why does `fl=url` return FEWER records than `fl=url,timestamp,...`?
 #
 # THE CONTRADICTION (all OBSERVED, ledger seq 68 and seq 102, same crawl, same
@@ -41,8 +47,10 @@
 #                                   pages is not 1. Pages 0..3 settle whether the
 #                                   set really spans 3 pages.
 #
-# DELAY=10. Eight of fifteen requests answered 502/504 at 2.5 s and four of
-# eleven at 8 s. A 502/504 is a failure and never an absence.
+# DELAY=10. Nine of fifteen requests answered 502/504 at 2.5 s (seq 80-94) and
+# nine of eleven at 8 s (seq 95-105). A 502/504 is a failure and never an
+# absence. [CORRECTED: this file originally said 'eight of fifteen' and 'four
+# of eleven'; neither reproduced from the ledger.]
 s6cmp3-narrow-reissue|determinism-narrow-again|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
 s6cmp3-intermediate-width|width-midpoint|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp|--max-time 300
 s6cmp3-narrow-status|determinism-second-narrow|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,status|--max-time 300

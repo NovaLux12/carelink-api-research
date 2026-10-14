@@ -29,8 +29,12 @@ not print a silent `None`, because a tool that degrades quietly is the failure
 mode this repo keeps paying for.
 
 Usage:
-  python3 account.py            # full report
-  python3 account.py --json     # machine-readable, for the gate
+  python3 account.py [LEDGER]     # full report
+  python3 account.py [LEDGER] --json   # machine-readable, for the gate
+
+LEDGER is optional and defaults to this lane's own results.jsonl. It is a POSITIONAL
+argument because docs/10 tells the next pass to run this over area M's ledger -- a
+claim that was false when the argument was not implemented and the path hardcoded.
 """
 
 from __future__ import annotations
@@ -133,6 +137,20 @@ def whole_kib_detector(rows):
 
 
 def main() -> int:
+    # A positional LEDGER argument. Implemented because docs/10 row 65 instructs a
+    # successor to run this detector over another pass's committed ledger; until
+    # this existed that instruction was not executable and silently re-analysed
+    # this lane's own file.
+    global LEDGER, PRIOR_SEQ
+    argv = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if argv:
+        LEDGER = os.path.abspath(argv[0])
+        if not os.path.exists(LEDGER):
+            print(f"account.py: no such ledger: {LEDGER}", file=sys.stderr)
+            return 2
+        # A foreign ledger has none of this lane's sequence boundaries, so the
+        # whole-ledger figures are the only ones that mean anything for it.
+        PRIOR_SEQ = 0
     rows = load()
     total = len(rows)
     hosts = sorted({r["host"] for r in rows})

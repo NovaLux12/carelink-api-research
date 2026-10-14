@@ -93,8 +93,8 @@ CAP=400
 # Minimum per-host spacing is 2.5 s and the sleep runs INSIDE the lock. The
 # default can be raised from the environment without editing this file, which
 # matters because this API answers 502/504 under load and a retry storm makes
-# that worse: measured 8 of 15 requests in the first completeness round came
-# back 502/504 at 2.5 s. Raising the delay is the honest fix; retrying faster is
+# that worse: 9 of the 15 requests in the first completeness round came back
+# 502/504 at 2.5 s, and 9 of the next 11 at 8 s. Raising the delay is the honest fix; retrying faster is
 # the one that gets an account throttled.
 DELAY="${S6_DELAY:-2.5}"
 QFILE="${1:?usage: probe.sh <queries-file>}"
