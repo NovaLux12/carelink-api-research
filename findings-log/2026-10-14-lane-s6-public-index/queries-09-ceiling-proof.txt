@@ -49,8 +49,8 @@
 #    whose showNumPages reports pages=3 rather than pages=1 (seq 83). If a
 #    NARROW field set -- smaller records, so strictly more of them fit under any
 #    ceiling -- returns MORE than 203, then 203 was a floor and the figure is
-#    wrong as a measurement. (It was NEVER published; see the banner.) This is the single request that turns
-#    "lower bound" into "demonstrably incomplete".
+#    wrong as a measurement. (It was NEVER published; see the banner.) This is
+#    the single request that turns "lower bound" into "demonstrably incomplete".
 #
 #  2 REPRODUCIBILITY OF A LARGE NON-ROUND RESPONSE. Every claim about the
 #    ceiling rests on small responses being reproducible and large ones not.
