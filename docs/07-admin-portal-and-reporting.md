@@ -362,8 +362,8 @@ animation-library internals, Pusher SDK internals, Medtronic's own snapshot-time
 **report** service (`hcp/reports/getSnapshotTimelinesRange`, `TIMELINE_RANGE`), two
 leaked-password dictionary words, or one analytics label. `grep-out.txt` counts
 **per build**, so: `m2m` — the call pattern the area's own text proposed — is **1
-hit in each build** (2 across both), and it is the tail of `moom4261` inside a
-leaked-password list; `baseUrl` is **2 hits in each build** (4 across both), and
+hit in each build** (2 across both), and it falls in the **middle** of `cum2me`
+inside a leaked-password list; `baseUrl` is **2 hits in each build** (4 across both), and
 every one of them is inside an embedded Pusher SDK, not a CareLink base (OBSERVED).
 
 **4. What is NOT closed.** Which of the three readings explains the `403`s — no routes

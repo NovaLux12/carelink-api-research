@@ -270,14 +270,20 @@ application's own vocabulary.
 Counted **per body**, because `grep-out.txt` reports per body and a cross-build
 total beside a per-build figure is the unit error this pass's own correction C3
 exists to prevent: `m2m` is **1 per body** (2 across both), `baseUrl` is **2 per
-body** (4 across both), and the byte offsets below are identical in both builds.
+body** (4 across both). **The two tokens are not build-invariant**, so their offsets are
+tabulated separately rather than given once: `m2m` is at **387460 in both** builds,
+while `baseUrl` is at **2422149 / 2422752 in the clinic build and 2422091 /
+2422694 in the support build** — the support build's two offsets sit **58 bytes
+earlier**, and no reason is offered for that difference.
 
 Hand-checked, not counted (`grep-out.txt` carries the context):
 
 - **`m2m`, 1 hit, at byte 387460.** Area F's own text proposes looking for "a
   `m2m` / `gc` call pattern" ([`docs/11`](../../docs/11-suggested-research-areas.md)
   :214). The single `m2m` byte sequence in either build is the **tail of
-  `moom4261`** (itself at byte 387449), inside a leaked-password dictionary — the
+  `cum2me`**, whose own bytes are 387458–387463, so the token is the word's
+  **third through fifth characters** — its middle, not its tail — inside a
+  leaked-password dictionary — the
   same blob that holds the `discover` and `pde` hits area V documented. The
   premise carries its own false-positive trap and it fires on the first token
   tried.
@@ -444,7 +450,7 @@ to confirm; it is not claimed here.
 | 11 | Zero of 15 gateway responses carry any `access-control-*`; header set is exactly six keys | OBSERVED | `headers/003`…`headers/017`; §5 |
 | 12 | Both portal bundles reproduce their pinned anchors in full (3 397 615 B / `2a7fa8e7…`; 3 410 666 B / `a054555a…`) | OBSERVED | `results.jsonl` seq 1–2; §6.1 |
 | 13 | `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both config-key spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and all five gateway ids are **0 in both builds** | OBSERVED | `grep-out.txt` token tables; `grep.sh` |
-| 14 | `m2m` = 1 hit, at byte 387460, inside `moom4261` (byte 387449), a leaked-password word | OBSERVED | `grep-out.txt` context dump |
+| 14 | `m2m` = 1 hit, at byte 387460, inside `cum2me` (bytes 387458–387463) — its third through fifth characters | OBSERVED | `grep-out.txt` context dump; derivation in C5 |
 | 15 | `baseUrl` = 2 hits at bytes 2422149 / 2422752, both inside an embedded Pusher SDK | OBSERVED | `grep-out.txt` context dump |
 | 16 | `personal.` = 4 hits at bytes 2403157 / 2762844 / 3238864 / 3239490, **none** a key of the 69-name patient document | OBSERVED | `grep-out.txt`; offsets tabulated at §6.4 |
 | 17 | `timeline` 66 + `Timeline` 126 + `TIMELINE` 4 = **196** occurrences, 74 signatures, none naming the service | OBSERVED | `grep-out.txt` census, counting rule at §6.5 |
@@ -512,8 +518,16 @@ retired check.
 
 **What replaces it — the check `docs/09` §4 says can fail: per-gap, not
 per-extent.** Same-host consecutive pairs, `|send_gap − mtime_gap|`, counted in
-request order. **10 gaps, max 0.947 s, median 0.0151 s, and 2 of 10 disagree by
+request order. **10 gaps, max 0.947 s, median 0.0112 s, and 2 of 10 disagree by
 > 0.5 s** — which is the property a span check cannot have, since it fires.
+**Median rule, stated because getting it wrong is this repo's own recorded defect:**
+for even `n` the median is the **mean of the two central sorted elements** — here
+the 5th (0.007333 s) and the 6th (0.015135 s), giving **0.011234 s**, published as
+**0.0112 s**. The figure that was published before this correction, **0.0151 s**, was
+the **upper-middle element** `sorted(x)[n//2]` on an even-length list — the exact
+error `docs/09` §4 records for area K and states the corrected rule for. **The 3-dp
+table below gives 0.011 s** from its own printed values `(0.007 + 0.015)/2`, so the
+gap between the table and the median is presentation, not arithmetic.
 
 | host | pair | `t_sent` gap | mtime gap | abs diff |
 |---|---|---:|---:|---:|
@@ -589,7 +603,8 @@ Recorded once here so the numbers are unambiguous, because the prose elsewhere
 compressed a per-build count against a cross-build one. **`grep-out.txt` reports
 per body**: `m2m` = **1 per build** (**2 across both**), `baseUrl` = **2 per
 build** (**4 across both**). §6.3's byte offsets are **clinic-build offsets** and
-are identical in the support build, which is why they are given once. No figure
+are **build-invariant for `m2m` only**, and `baseUrl`'s are **58 bytes earlier in the
+support build** than in the clinic build, so they are tabulated separately. No figure
 changes; the unit does.
 
 ### C4 — what did NOT move, and one disclosure that is now discharged
@@ -619,3 +634,152 @@ changes; the unit does.
   `--no-suite` flag.** Those 13 requests are **not** cited as evidence for any
   claim in this pass. Every measurement in this log and every correction above
   comes from **this pass's own ledger** and its own body files.
+
+
+---
+
+## Correction (2026-10-15, verifier round 2 of this pass, PR #129)
+
+Four items, three of them errors in figures this log published, and all four
+**repaired in place in the body of the log** with the superseded wording preserved
+here verbatim. That split is this repository's own practice and not a convenience:
+`AWS-GATEWAYS.md`'s Correction section repaired its §9 Files row in place *and*
+recorded the repair; area M's log rewrote a false sentence in place under a dated
+`⚠ CORRECTED` marker; area Q withdrew a strength word in place and said so. The rule
+being honoured is `AGENTS.md` §3's — *"Corrections are appended … the superseded
+wording stays visible"* — read with §1's, that a claim you cannot source is
+**deleted rather than softened**. Leaving a false attribution standing in prose
+until the end of the document would leave `moom4261` readable as this pass's
+finding for a further 300 lines. **Append-only is preserved: every superseded
+wording is quoted below, and no claim has been deleted without its retraction.**
+
+⚠ **Heading deliberately NOT bent to satisfy a gate regex.** `check_append_only`'s
+Correction test matches `^## Correction \(\d{4}-\d{2}-\d{2}\)\)` — it requires a
+literal `)` right after the date — so **neither** this section's heading **nor**
+round 1's matched it, and the `M` arm never ran on this file anyway because the
+gate's three-dot diff classifies it `A` within the branch range (the blind spot
+`docs/09` §4 documents). **This heading is not being changed to satisfy that
+regex**, because `docs/09` §4 says the regex is too strict and that headings
+should not be bent to meet it. The section is dated, `##`-level, and quotes its
+superseded wording, which is what §3 asks for in substance.
+
+### C4 — the `m2m` hit is the middle of `cum2me`, not the tail of `moom4261`
+
+**The superseded wording, verbatim.** §6.3: *"The single `m2m` byte sequence in
+either build is the **tail of `moom4261`** (itself at byte 387449), inside a
+leaked-password dictionary"*; §9 row 14: *"`m2m` = 1 hit, at byte 387460, inside
+`moom4261` (byte 387449), a leaked-password word"*; and the same phrase in
+`docs/07` and twice in `docs/11`. **The word was wrong. The offset was right.**
+
+**The derivation, from the committed artefact and not by eye** — this is the whole
+point, since the error was made by reading a context string rather than measuring it:
+
+1. `grep-out.txt` records the context dump at **context offset 387415**, and the
+   dumped window measures **exactly 93 bytes** — 45 left + the 3-byte token + 45
+   right, as the dump's own `.{0,45}….{0,45}` pattern declares.
+2. Token byte = context offset + 45 = **387460**, occupying **387460–387462**, and
+   the three characters at offset 45 of the committed dump's own window are
+   `m2m` — so the **offset is confirmed by the committed artefact itself**.
+3. Walking the alphanumeric run outward from 387460 over the body gives
+   **`cum2me`, bytes 387458–387463**, length 6. `m2m` therefore occupies that
+   word's **third through fifth characters** — its **middle**.
+4. `moom4261` is a **separate, earlier** entry in the same list, and `m2m` at
+   387460 is **outside** it. `"m2m"` is not a substring of `"moom4261"` under any
+   window; the two are separated by the comma and `cum` between them.
+
+**The verdict is unchanged and the negative stands.** `cum2me` is in the same
+leaked-password dictionary list — the same blob that holds area V's `discover` and
+`pde` hits and §6.3's `baseUrl` neighbours — so the `m2m` literal remains a
+false hit inside a dictionary word, and the area's own proposed call pattern still
+false-hits on the first token tried. **What was wrong was the word, not the
+conclusion.** Four sites corrected: this log's §6.3 and §9 row 14, `docs/07`, and
+`docs/11`'s closing addendum and Closed row.
+
+### C5 — two offset-provenance claims this pass introduced were themselves false
+
+**The superseded wording, verbatim.** §6.3: *"the byte offsets below are
+**identical in both builds**"*; §6, correction C3: *"§6.3's byte offsets are
+**clinic-build offsets** and are **identical in the support build**"*.
+
+**Both false, and the second self-contradictory in a single sentence** — it claimed
+the offsets were clinic-specific *and* build-identical. Measured per body:
+
+| token | clinic build | support build | identical? |
+|---|---:|---:|---|
+| `m2m` | 387460 | 387460 | **yes** |
+| `baseUrl` #1 | 2422149 | 2422091 | **no — 58 bytes earlier** |
+| `baseUrl` #2 | 2422752 | 2422694 | **no — 58 bytes earlier** |
+
+So **only the `m2m` offset is build-invariant.** The two `baseUrl` offsets are
+tabulated separately now, and **no cause is asserted for the 58-byte difference** —
+the two builds are different bundles of different lengths and nothing here measures
+what sits at that displacement. This is recorded rather than smoothed over because
+it was introduced **by this pass while fixing a real unit error**: item 4 of round 1
+corrected a genuine per-build/cross-build conflation and, in doing so, asserted a
+provenance for the very offsets it was reconciling **without measuring them**.
+**Correcting a unit error with an unmeasured provenance claim trades one defect for
+another**, and the correction is the only place that trade is visible.
+
+### C6 — the published median was the upper-middle element, not the median
+
+**The superseded wording, verbatim.** §C1: *"**10 gaps, max 0.947 s, median 0.0151
+s**, and 2 of 10 disagree by > 0.5 s"*.
+
+`sorted(x)[n//2]` on an even-length list returns the **upper-middle** element. With
+`n = 10` that is the 6th value, `0.015135 s` — the number published. **This is the
+error `docs/09` §4 records by name for area K and states the corrected rule for.**
+The ascending series, unrounded:
+
+```
+0.000447  0.001694  0.004942  0.006821  0.007333 | 0.015135  0.015689  0.056121  0.883400  0.946572
+                                          ^ 5th        ^ 6th
+```
+
+**Median rule, stated so the next reader does not repeat it:** for even `n` the
+median is the **mean of the two central sorted elements** — here
+`(0.007333 + 0.015135)/2` = **`0.011234 s`**, published as **`0.0112 s`**. The 3-dp
+table in C1 gives **`0.011 s`** from its own printed values `(0.007 + 0.015)/2`, so
+the distance between the table and the figure is **presentation, not arithmetic**.
+
+⚠ **A disagreement with the verifier's brief, recorded rather than smoothed over.**
+That brief gave the true median as **0.0110 s** and said the 3-dp table "caps that
+at **0.0115**". **Neither figure reproduces from this ledger**: on unrounded values
+the mean is **0.011234 s**, and the 3-dp table's own values give **0.011**. I have
+published **0.0112 s** and named the rule, which is what makes the number checkable
+either way. **The correction is unaffected** — the figure was wrong under either
+reading, and `max 0.947 s` and `2 of 10 exceed 0.5 s` both re-derive exactly.
+**Non-load-bearing:** the pass's verdict rests on neither clock check.
+
+### C7 — the one in-place edit that carried no recorded reason
+
+Round 1 changed §6.3's heading in place from *"Why the two hits that did fire are
+false hits"* to *"Why the two **literals** that did fire are false hits"*, and that
+edit appeared in **neither** C2's adjudication table nor the round-1 commit message.
+**The reason, recorded here:** the old heading said **"hits"** where the section
+counts **literals**, and "two hits" is exactly the per-build/cross-build ambiguity
+C3 exists to prevent — read against `m2m` = 1 per body it implied 2 per body. It was
+a defensible edit and it was still an **unrecorded in-place rewrite of an append-only
+document**, which is the defect `docs/09` §4 devotes a row to. The record is the
+part that was missing; the edit is unchanged.
+
+### C8 — nothing measurable moved, and the item-5 brief correction
+
+- **All four evidence artefacts are byte-identical to `cd9b79a`**: `results.jsonl`,
+  `run.log`, `headers/` and `grep-out.txt` are untouched by this round and by round
+  1. No round-1 measurement can have changed, and none has — `wc -l results.jsonl` is
+  still **17**, matching the accounting line **"17 of a 40 cap"**.
+- **Round 1's items stay fixed**: `README.md:404` is readable by the gate's own
+  regex at **217**, no live strength word remains (the surviving hits are all inside
+  C2 quoting the deleted one), §C1's span check stays retracted with its superseded
+  wording visible, and the `docs/09:205` **147** stays at 147 as quoted history
+  inside a trap row.
+- **Item 5, recorded so it is not "fixed" later by a later pass:** the brief's own
+  claim that `research-checks.py`'s Correction regex is unanchored at the closing
+  paren **is wrong — it requires a literal `)` immediately after the date**, so
+  neither this section's heading nor round 1's matched it, and the `M` arm never ran
+  because the three-dot diff classifies the file `A`. **No heading is to be changed
+  to satisfy that regex** (`docs/09` §4: the regex is too strict, and headings should
+  not be bent to meet it). The round-1 brief also overran its own budget by invoking
+  `./scripts/research-gate.sh --no-suite` — **that flag does not exist**, so the full
+  live suite ran and made **13 requests on hosts outside this claim's set**. Those
+  requests are **not** cited as evidence for any claim here.
