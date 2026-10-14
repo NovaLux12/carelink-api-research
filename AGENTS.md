@@ -35,6 +35,61 @@ property is destroyed by one unlabelled inference.
 
 Where sources disagree, **give both**. Never pick one silently.
 
+### Counting sources — when "independent" is allowed (§2.1)
+
+Evidence class labels the *kind* of source (OBSERVED / PUBLISHED / INFERRED).
+It does not say how many independent sources produced a claim. The repo's two
+passes over third-party material (the 2026-10-11 pass and area Q) found the
+same failure: a claim labelled "corroborated independently" that rested on two
+artefacts by the *same* author — one source, stated twice. Correcting it needs
+a rule, not a label.
+
+A source is identified by **the person or organisation that produced the
+measurement or observation**, not by the number of artefacts carrying it.
+
+Two sources count as **independent** only where all three hold:
+
+1. **Different authors.** A distinct person or organisation responsible for the
+   measurement or observation. Two files in one repository, or one file plus a
+   PR comment on it, are one source regardless of how many commits or hosts
+   separate them (area Q, `docs/03` §3a.4: the boundary table in the README
+   and the same table under PR #4711 are the same author, `CarlosJPV`).
+2. **Different artefacts.** Neither artefact is a copy of, or is produced by
+   reading, quoting, summarising, or re-running, the other.
+3. **Neither quoting the other.** Where one is derived from the other — a PR
+   comment quoting a commit, a secondary site reprinting a README, a draft
+   PR re-typing a table — it is one source stated twice, however many URLs
+   pass it on.
+
+**Strength words.** Before using `independently`, `corroborated`,
+`corroborated independently`, `confirms`, `confirms independently`,
+`verifies independently`, or `double-sourced`, count the *independent*
+sources above. The word is permitted only where that count is **≥ 2**.
+Otherwise **delete** the word (§1) and restate the claim as
+`reported by <author> at <artefact> (one source)`.
+
+**Coherence words are not corroboration.** `consistent with`, `supports`,
+`agrees with`, and `not contradicted by` describe agreement, not multiplicity.
+They are allowed for a single source, and may not be silently upgraded into
+"independently corroborated" by later prose.
+
+**Third-party material stays corroboration.** SOURCE-OBSERVED (`file:line` at
+a named commit) and SOURCE-PUBLISHED (README / PR / commit history) — the
+descriptors used in `docs/03` §3a.1–§3a.4 for client-source claims — are never
+proof of vendor behaviour. The non-promotion rule above (`Never let
+INFERRED read as OBSERVED`) applies to them: they do not become OBSERVED
+because a client prints a field, and labelling such a claim "verified" does
+not move the independence count.
+
+**The two axes are orthogonal.** Evidence class describes the *kind* of
+source; the independence count above is a *property of the sources*. A claim
+may be OBSERVED, PUBLISHED, or INFERRED and still rest on one source. The
+labels in the table above stand; independence is flagged separately, in the
+prose that carries the claim.
+
+When this rule is the basis of a claim's revision, cite the log:
+[source: findings-log/2026-10-14-area-s-independence-rule/FINDINGS.md].
+
 ---
 
 ## 3. Where findings go

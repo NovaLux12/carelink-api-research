@@ -921,6 +921,31 @@ comment) would fail under any definition strict enough to matter.
 
 ## Tier 3 — digging further for its own sake
 
+#### Addendum (2026-10-14, pool lane S, issue #105): proposed independence rule
+
+Not closed — the S close condition asks for the rule to be **in force**, and this
+pass proposes rather than decides it. The rule is drafted in
+`AGENTS.md` §2.1 (Counting sources — when "independent" is allowed): a source is
+identified by the person or organisation that produced the measurement, not by
+the artefact count; two sources are independent only where all three of
+*different authors*, *different artefacts*, *neither quoting the other* hold;
+and the strength words (`independently`, `corroborated`, `confirms`,
+`verifies independently`, `double-sourced`) are permitted only where that count
+is ≥ 2, otherwise deleted and restated as `reported by <author> at
+<artefact> (one source)`. Coherence words (`consistent with`, `supports`,
+`agrees with`, `not contradicted by`) describe agreement, not multiplicity, and
+never upgrade into corroboration.
+
+`AGENTS.md` §2's three classes stand unchanged; SOURCE-OBSERVED / SOURCE-PUBLISHED
+remain corroboration descriptors, not ranks (option (b) of this addendum's own
+text). The crafted pass:
+[source: findings-log/2026-10-14-area-s-independence-rule/FINDINGS.md].
+
+**What remains:** the audit behind `docs/10` §1 row 59 (every "corroborated
+independently" claim in the 2026-10-11 pass and in this repo's third-party-
+sourced cells), which the rule above is a prerequisite for rather than a
+substitute. That row tracks the audit; this area tracks the rule.
+
 ### K. The chunk corpus, for real this time
 
 224 lazy chunks are mined for endpoints and field names. **They were never mined for
