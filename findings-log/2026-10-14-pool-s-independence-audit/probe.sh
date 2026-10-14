@@ -30,6 +30,14 @@
 # FINDINGS.md and hits.txt and not this file. A fix that corrects the table and
 # leaves the tool that prints it wrong is not a fix.
 #
+# Correction (2026-10-15, round 2): the first version of the note above blamed
+# this on GNU grep rejecting `(?:...)` "silently dropping the rest". That
+# explanation was fabricated, labelled "verified" on a transcript that did not
+# support it, and it has been withdrawn — probe.sh never contained `(?:` at any
+# commit. The boundary was never written. See the `## Correction (2026-10-15)`
+# section, C7, in FINDINGS.md for the measurement and for what grep actually
+# does.
+#
 # WHAT IT MEASURES: the CHECKED-OUT WORKING TREE, not origin/main. After this
 # branch's own edits the in-scope total is 63 occurrences / 44 lines
 # (FINDINGS.md section 1a). The section 1 table — 68 / 49, measured before the
@@ -50,14 +58,31 @@ cd "$(git rev-parse --show-toplevel)"
 # is load-bearing, not cosmetic — it is what makes `corroborated independently`
 # ONE occurrence instead of `corroborated` + `independently`.
 #
-# `\b` before EVERY alternative, matching hits.py's `\b(?:...)`. It is what
-# stops `agrees with` matching inside `disagrees with` — the opposite word —
-# which the first pattern matched in three places (FINDINGS.md section 0-M).
+# `\b` before EVERY alternative. It is what stops `agrees with` matching inside
+# `disagrees with` — the opposite word — which the first pattern matched in three
+# places (FINDINGS.md section 0-M). The boundary was NEVER written here: this
+# file has carried an un-boundaried pattern at every commit it has existed
+# (5bfdb6c, d85634b, 9e82ecf — verified 2026-10-15 with `git show <c>:<path>`,
+# 0 hits for `(?:` in all three). That is the whole cause; see the correction
+# below for what a `(?:...)` spelling would and would not have done under grep.
 #
-# The spelling differs from hits.py because GNU grep -E does NOT accept `(?:`
-# (it warns "? at start of expression" and silently drops the boundary — which
-# is how the un-boundaried count survived here at all; verified 2026-10-15).
-# Repeating `\b` per alternative is the grep spelling of the same pattern: the
+# The spelling is per-alternative rather than hits.py's `\b(?:...)` because
+# GNU `grep -E` does not implement non-capturing groups. Measured 2026-10-15,
+# not assumed:
+#     $ printf 'alpha agrees with beta\n' > a.txt
+#     $ grep -oiE '\b(?:agrees with)' a.txt
+#     grep: warning: ? at start of expression
+#     exit=1                      <- the alternative straight after `(?:` never matches
+#     $ grep -oiE '\bagrees with' a.txt
+#     agrees with ; exit=0
+# It does not "silently drop the rest": the alternative immediately after `(?:`
+# becomes unmatchable and alternatives 2..n still match. Run over docs/ + README
+# with the full eleven-phrase list, the `(?:...)` spelling returns 60
+# occurrences against this file's 63 — the 3 lost being `double-sourced`, which
+# is the FIRST alternative. So the two spellings are NOT interchangeable and
+# the counts above are what proves it.
+#
+# Repeating `\b` per alternative is the grep spelling of hits.py's pattern: the
 # engine asserts a word boundary at the match start whichever alternative it
 # then takes. Verified to give hits.py's figures exactly — 63 / 44 in scope at
 # this branch's head, 68 / 49 at origin/main 7d915b8, `AGENTS.md` 14 / 7 both.

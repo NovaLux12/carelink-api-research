@@ -456,9 +456,10 @@ here, and the two bodies carry dates within days of each other.
 ## §4 — What was changed
 
 **13 strength-word occurrences were withdrawn from live claim text, across 12
-lines in 6 files.** Every one keeps its original wording readable beside it
-(`AGENTS.md` §3, `CONTRIBUTING` step 6) — which is why the *occurrence* count is
-the wrong progress metric and the per-file direction is not uniform (§1a).
+lines in 6 files.** **Eleven of the twelve** keep their original wording readable
+beside them (`AGENTS.md` §3, `CONTRIBUTING` step 6) — which is why the
+*occurrence* count is the wrong progress metric and the per-file direction is not
+uniform (§1a). **The twelfth does not**, and §4's table names it.
 
 | file | line | withdrawn |
 |---|---|---|
@@ -490,27 +491,70 @@ this branch's head. Where the correction block sits now, site by site:
 | `docs/11:1627` | `docs/11:1590` | |
 
 **`docs/11:1006` is the one site whose original wording this pass did *not* keep
-readable, and the two sentences just above it overstate.** §4 claims *"Every
+readable at head, and the two sentences above it overstate.** §4 claimed *"Every
 one keeps its original wording readable beside it"* and *"No claim was
-deleted"*. That line sat inside the area-K S4 addendum, and closing area S
-deleted **the whole block** — §1a records the deletion and its reason (it was
-almost entirely `AGENTS.md` §2.1's own word list, which the counting rule
-excludes from *claims* but cannot exclude from *occurrences*). So the withdrawn
-word is gone from the page and the sentence that carried it went with it; the
-withdrawal is auditable here and in `git diff origin/main...HEAD`, and at neither
-place at head. Recorded rather than silently repaired: restoring a 35-line
-addendum is a content decision for the pass's author, not a fix round's, and
-this note is the honest shape of the defect.
+deleted"*; both are corrected in place below. That line sat inside the
+**`#### Addendum (2026-10-14, from area S4)`** block at `origin/main`
+`docs/11:974–1010`, whose first body line reads *"**Area K is NOT closed.**"*.
+Closing S deleted **the whole `### S` area section from `docs/11`** — 128 lines
+at `origin/main` `docs/11:912–1039` — not only this addendum; §1a records the
+deletion and the reason §0 gives for it (the block was almost entirely
+`AGENTS.md` §2.1's own word list, which the counting rule excludes from
+*claims* but cannot exclude from *occurrences*). So the withdrawn word is gone
+from the page and the sentence that carried it went with it; the withdrawal is
+auditable here and in `git diff origin/main...HEAD`, and at neither place at head.
+**Restoration is not a fix round's to make** — and the remit question is sharper
+than the first version of this note put it, see C6.
+
+**⚠ Corrected 2026-10-15 (round 2) — this note previously called the deleted
+block *"the area-K S4 addendum"*. The attribution was wrong and it inverted the
+remit question.** S4 is **not** area K's addendum and does not sit under `### K`.
+At `origin/main` the heading reads *"Addendum (2026-10-14, **from area S4**): the
+patient corpus mined for control flow — and the negative it retracts"*, filed as
+a `####` child of **`### S. Two more evidence classes for third-party source
+material`** (`origin/main:912`). **Area S4 is a sibling lane under the same
+letter S**, its own dated pass
+(`findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/`), whose headline is
+a **retraction of area P's** `markers` negative and whose scope note answers the
+patient half of K. So what was erased is a **sibling lane's dated addendum,
+removed by the lane that shares its letter** — not another area's work in the
+sense this note first implied, and the owner call therefore belongs to whoever
+owns the S lanes, not to whoever owns K or P.
 
 **Nothing was pinned in `regression/hurl/`, and nothing was added to the gate.**
 A check enforcing §2.1 is a maintainer decision recorded as such at
-`docs/11:1580-1582`; extending the gate's own patterns in the same PR the gate
-passed is the thing `docs/09` §4 explicitly declines to do. It is the successor
-area, not a side effect here.
+`docs/11:1580-1582` @ `origin/main` (**`docs/11:1543-1545` at this branch's
+head** — byte-identical, 37 lines up); extending the gate's own patterns in the
+same PR the gate passed is the thing `docs/09` §4 explicitly declines to do. It
+is the successor area, not a side effect here.
 
-**No claim was deleted.** No pinned bridge value moved — this pass changes no
-vendor fact, no version, no route and no field name, only how this repo describes
-how well it knows something. **Nothing here needs a `downstream-bridge` label.**
+**No claim was deleted by relabelling — but one block was deleted outright, and
+"no claim was deleted" was the wrong sentence to write.** Closing S removed the
+whole **`### S` area section from `docs/11`**: **128 lines** at `origin/main`
+`docs/11:912–1039`, replaced at head by a **14-line** pointer, `#### S moved to
+the Closed table 2026-10-14` (`docs/11:984`). That block carried **three** dated
+addenda — area Q's (`:931`), **S4's** (`:974`) and pool lane S's independence-rule
+addendum (`:1016`) — and with it went the withdrawn word at `docs/11:1006`,
+whose correction could not be written beside it because the line it belonged to
+no longer exists.
+
+**What did *not* go with it, measured rather than assumed.** Every finding the
+removed block reported survives somewhere readable:
+
+| removed addendum | its substance survives at head in |
+|---|---|
+| **S4**, `:974` — the patient corpus | `findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/` (its own dated log, append-only per §3, untouched), **and** `docs/10:46`, which carries S4's retraction of area P's `markers` negative in full — `markers` → `unfilteredEventMarkers`, the four fields, the `BG_READING`-vs-`BG` spelling disagreement |
+| area Q, `:931` | `findings-log/2026-10-13-area-q-appversion-axis/` |
+| pool lane S, `:1016` | `AGENTS.md` §2.1 itself, which is where the proposed rule landed |
+
+So the loss is **S4's, Q's and lane-S's area *text* on one page**, not their
+findings. `docs/11` is a priorities page, and S now sits in its Closed table.
+
+**This is the owner call, not a fix round's** — see the `## Correction
+(2026-10-15)` section, C6. No pinned bridge value moved: this pass changes no
+vendor fact, no version, no route and no field name, only how this repo
+describes how well it knows something. **Nothing here needs a
+`downstream-bridge` label.**
 
 ---
 
@@ -643,20 +687,23 @@ occurrence without leaving the count. This is §6 item 2 happening inside the
 audit written to catch §6 item 2, and it survived a commit that named the exact
 defect in its own title.
 
-**The fix, and one thing about it worth recording.** `probe.sh` now carries
-`\b` before every alternative. It does **not** use `hits.py`'s spelling, and
-cannot: **GNU `grep -E` does not accept `(?:`** — it warns `? at start of
-expression` and silently drops the rest, which is very likely how the boundary
-went missing in the first place. Verified 2026-10-15:
+**The fix.** `probe.sh` now carries `\b` before every alternative. It does
+**not** use `hits.py`'s `\b(?:…)` spelling, and cannot: **GNU `grep -E` does
+not implement non-capturing groups.** What it does with them is *not* what C1
+first said — see the round-2 correction at C7 for the measurement, which also
+withdraws the "silently drops the rest" explanation as fabricated. The short
+version, measured 2026-10-15:
 
 ```
-$ echo "disagrees with foo" | grep -oiE '\b(?:agrees with|supports)'
+$ printf 'alpha agrees with beta\n' > a.txt
+$ grep -oiE '\b(?:agrees with)' a.txt
 grep: warning: ? at start of expression
-$ echo "disagrees with foo" | grep -oiE '\bagrees with'
-(no output)
+exit=1                       # the alternative straight after '(?:' never matches
+$ grep -oiE '\bagrees with' a.txt
+agrees with ; exit=0
 ```
 
-Repeating `\b` per alternative is the grep spelling of the same pattern — the
+Repeating `\b` per alternative is the grep spelling of `hits.py`'s pattern — the
 engine asserts a word boundary at the match start whichever alternative it then
 takes — and §0-M already describes it in those words. **Both figures now, on
 this branch's head:**
@@ -813,3 +860,146 @@ while a commit in this very branch claimed to have fixed the class they belong
 to. Whether the gate should grow a check that a committed probe reproduces its
 own stated numbers is a maintainer decision of the same kind as C5's
 `docs/11:1006` — recorded, not taken.
+
+
+## Correction (2026-10-15)
+
+Second round of fixes, on five further defects a fresh-context verifier returned
+against `3de7d18`. **No figure in §§0–6 moved, and none of round 1's five
+items was re-opened.** Requests: still **0**; `results.jsonl` still **0 rows**;
+the accounting line still `0 of a 0 cap`.
+
+### C6 — §4's two sentences were false as written, and the deletion is bigger than round 1 said
+
+**Two sentences, corrected in place above, with the superseded wording they
+replaced removed** — which is the one time in this log an existing sentence is
+not kept beside its correction, and the reason is recorded here rather than
+assumed: a sentence that says *"No claim was deleted"* **beside a table row that
+says `not present`** is the defect, not the evidence. Keeping it would have
+preserved a live falsehood on the strength of a rule about preserving
+retractions.
+
+- **§4** claimed *"Every one keeps its original wording readable beside it"*.
+  It is **eleven of twelve**. `docs/11:1006` does not, and the table already
+  said so two paragraphs below the claim.
+- **§4** claimed *"No claim was deleted"*. **One block was deleted outright**:
+  the whole **`### S` area section from `docs/11`** — **128 lines** at
+  `origin/main` `docs/11:912–1039`, replaced at head by a **14-line** pointer
+  (`docs/11:984`). Round 1 recorded this as the deletion of "a 35-line addendum".
+  **That was wrong by a factor of three**, and the number is now measured from
+  the diff rather than estimated: `git diff --numstat origin/main...HEAD --
+  docs/11-suggested-research-areas.md` reads **98 insertions, 134 deletions**,
+  and the `-U0` hunk is `@@ -912,128 +984,14 @@`.
+
+**What survived the deletion, checked rather than hoped.** Every finding the
+removed block reported is still readable somewhere:
+
+| removed addendum (`origin/main`) | survives at head in |
+|---|---|
+| **S4**, `:974–1010` | `findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/` (own dated log, append-only per §3, untouched) **and `docs/10:46`**, which carries S4's retraction of area P's `markers` negative in full |
+| area Q, `:931` | `findings-log/2026-10-13-area-q-appversion-axis/` |
+| pool lane S, `:1016` | `AGENTS.md` §2.1 — where the proposed rule landed |
+
+So the loss is the three lanes' **area text on one priorities page**, not their
+findings. `docs/11` is a priorities page; S now sits in its Closed table.
+
+**The remit question, restated because the round-1 answer was wrong — and this
+is the part of C6 that matters most.** Round 1 called the deleted block *"the
+area-K S4 addendum"*. It is not area K's, and it does not sit under `### K`. At
+`origin/main:974` the heading is *"Addendum (2026-10-14, **from area S4**): the
+patient corpus mined for control flow — and the negative it retracts"*, a `####`
+child of **`### S. Two more evidence classes for third-party source material`**
+(`origin/main:912`), first body line *"**Area K is NOT closed.**"*. **S4 is a
+sibling lane under the same letter S**, whose headline retracts **area P's**
+negative and whose scope note answers K's patient half. **So what was erased is
+a sibling lane's dated addendum, removed by the lane that shares its letter** —
+which is why this is not a call about K or P, and why the owner decision
+belongs to whoever owns the S lanes. Recorded, not taken: restoring the block
+is a content decision, and a fix round that both deletes and restores `docs/11`
+prose would be making it.
+
+### C7 — C1's `(?:` root cause was fabricated, and it was labelled "verified"
+
+**Retracted: the claim that GNU grep "silently drops the rest" of a `(?:…)`
+group.** It does not. Measured 2026-10-15 over the real corpus:
+
+| spelling of the eleven-phrase pattern | occurrences on `docs/` + `README.md` |
+|---|---|
+| `\b(?:A\|B\|…)` — `hits.py`'s, under `grep -E` | **60** |
+| `\bA\|\bB\|…` — this file's, per alternative | **63** |
+
+The **3 lost are exactly `double-sourced`**, which is the **first** alternative —
+3 under the per-alternative spelling, **0** under `(?:…)`. `independently`
+(18), `corroborated` (13), `confirms` (11), `consistent with` (7), `agrees with`
+(5) and `supports` (3) are identical under both, because they are alternatives
+2…n and those still match. **The alternative immediately after `(?:` becomes
+unmatchable; the rest survive.**
+
+**The verifier's replacement claim is also wrong, and the evidence says so.**
+It reported that under `(?:` *"every alternative dies, including ones that would
+have matched"*, on this demonstration:
+
+```
+$ grep -oiE '\b(?:agrees with|confirms)' f     # on "alpha agrees with beta"
+exit=1        # 'confirms' dead too
+```
+
+That file contains **neither** word. `confirms` is the **second** alternative,
+and on a file that *does* contain it the same pattern returns it with exit 0 —
+which is how the 60-vs-63 split above was found. Both explanations were wrong in
+the same way: **a non-matching result read as evidence of what the engine does
+with matching text.**
+
+**And the claim was never needed.** `probe.sh` has **never** contained `(?:`:
+
+| commit | `probe.sh` hits for `(?:` | `hits.py` hits for `(?:` |
+|---|---|---|
+| `5bfdb6c` | **0** | file not yet written |
+| `d85634b` | **0** | 1 |
+| `9e82ecf` | **0** | 1 |
+| `3de7d18` | 0 in the pattern; 2 in the comment that made this error | 1 |
+
+(`git show <c>:findings-log/2026-10-14-pool-s-independence-audit/probe.sh |
+grep -c '(?:'`.) **The boundary was simply never written into `probe.sh`.** That
+is C1's own evidence, and it is a smaller, duller and more useful cause than the
+one that was invented to explain it.
+
+**Un-verified accordingly.** The transcript C1 presented as verification showed a
+warning and a changed answer; it did not show the mechanism claimed, and the
+mechanism was asserted anyway. **The fix and its counts are untouched** — 63 / 44
+at head, 68 / 49 at `origin/main`, `AGENTS.md` 14 / 7 — because they never
+depended on the explanation. What is withdrawn is the explanation, and the
+"verified" that let it through a round.
+
+### C8 — one stale line cite, scoped
+
+**`docs/11:1580-1582` → `docs/11:1580-1582` @ `origin/main`, which is
+`docs/11:1543-1545` at this branch's head.** Verified **byte-identical**
+(`diff <(git show origin/main:… | sed -n '1580,1582p') <(sed -n '1543,1545p' …)`
+— empty), 37 lines apart, the offset being this pass's own `docs/11` deletions
+(C6). This is round-1 item 5's own class, re-entering on a cite added after that
+fix. Corrected with the same convention used everywhere else in this document.
+
+**And the first attempt at this correction was itself off by one** — it read
+`1542-1544` and asserted "the same text" without having diffed it. `diff`
+caught it immediately. Recorded because that is the second time in two rounds
+that a line mapping in this log was asserted rather than compared, and the fix
+is always the same: `diff` the two ranges instead of reading one of them.
+
+### Disclosure moved into the PR body (not a log fix)
+
+The §4 deletion was disclosed **only here**, in a findings log a reviewer may
+never open, and the file that looked like the PR body — `.loop/PR-S.md` — is
+**gitignored** (`.gitignore:5`) and untracked, so it is scratch and cannot carry
+a disclosure. **The disclosure is now in the live PR body**, in its own section,
+naming the block, its line range, what survives, and who the decision belongs
+to. A correction that lives only in an appendix is not a correction a reviewer
+meets.
+
+### What this round did not do
+
+**No regression pin, no gate change** — unchanged from round 1, still the
+maintainer decision recorded at `docs/09` §4 and `docs/11:1543-1545`. **No
+figure moved, no finding was retracted, no count changed, and `AGENTS.md` §2.1
+is untouched.** The two things a fix round must not do here it did not do:
+it did not restore `docs/11` prose, and it did not decide whose call that is.
