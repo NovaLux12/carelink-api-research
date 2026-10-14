@@ -1334,10 +1334,13 @@ observed.
 The blocker above is now **operationally lifted for the seven crawls named in that
 pass** — each of `CC-MAIN-2013-20`, `-2013-48`, `-2014-10`, `-2015-22`,
 `-2021-04`, `-2021-25` and `-2022-05` now carries a `200`-with-records positive
-control on that exact crawl (`commoncrawl.org` direct on six of the seven;
-`google.com` returned records on the four crawls where commoncrawl.org did not;
-and on CC-MAIN-2021-25 both hosts gateway-failed before `google.com` rescued it
-on its second attempt). The `cluster.idx`-level "is this crawl served at all"
+control on that exact crawl (`commoncrawl.org` direct on six of the seven (all except
+CC-MAIN-2021-25 on a first attempt);
+`google.com` returned records on the four crawls whose commoncrawl.org first
+attempt gateway-failed (CC-MAIN-2013-20, -2013-48, -2021-04, -2021-25);
+only commoncrawl.org gateway-failed on CC-MAIN-2021-25 (including its second
+attempt), while `google.com` returned 200 / 5 records on its sole attempt
+between those two failures). The `cluster.idx`-level "is this crawl served at all"
 check remains **unbuilt** and is not claimed; the per-host controls are the substitute,
 and a gateway failure on one host is recorded as carrying no information in either
 direction (consistently with §5-C2 of the ipro pass).
