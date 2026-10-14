@@ -1,6 +1,6 @@
 # 0 requests. Accounting: 0 of a 0 cap.
 
-Inter-request delay: n/a (0 requests issued). Methods: GET (policy-only; no requests issued).
+Inter-request delay: n/a — 0 vendor requests issued; the ≥2 s spacing floor applies vacuously (no sends). Methods: GET (policy-only; no requests issued).
 
 ## Area: docs/10 row — "Does any 'corroborated independently' claim in the
 third-party material actually rest on two sources?" (paired with area S, option b)
@@ -30,14 +30,14 @@ surviving candidates audited below.
 
 ## Counts
 
-- Total strength-word occurrences in scanned scope: 18 across 8 files (13 of them inside the independence-rule log and docs citing it or quoting corrections — those are about the rule itself, not new claims).
+- Strength-word scan returned 16 matches of the seven named phrases across the eight target files; the same phrases recur 24 times in total once the independence-rule findings file is included, where they are themselves the subject rather than claims (the remaining 13+ occurrences are citations of the rule text, not new strength-word claims).
 - Genuine third-party claims carrying a strength word: 6 (#1–4 plus cross-references).
 - Of those, 1 already withdrawn (appVersion, area Q); 2 need a relabel (#2, #3); 1 is supportable with the artefact committed (#4); 1 is an allowed coherence use (#5's scope allows); 1 inherits #2.
 - Under §2.1, every one of the 6 is **one OR two sources at most**, and none reached the independent-source count threshold on the basis of the same author's second artefact alone. #4 (#4) is the only candidate for true independence, and even there our verb is "verified" not "observed" — the evidence class stays SOURCE-PUBLISHED at most.
 
 ## What this closes
 
-This audit does not change `AGENTS.md` §2.1 (already present) nor close area S by itself (area S is a maintainer rule decision, out of scope for a pass). It establishes that, among the corpus examined, the only strength-word claim that survived audit is #1 which was already corrected; the remainder are at most "one source, restated" or "same-author corroboration" and are hereby relabelled in the fix list below. A doc edit implementing those relabels is not shipped in this PR — it is filed as the correction follow-up, because the two clearest ones (§docs/10:45 and HCP-CONFIG-SCHEMA) belong to their owners' wording and a careless rewrite risks smoothing over the correction history (AGENTS §6 item 5).
+This audit does not change `AGENTS.md` §2.1 (already present) nor close area S by itself (area S is a maintainer rule decision, out of scope for a pass). It classifies the six uses: #1 is already withdrawn; #2 and #3 carry relabel recommendations (same-author corroboration); #5 is an allowed coherence use; #6 inherits #2. #4 is the only one flagged as a possible independence candidate, and it is supportable as 'independently verified' only where the xDrip commit is named — the log (line 239) cites `CareLinkClient` on `master` without a commit hash, so under AGENTS.md §2.1 #4 currently rests as SOURCE-PUBLISHED corroboration. A doc edit implementing the relabels is not shipped in this PR — it is filed as the correction follow-up, because the two clearest ones (§docs/10:45 and HCP-CONFIG-SCHEMA) belong to their owners' wording and a careless rewrite risks smoothing over the correction history (AGENTS §6 item 5).
 
 ## Fix list (filed, not applied in this run)
 
