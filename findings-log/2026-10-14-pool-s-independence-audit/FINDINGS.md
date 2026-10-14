@@ -1,11 +1,32 @@
 # Area S — exercising `AGENTS.md` §2.1 over every strength-word claim in `docs/` and `README.md`
 
+> ⚠ **Correction (2026-10-15), scoping this title.** The population is **not**
+> "every strength-word claim". It is **every occurrence of the eleven phrases
+> `AGENTS.md` §2.1 names** — exact strings, §0-V — in `docs/*.md` + `README.md`,
+> which is a smaller set than a reader would count by eye: `corroborates`,
+> `corroborating`, `corroboration`, `confirmed` and the other inflections fall
+> **outside** it (§0's coverage limit; measured there, not estimated). The title
+> above is kept verbatim (`AGENTS.md` §3), and the inflection limit is restated
+> where the broad claim is made, in §6.
+
 **Date:** 2026-10-14
 **Area:** S — Two more evidence classes for third-party source material
 (`docs/11-suggested-research-areas.md:912`, with area Q's addendum at `:931` and
 the 2026-10-14 rule addendum at `:1016`).
 **Claim issue:** [#125](https://github.com/NovaLux12/carelink-api-research/issues/125)
 **Branch:** `research/s-independence-audit`
+
+**⚠ Correction (2026-10-15) — what every `file:line` in this document refers
+to.** Unless a table says otherwise, the line numbers here are **`origin/main`
+at `7d915b8`** — the revision *before* this pass's edits, which is the
+population the audit measured and the wording it withdrew. **Eight of the
+twelve withdrawn sites no longer hold the quoted wording at this branch's
+head**, because the corrections that preserve it sit elsewhere in the same
+lines. The head line for every withdrawn site is given under §4's table. For
+the sites the audit did **not** edit, §2 and §3a give the head line beside the
+`origin/main` one, because a reader re-checking the scope test at head lands on
+a blank otherwise — sharpest case `docs/11:1631` @ `origin/main`, which is
+**`docs/11:1594`** at head.
 
 ## Accounting
 
@@ -184,6 +205,16 @@ it **survives**).
 Against `origin/main` at `7d915b8`. Re-derive with `bash probe.sh`, or
 `python3 hits.py`.
 
+**⚠ Correction (2026-10-15) — both of those commands read the *checked-out
+working tree*, so on this branch they return §1a's post-edit figures (63
+occurrences / 44 lines), not this table's 68 / 49.** `7d915b8` is where this
+table's numbers come from; `git worktree add … origin/main && bash probe.sh`
+re-derives them from a clean checkout of that revision. Until this correction
+`probe.sh` also disagreed with `hits.py` on the same tree — it read 68 / 47 —
+because its pattern was missing the left word boundary that `hits.py` carried.
+Both now carry it and both agree; see the `## Correction (2026-10-15)` section
+at the foot of this file.
+
 | | occurrences | matching lines |
 |---|---|---|
 | **`docs/*.md` + `README.md`** (in scope) | **68** | **49** |
@@ -281,6 +312,15 @@ count of **0**), `docs/09:59`, `docs/09:117`, `docs/11:483`,
 `docs/11:1631` (*"Two INFERRED premises are now **confirmed**"* — an
 evidence-class transition, INFERRED → OBSERVED, not a second source).
 
+**⚠ Correction (2026-10-15) — head lines for the unedited sites.** All five
+numbers above are `origin/main` @ `7d915b8`. At this branch's head they read
+`docs/07:149`, `docs/09:59`, `docs/09:117`, `docs/11:483` — unchanged — and
+**`docs/11:1594`**, because `docs/11` lost 36 lines when this pass's correction
+blocks and the area-S addendum landed. `docs/11:1631` at head is **past the end
+of the file** (1617 lines), so a reader re-checking this scope test by line
+there lands on a blank. The same shift applies to the two *edited* sites named
+below, `docs/11:1627` → `docs/11:1590`.
+
 **The test discriminates rather than excusing, and the check on it is that it
 must not rescue a line whose word *is* doing multiplicity work.** `docs/03:241`
 and `docs/11:1627` both contain an explicit cross-source agreement — *"the PR
@@ -348,6 +388,15 @@ three-part test.
 | `docs/11:1643` | `corroborated` ×2, `independently` | quoted withdrawn wording + a pointer to the rule | — | **NO EDIT** (§3) |
 | `docs/11:773 / 788 / 798 / 805` | 4 hits | the **blockquoted verbatim area-Q area text**, kept so its correction stays readable | — | **NO EDIT** (§3) |
 | `docs/11:940–961`, `1024–1037` | 18 hits | area Q's and the 2026-10-14 addenda, describing §2.1 and quoting the withdrawn wording | — | **rule text / subject matter** |
+
+**⚠ Correction (2026-10-15) — this table's line numbers are `origin/main` @
+`7d915b8`, not the merge result.** Rows naming an *edited* site record where the
+withdrawn wording was measured, which is why they are given against the
+revision the audit ran on; §4's table carries the head line for each. Rows
+naming an *unedited* site under the scope test must be checkable at head too,
+and one is not: **`docs/11:1631` is `docs/11:1594` at head.** The other four
+unedited sites — `docs/07:149`, `docs/09:59`, `docs/09:117`, `docs/11:483` —
+hold at head. §2 carries the same note.
 
 ### 3b — the one claim that went the other way: count 1 → 2, found by reading the artefact
 
@@ -422,6 +471,37 @@ the wrong progress metric and the per-file direction is not uniform (§1a).
 | `docs/10-open-questions.md` | 64 | `independently` |
 | `docs/11-suggested-research-areas.md` | 720, 1006, 1183, 1496, 1627 | `independently` ×2, `corroborated` ×3 |
 
+**⚠ Correction (2026-10-15) — the table's line numbers are `origin/main` @
+`7d915b8`.** Eight of the twelve sites no longer hold the withdrawn wording at
+this branch's head. Where the correction block sits now, site by site:
+
+| `origin/main` | at head | note |
+|---|---|---|
+| `README.md:50` | `README.md:53` | correction block three lines on |
+| `docs/03:241` | `docs/03:245` | |
+| `docs/03:400` | `docs/03:424` | |
+| `docs/05:331` | `docs/05:336` | |
+| `docs/09:194` | `docs/09:194` | correction is inline in the same line |
+| `docs/10:45`, `docs/10:64` | unchanged | inline |
+| `docs/11:720` | `docs/11:720` | inline |
+| `docs/11:1006` | **not present** | see below |
+| `docs/11:1183` | `docs/11:1141` | |
+| `docs/11:1496` | `docs/11:1458` | |
+| `docs/11:1627` | `docs/11:1590` | |
+
+**`docs/11:1006` is the one site whose original wording this pass did *not* keep
+readable, and the two sentences just above it overstate.** §4 claims *"Every
+one keeps its original wording readable beside it"* and *"No claim was
+deleted"*. That line sat inside the area-K S4 addendum, and closing area S
+deleted **the whole block** — §1a records the deletion and its reason (it was
+almost entirely `AGENTS.md` §2.1's own word list, which the counting rule
+excludes from *claims* but cannot exclude from *occurrences*). So the withdrawn
+word is gone from the page and the sentence that carried it went with it; the
+withdrawal is auditable here and in `git diff origin/main...HEAD`, and at neither
+place at head. Recorded rather than silently repaired: restoring a 35-line
+addendum is a content decision for the pass's author, not a fix round's, and
+this note is the honest shape of the defect.
+
 **Nothing was pinned in `regression/hurl/`, and nothing was added to the gate.**
 A check enforcing §2.1 is a maintainer decision recorded as such at
 `docs/11:1580-1582`; extending the gate's own patterns in the same PR the gate
@@ -486,6 +566,35 @@ every strength-word claim in `docs/` and `README.md`, all but three either were
 one source stated twice or have been relabelled as such.** A negative counts.
 It is not a clean sweep — it is a sweep that found 12 and fixed 12.
 
+> ⚠ **Correction (2026-10-15) — the sentence above generalises from a subset, in
+> the document written to prevent exactly that (§6 item 7).** It is kept verbatim
+> and is **superseded** by this one:
+>
+> **Of every occurrence of the eleven phrases `AGENTS.md` §2.1 names** —
+> exact strings, §0-V, not inflections — **in `docs/*.md` and `README.md`, all
+> but three either were one source stated twice or have been relabelled as such.
+> Those three are `docs/10:37` (count 3), `README.md:340` (count ≥ 2), and the
+> `docs/03` §3a.4 replacement (count 2).**
+>
+> **The coverage limit belongs here, where the broad claim was, and not only at
+> `docs/10:59`.** The counted population is **exact strings**: `corroborates`
+> (7), `corroborating` (5), `corroboration` (19), `confirmed` (43) and the rest
+> of the inflections measured at §0 fall **outside** it — measured, not
+> estimated, §0. §5 lists **eleven** of those lines as carrying a real
+> multiplicity claim, and **a fourth claim survives among them** which the "all
+> but three" sentence above does not count: `docs/05:301`, *"independent
+> corroboration of the field name"*, **count 2** (the vendor bundle and the
+> third-party clients), and it **survives**. So the honest statement is
+> **four survivors across the audited material** — three inside the eleven-string
+> population and one outside it — and the headline above names only the first
+> three because the population it measures is the eleven strings.
+>
+> **Why the population was not widened:** deciding that `corroborates` joins
+> `corroborated` is a **maintainer decision about the rule**, not a research
+> pass's side effect (`AGENTS.md` §1; the same reasoning `docs/09` §4 records
+> for extending the gate's own patterns). Every inflection line was **read**
+> anyway, and §5 reports what reading them found.
+
 **What this pass did not do, and does not claim.** It did not audit
 `CONTRIBUTING-research.md`, `SECURITY.md`, `regression/`, `scripts/`,
 `.github/`, `PR.md`, or `findings-log/` as *editable* prose. It did not widen
@@ -497,3 +606,210 @@ It is not a clean sweep — it is a sweep that found 12 and fixed 12.
 *Sections 1–6 are written after the count; §0 was committed first and is
 unchanged by them, and the correction inside it keeps the superseded count
 readable beside the corrected one.*
+
+
+## Correction (2026-10-15)
+
+Second fix round, on the six defects a fresh-context verifier returned against
+the committed artefacts. **The research was not re-run and none of its numbers
+changed** — every figure in §§0–6 was re-derived independently and stands. What
+was wrong was the artefacts failing to reproduce their own numbers, one claim
+carrying two evidence classes across two pages, and the summary claiming more
+population than §0 measured. **Requests: still 0.** This round read committed
+text and one JSON artefact already on disk; `results.jsonl` remains **0 rows**
+and the accounting line above remains `0 of a 0 cap`.
+
+### C1 — `probe.sh` never received the word boundary, so it did not reproduce §1
+
+**The defect.** `hits.py:39` has carried `\b(?:…)` since it was written.
+`probe.sh:33` never did — it was committed un-boundaried in **`5bfdb6c`**, in
+**`d85634b`**, and again in **`9e82ecf`**, whose own commit message reads *"fix
+the population table to the corrected pattern, keep the error"*. That commit
+edited `FINDINGS.md` and `hits.txt` and **not the script that prints the
+denominator**. So the file this log points a reader at for re-derivation
+returned a different answer from the file it also points at:
+
+| on this branch's head, same tree, same eleven phrases | occurrences | lines |
+|---|---|---|
+| `bash probe.sh` — boundary missing | **68** | **47** |
+| `python3 hits.py` — boundary present | **63** | **44** |
+
+The **5-occurrence, 3-line** gap is `agrees with` matching inside **`disagrees
+with`** — the opposite word — at head over **5 lines**: `README.md:422`,
+`docs/10:47`, `docs/10:59`, `docs/11:1595`, `docs/11:1604`. Three of those lose
+their *only* match and so leave the line count (`README.md:422`, `docs/10:47`,
+`docs/11:1595`); the other two carry other phrases of the eleven and lose an
+occurrence without leaving the count. This is §6 item 2 happening inside the
+audit written to catch §6 item 2, and it survived a commit that named the exact
+defect in its own title.
+
+**The fix, and one thing about it worth recording.** `probe.sh` now carries
+`\b` before every alternative. It does **not** use `hits.py`'s spelling, and
+cannot: **GNU `grep -E` does not accept `(?:`** — it warns `? at start of
+expression` and silently drops the rest, which is very likely how the boundary
+went missing in the first place. Verified 2026-10-15:
+
+```
+$ echo "disagrees with foo" | grep -oiE '\b(?:agrees with|supports)'
+grep: warning: ? at start of expression
+$ echo "disagrees with foo" | grep -oiE '\bagrees with'
+(no output)
+```
+
+Repeating `\b` per alternative is the grep spelling of the same pattern — the
+engine asserts a word boundary at the match start whichever alternative it then
+takes — and §0-M already describes it in those words. **Both figures now, on
+this branch's head:**
+
+| | occurrences | lines |
+|---|---|---|
+| `bash probe.sh` | **63** | **44** |
+| `python3 hits.py` | **63** | **44** |
+| `AGENTS.md`, both, rule text | 14 | 7 |
+
+and at `origin/main` `7d915b8`: **68 / 49** both, `AGENTS.md` **14 / 7**.
+**The superseded pattern and its 71 / 52 result stay visible** in `hits.txt`
+and in §0-M. Neither is deleted: the wrong count is the evidence that the
+correction was needed.
+
+**A sixth defect fell out of this one, not in the verifier's list.** `probe.sh`
+reads the **checked-out working tree**, so §1's *"Re-derive with `bash
+probe.sh`"* could never have produced §1's own 68 / 49 on this branch — at head
+both scripts return §1a's 63 / 44. §1 now says so and gives the command that
+reaches `7d915b8`.
+
+### C2 — `hits.txt` contradicted its own footer
+
+The listing at the top of the file was the **superseded** one — 71 / 52, with
+`README.md:412`, `docs/10:47` and `docs/11:1632` printed as `[agrees with]`
+against text reading `disagrees with` — while the footer at the bottom read
+`TOTAL in scope (corrected) 68 49`. A reader who opened the file for the
+denominator, as §1 directs, got the uncorrected number from the listing and the
+corrected one from the footer, and no indication which to believe.
+
+**The listing is regenerated under the corrected pattern** and now totals 68 /
+49, agreeing with the footer. **The superseded listing is kept whole** under its
+own heading, which names the pattern that produced it, the three sites it
+miscounts and why, and the reason it is kept. The footer was **not** edited to
+meet the listing — it was the correct side of that disagreement. `git diff` of
+the two listings is exactly the three false-positive blocks and the total line.
+
+### C3 — one claim, two evidence classes, and an INFERRED warrant that could not carry it
+
+`docs/03` §3a.4 asserted **`3.8.0` is accepted by the vendor's body gate —
+independent count 2** … *"different authors, different artefacts, neither
+quoting the other"* with **no `INFERRED` marker and no mention of `#4547`**
+anywhere in §3a.4. `docs/10` §1 row 59 carried the same claim and said *"That
+the two are independent is INFERRED from the absence of any attribution in the
+body; the linked issue `#4547` would settle it and was not read."* One claim,
+two evidence classes, two pages — `AGENTS.md` §2's *"Never let INFERRED read as
+OBSERVED"* broken in the direction that makes the claim look stronger.
+
+**The warrant was also wrong on its own terms**, and the verifier is right
+about why: **absence of attribution cannot establish non-quotation**, because
+absence is symmetric and non-quotation is directional. Reading the PR body and
+finding no attribution in it says nothing about whether the *comment* on that
+PR was written from the body.
+
+**Both directions are now settled by the artefacts, and neither step is an
+inference.** `bodies/17-xd-pr4711-comments.b` is the file beside the one §3b
+read. It holds three comments; the first is:
+
+| field | value |
+|---|---|
+| `id` | `5413938350` |
+| `user.login` | **`CarlosJPV`** |
+| `created_at` | **`2026-08-25T17:06:27Z`** |
+| `updated_at` | `2026-08-25T17:06:27Z` |
+
+and its body carries a **direct measurement of `3.8.0`**:
+
+> *"Varying `appVersion` on `POST {baseUrlCumulus}/display/message`:"*
+>
+> `| `3.8.0` | **200 OK** |`
+>
+> *"**Your PR is correct as written** — `3.8.0` clears the gate."*
+
+Read here, verified field by field rather than taken on report. It names **no
+device, no account, no version other than the grid**, and quotes nothing from
+the PR body; the body (`created_at` **`2026-08-25T16:16:14Z`**, i.e. **50
+minutes earlier**) names two devices and accounts and **no status code**. The
+two artefacts **share no evidence**, and the ordering rules out the body having
+been derived from the comment. §2.1's conditions 2 and 3 therefore hold on
+SOURCE-OBSERVED grounds, not on an inference from silence.
+
+**What stays INFERRED, and is now labelled on both pages:** that `CarlosJPV`,
+who had plainly read the PR before answering it, drew his conclusion from his
+own grid rather than from the body's. The grid is his observation; the
+disposition is not observable. That is the residue, and it is stated as such
+rather than dropped.
+
+**`#4547` is moot and withdrawn as a caveat.** It was raised to settle whether
+the body's author had seen the other account; the two `created_at` values settle
+that direction instead. `#4547` was **not read**, and nothing in either page
+now rests on it.
+
+### C4 — the headline claimed a population §0 never measured
+
+The title and §6's closing sentence claimed *"every strength-word claim in
+`docs/` and `README.md`"*. The population is **§2.1's eleven exact strings**
+(§0-V), which is narrower than the eye: `corroborates` (7), `corroborating`
+(5), `corroboration` (19), `confirmed` (43) and the other measured inflections
+fall **outside** it. And §6's own list names **three** survivors while §5 names
+a **fourth** — `docs/05:301`, *"independent corroboration of the field name"*,
+**count 2**, which survives and is not among the three. That is §6 item 7 in
+miniature, in the document written to prevent it.
+
+**The title is annotated and §6's sentence is superseded, both verbatim beside
+the correction** (`AGENTS.md` §3), and the scope is restated as *"every
+occurrence of the eleven phrases `AGENTS.md` §2.1 names"*, with the survivors
+enumerated: **three inside the eleven-string population, a fourth outside it**,
+and the inflection coverage limit **moved to where the broad claim is made**
+rather than living only at `docs/10:59`.
+
+### C5 — line numbers resolved against `origin/main`, not the merge result
+
+§1 scoped itself; §3, §4's table and the `docs/10:59` list did not. **Eight of
+the twelve withdrawn sites no longer hold the cited line at head** — the
+correction that preserves the withdrawn wording sits elsewhere in the same
+line, or the block moved. A reader re-verifying by line landed on unrelated
+text. Sharpest case, and the one the verifier found by looking rather than
+computing: **`docs/11:1631` is cited twice** — §2's unedited list and §3a's row
+for `docs/11:1631` — as an *unedited* site under the scope test, and at head
+that line is **past the end of the file** (1617 lines). The claim is at
+**`docs/11:1594`**.
+
+**Fixed by stating the commit where the reader meets the numbers**, not by
+renumbering: a document header note for every `file:line` in §§0–6; §2 and §3a
+give the head line beside the `origin/main` one; §4's table carries a full
+site-by-site mapping; `docs/10:59`'s list now names `origin/main` @ `7d915b8`
+and gives all twelve head lines. `docs/11:1631` → **`docs/11:1594`** at head is
+stated at both sites where it is cited as an unedited site.
+
+**The mapping produced a finding the verifier did not ask for, and it is
+recorded rather than repaired.** `docs/11:1006` is one of the twelve withdrawn
+sites and its wording is **not readable anywhere at head**: it sat inside the
+area-K S4 addendum, which closing area S **deleted whole** (§1a gives the
+reason). §4's two sentences — *"Every one keeps its original wording readable
+beside it"* and *"No claim was deleted"* — are therefore **true of eleven
+sites and not of the twelfth.** Restoring a 35-line addendum is a content
+decision for this pass's author, not a fix round's, so §4 now says what is true
+and this paragraph says what is not.
+
+### What this round did not do
+
+**No regression pin was added.** Nothing in `regression/` pins anything this
+pass derived, and that is correct: the pass moves no vendor fact, no version, no
+route and no field name. **The gate was not extended** — a maintainer decision,
+recorded at `docs/09` §4. **No finding in §§0–6 was retracted**, no count
+changed, and `AGENTS.md` §2.1 itself is untouched. `scripts/research-checks.py`
+and `scripts/measure_assertions.py` were re-run after every edit: **216 / 430**,
+exit **0**.
+
+**One thing left for the owner, not for a fix round:** the six defects above
+were all found by a verifier reading the artefacts, not by the gate, and three
+of the six (`probe.sh`, `hits.txt`, the two-pages-one-claim split) were live
+while a commit in this very branch claimed to have fixed the class they belong
+to. Whether the gate should grow a check that a committed probe reproduces its
+own stated numbers is a maintainer decision of the same kind as C5's
+`docs/11:1006` — recorded, not taken.

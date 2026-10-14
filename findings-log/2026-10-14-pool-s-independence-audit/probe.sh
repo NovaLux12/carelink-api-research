@@ -19,6 +19,25 @@
 # denominator and stopped, which is exactly the shape of a check that looks
 # like it ran. Same family as the gate's own "an `ok` printed below its own
 # `!!`" row in docs/09 section 4. Fixed by making the no-match case explicit.
+#
+# Correction (2026-10-15): the pattern below was still missing the left word
+# boundary, so this script did NOT reproduce FINDINGS.md's denominator while
+# hits.py did — probe.sh read 68 occurrences / 47 lines where hits.py read
+# 63 / 44 on the same tree, and the 5-occurrence gap was `disagrees with`
+# matching `agrees with`. The three commits on this branch (5bfdb6c, d85634b,
+# 9e82ecf) all carried the un-boundaried string; 9e82ecf, titled "fix the
+# population table to the corrected pattern, keep the error", edited
+# FINDINGS.md and hits.txt and not this file. A fix that corrects the table and
+# leaves the tool that prints it wrong is not a fix.
+#
+# WHAT IT MEASURES: the CHECKED-OUT WORKING TREE, not origin/main. After this
+# branch's own edits the in-scope total is 63 occurrences / 44 lines
+# (FINDINGS.md section 1a). The section 1 table — 68 / 49, measured before the
+# edits — is re-derived at origin/main with:
+#     git worktree add /tmp/s-at-main origin/main && bash probe.sh
+# or, without a second checkout:
+#     git stash && bash probe.sh && git stash pop
+# Both figures are printed by section A + B below.
 
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)"
@@ -30,7 +49,19 @@ cd "$(git rev-parse --show-toplevel)"
 # Longest-alternative-first: Perl alternation is first-match-wins, so the order
 # is load-bearing, not cosmetic — it is what makes `corroborated independently`
 # ONE occurrence instead of `corroborated` + `independently`.
-ALL='double-sourced|verifies independently|corroborated independently|confirms independently|not contradicted by|consistent with|agrees with|independently|corroborated|confirms|supports'
+#
+# `\b` before EVERY alternative, matching hits.py's `\b(?:...)`. It is what
+# stops `agrees with` matching inside `disagrees with` — the opposite word —
+# which the first pattern matched in three places (FINDINGS.md section 0-M).
+#
+# The spelling differs from hits.py because GNU grep -E does NOT accept `(?:`
+# (it warns "? at start of expression" and silently drops the boundary — which
+# is how the un-boundaried count survived here at all; verified 2026-10-15).
+# Repeating `\b` per alternative is the grep spelling of the same pattern: the
+# engine asserts a word boundary at the match start whichever alternative it
+# then takes. Verified to give hits.py's figures exactly — 63 / 44 in scope at
+# this branch's head, 68 / 49 at origin/main 7d915b8, `AGENTS.md` 14 / 7 both.
+ALL='\bdouble-sourced|\bverifies independently|\bcorroborated independently|\bconfirms independently|\bnot contradicted by|\bconsistent with|\bagrees with|\bindependently|\bcorroborated|\bconfirms|\bsupports'
 
 # `grep -c` counts LINES; `grep -o | wc -l` counts OCCURRENCES. Both are
 # printed because they are not the same number and quoting only one of them is
