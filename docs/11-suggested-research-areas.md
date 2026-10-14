@@ -1613,6 +1613,17 @@ at once: it is invisible to the pattern, and the page's stated count would then 
 own contents. This was already recorded for the sub-declared-gap question in
 [`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
 
+⚠ **Disclosed 2026-10-15 (area R): the Closed table below physically holds 23
+rows while the arbiter's pattern measures 22, and the difference is the `S6`
+row** — a closed area that fails this page's own rule in exactly the way the rule
+two lines above describes. The number is not wrong; it is measured on a stated
+pattern, and the pattern cannot see `S6`. Both figures are given rather than one
+being quietly chosen (`AGENTS.md` §2). Neither is adjusted here: the `S6` row
+stays, the counting rule stays, and widening the pattern is a maintainer decision
+that `docs/09` §4 already rules out of a research pass — "changing the gate's own
+pattern in the same PR the gate passed is not a research pass's side effect". The
+residual is a known one-cell divergence, not a hidden one.
+
 > ⚠ **Corrected 2026-10-13 by area M.** This read *"9 open plus 17 closed"*. **The
 > words are not mine — `git diff origin/main...HEAD -- docs/ | grep -c 'Every letter A'`
 > is 0 — but the values are mine to maintain, because closing area M is what broke

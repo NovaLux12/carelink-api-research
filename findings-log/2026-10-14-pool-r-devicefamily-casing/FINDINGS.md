@@ -332,3 +332,89 @@ rather than producing a number — a count that cannot fail is not evidence
 
 No credential, session value, patient identifier or internal hostname appears in
 any file this pass added, and none was read, handled or recorded at any point.
+---
+
+## Correction (2026-10-15)
+
+Two defects found by the `carelink-verifier` round on PR #127 at `c267d65`, and
+independently reproduced against the artefacts before being actioned. Neither
+changes the verdict, the count, or a single figure this pass publishes — one
+changes a machine artefact that contradicted them, and one moves a citation by 35
+lines. Both original statements stay visible above, as `AGENTS.md` §3 requires.
+
+### C1 — the committed `run.log` was stale, and published the number this pass exists to refute
+
+**This was the blocking finding, and the mechanism is the one `AGENTS.md` §6 item
+5 names: derived prose contradicting its own source table.**
+
+`run.log` in this directory was the output of an **earlier** version of
+`count-candidates.py` — the version before this pass applied the **R-2(d)**
+exclusion of `S-CLIENT-DTO` — and it was committed without regeneration. It
+therefore published:
+
+| line in the stale `run.log` | what it said | what the current script says |
+|---|---|---|
+| `:13` | `S-CLIENT-DTO    4  …APP-EMULATION-RESEARCH.md:384-385` listed under **admitted** sources | `S-CLIENT-DTO` appears only under **DECLARED BUT NOT ADMITTED** |
+| `:40` | `union size = 23` | `UNION SIZE (the published number) = 21` |
+| `:41` | `sum of the three sources = 25` | `sum of the admitted sources = 27` |
+| `:23`, `:26`, `:30`, `:32` | `CC`, `CGM`, `GUARDIAN`, `NGP` attributed to `S-CLIENT-DTO` as a member source | `CC` and `CGM` are **not members**; `GUARDIAN` and `NGP` come from `S-ENUM`/`S-CLIENT` |
+| `:62` | "`CC` re-enters through `S-CLIENT-DTO`" | `CC` is not admitted at all |
+
+So **the number this pass refutes (`23`) was sitting inside the ledger**, in the
+same commit that published **21**, while §7 below pointed a reader at that file as
+the harness output. `AGENTS.md` §2 requires that where sources disagree you give
+both and never pick one silently; this was not a disagreement between sources, it
+was a stale derived artefact asserting a second number without saying so.
+
+**Fix: regenerated, not hand-edited.** `run.log` is now the output of
+`probe.sh`, which wraps the current `count-candidates.py` between its two marker
+lines, and the committed file's body is byte-identical to a fresh run of that
+script. The regeneration issues **no network request** — `probe.sh` has no
+`curl`/`wget`/`nc` and no host list, and `count-candidates.py` imports only
+`re` and `sys` — so the accounting is unchanged at **0 of a 0 cap** with
+`results.jsonl` at **0** rows, and **no request row was added** for the
+regeneration.
+
+**What this says about the pass, not just the file.** The prose was right and the
+machine artefact was wrong, which is the *reverse* of the usual failure mode and is
+therefore worth naming: the counting rule did its job (the script refused to
+default, and the stale output was recognisable only because the rule pins an exact
+number to print). What it did **not** do was force the committed ledger to be
+regenerated whenever the rule's implementation changed. That is a harness gap, and
+it is recorded here rather than fixed, because `probe.sh` is this pass's own
+artefact and retro-fitting a "the ledger must be newer than the script" check to it
+after the fact would be the same class of quiet edit this correction is about. A
+successor pass that touches the rule should regenerate the ledger as part of the
+change; the cheapest durable form is a note in the harness header, which is where
+the reader lands first.
+
+### C2 — the attribution cite pointed at a range that does not contain the phrase
+
+§2 above, and the sentence reproduced in `docs/05`, attributed the phrase
+**"from xDrip's message classes"** to
+`findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`. It does not
+appear there. Measured on the committed file:
+
+- **`:349`** is the heading that carries the phrase —
+  `# Round 3 — the full \`RecentData\` payload schema (from xDrip's message classes)`
+- **`:384`** is `### \`deviceFamily\` values — this is the wire vocabulary`
+- **`:385`** is the token line — the four tokens, where `CC` includes Instinct.
+
+So `:384-385` is exactly right for the **token list** and exactly wrong for the
+**phrase**. That is `AGENTS.md` §6 item 6's shape — a citation pointing at
+something other than what it is cited for — and it is the kind that survives
+review precisely because the cited range *does* contain the tokens.
+
+**The conclusion is unchanged, and the fix strengthens it.** The phrase sits in
+the heading of the enclosing **section**, so the defect is broader than the pass
+first described: the whole of Round 3 attributes itself to xDrip's message classes
+and **no commit is named anywhere in it**. The exclusion of `S-CLIENT-DTO` under
+**R-2(d)** therefore stands, `CGM` and `CC` remain unadmitted, and the union
+remains **21, not 23**.
+
+**Fix.** `count-candidates.py` now carries the two cites deliberately apart —
+`:349` for the phrase, `:384-385` for the tokens — and prints both in the
+`DECLARED BUT NOT ADMITTED` block, so the regenerated `run.log` states the
+attribution at the line that holds it. The `docs/05` citations were corrected in
+place (canonical docs supersede), and this section keeps the original wording
+visible above.

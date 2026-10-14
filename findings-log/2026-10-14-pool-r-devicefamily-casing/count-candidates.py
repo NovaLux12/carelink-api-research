@@ -64,9 +64,13 @@ A = {
 
 # Declared but NOT admitted: the set fails R-2(d), because the artefact that
 # carries it names no file:line at a named commit for the third-party revision
-# it was read from.
+# it was read from. Two cites, deliberately kept apart: :349 is the heading that
+# carries the attribution PHRASE, :384-385 is where the token list is. An earlier
+# version of this file attributed the phrase to :384-385, which does not contain
+# it (correction in FINDINGS.md).
 NOT_ADMITTED = ('S-CLIENT-DTO',
-                'findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385',
+                'findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:349 '
+                '(heading "from xDrip\'s message classes"); tokens at :384-385',
                 'reads "from xDrip\'s message classes" with no file:line and no '
                 'named commit for the xDrip revision; a bare PR number is not a '
                 'commit. Fails R-2(d).')

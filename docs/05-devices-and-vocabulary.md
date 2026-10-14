@@ -301,8 +301,9 @@ findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md].
 
 **Correction (2026-10-14, area R).** That vocabulary has now been re-derived to a
 committed line — `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`,
-whose own heading attributes it to *"xDrip's message classes"* — and it names **no
-`file:line` and no named commit** for the xDrip revision it was read from, so it
+which sits inside a section headed at **`:349`** — *"Round 3 — the full `RecentData`
+payload schema (from xDrip's message classes)"* — and it names **no `file:line` and
+no named commit** for the xDrip revision it was read from, so it
 is **not usable as SOURCE-OBSERVED** (`AGENTS.md` §2.1) and its two strings this
 repository cannot otherwise account for, `CGM` and `CC`, are **not admitted** into
 the candidate set below. The repair is one cite: the 2026-10-11 pass read xDrip at
@@ -462,9 +463,10 @@ denominator is re-derivable from a clean clone:
 >
 > **One declared vocabulary is NOT admitted, and that is a finding.** The
 > third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` sits at
-> `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, which
-> attributes it to *"xDrip's message classes"* with **no `file:line` and no named
-> commit**, so it fails **R-2(d)**. Admitting it would make the union **23, not
+> `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, inside a
+> section headed at **`:349`** — *"Round 3 — the full `RecentData` payload schema
+> (from xDrip's message classes)"* — which names **no `file:line` and no named
+> commit**. So it fails **R-2(d)**. Admitting it would make the union **23, not
 > 21** — the two extra strings being `CGM` and `CC`. The repair is one cite: the
 > 2026-10-11 pass read xDrip at **`366c97a8`** (tag `2026.10.10`).
 >

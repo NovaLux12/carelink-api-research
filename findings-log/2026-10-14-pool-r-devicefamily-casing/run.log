@@ -3,51 +3,54 @@
 # method: GET (not used — no request was made)
 # inter-request delay: >=2s (vacuous at 0 requests)
 # cap: 0
-# started: 2026-10-14T22:55:36Z
+# started: 2026-10-14T23:01:27Z
 # --- offline re-derivation begins (no network syscall is issued below) ---
 COUNTING RULE R-1..R-5 — see the docstring of this script.
 
-SOURCES (every string extracted from a committed artefact):
-  S-MAP          16  findings-log/2026-10-13-area-h-report-naming/family-map-verbatim.txt:1-16
-  S-ENUM          5  findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md:18-19
-  S-CLIENT-DTO    4  findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385
+ADMITTED SOURCES (every string extracted from a committed artefact at a named file:line):
+  S-MAP        16  findings-log/2026-10-13-area-h-report-naming/family-map-verbatim.txt:1-16
+  S-ENUM        5  findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md:18-19
+  S-CLIENT      6  findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md:353-354
 
 UNION (R-4: each string once):
-  BLE              S-ENUM
+  BLE              S-ENUM,S-CLIENT
   BLE700           S-MAP
   BLE720           S-MAP
   BLE740           S-MAP
   BLE770           S-MAP
   BLE780           S-MAP
-  BLE_X            S-ENUM
-  CC               S-CLIENT-DTO
+  BLE_X            S-ENUM,S-CLIENT
   CC840            S-MAP
   CC880            S-MAP
-  CGM              S-CLIENT-DTO
   EAGLE            S-MAP
   GM               S-MAP
   GST              S-MAP
-  GUARDIAN         S-ENUM,S-CLIENT-DTO
+  GUARDIAN         S-ENUM,S-CLIENT
   INSTINCT         S-MAP
-  NGP              S-CLIENT-DTO
+  NGP              S-CLIENT
   NMX7             S-MAP
   NMX8             S-MAP
-  SIMPLERA         S-MAP,S-ENUM
+  SIMPLERA         S-MAP,S-ENUM,S-CLIENT
   SIMPLERACC       S-MAP
   SIMPLERACCOLID   S-MAP
-  SIMPLERA_X       S-ENUM
+  SIMPLERA_X       S-ENUM,S-CLIENT
 
-union size                = 23
-sum of the three sources  = 25  (NOT the answer; the difference is 2 shared string(s))
+UNION SIZE (the published number) = 21
+sum of the admitted sources      = 27  (NOT the answer; 6 shared string(s))
 
 OVERLAPS:
   S-MAP & S-ENUM: ['SIMPLERA']
-  S-MAP & S-CLIENT-DTO: (none)
-  S-ENUM & S-CLIENT-DTO: ['GUARDIAN']
+  S-MAP & S-CLIENT: ['SIMPLERA']
+  S-ENUM & S-CLIENT: ['BLE', 'BLE_X', 'GUARDIAN', 'SIMPLERA', 'SIMPLERA_X']
+
+DECLARED BUT NOT ADMITTED — S-CLIENT-DTO:
+  artefact : findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:349 (heading "from xDrip's message classes"); tokens at :384-385
+  reason   : reads "from xDrip's message classes" with no file:line and no named commit for the xDrip revision; a bare PR number is not a commit. Fails R-2(d).
+  if admitted, the union would be 23, not 21 (+2: CC, CGM)
 
 MATCH TABLE (R-3: excluded from the union, counted separately):
   findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:103-115  -> 78 MMT-* + 9 SKU-* = 87 codes
-  display-name pairs: 76 quoted + 2 unquoted aliases + 9 SKU-* = 87 (area G FINDINGS.md:118-119) — not re-derived here, quoted from that line
+  display-name pairs: 76 quoted + 2 unquoted aliases + 9 SKU-* = 87, quoted from area G FINDINGS.md:118-119 and not re-derived here
 
 EXCLUDED UNDER R-3 (named, with reason — never silently dropped):
   MINIMED                          findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69
@@ -59,5 +62,5 @@ EXCLUDED UNDER R-3 (named, with reason — never silently dropped):
   Ut.Ey.all                        findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md:604
                                    a deviceFamily-FILTER key for a server-populated localStorage object, not a family value
   CC/COSMOS/COSMOS_WHITELISTED/DEVICE findings-log/probe-2026-10-08/recon/JS-API-SURFACE.md:562
-                                   deviceType values, not deviceFamily values; excluded as deviceType. `CC` re-enters through S-CLIENT-DTO, not through here
+                                   deviceType values, not deviceFamily values; excluded as deviceType. `CC` would re-enter only through its own family citation, which fails R-2(d)
 # --- offline re-derivation ends ---
