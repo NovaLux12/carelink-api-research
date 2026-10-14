@@ -395,3 +395,193 @@ read against.**
 every `/ipro/hcp/` member and every verdict. None of them reads the crawl
 inventory; they read CDX responses. Only the denominator moved, and it moved
 **toward** the prior pass's figure rather than away from it.
+
+## Correction (2026-10-15) — verification round 1: nine arithmetic items, and a second correction to the first correction
+
+Round-1 verification returned **NOT CLEAN** on `5738a16`. The spine held — the
+spacing floors, the 40-row ledger with every retry carrying its own row, both
+positives read from the bodies, the `CC-MAIN-2022-05` ordering, the 2022 capture
+refuting "bounded 2020", `CC-MAIN-2014-23` held indeterminate, and "absent from
+Common Crawl" disclaimed. **What did not hold was arithmetic that had escaped
+into prose** — this log's own §6 item 5. Everything below is derived in code
+(`derive.py`, now reading only committed files) and is re-checkable on a clean
+clone.
+
+`findings-log/` is append-only, so nothing above is edited. Line numbers refer to
+`5738a16`.
+
+### C1 — "8 of the 9" was wrong; the negative is **7 of the 9**
+
+`FINDINGS.md:217` counts `cells classified | 8`, and prose above carried that
+number forward as "8 without ipro". Re-derived per crawl from the ledger
+(`derive.py` §4): `/ipro/hcp/` was absent in **7 of the 9** newly-read crawls.
+Two of those eight classified cells — `CC-MAIN-2014-15` (4 members) and
+`CC-MAIN-2022-27` (1 member) — **do** carry ipro records, so the table cell and
+the prose disagreed. **Corrected: 7 of 9.**
+
+**The denominator is stated explicitly, because two are defensible:**
+
+| denominator | figure | reading |
+|---|---|---|
+| all 9 crawls this pass first read (**published**) | **7 of 9** | the indeterminate cell counts in the denominator and is not in the numerator |
+| the 8 classified cells only | **6 of 8** | a `404` behind no control cannot carry an absence in either direction |
+
+The two differ by exactly the one indeterminate cell (`CC-MAIN-2014-23`). Both
+are stated; neither is a rounding. `docs/11` carries both.
+
+### C2 — the census table's row labels conflated two things
+
+`FINDINGS.md:214-216`. The nine newly-read crawls are **8 record cells + 1
+indeterminate** — **zero** readable absences among them. The three readable
+absences (`-2013-20`, `-2021-04`, `-2022-05`) are on crawls a prior pass had
+**already read**; this pass re-probed them with its own control+probe pair. The
+row labelled "cells classified (record or readable absence) | 8" is right on the
+number and wrong on the label. **Corrected in `docs/11`; the eight are record
+cells, not "record or absence" cells.**
+
+### C3 — `CC-MAIN-2018-05` was never queued; the cap blocked a **retry**
+
+`FINDINGS.md:217` said "selected but never sent — queue abandoned on the cap".
+`grep -rn '2018-05' q-0*.tsv probe.sh results.jsonl run.log` returns **0 hits** —
+it was never enqueued. And `run.log.capped`'s `CAP REACHED at 40 of 40` did not
+abandon a queued line: `q-05-last.tsv` holds exactly one entry, which **was**
+sent as seq 40; that row answered `502`, `is_failure` was true, `attempt 0 <
+MAXRETRY 2`, so the loop went round again and the cap check at `probe.sh:60-62`
+stopped it before the retry. **Corrected: the crawl was never queued, and the
+cap instead blocked the retry of seq 40.** The bare fact "was never sent" at
+`FINDINGS.md:238` is true and stands.
+
+### C4 — "all 40 rows are re-derivable from these files" was false
+
+`FINDINGS.md:36`. Two of `derive.py`'s blocks were gated on `$L_BODIES` and
+silently disabled when unset: the **mtime oracle** and the **84-crawl
+denominator**. `results.jsonl` carries a 400-character `body_head` and no mtime
+field, so neither was re-derivable from the tree — `docs/09` §4's own lesson,
+which this pass reproduced in reverse.
+
+**Fixed by committing the data, not by weakening the claim.** Two new files:
+
+- **`spacing.txt`** — the per-gap series on **both** clocks, 39 gaps, with the
+  counting rule and the floor for each: clock A (`t_sent`) **4.272 s**, clock B
+  (kernel body mtime) **4.035 s**, 0 under 3.5 s and 0 under the `>=2 s` floor
+  on either. It states plainly that **the mtime series is machine-local and is
+  not re-derivable from a clean clone** (git does not preserve mtimes), which is
+  the repo's own convention for that oracle.
+- **`crawl-window.txt`** — all 128 published `id`/`from`/`to` rows plus the
+  window decision and the read-by tag, so the 84 is re-derivable from the tree.
+
+`derive.py` now reads only committed files, and prints the `L_BODIES` blocks as
+an explicit *optional cross-check that says so when absent*, instead of printing
+nothing.
+
+### C5 — "roughly 1.6 requests per crawl" had no derivation; the real figure is **2.4–3.2**
+
+Published at `docs/11:1389` as **S-L2's blocker figure**, which is the number a
+third party would budget from. It matched nothing on disk. Derived from this
+pass's own ledger, counting rule: *requests per newly-read crawl = every
+`results.jsonl` row whose crawl is one of the nine ÷ 9.*
+
+| | figure | rule |
+|---|---|---|
+| **measured** | **3.22** (29 rows ÷ 9 crawls) | rows on the nine newly-read crawls: 15 control + 14 probe |
+| **derived** | **2.36** | row failure rate on those rows `p = 0.448`; `E[attempts/query]` at `MAXRETRY=2` is `(1−p)(1+p+p²) + 3p³ = 1.180`; two queries per crawl → `2.36` |
+
+The measured figure exceeds the derived one because **two of the nine crawls
+exhausted a control host** (`-2014-23` across two hosts, `-2022-27` across three
+attempts). **Publish 2.4–3.2, not 2 and not 1.6.** `1.6` is withdrawn; it had no
+derivation and the nearest committed figure is area M's "roughly 1.3 N" at 28%.
+
+### C6 — "within sixteen minutes" was wrong by about sixfold
+
+`FINDINGS.md:309`, labelled OBSERVED. The five `javascript-warning.html` records
+in the `CC-MAIN-2022-27` body run **`20220703140102` → `20220703154254`**:
+**span 1 h 41 m 52 s, maximum consecutive gap 0:52:07.** Five records and all
+HTTP 200 are correct; the interval was not. Relative to the `index.jsp` capture
+at `14:09:27`, only 2 of 5 fall inside sixteen minutes, so no subset of the data
+gives the figure that was published. **Corrected to 1:41:52 with the rule stated
+("span = last timestamp − first timestamp").** The side-finding is still not
+interpreted.
+
+### C7 — the `docs/09` trap rows are not this pass's artefact
+
+`FINDINGS.md:326-329` said the rot-prone halves are "recorded as `docs/09` §4
+trap rows instead", which reads as though this pass produced them. **`docs/09` is
+not in this diff and cites nothing from this pass.** The two rows that already
+cover both halves are **`docs/09:186`** (host reachability is a fact about a host
+at a time, not a property) and **`docs/09:187`** (~28% failure rate, and a
+covered host is not a shield). **Restated: "already carried by the rows at
+`docs/09:186-187`."**
+
+### C8 — the control host was "varied per crawl", not "alternating"
+
+`FINDINGS.md:234`. The ledger's control hosts run
+`cc, google, google, cc, google, cc, google, cc, cc, google, cc, google` —
+**two `commoncrawl.org` in a row** at `-2014-15` → `-2015-11`, and a third at
+`-2019-04` → `-2020-05`. "Varied per crawl" is the true claim; "alternating" is
+not.
+
+### C9 — this log's own first Correction was incomplete: the 87 was **two** errors, not one
+
+The Correction above attributes the whole 87 → 84 gap to the two 2013 crawls
+dropping out. Re-derived against the committed inventory, that is **half** the
+story, and the half it named is not the half that mattered:
+
+| variant | rule | count |
+|---|---|---|
+| **correct** | `from`/`to` compared against the **same** ISO shape, endpoints inclusive | **84** |
+| correct, day precision | `from[:10]` / `to[:10]`, dashes kept on both sides | **84** |
+| the one that printed 87 | `from[:8]` / `to[:8]` — **dashes kept** — against a **dashless** bound | **87** |
+
+The buggy variant makes **two** opposite mistakes, because `-` is `0x2D`, which
+sorts below both `0` (`0x30`) and `2` (`0x32`):
+
+- **drops 2** — the `to` test fails for every 2013 crawl (`'2013-06-20…' >=
+  '20130517'` is false);
+- **wrongly includes 5** — the `from` test *passes* for every post-window 2022
+  crawl (`'2022-06-24…' <= '20220513'` is true), so `CC-MAIN-2022-21`, `-2022-27`,
+  `-2022-33`, `-2022-40` and `-2022-49` all entered the window.
+
+84 − 2 + 5 = **87**. **Two consequences that change published claims:**
+
+1. **The rule was stated too narrowly.** Full ISO-8601 precision is *not*
+   required — comparing `YYYY-MM-DD` on both sides gives the same **84**. What is
+   forbidden is comparing two **different shapes**. The rule above and in
+   `crawl-window.txt` is corrected accordingly.
+2. **`CC-MAIN-2022-27` is outside the window.** Its window is
+   `2022-06-24 → 2022-07-07`. So of the nine crawls this pass first read, **8 are
+   in the 2013-05-17 → 2022-05-13 window and 1 is not** — it was read precisely
+   because the 2022-end question needed the crawl after the window. **The window
+   census therefore reads 84 in window, 12 read before, 8 read new, 64 still
+   unread** — not the **63** published above. The 2022 *capture* is unaffected;
+   only the census denominator moves.
+
+**What is not retracted.** Every probe, control, census-table cell, `/ipro/hcp/`
+member and verdict. The spine round 1 confirmed is confirmed: the 2022 capture
+on `CC-MAIN-2022-27` is a record on an out-of-window crawl, which is exactly why
+no in-window 2022 crawl had carried it. The counting-rule table, the
+`CC-MAIN-2022-05` ordering, `CC-MAIN-2014-23`'s indeterminacy, the host-scope
+fills, both spacing floors and the 40-row ledger are untouched.
+
+### C10 — the append-only guard **cannot see this file**, and that is worth stating rather than banking
+
+`scripts/research-checks.py`'s `check_append_only` arms on status `D` and `M`
+(`scripts/research-checks.py:471` and `:474`). The diff it reads is three-dot
+(`origin/main...HEAD`), and every file in this directory is added on this branch,
+so `git diff --name-status origin/main...HEAD -- findings-log/` reports **`A`** for
+`FINDINGS.md` — and `A` matches neither arm, so the check prints `ok`
+**without ever reading the file.**
+
+**Proved, not assumed.** A negative control: renaming this very section's heading
+from `## Correction (2026-10-15) — verification round 1…` to an undated one and
+re-running the check **still printed `ok findings-log changes are append-only`**.
+The heading form the repo's own gate screens for is
+`^## Correction \(\d{4}-\d{2}-\d{2}\)` and both sections here match it, but that
+is a fact about this file's text, not something the gate confirmed.
+
+**So the append-only discipline on this log is mine, not the gate's**, and the
+green line above should be read for what it is: `D` and `M` are clean. This is the
+defect `docs/09` §4 already records at length — *an append-only guard that never
+sees a new document* — reproduced here on a pass that had every intention of
+complying. **Not fixed here:** widening the gate's own patterns is a maintainer
+decision (`docs/09` §4, and `AGENTS.md` §11 on a pass not extending the gate).
+Recorded so the next reader does not take that `ok` as evidence about this file.
