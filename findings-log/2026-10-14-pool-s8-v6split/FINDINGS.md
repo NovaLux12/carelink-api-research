@@ -37,8 +37,8 @@ because sends were 2.5 s apart by construction.
 - **Trials cell bytes vs. the fabricated arm.** The v6 cell (10053 B,
   `1aab9bb1…`) and the fabricated-tail arm (10069 B, `a5c9ddf8…`) differ by
   exactly 16 bytes, and that 16-byte difference is byte-for-byte the echoed path
-  segment (`"android,3.6"` → `"android,absent-probe-413306"`). The substitution was verified for these two tails only, so the templated-response reading is INFERRED from two cells, not proven for every tail.
-  response** on this host. Consequently the two bodies **do not** prove that the
+  segment (`"android,3.6"` → `"android,absent-probe-413306"`). The substitution was verified for these two tails only,
+  so the templated-response reading is INFERRED from two cells, not proven for every tail. Consequently the two bodies **do not** prove that the
   v6 cell is a distinct document or that the fabricated arm is an SPA fallback
   — byte size alone cannot separate them. What remains solid from this control:
   both arms are `200` and both differ from the 42 B no-route digest used on
