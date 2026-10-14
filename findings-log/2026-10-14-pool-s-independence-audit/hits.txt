@@ -1,0 +1,196 @@
+
+README.md:50  [independently]
+    reverse-engineers this surface independently, because there's nothing to read.
+
+README.md:340  [independently]
+    reverse-engineers the same surface independently, and each one is only as
+
+README.md:412  [agrees with]
+    gate fails any PR whose prose count disagrees with the measurement. That
+
+docs/03-discovery-and-versions.md:8  [agrees with]
+    [`00-summary-the-map.md`](00-summary-the-map.md) and agrees with it; the
+
+docs/03-discovery-and-versions.md:232  [corroborated independently]
+    The 2026-10-11 pass recorded this table as *"corroborated independently by a xDrip
+
+docs/03-discovery-and-versions.md:241  [independently]
+    is independently verifiable in code (§3a.1); and the PR body independently confirms
+                                      [independently]
+    is independently verifiable in code (§3a.1); and the PR body independently confirms
+                                      [confirms]
+    is independently verifiable in code (§3a.1); and the PR body independently confirms
+
+docs/03-discovery-and-versions.md:245  [independently]
+    - **Withdrawn:** the word *independently*. The original wording stays readable in
+
+docs/03-discovery-and-versions.md:400  [independently]
+    "POST → 401" and now proven independently from the OPTIONS axis rather than inferred
+
+docs/03-discovery-and-versions.md:475  [consistent with]
+    uniformly dead one is more consistent with an oversight than with a contract. **The
+
+docs/04-configuration.md:456  [agrees with]
+    trials **per-key** projection of the same key agrees with it cell for cell. The
+
+docs/05-devices-and-vocabulary.md:276  [confirms]
+    bundle confirms as a first-class device type. The mobile payload's family vocabulary is
+
+docs/05-devices-and-vocabulary.md:331  [independently]
+    `medicalDeviceFamily` directly, independently corroborating point 1) and 87,564
+
+docs/07-admin-portal-and-reporting.md:149  [confirms]
+    recorded and this table neither confirms nor refutes it. What the table adds is that the
+
+docs/07-admin-portal-and-reporting.md:300  [consistent with]
+    the three gateways. Three readings are consistent with the evidence and cannot be separated
+
+docs/09-methodology-and-oracles.md:59  [confirms]
+    route; it only ever confirms a negative** [source: AWS-GATEWAYS §0, §2].
+
+docs/09-methodology-and-oracles.md:117  [confirms]
+    positively confirms *no* GET/OPTIONS route [source: AWS-GATEWAYS §2, §11].
+
+docs/09-methodology-and-oracles.md:194  [independently]
+    | **The `date` series itself is the suspect** — use body-file mtimes instead | **Area D answered the open question above, and the answer was that the instrument is the problem.** That pass made the same finding four passes running (14 gaps under 2.5 s, min 1.642 s) **and recorded 11 of 119 requests with a NEGATIVE duration** — `t_done` earlier than `t_sent`, which is impossible — so those timestam
+                                       [agrees with]
+    | **The `date` series itself is the suspect** — use body-file mtimes instead | **Area D answered the open question above, and the answer was that the instrument is the problem.** That pass made the same finding four passes running (14 gaps under 2.5 s, min 1.642 s) **and recorded 11 of 119 requests with a NEGATIVE duration** — `t_done` earlier than `t_sent`, which is impossible — so those timestam
+
+docs/10-open-questions.md:37  [independently]
+    | Which field carries `deviceFamily`, and in what casing | **The field name is settled; the value's casing is not.** `/patient/monitor/data` carries **`deviceFamily`** (routing discriminator) and the Cumulus/ble payload carries **`medicalDeviceFamily`** (reported family) — agreed independently by three clients at named commits (`nightscout-connect` `index.js:587`; xDrip `MonitorData.java:5` + `Rec
+
+docs/10-open-questions.md:45  [double-sourced]
+    | **Is `commoncore-trials.medtronic.com` a real host?** | ⚠ **ANSWERED 2026-10-13 (the `commoncore-trials` pass, #58, 9 of a 10 cap, OBSERVED): yes — it is a real host, and the row's two possible verdicts were both wrong.** **The existence question is closed: INFERRED → OBSERVED.** It is a **CNAME to a CloudFront distribution** (`d16wbx60y036c9.cloudfront.net`, 4 A records), presents a **host-spec
+
+docs/10-open-questions.md:47  [agrees with]
+    | Would any host accept a token minted by a shadow Auth0 tenant | Should not — **five** tenants, ten JWKS kids, completely disjoint; if anything accepts it, the bug is a loose `kid`/`aud` verifier, not a key leak (INFERRED from OBSERVED key sets) [AUTH-TENANT §8; findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §5] | Blocked on a token. The issuer inventory this question needed is
+
+docs/10-open-questions.md:50  [consistent with]
+    | Do the two dedicated-route config escapes (`/patient/configuration/defaultCountry`, `/patient/configuration/recaptcha/key`) exist on `.com` and `-trials`, and is the 404 content-type set deployment-dependent? | **ANSWERED 2026-10-13 (area F, #55) — and the predicted answer was wrong, which is why it is worth the row.** Area E predicted "the routes are EU-only"; **all three routes answer `200 app
+
+docs/10-open-questions.md:57  [supports]
+    | Why does `v6/discover/android/3.6` answer `200` on `-trials` and `403` on the other two hosts | **Unknown, and not re-probed since the pass that produced the matrix.** `ORACLE-PROBE-MATRIX.md` **declares no capture date of its own**; the date is inherited from its parent `VERSION-AXIS.md`, whose title reads **2026-10-10**. ⚠ An earlier draft of this row attributed the cells to **2026-07-21**, wh
+
+docs/10-open-questions.md:59  [corroborated independently]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [corroborated independently]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [independently]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [confirms]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [independently]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [corroborated]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+                             [corroborated]
+    | Does any "corroborated independently" claim in the third-party material actually rest on two sources? | **At least one does not, and it was found by reading the artefact.** The `appVersion` boundary table was recorded as "author-reported **and corroborated independently by a xDrip maintainer** in xDrip PR #4711". PR #4711 has **three** comments: the table (by `CarlosJPV` — also the author of the
+
+docs/10-open-questions.md:62  [consistent with]
+    | Which of three readings explains `patient-timeline`'s no-route 403s (no routes deployed / write-only routes / live stage isn't `prod`) | All three are consistent with the evidence and cannot be separated with GET-only probing (OBSERVED) [AWS-GATEWAYS §6] | The single separating test is an authentication attempt — **excluded by this project's constraints**; recommended first follow-up only with e
+
+docs/10-open-questions.md:64  [independently]
+    | Can a **single** Common Crawl index query be read as a zero — and is a domain result set complete, or truncated? | **No on the first, unknown on the second.** Area M sent 61 requests to `index.commoncrawl.org`/`data.commoncrawl.org` and **17 of them (28%) answered 502 ×6, 504 ×7, 400 ×2 or 503 ×2** — nginx gateway pages, an S3 `SlowDown`, and one HTTP **400 whose body is a Python `RemoteDisconne
+                             [corroborated]
+    | Can a **single** Common Crawl index query be read as a zero — and is a domain result set complete, or truncated? | **No on the first, unknown on the second.** Area M sent 61 requests to `index.commoncrawl.org`/`data.commoncrawl.org` and **17 of them (28%) answered 502 ×6, 504 ×7, 400 ×2 or 503 ×2** — nginx gateway pages, an S3 `SlowDown`, and one HTTP **400 whose body is a Python `RemoteDisconne
+
+docs/11-suggested-research-areas.md:483  [confirms]
+    entry document in the same run, but no authenticated session confirms a logged-in user
+
+docs/11-suggested-research-areas.md:673  [consistent with]
+    **consistent with naming the gateway this repo probed**; the id segment was
+
+docs/11-suggested-research-areas.md:720  [corroborated]
+    is corroborated rather than amended.
+
+docs/11-suggested-research-areas.md:773  [corroborated]
+    > two claims it rests on no longer holds. **⚠ Withdrawn:** *"corroborated by a xDrip
+
+docs/11-suggested-research-areas.md:788  [corroborated]
+    > > (SOURCE-PUBLISHED — author-reported table, corroborated by a xDrip maintainer on
+
+docs/11-suggested-research-areas.md:798  [independently]
+    > > re-derives it independently — `CarlosJPV`, xDrip and this ecosystem's own
+
+docs/11-suggested-research-areas.md:805  [independently]
+    > > independently. No client dates either change, so no drift timeline is asserted.
+
+docs/11-suggested-research-areas.md:940  [corroborated]
+    Area Q's own area text claimed the `appVersion` boundary table was *"corroborated by a
+
+docs/11-suggested-research-areas.md:951  [independently]
+    independent sources** — and a rule about strength words (*independently*,
+
+docs/11-suggested-research-areas.md:952  [corroborated]
+    *corroborated*, *confirms*) that says what each requires. Nothing in `AGENTS.md` §2
+                                        [confirms]
+    *corroborated*, *confirms*) that says what each requires. Nothing in `AGENTS.md` §2
+
+docs/11-suggested-research-areas.md:958  [corroborated independently]
+    `docs/10` §1, the *corroborated independently* row, which carries the full framing).
+
+docs/11-suggested-research-areas.md:961  [independently]
+    **and** a statement of what "independently corroborated" requires — different
+                                        [corroborated]
+    **and** a statement of what "independently corroborated" requires — different
+
+docs/11-suggested-research-areas.md:1006  [independently]
+    independently, which is why it is trusted rather than merely asserted; the remaining
+
+docs/11-suggested-research-areas.md:1024  [independently]
+    and the strength words (`independently`, `corroborated`, `confirms`,
+                                         [corroborated]
+    and the strength words (`independently`, `corroborated`, `confirms`,
+                                         [confirms]
+    and the strength words (`independently`, `corroborated`, `confirms`,
+
+docs/11-suggested-research-areas.md:1025  [verifies independently]
+    `verifies independently`, `double-sourced`) are permitted only where that count
+                                         [double-sourced]
+    `verifies independently`, `double-sourced`) are permitted only where that count
+
+docs/11-suggested-research-areas.md:1027  [consistent with]
+    <artefact> (one source)`. Coherence words (`consistent with`, `supports`,
+                                         [supports]
+    <artefact> (one source)`. Coherence words (`consistent with`, `supports`,
+
+docs/11-suggested-research-areas.md:1028  [agrees with]
+    `agrees with`, `not contradicted by`) describe agreement, not multiplicity, and
+                                         [not contradicted by]
+    `agrees with`, `not contradicted by`) describe agreement, not multiplicity, and
+
+docs/11-suggested-research-areas.md:1036  [corroborated]
+    **What remains:** the audit behind `docs/10` §1 row 59 (every "corroborated
+
+docs/11-suggested-research-areas.md:1037  [independently]
+    independently" claim in the 2026-10-11 pass and in this repo's third-party-
+
+docs/11-suggested-research-areas.md:1183  [corroborated]
+    is corroborated, not weakened. **Still NOT measured:** re-fetching all 225 clinic
+
+docs/11-suggested-research-areas.md:1404  [consistent with]
+    member in a second crawl is consistent with one surface and does not prove it,
+
+docs/11-suggested-research-areas.md:1496  [corroborated]
+    24; `-2022-05` 134), each corroborated complete by its own
+
+docs/11-suggested-research-areas.md:1603  [consistent with]
+    digest per host, consistent with the per-host reCAPTCHA keys already on
+
+docs/11-suggested-research-areas.md:1627  [independently]
+    | B — the `v12/display/message` routing picture | 2026-10-12 | **Positive on the audit target, and the premise needed no correction.** `v12/display/message` is `401` + `UnauthorizedException` + `x-ca-err: 990` on **all three** hosts, 3 of 3 — but `docs/03` §6 and `docs/06` had asserted "401 on all three hosts" on **one** raw row (`.eu` only, duplicated across two files), so the claim is now *confi
+
+docs/11-suggested-research-areas.md:1631  [confirms]
+    | O — is `/patient/reports/*` on `carelink.*` the reports surface for every region? | 2026-10-12 | **Positive, and the area's split does not exist.** All seven recorded paths answer on **all three** patient deployments — `carelink.minimed.eu`, `carelink.minimed.com`, `carelink-trials.minimed.com` — and the responses are **byte-identical across hosts** (one body digest per path, three hosts). 21 of
+
+docs/11-suggested-research-areas.md:1632  [agrees with]
+    | D — the 18-country sweep, completed | 2026-10-12 | **Both close conditions met: the sweep is complete AND the contradictions are enumerated.** **118** country codes requested — the offline-derived union of the codes the vendor's own three published config documents enumerate — **117** country documents served, every key given an ABSENT / NULL / VALUED verdict, **33/34/35 keys** by country, **no 
+
+docs/11-suggested-research-areas.md:1643  [corroborated]
+    | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:
+                                         [independently]
+    | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:
+                                         [corroborated]
+    | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:
+
+--- 71 occurrences across 52 matching lines in 14 in-scope files ---

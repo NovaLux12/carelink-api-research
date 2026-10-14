@@ -238,10 +238,31 @@ comment approves the PR; it does not restate, retest, or comment on the boundary
 values.**
 
 - **Still stands:** the table is SOURCE-PUBLISHED and author-reported; the *mechanism*
-  is independently verifiable in code (§3a.1); and the PR body independently confirms
+  is verifiable in code without relying on that report (§3a.1); and the PR body records
   the value xDrip moved *from* — `3.6.0` → `3.8.0` — with that PR **merged**
   2026-08-29T11:59:05Z. That is upstream corroboration that `3.8.0` works; it is not
   corroboration of where the boundary sits.
+- **⚠ Corrected 2026-10-14 (area S independence audit).** This bullet read
+  *"is **independently** verifiable in code"* and *"the PR body **independently
+  confirms** the value xDrip moved from"*. Both strength words are withdrawn
+  under `AGENTS.md` §2.1. **Counts:** §3a.1 rests on one artefact by one author
+  (`CarlosJPV/carelink-cumulus-bridge` @ `0180b89`), so **1**, not 2. The PR
+  body is authored by **`m0rt4l1n`** — read at the artefact, not the same person
+  as the table's author — but the PR body and the PR's own merge record are two
+  artefacts from **one** organisation, so for the *version-bump* claim the count
+  is **1**, not 2.
+- **What that read did miss, and it is the one genuinely new thing here.** The
+  PR body is a **second author** on one adjacent claim, and it is not quoting
+  the boundary table: *"This has been tested with a Medtronic 780G + Guardian 4
+  user and Medtronic InPen + Simplera user."* So **`3.8.0` is accepted by the
+  vendor's body gate — independent count 2** (`CarlosJPV` at `README.md:50-55` @
+  `0180b89`, SOURCE-PUBLISHED; `m0rt4l1n` at `NightscoutFoundation/xDrip` PR
+  #4711's body, SOURCE-PUBLISHED; different authors, different artefacts,
+  neither quoting the other). **Where the boundary sits stays at count 1.** That
+  is the first claim in this section whose independent count is ≥2, and it was
+  not known before this audit read the PR author off the artefact
+  [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
+  rows 6–7; source: findings-log/2026-10-13-area-q-appversion-axis/bodies/16-xd-pr4711.b].
 - **Withdrawn:** the word *independently*. The original wording stays readable in
   [findings-log/2026-10-11-third-party-client-sources/FINDINGS.md §3].
 
@@ -397,8 +418,19 @@ byte-identical to `android/3.6` except the echoed `"config":"android,3.8"`)
 vendor's own country-settings config hands out as `blePereodicDataEndpoint` — returns
 **403 on GET** and **200 with CORS on OPTIONS** on all three hosts: the resource exists,
 the **GET method is not defined**, it is POST-only, matching `work/METHOD-FACTS.md`'s
-"POST → 401" and now proven independently from the OPTIONS axis rather than inferred
+"POST → 401" and now proven from the OPTIONS axis directly rather than inferred
 [source: VERSION-AXIS §1].
+
+> **⚠ Corrected 2026-10-14 (area S independence audit).** The line above read
+> *"now proven **independently** from the OPTIONS axis"*. `AGENTS.md` §2.1 makes
+> `independently` a strength word requiring ≥2 **independent sources**, and both
+> sides here were produced by this repository — `work/METHOD-FACTS.md` and the
+> `VERSION-AXIS` OPTIONS sweep are two artefacts by **one** author. Count: **1**.
+> The word is withdrawn; what it was doing — that the verdict comes from a
+> *different axis* rather than from inference over the first — is now stated
+> outright instead of implied by the word.
+> [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
+> row 9].
 
 ## 9. PDE, `csr`, bare cumulus — refined, with a caveat
 

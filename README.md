@@ -47,8 +47,18 @@ an RFC 9110 §8.4 violation, and it breaks any client that doesn't opt in. Here
 
 Every third-party CareLink client — including
 [the one that feeds Nightscout](https://github.com/NovaLux12/carelink-bridge) —
-reverse-engineers this surface independently, because there's nothing to read.
+reverse-engineers this surface from the same zero, because there's nothing to read.
 This repo is that work, done once and cited.
+
+> **⚠ Corrected 2026-10-14 (area S independence audit).** This read
+> *"reverse-engineers this surface **independently**"*. The word is a strength
+> word under `AGENTS.md` §2.1 and is permitted only where ≥2 **independent
+> sources** support the claim; this sentence enumerates no sources and cites
+> none, so the count behind it is **1** — this repo's assertion. The word is
+> withdrawn and the claim is unchanged: see the enumeration four hundred lines
+> below, where the same statement carries its count on the line.
+> [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
+> row R1].
 
 The surprise is how much answers **without a credential at all**: the config
 file above, an endpoint that answers for 117 countries, and a third that lets
