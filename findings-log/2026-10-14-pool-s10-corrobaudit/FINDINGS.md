@@ -14,7 +14,7 @@ Coherence words (`consistent with`, `supports`, `agrees with`, `not
 contradicted by`) describe agreement, not multiplicity and never upgrade.
 
 Scan: grep across `docs/` + `findings-log/` (excluding lane outputs and the
-independence-rule findings itself). 18 occurrences across 8 files; the
+independence-rule findings itself). 16 matches across the eight target files (see list below); the
 surviving candidates audited below.
 
 ## Audit table
@@ -30,7 +30,7 @@ surviving candidates audited below.
 
 ## Counts
 
-- Strength-word scan returned 16 matches of the seven named phrases across the eight target files; the same phrases recur 24 times in total once the independence-rule findings file is included, where they are themselves the subject rather than claims (the remaining 13+ occurrences are citations of the rule text, not new strength-word claims).
+- Strength-word scan returned 16 matches of the seven named phrases across the eight target files; the same phrases recur 24 times in total once the independence-rule findings file is included, where they are themselves the subject rather than claims.
 - Genuine third-party claims carrying a strength word: 6 (#1–4 plus cross-references).
 - Of those, 1 already withdrawn (appVersion, area Q); 2 need a relabel (#2, #3); 1 is supportable with the artefact committed (#4); 1 is an allowed coherence use (#5's scope allows); 1 inherits #2.
 - Under §2.1, every one of the 6 is **one OR two sources at most**, and none reached the independent-source count threshold on the basis of the same author's second artefact alone. #4 (#4) is the only candidate for true independence, and even there our verb is "verified" not "observed" — the evidence class stays SOURCE-PUBLISHED at most.
@@ -43,7 +43,7 @@ This audit does not change `AGENTS.md` §2.1 (already present) nor close area S 
 
 1. docs/10:45 commoncore-trials row — replace "double-sourced from two independent passes, read off two independent headers" with "recorded in two passes of this repo (area O req 6; area E seq …); same CSP byte on both reads; same-author corroboration, observed independently but not independently sourced." Evidence classes unchanged (OBSERVED stays).
 2. HCP-CONFIG-SCHEMA (probe-2026-10-08) § Bottom line and 2026-10-13 area-p log §markers — drop "double-sourced"; state the same-author reads. Keep clinical half token-gated.
-3. Third-party pass §"independently verified" — keep SOURCE-PUBLISHED + cite the commit; the code mechanism's SOURCE-OBSERVED at xDrip master is a second artefact by a distinct author (xDrip) supplied by that repo, and `independently` is justified there only if the commit is cited, which the log does (master @ the stated commit). Survives.
+3. Third-party pass §"independently verified" — keep SOURCE-PUBLISHED; the code mechanism's SOURCE-OBSERVED readable in xDrip is a second artefact by a distinct author (xDrip), but the log (line 239) cites `CareLinkClient.java:664` with **no commit hash**, so `independently` is not yet supportable and must be downgraded to SOURCE-PUBLISHED corroboration until the xDrip commit is named and verified. (Not "Survives".)
 4. docs/03:232 + appVersion row — carried correction already in place; no further edit (do not re-smooth).
 
 Result: this pass does not merge an edit and does not reopen closed claims' wording silently; it documents the audit and files the fix list. Evidence class for every audited claim is at most PUBLISHED/OBSERVED third-party corroboration, never vendor-behaviour OBSERVED. Rule proposed (§2.1) now has its motivating audit's shape recorded here, satisfying area S's audit precondition; the rule decision itself remains with maintainers.
