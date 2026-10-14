@@ -1,0 +1,61 @@
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION -- the yield figures in the comment
+# below did not survive the ledger and are corrected in place; the QUERY LINES are
+# unmodified, because they are what was actually sent.
+#   round 1 (seq 80-94, queries-04, delay 2.5 s): 9 of 15 answered 502/504, not 8.
+#   round 2 (seq 95-105, queries-05, delay 8 s):  9 of 11 answered 504, not 4.
+#   Counts are from results.jsonl, per-status.
+# ROUND 3 — why does `fl=url` return FEWER records than `fl=url,timestamp,...`?
+#
+# THE CONTRADICTION (all OBSERVED, ledger seq 68 and seq 102, same crawl, same
+# url, same matchType, same API, same host, same run-day):
+#
+#   fl=url,timestamp,status,mimetype  -> 11522 records, 1864922 B, 37 hosts
+#   fl=url                            ->  5108 records,  655360 B,  2 hosts
+#
+# A byte ceiling predicts the OPPOSITE. `fl` cannot change which records MATCH
+# -- it chooses which fields each record carries -- so narrowing the fields makes
+# each record smaller, which should let MORE records fit under any byte ceiling.
+# Narrow returned 5108, fewer than medium's 11522. So either there is no byte
+# ceiling and `fl` is changing the match, or the ceiling is not a function of
+# bytes.
+#
+# The 5108-record body is exactly 655360 B = 640 KiB and ends on a clean record
+# boundary at `.../deep-brain-stimulation-dystonia/about/getting-dbs.html`, which
+# is a very round number for a coincidence. Its host set is
+# {medtronic.com, www.medtronic.com} -- and in SURT order the other 35 hosts
+# (ambassador, bakkeninvitation, ...) sort BEFORE www.medtronic.com, so a
+# complete SURT-ordered stream that reached www.medtronic.com should have carried
+# them. It did not. That is a second reason the narrow response cannot simply be
+# a truncated prefix of the medium one.
+#
+# Three ways this could be, and one request each:
+#   A  re-issue fl=url            -> same 655360 B again = deterministic ceiling;
+#                                   different = time- or load-dependent
+#   B  fl=url,timestamp           -> an intermediate width. Monotone
+#                                   (5108 < X < 11522) says width drives it.
+#                                   Not monotone says fl changes the match.
+#   C  fl=url,status              -> a second narrow point, to tell (A)'s
+#                                   "deterministic" from "coincidentally equal"
+#   D  the 32 KiB cell, narrowed  -> 2022-40/medtronic.com read 32768 B / 203
+#                                   records at MEDIUM. If narrow reads MORE than
+#                                   203 there, the 203 was a floor. If it also
+#                                   reads 32768 B, the ceiling is per-response
+#                                   and identical at both sizes, which is a
+#                                   different rule again.
+#   E  the pages=3 cell, paginated -> 2022-40/medtronic.com reports pages=3,
+#                                   blocks=14 -- the only cell in the repo where
+#                                   pages is not 1. Pages 0..3 settle whether the
+#                                   set really spans 3 pages.
+#
+# DELAY=10. Nine of fifteen requests answered 502/504 at 2.5 s (seq 80-94) and
+# nine of eleven at 8 s (seq 95-105). A 502/504 is a failure and never an
+# absence. [CORRECTED: this file originally said 'eight of fifteen' and 'four
+# of eleven'; neither reproduced from the ledger.]
+s6cmp3-narrow-reissue|determinism-narrow-again|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
+s6cmp3-intermediate-width|width-midpoint|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp|--max-time 300
+s6cmp3-narrow-status|determinism-second-narrow|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,status|--max-time 300
+s6cmp3-2022-40-narrow|ceiling-32k-cell-narrow|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
+s6cmp3-2022-40-medium|ceiling-32k-cell-medium|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 300
+s6cmp3-2022-40-page0|pagination-page0|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=0&fl=url,timestamp,status|--max-time 300
+s6cmp3-2022-40-page1|pagination-page1|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=1&fl=url,timestamp,status|--max-time 300
+s6cmp3-2022-40-page2|pagination-page2|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=2&fl=url,timestamp,status|--max-time 300

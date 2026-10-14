@@ -1,0 +1,3 @@
+collinfo|CONTROL-reachability|index.commoncrawl.org|/collinfo.json|
+control-positive|CONTROL-covered-host|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=example.com&output=json&matchType=domain&fl=url,timestamp,status&limit=5|
+control-absent|CONTROL-true-zero|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=zyxwvutsrqponm987notarealhost.invalid&output=json&matchType=domain&fl=url,timestamp,status&limit=5|

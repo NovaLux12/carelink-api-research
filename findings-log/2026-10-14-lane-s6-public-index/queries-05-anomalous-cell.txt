@@ -1,0 +1,60 @@
+# ⚠ CORRECTED 2026-10-14 AFTER VERIFICATION -- two statements below did not
+# survive the ledger (the round-1 yield figure, and the 'completes the triple'
+# plan); both corrected in place. The QUERY LINES are unmodified.
+# ROUND 2 — the anomalous cell, attacked from two directions.
+#
+# WHAT ROUND 1 ESTABLISHED (all three controls passed first, seq 77-79):
+#
+#   showNumPages, three cells:
+#     2022-40 / medtronic.com  {"pages": 3, "pageSize": 5, "blocks": 14}   <- !
+#     2026-39 / medtronic.com  {"pages": 1, "pageSize": 5, "blocks": 5}
+#     2015-48 / medtronic.eu   {"pages": 1, "pageSize": 5, "blocks": 1}
+#
+#   `pages` is 1 on two of the three. Area L only ever recorded pages=1, so
+#   this is the first cell in the repo where the API says its own result set
+#   spans more than one page. It is the same cell whose un-limited response is
+#   EXACTLY 32768 bytes = 2^15, which is what a byte ceiling looks like.
+#
+#   page=1 oracle: both single-page cells answer 400
+#   {"message": "Page 1 invalid: First Page is 0, Last Page is 0"}, so
+#   Last Page = 0 and the un-limited response was the whole set. The 2026-39
+#   cell is 11522 records -- the size class area L said was untested, and it
+#   corroborates complete.
+#
+# TWO ATTACKS ON 2022-40 / medtronic.com
+# -------------------------------------
+# A. Byte-cap detector, repeated. narrow/medium/wide at three field widths.
+#    Equal counts => no cap. wide < medium < narrow => capped, and every count
+#    so far for this cell is a FLOOR rather than a measurement.
+#
+# B. Pagination. If the API says the set spans 3 pages, then pages 0, 1 and 2
+#    should exist and page 3 should not. Retrieving them and summing the
+#    distinct records is a DIRECT count of the set that never depends on the
+#    un-limited response being whole. If the sum exceeds 203, the un-limited
+#    response was truncated and docs/10's "no limit => complete" inference is
+#    refuted at this size.
+#
+# The wide/narrow pair on 2015-48/medtronic.eu is the contrast case: round 1
+# already has `wide` at 132 records and the previous pass has `medium` at 132
+# records, so that cell is invariant. Adding `narrow` completes the triple and
+# turns "two widths agree" into "three widths agree".
+#
+# DELAY: run with S6_DELAY=8. Nine of fifteen round-1 requests (seq 80-94)
+# answered 502/504 at 2.5 s; a 502/504 is a failure, never an absence, so each
+# of those cells is simply unmeasured until it is re-issued. [CORRECTED: this
+# file originally said 'eight of fifteen'; the ledger says nine.]
+#
+# Also: the plan above says adding `narrow` 'completes the triple'. It did not --
+# seq 104 (fl=url, narrow) answered 504, so only TWO widths were ever measured on
+# that cell, not three.
+s6cmp2-2022-40-medtronic-com-narrow|completeness-narrow-retry|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 180
+s6cmp2-2022-40-medtronic-com-medium|completeness-medium-retry|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 180
+s6cmp2-2022-40-medtronic-com-wide|completeness-wide-retry|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype,digest,filename,offset,length|--max-time 180
+s6cmp2-2022-40-medtronic-com-page0|pagination-page0|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=0&fl=url,timestamp,status|--max-time 180
+s6cmp2-2022-40-medtronic-com-page1|pagination-page1|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=1&fl=url,timestamp,status|--max-time 180
+s6cmp2-2022-40-medtronic-com-page2|pagination-page2|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=2&fl=url,timestamp,status|--max-time 180
+s6cmp2-2022-40-medtronic-com-page3|pagination-past-last|index.commoncrawl.org|/CC-MAIN-2022-40-index?url=medtronic.com&output=json&matchType=domain&page=3&fl=url,timestamp,status|--max-time 180
+s6cmp2-2026-39-medtronic-com-narrow|completeness-narrow-retry|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 180
+s6cmp2-2026-39-medtronic-com-medium|completeness-medium-retry|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 180
+s6cmp2-2015-48-medtronic-eu-narrow|completeness-narrow|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url|--max-time 180
+s6cmp2-2015-48-medtronic-eu-medium|completeness-medium|index.commoncrawl.org|/CC-MAIN-2015-48-index?url=medtronic.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 180

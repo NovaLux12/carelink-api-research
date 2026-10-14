@@ -1,0 +1,37 @@
+# FINAL ROUND — the four cells still worth a request, and nothing else.
+#
+# The API answered 74 of the 143 requests so far with a gateway 502/504, which
+# is a failure carrying no information in either direction (docs/10's own rule).
+# [CORRECTED 2026-10-14: this originally said 'all 24 unanswered path-prefix cells'. The ledger
+# has 25 of 30 answering 502/504.]
+# Retrying all 25 unanswered path-prefix cells would burn the remaining budget
+# on a 20% yield, so this round is five queries, each with a reason:
+#
+#  1 ANCHOR. seq 118 recorded `medtronic.eu/oauth2/` on 2026-39 as a 404 true
+#    zero, but no row has ever returned a positive for `medtronic.eu` on that
+#    crawl, so that negative is UNANCHORED -- the same (crawl, host) cell has
+#    never been shown to hold anything. A 404 on a cell you have not shown to
+#    be populated is weak. This query populates it or it does not.
+#
+#  2 THE CRUX. `fl=url` on 2026-39/medtronic.com returned 5108 records at
+#    exactly 655360 B = 640 KiB, while `fl=url,timestamp,status,mimetype` on the
+#    same cell returned 11522 records at 1864922 B (seq 68, previous pass). A
+#    byte ceiling predicts the narrow field set fits MORE records, not fewer. If
+#    a re-issue returns 655360 B again the boundary is deterministic; if it
+#    returns something else the 640 KiB was a one-off and the ceiling is not a
+#    function of bytes. One request decides between them.
+#
+#  3, 4 area M's two named prefixes on the NEWEST crawl. `medtronic.com/connect/`
+#    on 2022-40 and on 2013-48 both answered a 404 true zero (seq 129, seq 139).
+#    The newest crawl is where a live surface would appear first, and both of
+#    these 504'd in the previous round.
+#
+#  5 `medtronic.eu/connect/` on 2026-39, which also 504'd.
+#
+# DELAY=12 after a cooldown. Anything still failing stays failed and is reported
+# as failed; nothing here is re-tried a second time in this round.
+s6fin-anchor-medtronic-eu-2026-39|anchor-positive-control|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu&output=json&matchType=domain&fl=url,timestamp,status,mimetype|--max-time 300
+s6fin-narrow-reissue-2026-39|crux-determinism-narrow|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com&output=json&matchType=domain&fl=url|--max-time 300
+s6fin-2026-39-com-connect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 180
+s6fin-2026-39-com-patient|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.com/patient/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 180
+s6fin-2026-39-eu-connect|path-prefix-inventory|index.commoncrawl.org|/CC-MAIN-2026-39-index?url=medtronic.eu/connect/&output=json&matchType=prefix&fl=url,timestamp,status|--max-time 180
