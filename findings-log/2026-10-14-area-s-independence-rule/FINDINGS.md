@@ -89,19 +89,20 @@ INFERRED and still rest on one source.
   was withdrawn, and survives in prose as
   `author-reported (one source), mechanism verifiable in code`
   [source: findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md §7].
-- **One raw artefact, restated across two pages (area Y, withdrawn candidate
-  Y-1).** "all three hosts return the same document" carried on a single raw
-  row quoted as host evidence — a claim marked in `docs/03:38` that the closure
-  audit flagged as two-host evidence; one row is one source, not three.
-  Correction: re-derive against the tracked ledger before any counting sentence.
-- **Independent (survives).** `carelink-trials.minimed.com` origin reflection
-  (area Z): preflight matrix re-derived live on all three cumulus hosts by the
-  pass itself, with per-host `Origin` injection and controls first on each host;
-  a separate, independently produced capture (the archive heads) does not
-  participate in the count **unless** its author and method differ — here the
-  archive capture failed the `_counting-sources_` test for that reason and a
-  third `Origin`-condition run was added instead (area Z;
-  `findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md`).
+- **A premise that survived two verifier rounds without being checked (area Y,
+  candidate Y-1, withdrawn).** This pass initially claimed `docs/03:38` was only
+  two-host evidenced, then repaired its arithmetic through three rounds before
+  checking the premise itself; area X's tracked ledger then refuted the premise
+  and **no correction is carried**. Self-contradiction of this kind is the
+  failure mode this rule is meant to prevent in the strength-word dimension,
+  not a one-source example.
+  [source: findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md
+  §"Y-1 … WITHDRAWN"].
+- **No second independently-verified example is cited here.** The POOL-5
+  bundle's `carelink-trials.minimed.com` case cannot be called a `_counting-sources_`
+  failure from the committed excerpts available to this pass, and rather than
+  cite it, it is left with no citation — the pass records the gap instead (see
+  §Assumptions).
 - **PR-body confirmation (a second source, but only for what it confirms).**
   The xDrip PR #4711 merge independently confirms `3.6.0` → `3.8.0` because it
   is an upstream merge event distinct from the table, but it carries no
