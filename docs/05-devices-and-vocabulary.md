@@ -484,12 +484,23 @@ denominator is re-derivable from a clean clone:
 > 21** — the two extra strings being `CGM` and `CC`. The repair is one cite: the
 > 2026-10-11 pass read xDrip at **`366c97a8`** (tag `2026.10.10`).
 >
-> **Named withdrawals:** `MINIMED` and `PARADIGM` (the only other reported values,
-> cited once at `findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69`
-> with no `file:line` and no per-client attribution — **withdrawn from the docs,
-> see the correction on `docs/10` row 37**); `BLE_MINIMED` (cited to a PR number,
-> not a commit); `Ut.Ey.all` (a *filter* key, not a family value); and the
-> `deviceType` set `CC`/`COSMOS`/`COSMOS_WHITELISTED`/`DEVICE`.
+> **Named withdrawals:** `MINIMED` and `PARADIGM` — **three** files carry each
+> token as a claimed `medicalDeviceFamily` value, not the two originally stated:
+> `findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69` ("values
+> seen by these clients", no `file:line`, no per-client attribution),
+> `findings-log/2026-10-13-area-p-static-schema/FINDINGS.md:149`, and
+> `docs/10-open-questions.md:37`. A **fourth** file carries `PARADIGM` as an era
+> label rather than a value —
+> `findings-log/medtronic-carelink-2026-07-21/03-data-model-and-gaps.md:96`
+> ("the mddub sample is PARADIGM-era"). Method: `git grep -w -n <token>
+> 7d915b8 -- .`, the base commit of this pass's branch. **All three value-carriers
+> are uncited** — none supplies a `file:line` at a named commit — so all are
+> withdrawn, and `:149` is the *worst* of them rather than a rescue: it
+> **self-labels `Class: OBSERVED`** on the strength of the same three strings with
+> no file:line and no commit, which is the non-promotion failure `AGENTS.md` §2
+> names. See the correction on `docs/10` row 37. Then: `BLE_MINIMED` (cited to a
+> PR number, not a commit); `Ut.Ey.all` (a *filter* key, not a family value); and
+> the `deviceType` set `CC`/`COSMOS`/`COSMOS_WHITELISTED`/`DEVICE`.
 
 ### Are these three vocabularies even the same kind of thing? — **INFERRED**
 

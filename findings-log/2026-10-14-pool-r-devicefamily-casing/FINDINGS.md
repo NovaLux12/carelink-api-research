@@ -172,7 +172,7 @@ point at.
 
 | String | Cite | Why not counted |
 |---|---|---|
-| `MINIMED` | `findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69` | "values seen by these clients" — no `file:line`, no per-client attribution. **These two strings appear in exactly two places in the whole repository: that line, and `docs/10` row 37 echoing it.** |
+| `MINIMED` | `findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69` | "values seen by these clients" — no `file:line`, no per-client attribution. **These two strings appear in exactly two places in the whole repository: that line, and `docs/10` row 37 echoing it.** ⚠ **The count in this cell is FALSE — see `## Correction (2026-10-15)`, item C6.** Three files carry each token as a claimed `medicalDeviceFamily` value, plus one file carrying `PARADIGM` as an era label; the count above was published as the ground for the withdrawal and does not survive `git grep -w` at base `7d915b8`. Preserved unedited under append-only; the withdrawal itself stands, on the carriers being uncited rather than on their number. |
 | `PARADIGM` | same line | same defect |
 | `BLE_MINIMED` | `APP-EMULATION-RESEARCH.md:390` | cited to "the upstream PR #2 tests" — fails R-2(d) |
 | `Ut.Ey.all` | `recon/JS-API-SURFACE.md:604` | a `deviceFamily`-**filter** key over a server-populated `localStorage` object, not a family value |
@@ -274,6 +274,11 @@ carry: the matcher enum in the digest-pinned patient bundle, and area S4's four
 - `MINIMED` and `PARADIGM` are **withdrawn pending a `file:line`**. They exist in
   exactly two places in the repository — one uncited log line and the row that
   quotes it — so the row was citing its own source back at itself.
+  ⚠ **The count in this bullet is FALSE — see `## Correction (2026-10-15)`, item
+  C6.** Three files carry each token as a claimed value, not two, and a fourth
+  carries `PARADIGM` as an era label. The *withdrawal* stands on all three
+  value-carriers being uncited; it does not stand on their number. Preserved
+  unedited under append-only.
 - **The label changes.** The row read "*(OBSERVED, third-party source; INFERRED
   for the wire value)*". **OBSERVED is not available**: per `AGENTS.md` §2 it
   means seen in a live response, and no client read in this repository is that.
@@ -424,10 +429,6 @@ visible above.
 
 ## Correction (2026-10-15)
 
-**Second round.** Items from the second `carelink-verifier` round on PR #127 at `805211e`:
-the C2 cite correction reaching two canonical sites of three, and a label that counted
-occurrences as strings.
-
 Two items from the second `carelink-verifier` round on PR #127, at `805211e`.
 Neither changes the verdict, the union, or any figure this pass publishes. The
 first is a miss on my own round-1 fix, recorded as such rather than smoothed
@@ -465,13 +466,13 @@ occurrence in the tree was then enumerated and classified rather than assumed:
 | site | what the range is cited for | verdict |
 |---|---|---|
 | `docs/05:303` | the committed line the vocabulary was re-derived to (the tokens) | correct |
-| `docs/05:466` | where the tokens sit, with `:349` named alongside for the heading | correct |
+| `docs/05:480` | where the tokens sit, with `:349` named alongside for the heading | correct |
 | `count-candidates.py:73` | prints **both** cites apart in the NOT-ADMITTED block | correct |
-| `run.log:47` | the same, as the script's output | correct |
+| `run.log:49` | the same, as the script's output | correct |
 | `docs/11:1712` | **the phrase** | **wrong — fixed** |
-| `FINDINGS.md:65` | the four DTO tokens | correct |
-| `FINDINGS.md:157` | the phrase | wrong in the original; C2 above names and corrects it, and append-only forbids editing it in place |
-| `FINDINGS.md:357`, `:403`, `:416` | C1/C2 **describing** the defect | correct |
+| this file, §2 candidate table | the four DTO tokens | correct |
+| this file, §3 "The conditional is the finding" | the phrase | wrong in the original; C2 above names and corrects it, and append-only forbids editing it in place |
+| this file, **C1**'s stale-ledger table and **C2**'s ground-truth and **Fix** paragraphs | C1/C2 **describing** the defect | correct |
 | `docs/09:195` | **README line numbers** in the "A count the gate's regex cannot see" trap row — not this artefact at all | unrelated, verified, untouched |
 
 Two of those rows are this file's own append-only text, so they keep the defect
@@ -553,3 +554,164 @@ which it has (two of them).
 Two passes, two occurrences, one cause: **this file does not end with a newline,
 so every append to it must supply one.** A successor touching this directory
 should start with `printf '\n' >> FINDINGS.md` rather than discovering it again.
+
+---
+
+## Correction (2026-10-15)
+
+**Third round.** Items from the third `carelink-verifier` round on PR #127 at
+`6fe6ffb`. Two blocking, two minor. **Two defects survived three rounds because
+the repairs were scoped by recall rather than by a sweep** — which is the lesson
+C3 wrote down and then did not apply to itself. This round swept, and the sweep
+found more than the flagged lines.
+
+**What was changed in place, and what was appended, and why.** The two
+*mechanical* repairs — a wrong line-offset and a duplicated lead-in — were made
+**in place**, because neither erases wording, a claim or a retraction, and
+`AGENTS.md` §3 permits an edit when a dated `## Correction` section accompanies
+it. The two *claim* corrections are **appended**, with the superseded wording
+quoted above and still visible, because those are the ones the retraction history
+is about. Every one of the four is recorded below.
+
+### C6 — BLOCKING: the count published as `MINIMED`/`PARADIGM`'s evidence was false
+
+§3 and §5 D both published a frequency for these two tokens as the ground for
+withdrawing them. The wording, now superseded and still visible above:
+
+> *"**These two strings appear in exactly two places in the whole repository: that
+> line, and `docs/10` row 37 echoing it.**"*
+> *"They exist in exactly two places in the repository — one uncited log line and
+> the row that quotes it"*
+
+**It is three files for `MINIMED` and four for `PARADIGM`.** Method — whole-word
+match at the base commit of this branch's base, so the figure does not drift with
+my own edits:
+
+```
+git grep -w -n MINIMED  7d915b8 -- .
+  docs/10-open-questions.md:37
+  findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69
+  findings-log/2026-10-13-area-p-static-schema/FINDINGS.md:149
+git grep -w -n PARADIGM 7d915b8 -- .
+  docs/10-open-questions.md:37
+  findings-log/2026-10-11-third-party-client-sources/FINDINGS.md:69
+  findings-log/2026-10-13-area-p-static-schema/FINDINGS.md:149
+  findings-log/medtronic-carelink-2026-07-21/03-data-model-and-gaps.md:96
+```
+
+The fourth `PARADIGM` is **not** a value claim: it reads *"the mddub sample is
+PARADIGM-era"* — an era label. So the honest figure is **three carriers asserting
+each token as a `medicalDeviceFamily` value, plus one era label**.
+
+**This document contradicted itself 110 lines below, and that is the sharper
+defect.** §5 E already cited `2026-10-13-area-p-static-schema/FINDINGS.md:147-151`
+as a site comparing the enum against `GUARDIAN`, `MINIMED`, `PARADIGM` — the third
+carrier the §3 count said did not exist. A document that refutes its own count is
+worse than a document that makes a bad count, because a reader who checks one
+sentence concludes the other is sound.
+
+**The withdrawal conclusion survives; its stated evidence does not.** All three
+value-carriers are uncited — **none supplies a `file:line` at a named commit** — so
+R-3 still excludes both and the union is still **21**. What was wrong was the
+*count*, not the verdict. `AGENTS.md` §1: a sentence whose evidence cannot be
+pointed at does not get softened, and here it could be pointed at and was false.
+
+**The third carrier is worse than the two named, not a rescue.**
+`…area-p-static-schema/FINDINGS.md:149` **self-labels `Class: OBSERVED`** on the
+strength of those same three strings, with no `file:line` and no named commit —
+which is precisely the non-promotion failure `AGENTS.md` §2 names. A carrier that
+labels itself OBSERVED is a *worse* carrier than one that labels itself nothing,
+because the label invites exactly the promotion §2 forbids.
+
+**The sweep, and what it found beyond the flagged lines.** `git grep` for the
+false claim's wording across the tree found it in **four places beyond the two
+here** — `docs/10` row 37, `docs/11`'s Closed-table row, `docs/05`'s named-
+withdrawals block, and **this area's own PR description**. All four are corrected
+(`docs/` supersedes in place; the PR body is corrected). The two earlier PR
+comments were checked and do **not** carry it. **Every other frequency claim in
+this document was re-derived the same way and holds:** 24 files under
+`findings-log/probe-2026-10-08/` at base and at head, 0 of them non-markdown;
+the four `NGP` sites; the three-client commit table; the 78+9 code counts and the
+76+2+9 name-pair counts, all three of which the re-derivation script re-extracts
+from the cited lines rather than restating.
+
+### C7 — BLOCKING: five line pointers in C3's own sweep table had drifted
+
+Every pointer in C3's table was correct at `805211e`. **This pass's own edits
+displaced five of them** — the C4 label change inserted two lines above
+`run.log:47`, the C5 blank-line fix one line above three `FINDINGS.md` cites, and
+the unpinned-status block fourteen lines above `docs/05:466`. The offsets were
+now `480`, `49`, `358`, `404` and `417`. Each was confirmed by **reading the
+target line**, not by adjusting the number until it looked right.
+
+**This is §6 mode 6 — a citation pointing at the wrong line — inside the section
+whose stated purpose is that a recall-scoped citation fix will miss one again.**
+The enum in C3 was complete and every verdict in it was accurate; only the
+pointers rotted. Corrected in place: pointer offsets carry no claim, so nothing
+was erased.
+
+**The sweep.** Every `path:line` cite in this directory was extracted
+mechanically and resolved against the head tree, including the short forms a
+regex on file extensions misses (`docs/05:480`, `docs/11:1712`, `docs/09:195`).
+**23 cites, 0 failures**, and the six short-form pointers were read by hand.
+
+**The structural lesson, and this pass proved it in the same round.** A
+**self-referential** line cite inside an append-only file cannot stay valid: every
+correction appends lines, and anything that shifts text above the cite breaks it.
+C3's own edits broke C3's pointers; then, **after fixing them to verified offsets,
+this pass inserted two inline correction markers further up the file and broke the
+corrected pointers a second time.** A second repair to the same lines, from the
+same cause, inside the round that diagnosed it.
+
+**So the pointers were not merely re-nudged — the three self-referential cells were
+converted to section-heading anchors** (§2 candidate table, §3 "The conditional is
+the finding", C1's stale-ledger table, C2's ground-truth and Fix paragraphs).
+Headings are stable under append, so the table is now append-proof rather than
+correct-until-next-time. The six cites that point at **other** files keep real line
+numbers and were re-verified against the head tree after every edit in this round.
+
+**The generalisable form:** a line cite into a file you are also editing is a
+claim with a half-life, and the half-life is shorter than the review cycle. Reach
+for an anchor that the edit cannot move.
+
+### C8 — MINOR: C5's trailing-newline claim was written in the present tense and is false at the commit that states it
+
+C5's durable lesson read: *"**this file does not end with a newline, so every
+append to it must supply one.** A successor touching this directory should start
+with `printf '\n' >> FINDINGS.md`."*
+
+At the commit making that statement the file **does** end with a newline. The
+**past-tense diagnosis is accurate**: `git show c267d65:…/FINDINGS.md | tail -c 1`
+returns `2e` (`.`), while the current file's last byte is `0a`. The original text
+of this document never had a trailing newline; C5's own blank-line repair added
+one. So the advice, followed literally now, would inject a spurious blank line.
+
+**Restated in the conditional form that is true at every commit:**
+
+> This document's original text did not end with a newline, so the first appends
+> into it had to supply one — and each of those appends, being `cat >>` against a
+> file that now *does* end with one, should supply **nothing**. **Check before
+> appending:** `tail -c 1 FINDINGS.md | xxd`. If the last byte is `2e`, prepend a
+> newline; if it is `0a`, do not. Appending unconditionally has now been wrong
+> once, in the other direction, which is the reason to state the rule as a check
+> rather than as an instruction.
+
+**The sentence being corrected is the last line of the section immediately above this one.** A correction that supersedes the line directly above it is the clearest possible demonstration that the original was wrong at the commit that stated it.
+
+The reason the restatement matters beyond tidiness: the original advice was
+falsifiable by the commit that made it, and a reader who ran it would have damaged
+the file.
+
+### C9 — MINOR: an orphaned duplicate lead-in, removed
+
+The second-round section carried **two** lead-ins to one section — a bolded
+**"Second round."** paragraph above a blank line and a near-duplicate paragraph
+below it. The orphan is removed; the surviving lead-in is the one that carries
+the substance. Three lines, no claim affected.
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the
+counting rule, the ledger (`results.jsonl` **0** rows, **`0 of a 0 cap`**), and
+the exclusions. **All three corrections from rounds 1 and 2 were re-verified
+rather than assumed**, and none of them moved.
