@@ -270,7 +270,9 @@ carry: the matcher enum in the digest-pinned patient bundle, and area S4's four
 
 - `GUARDIAN` survives and is now sourceable twice: SOURCE-OBSERVED in the three
   third-party clients, **and** OBSERVED in the vendor's own digest-pinned bundle
-  (`docs/05:315`, `"GUARDIAN" === n.deviceFamily`).
+  (the `docs/05` correction section on the two names being one axis, where
+  `"GUARDIAN" === n.deviceFamily` is quoted inside the `parseJsonData`
+  extract).
 - `MINIMED` and `PARADIGM` are **withdrawn pending a `file:line`**. They exist in
   exactly two places in the repository — one uncited log line and the row that
   quotes it — so the row was citing its own source back at itself.
@@ -639,8 +641,9 @@ from the cited lines rather than restating.
 
 Every pointer in C3's table was correct at `805211e`. **This pass's own edits
 displaced five of them** — the C4 label change inserted two lines above
-`run.log:47`, the C5 blank-line fix one line above three `FINDINGS.md` cites, and
-the unpinned-status block fourteen lines above `docs/05:466`. The offsets were
+the `run.log` cite it had displaced, the C5 blank-line fix one line above the
+three `FINDINGS.md` cites, and the unpinned-status block fourteen lines above the
+`docs/05` cite. The offsets were
 now `480`, `49`, `358`, `404` and `417`. Each was confirmed by **reading the
 target line**, not by adjusting the number until it looked right.
 
@@ -682,7 +685,7 @@ with `printf '\n' >> FINDINGS.md`."*
 
 At the commit making that statement the file **does** end with a newline. The
 **past-tense diagnosis is accurate**: `git show c267d65:…/FINDINGS.md | tail -c 1`
-returns `2e` (`.`), while the current file's last byte is `0a`. The original text
+returns `2e` (`.`), while the current file's last byte is `0a`. ⚠ **The second half of this sentence is WITHDRAWN — see `## Correction (2026-10-15)`, item C10.** It was true when written at `6fe6ffb` and was falsified by a later edit that removed the newline again, so this file no longer asserts its own trailing byte anywhere; the durable form is a measurement with a command attached, not a stated state. The original text
 of this document never had a trailing newline; C5's own blank-line repair added
 one. So the advice, followed literally now, would inject a spurious blank line.
 
@@ -690,7 +693,7 @@ one. So the advice, followed literally now, would inject a spurious blank line.
 
 > This document's original text did not end with a newline, so the first appends
 > into it had to supply one — and each of those appends, being `cat >>` against a
-> file that now *does* end with one, should supply **nothing**. **Check before
+> file that now *does* end with one, should supply **nothing**. ⚠ **This clause and the "other direction" claim below are WITHDRAWN — see item C10.** The file did not reliably end with one; the rule is now "measure, never assert". **Check before
 > appending:** `tail -c 1 FINDINGS.md | xxd`. If the last byte is `2e`, prepend a
 > newline; if it is `0a`, do not. Appending unconditionally has now been wrong
 > once, in the other direction, which is the reason to state the rule as a check
@@ -715,3 +718,155 @@ The verdict (negative — the casing stays unobserved), the union (**21**), the
 counting rule, the ledger (`results.jsonl` **0** rows, **`0 of a 0 cap`**), and
 the exclusions. **All three corrections from rounds 1 and 2 were re-verified
 rather than assumed**, and none of them moved.
+
+
+
+---
+
+## Correction (2026-10-15)
+
+**Fourth round.** Items from the fourth `carelink-verifier` round on PR #127 at
+`a1c4dd6`. Two blocking, one minor. **Every one of them is the same defect C8
+exists to describe: a sentence about this file that the edit making it falsifies.**
+
+### C10 — BLOCKING: C8 asserted a trailing byte that the commit carrying it did not have
+
+C8's text read *"the current file's last byte is `0a`"*, together with two
+sentences resting on it — *"a file that now **does** end with one, should supply
+nothing"* and *"appending unconditionally has now been wrong once, in the other
+direction"*.
+
+**The byte was `2e`, and still is.** Three independent routes, all agreeing:
+
+```
+tail -c 1 FINDINGS.md | xxd                             → 2e
+python3 -c "…read().endswith(b'\n')"                    → False
+git cat-file -p a1c4dd6:…/FINDINGS.md | tail -c 20|xxd → …76656452e   ("…ved.")
+```
+
+Measured across this branch's own history:
+
+| commit | last byte |
+|---|---|
+| `c267d65` | `2e` |
+| `805211e` | `2e` |
+| `6fe6ffb` | **`0a`** |
+| `a1c4dd6` | **`2e`** |
+
+So the **past-tense half of C8 is accurate** — the original text of this document
+never had a trailing newline, and that is what broke the round-1 append. But
+round 2 restored one and **round 3 removed it again**, silently, by rewriting the
+file through a text-mode write while editing other parts of it. **This commit
+therefore removed the very byte it claimed to have measured.** The commit message
+for `a1c4dd6` repeated the error, so message and file agreed with each other and
+both were wrong — which is the worst version of this failure, because agreement
+between two artefacts is exactly what a reader checks before believing either.
+
+**Restated so that it cannot be falsified the same way again.** The current
+trailing byte is **deliberately not asserted here**. A sentence in this file
+stating what this file's own last byte *is* is falsified by any later edit that
+rewrites the file — which is precisely what happened, twice. The durable form is
+a **measurement with a command attached**, not a state:
+
+> **Measure it; never assert it.**
+> `tail -c 1 findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md | xxd`
+> — if the last byte is `2e`, prepend a newline before appending; if it is `0a`,
+> append nothing. **Run it against the file as it will be committed**, not
+> against a working copy inspected before the append, because the append is the
+> thing that changes the answer.
+
+The direction claim also changes. Appending was wrong once **in each** direction —
+once for omitting a needed newline, once for injecting an unneeded one — not
+"once, in the other direction". That sentence was wrong at the commit that wrote
+it, for the same reason.
+
+**What this cost, stated plainly.** Four verifier rounds, and the recurring theme
+is that **a document describing itself is the hardest kind to verify**, because
+every edit to the description is also an edit to the thing described. Three of
+the four rounds' blocking findings are in this file and two of them are about this
+file's own bytes and line numbers. The generalisable rule is already written at
+the end of this correction set and is worth restating as the pass's own lesson:
+**prefer an anchor the edit cannot move** — a command, a heading, a hash of a
+named commit — over a line number, an offset, or a byte observed in the artefact
+being described.
+
+### C11 — MINOR: one sweep, two totals, and an enumeration that summed to 11
+
+**Two different totals were published for the same sweep in the same round** — this
+log said *"23 cites, 0 failures"* while that round's commit message said *"29
+cites resolved, 0 failures"*. Neither carried a counting rule, which is `AGENTS.md`
+§6 item 7 exactly: a count with no rule is not a number, it is a vibe.
+
+**One number now, with the rule in a script**, as `count-cites.py` in this
+directory. It states its rule before it counts (R-C1 subject: `*.md` in this
+directory only · R-C2 unit: one `path:line` token inside backticks, a path with no
+line number is a *source pointer* and is never added to the cite total · R-C3
+self-referential cites are excluded, because they were converted to heading
+anchors precisely because a line cite into a file this pass keeps editing has a
+half-life shorter than the review cycle · R-C4 the sweep table's short forms are
+counted too, because a regex on file extensions misses them · R-C5 distinct
+resolved targets, counted once · R-C6 every cite must resolve, exist, and be
+**non-blank**).
+
+> **CITE COUNT = 28. Failures = 0.** Two further figures are reported beside it
+> and are **not** added to it — the path-only source-pointer count (R-C2) and the
+> self-referential count (R-C3) — and **both are left to the script to print
+> rather than restated here**, because a figure this file prints about this
+> file's own contents is falsified by the next edit, which is the entire
+> subject of C10. Run the script for their current values.
+
+**The rule found two more defects the earlier sweeps missed**, which is the
+argument for having written it down rather than eyeballing a list:
+
+1. **The `docs/05` cite at line 315 was stale.** The `"GUARDIAN" === n.deviceFamily` literal it
+   cited had moved to line 373 under round 3's edits to that page. It is now
+   a **heading anchor** — the `docs/05` correction section on the two names being
+   one axis — so it cannot drift again. R-C6's non-blank clause is what caught it:
+   the line **existed**, so an existence-only check passed it.
+2. **A historical mention was masquerading as a live cite.** C7's *"the C4 label
+   change inserted two lines above the `run.log` cite"* describes where a cite **used
+   to be**, so it is history, not a citation. Restated as prose without the
+   offset, so it is no longer counted as a live cite.
+
+**The enumeration now sums correctly.** The four buckets of in-place deletions in
+this file were published as `3 + 1 + 3 + 3 = 11` against an actual **10** —
+the `FINDINGS.md:357/:404/:417` cell had been counted **twice**, once as a
+superseded pointer cell and again as a converted self-cite. The buckets are:
+
+| bucket | n |
+|---|---:|
+| orphan lead-in removed (3 text lines + its blank separator) | 4 |
+| superseded pointer cells (the `docs/05` and `run.log` cites, and the `FINDINGS.md` cell) | 3 |
+| self-cite cells converted to heading anchors (`FINDINGS.md:65`, `FINDINGS.md:157`) | 2 |
+| `\| MINIMED \|` table row, sentence kept verbatim with a marker appended | 1 |
+| **total** | **10** |
+
+The arithmetic was wrong, not the disclosure: every one of the ten was enumerated
+individually in that correction and none erased a claim, a retraction or a
+sentence.
+
+### C12 — the PR's append-only attestation did not match what the commit did
+
+This round's PR description still carried *"one new dated directory, nothing
+deleted or rewritten in place; `check_append_only` confirms"*. Relative to `main`
+that is true — `FINDINGS.md` is a wholly new file, and
+`research-checks.py`'s rule is the narrower *additions + dated corrections*, which
+is satisfied. But the sentence is the PR's append-only attestation and it did not
+mention the ten in-place line deletions this pass made, which is the one thing a
+reviewer most needs stated.
+
+**Reworded to state what happened**: ten in-place line deletions in
+`FINDINGS.md`, all enumerated in C11 with a bucket that now sums to 10, none
+erasing a claim, a retraction or a sentence, and three dated
+`## Correction (2026-10-15)` sections accompanying them. The substance was never
+in question; the disclosure was.
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the sum
+(**27**), the counting rule and its non-zero exit on anchor drift, the ledger
+(`results.jsonl` **0** rows against **`0 of a 0 cap`**), and the four corrections
+from rounds 1–3, all re-verified rather than assumed. The six line cites into
+`docs/` and `run.log` were deliberately **not** converted to anchors: that would
+mean more in-place rewrites of committed lines immediately before merge, trading a
+real `AGENTS.md` §3 cost for a risk window that closes at merge.
