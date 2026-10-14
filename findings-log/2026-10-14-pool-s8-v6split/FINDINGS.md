@@ -37,8 +37,7 @@ because sends were 2.5 s apart by construction.
 - **Trials cell bytes vs. the fabricated arm.** The v6 cell (10053 B,
   `1aab9bb1…`) and the fabricated-tail arm (10069 B, `a5c9ddf8…`) differ by
   exactly 16 bytes, and that 16-byte difference is byte-for-byte the echoed path
-  segment (`"android,3.6"` → `"android,absent-probe-413306"`). Substitution of
-  any tail reproduces the other body exactly, so the route is a **templated
+  segment (`"android,3.6"` → `"android,absent-probe-413306"`). The substitution was verified for these two tails only, so the templated-response reading is INFERRED from two cells, not proven for every tail.
   response** on this host. Consequently the two bodies **do not** prove that the
   v6 cell is a distinct document or that the fabricated arm is an SPA fallback
   — byte size alone cannot separate them. What remains solid from this control:
@@ -51,9 +50,9 @@ because sends were 2.5 s apart by construction.
 | Claim | Class | Source |
 |---|---|---|
 | v6 split persists on all three hosts | OBSERVED | `findings-log/…/headers/h*.b` |
-| v6 cell on -trials is a real document, not the catch-all | OBSERVED | body digests above (16 B apart) |
+| v6 cell (10053 B) vs fabricated arm (10069 B) | OBSERVED (size) | 16 B = echoed path segment; no distinctness proof (INFERRED only) |
 | v6 403 cells reproduce the no-route digest | OBSERVED | 42 B `f249b63c…` |
 | v11 live control 200 on all three | OBSERVED | seq 1,4,7 |
-| Trials absent control is the SPA fallback | OBSERVED | 10069 B `a5c9ddf8…` |
+| Fabricated-tail arm on trials (10069 B) | OBSERVED (size) | templated 200, not the 42 B no-route digest; 'SPA fallback' unverified (INFERRED only) |
 
 9 rows in `results.jsonl` = 9 requests claimed. Source cite: `results.jsonl`.
