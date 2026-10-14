@@ -7,8 +7,14 @@ network call of any kind · **Requests: 0 of a 0 cap.**
 
 > **Accounting.** This pass sent **0** HTTP requests to any Medtronic, MiniMed or
 > Abbott host — and **no request of any kind to any host**, which is the point.
-> The cap is zero because nothing is probed. `results.jsonl` holds **0** rows and
-> the `N of a M cap` line above reads **0 of a 0 cap**; the ledger and the prose
+> The cap is zero because nothing is probed. ⚠ **The accounting sentence that stood
+> here — *"`results.jsonl` holds **0** rows and the `N of a M cap` line above reads
+> **0 of a 0 cap**"* — asserted a state of this file in the present tense and
+> unanchored, and is therefore quoted here rather than restated per `AGENTS.md` §3.**
+> It held at `6b493e7` and is machine-checked by `research-checks.py`'s findings-log
+> hygiene rule, which fails if `results.jsonl` carries more rows than the cap line
+> claims. **Re-derive rather than read it off this sentence:**
+> `wc -l < results.jsonl`. The ledger and the prose
 > agree in both directions, which is checked by `scripts/research-checks.py`
 > (findings-log hygiene) and again by `probe.sh` itself.
 >
@@ -374,8 +380,8 @@ the harness output. `AGENTS.md` §2 requires that where sources disagree you giv
 both and never pick one silently; this was not a disagreement between sources, it
 was a stale derived artefact asserting a second number without saying so.
 
-**Fix: regenerated, not hand-edited.** `run.log` is the output of
-`probe.sh`, which wraps the current `count-candidates.py` between its two marker
+**Fix: regenerated, not hand-edited.** At `805211e`, `run.log` became the output of
+`probe.sh`, which wraps `count-candidates.py` as of that commit between its two marker
 lines, and the committed file's body is byte-identical to a fresh run of that
 script. The regeneration issues **no network request** — `probe.sh` has no
 `curl`/`wget`/`nc` and no host list, and `count-candidates.py` imports only
@@ -420,8 +426,8 @@ and **no commit is named anywhere in it**. The exclusion of `S-CLIENT-DTO` under
 **R-2(d)** therefore stands, `CGM` and `CC` remain unadmitted, and the union
 remains **21, not 23**.
 
-**Fix.** `count-candidates.py` now carries the two cites deliberately apart —
-`:349` for the phrase, `:384-385` for the tokens — and prints both in the
+**Fix.** At `805211e`, `count-candidates.py` carried the two cites deliberately
+apart — `:349` for the phrase, `:384-385` for the tokens — and printed both in the
 `DECLARED BUT NOT ADMITTED` block, so the regenerated `run.log` states the
 attribution at the line that holds it. The `docs/05` citations were corrected in
 place (canonical docs supersede), and this section keeps the original wording
@@ -509,8 +515,8 @@ sum of the admitted sources      = 27  (NOT the answer)
 ```
 
 `run.log` was **regenerated through `probe.sh`**, not hand-edited — the round-1
-lesson again: nothing compares `run.log` against this prose, which is exactly
-why CI could not catch either defect. The regeneration issues **no network
+lesson again: as of `6fe6ffb` nothing compared `run.log` against this prose, which
+is exactly why CI could not catch either defect. The regeneration issues **no network
 request** (`probe.sh` has no `curl`/`wget`/`nc` and no host list;
 `count-candidates.py` imports only `re` and `sys`), the accounting is unchanged
 at **0 of a 0 cap** with `results.jsonl` at **0** rows, and **no request row was
@@ -529,8 +535,9 @@ directory is append-only:
    **6 duplicate occurrences across 5 distinct strings**, and the arithmetic
    point it makes stands either way.
 
-The regenerated `run.log` in this directory is the authoritative copy of the
-script's output. Both passages are dated by the commit that produced them, which
+The `run.log` regenerated in this directory at `6fe6ffb` was the authoritative copy
+of the script's output at that commit. Both passages are dated by the commit that
+produced them, which
 is the point of keeping them.
 
 **What actually fixed C4.** Not the wording — the labelling discipline. A number
@@ -672,8 +679,9 @@ same cause, inside the round that diagnosed it.
 **So the pointers were not merely re-nudged — the three self-referential cells were
 converted to section-heading anchors** (§2 candidate table, §3 "The conditional is
 the finding", C1's stale-ledger table, C2's ground-truth and Fix paragraphs).
-Headings are stable under append, so the table is now append-proof rather than
-correct-until-next-time. The six cites that point at **other** files keep real line
+Headings are stable under append, so from `a1c4dd6` the table was append-proof
+rather than correct-until-next-time. The six cites that point at **other** files keep
+real line
 numbers and were re-verified against the head tree after every edit in this round.
 
 **The generalisable form:** a line cite into a file you are also editing is a
@@ -941,9 +949,14 @@ artefact that keeps being edited. **A measurement is not a property.** Stating
 *what was measured, against which commit* survives every later edit; stating
 *what is true* does not.
 
-**This file no longer carries an unmarked present-tense self-state claim.** That
-sentence is bounded on purpose: it is about *this class of sentence*, not about
-every future edit, and it is the kind of claim C13 exists to distrust. What is
+> **Verbatim, withdrawn at `6b493e7`:** *"**This file no longer carries an unmarked
+> present-tense self-state claim.**"* ⚠ **That sentence asserted the class was empty,
+> and was itself a member of it** — present tense, unanchored, unmarked, sitting
+> inside the section whose purpose was to end the class. It is quoted, not
+> restated, because `AGENTS.md` §3 requires the superseded wording to stay visible.
+> **A document must not claim its own class is empty; it must simply not contain
+> the class**, and let a sweep's output show that. The sweep run at `6b493e7`
+> returned the hits listed in C19's table, each adjudicated there. What is
 true at any commit is measured, not asserted — and the byte is measured with
 
 ```
@@ -1134,9 +1147,18 @@ class** — which is far smaller than the claim withdrawn.
 
 **2. Two self-introduced claims — mis-attributed to C13 in the first version of
 this paragraph.** They live in **C5's** marker (*"this file's last byte is `0a`"*)
-and **C10's** marker (*"The file's last byte is now `0a`"*), not in C13's. At
-`b1386e6` both read that way in the present tense and neither was anchored — the
-same shape as the `run.log` claim C13 de-anchored in the same pass. Both were
+and **C10's** marker (*"The file's last byte is now `0a`"*), not in C13's. ⚠
+**Corrected 2026-10-15: this paragraph originally attributed the present-tense
+state to `b1386e6`, which is false.** Measured across the branch's own history: at
+`cc513f9` — the commit *before* that one — `:560` read *"this file's last byte is
+`0a`"* and `:745` read *"The file's last byte is now `0a`"*, both in the present
+tense and both unanchored. At `b1386e6` both had **already** been rewritten into the
+past tense anchored to `cc513f9`, because `b1386e6` **is** the commit that rewrote
+them. The original sentence also contradicted its own next clause, which cannot be
+both present-tense at `b1386e6` and rewritten there. **The mechanism was a
+conversion that replaced an accurate phrase with a wrong commit anchor** — and it
+was caught only because the anchors were re-read against the commit objects rather
+than accepted. The present-tense state obtained at `cc513f9`; both were
 rewritten at `b1386e6` into past tense anchored to `cc513f9`, the commit they were
 measured against, carrying the instruction *"measure it; do not read it off this
 sentence"*.
@@ -1205,10 +1227,22 @@ substance of this correction.
 
 **Eight sites converted, covering ten present-tense claims.** Two further sites
 (`:560`, `:747`) were **already compliant** — past tense and anchored to
-`cc513f9` — and were verified and left alone rather than touched. Every remaining
-detector hit in the file is now one of three permitted forms: a past-tense
-anchored statement, an explicit verbatim quotation of withdrawn wording, or the
-sweep's own term list.
+`cc513f9` — and were verified and left alone rather than touched.
+
+> **Verbatim, withdrawn at `6b493e7`:** *"Every remaining detector hit in the file is
+> now one of three permitted forms: a past-tense anchored statement, an explicit
+> verbatim quotation of withdrawn wording, or the sweep's own term list."* ⚠ **That
+> sentence asserted a property of the file and was itself a member of the class** —
+> present tense, unanchored, unmarked — and it was **introduced by the very commit
+> that converted the class**, which is the recurrence this section exists to name.
+> It is quoted, not restated, for the same `§3` reason.
+>
+> **The three permitted forms, stated once, as a rule about what may be written
+> rather than a claim about what was written:** (a) past tense anchored to a named
+> commit; (b) an explicit verbatim quotation of withdrawn wording; (c) the sweep's
+> own term list. A detector hit in any other form is a defect to fix, and the sweep
+> run at `6b493e7` is recorded by **its output** in this table — not by a sentence
+> asserting the output is clean.
 
 | site | before | after |
 |---|---|---|
@@ -1273,3 +1307,155 @@ The verdict (negative — the casing stays unobserved), the union (**21**), the 
 the ledger (`results.jsonl` **0** rows against **`0 of a 0 cap`**), and rounds 1–6's
 fixes, all re-verified rather than assumed. No claim, retraction or sentence is
 deleted anywhere in this round: every withdrawal is a quotation, not a removal.
+
+---
+
+## Correction (2026-10-15)
+
+**Eighth round.** Items from the eighth `carelink-verifier` round on PR #127 at
+`6b493e7`. Everything mechanical in that round is confirmed and is not
+re-touched. Three blocking findings, one structural diagnosis, and the reason the
+first seven rounds kept missing is finally named here.
+
+### C23 — BLOCKING: the two sentences that declared the class empty were members of it
+
+The diagnosis, stated plainly because it is the most useful thing in this round:
+
+> **Two sentences asserting the class is empty were themselves members.** Both
+> evaded the five-term detector by **exactly one token** — `no longer asserts`
+> became `no longer **carries**`, and `is now the` became `is now **one**`.
+
+| site | the sentence | why it was a member |
+|---|---|---|
+| C13 | *"This file no longer carries an unmarked present-tense self-state claim."* | present tense, unanchored, unmarked — and by this document's own construction (`C13:896-901` counts *"what it contains"*), **if true, false** |
+| C19 | *"Every remaining detector hit in the file is now one of three permitted forms…"* | present tense, unanchored, unmarked, **introduced by the very commit that converted the class** |
+
+**A regex cannot be its own construction.** Five terms could not have caught
+either, because both differ from a listed term by one word, and widening the term
+list is precisely the sweep-the-class move that has failed seven times running.
+
+**Fix: delete both assertions. Do not restate them.** A document must not *claim*
+its own class is empty; it must simply not contain the class, and let a sweep's
+output show that. Both sentences are now **verbatim withdrawals** — quoted, marked
+with the commit at which they were withdrawn, and carrying a pointer to the sweep
+output that is the evidence. Nothing is deleted: `AGENTS.md` §3 requires the
+superseded wording visible, and a withdrawal satisfies that while making no claim.
+
+The three permitted forms survive, but are now stated **as a rule about what may
+be written** rather than as a claim about what was written — (a) past tense
+anchored to a named commit; (b) an explicit verbatim quotation of withdrawn
+wording; (c) the sweep's own term list.
+
+**What replaces the deleted claims is the sweep's own output**, recorded as
+"the sweep run at `6b493e7` returned the hits adjudicated in C19's table" — a
+statement about a sweep at a commit, which is checkable, rather than a statement
+about what this file therefore is, which is not.
+
+### C24 — BLOCKING: a conversion replaced an accurate phrase with a wrong commit anchor
+
+C18 asserted *"At `b1386e6` both read that way in the present tense and neither was
+anchored."* **False, and it contradicted its own next clause** — a sentence cannot
+both read present-tense at `b1386e6` and have been rewritten there.
+
+Measured against the commit objects:
+
+| commit | `:560` (C5's marker) | `:745` (C10's marker) |
+|---|---|---|
+| `cc513f9` | *"this file's last byte **is** `0a`"* | *"The file's last byte **is now** `0a`"* |
+| `b1386e6` | *"…last byte **was** `0a` **at `cc513f9`**"* | *"…last byte **was** `0a` **at `cc513f9`**"* |
+
+`b1386e6` **is** the commit that rewrote them, so the state *at* `b1386e6` is
+already the rewritten one. **The present-tense state obtained at `cc513f9`**, the
+commit before. Corrected, with the contradiction left visible.
+
+**The mechanism, which is the transferable part: a tense conversion is an anchor
+write, and an anchor write must be verified against the commit objects like any
+other citation.** Round 6's finding — *"fixing a citation by adding one, without
+checking where it lands"* — recurred here inside a tense conversion rather than
+inside a citation, which is the same defect wearing different clothes.
+
+### C25 — nine unadjudicated candidates, read and adjudicated
+
+The verifier listed nine it had not adjudicated and declined to certify without
+reading each in context. Read, in context, at `6b493e7`:
+
+| site | the claim | verdict |
+|---|---|---|
+| `:10` | *"`results.jsonl` holds **0** rows and the `N of a M cap` line reads **0 of a 0 cap**"* | **MEMBER** — present-tense state about this file, unanchored. Machine-checked by `research-checks.py`, but that is a second gate, not an anchor. **Converted**: quoted, marked, and the derive-command recorded. |
+| `:175` | the `MINIMED` cell's *"exactly two places"* count, with its withdrawal | **COMPLIANT** — the false sentence is already a preserved, marked withdrawal (§3), and the replacement count is anchored to `git grep -w` at base `7d915b8`. |
+| `:279` | *"⚠ The count in this bullet is FALSE"* | **COMPLIANT** — a withdrawal marker, not a state claim. |
+| `:377` | *"`run.log` **is** the output of `probe.sh`"* | **MEMBER** — present tense, unanchored; my round-8 de-anchoring removed *"now"* and left *"is"*, which is the same defect. **Converted** to `805211e`. |
+| `:423` | *"`count-candidates.py` **now carries** the two cites deliberately apart"* | **MEMBER** — a present-tense claim about a file's contents, which C13's own definition counts. **Converted** to `805211e`. |
+| `:512` | *"nothing compares `run.log` against this prose"* | **MEMBER** — an open-ended universal about the repo's tooling. **Converted** to `6fe6ffb`. |
+| `:532` | *"The regenerated `run.log` … **is** the authoritative copy"* | **MEMBER** — present-tense state about a file. **Converted** to `6fe6ffb`. |
+| `:675` | *"the table **is now** append-proof"* | **MEMBER** — present tense about the table's state. **Converted** to `a1c4dd6`. |
+| `:705` | *"A correction that supersedes the line directly above it is the clearest possible demonstration…"* | **COMPLIANT** — a general claim about the class of corrections, not a state claim about this artefact. Left alone. |
+
+**Six members converted, three compliant.** Every anchor written this round was
+then **re-verified against the commit objects**, which is how four of the six were
+caught wrong on first draft (see below).
+
+**And the trap fired anyway, a second time.** Drafting the six anchors I wrote
+`a1c4dd6` for three of them and `b1386e6` for a fourth, from memory. Checking them
+against the objects showed **four wrong**: the `:349` cite first appears at
+**`805211e`**, not `a1c4dd6`; the heading-anchored self-cites first appear at
+**`a1c4dd6`**, not `b1386e6`; C4 first appears at **`6fe6ffb`**. Corrected, and the
+first grep I used to check was itself wrong — `":349 (heading"` does not appear
+because the string is split across two source lines, so the grep returned `0` for
+*every* commit and would have "confirmed" anything. **A check that returns zero for
+the wrong reason is worse than no check**: the first grep said the cite was absent
+everywhere, which was false, and only re-deriving with a pattern that matches the
+real text corrected it.
+
+### C26 — the leak scan, with the nets proved live
+
+Round 7's verifier parsed all ten patterns and **did not prove they fire**, and said
+so plainly. Its first control list was mis-ordered and produced seven spurious
+`DEAD!!` readings.
+
+**`scrub-selftest.py` is committed with this correction**, and it does three things
+the earlier ad-hoc attempts did not:
+
+1. **Derives every control from the regex**, element by element — every mandatory
+   literal reproduced, every quantifier satisfied at its minimum, and **every
+   alternation branch exercised separately**. Coverage is asserted: **10 of 10**
+   patterns carry at least one control, and an uncontrolled pattern fails the run.
+2. **Carries negative controls**, so a net that fires on everything is caught too:
+   a long random vendor field name, a sha256 digest, a URL path, the superseded
+   lowercase-`u` reCAPTCHA shape, and the one-label host shape — **6 strings, 0
+   false positives**.
+3. **Scans its own source.** Every control is assembled at runtime from fragments,
+   because a committed file containing a string that matches the very patterns it
+   tests would turn the gate red — the situation `scrub-patterns.txt:5-6` documents
+   for itself. **214 lines of this file: 0 hits.**
+
+**Result over `git diff 7d915b8 HEAD`:**
+
+```
+patterns parsed            : 10
+positive controls fired    : 22   (10/10 patterns covered)
+dead patterns              : 0
+false positives            : 0    (6 negative controls)
+scrub hits, added lines    : 0    (2131 added lines)
+scrub hits, this file      : 0    (214 lines, self-scan)
+RESULT: PASS
+```
+
+**And it caught me.** The first run reported **5 dead patterns** — all five
+branches of the internal-host pattern. The nets were fine; **my controls were
+mis-shaped**: that regex is `prefix . label . (minimed|medtronic) .`, so it needs
+**two** labels before the TLD, and the one-label form I had written does not match.
+Re-derived, all five fire, and the wrong shape was **added as a negative control**
+so the mistake cannot recur silently. This is the same class as the mis-ordered
+control list that produced seven spurious `DEAD!!` readings elsewhere in this pool —
+and the reason this script prints the derivation next to each control is that a
+reader should be able to tell a dead net from a bad control without running it.
+
+### What this round did not change
+
+The verdict (negative — the casing stays unobserved), the union (**21**), the sum
+(**27**), `run.log` and its rule, `count-cites.py`'s figure (**22**, failures 0),
+the ledger (`results.jsonl` **0** rows against **`0 of a 0 cap`**), and rounds 1–7's
+fixes, all re-verified rather than assumed. No claim, retraction or sentence is
+deleted anywhere in this round: every withdrawal is a quotation, and the two
+deleted *assertions* survive as quotations.
