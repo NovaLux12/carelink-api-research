@@ -58,6 +58,16 @@ and "404 = absent" is unreachable. A certainly-absent control UUID returns
 byte-identical output to the published root. **403 can never positively confirm a
 route; it only ever confirms a negative** [source: AWS-GATEWAYS §0, §2].
 
+> **⚠ The "404 is never emitted" clause is now observed on this family itself, not
+> only by analogy from `clcloud.*` (2026-10-14, area F, #123).** 17 further requests
+> — 15 of them gateway cells across both families — returned **zero 404s**, and the certainly-absent
+> control UUID was byte-identical to every plausible path on all three
+> `patient-timeline` deployments — one 42-byte body, one digest, 11 of 11 cells
+> [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md §3]. That digest
+> `f249b63cb2fcb66b…` reproduces the `f249b63cb2fc` this page publishes **in full**.
+> One pass does not make "404 is not in this stack's vocabulary" a law; it removes
+> the *analogy* from the citation, which is what `docs/10` flagged.
+
 The full oracle needs **both** methods, or it under-reports liveness:
 
 ```
@@ -273,7 +283,7 @@ Practical consequences, all visible in this repo:
   [source: CLAIM-AUDIT; SECURITY-FINDINGS addendum; CHUNK-CORPUS;
   AUTH-TENANT-FINDINGS §8].
 - Claims are pinned by a regression suite so they fail loudly rather than rot:
-  `regression/hurl/` holds 216 assertions (430 execute per run, counting the
+  `regression/hurl/` holds 217 assertions (431 execute per run, counting the
   16-family loop expansion and hurl's status-line checks); exit 0 = the public
   surface has not drifted *past the pinned values* since 2026-10-08
   [source: docs/00-summary-the-map.md;

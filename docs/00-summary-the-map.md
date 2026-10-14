@@ -202,7 +202,8 @@ keys are regional. It contains:
 | `logbook.supported.entry.types` | 12 entry types. |
 | `system.logbook.entry.validation.config` | **`null` on both patient regions, full schema on trials** — 12 sensor locations, 5 clinical removal reasons, 8 dose units. |
 | `csr.control.codes.settings` | Device **control** codes (`dpml`/`tup`/`vex`/`tcc`). **Not** the NGP alarm set. |
-| `mmm.data.api.url`, `personal.patient.timeline.config.host` | Undocumented AWS API Gateways. |
+| `mmm.data.api.url`, `personal.patient.timeline.config.host` | Undocumented AWS API Gateways. **Both are published and neither is called by any web client in this repo's corpus** — see the row below. |
+| **↳ who calls the two AWS API Gateways** | **Negative, 2026-10-14 (area F, #123), and it is a structural negative rather than an absence.** `patient-timeline` has **no matching GET route on any of its three deployments** (11 of 11 cells `403` + one 42-byte body, certainly-absent control byte-identical); `dialog-lite` 500s on every invocation behind a stage-wide catch-all, so **enumeration there is empty by construction** and its `500` cannot discriminate a path. Neither gateway has ever emitted an `Access-Control-*` header (0 of 15 re-measured), so **neither is browser-callable**. And **no client artefact in the two portal builds names either service** — `patient-timeline`, `dialog-lite`, `execute-api` and all five gateway ids are **0 in both**, because **neither build reads the patient config document at all** (`personal.` is 4 hits, none a key of the 69-name document). The patient build is the only one of the three that names the timeline, and there every hit is an Angular component selector. ⚠ **The three readings of the `403`s are still undecided** — that needs an authentication attempt, which `AGENTS.md` §8/§11 exclude [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md] |
 | **`system.gc.gz.transition.flags`** | **The vendor's own migration switchboard, in no prior note until 2026-10-12.** `displayMessage.useCumulusUrls` is **`true` on all three deployments**, beside a three-way plane dispatch table `personalDisplayMessageUrl` / **`csrDisplayMessageUrl`** / `carepartnerDisplayMessageUrl`. Five sibling booleans — `pullGMInfoFromCumulus`, `pullSMSHistoryFromCumulus`, `sendDiagnosticLogsToCumulus`, `sendPeriodicToCumulus`, `sendSMSFromCumulus` — are **all `true`**, so five capabilities are already on the Cumulus plane [findings-log/2026-10-12-published-pointers/FINDINGS.md §2c] |
 
 Hash-verified **global, not regional**: the family map, the Flex naming, the
@@ -376,7 +377,7 @@ The clinician bundle in detail is in
 client** — 70 `/patient/*` endpoints that appear nowhere in the clinician map. The
 clinician bundle replicates across **five** hosts, not two.
 
-`regression/hurl/` pins 216 of these facts so they fail loudly rather than rot.
+`regression/hurl/` pins 217 of these facts so they fail loudly rather than rot.
 
 ---
 

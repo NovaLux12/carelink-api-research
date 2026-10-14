@@ -1,0 +1,34 @@
+2026-10-14T22:55:39.421Z	2026-10-14T22:55:41.548Z	GET	2026-10-14T22:55:42.411Z	bundle-clinic
+2026-10-14T22:55:41.548Z	2026-10-14T22:55:42.411Z	carelink.medtronic.eu	https://carelink.medtronic.eu/main.fb5f8cb7eb60c4d5.js	200	application/javascript		3397615
+2026-10-14T22:55:42.324Z	2026-10-14T22:55:44.833Z	GET	2026-10-14T22:55:45.837Z	bundle-support
+2026-10-14T22:55:44.833Z	2026-10-14T22:55:45.837Z	carelink-support.medtronic.com	https://carelink-support.medtronic.com/main.759cddab23085086.js	200	application/javascript		3410666
+2026-10-14T22:55:46.120Z	2026-10-14T22:55:48.627Z	GET	2026-10-14T22:55:48.714Z	pt-eu-root
+2026-10-14T22:55:48.627Z	2026-10-14T22:55:48.714Z	d4mwt26mmi.execute-api.eu-central-1.amazonaws.com	https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline/	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:55:48.994Z	2026-10-14T22:55:51.500Z	GET	2026-10-14T22:55:51.580Z	pt-eu-absent
+2026-10-14T22:55:51.500Z	2026-10-14T22:55:51.580Z	d4mwt26mmi.execute-api.eu-central-1.amazonaws.com	https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline/9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:55:51.862Z	2026-10-14T22:55:54.368Z	GET	2026-10-14T22:55:54.449Z	pt-eu-v1root
+2026-10-14T22:55:54.368Z	2026-10-14T22:55:54.449Z	d4mwt26mmi.execute-api.eu-central-1.amazonaws.com	https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline/v1/	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:55:54.732Z	2026-10-14T22:55:57.239Z	GET	2026-10-14T22:55:57.315Z	pt-eu-v1events
+2026-10-14T22:55:57.239Z	2026-10-14T22:55:57.315Z	d4mwt26mmi.execute-api.eu-central-1.amazonaws.com	https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline/v1/events	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:55:57.603Z	2026-10-14T22:56:00.110Z	GET	2026-10-14T22:56:00.186Z	pt-eu-logbook
+2026-10-14T22:56:00.110Z	2026-10-14T22:56:00.186Z	d4mwt26mmi.execute-api.eu-central-1.amazonaws.com	https://d4mwt26mmi.execute-api.eu-central-1.amazonaws.com/prod/patient-timeline/logbook	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:00.471Z	2026-10-14T22:56:02.979Z	GET	2026-10-14T22:56:03.309Z	pt-us-root
+2026-10-14T22:56:02.979Z	2026-10-14T22:56:03.309Z	7r9xxd72kk.execute-api.us-east-1.amazonaws.com	https://7r9xxd72kk.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:03.590Z	2026-10-14T22:56:06.969Z	GET	2026-10-14T22:56:06.417Z	pt-us-absent
+2026-10-14T22:56:06.969Z	2026-10-14T22:56:06.417Z	7r9xxd72kk.execute-api.us-east-1.amazonaws.com	https://7r9xxd72kk.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:06.702Z	2026-10-14T22:56:09.208Z	GET	2026-10-14T22:56:09.602Z	pt-us-v1events
+2026-10-14T22:56:09.208Z	2026-10-14T22:56:09.602Z	7r9xxd72kk.execute-api.us-east-1.amazonaws.com	https://7r9xxd72kk.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/v1/events	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:09.888Z	2026-10-14T22:56:12.394Z	GET	2026-10-14T22:56:12.728Z	pt-tr-root
+2026-10-14T22:56:12.394Z	2026-10-14T22:56:12.728Z	oflhmnvbe6.execute-api.us-east-1.amazonaws.com	https://oflhmnvbe6.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:13.763Z	2026-10-14T22:56:15.514Z	GET	2026-10-14T22:56:15.833Z	pt-tr-absent
+2026-10-14T22:56:15.514Z	2026-10-14T22:56:15.833Z	oflhmnvbe6.execute-api.us-east-1.amazonaws.com	https://oflhmnvbe6.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:16.119Z	2026-10-14T22:56:18.627Z	GET	2026-10-14T22:56:18.894Z	pt-tr-v1events
+2026-10-14T22:56:18.627Z	2026-10-14T22:56:18.894Z	oflhmnvbe6.execute-api.us-east-1.amazonaws.com	https://oflhmnvbe6.execute-api.us-east-1.amazonaws.com/prod/patient-timeline/v1/events	403	application/json	MissingAuthenticationTokenException	42
+2026-10-14T22:56:19.253Z	2026-10-14T22:56:21.765Z	GET	2026-10-14T22:56:21.869Z	dl-eu-root
+2026-10-14T22:56:21.765Z	2026-10-14T22:56:21.869Z	0ptoikank6.execute-api.eu-central-1.amazonaws.com	https://0ptoikank6.execute-api.eu-central-1.amazonaws.com/prodous/dialog-lite/v1/	500	application/json	InternalServerErrorException	36
+2026-10-14T22:56:22.167Z	2026-10-14T22:56:24.674Z	GET	2026-10-14T22:56:24.770Z	dl-eu-absent
+2026-10-14T22:56:24.674Z	2026-10-14T22:56:24.770Z	0ptoikank6.execute-api.eu-central-1.amazonaws.com	https://0ptoikank6.execute-api.eu-central-1.amazonaws.com/prodous/9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6	500	application/json	InternalServerErrorException	36
+2026-10-14T22:56:25.579Z	2026-10-14T22:56:27.566Z	GET	2026-10-14T22:56:27.877Z	dl-us-root
+2026-10-14T22:56:27.566Z	2026-10-14T22:56:27.877Z	r5djbmetbb.execute-api.us-east-1.amazonaws.com	https://r5djbmetbb.execute-api.us-east-1.amazonaws.com/prod/dialog-lite/v1/	500	application/json	InternalServerErrorException	36
+2026-10-14T22:56:28.158Z	2026-10-14T22:56:30.664Z	GET	2026-10-14T22:56:30.990Z	dl-us-absent
+2026-10-14T22:56:30.664Z	2026-10-14T22:56:30.990Z	r5djbmetbb.execute-api.us-east-1.amazonaws.com	https://r5djbmetbb.execute-api.us-east-1.amazonaws.com/prod/9f3c1d7e-2b48-4a6c-8e51-0c7d9a2b41f6	500	application/json	InternalServerErrorException	36

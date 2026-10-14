@@ -400,6 +400,22 @@ are recorded in [`docs/11`](11-suggested-research-areas.md) area F. **Whether th
 value may be published is a call for a human holding it, not a pre-committed step
 here.**
 
+**⚠ Who reads this key — a negative, and a bigger one than "no caller found"
+(2026-10-14, area F, #123).** Both **portal** builds (clinic `2a7fa8e7…`, support
+`a054555a0f22176e…`) were re-fetched on their content-hashed asset names and both
+reproduce their pinned anchors in full, so the corpus is the corpus. In **both**,
+`personal.patient.timeline.config` is **0 hits**, `patient-timeline` is **0**, and —
+the finding — **`personal.` is 4 hits and not one of the four is a key of this
+69-name document**, while `/patient/` and `carelink.minimed` are 0 and the builds'
+named API surface is the clinician `hcp/*` namespace. **Neither portal build reads
+this document at all**, so the pointer cannot be reached from that code and no
+server-side proxy can exist in those builds to reach it (OBSERVED for the corpus
+facts; INFERRED for the consequence). The **patient** build is the only one of the
+three that has ever named the timeline at all, and there every hit is an Angular
+component selector, not a URL — see `docs/07` and the log
+[findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md §6]. **The key is
+published, and no web client in this repo's corpus acts on it.**
+
 ### Credential-shaped values — structure only, comparison held
 
 **The config publishes credential-shaped values.** Recorded here with **no value
