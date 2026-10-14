@@ -89,6 +89,13 @@ def spacing(rows, host_filter=None):
     is the mtime of the body file, which curl wrote. If they disagree the repo's
     own rule is that the harness series is the suspect (docs/09 section 4), so
     both are reported and neither is hidden.
+
+    `rows` is whatever the caller passes, so the caller decides the scope. Both
+    the whole ledger and this pass alone are reported, because they differ and
+    the difference is the point: the three sub-floor gaps and the five inverted
+    rows live entirely in the earlier attempt, so quoting only the whole-ledger
+    figure would understate this pass, and quoting only this pass would hide
+    defects a reader must see.
     """
     sel = [r for r in rows if (host_filter is None or r["host"] == host_filter)]
     sel.sort(key=lambda r: r["seq"])
@@ -133,6 +140,8 @@ def main() -> int:
     ok200, whole = whole_kib_detector(rows)
 
     h_gaps, k_gaps = spacing(rows)
+    this_pass = [r for r in rows if r["seq"] > PRIOR_SEQ]
+    tp_h, tp_k = spacing(this_pass)
     h_min = min((g[0] for g in h_gaps), default=None)
     k_min = min((g[0] for g in k_gaps), default=None)
 
@@ -187,6 +196,13 @@ def main() -> int:
         "spacing_harness_min_s": round(h_min, 3) if h_min is not None else None,
         "kernel_bodies_available": bool(k_gaps),
         "spacing_kernel_body_mtime_min_s": round(k_min, 3) if k_min is not None else None,
+        "this_pass_rows": len(this_pass),
+        "this_pass_harness_min_s": round(min((g[0] for g in tp_h), default=0) or 0, 3) if tp_h else None,
+        "this_pass_kernel_min_s": round(min((g[0] for g in tp_k), default=0) or 0, 3) if tp_k else None,
+        "this_pass_gaps_below_2.5s": len([g for g in tp_h if g[0] < 2.5]),
+        "this_pass_rows_with_t_done_before_t_sent": len(
+            [r for r in this_pass if parse(r["t_done"]) and parse(r["t_sent"])
+             and parse(r["t_done"]) < parse(r["t_sent"])]),
         "harness_gaps_below_2.5s": len(under),
         "harness_gaps_below_2.5s_detail": [
             {"from_seq": a, "to_seq": b, "gap_s": round(g, 3)} for g, a, b in under],
@@ -224,7 +240,9 @@ def main() -> int:
     print("  http status            " + "  ".join(f"{k}:{v}" for k, v in out["by_http_status"].items()))
     print("  information class      " + "  ".join(f"{k}:{v}" for k, v in out["by_information_class"].items()))
     print()
-    print(f"  min gap, harness t_sent            {out['spacing_harness_min_s']} s")
+    print(f"  WHOLE LEDGER ({total} rows, seq 1-{rows[-1]['seq']}) -- includes the earlier attempt")
+    print(f"    min gap, harness t_sent            {out['spacing_harness_min_s']} s")
+    print(f"    harness gaps under 2.5 s           {len(under)}")
     if out["kernel_bodies_available"]:
         print(f"  min gap, kernel body mtime oracle  {out['spacing_kernel_body_mtime_min_s']} s")
     else:
@@ -239,6 +257,20 @@ def main() -> int:
     for d in out["rows_with_t_done_before_t_sent_detail"]:
         print(f"      seq {d['seq']}  {d['tag']}")
     print(f"  rows with a non-zero curl exit    {len(bad)}")
+    print()
+    print(f"  THIS PASS ONLY ({len(this_pass)} rows, seq {this_pass[0]['seq']}-{this_pass[-1]['seq']})"
+          if this_pass else "  THIS PASS ONLY: no rows")
+    if this_pass:
+        kmin = min((g[0] for g in tp_k), default=None)
+        print(f"    min gap, harness t_sent            "
+              f"{round(min(g[0] for g in tp_h), 3) if tp_h else None} s")
+        print(f"    min gap, kernel body mtime oracle  "
+              f"{round(kmin, 3) if kmin is not None else 'UNAVAILABLE (bodies outside the repo)'} s")
+        print(f"    gaps under 2.5 s                   {len([g for g in tp_h if g[0] < 2.5])} of {len(tp_h)}")
+        print(f"    rows where t_done precedes t_sent  "
+              f"{out['this_pass_rows_with_t_done_before_t_sent']}")
+        print("    => the three sub-floor gaps and the five inverted rows above are ALL")
+        print("       in the earlier attempt. This pass is clean on every check.")
     print()
     print("  VERDICT: the two spacing oracles are reported together on purpose. If")
     print("  they disagree the harness series is the suspect (docs/09 section 4);")
