@@ -558,6 +558,13 @@ Every response is a Java-style config envelope:
 - Dedicated alias routes: `/patient/configuration/defaultCountry` → `{"value":"GB"}`,
   `/patient/configuration/recaptcha/key` → `{"value":"6LfUbuor…"}`.
   `/patient/configuration/messages/en` is live and returns `{"messages":[]}`.
+- Successor check 2026-10-14 (issue #102): the three envelopes are **host- and
+  language-independent in shape** — `defaultCountry` 20 B with the same digest on `.com`
+  and `-trials`, `recaptcha/key` 58 B with a **different** digest per host, and
+  `messages/{en,fr,de}` all 22 B with one identical digest across both hosts and all three
+  languages. Envelope member sets: `defaultCountry`/`recaptcha/key` → `{value}` (string,
+  2 and 40 characters respectively), `messages/{lang}` → `{messages}` (array, length 0).
+  [source: findings-log/2026-10-14-area-f-dedicated-routes-succession/FINDINGS.md]
 - Control: `/patient/configuration/system/zzz.not.a.real.key.zzz` → 404 with
   `content-type: text/vnd.a`, so 404 is a genuine "absent", not a catch-all. Do not
   discriminate on that odd content-type — with one refinement 2026-10-13 (area W):
