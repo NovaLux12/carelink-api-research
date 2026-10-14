@@ -1006,7 +1006,7 @@ using the subject itself as the query, and assert the mentions agree:
 | `timeline` census | `\b196\b` | 16 | **agree on subject**; a few are a different subject, listed at R4 |
 | signature count | `\b74\b` | 9 | **agree on subject**; same |
 | `BLOCK 7` range | `240-24[23]` | 4 | **agree** on `:240-242` |
-| `docs/11` letter cites | `docs/11…:(209|214|221|222)` | 3 | **agree** on `:221`/`:222` |
+| `docs/11` letter cites | `docs/11(.{0,200}):(209\|214\|221\|222)` — **runnable, not schematic**; see R1a | 3 | **agree** on `:221`/`:222` |
 
 **The counts fell, and that is the correction working.** Quoted superseded wording is
 **evidence, not a claim** — `AGENTS.md` §3 requires it to stay visible, and a claim is
@@ -1421,3 +1421,127 @@ moved — `git diff cd9b79a -- regression/` is empty.
 subject sweep and the R5 table read `git diff --name-only 7d915b8 HEAD`; the artefact
 identity check compares `cd9b79a`; `research-checks.py` and `measure_assertions.py`
 read the **working tree**. **`origin/main` was used for nothing.**
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 7. Verification returned **CLEAN with no blocking findings** and four items
+"owed before merge". All four are closed here. **Nothing CLEAN is re-litigated.**
+
+**Base for every diff and sweep in this round: `7d915b8`** — this branch's merge
+point. `origin/main` (`270d06f`, area S merged) was used for **nothing**, and the R5
+re-derivation reads each ref **from git** rather than from the worktree.
+
+### R1a — the query cell is now runnable, and why that was the route
+
+The `docs/11` cell published `docs/11…:(209|214|221|222)`. **The cell is now
+`docs/11(.{0,200}):(209|214|221|222)`** and runs as written:
+
+```
+returns 3  ->  FINDINGS.md:284   grep.sh:6   grep.sh:45
+```
+
+**Runnable form chosen over marking it schematic, because the schematic form has
+three defensible readings and they disagree:**
+
+| reading of `…` | result |
+|---|---:|
+| `.{0,4}` — the gap bounded to 4 chars | **1** — misses gaps of 28 and 45 |
+| `.{0,200}` — bounded above only | **3** ✅ |
+| unbounded above (the "real" reading) | **3** ✅ |
+| swept against **`git diff` text** instead of the working tree | **8** — diff headers and hunks |
+
+**The bound is not load-bearing and that is stated:** the widest real gap is **45**
+chars, so `.{0,45}`, `.{0,200}` and unbounded all return **3**. The cell publishes
+**200** because it is a number a reader can trust to be non-clipping, and the claim
+does not depend on where the bound sits.
+
+**On the competing 4th hit** (`docs/09:203`): **there is no such mention.** The log's
+only `docs/09` line-cite in that area is **`docs/09:195`** (the gzip row carrying
+*"196 B 404s"*), it sits at `FINDINGS.md:1072`, and that line is **inside a
+`## Correction (…)` section** — so **rule E1 excludes it**, by design. A sweep that
+returns it had E1 off. **Same shape as the round-4 record: a numeral or a filename
+that looks like the subject without being it**, which is why R4's own limit note
+("a subject sweep says *here is everywhere this subject appears*, not *every one of
+these is the same claim*") is the thing that resolves it.
+
+### R3 — the four evidence artefacts, digested against `cd9b79a`
+
+The claim has been "byte-identical" since round 2 and was asserted, never shown.
+**Run and pasted**, read from git at both refs:
+
+```
+results.jsonl  dba9f9f243f55dfdea4aea85d1b1fb92c73b2b949f08e9aac0da47e6823ff9fa  (both)
+run.log        24b2df751d47ef6884b95774bd695a463dbadad1b41655725e28d28b7dd371d2  (both)
+grep-out.txt   ae872d12972464db2bcfea2aa790f8fa5644ec514ab9d3811c352fc20473d482  (both)
+headers/       tree a1375242809f19f3b5053fe718f040b54a9e3a6d          (both)
+               concatenated bytes 61c4c64cc818e731a89a692ef8bd0ea145ae7fb1e174d2907f9289a12eda0f04 (both)
+```
+
+`headers/` is 17 files, so it is digested **twice** — as a git **tree hash** and as
+the **concatenated bytes** in `git ls-tree | sort` order, because a tree hash alone
+proves path-and-blob identity while the concatenation proves the bytes a reader would
+reassemble. **Both identical at `cd9b79a` and at this head. The claim stands, and is
+now checkable rather than asserted.**
+
+### R5b — the merge-hazard table, re-derived, with the method shown
+
+This was the one arithmetic claim the verifier could not test. **Method, in full, and
+every figure read AT THE REF from git rather than from the worktree:**
+
+- `open` = count of `/^### [A-Z]\.\s/` headings — **research-checks.py's own pattern**
+- `closed` = count of `/^| [A-Z] — /` rows in the section after `## Closed areas`
+- `prose` = the **live (non-blockquoted)** `N open plus M closed` sentence —
+  quoted history excluded, as `check_prose_counts` does
+- `config` = the `about: N open areas` claim
+
+| ref | open headings | letters | closed rows | live prose | `config.yml` | internally consistent |
+|---|---:|---|---:|---|---|---|
+| `7d915b8` base | 5 | **F R S K L** | 21 | `5 + 21` (line 1554) | 5 | ✅ |
+| `270d06f` main, **area S closed** | 4 | **F R K L** | 22 | `4 + 22` (line 1517) | 4 | ✅ |
+| this head, **area F closed** | 4 | **R S K L** | 22 | `4 + 22` (line 1702) | 4 | ✅ |
+
+**All three are internally consistent** — `open == prose == config.yml`, `closed ==
+prose`, and `open + closed == 26` at every ref. That is the point: **neither branch is
+wrong.**
+
+**The merged state is `3 open` (R K L) and `23 closed`** (`21 + 2`), so the merged
+`docs/11` prose and `config.yml` must both read **3 open plus 23 closed**.
+
+> **⚠ UNCHANGED AND STILL THE QUEUE'S TO HANDLE — deliberately not resolved here.**
+> Two closures from one base collide on the **count**, not on the text: both branches
+> wrote the identical `4 + 22` into the same prose sentence and the same
+> `config.yml` value, so a text-level merge keeps whichever git selects and leaves both
+> surfaces **one too high**. Reconciling means recomputing **all three sites
+> together**. `research-checks.py`'s `check_prose_counts` will fail the merged result,
+> which is that check working, not a defect to work around.
+
+### R4b — the 2.866 s oracle is host-local, and the PR body said otherwise
+
+**Confirmed, and the PR body was corrected.** The kernel body-mtime figure was computed
+from response bodies that **are not in the repository**: there are **0 `.js` files** in
+the tree, and `results.jsonl` keeps an **80-byte** `body_head` per bundle row beside a
+16-character digest prefix — never a body. Git does not preserve mtimes either.
+
+So **`FINDINGS.md` was already right** (it says "not re-derivable from a clean clone"
+at both §2 and §9), and **the PR description was the surface that implied a checkable
+second opinion.** It now says plainly that **2.866 s is a host-local measurement, not a
+second opinion a reader can re-derive**, that the 17-row ledger keeps no body, and that
+**the load-bearing figure is the `t_sent` series, which reproduces from the committed
+ledger alone.** `2.866 s` was also struck from that body's list of "re-checked and still
+true" items.
+
+**The generalisable form, recorded because it is the third untracked surface in this
+PR to carry a stale claim** (after the PR body's `moom4261` in round 5 and the commit
+message in round 6): **an oracle derived from data that is not committed is not
+corroboration, it is an unrecorded observation.** It can still be true and still be
+useless to a verifier, and the wording has to say which it is.
+
+### R7b — nothing moved, and counts cannot move
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. All eleven subject counts **re-run after R1a's edit** and are **unchanged** —
+the edited cell is inside a `## Correction (…)` section, so **E1 excludes it**, which is
+the second proof that the exclusion is doing its job rather than decorating the rule.
