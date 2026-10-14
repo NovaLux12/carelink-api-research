@@ -112,7 +112,7 @@ sha256 is `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` —
 
 **The oracle, and what it is allowed to say.** Under Oracle A (`docs/09` §2),
 `MissingAuthenticationTokenException` means **no matching route**; it can only
-ever confirm a negative and never confirms that a route exists. That reading is
+ever confirm a negative and never establishes that a route exists. That reading is
 admissible *here* because the certainly-absent control is **byte-identical to
 every plausible path on every deployment** — the two are indistinguishable, so
 the response carries no route-specific information at all.
@@ -244,7 +244,7 @@ Two gates, and both are load-bearing:
 
 ### 6.2 The result: 0 hits, twice
 
-**OBSERVED, both bodies independently.** Every one of these literals scores
+**OBSERVED, both bodies.** Every one of these literals scores
 **zero** in the clinic build *and* in the support build:
 
 `patient-timeline` · `dialog-lite` · `app-patient-timeline` · `patientTimeline`
@@ -265,7 +265,12 @@ builds do not carry it **once**, so neither portal build has a patient-timeline
 *component* either — the service is not merely uncalled, it is absent from the
 application's own vocabulary.
 
-### 6.3 Why the two hits that did fire are false hits
+### 6.3 Why the two literals that did fire are false hits
+
+Counted **per body**, because `grep-out.txt` reports per body and a cross-build
+total beside a per-build figure is the unit error this pass's own correction C3
+exists to prevent: `m2m` is **1 per body** (2 across both), `baseUrl` is **2 per
+body** (4 across both), and the byte offsets below are identical in both builds.
 
 Hand-checked, not counted (`grep-out.txt` carries the context):
 
@@ -417,7 +422,7 @@ set** — so it was not run. What *was* verified, without a request: `bash -n` o
 suite (clean); the `jq` filter and the expected value against the **committed 69-name
 list** `findings-log/2026-10-13-area-w-per-key/keys.txt` (69 lines — the value is right);
 and `python3 scripts/research-checks.py`, which re-derives the static and runtime
-assertion counts from `scripts/measure_assertions.py` and confirms the new site's
+assertion counts from `scripts/measure_assertions.py` and re-derives the new site's
 accounting (**217 static / 431 executed**, matching the prose this pass updated). The
 assertion's *live* behaviour is for the PR gate's own 05 run and the weekly drift sweep
 to confirm; it is not claimed here.
@@ -469,3 +474,148 @@ this pass: **one** source each.
 | `headers/` | 17 per-request response heads, verbatim |
 | `grep.sh` | the offline corpus grep, **zero requests**, with the anchor gate and the named method gate |
 | `grep-out.txt` | its output: both token tables, every occurrence with context, and the exhaustive `timeline` signature census |
+
+## Correction (2026-10-15, verifier round 1 of this pass, PR #129)
+
+Four items. One of them retires a sentence this log published, and it is kept
+above rather than edited away, because a check a page once published and then
+retired is evidence (`AGENTS.md` §3, and `docs/09` §4's own precedent for the
+identical sentence).
+
+### C1 — §2's span cross-check is RETRACTED, and replaced with the per-gap check
+
+**The superseded wording, verbatim, at §2:** *"The two oracles span the same
+window (**48.95 s** vs **51.57 s**), consistent with one series."*
+
+**Why it is retracted.** `docs/09` §4 has retired exactly this check by name —
+*"a two-clock validation that compares only the clocks' extents is a tautology
+wearing a number"* — and it had already retired the identical span sentence from
+area F's own 2026-10-13 log. This pass re-imported a retired check. Worse, the
+two figures do not re-derive under any definition the sentence names: **no series
+in the committed ledger spans 48.95 s.** Every span the ledger supports, computed
+by name:
+
+| series | span |
+|---|---:|
+| `t_queued`, first → last | 48.737 s |
+| **`t_sent`, first → last** | **49.116 s** |
+| `t_done`, first → last | 48.579 s |
+| kernel body-mtime, first → last | 48.950 s |
+| last `t_done` − first `t_queued` | 51.569 s |
+
+So **48.950 s is the mtime span** and **51.569 s is `t_done`-minus-`t_queued`** —
+two different quantities from two different pairs of series, compared as though
+they were one pair's extent. `51.57` reproduced only under a definition the
+sentence never gave. **Both figures are withdrawn as stated, and neither is
+replaced by a span comparison of any kind**, because the span comparison is the
+retired check.
+
+**What replaces it — the check `docs/09` §4 says can fail: per-gap, not
+per-extent.** Same-host consecutive pairs, `|send_gap − mtime_gap|`, counted in
+request order. **10 gaps, max 0.947 s, median 0.0151 s, and 2 of 10 disagree by
+> 0.5 s** — which is the property a span check cannot have, since it fires.
+
+| host | pair | `t_sent` gap | mtime gap | abs diff |
+|---|---|---:|---:|---:|
+| `0ptoikank6…` | 14→15 | 2.909 | 2.902 | 0.007 |
+| **`7r9xxd72kk…`** | **8→9** | **3.990** | **3.107** | **0.883** |
+| **`7r9xxd72kk…`** | **9→10** | **2.239** | **3.186** | **0.947** |
+| `d4mwt26mmi…` | 3→4 | 2.873 | 2.866 | 0.007 |
+| `d4mwt26mmi…` | 4→5 | 2.868 | 2.870 | 0.002 |
+| `d4mwt26mmi…` | 5→6 | 2.871 | 2.866 | 0.005 |
+| `d4mwt26mmi…` | 6→7 | 2.871 | 2.871 | 0.000 |
+| `oflhmnvbe6…` | 11→12 | 3.120 | 3.105 | 0.015 |
+| `oflhmnvbe6…` | 12→13 | 3.113 | 3.057 | 0.056 |
+| `r5djbmetbb…` | 16→17 | 3.098 | 3.114 | 0.016 |
+
+**The two series disagree only where the harness clock convicts itself.** Both
+disagreing gaps straddle **seq 9**, the one row recording a **negative duration**
+(`t_done` 0.552 s before `t_sent`). Per-row `mtime − t_sent`, **16 of 17 rows
+positive** at **+0.072 to +1.005 s** and **seq 9 negative at −0.557 s** — a body
+written before the request that wrote it was stamped, which is impossible. So the
+2.239 s `t_sent` gap is an artefact of that one row, exactly as §2 concluded, and
+it is now demonstrated **by where the two series differ** rather than by comparing
+their extents.
+
+⚠ **A provenance defect in this pass's own reader, disclosed rather than
+smoothed over.** The raw per-row `mtime − t_sent` values all read **+3600 s** to
+four decimals, because the measurement script converted the mtimes with a
+local-time `fromtimestamp` while the ledger stamps UTC. **The constant cancels in
+every difference**, so the mtime span and every gap above are unaffected; **only
+the absolute per-row offset needed it removed.** It is recorded here because a
+reader who re-runs the comparison without that subtraction will see 3600 s and
+conclude something dramatic. **No cause is asserted for the corrupt row itself.**
+
+**The load-bearing figure is unchanged by this correction:** the measured
+`t_sent` floor of **2.239 s**, 1 of 10 gaps under the declared 2.5 s and **0** under
+the repo's ≥2 s floor, reproducing from `results.jsonl` alone. The mtime floor
+of 2.866 s remains **not re-derivable from a clean clone** (git does not preserve
+mtimes; bodies are transient). **The pass's verdict does not rest on either clock
+cross-check** — it rests on the 403 body digest being byte-identical across 11
+cells and on the corpus grep.
+
+### C2 — §6.2's `independently` is deleted, per `AGENTS.md` §1 and §2.1
+
+**The superseded wording, verbatim, at §6.2:** *"**OBSERVED, both bodies
+independently.**"*
+
+`independently` is on `AGENTS.md` §2.1's enumerated list and is permitted only at
+an independent-source count of **≥ 2**. This pass has condition 2 (different
+artefacts) and condition 3 (neither quotes the other), but **not** condition 1
+(different authors): one pass, one observer, two hosts — and §2.1's own precedent
+is explicit that two artefacts are one source *"regardless of how many commits or
+**hosts** separate them."* It also contradicted this log's own §9, which records
+rows 12–17 as **first** measurements, **one** source each.
+
+**Fixed by deletion, not by softening: `**OBSERVED, both bodies.**`** The claim
+itself — every listed literal scores zero in each body — is unchanged, true, and
+sourced to `grep-out.txt`. Only the strength word was unsupportable, and
+`AGENTS.md` §1 says to delete rather than hedge.
+
+**The whole §2.1 list was then swept over this pass's added lines**, and three
+further occurrences were adjudicated:
+
+| occurrence | adjudication |
+|---|---|
+| `docs/10` §1, *"All three are **consistent with** the evidence"* | **kept** — a coherence word, permitted for a single source, and it is pre-existing wording this pass preserved rather than authored |
+| §9, *"**Independent-source count**, per `AGENTS.md` §2.1"* and *"no **independence** word is used for them"* | **kept** — these name the §2.1 analysis itself; they are not strength claims about a source |
+| §3, *"it can only ever confirm a negative and never **confirms** that a route exists"* | **reworded** to *"never **establishes** that a route exists"* — `confirms` is on the list, and although the use is negated it need not be read twice to be adjudicated |
+| `probe.sh`, *"it never **confirms** a route exists"* | **reworded** to *"never **establishes**"* — same reason |
+| §8, *"…and **confirms** the new site's accounting"* | **reworded** to *"…and **re-derives** the new site's accounting"* — it described a local script output, but `confirms` reads as a multiplicity claim and was not worth defending |
+
+### C3 — the `m2m` / `baseUrl` per-build totals, stated so they cannot be misread
+
+Recorded once here so the numbers are unambiguous, because the prose elsewhere
+compressed a per-build count against a cross-build one. **`grep-out.txt` reports
+per body**: `m2m` = **1 per build** (**2 across both**), `baseUrl` = **2 per
+build** (**4 across both**). §6.3's byte offsets are **clinic-build offsets** and
+are identical in the support build, which is why they are given once. No figure
+changes; the unit does.
+
+### C4 — what did NOT move, and one disclosure that is now discharged
+
+- **The `README.md` count site the gate cannot read** (verifier round 1, blocking
+  item 1) was a **`docs/`-level defect in this PR, not in the log**, so it is
+  corrected in `README.md` itself and the pattern was **not** widened — a
+  maintainer decision, per `docs/09` §4's standing note. `README.md:205`-style
+  **quoted history inside a trap row was deliberately left at its historical
+  value**, because changing it would falsify the record of the trap itself. A
+  re-scan for a number separated from its phrase by a line break returns **0**
+  invisible sites across `README.md`, `docs/*.md`, `AGENTS.md`,
+  `CONTRIBUTING-research.md` and `config.yml`.
+- **The added assertion is no longer outstanding.** This log disclosed that
+  `05-public-config.check.sh` was **not** executed, because running it fetches
+  three hosts outside this claim's authorised set. The verifier executed it live
+  and it passed **85 of 85**, with this pass's `EU bulk config has the same 69
+  top-level keys` green beside the `.com` and `-trials` cells. **The disclosure
+  was honest and correctly reasoned, and it is now discharged by a run whose
+  author was not this pass** — so it is recorded as the verifier's measurement,
+  not re-claimed as this pass's.
+- **Not claimed from the verifier's run:** it overran its own budget — it invoked
+  `./scripts/research-gate.sh --no-suite`, and the gate's argument parser matches
+  only `--staged` / `--all` / `--suite` / `--help`, so the **full live suite ran**
+  and made **13 requests on hosts outside this claim's set**. Disclosed by the
+  verifier, and recorded here for the pool's benefit: **`research-gate.sh` has no
+  `--no-suite` flag.** Those 13 requests are **not** cited as evidence for any
+  claim in this pass. Every measurement in this log and every correction above
+  comes from **this pass's own ledger** and its own body files.

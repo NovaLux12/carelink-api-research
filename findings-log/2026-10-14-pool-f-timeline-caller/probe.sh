@@ -18,7 +18,7 @@
 # ORACLE (docs/09 §2, Oracle A), and it is NOT the same in both directions:
 #   - x-amzn-errortype: MissingAuthenticationTokenException (403, 42 B) on
 #     patient-timeline => NO MATCHING ROUTE. It can only ever confirm a
-#     negative; it never confirms a route exists.
+#     negative; it never establishes that a route exists.
 #   - x-amzn-errortype: InternalServerErrorException (500) on dialog-lite
 #     => the path IS matched and the Lambda raised. It never means "exists"
 #     in the ordinary sense and it is not a health signal.
