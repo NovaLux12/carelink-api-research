@@ -132,17 +132,24 @@ req() { # req <filename-without-leading-slash> <id|""> <role>
     # CORRECTED 2026-10-14 after independent verification. An earlier version of
     # this comment claimed "the mtime series is the spacing authority here (the
     # harness date series is the suspect, the kernel's write time is not)". That
-    # is WRONG, and it is arithmetically impossible rather than merely
-    # unsupported: mtime_gap == t_sent_gap + delta_latency, and delta_latency
-    # swings by up to 0.895 s across this run -- LARGER than the 2.0 s margin
-    # under test. The mtime series therefore cannot exonerate a short t_sent gap;
-    # in all five sub-floor cases the +0.65..+0.90 s latency swing is exactly
-    # what lifts the mtime gap above 2.6 s.
+    # is WRONG: mtime_gap == t_sent_gap + delta_latency, so the mtime series
+    # cannot exonerate a short t_sent gap. Measured across this run,
+    # delta_latency takes +0.653, +0.682, +0.707, +0.731, +0.895 s in exactly the
+    # five sub-floor cases -- i.e. the latency swing is what lifts those mtime
+    # gaps above 2.6 s. (The swing does NOT exceed the 2.0 s floor, so it does
+    # not by itself breach it; the point is that the mtime series is not an
+    # independent witness.)
     #
     # Both series are reported; NEITHER is the authority. The t_sent series is
     # the series that proves or disproves the claim, and it shows 5 gaps under
-    # the 2.0 s floor. See FINDINGS.md section 3 (spacing) and section 5.4 for
-    # the unexplained constant 3600.000 s offset in body_mtime_ns.
+    # the 2.0 s floor. See FINDINGS.md section 1a (spacing).
+    #
+    # CORRECTED AGAIN 2026-10-14, second verification round. An earlier comment
+    # here claimed a constant 3600.000 s offset in body_mtime_ns. That was FALSE
+    # and was introduced by this pass's own first correction round. Measured:
+    # body_mtime_ns - t_sent spans [-0.823, +0.356] s, spread 1.180 s, which is
+    # the scale of the request latency itself. The 3600.000 s figure was never
+    # checked and is withdrawn.
     mtns=$(python3 -c 'import os,sys;print(os.stat(sys.argv[1]).st_mtime_ns)' "$bfile")
     # 90 B head, as the 2026-10-13 clinic pass recorded it. All control
     # characters including newline are dropped: the row travels through an

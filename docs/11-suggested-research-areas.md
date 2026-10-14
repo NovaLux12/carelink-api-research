@@ -1237,7 +1237,7 @@ digest pinned):
   hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
   issue #103 is L (positive control, 0–2 GETs).
 
-#### Addendum (2026-10-14, issue #121): the clinic 225 are swept — and area P's negative is refuted for that build
+#### Addendum (2026-10-14, issue #121): the clinic 225 are swept — and area P's negative is completed, not refuted
 
 **Area K is NOT closed.** This is the clinic half only, and the cross-client
 differential it was meant to settle is **not settled** — see the refusal below.
@@ -1304,14 +1304,18 @@ the declared 2.5 s and 5 under the repo's 2.0 s floor** (min 1.766 s). A kernel
 body-mtime series was recorded alongside and shows 0 under either — **and it
 cannot settle the question**, because `mtime_gap == t_sent_gap + Δlatency` with
 Δlatency swinging by up to 0.895 s, which is larger than the margin under test;
-in all five sub-floor cases a +0.65…+0.90 s latency swing is precisely what lifts
-the mtime gap above 2.6 s. **Both series are reported and neither is the
-authority; no cause is asserted.** `body_mtime_ns` also sits a constant
-**3600.000 s** ahead of `t_sent` on a self-consistent clock, whose provenance is
-**unexplained** — the offset cancels in gaps, so the figures stand, but it is not
-accounted for. **The mtime figures ARE re-derivable from a clean clone**, because
-`results.jsonl` commits `body_mtime_ns` for all 231 rows; an earlier draft of this
-addendum said otherwise and was wrong. Gaps are named by seq pair in the log.
+in all five sub-floor cases the +0.653…+0.895 s latency swing is precisely what
+lifts those mtime gaps above 2.6 s — the swing does not itself breach 2.0 s, but
+the mtime series is therefore not an independent witness. **Both series are
+reported and neither is the
+authority; no cause is asserted.** Both figures **ARE re-derivable from a clean
+clone**, because `results.jsonl` commits `body_mtime_ns` for all 231 rows; an
+earlier draft of this addendum said otherwise and was wrong. `body_mtime_ns −
+t_sent` spans **[−0.823, +0.356] s, spread 1.180 s** — comparable to the request
+latency itself, as a write timestamp should be. ⚠ **Two earlier drafts of this
+addendum claimed a constant "3600.000 s" offset here. That was false** and was
+introduced by this pass's own first correction round; it is withdrawn. Gaps are
+named by seq pair in the log.
 
 **Three instrument defects the pass found in itself**, recorded because a check
 that cannot fail is not evidence: a literal detector whose quote-parity flipped
@@ -1339,14 +1343,24 @@ and returns a wrong answer without failing.
 | **main-only** | **184** |
 
 **⚠ This addendum's first draft published "168 shared, 1 chunk-only, 0
-main-only". That was wrong in all three figures, and the reason matters more
-than the numbers.** It was measured while the sweep was **mid-flight at 115 of
-231 cells**, over a corpus directory that was still being written to. Reporting a
-set difference computed over a partially-fetched corpus is `AGENTS.md` §6 item 7
-— a count generalised from a subset — and the direction of the error is the
-dangerous one: a partial corpus makes the chunk side look *richer* than it is,
-because routes not yet fetched cannot be counted as missing. The verifier caught
-it; the correction is kept visible rather than smoothed over.
+main-only". That was wrong in all three figures. The verifier caught it; the
+correction is kept visible rather than smoothed over.**
+
+**⚠ The first correction's own explanation was ALSO wrong, and is corrected
+here.** Round 1 attributed the error to the corpus being incomplete mid-sweep and
+said a partial corpus "inflates the shared figure". Both halves are false: a
+partial corpus **deflates** shared, and the real defect was the **extraction
+rule**. The first draft's rule was a raw byte grep for `hcp/[A-Za-z0-9_/.-]*`,
+which reproduces its own erroneous **168** exactly on the complete main bundle.
+It silently misses **26** literals that the parity-free rule catches — every
+`/hcp/…` leading-slash form, every `((param))` template, the `?`/`=` query
+string, and the `" /hcp/linkedPatient"` space-prefixed literal `docs/07` line 65
+warns about. A second, separate error compounded it: the main bundle was globbed
+onto **both** sides of the set difference.
+
+The generalisable lesson, which is the same one `docs/09` §4 trap 3 records: *a
+counting rule that cannot express a form the corpus contains will report that
+form as absent, and "absent" is indistinguishable from "not found".*
 
 The substantive conclusion is **unchanged and stronger**: the lazy chunks carry
 essentially no route literals of their own. They route through the constant table

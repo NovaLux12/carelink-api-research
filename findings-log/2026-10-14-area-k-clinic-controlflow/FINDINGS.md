@@ -298,7 +298,7 @@ The logbook entry is inserted **only when `we` is truthy**, immediately before t
 
 ### 3i. How the clinic build addresses its routes — OBSERVED
 
-Eager main bundle, module 66703 (the route table): **180 `hcp/`-prefixed route literals**; **20 distinct** carry a `((param))` template across **23 occurrences** (corrected 2026-10-14 after independent verification — an earlier "21" counted occurrences under a rule that was never stated, `AGENTS.md` §6 item 7); **exactly 1** carries a query string (`hcp/configuration/public/user-identifier-settings?countryCode=((countryCode))`). Substitution is a single `String.replace` per call site — 15 such sites, offsets 2,405,549 and 3,016,707–3,188,583 — so a route carrying two `((…))` markers would only get its first replaced. The **three** `/logbook/entries*` routes (`entries`, `entries/filled`, `entries/last`) carry `((patientId))` — corrected from "all four", which miscounted a fourth route that carries no such marker — and chunk 9481's helper at offset 6,657 does the same substitution.
+Eager main bundle, module 66703 (the route table): **184 distinct route literals** (176 `hcp/`-prefixed plus 8 `/hcp/`- or space-prefixed), across **190 quoted occurrences** — corrected 2026-10-14 after the second verification round, which found an earlier draft's "180 `hcp/`-prefixed route literals" was an occurrence count standing beside a distinct count in the same sentence, and that `docs/11` publishes **184** for the same population in the same PR. The distinct set is committed and re-derivable via `route-delta.py` → `route-delta.json`; **20 distinct** carry a `((param))` template across **23 occurrences**; **exactly 1** carries a query string (`hcp/configuration/public/user-identifier-settings?countryCode=((countryCode))`). Substitution is a single `String.replace` per call site — 15 such sites, offsets 2,405,549 and 3,016,707–3,188,583 — so a route carrying two `((…))` markers would only get its first replaced. The **three** `/logbook/entries*` routes (`entries`, `entries/filled`, `entries/last`) carry `((patientId))` — corrected from "all four", which miscounted a fourth route that carries no such marker — and chunk 9481's helper at offset 6,657 does the same substitution.
 
 This is the mechanism behind §3 of the cross-client differential: **the clinic client resolves every route through an exported-constant table; the patient client inlines literals.**
 
@@ -368,7 +368,7 @@ The arithmetic that kills it, read from the two committed `counters.json` files:
 
 **So the differential under S4's rule is a statement about the two builds' *source conventions*, not about their API surfaces.** The honest reading is: 5 of the clinic's call sites are inline literals and 220 route through a constant table; 154 of the patient build's 233 are inline literals. On the literal-only subset the two sets are **disjoint** (0 shared), which is a fact about namespace rather than about schema — the clinic's 5 are all `hcp/*` and the patient build's 144 are all `patient/*`.
 
-**A shared schema cannot be shown or denied with the rule as it stands.** Closing this needs a resolver for the clinic's constant-table indirection (module 66703 exports 188 route constants, 180 of them `hcp/` literals). Writing one is a *rule change* to a script another pass owns, not a clinic-side side-effect, and per `AGENTS.md` §9's precedent ("changing the gate's own pattern in the same PR the gate passed is a decision for a maintainer, not a side effect of a research pass") it belongs to the owner. **This is the pass's successor recommendation and it is stated as a gap, not worked around.**
+**A shared schema cannot be shown or denied with the rule as it stands.** Closing this needs a resolver for the clinic's constant-table indirection (module 66703 exports 188 route constants; the literal strings behind them are **184 distinct**, of which **176** are `hcp/`-prefixed — see §3i and `route-delta.json` for the exact split). Writing a resolver is a *rule change* to a script another pass owns, not a clinic-side side-effect, and per `AGENTS.md` §9's precedent ("changing the gate's own pattern in the same PR the gate passed is a decision for a maintainer, not a side effect of a research pass") it belongs to the owner. **This is the pass's successor recommendation and it is stated as a gap, not worked around.**
 
 ### 4d. S4's two arithmetic checks, re-derived from the committed files
 
@@ -429,9 +429,14 @@ records them because the retraction history is the evidence (§3).
    than the margin under test — so it cannot exonerate a short `t_sent` gap. The
    comment is corrected in place and both series are now reported with neither
    elevated to authority.
-4. **`body_mtime_ns` carries an unexplained constant 3600.000 s offset** from
-   `t_sent` on a self-consistent clock. Provenance not established; the offset
-   cancels in gaps so the reported figures stand, but it is not accounted for.
+4. **RETRACTED IN ROUND 2 — this item was itself wrong.** Round 1 recorded
+   "`body_mtime_ns` carries an unexplained constant 3600.000 s offset". **That was
+   false and was introduced by this pass's own first correction.** Measured
+   directly: `body_mtime_ns − t_sent` ∈ **[−0.823, +0.356] s, spread 1.180 s**
+   over all 231 rows — the scale of the request latency itself, which is what a
+   write timestamp should look like. The 3600.000 s figure appears to have come
+   from a BST-vs-UTC parse and was never checked. The claim is withdrawn in all
+   three places it was published (`docs/11`, this file, `probe.sh`).
 5. **Offset convention overstated** — see the corrected convention at the head.
    The measurements themselves were re-verified at the byte against the
    hash-pinned body and stand.
@@ -453,6 +458,69 @@ records them because the retraction history is the evidence (§3).
 be re-examined. That is a **separate area with its own claim lifecycle** and is
 filed as a successor in `docs/11`, not actioned here — §11 permits a pass to
 propose, not to spend another area's budget.
+
+## 5b. Correction (2026-10-14) — second verification round
+
+The confirming round reviewed `a01992f` and returned **NOT CLEAN** again:
+4 of 9 fixed, 2 partial, 1 not fixed, and **3 new defects introduced by the round-1
+fixes themselves**. That pattern — each round finding fresh defects — is recorded
+here rather than smoothed over, because it is the honest account of this pass.
+
+**Round-1 fixes that were themselves wrong:**
+
+1. **The "3600.000 s" offset was fabricated by round 1.** Round 1 introduced this
+   number and published it in three files. It is false: `body_mtime_ns − t_sent`
+   ∈ [−0.823, +0.356] s, spread **1.180 s** — the scale of the request latency
+   itself, which is what a write timestamp should look like. Withdrawn in all
+   three places. The number appears to have come from a BST-vs-UTC parse and was
+   never checked; introducing an unchecked number while correcting other
+   unchecked numbers is the failure mode this repo exists to catch.
+2. **Round 1's stated *cause* for the route-delta error was backwards.** It said a
+   partial corpus "inflates" the shared figure. A partial corpus **deflates** it,
+   and the real cause was the extraction rule: the draft's `hcp/[A-Za-z0-9_/.-]*`
+   reproduces its own erroneous **168** exactly on the complete main bundle,
+   missing **26** literals (`/hcp/…`, `((param))`, `?`/`=`, and the
+   space-prefixed `" /hcp/linkedPatient"`). A second error compounded it — the
+   main bundle was globbed onto **both** sides. Both causes are now stated.
+3. **"0.895 s is LARGER than the 2.0 s margin" was self-evidently false.** The
+   measured five-case lifts are +0.653 / +0.682 / +0.707 / +0.731 / +0.895 s. The
+   *conclusion* — the mtime series is not an independent witness — survives and is
+   correct; the *stated reason* was wrong and is restated.
+
+**New findings, accepted:**
+
+4. **The route delta had no derivation artefact at all** — it existed only as prose
+   in `docs/11`, and bodies are transient (`AGENTS.md` §7), so it was not
+   re-derivable from a clean clone. Now committed as **`route-delta.py`** (the
+   rule, with its known limits stated) and **`route-delta.json`** (the extracted
+   sets, their digests, and an arithmetic self-check). Reproduces
+   **184 / 3 / 0 shared**.
+5. **"180 route literals" was an occurrence count beside a distinct count.** Now
+   **184 distinct** (176 `hcp/`-prefixed + 8 `/hcp/`- or space-prefixed) across
+   **190 occurrences**, consistent with the 184 `docs/11` publishes.
+6. **`docs/11` addendum heading still read "refuted"** after the body was
+   corrected. Now "completed, not refuted".
+7. **Two broken cross-references** introduced by round 1 in `probe.sh` (pointing
+   at "section 3 (spacing)", which is §1a, and "section 5.4", which does not
+   exist). Both corrected.
+
+**A defect in this pass's own new code, caught by its own check.** The first
+`route-delta.py` used `"([^"\n]*)"` to exclude newlines from a literal span. That
+looks safer and is wrong for this corpus: the minified main bundle is 3,397,615 B
+on a single line with only 102 newlines, so the class permitted ~33 KB spans and
+the script reported **0 routes in the main bundle**. It was caught by the
+arithmetic self-check (`0 + 0 = 0`), not by reading the output — which is the
+argument for having the check at all.
+
+**Independently confirmed clean in this round:** `research-gate.sh` exit 0;
+`mine.py self-test` 6/6 exit 0; `scrub-check.sh` fails closed on all four
+branches and covers `.txt`/`.tsv`/`.json`/`.jsonl`/`.py`/`.log`, which the gate's
+leak scan does **not** (`research-gate.sh:92` selects only `md|yml|yaml|sh|hurl`);
+a leak scan over all 17,171 added lines found 0 `jsessionid_`, 0 `sessionData=`,
+0 home-directory paths, 0 `.corp` names, 0 cloud credentials, and the known
+vendor key not reproduced. All `[source: findings-log/…]` cites resolve and
+support their sentences. The 228-file corpus composition is confirmed: the SPA
+shell carries **0** `hcp/` literals and cannot move any published figure.
 
 ---
 
