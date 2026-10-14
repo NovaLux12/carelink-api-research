@@ -162,7 +162,7 @@ the control flow of construction is knowable from these bytes:
   negative; this pass does not change it. No call site in the corpus reads
   `config` beyond resolving the key (offset 2,190,314 in the patient bundle:
   `D.logbookConfiguration = "system.logbook.entry.validation.config"`, selector
-  `yt` at byte 96,883).
+  `yt` at byte 96,846).
 - **Whether `entryTs` is submitted in the server's timezone or the client's
   local offset string** is observable in the builder (`zoneOffset` encoding in
   the read URLs) but the timezone conversion is not pinned by this pass.
