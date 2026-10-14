@@ -270,11 +270,12 @@ application's own vocabulary.
 Counted **per body**, because `grep-out.txt` reports per body and a cross-build
 total beside a per-build figure is the unit error this pass's own correction C3
 exists to prevent: `m2m` is **1 per body** (2 across both), `baseUrl` is **2 per
-body** (4 across both). **Their byte offsets are tabulated per build, because they do
-not agree across builds**: `m2m` is at **387460 in the clinic build and 387460 in
-the support build** — the same — while `baseUrl` is at **2422149 / 2422752 in the
-clinic build and 2422091 / 2422694 in the support build**, the support build's two
-sitting **58 bytes earlier**. **No reason is offered for that difference.**
+body** (4 across both). **Each token's byte offsets are tabulated per build, and the
+two tokens come out differently: `m2m` sits at the same byte in both builds, and
+`baseUrl` does not.** `m2m` is at **387460 in the clinic build and 387460 in the
+support build**; `baseUrl` is at **2422149 / 2422752 in the clinic build and 2422091
+/ 2422694 in the support build**, the support build's two sitting **58 bytes
+earlier**. **No reason is offered for that difference.**
 
 Hand-checked, not counted (`grep-out.txt` carries the context):
 
@@ -991,18 +992,47 @@ reporting "1 further false claim" from it gave a zero the reader had no way to t
 mention of each across the whole diff — this log, `docs/`, and **every `.sh`** —
 using the subject itself as the query, and assert the mentions agree:
 
-| subject | mentions | agreement |
-|---|---:|---|
-| `m2m` offsets (`387460`) | 8 | **agree** — every mention either gives the single value or states it per build and identical |
-| `baseUrl` offsets (`2422149` `2422752` `2422091` `2422694`) | 9 | **agree** — per-build labelled; 2 of the 9 are the quoted superseded wording |
-| `personal.` offsets (8 values) | **4** (was 8 sites, now 4) | **agree** — all four in the per-build table and row 16 |
-| `cum2me` bytes (`387458`–`387463`) | 5 | **agree**; 1 is the quoted superseded wording |
-| `403` body digest (`f249b63cb2fc…`) | 13 | **agree** — every occurrence a consistent prefix of the one full value |
-| `500` body digest (`660f19c0…`) | 6 | **agree** — same |
-| `timeline` census (`196`) | 17 | **agree on subject**; 2 are a different subject (§V4 below) |
-| signature count (`74`) | 10 | **agree on subject**; 3 are a different subject |
-| `BLOCK 7` range | 8 | **agree** on `:240-242`; 2 describe the defect |
-| `docs/11` letter cites | 6 | **agree** on `:221`/`:222`; 2 describe the defect |
+| subject | query | mentions | agreement |
+|---|---|---:|---|
+| `m2m` offsets | `387460` | 10 | **agree** — every mention either gives the single value or states it per build and identical |
+| `baseUrl` offsets | `2422149` `2422752` `2422091` `2422694` | 10 | **agree** — per-build labelled; 2 are the quoted superseded wording |
+| `personal.` offsets | all 8 values | 7 | **agree** — every one in the per-build table, row 16, or the counting rule |
+| `cum2me` **byte values** | `387458` `387463` | 6 | **agree**; 1 is the quoted superseded wording |
+| `cum2me` **as a string** | `cum2me` | 13 | **agree**; includes the 2 raw `grep-out.txt` dump rows |
+| `403` body digest | `f249b63cb2fc` | 14 | **agree** — every occurrence a consistent prefix of the one full value |
+| `500` body digest | `660f19c0` | 7 | **agree** — same |
+| `timeline` census | `\b196\b` | 21 | **agree on subject**; 2 are a different subject |
+| signature count | `\b74\b` | 13 | **agree on subject**; 3 are a different subject |
+| `BLOCK 7` range | `240-24[23]` | 11 | **agree** on `:240-242`; 2 describe the defect |
+| `docs/11` letter cites | `docs/11…:(209|214|221|222)` | 8 | **agree** on `:221`/`:222`; 2 describe the defect |
+
+⚠ **⚠ CORRECTED 2026-10-15 (round 5) — this table originally published counts of
+8 / 9 / 4 / 5 / 13 / 6 / 17 / 10 / 8 / 6 with NO counting rule, and those figures are
+NOT REPRODUCIBLE under any rule that could be stated.** They came from a file set
+narrower than the one a written rule would select, which is precisely what a count
+without a rule is: **a number nobody else can reproduce** (`docs/09` §4, and this
+pass's own `§6` mode 7). **The counting rule, written down so this table is
+checkable rather than merely readable:**
+
+> **A MENTION is one LINE** of a file that **(a)** is listed by
+> `git diff --name-only origin/main`, **(b)** ends `.md` / `.sh` / `.hurl` / `.txt`,
+> **(c)** is **not** under `findings-log/probe-2026-10-08/`,
+> `findings-log/2026-10-12-published-pointers/` or any `findings-log/2026-13*/`
+> directory — those are **other passes' artefacts**, verified pre-existing — and
+> **(d)** contains at least one of the subject's identifying literals, matched
+> **case-sensitively** with `grep -E`. **One line is at most ONE mention** however
+> many times the literal appears on it. **A line matching two subjects counts once for
+> EACH.** Files are read from the **working tree** (= PR head content), never from
+> `origin/main`.
+
+Under that rule the four subjects the verifier also counted come out at
+**`m2m` 10, `baseUrl` 10, `personal.` 7** — **identical to its figures** — and the
+one that does not is `cum2me`, where **the count depends entirely on the query**:
+**6** on the byte values and **13** on the string. **That is the point of the rule
+rather than an embarrassment of it: `cum2me` is now two subjects with two stated
+figures, and the verifier's 15 is consistent with the string query on a marginally
+wider file set.** Before this correction the table gave one figure for a subject
+that has two.
 
 ⚠ **The boundary of this method too, recorded so the table is not read as cleaner
 than it is: a NUMERAL IS NOT A UNIQUE IDENTIFIER.** Querying subjects `196` and `74`
@@ -1027,8 +1057,9 @@ and by row 14; and the round-3 defence of it — that other hits were *"a legiti
 about the LITERAL COUNTS"* — did not reach it, because the next clause is *"so their
 **offsets**"*. On the counts reading it is false too: `m2m` is 1 per build and
 `baseUrl` 2 per build, so both are build-invariant. **The replacement says what is
-true and only that**: the two tokens' **byte offsets** do not agree across builds, and
-which one agrees is named.
+true and only that**, after a further correction (round 5, R1 below): **each** token's
+**byte offsets** are tabulated per build, and the sentence names which token agrees
+across builds and which does not — `m2m` agrees, `baseUrl` does not.
 
 ### R2 — `probe.sh:79`, and a sweep row that claimed a completeness it had not checked
 
@@ -1095,3 +1126,133 @@ All four evidence artefacts remain **byte-identical to `cd9b79a`**
 (`results.jsonl`, `run.log`, `headers/`, `grep-out.txt`). `wc -l results.jsonl` is
 **17**, matching **"17 of a 40 cap"**. No vendor request was issued this round.
 `regression/hurl/` untouched, so the counting rule is unchanged: **217 / 431**.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 5 of verification. **One blocking clause, one bookkeeping gap.** Everything
+else was CONFIRMS on independent re-derivation and is not re-litigated here.
+
+### R1 — the plural survived the clause that replaced it
+
+**The superseded wording, verbatim, at §6.3.** *"**Their byte offsets are tabulated per
+build, because they do not agree across builds**: `m2m` is at **387460 in the clinic
+build and 387460 in the support build** — the same — while …"*
+
+Round 4 deleted *"The two tokens are not build-invariant"* and put a replacement in
+its place. **The replacement carried the same defect**: the plural **"they"** covers
+both tokens and is false for `m2m`, which round 4's own subject sweep had just
+measured as identical in the two builds. **It contradicted `:483`** (row 14,
+*"identical"*), **`:636`** (*"build-invariant for `m2m` only"*), **`:744`** and C5's
+own table at **`:740`** — **four records in the same file, one clause away.**
+
+> **It is the identical failure to round 3's, in the sentence written to replace round
+> 3's instance of it** — `§6` mode 5, derived prose contradicting its own source
+> table. **A replacement clause is a new claim and needs the same check as any other,
+> not a lighter one for being written by the correcting pass.**
+
+**Now true of both tokens, and it names which is which:** *"**Each token's byte offsets
+are tabulated per build, and the two tokens come out differently: `m2m` sits at the
+same byte in both builds, and `baseUrl` does not.**"*
+
+**Swept the class before pushing, as instructed, and it is now empty:** every line in
+the diff making a claim that sweeps **both** tokens' offsets —
+`their byte offsets` / `the two tokens` / `both tokens` on any line also carrying one
+of the four offset literals — returns **0 both-token offset claims**. Read as
+*"0 claims found under the rule"*, not *"no violations"*: the rule is stated in R2
+below, and a sweep that finds nothing must be read as a question asked, not as proof
+of cleanliness.
+
+### R2 — the sweep table's counts had no counting rule, and were not reproducible
+
+**The superseded wording.** The round-4 subject-sweep table published counts of
+**8 / 9 / 4 / 5 / 13 / 6 / 17 / 10 / 8 / 6** with **no rule recorded anywhere**, and
+those figures come from a file set **narrower than any rule that could be stated** —
+so **no one, including me, could reproduce them**. A count whose rule is not written
+down cannot be checked by anyone else, which is this project's own `§6` mode 7 and
+`docs/09` §4's *"a number that cannot fail is not evidence"*.
+
+**The rule is now written down**, in the table itself, so the numbers beside it are
+checkable rather than merely readable:
+
+> **A MENTION is one LINE** of a file that **(a)** is listed by
+> `git diff --name-only origin/main`, **(b)** ends `.md` / `.sh` / `.hurl` / `.txt`,
+> **(c)** is **not** under `findings-log/probe-2026-10-08/`,
+> `findings-log/2026-10-12-published-pointers/` or any `findings-log/2026-10-13*/`
+> directory — **other passes' artefacts**, verified pre-existing — and **(d)** contains
+> at least one of the subject's identifying literals, matched **case-sensitively** with
+> `grep -E`. **One line is at most ONE mention** however many times the literal appears
+> on it. **A line matching two subjects counts once for EACH.** Files are read from the
+> **working tree** (= PR head content), never from `origin/main`.
+
+**Under that rule the counts change**, and the verifier's independent figures
+**reproduce exactly on three of four subjects**: `m2m` **10**, `baseUrl` **10**,
+`personal.` **7** — matching the verifier's 10 / 10 / 7. The fourth is `cum2me`,
+where **the count is a property of the query, not of the subject**: **6** counting the
+**byte values** `387458`/`387463`, and **13** counting the **string** `cum2me`. That
+is now **two subjects with two stated figures**, where before it was one subject with
+one unreproducible figure — and the verifier's **15** is consistent with the string
+query on a marginally wider file set. **The rule exists to make exactly this visible,
+not to hide it.**
+
+### R3 — R1's own prose described a replacement it did not deliver
+
+Found by the same subject sweep. R1's text read *"The replacement says what is true
+and only that: the two tokens' byte offsets do not agree across builds, and which one
+agrees is named"* — **the first clause repeats the defect and the second describes
+something the replacement did not do.** Corrected in place, with the supersession
+stated rather than the sentence quietly rewritten.
+
+### R4 — the PR BODY was never re-audited, and carried two of these
+
+**This is the one that mattered most and no item named it**, because it is not in the
+diff: **the PR description is not a tracked file, so no diff-scoped sweep can ever see
+it.** It was written at `cd9b79a` and audited at **no** round in between. It still
+named **`moom4261`** (wrong since round 2), still gave `baseUrl`'s **clinic-only**
+offsets unlabelled (wrong since round 4), and still said the `m2m` hit was *"the
+tail"* of a dictionary word. **All three corrected, plus a dated audit note appended
+to the body** — and `README.md`'s *"216 → 217"* left as written, because that is a
+**delta** statement and it is true.
+
+**The lesson generalises past this PR: anything a reviewer reads but git does not
+track — a PR description, a commit message, an issue body — is outside every sweep
+this log has run, and has to be audited by hand.** The commit message of round 4
+likewise repeats R1's false clause; **it is immutable history** and is not rewritten,
+but this commit's message states the correction and the superseded line is identifiable
+at `2573474`.
+
+### R5 — the battery this round's audit did not reach, run here instead
+
+The verification step budget ran out, so the following were **not** checked by it and
+**were checked here** rather than assumed:
+
+| check | result |
+|---|---|
+| `measure_assertions.py` | **217 431**, exit 0 |
+| `research-checks.py` | **CHECKS PASS**, exit 0 |
+| leak scan, all 10 patterns, whole diff | **0 hits** |
+| `196` / `74` census re-derived **from `grep-out.txt`**, not from prose | clinic **196 / 74** and support **196 / 74**; per-case `66 + 126 + 4 = 196` in **both** |
+| `README.md` 217 readable by **the gate's own regex** | regex matches at **`README.md:404`** and **`:470`**, both **217**; **0** wrapped-across-newline sites |
+| §2.1 strength words | 13 hits, **all inside corrections quoting the deleted word**, none live |
+| `docs/09:205`'s quoted-history `147` | **untouched** — 0 lines added, row intact |
+| `regression/` pin agreement | `git diff cd9b79a -- regression/` is **empty**: the suite has not been touched since the EU pin landed at `cd9b79a`, so **no pin can have moved** |
+| PR body | audited and corrected — R4 |
+
+### R6 — nothing measurable moved, and one harness fact worth keeping
+
+All four evidence artefacts remain **byte-identical to `cd9b79a`**. `wc -l
+results.jsonl` is **17**, matching **"17 of a 40 cap"**. No vendor request was issued
+this round.
+
+⚠ **A harness fact the verifier established, kept here because it will bite the next
+reader of `grep-out.txt`:** `grep.sh`'s context-dump block ends in a `||` fallback,
+and when `head` closes the pipe early **grep takes SIGPIPE and the fallback emits a
+SECOND, bare-offset line set** — so that block is **not** cleanly parseable as *"≤ 12
+lines per token"*. **This pass's sweep never counted mentions from that block**: every
+count above comes from a `grep -E` over the **working tree**, and every offset from the
+committed context dump's `offset + 45` rule with the 45-byte left context asserted
+first. **Had the sweep counted that block, its `≤12` figure would have been wrong in
+the same direction as a `head`-truncation artefact — which is what the census in §6.5
+already documents.**
