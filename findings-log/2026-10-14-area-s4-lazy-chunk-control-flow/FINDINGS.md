@@ -465,16 +465,15 @@ re-matched here.
 
 ## 10. Request accounting
 
-**0 of 0 requests. Cap: 0. Methods used: none.**
+**0 of a 0 cap.** Cap for this pass: **0 requests**. Requests issued: **0**.
 
 | item | value |
 |---|---|
-| cap set for this pass | 0 requests |
-| requests issued | **0** |
+| accounting | **0 of a 0 cap** |
 | HTTP methods used | none — no `GET`, `POST`, `PUT`, `DELETE` or `OPTIONS` |
 | DNS lookups | none |
 | hosts contacted | none — not the vendor estate, not Common Crawl, not Wayback |
-| inter-request delay | **vacuous** — AGENTS.md §8's ≥2 s same-host floor has nothing to apply to, because no request was made |
+| inter-request delay | **≥2 s** floor declared per AGENTS.md §8, and **vacuous**: there were no requests to space out |
 
 Every figure in §2–§7 is a local substring scan over bytes already on disk, re-identified
 against the manifest digest in §2. The corpus was read; nothing was fetched. The one
