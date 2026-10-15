@@ -552,9 +552,52 @@ open-questions row for
 `personal.patient.timeline.config.host` still reads *"The one thing a web sweep
 could still add is the portal **lazy-chunk** corpus (**224 chunks**, never swept
 for these tokens)"*, and `docs/11`'s own text repeats "224 lazy chunks" — found by
-`grep -nF '224 lazy chunks are mined for endpoints' docs/11-suggested-research-areas.md`,
-1 hit. Both trace to `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`,
+`grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md`,
+**1 hit at head and 1 at `origin/main`**. Both trace to
+`findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`,
 whose own heading reads **"Lazy-chunk corpus (224 files)"**.
+
+⚠ **Corrected 2026-10-15 after verification round 3 — a recorded grep that stopped
+reproducing the moment this section was written.** This cite originally read
+`grep -nF '224 lazy chunks are mined for endpoints' …`, **1 hit**, and the count was
+true against `origin/main`. **At head the short form returns 2**: one hit is this
+section's own text, which quotes the short pattern inside its own command, and the
+genuine target is the other. `AGENTS.md` §6 item 2 — and, as the verifier put it, the
+same class as §13 row 10, committed in the sentence that documents closing row 10.
+
+**The rule this establishes, and it is applied to every recorded grep in this
+directory:** *a recorded grep must state its hit count **and** say whether the result
+set contains this pass's own text; where it does, the command must be written so it
+cannot.* The fix is to lengthen the pattern until only the target sentence carries it —
+`…endpoints and field names` is carried by the target and by nothing this pass wrote.
+
+**The audit, so the next reader does not have to redo it.** Every reproduction grep this
+pass records, measured at head and at `origin/main`:
+
+| recorded grep | subject | head | `origin/main` | stable? |
+|---|---|---:|---:|---|
+| `grep -nF '\| A — is \`carelinkhp\` really the clinician portal for every region?' docs/11-…` | `docs/11` | 1 | 1 | **yes** — this pass quotes only a fragment of it, never the full row prefix |
+| `grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-…` | `docs/11` | 1 | 1 | **yes** — was 2 with the short pattern; lengthened, and this note is why |
+| `grep -rn 'docs/11-suggested-research-areas\.md:[0-9]' .` | this directory | 1 | n/a | **yes, and self-matching by design** — the one hit is row 3 quoting the cite it retracts (`AGENTS.md` §3), not a live cite |
+| `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-…` | `docs/10` | 0 | 0 | **yes** |
+| `grep -ciE 'portal .*chunk' docs/10-…` | `docs/10` | 4 | 4 | **yes** — `docs/10` is not edited here |
+| `grep -ciE '\b209\b\|unswept'` over the Closed table | `docs/11` | 0 | 0 | **yes** |
+| `grep -n '\b209\b' docs/11` | `docs/11` | 8 | **0** | **no — and declared**: every hit is this pass's **own added block** (lines 852–1069) — 1 in the Result paragraph, 7 in successors 1a/1b. The count is *expected* to change as this block grows, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number |
+
+⚠ **Corrected 2026-10-15 after verification round 3 — this row was wrong twice, in the
+two ways the row above warns about.** Round 2 recorded this as *"8 at head, 3 at
+`origin/main`, all inside this successor."* **Both halves were false.** `origin/main`
+carries **0** occurrences, not 3 — the earlier figure was read off a working tree that
+already held this pass's block, so the "base" reading was not a base reading at all.
+And "all inside this successor" was false too: **one of the eight is in the F-1 Result
+paragraph**, not in successor 1a. Both are the class §13 row 17 describes — a recorded
+grep result that stops being true when the pass's own text grows into it — and the
+correct form is the property that survives editing, not a count that does not.
+
+**The last row is the honest form of the same lesson.** Some recorded counts are
+*inherently* unstable because the pass's own writing is what is being counted. Those
+must be stated as a property that holds at any head, not as a number that a later
+revision falsifies.
 
 That record is not wrong about the map. It says, at `:9-10`:
 
@@ -676,6 +719,24 @@ statement of what `docs/11` asserts, and of what supports it:
 > it: that no sixth byte differs.** The figure is OBSERVED as computed and
 > unverifiable now — the same class as §5c's byte offsets above.
 
+**Both generators were executed, not just their outputs read (round 3).** Rounds 1-2
+checked `chunk-map.json` and `distinct-diff.json` as *data*; neither ever *ran* the
+script that writes them, so a broken generator would have been invisible. Both now run:
+
+| generator | executed | reproduces |
+|---|---|---|
+| `derive-map.py` | exit **0** against a synthetic runtime carrying the committed 225-entry map | **emitted key set == committed key set** for both builds; all **225** entries round-trip exactly; `2076 → common` recovered from the `f.u` ternary; `n_entries`/`n_duplicate_ids`/`distinct_hashes` identical; the three display-prefix keys it now emits are present |
+| `diff-distinct.py` | exit **0** against byte pairs rebuilt to differ by exactly the recorded middle | **all six arithmetic fields match** for all four ids — `longest_common_prefix`, `longest_common_suffix`, both `divergent_middle_bytes_*` (5), and both `body_bytes` — and the `37254`/`21981` excerpts come back byte-for-byte |
+
+⚠ **What this does and is not.** It exercises the **parsers, the emitted key set and
+the arithmetic**; it does **not** re-derive anything from vendor bytes, because the
+runtime bodies and the chunk bodies are gone. A synthetic input built *from the
+committed output* can only prove the generator round-trips its own data — it cannot
+prove the committed data came from Medtronic. **What that leaves covered by the
+synthetic run: "the generator would emit this shape from an `f.u` of this form". What
+it leaves uncovered is unchanged from the table above** — the vendor-observation half
+was never re-derivable, and §8b is where that is stated.
+
 **The fix, named rather than left open:** a future sweep should commit a small
 per-cell evidence index at capture time — an offset list plus a ~160-byte excerpt
 per non-zero hit, and a fixed-width window per distinct pair. Roughly 30 KB, no
@@ -750,10 +811,10 @@ hosts, one request shape; not generalised in either direction.**
 | `chunk-map.json` · `chunk-map.tsv` | the two maps and the diff. 225 ids per build. |
 | `sweep.py` | the four gates, the per-build census, the case-sensitivity control, every non-zero hit with context, the bridge. |
 | `spacing.py` · `spacing.json` | both spacing series and the negative-duration count. |
-| `verify-derivable.py` | **the receipt for §8b.** Re-derives, offline and zero requests, every figure this pass says is re-derivable from its committed artefacts — ledger shape, the content-type gate, the token census, both spacing series, the §2d arithmetic, the per-token census **magnitudes** (not only the name set), `chunk-map.json` as well as the `.tsv`, the bridge, `distinct-diff.json`'s internal arithmetic, and `run.log`'s regeneration. **125 checks; exits non-zero on any mismatch.** It also prints, on exit, the two claims it deliberately does **not** check and why. **Non-vacuity is proven by mutation**, not asserted: seq-200 `Timeline`+1, `t_sent`+1 s, and a `chunk-map.json` special-case change each turn it red, and restoring the files turns it green again (§13 rows 14-15). |
+| `verify-derivable.py` | **the receipt for §8b.** Re-derives, offline and zero requests, every figure this pass says is re-derivable from its committed artefacts — ledger shape, the content-type gate, the token census, both spacing series, the §2d arithmetic, the per-token census **magnitudes** (not only the name set), `chunk-map.json` as well as the `.tsv`, the bridge, `distinct-diff.json`'s internal arithmetic, and `run.log`'s regeneration. **127 checks; exits non-zero on any mismatch.** It also prints, on exit, the two claims it deliberately does **not** check and why. **Non-vacuity is proven by mutation**, not asserted: seq-200 `Timeline`+1, `t_sent`+1 s, and a `chunk-map.json` special-case change each turn it red, and restoring the files turns it green again (§13 rows 14-15). |
 | `diff-distinct.py` · `distinct-diff.json` | what the 4 build-distinctive chunks differ by. |
 | `runlog.py` · `run.log` | `run.log` is **generated from `results.jsonl`**. The harness's own `run.log` printf had one conversion too few for its argument list, and bash `printf` reuses the format string when arguments outnumber conversions, so it emitted extra lines instead of failing. Found by reading the file; the ledger was never affected (one `python3` row per request) and is the record. |
-| `scrub-check.sh` | every pattern in `scripts/scrub-patterns.txt` against **all 271 files this pass adds** — the 20 top-level artefacts plus **all 252 `.h` header captures** — because the gate reads no `.txt`, `.jsonl`, `.tsv`, `.json`, `.log` or `.h` file in any mode, `--all` included (`docs/09` §4, "a leak scan that cannot see the file it was written for"). Measured: **271 files, 10 patterns, 0 hits, 0 `Set-Cookie`**. It also **fails closed** — unreadable pattern list, fewer than 5 parsed patterns, or zero subject files each exit 1. ⚠ **Corrected 2026-10-15 (verification round 1): the first version of this script screened 19 of 271 files** — its `for f in "$DIR"/*` loop did not recurse into `headers/`, so every one of the 252 captures went unread — **and printed PASS having iterated zero patterns** when run from a partial tree. The verifier screened `headers/` by hand: **0 hits**, so nothing had escaped and no published claim was affected; the *sentence* was the defect. Both are fixed; the wrong claim is kept here rather than deleted (`AGENTS.md` §3). |
+| `scrub-check.sh` | every pattern in `scripts/scrub-patterns.txt` against **all 271 files it screens** — **19 top-level artefacts plus all 252 `.h` header captures**; the directory holds **272**, the 272nd being the script itself, which is excluded because it contains the patterns — because the gate reads no `.txt`, `.jsonl`, `.tsv`, `.json`, `.log` or `.h` file in any mode, `--all` included (`docs/09` §4, "a leak scan that cannot see the file it was written for"). Measured: **271 files, 10 patterns, 0 hits, 0 `Set-Cookie`**. It also **fails closed** — unreadable pattern list, fewer than 5 parsed patterns, or zero subject files each exit 1. ⚠ **Corrected 2026-10-15 (verification round 1): the first version of this script screened 19 of 271 files** — its `for f in "$DIR"/*` loop did not recurse into `headers/`, so every one of the 252 captures went unread — **and printed PASS having iterated zero patterns** when run from a partial tree. The verifier screened `headers/` by hand: **0 hits**, so nothing had escaped and no published claim was affected; the *sentence* was the defect. Both are fixed; the wrong claim is kept here rather than deleted (`AGENTS.md` §3). |
 | `results.jsonl` | 252 rows, millisecond `t_queued`/`t_sent`/`t_done` plus the kernel `body_mtime`. |
 | `headers/` | 252 response heads. |
 ---
@@ -771,18 +832,21 @@ Each is a prose or tooling defect, fixed against the same committed artefacts.
 | 2 | §12 | claimed `scrub-check.sh` screened "every file here". It screened **19 of 271** — `"$DIR"/*` does not recurse into `headers/` — and **printed PASS having iterated 0 patterns** from a partial tree | **disagreement** — the sentence, not the corpus; verifier screened `headers/` by hand, 0 hits | script rewritten to `find -type f` incl. `.h`, with three fail-closed guards; now 271 files / 10 patterns / 0 hits; sentence narrowed to the measured coverage |
 | 3 | §11 **and `probe.sh`** | cited `docs/11-suggested-research-areas.md:2082` for the NXDOMAIN source row, **at two sites**: this file's evidence map, **and the `probe.sh` header comment at line 18**. Correct against `origin/main`; **on this branch line 2082 is the area-Y addendum** and the row is at 2198, because this PR inserted 116 lines above it | **disagreement** — §6 item 6 in line-number form | **both** sites replaced with a grep that hits exactly one line, plus the area-A `file:line` form. Round 1 fixed only the evidence-map site and this correction recorded only that one, so **the correction itself understated the defect** — the table is now corrected in place and the sweep is recorded below. The `05-public-config.check.sh:329–330` cite was always correct: `regression/hurl/` is not edited here. `docs/11` never carried the `:2082` cite and still does not — see row 9 |
 | 4 | `docs/11` §1a | no recorded grep-first duplicate test, which `CONTRIBUTING-research.md:195-200` requires ("grep both first") | **absence** of a check, not a disagreement — the successor is substantively non-duplicate | test run and recorded in `docs/11` with its commands and hit counts |
-| 5 | §5c, `distinct-diff.json` | per-hit byte offsets, the quoted minified source, `checkPhoneNumber` at 259 411, `$.C40` at 6 798, and the exhaustiveness of "exactly five bytes" are **not re-derivable from a clean clone**: bodies were written to a `mktemp -d` and are gone from the machine | **absence** of the artefact | `verify-derivable.py` added (**125 checks**, zero requests; the magnitude and JSON gaps found in round 2 are rows 14 and 15) so the re-derivable half is machine-checked; **§8b names, per claim, what remains log-level** and why; the fix is filed as a successor |
+| 5 | §5c, `distinct-diff.json` | per-hit byte offsets, the quoted minified source, `checkPhoneNumber` at 259 411, `$.C40` at 6 798, and the exhaustiveness of "exactly five bytes" are **not re-derivable from a clean clone**: bodies were written to a `mktemp -d` and are gone from the machine | **absence** of the artefact | `verify-derivable.py` added (**127 checks**, zero requests; the magnitude and JSON gaps found in round 2 are rows 14 and 15) so the re-derivable half is machine-checked; **§8b names, per claim, what remains log-level** and why; the fix is filed as a successor |
 | 6 | §2a/§2c | under-claimed: `gap = 2.5 + dur[prev] + overhead` accounts for **26 of the 30** sub-2.5 s gaps at a constant **+0.086…+0.099 s**, and every one of the 4 it does not fit has a *positive* predecessor duration | **addition**, not a defect | §2d added. **No cause is still asserted** — the identity explains the size of a short reading, not the impossible duration it rests on |
 | 7 | `chunk-map.json` | `f_u_expression` was a 400-char prefix with nothing saying so, and is identical across builds **by truncation, not by identity** — id 2076 falls outside the cut, which is the entry that differs | **disagreement** — the field invited a false reading | renamed `f_u_expression_first_400_chars` with `f_u_expression_truncated_at` and `f_u_expression_note` in the JSON, and `derive-map.py` updated to emit the same keys so a regeneration cannot lose them |
 | 8 | `docs/10` | still publishes "**224 chunks**, never swept for these tokens" for this corpus; our denominator is **225** | **disagreement**, but **not this PR's file** | resolved and published as **§8a**: 224 = 225 − 1, the lost entry being the `f.u` `2076 → common` id-vs-name form, which closes the explanation area K left open. `docs/10` is not this pass's lane; it is named as a successor in `docs/11` |
 | 9 | §13 item 3 | **the correction table recorded only one of two sites.** Round 1's finding named two; the fix repaired `FINDINGS.md`'s evidence map and **left `probe.sh:18` carrying the same stale cite**, then wrote the correction as though one site existed. The record of the correction was wrong in the same way the original defect was | **disagreement** — and the generalisable half is row 10 | both sites fixed; the table above now names both; the sweep in §13 names what a fix has to cover |
-| 10 | — | **a grep that only reads one file type cannot clear a whole-directory defect.** `grep -rn` over this directory now finds **one** `docs/11…:NNN` site and it is the *quoted* wrong cite inside row 3 above — i.e. a correction quoting what it retracts, which is required by `AGENTS.md` §3 and is not a live cite. `probe.sh` is a **script**: a fix that greps `FINDINGS.md` will never see it, and `verify-derivable.py` reads the ledger and the map, **not** the scripts, so nothing mechanical would have caught it either | **absence** of coverage | the sweep is over **every file in this directory** — `.md`, `.sh`, every `.py`, `chunk-map.*`, `cells*.txt`, `*.jsonl`, `*.tsv`, `headers/*.h` — because a line-number cite can live in any of them. It is one command and it is re-runnable: `grep -rn 'docs/11-suggested-research-areas\.md:[0-9]' .` over **272 files** (19 top-level + 252 `headers/*.h` + the rest). **Result at head: 1 hit**, and it is row 3 above **quoting the cite it retracts** — required by `AGENTS.md` §3, not a live cite. **Zero live cites remain.** **Recorded because the same trap is already in `docs/09` §4** ("A leak scan that cannot see the file it was written for"), and this is its citation-shaped twin |
+| 10 | — | **a grep that only reads one file type cannot clear a whole-directory defect.** `grep -rn` over this directory now finds **one** `docs/11…:NNN` site and it is the *quoted* wrong cite inside row 3 above — i.e. a correction quoting what it retracts, which is required by `AGENTS.md` §3 and is not a live cite. `probe.sh` is a **script**: a fix that greps `FINDINGS.md` will never see it, and `verify-derivable.py` reads the ledger and the map, **not** the scripts, so nothing mechanical would have caught it either | **absence** of coverage | the sweep is over **every file in this directory** — `.md`, `.sh`, every `.py`, `chunk-map.*`, `cells*.txt`, `*.jsonl`, `*.tsv`, `headers/*.h` — because a line-number cite can live in any of them. It is one command and it is re-runnable: `grep -rn 'docs/11-suggested-research-areas\.md:[0-9]' .` over **272 files** (20 top-level + 252 `headers/*.h`; `scrub-check.sh` screens 271, excluding itself). **Result at head: 1 hit**, and it is row 3 above **quoting the cite it retracts** — required by `AGENTS.md` §3, not a live cite. **Zero live cites remain.** **Recorded because the same trap is already in `docs/09` §4** ("A leak scan that cannot see the file it was written for"), and this is its citation-shaped twin |
 | 11 | §8a | **cited the wrong file.** The open item was attributed to *"Area K's `FINDINGS.md:246-249`"* with no path. Those lines are in `2026-10-14-area-k-clinic-controlflow/FINDINGS.md` §3d — a *different* area-K pass, reading `### 3d. Two more interceptors: the X-System-ID header…`. The quoted sentence is at `2026-10-13-area-k-patient-chunks/FINDINGS.md:247-249`. Two adjacent passes, a line range that matches, **the file does not** | **disagreement** — §1: cannot point at the line it came from | path corrected and the whole `file:line` is now given; the ground truth was checked by grepping the quoted sentence across both area-K logs (**1 hit** in `patient-chunks`, **0** in `clinic-controlflow`). Every other area-K cite in this pass's additions was checked for the same confusion and is unaffected |
 | 12 | §8a header + lede | the header said this *"closes a successor area K left open"* and the lede said *"it closes a successor area K left open"* — while **the body of the same section** said *"Area K's §8 is not in this pass's lane to close, and this log does not close it."* **The header contradicted its own body** | **disagreement** — §6 item 5 in its purest form, a heading generalised past the section under it | header and lede rewritten: the **denominator is settled (225)** and a **candidate cause is supplied**; it closes nothing, and *which* entry the 2026-10-08 run lost is INFERRED because that record says "one entry" and does not name it |
 | 13 | §8b | said `docs/11`'s "exactly five bytes" *"is what `distinct-diff.json` measures"*. It does not: the artefact measures an **arithmetic sum that reconciles** (`prefix + 5 + suffix == body_bytes`), not an **equality between the two flanking regions** — which is what "exactly five bytes" claims, and which §8b's own line above names as not checkable | **disagreement** — the sentence overstated the artefact by one inferential step | rewritten to state exactly what was measured, and to separate what supports the claim from what does not |
 | 14 | `verify-derivable.py` | **checked the census by NAME SET only.** A mutation of `Timeline` at seq 200 changed 104 → 105 and **every check still passed**, because the set of non-zero tokens was unchanged — and `104` is a number `docs/11` publishes | **absence** of coverage — the checker was weaker than the prose it backed | **magnitude checks added** for every scored token on both builds, plus the three published sums (148 / 4 / 172). Re-proven non-vacuous by mutation: seq-200 `Timeline`+1 → **FAIL**; `t_sent`+1 s → **7 FAILs**; `chunk-map.json` support `2076→2077` → **FAIL**; restore → PASS |
 | 15 | `verify-derivable.py` | **never read `chunk-map.json`** — only the `.tsv` — while §8a fact #2 cites `special_case_id_to_name`, which lives in the JSON. A claim sourced from a file the checker does not open is checked nowhere | **absence** of coverage | the checker now reads the JSON and asserts, per build, the `2076 → common` special case, 225 entries / 0 duplicates / 225 distinct hashes, that the display-prefix note survived, and that **JSON and TSV agree on all 225 (id, name, hash)** |
 | 16 | `docs/11:866-867`, `:895-897` | the **caveats existed in the log but two of the three affected figures carried none in the canonical page.** §2's failure is a claim that reads as checkable in `docs/` with its caveat only in a pass's log. The "exactly five bytes" figure had a same-paragraph caveat; **"identical byte offset in both builds"** and **§5d's byte offsets 6 756 / 6 798** had none at their site | **absence**, and the verifier was right to stop short of judging sufficiency | each of the two sites now carries its caveat **before the reader finishes the sentence that states the figure**, naming what is re-derivable (the counts) and what is not (the offsets and quoted bytes), with §1b as the rule |
+| 17 | §8a, `docs/11:930` and `:1048` | **a recorded grep that stopped reproducing the moment this pass documented it.** The cite read `grep -nF '224 lazy chunks are mined for endpoints' docs/11-…`, **1 hit** — true against `origin/main`, and at head the **short** pattern returns **2**, because the paragraph quoting the command is itself a hit. `AGENTS.md` §6 item 2, and the same class as row 10 committed in the sentence that documents closing row 10 | **disagreement** — a reader running the recorded command got a different answer than the record stated | pattern **lengthened** to `…endpoints and field names`, which only the target sentence carries: **1 hit at head and 1 at `origin/main`**, and it cannot drift as this pass edits. **The rule is the point and is audited over every recorded grep in this directory**, in a table under §8a: *a recorded grep states its hit count **and** whether its result set contains this pass's own text; where it does, the command is written so it cannot.* Five of six are stable; the one that cannot be is recorded as a **property** ("every hit is inside this successor") rather than a number a later revision falsifies |
+| 18 | `verify-derivable.py` | **one check could not fail.** The "id differences" line read `[i for i in cl if i != com[i][0] and False]`: `com` is keyed **by id**, so `com[i][0]` is the *name*, and the trailing `and False` hard-wired the result to `[]`. It contradicted no published figure and the property was enforced elsewhere, but it **counted toward the headline while being incapable of failure** — which undercuts §14's own argument | **absence** of a real check, in a script whose whole value is that it can fail | **removed and replaced by three real ones**, checked *before* any per-id lookup so they fire by name in both directions: `committed id keys == re-derived id keys`, `committed rows whose id is absent from the re-derived map`, `re-derived ids the committed map never carried`. The old form was also **shadowed** — a *missing* key makes the per-id lookup raise `KeyError` and abort the run before any boolean could report it. Proven: a mutant with 225 rows and id `2873` relabelled `9999` fails all three by name (the `KeyError` remains as a backstop). **Headline recounted: 125 → 127**, every site that stated it moved |
+| 19 | `verify-derivable.py` | **`REPO = HERE.parents[1]` only resolved at exactly `<repo>/findings-log/<name>/`.** A copy anywhere else raised `FileNotFoundError` on `committed-map.txt` and **exited 1 before checking anything** — which reads as "the checker is red" rather than "the checker could not find its inputs" | **absence** of portability; a reader could not re-run the receipt without rebuilding a depth-correct mirror | replaced with an upward search for a directory holding **both `AGENTS.md` and `findings-log/`**. Proven: the same pass directory copied to `.loop/vr3/pass/` now exits **0 with 127 checks**. Named in §14 |
 
 **On finding 5, stated plainly rather than dressed up.** The instruction was to
 commit a per-cell evidence index so §5c becomes checkable from a clone. **That
@@ -814,6 +878,34 @@ check them without redoing the work. Each item now names where it is discharged.
 
 **And the checker's own honesty, which is the same class as item 2.** A checker
 that passes is only evidence if it can fail. `verify-derivable.py` is **not** taken
-on trust: §13 rows 14-15 record three mutations that turn it red and a restore that
+on trust: §13 rows 14-15 and 18 record mutations that turn it red and a restore that
 turns it green. It also **prints, on exit, the two claims it does not check** — so
 a reader is told what it skipped rather than inferring coverage from a green run.
+
+⚠ **One of those checks could not fail, and this section is corrected because of it.**
+Round 3 found the "id differences" line reading `[i for i in cl if i != com[i][0] and
+False]` — `com` is keyed by id, so `com[i][0]` is the *name*, and `and False` pinned the
+result to `[]`. It contradicted no figure published here, and the property it claimed
+was enforced by a `KeyError` a few lines above. But **a check that cannot fail is not a
+check, and counting it toward "127 checks" overstated what the headline means.** It was
+replaced by three that can (§13 row 18), the headline was recounted, and **the claim
+"every check here can fail" is now asserted per check, not in general.**
+
+**Two limits of that evidence, stated so a reader does not over-read it.**
+
+1. **`verify-derivable.py` is not part of the gate.** Nothing in CI runs it, and no
+   mutation testing runs in CI. Its green is **evidence a reader must choose to run** —
+   the same status as `scrub-check.sh` and this log's own spacing recheck. CI's `gate`
+   says nothing about it either way.
+2. **`AGENTS.md` §11's branch protection currently requires zero approving reviews.** A
+   green `gate` is therefore **not** a human having read this PR. The substitute for a
+   reviewer here was an independent verifier, three rounds of it, each finding real
+   defects — §6 items 5 and 6 were violated *in the corrections to earlier rounds*, and
+   item 2's checker gap survived a round because a check that cannot fail still counted.
+
+**A third limit, now fixed: the checker only ran from one directory.** `REPO` was
+`HERE.parents[1]`, which resolves only at exactly `<repo>/findings-log/<name>/`; anywhere
+else it exited 1 on a missing input before checking anything, which looks like a red
+result rather than a broken invocation (§13 row 19). It now searches upward for a
+directory holding both `AGENTS.md` and `findings-log/`, and is proven to run from an
+arbitrary depth.

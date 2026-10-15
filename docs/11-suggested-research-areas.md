@@ -927,8 +927,13 @@ support build's own host is the one the pinned suite already reads. The pass use
 
 **⚠ And the denominator this repo already published for this corpus is 224 — it is
 225 minus one.** `docs/10`'s config-pointer row and this page's own text (found by
-`grep -nF '224 lazy chunks are mined for endpoints' docs/11-suggested-research-areas.md`,
-1 hit) both say "224 chunks". The 2026-10-08 record those came from is explicit: the
+`grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md`,
+**1 hit**, at head and at `origin/main`) both say "224 chunks". **The pattern is the
+longer one on purpose:** the short form returns **2** at head, because this paragraph
+quotes the short pattern inside its own command — a recorded grep whose result set
+cannot tell this pass's own footprint from its target stops being true the moment the
+paragraph documenting it is written. The 2026-10-08 record those came from is explicit:
+the
 runtime holds a **225-entry** map, it built filenames as `<id>.<hash>.js` — the **id**
 form — and *"**224 fetched. One entry returned the SPA fallback**"*. The entry it lost
 is the one whose id form is not the name `f.u` emits: id **2076**, which `f.u` maps to
@@ -975,7 +980,7 @@ first"). Commands and hit counts, at head:
 | `docs/10` §1 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-open-questions.md` | **0** | not there |
 | `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 2 | both incidental — line 61 is the false-hit word list, line 63 is the config-pointer row |
 | Closed table | `awk 'NR>=2181' docs/11 \| grep -ciE '\b209\b\|unswept'` | **0** | not closed |
-| this page | `grep -n '\b209\b' docs/11` | 8, **all inside this successor** | not a duplicate of itself |
+| this page | `grep -n '\b209\b' docs/11` | 8, **0 at `origin/main`** — every one inside this pass's own added block (lines 852-1069): 1 in the Result paragraph above, 7 in successors 1a/1b | not a duplicate of itself |
 
 **Non-duplicate, recorded.** ⚠ One related hit **is** a real staleness and is **not**
 this successor: `docs/10`'s config-pointer row still reads *"The one thing a web sweep
@@ -1041,8 +1046,12 @@ zero-request `verify-derivable.py` that machine-checks the half that *is* checka
 
 **Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
 config-pointer row and this page's own text (`grep -nF '224 lazy chunks are mined for
-endpoints' docs/11-suggested-research-areas.md`, 1 hit) both say the portal lazy-chunk
-corpus is **224** chunks. The 2026-10-08 record that number came from is explicit about
+endpoints and field names' docs/11-suggested-research-areas.md`, **1 hit at head and at
+`origin/main`**) both say the portal lazy-chunk
+corpus is **224** chunks. **The longer pattern is deliberate** — the short form returns
+2 at head, one of them being this block quoting it, so a recorded grep has to be written
+so its result set cannot contain the sentence that documents it. The 2026-10-08 record
+that number came from is explicit about
 why:
 *"holds a 225-entry webpack chunk map … so the filenames are `<id>.<hash>.js`"* and
 *"**224 fetched. One entry returned the SPA fallback**"* — it built URLs in the **id**

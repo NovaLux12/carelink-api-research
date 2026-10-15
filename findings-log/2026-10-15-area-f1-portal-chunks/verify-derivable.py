@@ -44,8 +44,28 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 
 HERE = pathlib.Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else pathlib.Path(__file__).resolve().parent
-# <checkout>/findings-log/<dir>/ -> two levels up is the checkout root.
-REPO = HERE.parents[1]
+
+
+def find_repo_root(start):
+    """Walk upward for the checkout root, identified by AGENTS.md.
+
+    NOT `parents[1]`. That form only resolves at exactly
+    `<repo>/findings-log/<name>/`, so a copy anywhere else -- `.loop/vr3/<pass>/`,
+    a scratch mirror -- raised FileNotFoundError on committed-map.txt and exited 1
+    before checking anything, which reads as "the checker is red" rather than
+    "the checker could not find its inputs" (verification round 3). Searching
+    upward for AGENTS.md works at any depth and in a worktree.
+    """
+    for cand in [start, *start.parents]:
+        if (cand / "AGENTS.md").is_file() and (cand / "findings-log").is_dir():
+            return cand
+    raise SystemExit(
+        "verify-derivable: no checkout root above %s -- expected a directory "
+        "holding both AGENTS.md and findings-log/. Pass the pass directory "
+        "explicitly, or run it from inside the checkout." % start)
+
+
+REPO = find_repo_root(HERE)
 LEDGER = HERE / "results.jsonl"
 DECLARED, FLOOR, LOCKD = 2.5, 2.0, 2.5
 CAP = 260
@@ -310,11 +330,29 @@ for line in cm.read_text().splitlines():
     if len(p) == 3:
         com[p[0]] = (p[1], p[2])
 ck("committed map rows", len(com), 225)
+# "id differences" is asserted as SET EQUALITY, checked BEFORE any per-id lookup,
+# so it fires cleanly and by name in either direction.
+#
+# The line this replaces was `[i for i in cl if i != com[i][0] and False]`: `com`
+# is keyed BY id, so `com[i][0]` is the NAME, and the trailing `and False`
+# hard-wired the result to [] -- a check that could not fail on any data while
+# counting toward this script's headline (verification round 3). Two things
+# replace it:
+#   * set equality, which is stronger than a difference count and falsifiable in
+#     both directions without raising;
+#   * ordering, because the old form was also shadowed -- a *missing* key makes
+#     the per-id lookup below raise KeyError and abort the whole run before any
+#     boolean could report it. Checking the sets first turns that crash into a
+#     named failure. The KeyError remains as a backstop.
+ck("committed id keys == re-derived id keys (id differences = 0)", set(com) == set(cl), True)
+ck("committed rows whose id is absent from the re-derived map",
+   sorted(set(com) - set(cl)), [])
+ck("re-derived ids the committed map never carried",
+   sorted(set(cl) - set(com)), [])
 ck("shared hashes", len([i for i in cl if cl[i]["hash"] == com[i][1]]), 225)
 ck("only in re-derived", sorted({cl[i]["hash"] for i in cl} - {v[1] for v in com.values()}), [])
 ck("only in committed", sorted({v[1] for v in com.values()} - {cl[i]["hash"] for i in cl}), [])
 ck("name differences", [i for i in cl if cl[i]["name"] != com[i][0]], [])
-ck("id differences", [i for i in cl if i != com[i][0] and False], [])
 
 print("\nK. the bridge: stride 18 from index 9, and 12 of 12 byte-identical")
 shared = sorted({cl[i]["hash"] for i in cl if cl[i]["hash"] == su[i]["hash"]})
