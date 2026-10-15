@@ -591,3 +591,96 @@ rows this run. **"The leak scan has not read the ledger" is true; "the gate has
 never read the ledger" is false.** Two different checks, two different reach, and
 conflating them is the error `docs/09` §4 records as *"the corpus is two sources,
 not one"* arriving as *two checks with one name*.
+
+
+## Correction (2026-10-15) — verification round 5: three caveats, one of which was a claim about prose this file also got wrong
+
+Round 5 returned **NOT blocking** on `7c6f31c` and independently re-derived the
+measurement again: 228 rows, every one a GET to `index.commoncrawl.org`, zero
+Medtronic requests; 28 members across 8 crawls spanning 2017-06-26 → 2021-09-28;
+6 distinct paths; 187 gaps with a 3.536 s floor, 0 under 3.5 s and 0 under 2.0 s,
+two honest negative durations and no cause asserted; 65 of 84 readably absent with
+UNREAD 0; 44 = 41 after + 3 before; `derive.py`'s two routes still able to
+disagree; and — by driving the real `check_append_only` through four in-place
+rewrites — the three-dot diff confirmed to stay `A` each time. **Zero new
+requests.** Append-only is structurally clean: nothing in this PR deletes a line
+from any log.
+
+### R5-1 — two percentages, one cell, two denominators; the page named the script and disagreed with it
+
+`docs/11`'s budget row read *"predecessor … → measured **BELOW** by **2.4%** ·
+continuation … → measured **ABOVE** by **3.4%**"*. **Those are different
+denominators.** Exact:
+
+| | difference | on `measured` | on `derived` |
+|---|---|---|---|
+| predecessor | 3.2985 − 3.2222 = 0.0763 | **2.3679% → 2.4%** | 2.3132% → 2.3% |
+| continuation | 2.9375 − 2.8420 = 0.0955 | **3.2511% → 3.3%** | 3.3603% → 3.4% |
+
+**`budget.py:105` uses `measured` and prints 3.3%**; this log's `:473-474` and the
+round-4 PR body said **3.4%**. **The page named the script as its authority and
+disagreed with it by 0.1 pp.**
+
+**Resolved in favour of `measured`** — `budget.py`'s existing choice, so page and
+script cannot differ again — and **stated once, in the page, as the denominator
+for every percentage in that cell.** The `derived`-denominator figures (2.3% /
+3.4%) are recorded above so the alternative is visible rather than deleted.
+
+**This log's own `:473-474` and `:592`-adjacent prose still read 3.4%.** Those are
+in an append-only body: **superseded by this section, not edited.**
+
+### R5-2 — "predecessor" named two different populations in adjacent rows
+
+The per-crawl row used the **29-row S-L2** population (`29 ÷ 9 = 3.2222`); the
+per-query row used the **whole 40-row predecessor ledger** (`40 ÷ 28 = 1.4286`
+against `E[N] = 1.5156` at `p = 15/40`), while `budget.py --population s-l2`
+prints the **29-row** per-query pair as **1.5263 vs 1.6492**. Both read "observed
+BELOW", so **no directional error survives** — but round 3's finding was precisely
+that *a published figure whose population is not named is a typed number wearing a
+script's name*, and that is what two rows in one table were doing.
+
+**`docs/11` now carries a three-row population table above the measurement table,
+and every measurement row names its population by id:** **S-L2** (29 rows / 9
+crawls), **P-WHOLE** (40 rows / 13 crawls), **THIS** (188 rows / 64 crawls). The
+per-query row now publishes **all three**: S-L2 **1.5263** vs **1.6492**, P-WHOLE
+**1.4286** vs **1.5156**, THIS **1.4574** vs **1.4210**.
+
+**The rounded 1.46 now appears in `docs/11`** (it existed only at this log's
+`:480`), and the retracted **1.45** is named as retracted rather than silently
+dropped.
+
+### R5-3 — a mis-citation: "the corpus is two sources, not one" is **not** in `docs/09`
+
+`:592` above attributes that doctrine to `docs/09` §4.
+**`grep -rn "two sources" docs/09` returns nothing — the phrase is not in
+`docs/09` at all.** It lives in **`docs/11`'s area-Y addendum**
+(`docs/11:1564`, heading *"Addendum (2026-10-12, from area Y): the corpus is two
+sources, not one"*, cited in prose at `docs/11:1522`) and in this pass's
+`census-84.txt:27`. **The doctrine is real and correctly sourced elsewhere; this
+file's pointer was wrong**, and it is corrected here and in the PR body.
+**`AGENTS.md` §6 item 6 is the doctrine's own rule** — *a citation pointing at a
+file that doesn't contain it* — and this file committed it while documenting it.
+
+### R5-4 — the gate-green headline was an overstatement, and is scoped
+
+This file's R4-7 and the PR body both said *"gate-green is not a meaningful signal
+for this PR."* **That collapsed two dimensions into one and was an
+overstatement.** The accurate statement, which was already in this file's own
+parenthetical:
+
+> **Gate-green is a WEAK signal for the LEAK dimension** of this PR — the leak
+> stage's filter `\.(md|yml|yaml|sh|hurl)$` reads **7 of the 260** changed files,
+> and the **253** it cannot read include **every file carrying a measurement
+> record**, including `results.jsonl` itself. **It remains a LIVE signal for the
+> ledger's row count**, because `research-checks.py:355-360` opens `results.jsonl`,
+> counted **228** rows, and fails when `rows > used`. **"The leak scan has not read
+> the ledger" is true; "the gate has never read the ledger" is false.**
+
+Both code paths share the extension filter — `diff`, `staged` and `--all` — so the
+253 hold in **`--all`** too, not only in diff mode. The 7-vs-6 discrepancy is
+resolved: **7 is right**; the `SELF`/`SELF_PATTERNS` exclusions remove nothing here
+because neither file is in this diff, and the off-by-one is the `.yml` drop.
+
+**Not retracted:** the scan itself. All ten patterns were applied to all 260 files
+by both code paths, with controls proven to fire first to each pattern's documented
+shape — **0 hits on every net, on both paths.**

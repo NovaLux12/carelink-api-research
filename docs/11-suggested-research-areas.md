@@ -1491,13 +1491,30 @@ from the prose again. **Checked against a large sample — and the check does NO
 ⚠ **CORRECTED 2026-10-15 (verifier round 4): an earlier version of this cell said the
 continuation came in "11% below the prediction, the correct direction for a budget"
 and that "the model is conservative". Both were wrong, and they were wrong by
-conflating two different quantities.** The two measurements, each named:
+conflating two different quantities.** ⚠ **CORRECTED AGAIN 2026-10-15 (verifier round
+5): the two percentages in the row below shared one cell and **two different
+denominators** — 2.4% was on `measured`, 3.4% on `derived` — and **no denominator
+was stated anywhere**, while `budget.py` printed **3.3%**, so the page named the
+script as its authority and disagreed with it by 0.1 pp. **The denominator is now
+stated once and used throughout: `measured`,** which is `budget.py`'s choice, so
+page and script cannot differ again. (The other denominator would give 2.3% and
+3.4%; both are correct arithmetic on different bases and only one is published.)
 
-| quantity | value | comparison |
+**POPULATION RULES, named in every row** — round 3's finding was that *a published
+figure whose population is not named is a typed number wearing a script's name*,
+and two rows below were both saying "predecessor" for **two different row sets**:
+
+| id | population | rows |
 |---|---|---|
-| **requests per crawl** — measured `rows ÷ crawls` vs derived `2(1+p+p²)` | predecessor **3.2222** vs **3.2985** → measured **BELOW** by 2.4% · continuation **2.9375** vs **2.8420** → measured **ABOVE** by 3.4% | **the sign flips between populations** |
-| **mean attempts per query** — `rows ÷ logical queries` vs `E[N]` | predecessor **1.4286** vs **1.5156** → observed **BELOW** · continuation **1.4574** vs **1.4210** → observed **ABOVE** | **flips too** |
-| **budget headroom** — rows spent vs rows predicted | **188** vs `64 × 3.2985 = 211.1` → **10.9% under budget** | *a third thing, and not the comparison the sentence named* |
+| **S-L2** | every predecessor-ledger row whose crawl is one of the **nine** that pass **first-read**; the 3 re-probed prior-read crawls and the 1 anchor reproduction excluded | 29 over 9 crawls |
+| **P-WHOLE** | **every** row in the predecessor ledger, including the inventory fetch and the re-probed cells | 40 over 13 crawls |
+| **THIS** | every row in the continuation ledger | 188 over 64 crawls |
+
+| quantity | population | comparison |
+|---|---|---|
+| **requests per crawl** — measured `rows ÷ crawls` vs derived `2(1+p+p²)` | **S-L2**: **3.2222** vs **3.2985** → measured **BELOW by 2.4%** · **THIS**: **2.9375** vs **2.8420** → measured **ABOVE by 3.3%** | **the sign flips between populations** |
+| **mean attempts per query** — `rows ÷ logical queries` vs `E[N]` | **S-L2**: 29 ÷ 19 = **1.5263** vs **1.6492** → observed **BELOW** · **P-WHOLE**: 40 ÷ 28 = **1.4286** vs **1.5156** → observed **BELOW** · **THIS**: 188 ÷ 129 = **1.4574** (**1.46** rounded) vs **1.4210** → observed **ABOVE** | **flips at THIS** |
+| **budget headroom** — rows spent vs rows predicted | **THIS**: **188** vs `64 × 3.2985 = 211.1` → **10.9% under budget** | *a third thing, and not the comparison the sentence named* |
 
 **No direction is claimed.** The model is conservative only near the failure rate
 it was fitted on; at this pass's lower rate it is slightly optimistic. A single
