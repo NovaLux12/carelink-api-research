@@ -927,8 +927,10 @@ support build's own host is the one the pinned suite already reads. The pass use
 
 **⚠ And the denominator this repo already published for this corpus is 224 — it is
 225 minus one.** `docs/10`'s config-pointer row and this page's own text (found by
-`grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md`,
-**1 hit**, at head and at `origin/main`) both say "224 chunks". **The pattern is the
+`git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'`,
+**1 hit** at merge-base `ab28f58`, line 1254; this PR inserted +227 lines above it, so the
+target now sits at docs/11:1481. The same search run in-tree returns **2** — one is
+this passage's own command at docs/11:930) both say "224 chunks". **The pattern is the
 longer one on purpose:** the short form returns **2** at head, because this paragraph
 quotes the short pattern inside its own command — a recorded grep whose result set
 cannot tell this pass's own footprint from its target stops being true the moment the
@@ -978,9 +980,9 @@ first"). Commands and hit counts, at head:
 | where | command | hits | verdict |
 |---|---|---:|---|
 | `docs/10` §1 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-open-questions.md` | **0** | not there |
-| `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 2 | both incidental — line 61 is the false-hit word list, line 63 is the config-pointer row |
+| `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 4 | all incidental — lines 61 (false-hit word list), 63 (config-pointer row), 83 (CHUNK-CORPUS citation), 92 (chunk identifier in a deployment row) |
 | Closed table | `awk 'NR>=2181' docs/11 \| grep -ciE '\b209\b\|unswept'` | **0** | not closed |
-| this page | `grep -n '\b209\b' docs/11` | 8, **0 at `origin/main`** — every one inside this pass's own added block (lines 852-1069): 1 in the Result paragraph above, 7 in successors 1a/1b | not a duplicate of itself |
+| this page | `grep -n '\b209\b' docs/11` | 8, **0 at `origin/main`** — all 8 land in this pass's inserted block (docs/11:850–1082), not in the pre-existing text: 1 in the Result paragraph above (line 888) and 7 in successors 1a/1b (lines 947, 953, 955, 961, 964, 971, 980). It is **inherently unstable** — delete the block (or the finding) and the count returns to its pre-pass 0, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number | not a duplicate of itself |
 
 **Non-duplicate, recorded.** ⚠ One related hit **is** a real staleness and is **not**
 this successor: `docs/10`'s config-pointer row still reads *"The one thing a web sweep
@@ -1045,12 +1047,13 @@ zero-request `verify-derivable.py` that machine-checks the half that *is* checka
 #### Successor to area F — 1c: the **224** two pages still publish for a **225**-chunk corpus
 
 **Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
-config-pointer row and this page's own text (`grep -nF '224 lazy chunks are mined for
-endpoints and field names' docs/11-suggested-research-areas.md`, **1 hit at head and at
-`origin/main`**) both say the portal lazy-chunk
-corpus is **224** chunks. **The longer pattern is deliberate** — the short form returns
-2 at head, one of them being this block quoting it, so a recorded grep has to be written
-so its result set cannot contain the sentence that documents it. The 2026-10-08 record
+config-pointer row and this page's own text (`git show ab28f58:docs/11-suggested-research-areas.md
+| grep -nF '224 lazy chunks are mined for endpoints and field names'`, **1 hit at
+merge-base `ab28f58` (line 1254; +227 → 1481 at head, where the in-tree grep returns 2,
+one being this block)**) both say the portal lazy-chunk
+corpus is **224** chunks. **The count is pinned to merge-base so this passage cannot be
+counted into it:** the longer pattern is no defence while the command is written out
+in the sentence that documents it. The 2026-10-08 record
 that number came from is explicit about
 why:
 *"holds a 225-entry webpack chunk map … so the filenames are `<id>.<hash>.js`"* and
