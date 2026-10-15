@@ -451,9 +451,9 @@ precisely those three.
   not exercised and no delay is claimed.
 - **Files:** `FINDINGS.md` (this file), `scrub-diffmode-control.sh` (the probe
   record — the thing that produced every number here), `run.log` (full
-  transcript, taken at revision `d86a21b` — before the five round-2 `--self-test`
-  assertions were added; every *measured* number in it is unchanged at this revision, only
-  the self-test line count differs, §8b), `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
+  transcript, taken at `33895ee` — the tree whose harness blob it reproduces verbatim. The
+  five `--self-test` assertions added after it are 3 at `d86a21b` + 2 at `fea8b6d`; no
+  *measured* number in it moves, only the self-test line count, §8b), `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
   rendered_lines), `verdicts.tsv` (the derived per-pattern table), `self-screen.txt` (the `--screen`
   transcript), `results.jsonl` (empty).
 - **Committed artefacts contain no instance text and no absolute home path.**
@@ -609,9 +609,9 @@ $ grep -cE "records per pattern whether it survives a leading|carries a \*\*per-
 
 | Test | Successor 1 — the other two events' mode | Successor 2 — per-pattern liveness column |
 |---|---|---|
-| **Derived** | Passes. It retires half of itself on the strength of §4's one observation and names the exact line to read. It could not have been written before §4 existed | Passes. Both facts came out of building the control set this pass committed; neither was recorded anywhere |
+| **Derived** | Passes. It retires half of itself on the strength of §4's one observation and names the exact line to read. It could not have been written before §4 existed | Passes. Both facts came out of building the control set this pass committed; **one is new to the page, the other restates the addendum above** (disclosed above) |
 | **Bounded** | Passes. Zero requests, no vendor host, and the close condition is checkable by a stranger reading one log line | Passes. Same; and a negative counts, stated in the row |
-| **Non-duplicate** | Passes, per the greps above | Passes, per the greps above |
+| **Non-duplicate** | Passes, per the greps above | Passes as an *area*, and its close condition is disclosed above as a restatement of F3's rather than claimed clean |
 | **Labelled** | Passes. The one observation is OBSERVED from **one** source, explicitly not corroboration (§4); the `push to main` and fork shapes stay INFERRED | Passes. The `^+++` drop is measured on synthetic lines and labelled as such (§3c) |
 
 ### 7c. What was **not** changed, and why

@@ -1058,15 +1058,19 @@ Not load-bearing: the verdict does not depend on it.
 
 #### Successor to the area-D addendum — 2: a per-pattern liveness column, and the fact that no control set can be committed
 
-**Derived from the control set this pass committed.** Two facts fell out of building it, and
-neither is recorded anywhere.
+**Derived from the control set this pass committed.** Two facts fell out of building it: one
+is new to the page, the other restates the addendum above.
 
-⚠ **Partly a restatement, and said so.** The **close condition** below is *not* new — the
-addendum's F3 already states the same one: strip the `+` from the diff-mode subject lines,
-**or** annotate every pattern for `+`-liveness **and** ship a control per pattern that proves
-the answer. What is new here is **only the two facts** below: that no control set can be
-committed at all, and that the `^+++` filter is positional. A maintainer who has read the
-addendum has already seen the close condition.
+⚠ **Partly a restatement, and said so.** The **close condition** below is not new *in shape*
+— the addendum's F3 already asks for the same thing: annotate each pattern's `+`-liveness
+**and** ship a control that proves the answer. It differs in strength: F3 asks for a control
+for **each of the ten**, this successor for **one in ten** (a sample), and it adds the escape
+hatch that fact 1 forces — the control must be assembled at run time, because a committed
+instance would make the gate fire on itself. Of the two facts below, **only the first is new
+to the page** — that no control set can be committed at all; the second (that the `^+++`
+filter is positional) is **carried forward** from the addendum above, restated here only to
+keep this successor self-contained. A maintainer who has read the addendum has already seen
+the close condition and fact 2.
 
 1. **All ten nets are self-referential**, so no control set can live in the repo as a
    fixture: an instance that matches pattern P is by construction text that P matches, and
