@@ -95,10 +95,15 @@ def report(name, rule, rows):
     print('   DERIVED  %d queries x %.6f = %.4f requests per crawl' % (QUERIES_PER_CRAWL, tail, QUERIES_PER_CRAWL * tail))
     if measured is not None:
         print('   MEASURED %.4f requests per crawl (%d rows / %d crawls)' % (measured, len(rows), len(crawls)))
+        _seen = set()
+        _first = sum(1 for r in rows if not (r['path'] in _seen or _seen.add(r['path'])))
+        print('   mean attempts/QUERY observed %.4f (%d rows / %d logical queries) vs E[N] %.4f -> %s'
+          % (len(rows) / _first, len(rows), _first, tail,
+             'observed ABOVE' if len(rows) / _first > tail else 'observed BELOW'))
         print('   model is %s the measurement by %.1f%%  [round 3: this direction is NOT the same'
               % ('ABOVE' if QUERIES_PER_CRAWL * tail > measured else 'BELOW',
                  100 * abs(QUERIES_PER_CRAWL * tail - measured) / measured))
-    print('                            for every population -- see the note at the foot]')
+        print('                            for every population -- see the note at the foot]')
     print()
     return QUERIES_PER_CRAWL * tail
 
@@ -170,5 +175,20 @@ print("    both (228)        0.3289     2.8743     2.9610   derived BELOW by 2.9
 print()
 print("So the model is conservative only where the failure rate is near the one it was")
 print("fitted on, and slightly optimistic at the lower rate this pass met. A single")
-print("population cannot license a claim about the error sign. Both directions are")
-print("printed with every figure above, and no prose asserts which way it errs.")
+print("population cannot license a claim about the error sign.")
+print()
+print("ROUND 4: this file used to end with the claim that 'no prose asserts which way it")
+print("errs'. That was a claim about prose which was FALSE when written -- docs/11 asserted")
+print("'the correct direction for a budget' and docs/10 asserted 'the model is")
+print("conservative', both with the direction the table above contradicts. It is corrected")
+print("in docs/11 and docs/10 at round 4; this file now asserts nothing about prose, only")
+print("what it measures.")
+print()
+print("TWO QUANTITIES, NAMED, because they were conflated in prose:")
+print("  (i)  requests per crawl: measured rows/crawls vs derived 2*(1+p+p^2).")
+print("       S-L2: 3.2222 vs 3.2985 -> measured BELOW.  this pass: 2.9375 vs 2.8420")
+print("       -> measured ABOVE.  NOTE the continuation's 'model ABOVE' row above is the")
+print("       CONTINUATION POPULATION, and it disagrees with this per-crawl reading; the")
+print("       two are different populations and both are printed, never merged.")
+print("  (ii) rows spent vs rows predicted (budget headroom): 188 vs 211.1 -> 10.9% under.")
+print("       This is NOT the same comparison as (i) and was published as though it were.")

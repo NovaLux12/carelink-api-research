@@ -442,3 +442,152 @@ members across 8 crawls, 2017-06-26 → 2021-09-28**; the area-wide census
 durations; **zero Medtronic requests**; GET only; `index.commoncrawl.org` only.
 The claim is still **"absent from every crawl this pass could read"** and
 **"absent from Common Crawl"** stays disclaimed.
+
+
+## Correction (2026-10-15) — verification round 4: three of round 3's corrections asserted an edit that was never made
+
+Round 4 returned **NOT CLEAN** on `29ba42d` and confirmed the measurement, the
+`budget.py` populations, the 188 decomposition, the two independent `derive.py`
+routes (**which it proved can disagree** by flipping a verdict in `census-84.txt`
+and watching route A report it), `CC-MAIN-2018-05`'s verdict, the SyntaxWarning
+fix, and the append-only mechanism. **Zero new requests.**
+
+**The framing correction, which governs this whole section.** Round 3's corrections
+were written as if closing a finding and asserting the body had been corrected were
+**two independent acts. They are the same act.** A correction that says the body was
+fixed, when the body is append-only and was not fixed, is a **new false claim** —
+and round 3 made three of them. The rule this section follows instead:
+
+> **Where a file is append-only, the correction states what the body STILL SAYS,
+> names the correct value, and says plainly that the body was not edited because
+> the directory forbids it. It never claims an edit it did not make.**
+
+### R4-1 — the direction claims: corrected in `docs/`, retracted here
+
+**Correctable, and corrected in place** — `docs/` is canonical, not append-only:
+
+- **`docs/11`**'s budget cell said the continuation came in *"11% below the
+  prediction, the correct direction for a budget"* and that *"the model is
+  conservative"*. **Both were wrong, by conflating two different quantities.**
+  `2.94` is `rows ÷ crawls`; `211` is `crawls × derived`. On the like-for-like
+  comparison the continuation measured **2.9375 against a derived 2.8420 — ABOVE
+  the model by 3.4%** — while the predecessor's 29-row population came in **below**
+  by 2.4%. The cell now publishes three named quantities side by side and claims
+  **no direction**.
+- **`docs/11`**'s second claim — *"observed mean attempts per query (1.43
+  predecessor, **1.45** continuation) sits below the model's 1.65 / 1.42"* — was
+  wrong twice: the continuation's figure is **1.4574, which is ABOVE the model's
+  1.4210**, and it rounds to **1.46**, not 1.45. Corrected.
+- **`docs/10:64`** said *"so the model is conservative"* and is corrected with the
+  same three-quantity table.
+- **`budget.py`** ended with the sentence *"no prose asserts which way it errs"* —
+  a claim about prose, which was **false when written**, since `docs/11` and
+  `docs/10` both asserted a direction. The file now asserts nothing about prose
+  and prints both directions per population, plus the per-query mean beside the
+  per-crawl figure so the two cannot be merged again.
+
+### R4-2 — "41 of 128" was **never** corrected in this log, and round 3 said it was
+
+**The body of this file still reads 41 at two places and round 3 claimed both were
+fixed. They were not.** Verified: `git diff 4c585cd..29ba42d` on this file is a
+**single hunk, 189 insertions, 0 deletions** — pure append. The sites:
+
+| line | **what the body still says** | correct value |
+|---|---|---|
+| `:178` | *"**41** of the 128 published indexes lie outside the window entirely (**2008–2013 and 2022-06 onward**)"* — names **both** eras, counts one | **44** = 41 entirely-after **+ 3 entirely-before** (`CC-MAIN-2008-2009`, `CC-MAIN-2009-2010`, `CC-MAIN-2012`); `128 − 84 = 44` |
+| `:244-245` | *"**41** published indexes lie outside the window … or those **41** crawls are read too"* | **44** |
+
+**The body was not edited because `findings-log/` is append-only** (§3, and C10 of
+this log's own round-1 correction, which is the passage that says so). **The
+prose above is therefore superseded, not fixed**, and a reader who reads `:178`
+without reading this is reading a **wrong number about both eras.**
+
+**Round 3's R3-4 and the PR body both said "Corrected in `FINDINGS.md:178` and
+`:244`" / "Corrected in both logs." Neither is true.** The predecessor's `:735`
+carries the same false claim in its own C7. All three retractions are here.
+
+### R4-3 — the same stale-count-word shape, two more sites
+
+**The body still reads, unchanged since round 2:**
+
+| line | **what the body still says** | correct value |
+|---|---|---|
+| `:145` | *"**Five distinct paths now**, all on `carelink.minimed.eu`"* above a list of **six** items | **six** |
+| `:148` | *"— **six**, counting the bare prefix"* | **false reconciliation**: `/ipro/hcp/` is **item 1 of the six**; nothing needs counting |
+| `:163` | *"(the 19 remainder being the cells that do carry members, plus the eight `older-schema` rows)"* | enumerates **18 of 19** — it drops **`CC-MAIN-2014-23`**, the one INDETERMINATE cell. Correct: **10 RECORD-with-members + 8 `older-schema` + 1 INDETERMINATE** |
+
+None of the three was edited; all three are superseded by this section. **This is
+the sixth and seventh instance of the shape round 2 was commissioned to sweep.**
+
+### R4-4 — round 3's R3-5 **misquoted the line it was correcting**
+
+**R3-5's premise was false and its fix described work already done.** It quoted
+`:145` as *"a **five**-item list omitting `login.jsf?bhcp=1`"* and said *"the
+colon-list carried five items"*. **The list has carried all six items since round
+2** — `git show 4c585cd:…/FINDINGS.md` and the current file are **byte-identical**
+on those lines. `login.jsf?bhcp=1` was never omitted.
+
+What R3-5 got right, and what survives: the **subject** "**Five** distinct paths
+now" is wrong, and *"counting the bare prefix"* is a **false reconciliation**.
+What was wrong: the quote, and the implication that the list needed adding to.
+**A correction must quote its target accurately; a paraphrase that makes the target
+look worse than it is is its own defect class** — the same one R3-4 recorded, where
+a correction inherited a false premise from the round before it.
+
+### R4-5 — the PR body's "Proved" line was **false**; the conclusion was right
+
+Round 3's PR body said *"Proved: stripping the heading from a modified log still
+printed `ok`."* **That experiment does not print `ok`.** Driving the real
+`check_append_only` with synthetic diffs: `A` → ok (file never read); `M` + heading
+→ ok; **`M` + heading stripped → `!! modified without a '## Correction
+(YYYY-MM-DD)' section`**; `D` → `!! deleted`.
+
+**The correct claim is the one `FINDINGS.md` R3-6 already makes and I stated badly
+in the PR body:** the diff it reads is three-dot, and on this branch every file in
+this directory is status **`A`** — which matches neither the `D` arm nor the `M`
+arm — so **no file is read and the regex is never evaluated.** A sharper statement
+I can now support, from a scratch clone: **on a branch, a file added on that branch
+is `A` in the three-dot diff no matter how many times it is edited afterwards**,
+because the comparison is against the merge base, where the file does not exist.
+Editing it four times changed nothing about what the check can see.
+
+### R4-6 — round 3's R3-7 attributed an occurrence to `docs/10` that is not there
+
+R3-7 said *"three occurrences in `docs/11` and one in `docs/10`"* of the phrase
+"absent from Common Crawl". **Measured: `docs/11` has 3 (`docs/11:1282`, `:1423`,
+`:1670`); `docs/10` has ZERO.** The false attribution is withdrawn. `docs/10`'s
+row 64 does disclaim the whole-corpus claim — in different words, in the sentence
+this round corrected — but it does not contain that phrase, and R3-7 said it did.
+
+### R4-7 — the gate-coverage scan, finished
+
+Round 4 confirmed my extension tally but found I had **not actually applied the ten
+patterns to the 260 files**, so the CLEAN was unverified. It is now, and the
+6-vs-7 is reconciled.
+
+| | |
+|---|---|
+| changed files, `git diff 7d915b8 HEAD` | **260** |
+| pass the gate's filter `\.(md\|yml\|yaml\|sh\|hurl)$` | **7** — `config.yml`, `docs/10`, `docs/11`, 2 × `FINDINGS.md`, 2 × `probe.sh` |
+| **structurally unreadable by that filter** | **253** — `.h` 228, `.tsv` 8, `.py` 5, `.txt` 5, `.jsonl` 2, `.log` 2, `.capped` 2, `.out` 1 |
+
+**7 is right and 6 is not** — the `SELF_PATTERNS`/`research-gate.sh` exclusion
+removes nothing here, because neither file is in this diff; the likely cause of the
+off-by-one is dropping `.yml`, which is exactly one file.
+
+**The scan, all ten patterns, both code paths, all 260 files:** line-by-line with
+`re.M` → **0 hits**; whole-file with `DOTALL` and no `re.M` → **0 hits**.
+**Per-net, every one 0**: vendor key, reports-broker fragments, reCAPTCHA site
+keys, AWS VPC endpoint, internal `.minimed`/`.medtronic` host, `.corp` host,
+machine-specific paths, `jsessionid` values, `sessionData` values, credential
+prefixes. **Controls proved to fire first**, to each pattern's documented shape.
+
+**Is gate-green a meaningful signal for this PR? No, and here is the precise
+claim.** The leak scan's filter structurally cannot read **253 of 260** files,
+**including `results.jsonl` — the ledger every claim in this area rests on**. So
+the leak scan has never read the ledger. **But `research-checks.py:355-360` does
+open it**, count its rows, and fail the gate when `rows > used`; it read **228**
+rows this run. **"The leak scan has not read the ledger" is true; "the gate has
+never read the ledger" is false.** Two different checks, two different reach, and
+conflating them is the error `docs/09` §4 records as *"the corpus is two sources,
+not one"* arriving as *two checks with one name*.

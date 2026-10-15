@@ -1487,14 +1487,25 @@ under the corrected algebra the derived **3.30 exceeds the measured 3.22** by
 (no derivation at all), "2.4–3.2" (a wrong floor, since 2.4 came from the broken
 formula), and the sentence explaining why the measured number was the higher one.**
 What survives is the arithmetic above, computed in `budget.py` so it cannot drift
-from the prose again. **Checked against a large sample.** The 2026-15 continuation measured **2.94**
-rows per crawl (188 ÷ 64) against a **2.84** derived prediction at its own failure
-rate — **11% below the prediction, the correct direction for a budget.**
-**Assumption (INFERRED):** that `p`, measured as the *marginal* row failure rate,
-is the per-attempt failure probability a query actually faces; the observed mean
-attempts per query (**1.43** predecessor, **1.45** continuation) sits below the
-model's **1.65** / **1.42**, so the model is conservative and the divergence is
-recorded rather than reconciled.
+from the prose again. **Checked against a large sample — and the check does NOT have one direction.**
+⚠ **CORRECTED 2026-10-15 (verifier round 4): an earlier version of this cell said the
+continuation came in "11% below the prediction, the correct direction for a budget"
+and that "the model is conservative". Both were wrong, and they were wrong by
+conflating two different quantities.** The two measurements, each named:
+
+| quantity | value | comparison |
+|---|---|---|
+| **requests per crawl** — measured `rows ÷ crawls` vs derived `2(1+p+p²)` | predecessor **3.2222** vs **3.2985** → measured **BELOW** by 2.4% · continuation **2.9375** vs **2.8420** → measured **ABOVE** by 3.4% | **the sign flips between populations** |
+| **mean attempts per query** — `rows ÷ logical queries` vs `E[N]` | predecessor **1.4286** vs **1.5156** → observed **BELOW** · continuation **1.4574** vs **1.4210** → observed **ABOVE** | **flips too** |
+| **budget headroom** — rows spent vs rows predicted | **188** vs `64 × 3.2985 = 211.1` → **10.9% under budget** | *a third thing, and not the comparison the sentence named* |
+
+**No direction is claimed.** The model is conservative only near the failure rate
+it was fitted on; at this pass's lower rate it is slightly optimistic. A single
+population cannot license a claim about the error's sign, and both signs are now
+published. **Assumption (INFERRED):** that `p`, measured as the *marginal* row
+failure rate, is the per-attempt failure probability a query actually faces — the
+divergences above are recorded rather than reconciled, because reconciling them
+needs a per-attempt conditional rate this pass did not measure.
 **Blocker:** budget, against an API that fails 28–41% of its queries.
 **Closes when** every in-window crawl carries a classified cell, or the sweep stops
 with the remainder named. **A negative (no `/ipro/hcp/` anywhere else) counts** —

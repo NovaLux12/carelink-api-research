@@ -787,3 +787,31 @@ markdown; a person put it there. Corrected in the docstring, along with a
 spacing floors, `CC-MAIN-2022-05`'s readable absence, `CC-MAIN-2014-23`'s
 indeterminacy, the two-opposite-error account of the 87 → 84, and the claim that
 `/ipro/hcp/*` is one surface over time — still **INFERRED and undemonstrated**.
+
+### C9 — round 4: this log's `:735` was never corrected, and round 3 said it was
+
+Round 4 confirmed the measurement and found that round 3's corrections contained
+**three claims that a body had been fixed when it had not.** Two of them are
+recorded in the continuation's round-4 correction (R4-2, R4-3, R4-4); this one is
+this file's.
+
+**`FINDINGS.md:735` still reads "41 of the 128 published indexes lie outside the
+window", naming both eras.** The correct figure is **44** = **41** entirely *after*
+the window (2022-06 onward) **+ 3** entirely *before* it (`CC-MAIN-2008-2009`,
+`CC-MAIN-2009-2010`, `CC-MAIN-2012`), and `128 − 84 = 44`. That sentence's own
+parenthetical claims both eras, so as written it undercounts by three.
+
+**This body was not edited.** `findings-log/` is append-only, and this file's own
+**C10** — the round-1 finding that `check_append_only` cannot even see it — is the
+passage that says so. **The line above is superseded, not fixed**, and a reader who
+reads `:735` without this is reading a wrong number. That sentence is superseded in
+both directions: the figure **and** the claim in round 3 that it had been corrected.
+
+**The rule, stated because this log has now broken it twice.** Where a file is
+append-only, a correction **states what the body still says**, gives the correct
+value, and says the body was not edited. **It never claims an edit it did not
+make.** "Closing the finding" and "asserting the body was corrected" are **the same
+act**, not two.
+
+**The 44 is already correct** in `docs/11` (three sites) and `docs/10`, which are
+canonical and were edited in place. Only the logs retain the stale form.
