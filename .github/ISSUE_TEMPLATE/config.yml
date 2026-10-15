@@ -8,11 +8,10 @@ contact_links:
     about: Evidence classes, the never-publish rules, and the traps.
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
-    # 5, computed, not inherited. P closed by this same branch; the remaining open
-    # letters are F R S K L.
-    # research-checks.py counts ^### [A-Z]. headings in docs/11 and is the arbiter;
-    # on the merged page it reads F R S K L.
-    about: 5 open areas, each with a stated blocker and a definition of done.
+    # 1, computed, not inherited. F, L, S and R now closed; the remaining open
+    # letter is K. (S retains a #### successor note below its closed row.) N+M stays 26 (25 closed + 1 open). Re-derive rather than trust:
+    # python3 scripts/research-checks.py, which counts ^### [A-Z]. headings.
+    about: 1 open area, each with a stated blocker and a definition of done.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
     about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.

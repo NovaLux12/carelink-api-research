@@ -1,0 +1,4 @@
+control	CTRL-2022-05	/CC-MAIN-2022-05-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	ctrl-2022-05-cc
+probe-domain	IPRO-2022-05	/CC-MAIN-2022-05-index?url=minimed.eu&output=json&matchType=domain	domain-2022-05
+control-absent	ABSENT-2020-50	/CC-MAIN-2020-50-index?url=zz-area-l-absent-20261013.minimed.eu&output=json&matchType=host	absent-2020-50
+control-positive	POS-2020-50	/CC-MAIN-2020-50-index?url=carelink.minimed.eu&output=json&matchType=host&limit=5	pos-2020-50

@@ -1,0 +1,8 @@
+Area S independence audit - 2026-10-14 pool run, worker S
+Run type: OFFLINE STATIC AUDIT. 0 requests, 0 of a 0 cap.
+Method: GET (policy statement only; no GET issued).
+Inter-request delay: >=2 s floor, vacuous at 0 requests.
+
+Every number below was produced by ./probe.sh, which contains no network
+call of any kind. There is no oracle: the AGENTS.md 2.1 three-part test is the
+rule being applied, not an observation, and this pass does not manufacture one.
