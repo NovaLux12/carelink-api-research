@@ -1,0 +1,33 @@
+# seq39-timestamps.txt — the five `timestamp` values behind correction C6 of the first pass.
+#
+# Source: the response body of `CC-MAIN-2022-27-index?url=minimed.eu&matchType=domain`,
+# seq 39 of `findings-log/2026-10-14-pool-l-ipro-hcp-census/results.jsonl` (200, 9 records,
+# 4403 B). That body is OUTSIDE the repository by policy (AGENTS.md section 7), and
+# `results.jsonl` stores only a 300-character `body_head` that carries just the FIRST of
+# these five values -- so before this file, the replacement figures in correction C6
+# rested on timestamps that existed nowhere in the tree. Committed here the same way
+# `spacing.txt` commits its two-clock series.
+#
+# SCOPE: `timestamp` values and the host-relative path only. No record bodies, no
+# headers, no full URLs, nothing that could carry a session value.
+#
+# COUNTING RULE for the two figures C6 corrected: span = (last timestamp) - (first
+# timestamp); max consecutive gap = the largest difference between adjacent
+# timestamps in sorted order.
+#
+# timestamp	path	status
+20220703140102	/app/assets/assets/assets/assets/javascript-warning.html	200
+20220703145309	/app/assets/javascript-warning.html	200
+20220703150043	/app/assets/assets/assets/javascript-warning.html	200
+20220703153530	/app/assets/assets/javascript-warning.html	200
+20220703154254	/assets/javascript-warning.html	200
+
+records	5
+span	1:41:52
+max consecutive gap	0:52:07
+
+For contrast, the CORRECTED figures C6 published: span 1:41:52, max consecutive
+gap 0:52:07 -- reproduced by the two lines above. The first pass's original
+claim, 'within sixteen minutes', is off by about 6x and matched no subset:
+relative to the index.jsp capture at 20220703140927 only 2 of the 5 fall inside
+sixteen minutes.

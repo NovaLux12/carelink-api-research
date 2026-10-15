@@ -55,6 +55,28 @@ if [ ! -s "$BODY" ] || [ "$(head -c1 "$BODY")" != "{" ]; then
   exit 1
 fi
 
+# --- The EU deployment's third copy of the key-count pin ------------------
+# ZERO additional vendor requests: `$CFG` (carelink.minimed.eu) was fetched
+# above and `$BODY` still holds it. The area-E block further down pins
+# `keys | length` = 69 on .com and on -trials; this is the third deployment,
+# and it was the one that was missing.
+#
+# Source: findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md section 8
+#
+# WHAT THIS DOES AND DOES NOT PIN, carried with it rather than implied:
+#  - the COUNT, not the SET. A deployment that swapped one key for another
+#    would keep 69 and pass. The set-level proof is in the findings log and is
+#    not re-derivable from here.
+#  - nothing about the per-key projection property (123 valued cells, 0
+#    mismatches). That is 152 requests of work and belongs in the drift sweep.
+#
+# WHY THE CHECK IS WRITTEN OUT RATHER THAN LOOPED: scripts/measure_assertions.py
+# multiplies every `check "` site that sits inside a loop by LOOP_FAMILY_SITES
+# (16), and it is only correct because this file has exactly one such loop. A
+# second loop would multiply this site by 16 and silently corrupt every derived
+# count in the repo. Same rule, same reason, as the area-E block header.
+check "EU bulk config has the same 69 top-level keys" 'keys | length' '69'
+
 # --- The load-bearing claim behind repo issue #95 -------------------------
 # CC880 is the Minimed Flex family, and it contains the six models #93 added.
 check "CC880 family exists"                 '.["personal.device.family.to.model.mapping"] | has("CC880")' 'true'

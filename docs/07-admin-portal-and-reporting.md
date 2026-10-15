@@ -306,6 +306,83 @@ reveals stage, region, mapping template or backend service name**, and latency i
 region-correlated signal in the whole dataset (EU ~73–93 ms, US ~256–402 ms) [source:
 findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md].
 
+### ⚠ Re-measured 2026-10-14 (area F, #123): the BLOCK-7 cells ran, and the caller question has a negative answer
+
+Two separate questions are now closed, and one is explicitly **not**. 17 requests of a
+40 cap, GET only, ≥2.5 s same-host, **controls first on every host** [source:
+findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md].
+
+**1. The `BLOCK 7` cells that had never run are negative.** [AWS-GATEWAYS.md](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md):240-242 records
+that they never happened — an accidental re-run ate the last four budget slots. They ran
+here: `GET /prod/patient-timeline/v1/events` on all three `patient-timeline` deployments,
+and `GET /prod/patient-timeline/logbook` on the EU one, plus the `v1` prefix root.
+
+**All 11 of 11 `patient-timeline` cells** now answer `403`,
+`MissingAuthenticationTokenException`, 42 B, and the certainly-absent control is
+**byte-identical to every plausible path on every deployment** — one body digest across
+all eleven, `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`, which
+reproduces the 12-character digest this page already published **in full** for the first
+time (OBSERVED). Under Oracle A that is **no matching GET route** under
+`/prod/patient-timeline` on any of the three deployments. **Zero 404s in 17 requests** on
+both gateway families, which removes the `clcloud.*` analogy from the "404 is never
+emitted" clause and observes it on this family directly.
+
+**2. `dialog-lite` still 500s, and the control says what that means.** All four cells,
+both regions, published root *and* certainly-absent control, answer `500` with one body
+digest (`660f19c0…`, 36 B — **new**; the 2026-10-10 pass recorded the size but published
+no digest). Because the control is byte-identical to the root, the `500` **cannot
+discriminate the path**: it is the stage-wide catch-all's signature, not evidence that any
+particular route exists. What reproduces is that both deployments route anything with at
+least one path segment below the stage root and the integration raises on every
+invocation. **Zero of 15** gateway responses carry any `Access-Control-*` header and the
+header set is still exactly the six keys listed above — so this section's
+"structurally not browser-callable" premise is re-observed, not re-derived.
+
+**3. Who calls these: a negative, and a structurally grounded one.** Both portal builds
+were re-fetched on their **content-hashed asset names** and both reproduce their pinned
+anchors in full (`2a7fa8e7…`, 3 397 615 B; `a054555a0f22176e…`, 3 410 666 B), so the
+corpus is the corpus. In **both** bodies, every one of these scores **zero**:
+`patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both
+`personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`,
+`carelink.minimed` — **and each of the five 10-character gateway ids**.
+
+The reason is larger than the absence, and it is why no server-side proxy can exist in
+these builds either: **`personal.` occurs 4 times and none of the four is a key of the
+69-name patient document**, `/patient/` is 0, and the API surface these builds name is the
+clinician namespace (`hcp/patients` 42 hits, `hcp/configuration/public/` 15 hits). **They
+do not read the patient configuration document at all**, so the pointer
+`personal.patient.timeline.config.host` is unreachable from this code — which is a
+statement about the code, not about the service (OBSERVED for the two build facts;
+INFERRED for the "no proxy" consequence).
+
+**And the false-hit class, quantified, because a bare grep would have reported an
+integration that is not there:** `timeline` scores **196** (66 + 126 + 4 across 74
+signatures) against `patient-timeline`'s **0**, and every one of the 196 is GSAP
+animation-library internals, Pusher SDK internals, Medtronic's own snapshot-timelines
+**report** service (`hcp/reports/getSnapshotTimelinesRange`, `TIMELINE_RANGE`), two
+leaked-password dictionary words, or one analytics label. `grep-out.txt` counts
+**per build**, so: `m2m` — the call pattern the area's own text proposed — is **1
+hit in each build** (2 across both), and it falls in the **middle** of `cum2me`
+inside a leaked-password list; `baseUrl` is **2 hits in each build** (4 across both), and
+every one of them is inside an embedded Pusher SDK, not a CareLink base (OBSERVED).
+
+**4. What is NOT closed.** Which of the three readings explains the `403`s — no routes
+deployed / routes for other verbs only / the live stage is not `prod` — is **unchanged and
+still blocked**: separating them needs an authentication attempt, which `AGENTS.md` §8 and
+§11 exclude. Four more cells went into that same dead end and did not move it. See
+[`docs/10`](10-open-questions.md) §1. Also unchanged: *why* `dialog-lite` raises, and
+whether the raw `…timeline.config.host` value is publishable — the latter is a disclosure
+judgement for a maintainer holding the value, and is **not** pre-committed here.
+
+**One scope limit that belongs with the negative.** Three builds exist and only one has
+ever contained the timeline at all: the **patient** build carries
+`patient-timeline` 5 times, every hit an Angular component selector, with the config
+pointer read and its gateway-host sibling named but read by nothing (area V, 2026-10-13;
+that host is outside the host set #123 authorises, so that record is **cited, not
+reproduced**). So the honest scope of the negative is *no web caller in any of the three
+builds this repo has read* — not *no caller exists*. **INFERRED**, and it is a claim
+about the corpus, not about every client the vendor ships.
+
 ## The biggest blind spot
 
 **Prod `commoncore.medtronic.{eu,com}` has never been archived in any crawl** — only its

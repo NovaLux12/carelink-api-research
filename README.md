@@ -47,8 +47,18 @@ an RFC 9110 §8.4 violation, and it breaks any client that doesn't opt in. Here
 
 Every third-party CareLink client — including
 [the one that feeds Nightscout](https://github.com/NovaLux12/carelink-bridge) —
-reverse-engineers this surface independently, because there's nothing to read.
+reverse-engineers this surface from the same zero, because there's nothing to read.
 This repo is that work, done once and cited.
+
+> **⚠ Corrected 2026-10-14 (area S independence audit).** This read
+> *"reverse-engineers this surface **independently**"*. The word is a strength
+> word under `AGENTS.md` §2.1 and is permitted only where ≥2 **independent
+> sources** support the claim; this sentence enumerates no sources and cites
+> none, so the count behind it is **1** — this repo's assertion. The word is
+> withdrawn and the claim is unchanged: see the enumeration four hundred lines
+> below, where the same statement carries its count on the line.
+> [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
+> row R1].
 
 The surprise is how much answers **without a credential at all**: the config
 file above, an endpoint that answers for 117 countries, and a third that lets
@@ -400,12 +410,23 @@ Every correction stays in `findings-log/` rather than being quietly fixed — a
 research note that only records its successes isn't one. **[OBSERVED]** —
 `AGENTS.md` §6; `docs/09-methodology-and-oracles.md`.
 
-**The assertion is the arbiter, not the prose.** `regression/hurl/` holds **216
-pinned assertions** — 430 execute per run, once the 16-family loop in the config
+**The assertion is the arbiter, not the prose.** `regression/hurl/` holds
+**217 pinned assertions** — 431 execute per run, once the 16-family loop in the config
 suite is expanded and hurl's status-line checks are counted. Exit 0 = the vendor
 surface hasn't drifted past the pinned values. The suite has caught a page
 asserting a hash its own log had already retracted. **[OBSERVED]** —
 `docs/09-methodology-and-oracles.md`; `scripts/measure_assertions.py`.
+
+> ⚠ **This sentence was wrapped across a line break inside the bold span until
+> 2026-10-15**, and that is the exact trap [`docs/09`](docs/09-methodology-and-oracles.md)
+> §4 records under *"A count the gate's regex cannot see"*: `research-checks.py` matches
+> `(\d+) pinned assertions` on **one line**, so the site was invisible and the numbers
+> check printed `ok` about a value it had never seen — while `README.md`'s own table row
+> 56 lines below carried the right number and the file contradicted itself. **The
+> pattern was NOT widened**; that is a maintainer decision, per the same row. **The prose
+> was unwrapped so the gate can read it, and the count was re-derived by hand.**
+> If you find a count site the check does not read, `scripts/measure_assertions.py` is
+> the authority — not the green tick.
 
 **The numbers on this page are CI-enforced.** The assertion count isn't typed by
 a hand — a weekly job re-measures it and the badge reads the result, and the
@@ -456,7 +477,7 @@ Full list: [`AGENTS.md`](AGENTS.md) §7.
 |---|---|
 | **[`docs/`](docs/)** | 12 canonical pages. Synthesised, dated, every claim cites the log it came from. |
 | **[`findings-log/`](findings-log/)** | Append-only research logs, verbatim. Kept because conclusions were retracted and re-derived — that history is the evidence. |
-| **[`regression/hurl/`](regression/hurl/)** | 216 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
+| **[`regression/hurl/`](regression/hurl/)** | 217 pinned assertions across 5 suites. **Exit 0 = the vendor surface hasn't drifted past the pinned values.** |
 | **[`CONTRIBUTING-research.md`](CONTRIBUTING-research.md)** | How to contribute — the gate, the standard, the traps, the loop prompts. |
 | **[`AGENTS.md`](AGENTS.md)** | The operating rules — evidence classes, the scrub list, the four ways this project has been wrong, what automation may do. |
 | **[`scripts/research-gate.sh`](scripts/research-gate.sh)** | The gate. CI runs the identical script on every PR. |
