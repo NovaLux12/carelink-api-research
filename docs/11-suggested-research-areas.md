@@ -1367,8 +1367,8 @@ Three successors, none of which needs a token:
 > page — commands, counts and a per-hit verdict for each, plus the two things it
 > surfaced that are recorded rather than acted on. **Every count is bound to the commit
 > it was taken on**, and the test is re-runnable as `dup-test.sh`, which prints the SHA
-> it counted at — a `docs/11` grep count moves whenever any lane edits this page, which
-> in this pool is four lanes at once [source:
+> it counted at — a `docs/11` grep count can move whenever a lane edits this page, and
+> four lanes edit it at once in this pool [source:
 > findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10, `dup-test.sh`].
 
 #### S. Two more evidence classes for third-party source material

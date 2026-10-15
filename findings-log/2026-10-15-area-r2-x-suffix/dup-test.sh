@@ -9,10 +9,13 @@
 #   verification found all three of those counts had gone stale in the very commit
 #   that invalidated them: this pass edited docs/11 in six hunks and did not re-run
 #   or re-state them. Re-running and pasting new numbers would fix one instance of a
-#   bug that fires every time this file is edited — and four lanes in this pool edit
-#   docs/11 simultaneously, so the numbers move under this pass whether or not it
-#   touches them. So every count below is printed together with the commit it was
-#   taken on, and re-deriving the count on a different tree is expected to differ.
+#   bug that fires each time this file moves under a count that did not travel with
+#   it — and four lanes in this pool edit docs/11 simultaneously, so the file moves.
+#   So every count below is printed together with the commit it was taken on, and
+#   re-deriving a count on a different tree CAN differ. (Measured, not assumed:
+#   merging all four pool lanes moved none of these counts — see the merge-order
+#   note in FINDINGS.md, *Correction (2026-10-15) — round 4*. That is a result for
+#   these four passes, not a guarantee about the next edit.)
 #   THE VERDICTS ARE THE FINDING; THE COUNTS ARE A PROPERTY OF A NAMED TREE.
 #
 #   A count that names the tree it was taken on is re-derivable. A count that says
@@ -54,11 +57,12 @@ if git rev-parse --verify HEAD >/dev/null 2>&1; then
   echo "                  this pass's own hunks, and including any other lane's, since"
   echo "                  four lanes edit docs/11 in this pool — CAN move these counts:"
   echo "                  a count is evidence only at the SHA printed above. (Measured,"
-  echo "                  not assumed: merging all four pool lanes moved none of them —"
-  echo "                  see FINDINGS.md section 10's merge-order note. That is a"
+  echo "                  not assumed: merging all four pool lanes moved none of them."
+  echo "                  See the merge-order note in FINDINGS.md, *Correction (2026-10-15)"
+  echo "                  *round 4* — not section 10, which only points at it. That is a"
   echo "                  result for these four passes, not a guarantee for the next"
-  echo "                  edit.) Re-run this script and cite the new SHA; do not carry"
-  echo "                  a count forward un-pinned."
+  echo "                  edit. Re-run this script and cite the new SHA; do not carry a"
+  echo "                  count forward un-pinned."
 else
   echo "  HEAD          : (no git — counts below are unpinned and should not be cited)"
 fi
