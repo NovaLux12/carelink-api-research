@@ -417,6 +417,20 @@ The five-token enum above is still the client matcher set. `NGP` is compared by 
 rather than through `startsWith`, so it sits outside that matcher — which is consistent
 with a Guardian-era device reaching that code by a different route.
 
+> ⚠ **Corrected 2026-10-15 (issue #132), scoped — the sentence above over-counts.**
+> It previously read *"The five-token enum above is still the client matcher set"* and
+> treated all five declared members as matched. Measured in the digest-pinned eager
+> main bundle (`0fb4fbd4…`, 3 417 255 B), the enum declares **five** members but only
+> **three** are ever passed to `startsWith` — `BLE`, `SIMPLERA`, `GUARDIAN`. `BLE_X`
+> and `SIMPLERA_X` are declared and never read: `"BLE_X".startsWith("BLE")` already
+> holds, so both are **inert** — removing them would change no branch for any input.
+> The `NGP` clause of the sentence is unaffected and still stands.
+> **Scope:** the eager main only. The patient lazy corpus was not swept for `_X`
+> reads, so this is **not** a claim that the two members are read nowhere in the
+> client's code. The earlier reading is preserved above rather than edited out
+> (`AGENTS.md` §3) [source:
+> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §4, §11].
+
 **Also resolved:** the casing correction `timecapUnscrewed` → `timeCapUnscrewed` is real
 but was mis-stated. Both forms exist, with different jobs: **`timecapUnscrewed`** (42
 corpus occurrences) is a *form-control* name — `form.addControl("timecapUnscrewed", …)`,
@@ -525,6 +539,29 @@ denominator is re-derivable from a clean clone:
 > PR number, not a commit); `Ut.Ey.all` (a *filter* key, not a family value); and
 > the `deviceType` set `CC`/`COSMOS`/`COSMOS_WHITELISTED`/`DEVICE`.
 
+> ⚠ **Correction 2026-10-15 (issue #132) to two rows of the quoted table above,
+> which is left verbatim.** The blockquote is area R's audit and is preserved as
+> history (`AGENTS.md` §3), so this correction sits *beside* it rather than inside
+> it. The rows concerned are **"the client matcher enum | 5"** and **"the client's
+> comparison set, incl. `NGP` | 6"**:
+>
+> - **`5` is a correct *declared* count and an incorrect *matched* count.** The enum
+>   at byte 1,723,245 — the very declaration this row cites — declares five members,
+>   and this pass confirms **5** there. But only **three** are compared by
+>   `startsWith` in the digest-pinned eager main: `BLE`, `SIMPLERA`, `GUARDIAN`.
+>   `BLE_X` and `SIMPLERA_X` are read **nowhere in that artefact**.
+> - **`6` is not refuted, only scoped.** The set is the *declared* vocabulary plus
+>   `NGP`, and `NGP` is compared by equality. Whether a lazy chunk reads
+>   `BLE_X`/`SIMPLERA_X` is **unmeasured** — the 211 patient lazy chunks were swept
+>   for pointer tokens, not for `_X` reads. So this is not a correction of the
+>   number; it is a warning that the row labels a declared set as a matcher.
+>
+> **What did not move:** the 16 published family tokens, the union 21, the sum 27,
+> the `S-CLIENT-DTO` exclusion, and every named withdrawal above. **The pin is
+> unaffected** — `regression/hurl/05-public-config.check.sh` guards the map-axis `16`
+> and nothing in this row or in that file was touched by issue #132.
+> [source: findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §6, §10a]
+
 ### Are these three vocabularies even the same kind of thing? — **INFERRED**
 
 **They are two kinds of thing, not one vocabulary with disagreements**
@@ -534,13 +571,18 @@ denominator is re-derivable from a clean clone:
 1. the **16 map tokens** are a *published identifier axis* — keys of a vendor
    config mapping;
 2. the **client's 5 enum + `NGP`** are a *routing classification* the vendor's own
-   app compares against, five of them by `startsWith`, which constrains only a
-   value's leading characters;
+   app compares against, **three** of the five by `startsWith`, which constrains only a
+   value's leading characters; ⚠ **corrected 2026-10-15 (issue #132)** — this clause
+   previously read *"five of them by `startsWith`"*, counting declared members as
+   matched ones. Five are **declared**; **three** are matched (`BLE`, `SIMPLERA`,
+   `GUARDIAN`), and `BLE_X`/`SIMPLERA_X` are read nowhere in the eager main bundle.
+   Measured in the digest-pinned eager main only, so the lazy corpus is not covered
+   [source: findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3];
 3. the **third-party 4** are that client's *own* product-role DTO enum.
 
 Measured overlaps: map ∩ client = `{SIMPLERA}`; map ∩ third-party = **none**;
 client ∩ third-party = `{GUARDIAN}`. Two consequences a matcher must be built
-for: under the client's five `startsWith` tests, **`CGM` and `CC` match nothing**,
+for: under the client's `startsWith` tests, **`CGM` and `CC` match nothing**,
 and under the third-party four, **`BLE` and `SIMPLERA` match nothing**. The
 disagreement is structural, not a spelling drift.
 
@@ -552,7 +594,15 @@ code compares:
 
 1. **the client's own comparison set** — `BLE`, `BLE_X`, `SIMPLERA`,
    `SIMPLERA_X`, `GUARDIAN`, `NGP`. A value matching none of these would fail the
-   vendor's own routing;
+   vendor's own routing; ⚠ **corrected 2026-10-15 (issue #132) — keep the set, scope
+   the claim.** The six-member list still stands as the **declared** vocabulary, and
+   matching against all six is the safe choice. But only **three** of the five enum
+   members are actually compared by `startsWith` in the digest-pinned eager main, so
+   `BLE_X` and `SIMPLERA_X` are read nowhere **in that artefact** — a value reaching
+   this code as `BLE_X` already satisfies `startsWith("BLE")`, which is why declaring
+   them changes nothing. The lazy corpus was not swept for `_X` reads, so this is a
+   statement about the eager main and **not** a proof the six-member set is wrong
+   [source: findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §6].
 2. **the model code** — 87 codes (78 `MMT-*` + 9 `SKU-*`), whole-file census 80
    `MMT-*`. The path that works under *either* reading of the Flex problem;
 3. **the display name** — 87 pairs, because Medtronic spells the marketing name

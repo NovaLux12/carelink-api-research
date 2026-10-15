@@ -1246,7 +1246,7 @@ undocumented-and-unused"*. Measured on the digest-pinned patient bundle
 | member reads, total | **3** | `census.txt` §D, bytes 2 964 176 / 2 964 215 / 2 964 259 |
 | distinct members read | **3 of 5** — `BLE`, `SIMPLERA`, `GUARDIAN` | `census.txt` §I |
 | **`BLE_X`, `SIMPLERA_X`** | **0 reads.** Each occurs twice, both inside the declaration's own key and value | `census.txt` §E |
-| consumption shapes other than `<binding>.G.<member>` | **0** across 8 explicit sweeps — bracket read, `Object.values`/`keys`/`entries`, spread, pass-the-object-as-a-whole | `census.txt` §D |
+| consumption shapes other than `<binding>.G.<member>` | **none** across 8 explicit sweeps — bracket read, `Object.values`/`keys`/`entries`, spread, pass-the-object-as-a-whole. **7 of the 8 return 0**; the 8th returns only the already-counted same-token false hit at byte 198 638 | `census.txt` §D |
 
 The three reads are the three arms of one expression, and each is a `startsWith`
 **prefix** test (`p.startsWith(o.G.BLE)`). `"BLE_X".startsWith("BLE")` is already
@@ -1254,6 +1254,17 @@ true, so **deleting both `_X` members would change no branch, for any input,
 including their own values** (`census.txt` §J, truth table). That is stronger than
 "unused": the members are **inert**, and inert is a property no authenticated
 response can overturn.
+
+**And the enumeration is closed by the module boundary, not by a token count.** A
+global `\bo\.G\b` sweep finds **4** hits, one of them a different module's exported
+function; that is a count, not a closure. Bounding the *importing* module instead —
+webpack delimiter, module `83644`, bytes 2 962 630 – 2 965 093 — and enumerating
+every use of the imported binding gives **4 identifiers: the binding itself
+(`o=i(45559`) and three `o.G.<MEMBER>` reads, with no module-level `o`, no
+parameter named `o`, no alias and no bare pass-on**. With module `45559` exporting
+exactly one binding (`G`), the enum object cannot leave module `83644` by any
+route this body contains. So "0 reads" here is a closed enumeration, not a
+sampled one [source: findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §11].
 
 So of the three readings the row offers, two are **excluded by this corpus** and
 the third is untouched by it:
@@ -1298,25 +1309,40 @@ Three successors, none of which needs a token:
   eager-main negative is promoted to corpus-wide. **Assumptions (INFERRED):** that
   the eager main holds the only importer of a module the main itself defines —
   measured for the main, **assumed, not measured**, for the chunks.
-- **(b) The false-hit class as a first-class artefact.** `BLE` has **52**
-  case-sensitive hits in this bundle and **3 169** case-insensitively — a **60.9×**
-  multiplier — and 12 of the 52 are a Bluetooth-protocol debug table where `BLE`
-  abbreviates Bluetooth Low Energy, an unrelated third sense of the same token.
+- **(b) Add the `BLE`-shaped rows to the `docs/09` §4 trap list, with offsets.**
+  `BLE` has **52** case-sensitive hits in this bundle and **3 169**
+  case-insensitively — a **60.9×** multiplier — and those 52 partition as **4** in
+  the enum literal + **1** member read + **47** other, the 47 being **34
+  substrings** of longer identifiers and **13 standalone tokens** in the pump's
+  Bluetooth debug-event catalogue (bytes 3 316 707 – 3 321 247), where `BLE`
+  abbreviates Bluetooth Low Energy — an unrelated third sense of the same token.
   `SIMPLERACC` (byte 2 136 604) is a model-map key a substring grep reports as a
   sixth enum member, and lowercase `guardian` (9 hits) is a **human** guardian of a
   minor patient's account, not the CGM family. **Blocker:** none. **Closes when:**
-  these token shapes are in the repo's own false-positive register with their
-  offsets, so the next sweep reads them instead of rediscovering them.
+  these token shapes are rows in **`docs/09` §4**, the register that already exists
+  and already cites this token in §5 item 2 — so the next sweep reads them instead
+  of rediscovering them. **Narrowed by its own duplicate test** (`FINDINGS.md` §10b):
+  the register is named rather than implied, and area F's equivalent rows for the
+  `timeline` family are the precedent, not a second copy of this work.
 - **(c) The `NGP` figure does not reproduce.** This pass measures case-sensitive
-  `NGP` = **0**; the 94 case-insensitive hits are all `ngP` inside
-  `numberingPlan`-class identifiers. The 2026-10-08 note records "three apparent
-  matches … Samsung user-agent strings" and `docs/05`/`docs/09` repeat the figure;
-  the Samsung regexes are present but none carries `NGP`. **Blocker:** none, but
-  **this is a `docs/05` and `docs/09` call, not this lane's** — recorded here and in
-  the log as a disagreement with both readings given, and **neither page was
-  edited.** **Closes when:** one pass re-derives the figure on the pinned build and
-  the two pages are corrected together. **Assumptions (INFERRED):** that the
+  `NGP` = **0**; the 94 case-insensitive hits are the letters `ngP` (93) or `ngp`
+  (1, inside `bingpreview`) inside `numberingPlan`-class identifiers. The 2026-10-08
+  note records "three apparent matches … Samsung user-agent strings" and
+  `docs/05:327` / `docs/09:236` repeat the figure; the Samsung regexes are present
+  but none carries `NGP`. **Blocker:** none, but **this is a `docs/05`, `docs/09`
+  and `docs/10` call, not this lane's** — recorded here and in the log as a
+  disagreement with both readings given, and **none of the three pages was
+  edited.** (`docs/10` row 38 is **adjacent, not the same figure** — it concerns
+  the bundle's `N\d\d` tokens and a Samsung *device* regex — but a human resolving
+  this should see it.) **Closes when:** one pass re-derives the figure on the pinned
+  build and the pages are corrected together. **Assumptions (INFERRED):** that the
   earlier figure was case-insensitive; nothing on disk states the matching mode.
+
+> **Grep-first duplicate test, run for all three successors** against
+> `docs/10` §1, the Closed table and this page — commands, counts and a per-hit
+> verdict for each, plus the two things it surfaced that are recorded rather than
+> acted on: [source:
+> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10].
 
 #### S. Two more evidence classes for third-party source material
 
