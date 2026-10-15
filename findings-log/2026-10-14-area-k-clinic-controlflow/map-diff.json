@@ -1,0 +1,21 @@
+{
+  "runtime_body_sha256": "47939ec873c1fd9a05d733f0a487c28957b82e0a558187361fd6742b01f0959a",
+  "runtime_body_bytes": 8597,
+  "f_publicPath": "",
+  "f_u_ternary_condition_as_read": "2076===e?\"common\":e",
+  "f_u_special_case_id": "2076",
+  "f_u_special_case_name": "common",
+  "rederived_entry_count": 225,
+  "committed_entry_count": 225,
+  "id_sets_equal": true,
+  "ids_only_in_rederived": [],
+  "ids_only_in_committed": [],
+  "id_to_hash_equal": true,
+  "hash_set_equal": true,
+  "hashes_only_in_rederived": [],
+  "hashes_only_in_committed": [],
+  "duplicate_hashes_in_rederived": [],
+  "name_moves": [],
+  "order_equal": true,
+  "rederived_order_equals_committed_order": true
+}

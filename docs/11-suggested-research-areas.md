@@ -1450,7 +1450,168 @@ digest pinned):
   hcp/patients/{patientId}/logbook/entries`) stays open; the safe successor per
   issue #103 is L (positive control, 0–2 GETs).
 
+#### Addendum (2026-10-14, issue #121): the clinic 225 are swept — and area P's negative is completed, not refuted
+
+**Area K is NOT closed.** This is the clinic half only, and the cross-client
+differential it was meant to settle is **not settled** — see the refusal below.
+
+**231 of a 231 cap**, GET only, one host (`carelinkhp.minimed.eu`), **0 requests
+to any other host** [source:
+`findings-log/2026-10-14-area-k-clinic-controlflow/FINDINGS.md`].
+
+**The corpus did not drift.** 225 of 225 cells returned `application/javascript`,
+225 distinct body digests, 0 duplicates, and **0 of 225 differ** from the
+sha256s recorded on 2026-10-13. The map was re-derived from the live runtime's
+own `f.u` and diffed **by hash**; the `2076 === e ? "common" : e` special case was
+read out of the source, and a control confirmed the id-form 404s — docs/09 trap 3
+satisfied rather than assumed.
+
+**`system.logbook.entry.validation.config` is RECOVERED — which COMPLETES area P's
+negative rather than refuting it.** Area P scoped its claim to *"the reproducible,
+hash-verifiable web corpus"* and stated the route literal is followed *"by the
+next module; there is no adjacent field definition"*. Both halves hold: `C40` has
+**zero property reads** in the eager bundle (0 of 6 logbook constants do; 111 of
+188 routes do). P was **right about what it searched**; its corpus was incomplete.
+Per the same rule area Z's measurement was kept after a sweep narrowed it — *a
+measurement and the inference drawn from it are separate artefacts* — the correct
+label here is **completion**, and the earlier "refuted" wording in this addendum
+and in the commit subject is withdrawn.
+
+The route constant is in the eager main bundle, but the **call site is in lazy
+chunk `9481.6977c1a7bd7461f8`** (module 79481):
+`getLogBookConfig(){return this.http.get($.C40).pipe(catchError(()=>of({})))}`
+(byte 6,673), stored verbatim as `logbookConfiguration` (byte 15,295) and read
+**36 times** as `selectedEntryConfiguration`. The document is an object **keyed by
+entry type**, carrying `sensorLocations.options[]`/`freeText[]`, `types`,
+`doseUnits.options[]`, `questions[].label`/`.children[].conditionValue`.
+
+**Why area P could not have found it:** in the eager bundle the constant has **0**
+property reads outside re-export maps (0 of 6 logbook constants do; 111 of 188
+routes do). The control flow lives in a lazy chunk. **This is the same lesson area
+K already taught about the patient corpus, on the other half of the corpus.**
+
+**Semantics recovered, values token-gated.** `types` presence makes `removalReason`
+required (byte 82,617); `freeText[].triggerOption` selects the conditional
+validation on `removalDescription` (byte 99,642); `conditionValue` gates a child
+question (`o===i.conditionValue?0:-1`, byte 101k region). The **values** inside the
+document are not published and not claimed.
+
+**⚠ A negative that is the useful part: the client cannot tell an empty config
+from a failed fetch.** Its own fallback is `of({})`. So a `200` carrying `{}` would
+be **equally consistent with a swallowed auth failure** and must not be recorded as
+"the schema is empty". Any future sweep of that route must distinguish the two.
+
+**The cross-client differential is NOT reported, deliberately.** S4's committed
+`extract-call-sites.py` was run unmodified against the clinic corpus, and it
+resolves **220 of 225** clinic call sites as unresolved versus **58 of 233**
+patient sites — because the clinic routes through a constant table
+(`$.C40`, `$.lwO`, …) where the patient build inlines literals. Comparing the
+surviving **5** clinic shapes against the patient's **144** would be meaningless,
+so it is not done. The builds were proven distinct first: **0 of 145 shared chunk
+ids share a content hash**. Arithmetic stated and checked: patient
+`154+20+1+58=233` and `72+49+14+9+0=144`; clinic `5+0+0+220=225` and
+`2+3+0+0+0=5`.
+
+**Disclosed rather than smoothed:** on the `t_sent` series, **30 gaps fall under
+the declared 2.5 s and 5 under the repo's 2.0 s floor** (min 1.766 s). A kernel
+body-mtime series was recorded alongside and shows 0 under either — **and it
+cannot settle the question**, because `mtime_gap == t_sent_gap + Δlatency` with
+Δlatency swinging by up to 0.895 s, which is larger than the margin under test;
+in all five sub-floor cases the +0.653…+0.895 s latency swing is precisely what
+lifts those mtime gaps above 2.6 s — the swing does not itself breach 2.0 s, but
+the mtime series is therefore not an independent witness. **Both series are
+reported and neither is the
+authority; no cause is asserted.** Both figures **ARE re-derivable from a clean
+clone**, because `results.jsonl` commits `body_mtime_ns` for all 231 rows; an
+earlier draft of this addendum said otherwise and was wrong. `body_mtime_ns −
+t_sent` spans **[−0.823, +0.356] s, spread 1.180 s** — comparable to the request
+latency itself, as a write timestamp should be. ⚠ **Two earlier drafts of this
+addendum claimed a constant "3600.000 s" offset here. That was false** and was
+introduced by this pass's own first correction round; it is withdrawn. Gaps are
+named by seq pair in the log.
+
+**Three instrument defects the pass found in itself**, recorded because a check
+that cannot fail is not evidence: a literal detector whose quote-parity flipped
+after the first escape (self-test now 6/6, including an absent-token negative);
+and **a `scrub-check.sh` that resolved the repo root one level too high, iterated
+zero patterns, and printed `PASS`** — now exits non-zero below five parsed
+patterns. It also confirms a known-published vendor API key compiled into the
+bundle at main byte 3,323,593 is **not** reproduced in any artefact.
+
+**A route-delta negative — and a correction to an earlier draft of this very
+addendum.** Counting rule: a route literal is a `hcp/…` or `/hcp/…` string
+appearing inside a quoted span, extracted with a **parity-free** anchor
+(`"([^"]*hcp/[^"]*)"`) rather than a raw `grep` over raw bytes, because a raw
+grep flips quote-parity after the first escaped quote (docs/09 §5 false-hit
+class; the same defect is recorded in this pass's own `FINDINGS.md` §5.1).
+Set difference is computed under `LC_ALL=C sort -u` — an unsorted `comm` warns
+and returns a wrong answer without failing.
+
+| set | count |
+|---|---|
+| distinct `hcp/` literals in the **eager main bundle** | **184** |
+| distinct `hcp/` literals across all **225 lazy chunks** | **3** |
+| **shared** | **0** |
+| **chunk-only** | **3** — `hcp/countries/dialCodes`, `hcp/patients/checkPhoneNumber`, `/hcp/sso/auth/otc/send` |
+| **main-only** | **184** |
+
+**⚠ This addendum's first draft published "168 shared, 1 chunk-only, 0
+main-only". That was wrong in all three figures. The verifier caught it; the
+correction is kept visible rather than smoothed over.**
+
+**⚠ The first correction's own explanation was ALSO wrong, and is corrected
+here.** Round 1 attributed the error to the corpus being incomplete mid-sweep and
+said a partial corpus "inflates the shared figure". Both halves are false: a
+partial corpus **deflates** shared, and the real defect was the **extraction
+rule**. The first draft's rule was a raw byte grep for `hcp/[A-Za-z0-9_/.-]*`,
+which reproduces its own erroneous **168** exactly on the complete main bundle.
+It silently misses **26** literals that the parity-free rule catches — every
+`/hcp/…` leading-slash form, every `((param))` template, the `?`/`=` query
+string, and the `" /hcp/linkedPatient"` space-prefixed literal `docs/07` line 65
+warns about. A second, separate error compounded it: the main bundle was globbed
+onto **both** sides of the set difference.
+
+The generalisable lesson, which is the same one `docs/09` §4 trap 3 records: *a
+counting rule that cannot express a form the corpus contains will report that
+form as absent, and "absent" is indistinguishable from "not found".*
+
+The substantive conclusion is **unchanged and stronger**: the lazy chunks carry
+essentially no route literals of their own. They route through the constant table
+in the main bundle — which is the same mechanism behind §4c's 220-unresolved
+figure, and the reason the endpoint differential is not reportable. The three
+chunk-only literals are not new endpoints: `docs/07` line 47 already attributes
+`/hcp/sso/auth/otc/send` to a lazy chunk, and lines 47–48 name the other two as
+new literals the chunks contributed.
+
+#### Successor to area K — do the 15 `hcp/configuration/public/*` keys answer?
+
+**Derived from what this pass saw.** The client's own route table carries **15**
+keys under `hcp/configuration/public/` (eager main bundle, **module 66703** —
+which begins at byte 2,759,689 and owns the export map for these constants;
+offsets 2,761,878–2,769,023), and **`docs/07` publishes no per-key verdict for
+any of them** —
+it publishes the oracle (line 180) and one worked control pair, not which keys
+exist. So "the client calls these" is OBSERVED while "these answer" is unmeasured.
+
+**Blocker:** a bounded list already on disk, needing no invention. **19 requests**
+(15 keys + positive control `personal/media/config/eu` → 401 + absent control
+`zzz.this.does.not.exist.zzz` + case control `CSU.CONTROL.CODES.SETTINGS` vs
+`cua.control.codes.settings`), GET only, one host, controls first.
+
+**Closes when:** all 15 carry a verdict under `docs/07`'s own oracle, **and**
+`system.logbook.entry.validation.config`'s response is recorded as a **shape**
+(members and value types), never as raw content. **A negative counts** — "not
+published, and here is the exact reason" closes it. **The `of({})` ambiguity above
+is the trap:** a `200` carrying `{}` is not evidence of an empty schema.
+
+**Assumptions (INFERRED):** that the 15 keys in the client's route table are the
+complete public config set the clinic app uses. A client may call a subset, so a
+404 on a key the client calls would be drift, not absence.
+
+#### L. Recovery of the retired `ipro/hcp` JSF surface
+
 #### Addendum (2026-10-15, from pool L continuation, claim #126): **the window census is complete — 0 of 84 unread — and the family has dates in 2017, 2019, 2020 and 2021**
+
 
 **188 requests** of the 200 authorised in round 2 (area total **228 of a 240 cap**),
 GET only, `index.commoncrawl.org` alone, **zero requests to any Medtronic host**.

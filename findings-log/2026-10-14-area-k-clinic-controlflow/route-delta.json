@@ -1,0 +1,25 @@
+{
+  "arithmetic_check": "184 + 0 = 184 (main) ; 3 + 0 = 3 (chunks)",
+  "chunk_only": [
+    "/hcp/sso/auth/otc/send",
+    "hcp/countries/dialCodes",
+    "hcp/patients/checkPhoneNumber"
+  ],
+  "chunk_routes_sha256": "87d21d9b9a5920cc6f675d005a916c18dfa62f3c570cec927d9e8fe25c3ae033",
+  "counts": {
+    "chunk_distinct": 3,
+    "chunk_only": 3,
+    "main_distinct": 184,
+    "main_only": 184,
+    "shared": 0
+  },
+  "main_routes_sha256": "f685db1a471ed205dc8d8b9942a9b4d59dc5478d99e24feef6ffdbc5554a367d",
+  "rule": {
+    "anchor": "re.compile(r'\"([^\"]*)\"') -- parity-free, spans over 200 chars discarded as non-literals",
+    "known_limits": [
+      "backtick template literals are not matched (0 present here)",
+      "concatenation yields a partial literal; counted as a route"
+    ],
+    "match": "^ */?hcp/ after stripping at most one leading space"
+  }
+}
