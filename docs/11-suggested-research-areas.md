@@ -931,13 +931,12 @@ support build's own host is the one the pinned suite already reads. The pass use
 **1 hit**, anchored to the `ab28f58` object (line 1254) so the answer cannot drift as this
 page is edited) both say "224 chunks".
 
-Run *in-tree*, the same search returns **3**: two are this page's own command slots (the
-two places that quote the command) and one is the pre-existing target sentence. **No
-head-relative line number is published for those three sites, on purpose** — this PR
-inserts and edits above them, so any number would be false after the next edit, which is
-the very defect this passage documents. Count them yourself with
-`grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md`;
-the merge-base command above is fixed at 1.
+Run *in-tree*, the same search matches more than the target — **and the in-tree count is
+deliberately not published as a number.** This paragraph itself quotes the pattern (in the
+command above and in the table below), so the in-tree count is a function of the text
+describing it and changes with every edit here; publishing one would be false after the
+next commit, which is the very defect this passage documents. The merge-base form above is
+fixed at 1; run the in-tree grep yourself if you need the current figure.
 
 | site | what it is | how to resolve it | merge-base |
 |---|---|---|---|
@@ -946,11 +945,10 @@ the merge-base command above is fixed at 1.
 | the pre-existing 224 sentence | target prose (section K) | `git show ab28f58:docs/11-… \| grep -nF '224 lazy chunks are mined…'` | 1254 |
 
 **The pattern is the
-longer one on purpose, but lengthening did not free it:** at head **both** the short and
-the long form return **3** — this page carries the *long* form in each of its own two
-command slots, plus the target. The fix that works, and the one
-the table below records, is the merge-base qualification `git show ab28f58:…`, whose
-result set cannot see this pass's own text. The 2026-10-08 record those came from is explicit:
+longer one on purpose, but lengthening does not make the in-tree count stable:** this page
+quotes the pattern in its own command slots and its own table, so the in-tree count tracks
+this text. The fix that works, and the one the table below records, is the merge-base
+qualification `git show ab28f58:…`, whose result set cannot see this pass's own text. The 2026-10-08 record those came from is explicit:
 the
 runtime holds a **225-entry** map, it built filenames as `<id>.<hash>.js` — the **id**
 form — and *"**224 fetched. One entry returned the SPA fallback**"*. The entry it lost
@@ -998,7 +996,7 @@ first"). Commands and hit counts, at head:
 | `docs/10` §1 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-open-questions.md` | **0** | not there |
 | `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 4 | all incidental — lines 61 (false-hit word list), 63 (config-pointer row), 83 (CHUNK-CORPUS citation), 92 (chunk identifier in a deployment row) |
 | Closed table | `awk 'NR>=2181' docs/11 \| grep -ciE '\b209\b\|unswept'` | **0** | not closed |
-| this page | `grep -n '\b209\b' docs/11` | 8, **0 at `origin/main`** — all 8 land in this pass's inserted block (docs/11:852–1093), not in the pre-existing text: 1 in the Result paragraph above (line 888) and 7 in successors 1a/1b (lines 961, 967, 969, 975, 978, 985, 994). It is **inherently unstable** — delete the block (or the finding) and the count returns to its pre-pass 0, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number | not a duplicate of itself |
+| this page | `grep -n '\b209\b' docs/11` | 8, **0 at `origin/main`** — all 8 land in this pass's inserted block, not in the pre-existing text: 1 in the Result paragraph above and 7 in successors 1a/1b. No head line numbers are published (they move with every edit above them); resolve them with `grep -n '\b209\b' docs/11-suggested-research-areas.md`. It is **inherently unstable** — delete the block (or the finding) and the count returns to its pre-pass 0, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number | not a duplicate of itself |
 
 **Non-duplicate, recorded.** ⚠ One related hit **is** a real staleness and is **not**
 this successor: `docs/10`'s config-pointer row still reads *"The one thing a web sweep
@@ -1065,9 +1063,8 @@ zero-request `verify-derivable.py` that machine-checks the half that *is* checka
 **Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
 config-pointer row and this page's own text (`git show ab28f58:docs/11-suggested-research-areas.md
 | grep -nF '224 lazy chunks are mined for endpoints and field names'`, **1 hit at
-merge-base `ab28f58`, line 1254** — the in-tree count is 3 only because this page quotes
-the command twice; no head line number is published here, for the reason given above)
-both say the portal lazy-chunk
+merge-base `ab28f58`, line 1254** — the in-tree count is not published (this page quotes
+the command, so the count tracks it; see the note above)) both say the portal lazy-chunk
 corpus is **224** chunks. **The count is pinned to merge-base so this passage cannot be
 counted into it.** The 2026-10-08 record
 that number came from is explicit about
