@@ -451,9 +451,12 @@ precisely those three.
   not exercised and no delay is claimed.
 - **Files:** `FINDINGS.md` (this file), `scrub-diffmode-control.sh` (the probe
   record — the thing that produced every number here), `run.log` (full
-  transcript, taken at `33895ee` — the tree whose harness blob it reproduces verbatim. The
-  five `--self-test` assertions added after it are 3 at `d86a21b` + 2 at `fea8b6d`; no
-  *measured* number in it moves, only the self-test line count, §8b), `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
+  transcript, taken at `33895ee` — the tree whose harness blob it reproduces. Re-run at
+  this revision, the **only** difference is **five** `--self-test` assertions added
+  afterwards: its self-test block carries **8** and the harness now prints **13**, so no
+  *measured* number in it moves — only the self-test line count. Its line references in
+  §3 and §6 below are into **this committed transcript**, not into a fresh run, §8b),
+  `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
   rendered_lines), `verdicts.tsv` (the derived per-pattern table), `self-screen.txt` (the `--screen`
   transcript), `results.jsonl` (empty).
 - **Committed artefacts contain no instance text and no absolute home path.**
