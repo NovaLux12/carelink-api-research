@@ -24,12 +24,29 @@
 # That is not bookkeeping. It is a write-up shape that cannot converge, because
 # prose in this directory cites positions into a file this PR edits.
 #
-# So: FINDINGS.md publishes NO POSITION into a file this PR edits, in any of the
-# spellings it can take — `docs/11:NNNN`, "line NNNN" with that subject, or a
-# positional verb like "the table begins at NNNN". A position is a number a
-# reader is invited to look up, and this PR moves those numbers. What prose cites
-# instead is a grep, or `locate.sh` bound to a commit. (A bare number with no
-# positional context is deliberately NOT flagged; see the bound at line ~131.)
+# So: FINDINGS.md publishes NO POSITION into a file this PR edits. A position is a
+# number a reader is invited to look up, and this PR moves those numbers. What
+# prose cites instead is a grep, or `locate.sh` bound to a commit.
+#
+# WHAT IS ENFORCED, EXACTLY. Round 6 found this check claiming "the CLASS, not the
+# spelling" while catching only the colon form, so after round 6 the claim IS this
+# list and nothing wider:
+#
+#   A   <edited-file>:NUMBER           `docs/11:2236`
+#   A'  <edited-file>:NUMBER-NUMBER    `docs/11:2236-2253`
+#   A"  <edited-file>:  NUMBER         `docs/11: 2236`
+#   E   <edited-file>#L NUMBER         `docs/11#L2236`
+#   B   "line"/"lines" + NUMBER        when an edited-file subject is on the line
+#   C   a positional verb + NUMBER     "the table begins at 2236", subject on the line
+#
+# WHAT IS NOT ENFORCED, named so the residual cannot be mistaken for coverage:
+# a bare number with no positional context (deliberately — this file is full of
+# legitimate `200`s, `1024`s and `193`s); a position whose SUBJECT follows the
+# number ("absorbed from 2236 in docs/11"); and **a position split across two
+# lines**, the subject at the end of one and the number at the start of the next.
+# That last one was live in section 6 of this file and is fixed in the FILE, not in
+# this check: a line-based scan cannot see it, and a two-line join produced more
+# false positives than catches. See section 8a-6, rows 3 and 4.
 #
 # THE CHECK BELOW MATCHES THE SPELLINGS THE CLASS ACTUALLY TAKES — and after
 # verifier round 5 it does so for the colon form. An earlier revision tested each
@@ -63,7 +80,22 @@ D10=docs/10-open-questions.md
 D11=docs/11-suggested-research-areas.md
 # The single canonical test for a Correction SECTION heading. Used by the
 # exemption, the FAKE check and the listing below, so they cannot diverge.
-CORR_RE='^## 8a(-[0-9]+)?[.] Correction'
+CORR_RE='^## 8a(-[0-9]+)?[.] Correction([^A-Za-z]|$)'
+
+# FAIL CLOSED, AND FAIL EARLY. `git diff origin/main...HEAD` is the only source of
+# the edited-file list; with no `origin/main` (a shallow clone, a detached merge
+# checkout) it returns nothing, every path is then unmatched, and the check below
+# would report PASS on a file full of positions. So the guard runs BEFORE the
+# first grep: no list, no verdict.
+EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v '^findings-log/' || true)
+if [ -z "$EDITED" ]; then
+  echo "  ** FAIL - the edited-file list is empty: 'git diff --name-only" >&2
+  echo "     origin/main...HEAD' returned nothing (is origin/main present?). With no" >&2
+  echo "     list every position is exempt and the check is VACUOUS, not clean." >&2
+  echo "     Run this from a clone that has origin/main. **" >&2
+  exit 1
+fi
+EDRE=$(printf '%s\n' "$EDITED" | paste -sd'|' -)
 
 echo "dup-test.sh — the non-duplicate test, run against docs/10 section 1,"
 echo "the docs/11 Closed table, and docs/11 itself."
@@ -114,7 +146,10 @@ echo
 
 echo "═══ THE POSITION CHECK ═══"
 echo "  FINDINGS.md must publish no position into a file this PR edits:"
-echo "    docs/NN:NNNN | 'line NNNN' | 'lines NNNN-NNNN' | 'begins at NNNN'"
+echo "    docs/NN:NNNN | docs/NN:NNNN-NNNN | docs/NN: NNNN | docs/NN#LNNNN"
+echo "    | 'line NNNN' | 'begins at NNNN'   (subject on the same line)"
+echo "  NOT seen, and stated in the header rather than left to be discovered: a"
+echo "  subject-after-number, and a position split across two lines."
 echo "  Exempt: Correction SECTIONS, recognised by heading, which must be able to"
 echo "  quote a withdrawn number (AGENTS.md section 5). Everything after them is"
 echo "  checked — an earlier revision skipped to EOF and let later sections inherit"
@@ -149,9 +184,6 @@ echo "  the exemption."
 # NOT regex-escaped, and the join is `paste`. (An earlier revision escaped it for
 # a regex use that does not exist, which made gawk print "escape sequence ..."
 # warnings on stderr and made the no-write-to-stderr rule false.)
-EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v '^findings-log/')
-EDRE=$(printf '%s\n' "$EDITED" | paste -sd'|' -)
-[ -z "$EDRE" ] && EDRE='$^'
 
 HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
   BEGIN { split(ed, A, "[|]"); for (i in A) E[A[i]] = 1 }
@@ -162,16 +194,22 @@ HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
   {
     line = $0
     why = ""
-    n = split(line, W, /[^A-Za-z0-9._/:-]+/)
+    n = split(line, W, /[^A-Za-z0-9._/:+#-]+/)
     # A — a colon position into a file this PR edits (full path, or the
     # abbreviated `docs/11` form this pass actually writes)
-    for (i = 1; i <= n; i++)
-      if (W[i] ~ /^[A-Za-z0-9._/-]+:[0-9]+$/) {
-        pre = W[i]; sub(/:[0-9]+$/, "", pre)
-        if (E[pre] || (length(pre) > 2 && index(ed, pre) == 1)) {
-          why = "A file:NUMBER   "; break
-        }
+    for (i = 1; i <= n; i++) {
+      tok = W[i]; pre = ""
+      if (tok ~ /^[A-Za-z0-9._/-]+:[0-9]+(-[0-9]+)?$/) {
+        pre = tok; sub(/:[0-9]+(-[0-9]+)?$/, "", pre)          # rule A / A-prime
+      } else if (tok ~ /^[A-Za-z0-9._/-]+:$/ && i < n && W[i+1] ~ /^[0-9]{3,4}$/) {
+        pre = tok; sub(/:$/, "", pre)                          # rule A-doubleprime
+      } else if (tok ~ /^[A-Za-z0-9._/-]+#L[0-9]+$/) {
+        pre = tok; sub(/#L[0-9]+$/, "", pre)                   # rule E (github anchor)
       }
+      if (pre != "" && (E[pre] || (length(pre) > 2 && index(ed, pre) == 1))) {
+        why = "A file:NUMBER   "; break
+      }
+    }
     # B/C — a positional phrase whose SUBJECT is an edited file, named either by
     # its full path (`docs/11-suggested-research-areas.md`) or by any leading
     # directory of one (`docs/11`). Getting this direction wrong is how the
