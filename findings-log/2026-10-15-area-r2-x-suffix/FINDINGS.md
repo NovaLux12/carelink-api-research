@@ -264,6 +264,19 @@ the evidence carries:
 
 ## 5. What this pass does *not* decide
 
+- **That the suffix is meaningless — and one reason not to read it that way.** This
+  repository holds a note from 2026-07-21 stating that the bridge detects
+  `deviceFamily === 'BLE_X'`
+  (`findings-log/medtronic-carelink-2026-07-21/05-official-docs-matrix.md` line 88).
+  That is **not** a read of the bridge's source — it is an unattributed note with no
+  `file:line`, so it is the weakest thing in this log and is cited only for what it
+  bears on: **the suffix has at least one consumer outside the vendor's own client.**
+  A vendor app that declares a member it never reads, and a third-party client that
+  reads it as a distinct value, is a coherent shape — the declaration may exist to
+  *name* a value for consumers rather than to branch on it. This pass does not
+  measure that and does not adopt it; it is recorded so the negative in §1 is not
+  over-read.
+
 - **Whether `_X` carries meaning on the wire.** Still open, and unchanged by this
   pass. The discriminator's values arrive from `POST /patient/v2/monitor/data`
   (byte **3 372 491**; the route is already recorded as live and POST-only at
