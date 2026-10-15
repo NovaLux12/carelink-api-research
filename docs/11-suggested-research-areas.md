@@ -2311,6 +2311,170 @@ addendum means. **Assumptions (INFERRED):** that the three schemas carry the sam
 facts — the free-text roles look like the same queries under other names, but that
 is a reading of strings, not a demonstrated equivalence.
 
+**✅ CLOSED 2026-10-15 by [`findings-log/2026-10-15-area-l4-ledger-reader/`](../../findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md)
+— 0 of a 0 cap, GET/OPTIONS/POST all 0, entirely offline.** `read-area-l.py`
+resolves every area-L ledger with **one code path that never reads `role`**: a
+row's cell is decided by **what it queried** (the `url=` in `path`, common to
+every schema), not by what its author called it. **The three schema names above
+are not wrong — they are a count of member-field shapes, and
+`read-area-l.py schemas` measures exactly that and returns 3** (rule K2). What the
+committed reader could not survive is the **population**, not the shape count:
+`2026-10-14-pool-s7-l7crawl` has **no `role` key on any of its 19 rows** (a
+`crawl` field instead, and `"200 (curl)"` as a status *string* — so a
+`== "200"` test finds **0 of 19** rows), and `2026-10-14-pool-l-crawlcontrol`
+carries **no data cell at all**, all 20 of its rows being controls. Both are
+area-L work by their own `**Area:**` lines. **⚠ An earlier version of this entry
+published "the schema count is five, not three". That aggregate is withdrawn** —
+no counting rule produced it; it added a row-schema property to a
+query-derivation property. Distinct row key-sets across the population are **10**,
+member fields **3**, and the two component facts above stand with their own
+numbers (`AGENTS.md` §6 item 7). **Population: 8 ledgers, 380 rows**, counted by
+a recorded two-step rule before any row was read — and **`derive.py:169-170` was
+reading 6**, missing those two, so **39 rows — 10.3% of the population
+(39 ÷ 380) — were not in the corpus the census came from**. `older-schema` is now
+emitted **0 times**: all **8 of 8** resolve to a named `ledger seq`, and
+**7 → RECORD, 1 → ABSENCE** (`CC-MAIN-2013-48`, behind a `200`).
+
+**⚠ The label had already cost two cells, and this is the finding, not the
+cleanup.** The `older-schema` verdict is a bail-out in the committed reader
+(`derive.py:182-185`), which called anything without one of three literal `role`
+strings `older-schema`; but **`CC-MAIN-2020-24` carries 3 `/ipro/hcp/*` members**
+(`2026-10-13-area-l-ipro-hcp` seq 34, `FINDINGS.md:549`, `:265-267`) and
+**`CC-MAIN-2014-10` carries 1** (`2026-10-13-area-l-7crawl-reissue` seq 21-22,
+`FINDINGS.md:55`) — while `census-84.txt:36` and `:102` score both `older-schema`
+with **0** members and omit both from its member tally at `:168`. **Both values
+stand.** Re-derived vs committed: RECORD **72** vs **65**, ABSENCE **11** vs
+**10**, older-schema **0** vs **8**, in-window members **39** vs **35**, crawls
+carrying a member **12** vs **10** in-window (**13** vs **11** counting the one
+out-of-window crawl `census-84.txt:168` itself lists). 72+11+1+0 = 84, so the
+re-derived tally leaves none unassigned. **The repo already contradicted itself
+without any new evidence:** lines 1736 and 1738 above list both crawls' members
+as `(prior)`. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
+evidence is two sentences below and it governs every number printed here; it is
+stated here rather than only there because a limit separated from its figure by
+other prose reads as an exact figure (`AGENTS.md` §2).
+
+**Assumptions (INFERRED) — the equivalence is NOT closed, and this is the honest
+answer.** Measured field by field: all three member shapes normalise to the same
+record for **count, path and host**, but **`ipro_hcp_urls` (89 rows) carries no
+timestamp and no HTTP status at all** — the `2014-03-10` and `200` the prose
+gives for `CC-MAIN-2014-10` live in that pass's `FINDINGS.md`, not its ledger.
+**And the five resolved zeros rest on an internal-consistency argument inside
+one pass's ledger** (the same field, populated on a sibling crawl, empty on
+these) — the bodies that would demonstrate them are outside the tree by
+`AGENTS.md` §7. A reader that normalised free text into a schema would have
+assumed the equivalence it was asked to test; this one measures the gap instead.
+**The defect closes; the assumption stays INFERRED.**
+
+**⚠ `CC-MAIN-2013-48`'s member count is NOT DERIVABLE, not 0.** Its only
+member-bearing data row is a **502**
+(`2026-10-14-area-l-ipro-early-crawl-supplement` seq 3), and an empty list on a
+failed query carries no information — `census-84.txt:20` says a 502 is a FAILURE,
+never an absence. The reader now takes member counts **only from `200` rows** and
+prints every data row that could not supply one. **No headline number moves
+either way** (the cell was `0`, and a not-derivable cell is not carried in the
+member tally): RECORD 72, ABSENCE 11, 39 in-window members all stand.
+
+**And every member count published above is a LOWER BOUND, not an exact total.**
+A reader cannot distinguish "this crawl holds 3 members" from "this crawl holds at
+least 3, and the pass read one page". **Two of the three candidate mechanisms are
+measured and excluded, and one is not** — and both measurements are now computed by
+a committed script under a stated rule, because a version of this paragraph carried a
+count no script produced:
+
+| mechanism | status | measurement — `python3 …/kib-detector.py` |
+|---|---|---|
+| `limit=` tail truncation | **excluded for 73 of 74** member-source rows | cell **B** (one per crawl, what the reader counts): 74 rows, **68** carry no `limit=`, **6** carry one, and only **1 reached it** — `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. **Carrying a limit and reaching it are different predicates**, and only the second can cut a tail |
+| whole-KiB truncation | **excluded** | **0 candidates across 193** successful `200`s. "Successful" means the reader's own `status_of(row) == 200`; the other two obvious rules give **0** (`raw == 200`) and **183** (`raw == "200"`, missing the 10 `"200 (curl)"` rows), which is why the rule is stated beside the number |
+| **completeness of the record set** | **NOT MEASUREDABLE OFFLINE** | `docs/10` §1 anticipates it — *"clean for this test is not the same as complete"* — and the bodies are excluded by `AGENTS.md` §7 |
+
+**No upper bound on any crawl's members is claimed anywhere above, and every figure
+here is ≥ its stated member count, not =.**
+
+**Successors from this pass:**
+
+**S-L4a — the member tally is mis-scoped, and the fix is a page this pass does
+not own.** `census-84.txt:168` publishes **11** crawls carrying a member while
+every tally above it is scoped "IN-WINDOW crawls only" (`:161`), and its list
+contains `CC-MAIN-2022-27`, which `:119` itself marks `no`. **Blocker:** the
+correction belongs in `census-84.txt` and in this area's prose, both outside the
+claiming lane. **Closes when** the member tally states its window basis, or
+`CC-MAIN-2022-27` is named as the single out-of-window entry.
+**Assumptions (INFERRED):** that "crawls carrying a member" was *meant* to be
+in-window — the header does not say, and both framings are published rather than
+one being chosen.
+
+**S-L4b — every member count is a FLOOR, not an exact total, and the five zeros
+need a ledger field that distinguishes "computed, found none" from "not
+computed".** **Blocker:** the bodies are outside the tree by `AGENTS.md` §7, so
+"does a committed `200` row's member list enumerate every member in that crawl"
+is undemonstrable offline. **Closes when** either the bodies are made available
+under a disclosure decision, or every ledger row carries the distinction — a
+`shape` field as `ipro-hcp` already has, or an explicit `members_computed`.
+**Zero requests** for the second route. **Assumptions (INFERRED):** that a boolean
+in the ledger is sufficient for the second route; nothing in the tree says a later
+pass would populate it.
+
+**S-L4c — one reader for the other 36 committed ledgers.** **Blocker, weakened
+from "none":** the population contains at least one ledger that is **not
+machine-readable** — `2026-10-13-cors-method/results.jsonl` is **16 of its 24 rows
+malformed JSON**, on `main` too (commit `8b7b7e9`) — so a reader that must span
+it has to decide what a half-ledger counts as. Recorded, **not fixed**: it is
+pre-existing and outside this claim. Otherwise zero requests; apply the same
+count-then-read method to every `results.jsonl`.
+**Closes when** every committed ledger resolves under the same query-derived cell
+rule, or each non-resolving ledger is named with its schema and its reason.
+**A negative counts.** **Assumptions (INFERRED):** that the other passes' schemas
+are independent of area L's — different passes, different days, and nothing in the
+tree asserts the schema set is closed. **Measured here and worth carrying into
+that pass:** area L's own population was **not** the 6 its name rule most
+obviously suggests but **8**, so expect the slug rule and the `**Area:**` line to
+disagree, and report both.
+
+**S-L4d — "absent from 65 of the 84" reconciles with neither reading, and the
+sentence is in three places.** The **area-L addendum above** (this area's prose),
+this page's **Closed-area row `L`**, and **`docs/10-open-questions.md` §1** all
+publish it, while the same rows publish `65 RECORD · 10 ABSENCE · 1
+INDETERMINATE` — so the `docs/10` row **contradicts itself inside one table row**.
+Under the committed census the absent count is **19** (84 − 65); under this pass's
+re-derivation it is **12** (84 − 72). **65 is neither** — it is the census's RECORD
+cell read into the absent slot. **Find all three with
+`grep -rn 'absent from 65 of the 84' docs/`** — deliberately no line numbers here,
+because this page moves as other passes land and a pointer into it went stale
+before. (⚠ an earlier version of this successor pointed at `:2170`, which does
+**not** contain the sentence — it is the area-F dedicated-routes addendum. The
+finding was right; the pointer was wrong.) **Blocker:** all three are out of this
+pass's lane (`docs/10` §1, this area's prose, this page's Closed table).
+**Closes when** one reading is chosen on stated grounds and the other two retired
+with their arithmetic shown, or the sentence is re-derived from a named verdict
+rule. **Zero requests.** **Assumptions (INFERRED):** that "absent from X of 84"
+means *no member found* rather than *no `200`-bearing probe* — the two coincide
+only if RECORD and member-carrying are the same set, and this pass's own
+re-derivation shows they are not (**12** crawls carry members; **72** answered
+`200`). **Stated because this pass hunted this exact class twice and missed a
+third instance on the same page.**
+
+**S-L4e — `account.py` is handed on broken, and this successor exists so it is not.**
+`docs/10` §1's own successor tells the next pass to run that tool over **"every other
+committed CC ledger"**. Run exactly that way, it **crashes on a member of this very
+population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
+`account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
+another lane owns that file — and **that is why this successor exists**: recording
+the crash as observed is not enough while the row naming the tool still points the
+next pass straight at it. **Blocker: none — the closer is a maintainer decision, and
+the earlier wording here ("the fix belongs to the lane that owns `account.py`") named
+neither an owner nor a route, so it described the crash without stopping anything.**
+`account.py` is a committed analysis script, not a live surface; the next pass that
+runs it is whoever reads `docs/10`. **Closes when** EITHER the tool tolerates an
+absent `t_sent` — the spacing oracle needs only the rows that have one, so skipping
+them is sufficient and correct, not a loosening — OR the `docs/10` §1 successor is
+reworded to name the ledgers it can read, which costs nothing and is the smaller
+change. **Zero requests either way.** **Assumptions (INFERRED):** that the null is
+a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
+all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+[source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
+
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the
 crawl-window count, run against `collinfo.json` with the comparison asserted on
