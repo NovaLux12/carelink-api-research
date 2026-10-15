@@ -1908,17 +1908,28 @@ not the one the verifier named — found a **second** leak: the reCAPTCHA contro
 one escaped the scan only by luck: its pattern is anchored `^…$`, and the control sits
 mid-line inside a table cell, so `^` cannot reach it.
 
-⚠ **CORRECTED 2026-10-15 (round 12) — this paragraph blamed GATE MODE, and that was
-wrong.** I wrote that *"`--all` mode … a control at the start of a line WOULD have
-fired"*, implying the severity depended on the mode. **Both gate modes are
-line-oriented `grep`** — `diff` mode builds `ADDED` from `git diff -U0 | grep '^+' |
-grep -v '^+++'`, `--all` mode from `cat "$f"`, and **both then feed the same
-`grep -cEi`** — so the mode changes *which lines are read*, never *whether `^` can
-reach a token*. Measured, on the reCAPTCHA pattern
-`^6L[A-Za-z0-9_-]{2}buor[A-Za-z]{4}[0-9A-Za-z_-]{10,}$`: at line start → **1**; mid-line
-→ **0**. **Anchoring was the sole cause, and the mode was never part of it.** Again
-`§6` mode 2 — **a claim about what a matcher does, asserted without running the
-matcher** — and again in the paragraph whose subject is a matcher defect.
+⚠ **CORRECTED TWICE — round 12 said anchoring was the sole cause, and that was ALSO
+wrong. Mode is the cause, and the mechanism is a `+`.** `research-gate.sh:108` builds
+its diff-mode subject text with `git diff -U0 … | grep '^+' | grep -v '^+++'`, which
+**keeps the leading plus**. So every line the gate greps in diff mode begins with `+`,
+`^` anchors to `+`, and **a `^`-anchored net can never reach its token on that path.**
+Measured on the reCAPTCHA pattern `^6L[A-Za-z0-9_-]{2}buor[A-Za-z]{4}[0-9A-Za-z_-]{10,}$`:
+
+| the control is placed… | `grep -cEi` |
+|---|---:|
+| bare, at line start | **1** |
+| mid-line | **0** |
+| **at line start, behind a leading `+` — i.e. diff mode** | **0** |
+
+**So: anchoring was NOT the sole cause, mode is**, and round 12's *"both gate modes feed
+the same `grep -cEi`, so mode changes which lines and never whether `^` reaches a
+token"* was wrong on the point it was written to correct. It is **`§6` mode 2 twice
+running** — a claim about what a matcher does, asserted without running the matcher, and
+then re-corrected from a second unrun guess.
+
+**The corollary about `machine-specific paths`**: its pattern is
+`(^|[^a-z])/[hH]ome/…`, and **`[^a-z]` matches the `+`**, so that net **does** fire
+behind a plus. Its survival is not luck; it is the shape of its pattern.
 
 **Fixed by assembling controls at runtime from fragments**, in a new
 [`controls.py`](controls.py) in this log directory, whose fragments are split so that
@@ -1997,9 +2008,13 @@ untouched and was not re-litigated.
 ## Correction (2026-10-15)
 
 Round 12. **The blocking finding is genuinely fixed — the gate returns 0 on all ten nets
-on all three of its paths, against the committed head.** Three new findings, and **one
-of them is a regression on the property last round sold**, which is worth more than the
-two that are not.
+on all three of its paths, against the committed head.** ⚠ **⚠ NARROWED 2026-10-15
+(round 13): that sentence is true and still overstated**, because **one of the ten cannot
+fire on two of the three paths** — see **R13a**. **"Returns 0 because nothing matched"
+and "returns 0 because it is structurally unable to match" are different claims, and I
+published the second while meaning the first.** Three new findings, and **one of them is
+a regression on the property last round sold**, which is worth more than the two that
+are not.
 
 **Base for every diff and sweep: `7d915b8`.** `origin/main` used for nothing.
 
@@ -2032,21 +2047,36 @@ the committed tree:**
 **The planted-failure direction is the one that matters**, and it is the one that would
 have caught R12a. It is now in the record rather than implied.
 
-### R12c — `controls.py` is not what makes the gate green, and the gate reads 12 of 33 files
+### R12c — `controls.py` is not what makes the gate green, and the LEAK STAGE reads 12 of 33 files
 
 I wrote last round that `controls.py` was *"itself in the subject list"*. **It is not
 read by the gate at all**: the subject filter is an **extension** filter — `.md`, `.yml`,
 `.yaml`, `.sh`, `.hurl` — so `.py` is excluded in `diff` mode and in `--all` mode alike.
 The fragment-splitting is hygiene and stays; **it is not the mechanism.**
 
-> **The larger fact, and it is worth stating plainly: of this PR's 33 changed files the
-> gate reads 12.** The other **21 added files** — `results.jsonl`, `run.log`,
-> `grep-out.txt` and all seventeen `headers/*.h` — are outside its subject filter, so
-> **the gate has never read the ledger this entire pass rests on.** What keeps the gate
-> green is only that **no live match is written anywhere the gate reads**. Widening the
-> filter is a maintainer decision (the trap row already says so), and **nothing here
-> depends on it**: the scanner applies the gate's own filter to the same file list, and
-> prints both counts.
+> ⚠ **⚠ NARROWED 2026-10-15 (round 13) — this said "the gate", and it is the LEAK
+> STAGE.** *"The gate has never read the ledger"* was **false and I should have checked
+> before saying it**: **`scripts/research-checks.py:357-360`, run by `research-gate.sh:211`
+> as gate stage 7, opens this pass's `results.jsonl`, counts its rows and fails the gate
+> if the count exceeds what `FINDINGS.md` accounts for.** That path is live — 17 rows
+> read, 17 accounted for, no failure.
+>
+> **The same overreach in *"the gate reads 12 of 33 files"*: 12 is the LEAK STAGE's
+> subject count, not the gate's.** As a whole `research-gate.sh` also reads every
+> `docs/*.md` plus `README.md` and `AGENTS.md` in its citation stage, and
+> `research-checks.py` reads **all 50** dated `FINDINGS.md` files.
+>
+> **What survives, and was verified directly:** of the **33 changed files, the LEAK STAGE
+> reads 12**; the other **21 added files** — **`controls.py`**, `results.jsonl`,
+> `run.log`, `grep-out.txt` and all seventeen `headers/*.h` — are outside **that
+> stage's** filter, and a scan of those 21 returns **0 on all ten nets in both modes**.
+> **Widening the filter is a maintainer decision** (the trap row already says so) and
+> **nothing here depends on it.**
+>
+> ⚠ **Why the narrowing is not cosmetic.** Telling a reader a gate does not cover
+> something it **does** cover is the failure mode that gets a gate widened or disabled —
+> the exact harm `scrub-patterns.txt` spends forty lines arguing against. **An overstated
+> safety claim about a gate is worse than no claim about it.**
 
 ### R12d — the `--all`-mode mechanism was wrong, and running the matcher is what showed it
 
@@ -2074,3 +2104,107 @@ Fixed, and verified at the commit for every file this round touched.
 round. All eleven subject counts unchanged; every edited site is inside a
 `## Correction (…)` section and therefore E1-excluded. Both digest methods reproduce at
 `cd9b79a` and head.
+
+
+---
+
+## Correction (2026-10-15)
+
+Round 13. Round 12's fixes 1, 2 and 4 CONFIRM, the regression battery reproduces end to
+end, and **there is no scrub failure**: the ten nets were run over all 21 files the leak
+stage does not read, in both modes, and returned **0**. Three findings remain, and **two
+are overreach in claims about the gate**, which is the same failure this log has been
+correcting in other words for six rounds.
+
+**Base for every diff and sweep: `7d915b8`.** `origin/main` used for nothing.
+
+### R13a — ⚠ A `^`-ANCHORED SCRUB PATTERN IS STRUCTURALLY DEAD ON THE PATH CI RUNS. This is a GATE DEFECT, not a cosmetic.
+
+**This is the real finding under finding 1, and it belongs on the record in its own
+right.** `research-gate.sh:108` builds its diff-mode subject text with
+`git diff -U0 … | grep '^+' | grep -v '^+++'`, which **keeps the leading plus**. Every
+line the gate greps on that path therefore begins with `+`, so **`^` anchors to `+` and
+can never reach the token.**
+
+- **`reCAPTCHA site keys` is the ONLY `^`-anchored pattern in the list** — checked with
+  the gate's own `IFS='|' read` parsing: 1 anchored of 10, and the other nine are
+  unanchored.
+- **CI runs bare `./scripts/research-gate.sh` — diff mode — on every pull request**
+  (`.github/workflows/research-gate.yml:43-44`); `--all` runs only on push to `main`
+  (`:47`).
+- **So the net is dead on the path every PR is checked by**, and live only on the
+  `--all` path that runs after merge. Measured: bare control at line start → **1**;
+  behind a `+` → **0**.
+
+**One net survives the plus and one does not, for a structural reason worth stating:**
+`machine-specific paths|(^|[^a-z])/…` **does** fire behind a `+`, because `[^a-z]`
+matches the plus. So the difference is not "anchored versus not" but **"anchored at `^`
+versus having an alternative that accepts any non-letter"** — a distinction the pattern
+list does not currently record.
+
+**Not fixed here.** A `^`-anchored pattern cannot work in a `+`-prefixed pipeline, and
+the two available repairs — stripping the `+` in `research-gate.sh`, or rewriting the
+pattern to accept a leading `+` — are **both changes to the gate's own machinery**, which
+`docs/09` §4 reserves to a maintainer and which this pass must not make in the same PR
+it is being gated by. Recorded as a successor below.
+
+**And the consequence for a claim I made:** *"the gate returns 0 on all ten nets on all
+three of its paths"* is **true and overstated**. Net #3 returns 0 on the diff path
+**because it cannot fire**, not because nothing matched. **Returning 0 and being unable
+to return anything else are different claims**, and I published the second while meaning
+the first.
+
+### R13b — "the gate has never read the ledger" was false, and `research-checks.py` reads it
+
+Corrected above at the two sites. **`scripts/research-checks.py:357-360`, run by
+`research-gate.sh:211` as gate stage 7, opens this pass's `results.jsonl`, counts its
+rows and fails the gate if the count exceeds what `FINDINGS.md` accounts for.** I should
+have read the gate's other stages before writing a sentence about "the gate". The
+narrowed, supported claim is about the **leak stage** alone.
+
+> **Why this one is not cosmetic either, and why I am recording the reason.** Telling a
+> reader that a gate does not cover something it **does** cover is the failure mode that
+> gets a gate widened or disabled — the exact harm `scrub-patterns.txt` spends forty lines
+> arguing against. **An overstated safety claim about a gate is worse than no claim about
+> it**, because the next reader acts on it. The three findings this round are, in the end,
+> three instances of one habit: **a sentence about a mechanism, written without running
+> the mechanism** — a matcher, a file-open path, a filter.
+
+### R13c — two stale artefacts inside the evidence for the headline finding
+
+- `controls.py`'s docstring said *"12 of 32 changed files"* and named the excluded files.
+  **Both were stale the moment they were written** — `32` was correct at `342c192` and
+  wrong at the next commit, and **the named list omitted `controls.py`**, the file the
+  section was about. **No counts are hardcoded there now**: the scanner computes and
+  prints both at whatever ref it is given, and the docstring states only the property.
+- The log's own list of the 21 omitted `controls.py` for the same reason. **Corrected
+  above**, with the file named.
+
+### R13d — successor: a `^`-anchored pattern cannot work in the gate's diff path
+
+**What is missing:** a decision about `reCAPTCHA site keys` under a `+`-prefixed
+subject pipeline, and — more usefully — **an inventory of which patterns survive a leading
+`+` and which do not**, so the next pass does not have to derive it.
+
+**Why it is not a research pass's job:** both repairs touch the gate's own machinery —
+`research-gate.sh:108` or `scripts/scrub-patterns.txt` — and `docs/09` §4 records that
+widening or altering a check in the same PR the check passed is a **maintainer
+decision**. Recorded here and carried into `docs/11` as a dated addendum rather than
+attempted here.
+
+**Closes when:** either `research-gate.sh` strips the leading `+` from its diff-mode
+subject lines, **or** the pattern list records, per pattern, whether it survives one —
+**and a control exists for each of the ten that proves the answer**, because a net whose
+liveness is unstated is a net whose liveness nobody will notice has stopped.
+
+**Assumptions (INFERRED):** that the diff-mode subject construction at `:108` is the
+only `+`-prefixed path — `staged` mode at `:104` uses the same `grep '^+'` construction,
+and `--all` at `:106` uses `cat`, so this is a reading of the three lines together rather
+than of `:108` alone.
+
+### R13e — nothing measurable moved
+
+`wc -l results.jsonl` = **17**, matching **"17 of a 40 cap"**. No vendor request this
+round. `controls.py` reads the **committed** tree in both directions — `342c192` → exit
+**1**, head → exit **0**. All eleven subject counts unchanged; every edited site is inside
+a `## Correction (…)` section and therefore E1-excluded.

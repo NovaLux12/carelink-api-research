@@ -7,14 +7,26 @@ net. Two of them were, at `342c192`, and one of those was a live match for the
 internal-host net.
 
 The fragment-splitting below is good hygiene and is kept. It is **not** what makes
-the gate green: `research-gate.sh` chooses its subjects with
-`grep -E '\.(md|yml|yaml|sh|hurl)$'`, so **`.py` is excluded in `diff` mode and in
-`--all` mode alike** and this file is never read by the gate at all. What makes the
-gate green is simply that **no live match is written anywhere the gate reads** — in
-this pass, 12 of 32 changed files. The other 21 added files, `results.jsonl`,
-`run.log`, `grep-out.txt` and all 17 `headers/*.h`, are outside the gate's subject
-filter entirely, and a future change to that filter would be a change in what is
-checked, not in what is true.
+The fragment-splitting below is good hygiene and is kept. It is **not** what makes
+the gate green. `research-gate.sh`'s **leak stage** chooses its subjects with an
+extension filter over `.md`, `.yml`, `.yaml`, `.sh` and `.hurl`, so **`.py` is excluded
+in `diff` mode and in `--all` mode alike** and this file is never read by that stage.
+
+**NO FILE COUNTS ARE HARDCODED HERE, and that is the fix.** An earlier version of this
+docstring said *"12 of 32 changed files"* and enumerated the excluded files by name.
+Both were **stale the moment they were written** — `32` was correct at `342c192` and
+wrong at the next commit, and the named list omitted `controls.py`, the very file the
+section was about. **A count in a docstring about a subject list that changes every
+commit is the same defect this log has now corrected four times.** The scanner below
+therefore **computes and prints** both counts at whatever ref it is given, and this
+docstring states only the **property**.
+
+**And the scope is the LEAK STAGE, not the gate.** Saying "the gate reads N files" is
+false of `research-gate.sh` as a whole: its **citation** stage globs every `docs/*.md`
+plus `README.md` and `AGENTS.md`, and **`research-checks.py` — run by the gate as
+stage 7 — opens this pass's `results.jsonl`, counts its rows and fails the gate if the
+count exceeds what `FINDINGS.md` accounts for.** **The true claim is the narrower one
+this scanner supports: the LEAK STAGE does not read the ledger.**
 
 THE RULE, which is the finding and not the mechanism:
     A correction that demonstrates a detector is live must not write a live match
@@ -160,4 +172,6 @@ if __name__ == '__main__':
     bad = {k: v for k, v in hits.items() if v}
     print(f"  TOTAL HITS: {sum(hits.values())}  -> {bad or 'CLEAN on every net'}")
     sys.exit(1 if (dead or unbuilt or bad) else 0)
+
+
 

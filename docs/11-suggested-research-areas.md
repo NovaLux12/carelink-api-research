@@ -872,6 +872,52 @@ counts as closed.**
 file this repo controls, and the only judgement is whether a *vocabulary* is publishable
 when the *values* are held back, which this row does not pre-decide.
 
+#### Addendum (2026-10-15, from pool worker F, issue #123, round 13) — successor: a `^`-anchored scrub pattern cannot work in the gate's diff path
+
+**Derived from this pass, not from a topic**, and **it is a gate finding rather than a
+research one**, which is why it is a successor and not a fix.
+
+**What is missing.** `scripts/research-gate.sh:108` builds its **diff-mode** subject text
+with a `git diff -U0 | grep '^+' | grep -v '^+++'` construction, which **keeps the
+leading plus**. Every line the gate greps on that path therefore begins with `+`, so **a
+`^`-anchored pattern can never reach its token.** Measured on the one anchored net in the
+list:
+
+| control placed… | `grep -cEi` against the reCAPTCHA pattern |
+|---|---:|
+| bare, at line start | **1** |
+| mid-line | **0** |
+| **at line start behind a leading `+` — diff mode** | **0** |
+
+**Which nets, exactly.** `reCAPTCHA site keys` is the **only** `^`-anchored pattern in
+`scripts/scrub-patterns.txt` — 1 anchored of 10, checked with the gate's own
+`IFS='|' read` parsing. The other nine are unanchored. **CI runs bare
+`./scripts/research-gate.sh` — diff mode — on every pull request**
+([`research-gate.yml`](../../.github/workflows/research-gate.yml):43-44), with `--all`
+running only on push to `main` (`:47`). **So the net is dead on the path every PR is
+checked by and live only on the post-merge path.**
+
+**The distinction that is easy to get wrong, recorded because it is the useful part.**
+`machine-specific paths|(^|[^a-z])/[hH]ome/…` **does** fire behind a `+`, because
+`[^a-z]` matches the plus. **So the dividing line is not "anchored versus unanchored"
+but "anchored at `^`" versus "has an alternative accepting any non-letter"** — and the
+pattern list records which is which for none of its ten entries.
+
+**Blocker:** **both** available repairs touch the gate's own machinery — strip the `+` at
+`research-gate.sh:108`, or rewrite the pattern to tolerate a leading `+` — and `docs/09`
+§4 records that widening or altering a check **in the same PR the check passed** is a
+maintainer decision, not a research pass's. **Neither is attempted here.**
+
+**Closes when:** either the `+` is stripped from the diff-mode subject lines, **or**
+`scripts/scrub-patterns.txt` records per pattern whether it survives a leading `+` —
+**and a control exists for each of the ten that proves the answer**, because a net whose
+liveness is unstated is a net whose liveness nobody notices has stopped.
+
+**Assumptions (INFERRED):** that `:108` is the only `+`-prefixed subject path — `staged`
+mode at `:104` uses the same construction and `--all` at `:106` uses `cat`, so that is a
+reading of the three lines together, not of `:108` alone. Zero requests.
+
+
 ## Tier 2 — cheap, moderate value
 
 ### P (closed 2026-10-13) Recover the request schema from the vendor's own app, statically
