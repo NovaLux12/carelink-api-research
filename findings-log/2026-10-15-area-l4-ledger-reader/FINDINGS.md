@@ -347,13 +347,13 @@ not own.
 > ### ⚠ THIS PASS PUBLISHES NO `docs/NN:NNNN` POINTERS. THE GREPS ARE THE CITATION.
 >
 > Every pointer of that shape that has appeared in this file is stale or was stale
-> > within one commit. **The mechanism is not carelessness: this PR inserts lines into
+> within one commit. **The mechanism is not carelessness: this PR inserts lines into
 > `docs/11` above most of the passages it cites, so any pointer past the S-L4 block
 > moves the moment this PR lands.** (Round 4 recorded the inserted-line count as a
-> number; the number is now itself a position, for the same reason.) Round 1 pointed at an unrelated area-F
-> passage; round 2 corrected it; round 3 found that one stale too. **Correcting the
-> numbers would fix four instances of a bug that has fired in every round**, so they
-> are removed instead.
+> number; the number is now itself a position, for the same reason.) Round 1 pointed
+> at an unrelated area-F passage; round 2 corrected it; round 3 found that one stale
+> too. **Correcting the numbers would fix four instances of a bug that has fired in
+> every round**, so they are removed instead.
 >
 > **`dup-test.sh` is the single source for all of them**, and it derives every line
 > number by `grep`, prints what each line actually contains, **and exits non-zero**
@@ -364,7 +364,7 @@ not own.
 > ```sh
 > sh findings-log/2026-10-15-area-l4-ledger-reader/dup-test.sh
 > ```
->
+
 **No terminal position is published here, deliberately.** Round 4 caught this file
 asserting one that was stale on the very SHA it shipped in: a "measured, now"
 figure naming the *previous* commit's value. **Any position stated here expires on
@@ -376,7 +376,7 @@ the commit that adds lines above it, and this file is the thing adding them.** S
 The positions this file published and has now **withdrawn** are named in the
 Correction sections below, because `AGENTS.md` §5 requires a correction to say what
 it withdrew.
->
+
 > **The one exception, deliberate.** The `## Correction` sections quote `docs/NN:NNNN`
 > pointers **as history** — "superseded: `:2218`" — because `AGENTS.md` §5 requires
 > corrections to be *preserved*, not smoothed over, and a record that deleted the
@@ -957,6 +957,7 @@ with its own published table, which is `AGENTS.md` §6 item 5.
 380 rows), all five moved census cells, `older-schema` 8 → 0, both member-carrying
 cells, `CC-MAIN-2013-48` NOT DERIVABLE, 193/0 whole-KiB, and the INFERRED limits.
 **No other measured figure moved.**
+
 ## 8a-6. Correction (2026-10-15) — verifier round 6
 
 Round 6 re-verified the round-5 fixes on the same SHA and returned NOT CLEAN. Its
@@ -985,6 +986,52 @@ whole-KiB and the INFERRED limits are unchanged. Every blocker above is a defect
 this pass's **own apparatus**, found by turning that apparatus on itself — the one
 pattern all six rounds share.
 
+
+## 8a-7. Correction (2026-10-15) — verifier round 7
+
+Round 7 returned NOT CLEAN on three blockers. **One of them does not hold**, and it is
+recorded here as **refuted** rather than fixed, with the reproduction that settles it.
+The other two are real, and they are the same class: structure that a fix round rewrote
+without re-reading.
+
+| # | as filed | disposition | how it was settled, at this commit |
+|---|---|---|---|
+| 1 | §8a-6's heading abuts the paragraph above it — the one `## ` heading in this file with no blank line on either side (filed as the blank line *after* the heading; the missing one is *before* it) | **fixed** — blank line inserted | a scan of every `## ` heading whose preceding line is non-blank returns exactly one offender, the §8a-6 heading |
+| 2 | the body of this section's blockquote is shredded: a **doubled `>` marker**, a bare `>` **opening** a blockquote straight after a paragraph, a bare `>` **closing** one straight before a paragraph, and one line reflowed to **107** characters | **fixed** — the paragraph is rewrapped, both orphan markers become blank lines | four whole-file scans (`^> >`; a run not preceded by a blank line; a run ending in a bare `>`; blockquote lines over 100 chars) return **exactly four** offenders, all in this region |
+| 3 | `dup-test.sh`'s rule B is narrower than its header claims — the **full path** as subject (`docs/11-suggested-research-areas.md lines 2236`) is said not to be caught | **REFUTED — no change made** | re-tested in a scratch clone at this SHA. With the mutant in **live** text the check exits **1** and names the line under rule B; it exits 0 only when the mutant sits inside a Correction section, which is the exemption working as designed |
+| 4 | — (self-caught while applying rows 1–3) | **fixed** — this section first landed *after* §9, so a Correction section became the file's last section and `dup-test.sh`'s "sections AFTER the last Correction" listing emptied, because the exemption ran to EOF | the whole file's heading order is now printed by that listing itself: the corrections run §8a … §8a-7 and `## 9. Artefacts` is the only section after them. It is the same coupling §8a-5 row 3 describes, caught this time before it shipped |
+
+**On blocker 3, stated so it can be re-run rather than believed.** Rule B's subject test
+is `index(ed, W[i]) == 1` — the token must be a **prefix of** an edited path — so `docs/11`
+and `docs/11-suggested-research-areas.md` both match. Four live spellings, re-tested here,
+each with the mutant in live text:
+
+```
+docs/11:2236                                    exit=1   A file:NUMBER
+docs/11-suggested-research-areas.md lines 2236   exit=1   B line NUMBER
+docs/11 lines 2236                               exit=1   B line NUMBER
+the table begins at 2236 in docs/11              exit=1   C positional verb
+absent from 65 of the 84                         exit=0   (a quoted sentence, no position)
+```
+
+The mutation that reports exit 0 for the full path is one placed in an **exempt** span;
+the same string in live text fires. That the refutation turns on *where* a mutant is
+inserted is the point of this whole pass — and it is the same trap that produced §8a-6
+row 1, in the opposite direction.
+
+**Why this damage survived three rounds, which is the reusable part.** Rounds 3 and 4
+both did `git checkout`/stitch surgery over this region, and each certifies the lines it
+rewrote rather than the structure around the seam. `dup-test.sh` cannot see it — a
+line-based scan holds no opinion about blank lines — and the gate's markdown hygiene does
+not repair it. So: **a fix round re-reads the structure of the region it edits, not only
+the values inside it.**
+
+**One recorded count moved, and only because row 4 is a heading.** `run.log`'s
+`sh dup-test.sh` entry goes **70 → 71**: the exempt-section listing prints one line
+per Correction heading, and there is now one more of them. Nothing measured moved —
+no count, offset, cell or figure in this pass changes this round. The repairs are
+whitespace and one relocated section; the refutation publishes an exit code.
+
 ## 9. Artefacts
 
 | file | what |
@@ -1012,3 +1059,4 @@ python3  kib-detector.py            # rules 1-3, the truncation cells
 ```
 
 Every number in this file comes out of one of the commands above.
+

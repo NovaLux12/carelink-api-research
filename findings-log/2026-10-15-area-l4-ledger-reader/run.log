@@ -28,9 +28,10 @@
 # Round 6 regenerated it; round 5 did not. The 65 that round 5 recorded was a
 # hand-changed number whose stated cause (the `escape sequence` warnings going
 # away) was wrong: the real cause was a phantom heading the round-5 edit left in
-# `FINDINGS.md`. `dup-test.sh` now prints **70** -- 66 from the round-5 tree, plus
-# the four lines round 6 added to its own scope note. See `FINDINGS.md` section
-# 8a-6, which is the correction this line belongs to.
+# `FINDINGS.md`. Round 6 took it to **70** (66 from the round-5 tree, plus the four
+# lines round 6 added to its own scope note); round 7 takes it to **71**, because
+# the exempt-section listing prints one line per Correction heading and section
+# 8a-7 is one more. See `FINDINGS.md` sections 8a-6 and 8a-7.
 #
 # invocation                          exit  output lines  what it did
 # ----------------------------------  ----  ------------  ----------------------------------------
@@ -39,7 +40,7 @@ python3 read-area-l.py schemas          0            37  K1 key-sets 10, K2 memb
 python3 read-area-l.py manifest         0             9  wrote manifest.tsv, precedence order
 python3 read-area-l.py census           0           264  8 ledgers -> census + the member-limit block, vs census-84.txt
 python3 read-area-l.py self-test        0            52  33 controls, decomposition below
-sh dup-test.sh                          0            70  non-duplicate table (printed) + the position check, fatal, fail-closed
+sh dup-test.sh                          0            71  non-duplicate table (printed) + the position check, fatal, fail-closed
 sh locate.sh                            0            33  every landmark, resolved by content, bound to a commit
 python3 kib-detector.py                 0            53  RULES 1-3: the whole-KiB detector, RULE 2, the 3 limit cells
 
