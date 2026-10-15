@@ -328,9 +328,21 @@ Two consequences:
 2. The token **`NGP`** is a `deviceFamily` value the vocabulary table above does not list
    — the client compares it directly at **four** sites in the same chunk: bytes 76,304
    (gates alarm-code formatting), 78,359 (gates last-bolus fields), 83,893 (compares
-   `medicalDeviceFamily` directly, independently corroborating point 1) and 87,564
+   `medicalDeviceFamily` directly — point 1's one-axis reading again, at a
+   second call site in the same chunk) and 87,564
    (`this.isNGP="NGP"===K.deviceFamily`). **OBSERVED.** This is a *client-side* comparison
    value; the server's own NGP vocabulary remains token-gated (`docs/10` #38, #39).
+
+> **⚠ Corrected 2026-10-14 (area S independence audit).** The parenthetical above
+> read *"independently corroborating point 1"*. Both halves of that corroboration
+> are **one author**: byte 83,893 and point 1 are two read sites in the **same
+> client chunk**. `AGENTS.md` §2.1 counts the producer, not the artefact, so the
+> independent count is **1** and the strength word is withdrawn. The corrected
+> wording states the same fact — a second call site in the same chunk, which is
+> repetition rather than corroboration, and is why point 1 says the two-field
+> reading over-counts its own evidence.
+> [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
+> row 13].
 
 The five-token enum above is still the client matcher set. `NGP` is compared by equality
 rather than through `startsWith`, so it sits outside that matcher — which is consistent
