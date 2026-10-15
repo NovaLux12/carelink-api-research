@@ -109,7 +109,7 @@ def report(name, rule, rows):
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument('--population', default='all', choices=['all', 's-l2', 'first-read'],
+ap.add_argument('--population', default='all', choices=['all', 's-l2', 'p-whole', 'first-read'],
                 help='which population to report on')
 ap.add_argument('ledgers', nargs='*')
 args = ap.parse_args()
@@ -139,6 +139,11 @@ POPULATIONS = {
              'of the %d crawls that pass FIRST READ (%s); the 3 re-probed prior-read crawls '
              'and the 1 anchor reproduction are excluded'
              % (len(FIRST_READ), ', '.join(sorted(FIRST_READ))), S_L2_ROWS),
+    # Round 6, F3: docs/11 publishes a P-WHOLE row and there was no population that
+    # could reproduce it -- the same defect round 5 fixed for S-L2, recurring.
+    'p-whole': ('P-WHOLE', 'EVERY row in the predecessor ledger, including the inventory '
+                'fetch and the re-probed cells -- the population docs/11 names beside '
+                'S-L2 and THIS', prows),
     'first-read': ('the 64 crawls the continuation first read',
                    'every continuation-ledger row', trows),
     'all': ('both ledgers, whole', 'every row in every ledger named above', allrows),
@@ -150,6 +155,22 @@ for name, (label, rule, rows) in POPULATIONS.items():
 
 print('=' * 78)
 s_l2 = report(*POPULATIONS['s-l2'])
+pw = report(*POPULATIONS['p-whole'])
+print('THE THREE PAIRS docs/11 PUBLISHES, side by side, all script-reproducible:')
+print('   id      rows/crawls   derived     |   rows/logical  observed   E[N]      direction')
+for pid in ('s-l2', 'p-whole', 'first-read'):
+    rws = POPULATIONS[pid][2]
+    cr = {crawl_of(r) for r in rws if crawl_of(r)}
+    _s = set()
+    lg = sum(1 for r in rws if not (r['path'] in _s or _s.add(r['path'])))
+    f = [r for r in rws if is_failure(r)]
+    pp = F(len(f), len(rws))
+    E = 1 + pp + pp * pp
+    obs = F(len(rws), lg)
+    print('   %-7s %4d/%-3d %6.4f %10.4f  |  %4d/%-4d %8.4f  %8.4f  %s'
+          % (pid.upper(), len(rws), len(cr), 2 * E, len(rws) / len(cr),
+             len(rws), lg, float(obs), float(E),
+             'observed ABOVE' if obs > E else 'observed BELOW'))
 t = report(*POPULATIONS['first-read'])
 print('PREDICTED ROWS FOR THE CONTINUATION, from the S-L2 figure:')
 if s_l2:

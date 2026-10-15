@@ -684,3 +684,164 @@ because neither file is in this diff, and the off-by-one is the `.yml` drop.
 **Not retracted:** the scan itself. All ten patterns were applied to all 260 files
 by both code paths, with controls proven to fire first to each pattern's documented
 shape — **0 hits on every net, on both paths.**
+
+
+## Correction (2026-10-15) — verification round 6: a table labelled "Exact" that was not, a citation that moved under the fix that corrected it, and a figure the page dropped without saying
+
+Round 6 returned **I WOULD BLOCK** on `06e6099` and re-derived the measurement
+again without re-auditing it. **Zero new requests.** The arithmetic error below
+**came from the round-6 brief, not from this pass** — it is recorded as such,
+because a correction that hides where a wrong number came from cannot teach the
+next reader anything.
+
+### R6-1 — this log's "Exact" table was not exact, and the error is the rounding order
+
+`:617-618` published, under the heading **"Exact"**:
+
+| | on `measured` | on `derived` |
+|---|---|---|
+| predecessor | 2.3679% | 2.3132% |
+| continuation | 3.2511% | 3.3603% |
+
+**All four are wrong.** They come from computing the gap at **4 decimal places
+first** (`3.2985 − 3.2222 = 0.0763`) and then dividing that rounded gap. Recomputed
+from the ledgers at full precision — `derived = 2(1+p+p²)` and
+`measured = rows ÷ crawls`, both as exact rationals before any rounding — the values
+are:
+
+| | gap | on `measured` | on `derived` |
+|---|---|---|---|
+| predecessor (S-L2, 29 rows / 9 crawls) | 0.07623200 | **2.3658%** | **2.3111%** |
+| continuation (THIS, 188 rows / 64 crawls) | 0.09549004 | **3.2507%** | **3.3599%** |
+
+**The verifier's figures are right; the brief's, which I copied into that table,
+were not.** **The published 1-dp figures are unaffected** — 2.4% on `measured` and
+3.3% on `measured` are correct at one decimal place — but **a table labelled
+"Exact" must be exact**, and a four-digit percentage computed from a
+four-digit-rounded difference is not. **The lesson is about rounding order, not
+about care: divide at full precision, round once, at the end.**
+
+`docs/11` and the PR body published only the 1-dp figures, so **nothing downstream
+of this log's table was wrong**; `budget.py` computes the percentage directly and
+never rounded a gap.
+
+### R6-2 — the citation fix moved the lines it cited. `AGENTS.md` §6 item 6, inside its own fix
+
+R5-3 replaced a wrong *file* pointer (`docs/09` §4, which does not contain the
+phrase) with **`docs/11:1564`**, "cited in prose at `docs/11:1522`". **Both line
+pointers are wrong at HEAD.**
+
+| pointer | lands on at HEAD | should be |
+|---|---|---|
+| `docs/11:1564` | *"1. Open an issue using the **Claim a research area** form"* | **`docs/11:1581`** — heading `#### Addendum (2026-10-12, from area Y): the corpus is two sources, not one` |
+| `docs/11:1522` | *"**Assumption (INFERRED):** that `p`, measured as the *marginal* row"* | **`docs/11:1539`** — the prose citation |
+
+**Root cause, confirmed:** the pointers were **correct at the parent `7c6f31c`** —
+at that commit `docs/11:1564` was the heading and `:1522` was the prose citation —
+and **this PR's own `06e6099` shifted them by +17 lines** by inserting the
+population table above that point. **A line pointer into a file your own commit
+edits has a half-life shorter than the review cycle**, and this pool has now been
+bitten by that shape four separate times.
+
+**Every `docs/NN:NNNN` pointer this pass introduced, at HEAD:**
+
+| pointer | lands on | verdict |
+|---|---|---|
+| `docs/11:1564`, `docs/11:1522` (log `:657-658`; PR body §6 item 6) | off-topic | **WRONG — superseded by this section** |
+| `docs/09:186`, `docs/09:187` (log `:510-511`, `:513`) | the reachability row and the ~28% failure-rate row | correct at HEAD, **but see the rule below** |
+| `docs/10:64` (log `:481`) | row 64 | correct at HEAD |
+| `docs/11:1282` (log `:557`) | the "absent from Common Crawl" disclaimer | correct at HEAD |
+| `docs/11:1389` (log `:479`) | the S-L1 indeterminate cell | correct at HEAD |
+| `docs/11:1400` (log `:656`) | the S-L2 headline region | correct at HEAD |
+| `docs/11:1410` (log `:621`) | the S-L2 close-condition text | correct at HEAD |
+
+**The rule, adopted here and stated for the next pass: cite the section HEADING,
+not a line number**, whenever the target is a file this repo's passes edit. A
+heading is stable across an insert; a line number is not, and "it was right when I
+wrote it" is not a defence — it is the mechanism. **The PR body has been converted
+to heading citations; the seven log pointers above are frozen in an append-only
+body and are superseded rather than edited.**
+
+### R6-3 — `docs/11` silently dropped a figure it had published
+
+**The page at `4c585cd` published *"the observed mean attempts per query (**1.43**
+predecessor, **1.45** continuation)"*. At HEAD that sentence is gone**, replaced by
+the measurement table — and the page's only ⚠ clause (round 4) retracts *"11% below
+the prediction"* and *"the model is conservative"*, **not** 1.43/1.45.
+`grep -nE '1\.45([^0-9]|$)' docs/11` was **empty**: a silent drop, on the canonical
+page, of a figure a reader had been given.
+
+My R5-2 claim that *"the retracted 1.45 is named as retracted rather than silently
+dropped"* held **in this log** (`:478-480`, `:649`) **and not on the page** — the
+same claim-about-the-body failure round 4 found, in a third place.
+
+**Fixed in place.** `docs/11` now carries the retraction by name: **1.43 was right**
+for P-WHOLE (`40 ÷ 28 = 1.4286`); **1.45 was wrong twice** — the continuation's
+figure is **1.4574**, ABOVE the model's 1.4210, and it rounds to **1.46** — and
+both are superseded with the corrected pair published beside them.
+
+### R6-4 — `budget.py` had no population for a figure `docs/11` publishes (F3, now fixed)
+
+`docs/11`'s per-query row names **P-WHOLE** — 40 rows — and `budget.py` offered
+only `all` / `s-l2` / `first-read` (228 / 29 / 188 rows). **No population could
+reproduce the page's P-WHOLE figures.** The numbers were correct; the
+**script-reproducibility** was not — a partial recurrence of exactly the defect
+round 5 fixed for S-L2, where a published figure's population was not named.
+
+**Fixed:** `--population p-whole` now exists, carrying its own rule, and the script
+prints **all three published pairs side by side** so `docs/11`'s table is
+script-reproducible as a unit:
+
+```
+id          rows/crawls   derived   measured  |  rows/logical  observed   E[N]     direction
+S-L2          29/9       3.2985     3.2222   |    29/19      1.5263   1.6492   observed BELOW
+P-WHOLE       40/13      3.0312     3.0769   |    40/28      1.4286   1.5156   observed BELOW
+FIRST-READ   188/64      2.8420     2.9375   |   188/129     1.4574   1.4210   observed ABOVE
+```
+
+### R6-5 — the `^`-anchored net's false-negative side (F4): **already filed, on `main`, by area F**
+
+Measured here and **not new to the repo**. `scrub-patterns.txt` has exactly one
+anchored pattern, the reCAPTCHA net `^6L…$`. Against a value that fires correctly
+alone on a line:
+
+| context | anchored `re.search` | unanchored |
+|---|---|---|
+| alone on a line | FIRES | FIRES |
+| embedded in prose | **MISSED** | FIRES |
+| inside JSON | **MISSED** | FIRES |
+| inside a URL | **MISSED** | FIRES |
+
+The anchoring is a **deliberate, documented** false-positive control — and its
+**false-negative side was unrecorded.** **This pass does not file it as new:
+`origin/main` already carries it.** Area F's merge `750c72c` is titled *"a
+^-anchored scrub net is dead on the path CI runs; two gate claims narrowed to the
+leak stage"* and its log records the same observation
+(area F's log, **at `origin/main` = `c712830` and not present in this branch** — see the exemption below). **`scripts/` is
+untouched by this PR — pre-existing, not a regression.**
+
+<!-- allow-unresolved-cites: findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md — area F's log exists at origin/main (c712830) and is not in this branch, because this branch has not been rebased onto it. A reader can reach it at that ref. Resolving it here would need the rebase this PR must not perform. -->
+that it is **orthogonal** to the extension-filter hole and **compounds** it: a file
+the filter does not open is one thing, and a net that would not have fired on it
+even if it did is another.
+
+### R6-6 — the leak-filter figure is **base-relative**, and re-measured at the new base
+
+This log's R4-7 and the PR body both published **"7 of the 260"**. That is a
+measurement **against base `7d915b8`** and it does not survive a re-measure
+against the merge base. `origin/main` has moved to **`c712830`** (areas S and F
+landed):
+
+| base | changed files | leak filter reads | unreadable | `results.jsonl` unreadable |
+|---|---|---|---|---|
+| **`7d915b8`** (this branch's base) | 260 | **7** | 253 | **yes** |
+| **`origin/main` = `c712830`** | 298 | **20** | 278 | **yes** |
+
+**Both scans are clean: 0 hits on every net, on both code paths, at both bases.**
+**The number is now stated with its base attached** wherever it appears, so a
+reader at the merged tree does not take "7 of 260" as current. The brief's "15" was
+measured against a ref that had not finished updating; **20 is what
+`c712830` gives**, and the file list is printed so the figure is checkable rather
+than asserted.
+
+**Not acted on:** the merge conflict against `c712830` is the merge queue's.

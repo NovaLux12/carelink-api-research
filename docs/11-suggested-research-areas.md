@@ -1519,7 +1519,17 @@ and two rows below were both saying "predecessor" for **two different row sets**
 **No direction is claimed.** The model is conservative only near the failure rate
 it was fitted on; at this pass's lower rate it is slightly optimistic. A single
 population cannot license a claim about the error's sign, and both signs are now
-published. **Assumption (INFERRED):** that `p`, measured as the *marginal* row
+published.
+
+**And two figures this cell used to carry are retracted here, by name, because the
+table above replaced their sentence without saying so.** At `4c585cd` the cell
+published *"the observed mean attempts per query (**1.43** predecessor, **1.45**
+continuation)"*. **1.43 was right** for P-WHOLE (`40 ÷ 28 = 1.4286`). **1.45 was
+wrong twice** — the continuation's figure is **1.4574**, which is **ABOVE** the
+model's 1.4210, not below it, and it rounds to **1.46**. **The corrected pair is
+published above**, with each population named; **1.43 and 1.45 are superseded and
+neither is silently dropped** (`AGENTS.md` §5 — corrections are preserved, not
+smoothed over). **Assumption (INFERRED):** that `p`, measured as the *marginal* row
 failure rate, is the per-attempt failure probability a query actually faces — the
 divergences above are recorded rather than reconciled, because reconciling them
 needs a per-attempt conditional rate this pass did not measure.
