@@ -1058,7 +1058,17 @@ is not stable across builds, so deviceFamily wire strings are candidates, not
 confirmed live values.
 
 
-### R. Reconcile the `deviceFamily` correction against the client consensus
+### R (closed 2026-10-14) Reconcile the `deviceFamily` correction against the client consensus
+
+> **CLOSED 2026-10-14 — on the area's second close condition, and the close is a
+> negative.** Issue [#124](https://github.com/NovaLux12/carelink-api-research/issues/124),
+> **0 requests of a 0 cap**, ledger committed
+> ([findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md]). The value's
+> casing stays **unobserved**, `docs/05` now records that with the reason, and the
+> candidate set it will be matched against is reconciled under a counting rule.
+> Verdict, evidence and closing issue: the Closed table below. The original area
+> text is kept, unedited, under this heading; where the pass corrected it, the
+> correction is in the row, not silently absorbed into the area.
 
 **Added 2026-10-11.** `docs/05` is corrected — `deviceFamily` **is** an API field on
 `/patient/monitor/data`, agreed by three independent clients at named commits. What
@@ -1175,7 +1185,56 @@ token) counts.
 **Assumptions (INFERRED):** that the routing field and reported-family field
 stay distinct; that table strings are the wire vocabulary.
 
-#### S moved to the Closed table 2026-10-14
+> ⚠ **The first of those two assumptions is REFUTED** (area S4, and area R's own
+> audit). The routing field and the reported-family field are **one axis** — the
+> patient client assigns `n.deviceFamily = i.medicalDeviceFamily` — so a fourth
+> match axis is needed ahead of G's three: the **client's own comparison set**
+> (`BLE`, `BLE_X`, `SIMPLERA`, `SIMPLERA_X`, `GUARDIAN`, `NGP`). A future
+> response matching **none of the four** is itself the finding.
+> [findings-log/2026-10-14-area-s4-lazy-chunk-control-flow/FINDINGS.md] §6
+
+#### Addendum (2026-10-14, from area R, issue #124): two successors, because R closes on a negative and a negative leaves work
+
+Attached to closed area R rather than opened under a new letter — every letter
+A–Z is in use, and a two-letter heading is invisible to this page's own count
+(**Why there is no area AA**, below). **0 requests of a 0 cap**;
+[findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md].
+
+**1. The read-side echo casing of the recovered logbook keys.** Area P and area S4
+recovered the **write** payload verbatim, and S4 settled `timeCapUnscrewed` as the
+wire form against the form-control name `timecapUnscrewed`. Nothing establishes
+that the **read** response echoes any of these keys, and S4 explicitly flags the
+submission shape as *not* shown to be the `logbook/entries` response shape.
+
+- **Blocker:** a clinician token. `GET hcp/patients/{patientId}/logbook/entries` is
+  patient-scoped and is deliberately not requested by this project.
+- **Closes when:** one such response is read with key-names-only logging, **or** a
+  note records that read-side casing is unobtainable under this project's
+  constraints. **A negative counts.**
+- **Assumptions (INFERRED):** that the read path echoes the write schema rather
+  than a divergent one — **nothing on disk shows either.**
+
+**2. Whether the `_*` suffixes (`BLE_X`, `SIMPLERA_X`) are a transport axis, a
+model axis, or a build discriminator.** The enum declares four `_X`-suffixed
+variants and **no committed artefact reads the suffix** — it is declared, never
+consumed. A declared-but-unread enum member is exactly the shape that rots
+quietly, because the declaration looks like a specification.
+
+- **Blocker:** a client artefact that **branches** on the suffix rather than only
+  declaring it. None is on disk; the patient bundle and its lazy chunks were
+  swept (area K, 211 chunks) and the enum is module `45559` of the **main**
+  bundle.
+- **Closes when:** one call site is found that branches on the suffix, or a note
+  records the suffix as undocumented-and-unused. **A negative counts.**
+- **Assumptions (INFERRED):** that the suffix carries semantics rather than being
+  a build or A/B discriminator — the repo holds **no** evidence either way, and
+  the client's own matcher is a `startsWith` prefix test, which is consistent
+  with both readings.
+
+#### S. Two more evidence classes for third-party source material
+
+*(retained as a `####` subsection so the closed area does not re-enter the open-area count; area S is closed.)*
+
 
 Area S closed on **a negative**, not on silence. `AGENTS.md` §2.1 now states the
 independence rule and SOURCE-OBSERVED / SOURCE-PUBLISHED remain corroboration
@@ -1769,11 +1828,22 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 2 open plus 24 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 1 open plus 25 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
 [`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
+
+⚠ **Disclosed 2026-10-15 (area R): the Closed table below physically holds 26
+rows while the arbiter's pattern measures 25, and the difference is the `S6`
+row** — a closed area that fails this page's own rule in exactly the way the rule
+two lines above describes. The number is not wrong; it is measured on a stated
+pattern, and the pattern cannot see `S6`. Both figures are given rather than one
+being quietly chosen (`AGENTS.md` §2). Neither is adjusted here: the `S6` row
+stays, the counting rule stays, and widening the pattern is a maintainer decision
+that `docs/09` §4 already rules out of a research pass — "changing the gate's own
+pattern in the same PR the gate passed is not a research pass's side effect". The
+residual is a known one-cell divergence, not a hidden one.
 
 > ⚠ **Corrected 2026-10-13 by area M.** This read *"9 open plus 17 closed"*. **The
 > words are not mine — `git diff origin/main...HEAD -- docs/ | grep -c 'Every letter A'`
@@ -1863,6 +1933,8 @@ being superseded — never silently. Letters are not reused.
 | L — recovery of the retired `ipro/hcp` JSF surface, and the census under it | 2026-10-15 | ⚠ **SUPERSEDED IN PART by the 2026-10-15 continuation below — the first pass's "negative seven times" counted 9 first-read crawls; the completed census reads "absent from 65 of the 84", and the family has dates in 2017, 2019, 2020 and 2021 that this row predates.** First pass alone: **Positive twice, negative seven times, and the 2022 end is now a capture rather than an absence — which refutes the "bounded 2020 deployment" reading this area carried.** **40 of a 40 cap**, GET only, **`index.commoncrawl.org` alone, zero requests to any Medtronic host**, ≥ 3.5 s inside `flock`, measured `t_sent` floor **4.272 s** over 39 gaps (0 under 3.5 s, 0 under the `>=2 s` floor, 0 negative durations; kernel-mtime oracle 4.035 s). **13 crawls, every cell classified** under the counting rule — a cell reads as an absence only if some row for that crawl answered `200`, and a failure is labelled a failure: **9 records / 3 readable absences / 1 indeterminate**, with **15 of 40 rows failures** (502 ×10, 504 ×3, 400 ×2 — 38%) and **12 retries, each a request and each with a row**. **New:** `CC-MAIN-2014-15` holds **four** `/ipro/hcp/login.jsf` captures, all April 2014, all **200** (2014-04-17 / 04-23 / 04-24 ×2) — the densest cell in the corpus and the only one with repeated captures of one path on one crawl; `CC-MAIN-2022-27` holds `/ipro/hcp/index.jsp` @ **2022-07-03** **200**, **past** the 2022-05-13 archive end and past `CC-MAIN-2022-21` (window 2022-05-16 → 2022-05-29), the crawl the old reading rested on. **The disputed `CC-MAIN-2022-05` cell is settled:** control 504 → **200 / 5 records** → `minimed.eu` **404** immediately after, in one pass — a readable absence; **both prior readings stand unretracted** (the 7crawl Correction records that *its own* re-issued controls 504'd; #104 ran a control but sent no probe). Host-scope cells on `-2013-20` and `-2021-04` promoted to readable absences, discharging `early-crawl-reissue:107-111`. **The negative:** in **7 of the 9** crawls **first read** it did not appear at all — **8 of 9 would be wrong**, because two of the eight classified cells *do* carry members; over classified cells only it is **6 of 8**, the indeterminate cell being the whole difference. **`CC-MAIN-2014-23` is indeterminate** — four control rows, two control hosts, no `200` — and a third failure shape joins 502/504/503: a Python `400` carrying `ConnectionResetError` **and** one carrying `RemoteDisconnected`. **⚠ This pass retracted its own denominator, and its first explanation of that retraction was half wrong:** comparing dashed timestamps against a dashless bound made **two opposite** errors — `-` `0x2D` sorts below both `0` `0x30` and `2` `0x32`, so it dropped the 2 crawls of 2013 *and* wrongly included all 5 post-window 2022 crawls, 84 − 2 + 5 = **87** where the answer is **84**, reproducing `area-l-ipro-hcp:313-317` exactly. Comparing `YYYY-MM-DD` on both sides gives the same 84, so full timestamp precision is not required and what is forbidden is comparing two different string shapes. `AGENTS.md` §6 item 3, caught only by re-derivation; no probe, cell or verdict was affected. **`CC-MAIN-2022-27` is outside the window** (2022-06-24 → 2022-07-07): 9 crawls first-read, **8 in window** — and it is *precisely because* it sits after the window that no in-window 2022 crawl had carried the family. **Not claimed:** "absent from Common Crawl" — **64 of the 84** in-window crawls remain unread. A tenth selection, `CC-MAIN-2018-05`, was **never queued** (no `q-*.tsv` line, no row, no header); what the cap blocked was the **retry of seq 40**, whose `502` wanted a re-issue. Successors S-L1 (`cluster.idx` served-ness), S-L2 (the remaining census) and S-L3 (a denominator check) are dated addenda above | [findings-log/2026-10-14-pool-l-ipro-hcp-census/FINDINGS.md] | #126 |
 | P — recover the request schema from the vendor's own app, statically | 2026-10-13 | **Partial positive, asks (a) and (b); documented negative on the validation-config field set.** Static pass over the hash-pinned patient bundle `0fb4fbd4…` (3,417,255 B), both portal bundles (`2a7fa8e7…` / `a054555a…`) and its 211 lazy chunks, **0 requests**: (a) per-entry logbook submission payload recovered in lazy chunk `k-9799-ae484032a07c9d4f-js.b` — `entryTs`, `type`, `id`, `comment`, `sensorInsertionInfo { sensorLocation, otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation, otherSensorLocation, removalType, removalReason, removalDescription }`, plus `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, dynamic `attributes`; **casing correction `timecapUnscrewed` → `timeCapUnscrewed`**, and `sensorInsertionLocation` is a form-control, serialized as `sensorInsertionInfo.sensorLocation`. (b) `deviceFamily` routing-discriminator casing = client enum `{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }` (bundle module 45559 / byte 1,723,245, compared at byte 2,964,121) — candidates for area R, still client-side. (c) **negative**: `system.logbook.entry.validation.config` occurs only as a route literal (offsets 2,768,979 / 2,769,017) and once in the patient config-key registry (`D.logbookConfiguration`, offset 2,190,314; selector `yt` at 96,883), with no field set. `alarmCode` occurs 0 times in patient + portals + 211 chunks. Compensating: NGP `lastAlarm.code` is a **number** on the wire (chunk byte 76,314 / 87,560), settling the shape half of `docs/10` row 39. Prior negative `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md` preserved as pass 1 | [findings-log/2026-10-13-area-p-static-schema/FINDINGS.md] | #80 |
 | F — what the timeline and dialog-lite gateways actually are | 2026-10-14 | **Closed NEGATIVE on the letter's own condition — no caller named, because none exists in the corpus, and no third-party client can reach either service by GET.** The caller half is a **structural** negative, not an absence of evidence: both portal builds were re-fetched on their content-hashed asset names and **reproduce their pinned anchors in full** (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…` 3 410 666 B), and in **both** bodies `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both `personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and **all five 10-character gateway ids** are **0** — while **`personal.` is 4 hits and not one is a key of the 69-name patient document** (`hcp/patients` 42, `hcp/configuration/public/` 15). **Neither build reads the patient configuration document at all**, so the pointer is unreachable from that code and no server-side proxy can exist there to follow it; that also settles the letter's "look for a proxy in the portal bundle" reading. **The `BLOCK 7` cells that had never run ran and are negative: 11 of 11 `patient-timeline` cells answer `403` `MissingAuthenticationTokenException`, 42 B, one digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which reproduces this repo's published `f249b63cb2fc` IN FULL — with the certainly-absent control byte-identical to every plausible path on all three deployments, so under Oracle A there is **no matching GET route**. Zero 404s in 17 requests, so that clause is observed on this family directly rather than by analogy from `clcloud.*`. `dialog-lite` 500s on all 4 cells with one body digest (`660f19c0…`, 36 B, **new** — the 2026-10-10 pass recorded the size and no digest) and the certainly-absent control is byte-identical to the published root on **both** regions, so **the 500 cannot discriminate the path**: it is the catch-all's signature. Zero of 15 gateway responses carry `Access-Control-*` and the header set is still the same six keys, so "neither is browser-callable" is **re-observed, not re-derived**. **Most reusable number:** `timeline` scores **196** (66+126+4, 74 signatures) against `patient-timeline`'s **0**, and all 196 are GSAP / Pusher internals, Medtronic's own snapshot-timelines **report** service, two leaked-password words, or one analytics label — `docs/09` §5's false-positive class quantified on the exact token this area hunts; a right-context census pattern returns **189** and that figure is a defect of the pattern, not a count. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the letter proposed is **1 in each build** (2 across both) and falls in the **middle** of `cum2me`, inside a leaked-password list; `baseUrl` is **2 in each build** (4 across both), every one an embedded Pusher SDK. **17 of a 40 cap**, GET only, 7 hosts, ≥2.5 s same-host, **controls first on every host**, no POST, no token exchange, no authentication. Spacing floor **2.239 s** on the `t_sent` series (1 of 10 gaps under 2.5 s, **0** under the ≥2 s floor) with **one negative duration** (seq 9, −552 ms — the known corrupt-`t0` class, **no cause asserted**); the kernel body-mtime oracle reads **2.866 s with 0 sub-2.5 s gaps**, so no gap was actually short, and that oracle is **not re-derivable from a clean clone**. ⚠ **NOT closed, and this row does not claim it:** the **three readings of the 403s** (no routes / other verbs only / the live stage is not `prod`) need an authentication attempt, excluded by `AGENTS.md` §8/§11 — four more cells went into that dead end and did not move it, and `docs/10` §1 carries the row unchanged. Also unchanged: *why* `dialog-lite` raises, and whether the raw `…timeline.config.host` value is publishable — **a disclosure judgement for a maintainer holding the value, not pre-committed here**. **Scope limit:** three builds exist and only the **patient** build has ever named the timeline at all (there every hit is an Angular component selector; area V, cited not reproduced, since `carelink.minimed.eu` is outside the claim's host set), so the negative's scope is *no web caller in any of the three builds this repo has read* (**INFERRED**, a corpus claim, not a claim about every client). **Pinned:** the EU `keys | length` = 69 assertion, **zero extra vendor requests**, completing the third copy. **Not pinned:** the gateway cells — the `execute-api.*` hosts are in no suite and adding them would widen the drift sweep's vendor budget from a research pass. Successors: the **portal lazy-chunk corpus** (224 chunks, never swept for these tokens) and the new pin's stated limit (**count ≠ set**) | [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md] | #123 |
+| R — reconcile the `deviceFamily` correction against the client consensus | 2026-10-14 | **Negative, on the area's second close condition: the value's casing stays UNOBSERVED, and `docs/05` now says so with the reason.** **0 requests of a 0 cap** — no vendor host was touched and no request of any kind was made, because a zero-request pass cannot have an oracle and this one did not manufacture one. Three findings, and the second is the one that mattered: (1) **The reconciled candidate set is 21 strings under a counting rule stated before the number** (three admitted sources hold 27 between them; the difference of **6** is duplicate **occurrences** across **5** distinct shared tokens — `SIMPLERA` is in all three sources — and the sum is printed beside the union so it cannot be mistaken for it). Every member is *extracted from a committed artefact at a named `file:line`*, so the denominator is re-derivable from a clean clone and an anchor that stops resolving exits non-zero. ⚠ **Unpinned, stated rather than left to be discovered:** the suite guards only the **map axis** — `regression/hurl/05-public-config.check.sh` pins `family count is 16`, which this pass independently re-derived — while **nothing pins the union 21, the sum 27, or the `S-CLIENT-DTO` exclusion**. A pin was considered and declined: a new `check` site moves the static count and every site that states it, and `docs/09` §4 records that widening a gate pattern in the same PR the gate passed is a maintainer decision. The gap is the re-derivation script, not a pin. (2) **One of the three candidate vocabularies the area inherited fails the provenance bar the pass sets for itself** — the third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, inside a section headed at **`:349`** — *"Round 3 — the full `RecentData` payload schema (from xDrip's message classes)"* — which names **no `file:line` and no named commit**, so `CGM` and `CC` are **not admitted** and the union is **21, not 23**; the repair is one cite, since the 2026-10-11 pass read xDrip at `366c97a8`. (3) **The three vocabularies are not one vocabulary with disagreements** — the 16 map tokens are a *published identifier axis*, the client's 5 enum + `NGP` a *prefix-matched routing classification*, and the third-party four a *product-role DTO enum*; measured overlaps are `{SIMPLERA}`, **none**, and `{GUARDIAN}` respectively, so under the client's five `startsWith` tests `CGM`/`CC` match nothing and under the third-party four `BLE`/`SIMPLERA` match nothing (INFERRED, assumptions stated). **The audit re-counted every surviving `deviceFamily` claim against `AGENTS.md` §2.1 and one was deleted outright**: `docs/05`'s "appears as a call-site field name in the lazy-chunk corpus — independent corroboration of the field name" rested on a source that records that token as **0** across the 224 chunks in its own measure table, attributes its real evidence to a different artefact with no `file:line` and no digest, and whose 224 chunk bodies are **not committed** (independent count **0** — `AGENTS.md` §1 deletes the claim, §2.1 deletes the word). Two more re-labelled: `docs/05`'s "the vendor's bundles do not contain" is **false** (the patient lazy chunk carries `medicalDeviceFamily` at byte 83,893), and `docs/10` row 37's `(GUARDIAN, MINIMED, PARADIGM)` loses **`MINIMED`/`PARADIGM`** — ⚠ **corrected 2026-10-15: the count published as their evidence was false.** The row claimed they had one uncited log line plus the row quoting it; `git grep -w` at base `7d915b8` shows **three** files carrying each token as a claimed value and a **fourth** carrying `PARADIGM` as an era label — and moves from OBSERVED to **SOURCE-OBSERVED**, since no client read here is a live response. `GUARDIAN` survives, sourceable twice. **What would change the verdict:** one authenticated `GET /patient/monitor/data`, key-names-only, value verbatim, matched against four axes (client comparison set, model code, display name, 16 map tokens); **a value matching none of the four is itself the finding**. Two successors filed under the area: read-side echo casing, and whether the `_X` suffixes mean anything | [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] | #124 |
+
 
 ---
 
