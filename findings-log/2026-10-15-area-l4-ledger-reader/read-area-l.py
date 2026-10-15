@@ -789,20 +789,11 @@ def cmd_census(a):
                         continue
                     shapes.setdefault(k, []).append(row)
                     break
-    # Each ledger is read ONCE. An earlier draft walked the record list and
-    # re-opened the ledger inside the loop, which counted each row N times over
-    # and printed 36944 for a 380-row population — the same class of silent
-    # overcount this repo's S-L2 section had to correct twice.
-    for p in pop:
-        with open(os.path.join(REPO, p)) as fh:
-            for line in fh:
-                if not line.strip():
-                    continue
-                row = json.loads(line)
-                for k in shapes:
-                    if k in row:
-                        shapes[k].append(row)
-                        break
+    # Each ledger is read ONCE, and each row is appended to exactly one shape by
+    # the loop above. An earlier draft read the ledgers a second time here and
+    # appended every row again, which printed exactly 2x the true member-shape
+    # counts (456/178/22 for 228/89/11) — the same silent-overcount class this
+    # repo's S-L2 section had to correct twice. Removed in verifier round 5.
     print('  %-20s %6s  %s' % ('member shape', 'rows', 'fields recoverable per member'))
     for k, rows_ in shapes.items():
         if not rows_:

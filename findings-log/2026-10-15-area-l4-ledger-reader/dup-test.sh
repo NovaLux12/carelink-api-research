@@ -24,25 +24,29 @@
 # That is not bookkeeping. It is a write-up shape that cannot converge, because
 # prose in this directory cites positions into a file this PR edits.
 #
-# So: FINDINGS.md publishes NO POSITION, in ANY SPELLING. Not `docs/11:NNNN`,
-# not a bare `2189`, not "line 363-366", not "the table begins at 2224". A
-# position is a number a reader is invited to look up, and this PR moves those
-# numbers. What prose cites instead is a grep, or `locate.sh` bound to a commit.
+# So: FINDINGS.md publishes NO POSITION into a file this PR edits, in any of the
+# spellings it can take — `docs/11:NNNN`, "line NNNN" with that subject, or a
+# positional verb like "the table begins at NNNN". A position is a number a
+# reader is invited to look up, and this PR moves those numbers. What prose cites
+# instead is a grep, or `locate.sh` bound to a commit. (A bare number with no
+# positional context is deliberately NOT flagged; see the bound at line ~131.)
 #
-# THE REGEX BELOW MATCHES THE CLASS, NOT THE SYNTAX IT WAS WRITTEN FOR. An
-# earlier revision matched `docs/(10|11)[^ ]*:[0-9]+` — a colon — and a bare
-# `2189` walked straight past it. That is `AGENTS.md` section 6 item 2 aimed at
-# this repo's own check: a test that only catches the spelling it was written
-# for is not a test of the thing. This one matches a bare 3-4 digit number too,
-# so B3 cannot survive the apparatus built to stop it.
+# THE CHECK BELOW MATCHES THE SPELLINGS THE CLASS ACTUALLY TAKES — and after
+# verifier round 5 it does so for the colon form. An earlier revision tested each
+# punctuation-delimited TOKEN for a trailing `:NNNN`, but the tokeniser split on
+# `:`, so `docs/11:NNNN` was torn into `docs/11` + `NNNN` and the test could
+# never fire: it reported "0 positions" on a file that carried them. That is
+# `AGENTS.md` section 6 item 2 aimed at this repo's own check — a test that
+# catches only the spelling it was written for. The tokeniser now keeps `:`
+# inside a token, and the subject is matched by path PREFIX (see B/C below).
 #
-# THE EXEMPTION IS A KIND, NOT A POSITION. It exempts SECTIONS whose heading is a
-# Correction section (`^## 8a…`), recognised by their HEADING and running to the
-# next `^## ` heading. An earlier revision used `awk '/^## 8a/ {skip=1}'`, which
-# skipped from that line to EOF — so `## 9. Artefacts` was exempt although it is
-# not a Correction section, and anything appended after it inherited a free pass
-# forever. That exemption is implemented here by kind, and a heading matching the
-# Correction pattern that is NOT one is reported.
+# THE EXEMPTION IS A KIND, NOT A POSITION. It exempts SECTIONS whose heading
+# matches the ONE pattern in CORR_RE below and runs to the next `^## ` heading.
+# Two earlier revisions were wrong here: one used `awk '/^## 8a/ {skip=1}'`,
+# which skipped from that line to EOF so every later section inherited a free
+# pass forever; the next matched `^## 8a` alone, so any heading beginning `## 8a`
+# opened the exemption, correction or not. CORR_RE is now specific, and a heading
+# that mentions "correction" but does NOT match CORR_RE is reported as FAKE.
 #
 # WHY THE EXEMPTION EXISTS AT ALL: `AGENTS.md` section 5 requires corrections to
 # be PRESERVED, not smoothed over. A correction record must be able to quote the
@@ -57,6 +61,9 @@ ADVISORY=0
 
 D10=docs/10-open-questions.md
 D11=docs/11-suggested-research-areas.md
+# The single canonical test for a Correction SECTION heading. Used by the
+# exemption, the FAKE check and the listing below, so they cannot diverge.
+CORR_RE='^## 8a(-[0-9]+)?[.] Correction'
 
 echo "dup-test.sh — the non-duplicate test, run against docs/10 section 1,"
 echo "the docs/11 Closed table, and docs/11 itself."
@@ -106,8 +113,8 @@ echo "    therefore does NOT carry a copy of this table — it carries the comma
 echo
 
 echo "═══ THE POSITION CHECK ═══"
-echo "  FINDINGS.md must publish no position into any file, in any spelling:"
-echo "    docs/NN:NNNN | bare 3-4 digit numbers | 'line NNNN' | 'lines NNNN-NNNN'"
+echo "  FINDINGS.md must publish no position into a file this PR edits:"
+echo "    docs/NN:NNNN | 'line NNNN' | 'lines NNNN-NNNN' | 'begins at NNNN'"
 echo "  Exempt: Correction SECTIONS, recognised by heading, which must be able to"
 echo "  quote a withdrawn number (AGENTS.md section 5). Everything after them is"
 echo "  checked — an earlier revision skipped to EOF and let later sections inherit"
@@ -138,23 +145,33 @@ echo "  the exemption."
 #
 # A line is reported once, by first match.
 
+# `ed` below is used ONLY literally — as an exact key and via index() — so it is
+# NOT regex-escaped, and the join is `paste`. (An earlier revision escaped it for
+# a regex use that does not exist, which made gawk print "escape sequence ..."
+# warnings on stderr and made the no-write-to-stderr rule false.)
 EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v '^findings-log/')
-EDRE=$(printf '%s\n' "$EDITED" | sed 's/[][\\.*^$(){}?+|/]/\\&/g' | paste -sd'|' -)
+EDRE=$(printf '%s\n' "$EDITED" | paste -sd'|' -)
 [ -z "$EDRE" ] && EDRE='$^'
 
-HITS=$(awk -v ed="$EDRE" '
-  BEGIN { split(ed, A, "|"); for (i in A) E[A[i]] = 1 }
+HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
+  BEGIN { split(ed, A, "[|]"); for (i in A) E[A[i]] = 1 }
   # A Correction section is a SECTION: it starts at a "^## " heading and ENDS at
   # the next one. That is what makes the exemption a kind, not a position.
-  /^## / { insec = ($0 ~ /^## 8a/ || $0 ~ /^## Correction/) }
+  /^## / { insec = ($0 ~ cre) }
   insec  { next }
   {
     line = $0
     why = ""
-    n = split(line, W, /[^A-Za-z0-9._\/-]+/)
-    # A — a colon position into a file this PR edits
+    n = split(line, W, /[^A-Za-z0-9._/:-]+/)
+    # A — a colon position into a file this PR edits (full path, or the
+    # abbreviated `docs/11` form this pass actually writes)
     for (i = 1; i <= n; i++)
-      if (W[i] ~ /:[0-9]+$/ && E[W[i]]) { why = "A file:NUMBER   "; break }
+      if (W[i] ~ /^[A-Za-z0-9._/-]+:[0-9]+$/) {
+        pre = W[i]; sub(/:[0-9]+$/, "", pre)
+        if (E[pre] || (length(pre) > 2 && index(ed, pre) == 1)) {
+          why = "A file:NUMBER   "; break
+        }
+      }
     # B/C — a positional phrase whose SUBJECT is an edited file, named either by
     # its full path (`docs/11-suggested-research-areas.md`) or by any leading
     # directory of one (`docs/11`). Getting this direction wrong is how the
@@ -174,7 +191,7 @@ HITS=$(awk -v ed="$EDRE" '
 
 # Headings that LOOK like Correction sections but are not one — so the exemption
 # cannot be widened by renaming.
-FAKE=$(grep -n '^## ' "$LOG" | grep -i 'correction' | grep -vE '^\s*[0-9]+:## 8a' || true)
+FAKE=$(awk -v cre="$CORR_RE" '/^## / && tolower($0) ~ /correction/ && $0 !~ cre { print NR": "$0 }' "$LOG")
 
 N=$(printf '%s' "$HITS" | grep -c '' || true)
 echo
@@ -190,10 +207,10 @@ else
 fi
 echo
 echo "  Correction sections (exempt, by heading):"
-awk '/^## /{ if ($0 ~ /^## 8a/) print "    " NR": "$0 }' "$LOG"
+awk -v cre="$CORR_RE" '/^## /{ if ($0 ~ cre) print "    " NR": "$0 }' "$LOG"
 echo
 echo "  Sections AFTER the last Correction section, which the exemption does NOT reach:"
-awk -v last="$(grep -n '^## 8a' "$LOG" | tail -1 | cut -d: -f1)" '
+awk -v last="$(grep -nE "$CORR_RE" "$LOG" | tail -1 | cut -d: -f1)" '
   /^## / && NR > last { print "    " NR": "$0 }
 ' "$LOG"
 echo

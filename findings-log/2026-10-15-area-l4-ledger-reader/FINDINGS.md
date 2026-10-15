@@ -509,7 +509,7 @@ three mechanisms are measurable from the committed tree.** They now are:
 
 | mechanism | status | measurement |
 |---|---|---|
-| **`limit=` tail truncation** — `docs/10` §1: "a `limit` truncates from the **tail**, keeping the head of the SURT range" | **MEASURED, excluded for 73 of 74 member-source rows** (cell **B**, one per crawl — what `derive()` counts) | 74 rows: **68** carry no `limit=`, **6** carry one, and of those 6 only **1 reached it** — `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. **Carrying a limit and reaching it are different predicates**, and only the second can cut a tail. Computed by `kib-detector.py` RULE 3 (§8b) |
+| **`limit=` tail truncation** — `docs/10` §1: "a `limit` truncates from the **tail**, keeping the head of the SURT range" | **MEASURED, excluded for every qualifying row but the two that reached their own limit.** Cell **A** (per row — the cell that bears on the figures): **79 of 81**. Cell **B** (one per crawl — what `derive()` counts): **73 of 74** | 74 rows: **68** carry no `limit=`, **6** carry one, and of those 6 only **1 reached it** — `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. **Carrying a limit and reaching it are different predicates**, and only the second can cut a tail. Computed by `kib-detector.py` RULE 3 (§8b) |
 | **whole-KiB truncation** — the detector `docs/10` §1 defines and `docs/10` §1's successor names | **MEASURED, excluded** | **0 candidates across 193 successful `200`s** over the whole population (§8b) |
 | **completeness of the record set** — did the pass enumerate every member, or only what one response body held | **NOT MEASUREDABLE OFFLINE** | the bodies are excluded by `AGENTS.md` §7; `docs/10` §1 says of its own detector that *"clean for this test is not the same as complete"* |
 
@@ -541,8 +541,10 @@ docs/11 Closed table     the line matching '^## Closed areas'
 
 **Both are stated as greps because this PR edits `docs/11`, so every number a
 reader copied from it expired when the PR landed.** Four review rounds found that
-same defect at a new coordinate each time — `:2189` -> `docs/11:2170` ->
-`docs/11:2218` -> `:2232` -> `:2236` -> `:2253` — because every fix added lines.
+same defect at a new coordinate each time — because every fix added lines. The
+coordinates themselves are deliberately **not reproduced here**: printing them is
+the very defect under discussion, and an earlier revision of this paragraph was
+one of the offenders. What the file offers instead is a resolver —
 **`locate.sh` resolves every landmark this file names, by content, bound to the
 commit it measured at:**
 
@@ -628,7 +630,7 @@ numerator from one beside a denominator from another:
 
 **⚠ "Carrying a `limit=`" and "reaching it" are different predicates, and only the
 second can cut a tail.** Cell **B** — what `derive()` actually counts — has **1** such
-row: `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. Round 3's
+row, and cell **A** — every qualifying row, the cell that bears on the figures — has **2**: `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. Round 3's
 re-derivation, made by *importing* this reader's predicates rather than reimplementing
 them, returned **81 / 9 / 72 / 2** — cell **A** — which is right for the question it
 asked. **The withdrawn figure `69 / 67` matched no cell at all** — `69` is not any
@@ -665,9 +667,10 @@ Recorded-not-fixed is right for the **code** — another lane's file — and **n
 for the handoff**, because the row naming the tool still stands. Carried as successor
 **S-L4e** (the sixth entry in §8c).
 
-**So the floor claim of §7a is NARROWED, not retired.** Under cell **B** the `limit=`
-mechanism is measured and excluded for **73 of 74** member-source rows (1 is AT its
-limit); the whole-KiB mechanism for **all 193**. **What remains undemonstrated is
+**So the floor claim of §7a is NARROWED, not retired.** Under cell **A** (per row — the cell
+that bears on the figures) the `limit=` mechanism is measured and excluded for **79 of
+81** qualifying rows; under cell **B** (one per crawl, what `derive()` counts) for **73
+of 74** (1 is AT its limit); the whole-KiB mechanism for **all 193**. **What remains undemonstrated is
 completeness of the record set itself**, which no artefact in the tree can settle
 because the bodies are excluded by `AGENTS.md` §7.
 
@@ -822,17 +825,17 @@ and an arithmetic line that did not add up. Superseded text is named here
 |---|---|---|
 | 4 | the §7a floor claim's **carriage was unsigned** — `docs/11` publishes those figures in three places, and the hedge sat upstream of them | the floor now sits **in the same paragraph as each figure** in `docs/11`, and in the reader's own `census` output as a measured per-crawl block (§7a) |
 | 5a | **K2 was a hand-maintained literal** — `ipro_hcp_count` excluded by rule, so a future fourth shape would be silently missed | K2 now scans every key by the name pattern `^ipro_hcp` with an **explicit, printed exclusion list** and a row count for what it excluded (**11 rows**). A fourth shape is counted, not ignored. |
-| 5b | `run.log`'s self-test line count reconciled only if the capture included stderr | stated in `run.log`: captures are `2>&1`, so **38 stdout + 1 stderr = 39** |
+| 5b | `run.log`'s self-test line count reconciled only if the capture included stderr | stated in `run.log`: captures are `2>&1`, so **stdout + 1 stderr**. (Round 2's value was **38 + 1 = 39**; the checks have grown since and `run.log` carries the current figure — a correction row quotes a then-value.) |
 | 5c | the **10.3%** rounding was inline but unstated | **rounding rule stated** in §1: one decimal place, truncated, quotient printed beside it (39 ÷ 380 = 0.10263) |
 
 **The floor claim is NARROWED, not retired, and the narrowing is the substantive
 result of this round.** `docs/10` §1 already asks the general floor question and
 already names its own successor — "the same one-command test over every other
 committed CC ledger". **That test has now been run over area L** (§8b, by
-`kib-detector.py`): **193 successful `200`s, 0 whole-KiB candidates**, and under cell
-**B** the tail-truncation mechanism `docs/10` §1 describes is measured and excluded
-for **73 of 74** member-source rows — the one exception is `CC-MAIN-2020-50`, printed
-as `FLOOR` wherever a figure is published. **What survives is narrower:** completeness of the
+`kib-detector.py`): **193 successful `200`s, 0 whole-KiB candidates**, and the tail-truncation mechanism `docs/10` §1 describes is measured and excluded for
+**79 of 81** qualifying rows (cell **A**, per row — the cell that bears on the figures;
+on cell **B**, one per crawl, **73 of 74**) — the exceptions are the `CC-MAIN-2020-50`
+rows, printed as `FLOOR` wherever a figure is published. **What survives is narrower:** completeness of the
 record set itself, which `docs/10` §1's own words anticipate — *"Clean for this
 test is not the same as complete"* — and which no artefact in the tree can settle
 because `AGENTS.md` §7 excludes the bodies. **A successor that re-asks the general
@@ -851,7 +854,7 @@ measurements.** Every finding below is of that class and needs no request.
 | # | superseded | corrected to | why |
 |---|---|---|---|
 | 1 | this file published `docs/11:2218` for Closed row `L`, and "the Closed table begins at `:2189`" | **no position is published in this file, in any spelling.** `locate.sh` resolves every landmark by content, bound to a commit; `dup-test.sh` enforces it and exits non-zero | every pointer of that shape has been stale within one commit, because this PR inserts 142 lines into `docs/11` below most of what it cites. Correcting the numbers would fix four instances of a bug that has fired in every round |
-| 2 | the no-line-numbers policy, while the same file published five `docs/NN:NNNN` pointers | the policy is now **enforced and fatal**: `dup-test.sh` greps `FINDINGS.md` for a position in any spelling, outside the Correction sections, and **exits non-zero** | a policy the file stating it breaks is not a policy. The Correction sections are excluded **deliberately** — `AGENTS.md` §5 requires corrections preserved as history |
+| 2 | the no-line-numbers policy, while the same file published five `docs/NN:NNNN` pointers | the policy is now **enforced and fatal**: `dup-test.sh` greps `FINDINGS.md` for a position in the spellings it takes, outside the Correction sections, and **exits non-zero** | a policy the file stating it breaks is not a policy. The Correction sections are excluded **deliberately** — `AGENTS.md` §5 requires corrections preserved as history |
 | 3 | "moved row `L` by **17 lines**" | **2094 → 2170 → 2218 → 2232 → 2236**; main → head **+142**, the round before **+18** | "17" was neither figure, and this round introduced it. Measured, now |
 | 4 | "**67 of 69** member-source rows carry no `limit=`" | **RULE 3** stated and shipped in `kib-detector.py`. **A** every row **81 / 9 carry / 72 none / 2 at-limit** · **B** one per crawl, what `derive()` uses, **74 / 6 / 68 / 1** · **C** in-window, **72 / 5 / 67 / 1** | the published **69/67 matched no cell**, and **67** is cell C's "carrying none" beside cell A's denominator. The reviewer's re-derivation — *importing* this reader's predicates — returned **81/9/72/2**, cell **A**, which is right for its question |
 | 5 | `read-area-l.py` printed *"every other member-source row carries no `limit=`, so no limit truncated it"* | the block now counts **four** numbers and says **"AT their own limit"** is the only predicate that can cut a tail | the sentence asserted one predicate (carries none) about rows selected by another (reached it). **7** member-source rows carry a limit without reaching it |
@@ -889,7 +892,7 @@ this PR edits. **So this round changes the shape, not the instances.**
 | 3 | this file published a terminal position and "measured, now", plus an inserted-line count | **no terminal position, and no line count, is published anywhere in this file** | the "measured, now" figure named the *previous* commit's value on the SHA it shipped in. Any position stated here expires on the commit that adds lines above it — **and this file is the thing adding them** |
 | 4 | §8b carried a **transcribed** copy of `dup-test.sh`'s output, which had drifted (`floor` 31 recorded / 30 live; `truncat` 3 / 5) | **the table is gone; only the command remains** | transcription is what let it drift, and §9's whole purpose was to remove that manual step. The script prints the counts live |
 | 5 | "no line numbers are published here because this pass's own three commits moved row `L` by **17 lines**" — superseded in a Correction section, still live in §8c's body | **the body text is updated**; the Correction entries stay, because they are history | a correction recorded and not applied to the body is a correction that changes nothing |
-| 6 | "see §6, *Successors* 1 and 2" (no such list) and "`probe.sh` records the **four** commands" (it runs five) | both corrected | the successor list is under `## 8c`; `probe.sh` now runs five |
+| 6 | "see §6, *Successors* 1 and 2" (no such list) and "`probe.sh` records the **four** commands" (it runs **eight**) | both corrected | the successor list is under `## 8c`; `probe.sh` now runs **eight** |
 
 **THE STRUCTURAL CHANGE, which is the point of this round.**
 
@@ -906,7 +909,34 @@ this PR edits. **So this round changes the shape, not the instances.**
   artefact" are now true rather than aspirational.
 - **The exemption is a kind, not a position.** It covers Correction **sections**,
   recognised by heading and ending at the next heading. The earlier `awk
-  '/^## 8a/ {skip=1}'` skipped to EOF, exempting `## 9. Artefacts` and anything
+  '/^## 8a/ {skip=1}'` skipped to EOF, exempting `## 8a-5. Correction (2026-10-15) — verifier round 5
+
+Round 5 returned NOT CLEAN on three blockers, all of them in the **apparatus**
+rather than in the measurements — the same diagnosis as round 4, one level further
+in. Round 4 fixed the *prose*; round 5's finding is that the *checker written to
+police the prose* could not see the class it claimed to police.
+
+| # | superseded | corrected to | why |
+|---|---|---|---|
+| 1 | `dup-test.sh` reported "0 positions" on this file while the file carried `docs/11:NNNN` pointers | the tokeniser held `:` OUT of a token, so `docs/11:2218` was torn into `docs/11` + `2218` and the colon test could never fire; `:` is now inside the token class and the subject is matched by path prefix | a check that catches only the spelling it was written for is `AGENTS.md` §6 item 2 aimed at this repo's own check. Mutating one line into the class now exits non-zero and names the line |
+| 2 | the Correction exemption matched `^## 8a`, so any heading beginning `## 8a` opened it | **one** canonical pattern, `CORR_RE`, used by the exemption, the `FAKE` check and the listing, so the three cannot diverge; a heading that mentions "correction" but does not match `CORR_RE` is reported | the exemption is a kind, not a prefix |
+| 3 | `read-area-l.py` read every ledger **twice** and appended each row again, so the member-shape cells printed **456 / 178 / 22** | the second pass is removed; the cells print **228 / 89 / 11**, the values §7 publishes | the same silent-overcount class the S-L2 section had already been corrected for twice — and the one blocker that moved a *published* figure |
+| 4 | `run.log` recorded `dup-test.sh` at **66** output lines, and named `read-area-l.py` without its `python3 ` prefix | **65** lines, regenerated by re-running the invocations; every invocation named as `probe.sh` runs it | the count moved when the checker changed (which is correct — the transcript was stale); the missing prefix named a command that is not executable |
+| 5 | `dup-test.sh`'s `awk` emitted `escape sequence` warnings on stderr, falsifying `run.log`'s rule 2 | the `awk` no longer escapes characters it does not need to escape, so **`dup-test.sh` writes nothing to stderr** and rule 2 holds | a file that states a rule its own tools break is the defect the rule exists to catch |
+| 6 | §8a-2 row 5b quoted the round-2 self-test count (`38 + 1 = 39`) as though current | the **mechanism** is unchanged (`2>&1`); the count has grown with the checks and `run.log` carries the current figure | a correction row is history; its number is a then-value |
+
+**The one substantive correction is #3, and it is why this round is recorded here
+rather than as a footnote.** The double-append was not a citation defect — it
+inverted a number this pass publishes in §7 (the member-shape cells). Every other
+round found pointers, predicates or prose; this one found the reader disagreeing
+with its own published table, which is `AGENTS.md` §6 item 5.
+
+**Unchanged and re-verified after the edits above:** the population (8 ledgers /
+380 rows), all five moved census cells, `older-schema` 8 → 0, both member-carrying
+cells, `CC-MAIN-2013-48` NOT DERIVABLE, 193/0 whole-KiB, and the INFERRED limits.
+**No other measured figure moved.**
+
+## 9. Artefacts` and anything
   appended after it, forever. The script also **reports** a heading that looks like
   a Correction section and is not one, so the exemption cannot be widened by
   renaming.
@@ -949,4 +979,4 @@ sh       locate.sh                  # every landmark, resolved by content, bound
 python3  kib-detector.py            # rules 1-3, the truncation cells
 ```
 
-Every number in this file comes out of one of those six.
+Every number in this file comes out of one of the commands above.
