@@ -902,9 +902,16 @@ checked by and live only on the post-merge path.**
 
 **The distinction that is easy to get wrong, recorded because it is the useful part.**
 `machine-specific paths|(^|[^a-z])/[hH]ome/…` **does** fire behind a `+`, because
-`[^a-z]` matches the plus. **So the dividing line is not "anchored versus unanchored"
-but "anchored at `^`" versus "has an alternative accepting any non-letter"** — and the
-pattern list records which is which for none of its ten entries.
+`[^a-z]` matches the plus. **⚠ Corrected 2026-10-15 (area D, #134): this addendum stated that as a two-way
+division — anchored at `^` versus has an alternative accepting any non-letter — and it
+is not a partition.** The right-hand side is satisfied by **1 of the 10** patterns; the
+other eight are unanchored *and* carry no such alternative, and are live anyway. The
+rule is **one-directional**: **a net is dead behind `+` iff every alternative is
+`^`-anchored.** Carrying a non-letter alternative is one *sufficient* way to satisfy
+that, not a necessary one. The mechanism above is unchanged and survives the correction
+— it is the partition that was wrong, and all ten patterns are re-classified against the
+one-directional rule in [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §3b].
+**The pattern list records which is which for none of its ten entries.**
 
 **Blocker:** **both** available repairs touch the gate's own machinery — strip the `+` at
 `research-gate.sh:108`, or rewrite the pattern to tolerate a leading `+` — and `docs/09`
@@ -919,6 +926,23 @@ liveness is unstated is a net whose liveness nobody notices has stopped.
 **Assumptions (INFERRED):** that `:108` is the only `+`-prefixed subject path — `staged`
 mode at `:104` uses the same construction and `--all` at `:106` uses `cat`, so that is a
 reading of the three lines together, not of `:108` alone. Zero requests.
+
+> ⚠ **CORRECTED 2026-10-15 (area D, #134) — both halves of the sentence above are false.**
+> Read at the file: `:104` is
+> `[ -f "$f" ] || continue`, a guard inside the per-file loop, **not** the `staged`
+> construction, which is at **`:107`**; and `:108` is **not** the only `+`-prefixed path —
+> `:107` is a second one with identical semantics, so the count is **2, not 1**. The
+> `105,109` block carries exactly 2 occurrences of `grep '^+' | grep -v '^+++'` and exactly
+> 1 `cat "$f"`, counted rather than read. The premise this sentence supports — *"dead on the
+> path every PR is checked by"* — also **understates** it: the anchored net is dead on
+> **two** paths, `diff` **and** `staged`, and is only partly live in `--all`. Correction,
+> counts and the cell table: the next addendum on this page (area D, §"The correction"), and
+> [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §1a]. The correction is also
+> appended to the log this addendum came from
+> ([findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md](findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md),
+> `## Correction (2026-10-15)`), so the correction is reachable from the source as well as
+> from here. **The superseded wording is retained above rather than deleted** — the same
+> convention the Closed-areas L row uses.
 
 #### Addendum (2026-10-15, area D, pool lane D, issue #134) — the measurement branch: a control cell for each of the ten
 
@@ -954,11 +978,19 @@ of 4 in `--all` (bare at line start), **0 of 4** in `staged` and in `diff`
 [FINDINGS.md §3a]. A key inside a captured response body — where a key of that shape
 actually arrives — would not be caught by this net **in any mode**.
 
-**The distinction the addendum named is now measured, not asserted.**
+**The distinction the addendum named is now measured, not asserted — and restated, because
+the phrasing it used is not a partition.**
 `machine-specific paths` fires in **4 of 4** cells in **all three modes**, including behind
-a leading `+`, because `[^a-z]` accepts the plus. The dividing line is **anchored at `^`**
-versus **has an alternative accepting any non-letter**, and the pattern file records which
-is which for **none** of its ten entries [FINDINGS.md §3b].
+a leading `+`, because `[^a-z]` accepts the plus. ⚠ **Corrected 2026-10-15 (verifier round
+1, F3):** the area-F addendum stated the dividing line as a two-way partition — anchored at
+`^` *versus* has an alternative accepting any non-letter — and **1 of the 10** patterns
+satisfies its right-hand side. The other eight are unanchored and carry no such alternative,
+and are live anyway. **The rule is one-directional: a net is dead behind `+` iff every
+alternative is `^`-anchored.** A non-letter alternative is one *sufficient* way to satisfy
+that, not a necessary one — and that is the only correction, because the mechanism is
+unchanged and was independently re-derived rather than read back. All ten patterns are
+re-classified against the one-directional rule in [FINDINGS.md §3b], and the pattern file
+records which is which for **none** of its ten entries.
 
 **Two zero-means-different-things cells** are recorded so a later reader does not merge
 them [FINDINGS.md §3c]: an added line whose **content** starts with `++` renders as `+++…`,
@@ -1037,8 +1069,18 @@ neither is recorded anywhere.
 whether the net survives a leading `+`, and one in ten patterns ships a committed control
 that runs **without** writing an instance into a scanned file — e.g. instances derived from
 the exempt pattern file at run time, which is what this pass does and which works. **A
-negative counts**: if the maintainer judges per-pattern annotation unnecessary because
+negative counts**: if the maintainer judged per-pattern annotation unnecessary because
 `:108` is simply fixed, this successor is moot and should be closed with the reason.
+⚠ **The column must state the one-directional rule, not the two-way one this pass first
+published.** A column whose test is *"anchored at `^` versus has an alternative accepting
+any non-letter"* leaves **8 of 10** entries unclassified (verifier round 1, F3): the test
+is **dead behind `+` iff every alternative is `^`-anchored**
+[`FINDINGS.md` §3b], which classifies **10 of 10** with **0** disagreements. **Also here:
+the `docs/09` §4 `.txt` extension-blindness row (`docs/09:206`) has counts measured at
+`cd626d6` that are now stale, and it is annotated in place rather than re-derived** — its
+own counting rule is `git ls-files '*.txt'` against `git ls-files '*.md' '*.yml' '*.yaml'
+'*.sh' '*.hurl'` minus the two excluded files, so whoever picks it up has the command
+already written down and this pass does not vouch for `31`, `126` or `1216`.
 
 **Assumptions (INFERRED):** that a per-pattern annotation is cheaper than the alternative
 of stripping the `+`. The opposite is defensible — the area records both repairs, and this

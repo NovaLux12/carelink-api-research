@@ -28,7 +28,10 @@
 #   --screen     run the gate's leak-scan path (both subject modes) over THIS
 #               repository's own diff vs origin/main — the static part of the
 #               gate, so a committed artefact can be screened without running the
-#               vendor suite
+#               vendor suite. Run it from anywhere: the mode enters $REPO itself,
+#               asserts it got there, and refuses to report a clean scan over an
+#               empty subject list or a partial loop. It names the tree it read,
+#               so a committed transcript of it is re-derivable.
 #
 # WHY NO COMMITTED FIXTURES. All ten nets are self-referential: an instance that
 # matches pattern P is by construction text that pattern P matches, so committing
@@ -126,13 +129,15 @@ SELF=""; SELF_PATTERNS=""; MODE=""; ADDED=""; SUBJECT=""; f=""
 name=""; pat=""; hits=""; FAIL=0; REC=""; BASE=""; SCRATCH=""
 G_SELF='66,67'        # SELF / SELF_PATTERNS
 G_SUBJ='84,94'        # subject-list selection, all three modes
+G_FAILCLOSED='76,82'  # fail-closed override of MODE when origin/main is unresolvable
 G_ADDED='105,109'     # ADDED construction, all three modes
 G_LOOP='114,136'      # the matching loop: parse, carve-out, count, decide
-BLOCK_SELF=""; BLOCK_SUBJ=""; BLOCK_ADDED=""; BLOCK_LOOP=""
+BLOCK_SELF=""; BLOCK_SUBJ=""; BLOCK_FAILCLOSED=""; BLOCK_ADDED=""; BLOCK_LOOP=""
 
 load_blocks() {
   BLOCK_SELF="$(block "$G_SELF")"
   BLOCK_SUBJ="$(block "$G_SUBJ")"
+  BLOCK_FAILCLOSED="$(block "$G_FAILCLOSED")"
   BLOCK_ADDED="$(block "$G_ADDED")"
   BLOCK_LOOP="$(block "$G_LOOP")"
   eval "$BLOCK_SELF"
@@ -369,6 +374,43 @@ self_test() {
   case "$b" in *"grep -E '\.(md|yml|yaml|sh|hurl)\$'"*) : ;;
                  *) note_fail "subject block lost its diff/staged extension filter" ;; esac
 
+  # The fail-closed block, and it must be RUN rather than read. Verifier round 1,
+  # F5: --screen eval'd every other block but not this one, so a checkout where
+  # origin/main does not resolve produced an empty subject list, zero hits for
+  # every pattern, and exit 0 — a green that had checked nothing.
+  b="$(block "$G_FAILCLOSED")"
+  for sig in 'git rev-parse --verify origin/main' 'MODE="all"' 'BASE=HEAD'; do
+    case "$b" in *"$sig"*) : ;;
+                   *) note_fail "fail-closed block $G_FAILCLOSED lost ${sig@Q}" ;; esac
+  done
+  # Behaviour, both directions, in a throwaway repo so $SCRATCH is untouched.
+  fc_probe() {   # $1 = dir -> prints "MODE BASE" after the block has run
+    ( cd "$1" && MODE="diff"; BASE="origin/main"; eval "$BLOCK_FAILCLOSED" >/dev/null 2>&1
+      printf '%s %s\n' "$MODE" "$BASE" )
+  }
+  local fc r
+  fc="$(mktemp -d)"
+  ( cd "$fc" && git init -q . && printf 'x\n' > f.txt && git add f.txt \
+      && git -c user.email=c@localhost -c user.name=c commit -qm base ) >/dev/null 2>&1
+  r="$(fc_probe "$fc")"
+  if [ "$r" = "all HEAD" ]; then
+    note_ok "fail-closed block fires where origin/main cannot resolve (mode diff -> $r)"
+  else
+    note_fail "fail-closed block did NOT fire with no origin/main: got [$r], expected [all HEAD]"
+  fi
+  ( cd "$fc" && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  r="$(fc_probe "$fc")"
+  # On the non-fire path the gate's block still runs its assignment, so BASE
+  # becomes the RESOLVED sha rather than the literal string it was given. Assert
+  # on that: what matters is that MODE stayed diff and BASE got resolved.
+  case "$r" in
+    "diff "*) [ "${r#diff }" != "origin/main" ] \
+        && note_ok "fail-closed block leaves a resolvable origin/main alone (mode stays diff, BASE resolved to ${r#diff })" \
+        || note_fail "fail-closed block resolved nothing: got [$r]" ;;
+    *) note_fail "fail-closed block flipped MODE although origin/main resolves: got [$r], expected [diff <sha>]" ;;
+  esac
+  rm -rf "$fc"
+
   # The two facts the area's premise rests on, counted rather than read: the
   # ADDED block carries exactly two '+'-prefixed paths and exactly one cat path.
   b="$(block "$G_ADDED")"
@@ -449,6 +491,25 @@ self_test() {
     '++SENTINEL token here'*) : ;;
     *) note_fail "an added line whose content begins with a single '+' did not survive as '++...': [${rendered//$'\n'/ | }]" ;;
   esac
+
+  # F5 regression, at the entry point a reader actually uses. --screen invoked
+  # from a directory that is NOT the repo root must still screen the repo. Before
+  # the fix, gate :136's relative pattern path resolved to nothing there, the
+  # subject list came back empty, and the run printed "no pattern fired" and
+  # exited 0 — a green that had read no file at all.
+  local sdir sout
+  sdir="$(mktemp -d)"
+  sout="$( cd "$sdir" && bash "$HERE/scrub-diffmode-control.sh" --screen 2>&1 )"
+  case "$sout" in
+    *"HEAD "*) : ;;
+    *) note_fail "--screen from a foreign cwd did not report which tree it screened" ;;
+  esac
+  if printf '%s' "$sout" | grep -q 'subject files: 0'; then
+    note_fail "--screen from a foreign cwd screened 0 subject files — the F5 defect is back"
+  else
+    note_ok "--screen is cwd-independent: from a foreign directory it still screens the repo root"
+  fi
+  rm -rf "$sdir"
 }
 
 # ---------------------------------------------------------------- mutation test
@@ -542,17 +603,58 @@ check_negatives() {
 # The gate's leak-scan path, verbatim, over this repository's own diff. Static
 # only: the 05 vendor suite is NOT run (the pool serialises suites).
 screen() {
-  local rc=0 mode tmp st msg f
+  local rc=0 want tmp st msg f
   load_blocks
-  for mode in diff all; do
-    build_subject "$mode" "origin/main"
+  # The gate's loop reads `scripts/scrub-patterns.txt` by RELATIVE path (:136) and
+  # its subject block runs bare `git`, so the directory this mode runs in IS the
+  # input. Enter the repo explicitly and assert it, rather than letting the
+  # caller's cwd decide what gets scanned — run from anywhere else, :136 iterates
+  # nothing, every pattern reads 0, and the screen exits 0 having checked no file
+  # at all. That is the "check that cannot fail" shape this harness exists to
+  # close, in the one mode a reader is told to re-run (verifier round 1, F5).
+  cd "$REPO" || { echo "screen: cannot enter $REPO"; return 1; }
+  # Name the tree being screened. A transcript that does not say which commit it
+  # read cannot be re-derived, and its counts go stale the moment a doc line moves.
+  # Only the BASENAME is printed: the first version of this line printed $REPO
+  # whole, which put an absolute home path into a committed artefact, and the
+  # gate's own machine-path net fired on the transcript of its own screen.
+  echo "--- screen: repo $(basename "$REPO"), HEAD $(git rev-parse --verify HEAD 2>/dev/null || echo UNRESOLVED), dirty $(git status --porcelain 2>/dev/null | grep -c '') file(s) ---"
+  # Pre-flight, before any count is printed: the path the gate's loop reads and
+  # the absolute copy this harness parsed must be the same file.
+  if [ ! -r scripts/scrub-patterns.txt ]; then
+    echo "screen: !! gate :136 reads scripts/scrub-patterns.txt relative to the cwd, unreadable from $PWD"
+    return 1
+  fi
+  local rel_abs; rel_abs="$(cd "$(dirname scripts/scrub-patterns.txt)" && pwd)/$(basename scripts/scrub-patterns.txt)"
+  if [ "$rel_abs" != "$PAT_ABS" ]; then
+    echo "screen: !! gate :136 would read $rel_abs but this harness parsed $PAT_ABS"
+    return 1
+  fi
+  local np; np="$(count_patterns)"
+  if [ "${np:-0}" -eq 0 ]; then
+    echo "screen: !! parsed $np patterns — refusing to report a clean scan over zero patterns"
+    return 1
+  fi
+  for want in diff all; do
+    MODE="$want"; BASE="origin/main"
+    eval "$BLOCK_FAILCLOSED"      # the gate's own override (:76-82) — without it a
+    # missing origin/main yields an empty subject list and a silent pass, which is
+    # the same defect as an unreadable pattern file.
+    build_subject "$MODE" "$BASE"
     build_added
-    echo "--- screen: gate leak scan over this branch's diff, mode=$mode, subject files: $(printf '%s' "$SUBJECT" | grep -c '') ---"
-    if [ -z "$SUBJECT" ]; then echo '  (no subject files)'; continue; fi
+    echo "--- screen: gate leak scan over this branch's diff, mode=$MODE (requested $want), subject files: $(printf '%s' "$SUBJECT" | grep -c '') ---"
+    if [ -z "$SUBJECT" ]; then
+      echo "  !! no subject files for mode $MODE — a scan that reads nothing is not a clean scan"
+      rc=1; continue
+    fi
     tmp="$(mktemp)"
     FAIL=0; REC=""
     eval "$BLOCK_LOOP" >"$tmp" 2>&1
-    echo "  gate loop FAIL flag: $FAIL"
+    echo "  gate loop FAIL flag: $FAIL, loop verdicts recorded: $(printf '%s' "$REC" | grep -c '')"
+    if [ "$(printf '%s' "$REC" | grep -c '')" -ne "$np" ]; then
+      echo "  !! the loop recorded $(printf '%s' "$REC" | grep -c '') verdicts for $np patterns — a partial loop is not a clean loop"
+      rc=1
+    fi
     while IFS="$RS" read -r st msg; do
       [ -n "$st" ] || continue
       if [ "$st" = '!!' ]; then echo "  !! $msg"; rc=1; fi
@@ -561,24 +663,71 @@ $REC
 EOF
     rm -f "$tmp"
   done
+  # Re-derivability key. A transcript that names only a commit cannot be checked
+  # against a LATER commit, and this file is committed, so the commit it ships in
+  # cannot be named inside itself (verifier round 1, F6 — the previous
+  # self-screen.txt recorded a line count matching neither commit it could have
+  # been taken at, and named neither). So print the digest of the exact subject
+  # list and the exact line count it scanned: a reader who checks out any later
+  # commit and re-runs gets the same pair if and only if nothing the gate reads
+  # moved. That is the property a committed transcript needs.
+  MODE="all"; BASE="origin/main"
+  eval "$BLOCK_FAILCLOSED"
+  build_subject "$MODE" "$BASE"
+  build_added
+  echo "--- re-derivable key: --all subject list sha256 $(printf '%s' "$SUBJECT" | sha256sum | cut -d' ' -f1), non-empty subject lines $(printf '%s' "$ADDED" | grep -c '[^[:space:]]') ---"
   # The machine-path carve-out (gate :123-124) is the loop's only per-pattern
   # special case. Quantify it over the REAL --all subject text, not a synthetic
   # cell, so the number describes the repo as it stands.
   echo '--- carve-out over the real --all subject text (supplementary; pattern applied directly) ---'
-  build_subject all origin/main
+  MODE="all"; BASE="origin/main"
+  eval "$BLOCK_FAILCLOSED"
+  build_subject "$MODE" "$BASE"
   build_added
+  if [ -z "$SUBJECT" ]; then
+    echo '  !! no --all subject files — the carve-out would read nothing and 0 would mean nothing'
+    rc=1
+  fi
   local mp raw gated
   mp="$(pattern_pairs | awk -F'\t' '$1=="machine-specific paths"{print $2}')"
   raw="$(printf '%s' "$ADDED" | grep -cEi "$mp" || true)"
   gated="$(printf '%s' "$ADDED" | grep -v '/home/<user>' | grep -cEi "$mp" || true)"
+  echo "  subject files: $(printf '%s' "$SUBJECT" | grep -c '')"
   echo "  subject lines in the --all text: $(printf '%s' "$ADDED" | grep -c '[^[:space:]]')"
+  # What the carve-out actually removes. "Not load-bearing" is a claim about the
+  # HIT COUNT; "excludes nothing" would be a claim about the TEXT, and the two are
+  # not the same. Verifier round 1, F4: this pass said "excludes nothing" while
+  # the filter was dropping real lines. Count both.
+  echo "  lines the carve-out drops (grep -v '/home/<user>'): $(($(printf '%s' "$ADDED" | grep -c '') - $(printf '%s' "$ADDED" | grep -v '/home/<user>' | grep -c '')))"
+  echo "  lines carrying the literal /home/<user>: $(printf '%s' "$ADDED" | grep -cF '/home/<user>' || true)"
   echo "  machine-specific paths, carve-out NOT applied: $raw"
   echo "  machine-specific paths, carve-out applied (gate :124): $gated"
+  # Positive control, so "not load-bearing" is never read as "disabled": a REAL
+  # machine path must fire, and must survive the carve-out. The instance is taken
+  # from INST_HOMEPATH, which is itself assembled from fragments at runtime.
+  # Writing the example path the gate documents into this script instead is what
+  # makes it fail its own screen, for two reasons that are worth keeping apart:
+  # this file is a .sh, so it IS in the --all and diff subject sets; and the
+  # carve-out drops a WHOLE LINE that carries the documented example. Neither was
+  # hypothetical — the first version of this control named both paths on one
+  # comment line, and `--screen` went red on the harness itself. See FINDINGS.md
+  # §3c for what that accidental commit measured.
+  local pc
+  pc="$(frag 'cd ' "$INST_HOMEPATH" '/projects')"
+  echo "  control, a real machine path, carve-out NOT applied: $(printf '%s' "$pc" | grep -cEi "$mp" || true) (expect 1)"
+  echo "  control, the same line, carve-out applied:           $(printf '%s' "$pc" | grep -v '/home/<user>' | grep -cEi "$mp" || true) (expect 1 — the carve-out must not blanket-disable the net)"
   # docs/09 §4: all three leak-scan modes choose subjects by EXTENSION, so the
   # .tsv / .jsonl / .log artefacts this pass commits are read by no pattern in
   # any mode. Screen this log directory by hand, through the same loop.
   echo "--- screen: the gate's loop over EVERY file in this log dir, all extensions ---"
-  for f in "$HERE"/*; do
+  # Snapshot first. When this mode's own stdout is redirected into self-screen.txt
+  # (the committed transcript), the loop would otherwise read that file while the
+  # shell is still writing it, and the transcript would depend on stdout buffering.
+  # A committed artefact has to be byte-reproducible, so the bytes under test are
+  # taken once, up front, from a snapshot.
+  local snap; snap="$(mktemp -d)"
+  cp "$HERE"/* "$snap"/ 2>/dev/null
+  for f in "$snap"/*; do
     [ -f "$f" ] || continue
     ADDED="$(cat "$f")"
     scan
@@ -589,6 +738,7 @@ EOF
 $REC
 EOF
   done
+  rm -rf "$snap"
   [ "$rc" -eq 0 ] && echo '  ok no pattern fired on any committed artefact in this log directory'
   return $rc
 }

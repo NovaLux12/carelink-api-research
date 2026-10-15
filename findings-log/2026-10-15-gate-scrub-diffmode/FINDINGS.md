@@ -126,6 +126,16 @@ artefact (`run.log`, self-test block; `--self-test` runs it alone and exits 0):
   repository instead of the scratch repo, which yields an empty subject list and
   a **1350-row matrix of zeros that reads exactly like ten dead nets**. The guard
   exists because that failure mode is silent and plausible.
+- ⚠ **the fail-closed block, run in both directions** (added 2026-10-15, round 2).
+  `--screen` originally `eval`'d the subject block, the `ADDED` block and the
+  matching loop, but **not** `research-gate.sh:76-82` — so a checkout where
+  `origin/main` does not resolve produced an empty subject list, a zero for every
+  pattern, and **exit 0**. It is now `eval`'d like the rest, and asserted
+  behaviourally rather than by signature: in a throwaway repo with no
+  `origin/main` the block must move `diff` → `all` and set `BASE=HEAD`; after
+  `git update-ref refs/remotes/origin/main` it must leave `MODE=diff` alone. Both
+  directions are checked, because a block that always fired would satisfy the
+  first one alone. See §7 F5.
 
 ---
 
@@ -186,15 +196,76 @@ form this repo keeps re-learning.
 claim (dead in diff mode) is confirmed and extended; the `$` restriction is new
 here and is a property of the pattern, not of the gate.
 
-### 3b. `machine-specific paths` — the distinction the addendum flagged, measured
+### 3b. `machine-specific paths` — the mechanism, and the rule restated
 
 `scripts/scrub-patterns.txt:47`, `(^|[^a-z])/[hH]ome/…`, fires in **4 of 4**
 cells in **all three modes**, including cell C (`++/home/…` behind a `+`,
-`run.log` line 129) — because `[^a-z]` accepts the plus. The dividing line is
-therefore the one the addendum names: **"anchored at `^`" versus "has an
-alternative accepting any non-letter"**, and the pattern file records which is
-which for **none** of its ten entries. That is now measured rather than asserted
-(§3, first three columns).
+`run.log` line 129). The mechanism is not asserted, it is shown:
+
+```
+# the home segment is written <HOME> below: a committed instance of THIS net makes
+# the gate fire on this very file, which is §3c's point, not a contradiction of it.
+# substitute any /home/<lowercase-name> shape to reproduce.
+$ printf '+<HOME>/jle' | grep -oEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|)'
++<HOME>/jle                 # [^a-z] consumed the '+'
+$ printf '+<HOME>/jle' | grep -cE '^[hH]ome/'
+0                            # the ^ branch alone cannot skip the plus
+$ printf '+<HOME>/jle' | grep -cEi '[^a-z]/[hH]ome/[a-z][a-z0-9_-]{2,}(/|)'
+1                            # [^a-z] alone is sufficient
+```
+
+⚠ **A negative control in this pass's own working notes failed, and it is why the rule
+below is stated one-directionally.** The intended control was a path that cannot match
+because the case is wrong (`/homE/`), but the gate counts with `grep -cEi` (`:126`), which
+is **case-insensitive**, so `[hH]ome` accepts `homE` and the "certainly-absent" path
+matched. A case-based negative control is worthless against this gate. It was a scratch
+control, it reached no committed table, and **no number in §3 rests on it** — but it is
+recorded here because the corrected rule is the thing that would have caught it: applied to
+the *pattern*, "dead behind `+` iff every alternative is `^`-anchored" predicts nothing
+about case at all, so it never offered the false inference in the first place. The
+committed controls that do stand are the four cells per pattern plus three clean cells
+(§3, §3d), and the gate's own fail-closed behaviour is now exercised by a behavioural
+self-test rather than a string one (§2a).
+
+#### The rule, in the form that actually classifies all ten
+
+**A net is dead behind `+` iff every alternative is `^`-anchored.**
+
+⚠ **CORRECTED 2026-10-15 (verifier round 1, F3).** This pass, and the addendum it was
+answering, stated the dividing line as a **two-way partition** — *anchored at `^` versus
+has an alternative accepting any non-letter* — and that is **not a partition of the ten**:
+the right-hand side is satisfied by **exactly 1 of 10**. The other eight are unanchored
+*and* carry no non-letter alternative, and are live anyway, so the stated rule classifies
+**2 of 10** and leaves the rest unclassified. Carrying a non-letter alternative is one
+**sufficient** way to be live behind `+`, not a necessary one — being unanchored is
+sufficient on its own and needs no alternation at all. The rule above is the
+necessary-and-sufficient form, it is one-directional, and **all ten classify against it**:
+
+| pattern | line | every alternative `^`-anchored? | predicted | measured `diff` |
+|---|---:|---|---|---|
+| `vendor API key literal` | `:14` | no — bare literal, no anchor | live | **live 4/4** |
+| `reports-broker key fragments` | `:15` | no — alternation, neither branch anchored | live | **live 4/4** |
+| `reCAPTCHA site keys` | `:28` | **yes** — the sole pattern is `^…$` | **dead** | **DEAD 0/4** |
+| `AWS VPC endpoint service name` | `:44` | no | live | **live 4/4** |
+| `internal Grafana/K8s/GitLab/DB/Prometheus host` | `:45` | no — alternation, neither branch anchored | live | **live 4/4** |
+| `internal .corp host` | `:46` | no | live | **live 4/4** |
+| `machine-specific paths` | `:47` | no — one branch is `^`, the other `[^a-z]` | live | **live 4/4** |
+| `live jsession values` | `:48` | no | live | **live 4/4** |
+| `live sessionData values` | `:49` | no | live | **live 4/4** |
+| `credential prefixes` | `:57` | no — alternation, none anchored | live | **live 4/4** |
+
+**10 of 10 predicted, 10 of 10 measured, 0 disagreements.** That is the test the earlier
+two-way phrasing could not pass, and it is the point of restating it: a rule that leaves
+eight of ten unclassified cannot be used to annotate the pattern file, which is exactly
+what successor 2's close condition asks for.
+
+**Why the two-way phrasing looked right, in one sentence.** The area's evidence for it
+was two examples read as two sides — the reCAPTCHA pattern is the net that *died* behind
+`+`, and `machine-specific paths` is the net that *survived* — when in fact they are one
+rule seen from opposite ends, so the two read as a dichotomy that the other eight patterns
+silently do not belong to.
+
+The pattern file records which is which for **none** of its ten entries.
 
 ### 3c. Two structural cells — a zero that is not a pattern verdict
 
@@ -207,14 +278,59 @@ Both are recorded because a zero here and a zero in §3a are different facts. A
 pattern that does not match and a line the construction deleted look identical
 downstream, which is how a scan becomes a check that cannot fail.
 
-**The carve-out is not load-bearing today, and that is measured, not assumed.**
-Applied directly to the documented example with **no** carve-out, the machine-path
-pattern reads **0** — because after `/home/` the pattern requires `[a-z]` and the
-placeholder's next character is `<`. Over the real `--all` subject text **as of
-`origin/main` = `ab28f58`** (**206 files, 43,687 non-empty lines**), the pattern
-reads **0 with the carve-out and 0 without**. So `:123-124` currently excludes
-nothing. (Counted by `printf '%s' "$ADDED" | grep -c '[^[:space:]]'`, over the
-subject list `--all` actually builds — re-derive rather than trust the number.)
+**The carve-out is not load-bearing at `ab28f58`, and that is measured, not assumed —
+and "not load-bearing" is a claim about the hit count, not about the text.**
+
+⚠ **CORRECTED 2026-10-15 (verifier round 1, F4).** This pass wrote *"So `:123-124`
+currently excludes nothing."* That was wrong, and it was wrong in the direction that
+matters for a future reader: the filter is not a no-op. Measured over the real `--all`
+subject text **as of `origin/main` = `ab28f58`** (**206 files, 43,687 non-empty lines**),
+it drops **4 lines** — `grep -cF '/home/<user>'` reads **4**, and total lines fall
+**51,971 → 51,967** across the `grep -v`. What is unchanged is the **hit count**: the
+pattern reads **0 without the carve-out and 0 with it**, because after `/home/` it demands
+`[a-z]` and the placeholder's next character is `<`. So the accurate statement is
+**"excludes 4 lines, and none of them would have matched anyway"** — not "excludes
+nothing". Verifier round 1 re-derived all four numbers independently and they agree.
+
+**Two different claims, kept apart, because "not load-bearing" and "disabled" are not
+the same and only the first is this pass's:**
+
+| | at `ab28f58` | on this branch, mid-round-2 | **as committed (this PR)** |
+|---|---:|---:|---:|
+| lines the carve-out drops | **4** | **10** | **11** |
+| lines carrying the documented example | **4** | **10** | **11** |
+| hits **without** the carve-out | **0** | **1** | **0** |
+| hits **with** the carve-out (gate `:124`) | **0** | **0** | **0** |
+| verdict | **not load-bearing** | **load-bearing** | **not load-bearing** |
+
+The right-hand column is `self-screen.txt`, regenerated at the commit this file ships in
+and byte-reproducible: the harness now screens a **snapshot** of this directory, so the
+transcript no longer depends on stdout buffering while it is being written into.
+
+⚠ **The middle column was measured, not constructed.** Writing the F4 fix, this pass
+put both the documented example and a real machine path on **one comment line** of its own
+harness — a `.sh` file, therefore in both the `all` and `diff` subject sets. `grep -v
+'/home/<user>'` is **line-granular**, so it removed that line whole and suppressed a
+**genuine** match; `--screen` went red on the harness itself. The comment has been rewritten
+to name neither path and the harness now takes the instance from `INST_HOMEPATH`, which is
+assembled from fragments at runtime (§2). Two findings come out of that accident and both
+are load-bearing for this log:
+
+1. **The carve-out is a line-granular suppressor, not a pattern-level one.** It cannot
+   distinguish a line that documents the example from a line that *commits* the leak; if
+   both appear on one line, the leak is dropped. That is a latent defect of `:123-124`, not
+   a property of today's text, and it is why "not load-bearing at `ab28f58`" must never be
+   restated as "safe to keep".
+2. **It is an independent confirmation of successor 2** (§6, and `docs/11` successor 2):
+   all ten nets are self-referential, so a control set cannot live in the repo as a
+   fixture. This pass found that out by *committing* an instance and watching the gate fire
+   on its own control — the failure mode, observed rather than reasoned.
+
+**Positive control, kept visible so the verdict above is never read as "disabled":** a
+real machine path must fire, and must survive the carve-out. It does —
+`grep -cEi` reads **1** with the carve-out **not** applied and **1** with it applied, on
+`cd <machine path>/projects` (`self-screen.txt`, last two lines of the carve-out block).
+`:123-124` drops the documented example and nothing else.
 
 ### 3d. Negatives
 
@@ -275,7 +391,12 @@ corroboration of the general claim. §6 carries the full list of what is still o
   `FAIL` flag at **0** in both modes over the branch diff (3 subject files) and
   **0** hits on any file here. The one un-elided copy of the rendered subject
   lines lives in the harness's scratch directory, created by `mktemp -d` and
-  removed on exit.
+  removed on exit. ⚠ **This was nearly false, and the near-miss is the point:** writing
+  the F4 fix put a real machine path on a comment line of this pass's own harness,
+  which is a `.sh` file and therefore in both subject sets, and `--screen` went red
+  on the harness itself. The committed artefacts are clean because the instances are
+  assembled from fragments at runtime and never appear whole in a committed line —
+  see §3c and §7a.
 - **The 05 vendor suite was not run locally.** The pool serialises suites. The
   static portion of the gate this pass depends on — the leak scan, both subject
   modes — was run verbatim via `--screen`: the branch diff reads **3** subject
@@ -295,3 +416,110 @@ corroboration of the general claim. §6 carries the full list of what is still o
   the pattern, measured on synthetic lines; it is not a statement that a key is or
   is not currently committed anywhere.
 - **Anything about the vendor's surface.** This pass touched no vendor host.
+
+---
+
+## 7. Corrections from verifier round 1 (2026-10-15)
+
+An independent verifier returned **NOT CLEAN** on `076c040` with six findings, **none
+of which moved a measured number** — all citation, wording and harness-honesty defects.
+§1–§3 and §5–§6 above are unchanged except where a correction is cited in place. This
+section is the single place every round-2 change is recorded, and the file's renumbering
+is disclosed here rather than left for a reviewer to find. **Section numbers 1–6 are
+unchanged; §7 is new.** Nothing was inserted above §6.
+
+Each finding is a *disagreement with wording or structure*, not a disagreement with a
+measurement. What the verifier did **not** overturn, and what therefore stands: the
+`9 live / 1 dead / 0 undecidable` table, `staged` cell-for-cell, the 150 clean-cell
+rows, the vacuity guard at both layers, all ten classifications, the `reCAPTCHA`
+`--all` 1-of-4 cell, the 206 / 43,687 / 0 / 0 carve-out measurement, and the observed
+CI fact — **all independently re-derived rather than read back**, by a second corpus
+sharing no code with this harness, which landed on the same numbers (their matrix
+550 rows / 46 non-zero against this pass's 450 / 37, same structure).
+
+| # | finding | where it now lives | nature |
+|---|---|---|---|
+| F1 | the `:104` / `:108` correction was not carried to the first place a reader meets it | `docs/11`, in-place `⚠ CORRECTED` blockquote directly under the false sentence; §1a | disagreement |
+| F2 | the originating area-F log carried the false sentence with no correction appended | `findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md`, new `## Correction (2026-10-15)` section | absence of the sanctioned mechanism |
+| F3 | the liveness rule was stated as a two-way partition that classifies 2 of 10 | §3b restated one-directionally, all ten re-classified; `docs/11` §3b and the area-F addendum | disagreement on framing |
+| F4 | "the carve-out currently excludes nothing" — it excludes 4 lines | §3c, with the two-column measurement and the positive control | disagreement on wording |
+| F5 | `--screen` exited 0 having scanned nothing from a foreign cwd | `scrub-diffmode-control.sh` `screen()`, plus a behavioural self-test and an end-to-end regression | absence of a guard |
+| F6 | `self-screen.txt` recorded a line count matching no commit and named no commit | `--screen` now prints repo, HEAD and dirty-file count, so the transcript names its tree; regenerated | absence of provenance |
+| F7 | `docs/09:206`'s stale `.txt` counts were recorded only in another document | one inline sentence at `docs/09:206`; this log does **not** re-derive the row's numbers | absence of a pointer |
+
+### 7a. F5 and F6 — the harness defect that was not disclosed
+
+Two of the three harness defects are now fixed and asserted. The third was found by the
+verifier and is disclosed here in the same spirit as the first two:
+
+- **`--screen` had no cwd guard and no vacuity guard.** The gate's loop reads
+  `scripts/scrub-patterns.txt` by **relative** path (`gate:136`), and `screen()` had no
+  `cd` of its own, so from any directory but the repo root the loop iterated nothing,
+  every pattern read 0, and the mode printed `ok no pattern fired` and **exited 0**.
+  It also `eval`'d every block *except* the fail-closed block, so a missing
+  `origin/main` produced the same green by a second route. `screen()` now enters `$REPO`
+  and asserts it arrived, asserts the relative pattern path and the absolute parsed copy
+  are the same file, refuses to report a clean scan over **zero** patterns, an **empty**
+  subject list, or a **partial** loop (it compares the number of recorded verdicts
+  against the number of parsed patterns), and prints the tree it read. The
+  regression is asserted end-to-end in `--self-test`: `--screen` is invoked from a
+  scratch directory and must not report `subject files: 0`.
+- **`self-screen.txt` named no commit.** Its `--all` subject-line count read **44,619**,
+  which matched **neither** `33895ee` (**44,621**) nor `076c040` (**44,652**) — it was a
+  transcript of an intermediate working tree. No prose cited it, and the file's four
+  substantive assertions still held, but a transcript a reader cannot re-derive is not
+  evidence. `--screen` now prints `repo …, HEAD <sha>, dirty <n> file(s)` as its first
+  line, and the file has been regenerated from the final commit.
+
+### 7b. The grep-first duplicate test (`CONTRIBUTING-research.md:199`)
+
+Both successors were checked against `docs/10` §1, the `docs/11` Closed table and
+`docs/11` itself **before** publication, and the commands and results are recorded here
+rather than asserted. **Neither successor is a duplicate; neither was narrowed.**
+
+```
+$ grep -nEi "mode: diff|leak scan|fail.closed|fork (PR|pull request)|push to main" \
+      docs/10-open-questions.md
+  exit=1 — no match
+$ grep -nEi "mode: diff|leak scan|fail.closed|fork (PR|pull request)|push to main" \
+      docs/09-methodology-and-oracles.md
+  docs/09:206 — the `.txt` extension blind spot. Adjacent subject (which FILES the gate
+  reads), not the same one (which PATTERNS fire). This is F7's target, not a duplicate.
+$ grep -nE "leak scan|scrub pattern|scrub-patterns|research-gate\.sh" \
+      docs/10-open-questions.md
+  docs/10:50 — a row that CITES scrub-patterns.txt as a source for three reCAPTCHA keys.
+  A use of the file, not an open question about the gate.
+$ grep -nEi "per-pattern|survives a leading|liveness column|no control set|self-referential net" \
+      docs/10-open-questions.md docs/09-methodology-and-oracles.md
+  exit=1 — no match
+$ grep -c "#### Successor to the area-D addendum" docs/11-suggested-research-areas.md
+  2   (successors 1 and 2, both this pass)
+$ grep -n "^#### Successor to" docs/11-suggested-research-areas.md
+  564, 618, 822, 852   (area F — untouched, different area)
+  995, 1017            (area D — this pass)
+  1710                 (area K)
+```
+
+**Against the quality bar (`CONTRIBUTING-research.md:195-200`):**
+
+| Test | Successor 1 — the other two events' mode | Successor 2 — per-pattern liveness column |
+|---|---|---|
+| **Derived** | Passes. It retires half of itself on the strength of §4's one observation and names the exact line to read. It could not have been written before §4 existed | Passes. Both facts came out of building the control set this pass committed; neither was recorded anywhere |
+| **Bounded** | Passes. Zero requests, no vendor host, and the close condition is checkable by a stranger reading one log line | Passes. Same; and a negative counts, stated in the row |
+| **Non-duplicate** | Passes, per the greps above | Passes, per the greps above |
+| **Labelled** | Passes. The one observation is OBSERVED from **one** source, explicitly not corroboration (§4); the `push to main` and fork shapes stay INFERRED | Passes. The `^+++` drop is measured on synthetic lines and labelled as such (§3c) |
+
+### 7c. What was **not** changed, and why
+
+- **No repair to the gate.** `research-gate.sh`, `scrub-patterns.txt`,
+  `research-checks.py`, `measure_assertions.py`, `run.sh` and `research-gate.yml` are
+  byte-identical to `ab28f58`. Stripping the `+`, de-anchoring the reCAPTCHA net and
+  widening the extension filter are all maintainer decisions (`docs/09` §4).
+- **No pin added**, so the static assertion count stays **217** and the runtime count
+  **431**. A `check` site would move every site that states it.
+- **`docs/09:206`'s counts are not re-derived.** F7 adds a pointer and nothing else;
+  the row is `docs/09` §4's to maintain and its owner is named there. **This pass does
+  not vouch for `31`, for `126`, or for `1216`** — those were measured at `cd626d6` on
+  2026-10-13 and the row itself says the counts move as passes land.
+- **The four `Successor to area F` blocks, the Closed table and `README.md` are
+  untouched.**

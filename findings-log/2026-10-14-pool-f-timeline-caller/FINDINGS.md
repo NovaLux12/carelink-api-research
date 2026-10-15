@@ -2208,3 +2208,67 @@ than of `:108` alone.
 round. `controls.py` reads the **committed** tree in both directions — `342c192` → exit
 **1**, head → exit **0**. All eleven subject counts unchanged; every edited site is inside
 a `## Correction (…)` section and therefore E1-excluded.
+
+---
+
+## Correction (2026-10-15)
+
+**Round 13's own assumption, as recorded in R13 above, is wrong in two parts — and a
+later pass measured it rather than inferring it.** This section is appended, not edited
+into `R13`, per `AGENTS.md` §3. The false sentence is quoted in full; the file's existing
+text stands.
+
+**The sentence.** *"**Assumptions (INFERRED):** that the diff-mode subject construction
+at `:108` is the only `+`-prefixed path — `staged` mode at `:104` uses the same `grep
+'^+'` construction, and `--all` at `:106` uses `cat`, so this is a reading of the three
+lines together rather than of `:108` alone."*
+
+**Both halves are false, read at the file:**
+
+1. **`:104` is not the `staged` construction.** It reads `[ -f "$f" ] || continue` — a
+   guard inside the per-file loop. The `staged` construction is at **`:107`**.
+2. **`:108` is not the only `+`-prefixed path.** **`:107` is a second one**, with
+   identical semantics. The count is **2, not 1**. Counted rather than read: the
+   `105,109` block carries exactly 2 occurrences of `grep '^+' | grep -v '^+++'` and
+   exactly 1 `cat "$f"`, and the harness asserts both counts and exits non-zero if either
+   moves.
+
+**Why it matters beyond the citation.** R13a concluded that a `^`-anchored net is
+"structurally dead on the path CI runs". That conclusion **survives** and was measured —
+but it **understated the scope**. The anchored net is dead on **two** paths, `diff` **and**
+`staged`, not one. R13a did not claim `staged` was safe, so nothing R13a asserted is
+retracted; what is withdrawn is the *reading* of the three lines that put `staged` at
+`:104`, and the inference that `:108` is the sole `+`-prefixed path.
+
+**What the later pass added beyond the correction.** R13a's control set was three cells
+on one net. The measurement that follows covers **all ten** patterns × four placements ×
+three modes, and finds a **larger** restriction than the leading `+`: `reCAPTCHA site keys`
+is anchored at **both** ends, so its `$` defeats it in **every** mode whenever the token
+is not alone on the line — a key inside a captured response body, which is where a key of
+that shape actually arrives, is caught in **no** mode. That is a property of the pattern
+file, not of the gate, and it is new relative to R13a.
+
+**Measured, zero requests, no vendor host touched:**
+`diff` **9 live / 1 dead / 0 undecidable**, `staged` identical cell for cell, `--all`
+10 live with the anchored net live in **1** placement out of 4. The `:123-124` carve-out
+was found **not load-bearing at `ab28f58`** (0 hits with it, 0 without, over 206 files and
+43,687 non-empty lines) — with a positive control showing it does not disable the net.
+
+**One observation of CI's mode.** The `gate` job of run `38762357329` (event
+`pull_request`, head `research/D-scrub-diffmode-control`, SHA `33895ee`) printed
+`--- leak scan (mode: diff) ---` and concluded `GATE PASS`. That is **OBSERVED, once** —
+one run, one source, **not** corroboration of the general claim. The `push to main` event
+and a fork pull request remain **INFERRED** and are carried as a dated successor in
+`docs/11`.
+
+**Full artefact:** [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md] — §1a carries
+this correction, §3 the ten-pattern table, §3b the liveness rule, §3c the carve-out, §4
+the CI observation and its scope, §7 the verifier round-1 corrections. The area-D addendum
+and its two successors are in
+[`docs/11`](../../docs/11-suggested-research-areas.md).
+
+**No gate change was made.** Stripping the `+` at `:108`, de-anchoring the one anchored
+net, and widening the extension filter are each a maintainer decision (`docs/09` §4), and
+`research-gate.sh`, `scrub-patterns.txt`, `research-checks.py`, `measure_assertions.py`,
+`run.sh` and `research-gate.yml` are byte-identical to `ab28f58` in the branch that
+carried this measurement.
