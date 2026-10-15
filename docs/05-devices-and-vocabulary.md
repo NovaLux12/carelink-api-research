@@ -84,20 +84,31 @@ The patient portal's main bundle is served at the **domain root** of
 { BLE: "BLE", BLE_X: "BLE_X", SIMPLERA: "SIMPLERA", SIMPLERA_X: "SIMPLERA_X", GUARDIAN: "GUARDIAN" }
 ```
 
-consumed as `deviceFamily.startsWith(…)` — **five tokens**. `CC880` is not among them, and
-nor is anything containing `FLEX` [source:
+declared as **five** members and consumed as `deviceFamily.startsWith(…)` — but **only three
+are passed to it** (`BLE`, `SIMPLERA`, `GUARDIAN`). `BLE_X` and `SIMPLERA_X` are
+**declared and never read**: the prefix test already covers them, so deleting both
+members would change no branch for any input [source:
+findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §4]. `CC880` is not among
+the matched prefixes, and nor is anything containing `FLEX` [source:
 findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md].
+
+> **⚠ Corrected 2026-10-15 (issue #132), scoped.** This sentence previously read
+> *"consumed as `deviceFamily.startsWith(…)` — five tokens"*, which counted declared
+> members as consumed tokens. The **five declared / three consumed** split is now
+> stated. Measured in the digest-pinned eager main bundle only; "0 reads" is **not**
+> claimed for the patient lazy corpus. The 2026-10-08 source line it rests on is
+> unchanged.
 
 Two readings, and no source can currently separate them:
 
 | reading | claim |
 |---|---|
 | (a) | CC880 is the Flex family, and **Medtronic's own patient app is out of date** — it would also fail to detect a Flex. Possible; odd for a device already shipping |
-| (b) | There is **a further family value nobody has found**, one that *does* start with one of those five tokens, and the Flex reports that. The published `CC880 → "MiniMed™ Flex"` would then be a *display* name, not a wire family |
+| (b) | There is **a further family value nobody has found**, one that *does* start with one of those three prefixes, and the Flex reports that. The published `CC880 → "MiniMed™ Flex"` would then be a *display* name, not a wire family |
 
 Reading (b) is the one that keeps the wire-shape question open: the published config tells
 us Medtronic's internal label for the Flex, not what the patient API emits. The
-five-token `startsWith` matcher is direct evidence that whatever the Flex sends must be
+three-prefix `startsWith` matcher is direct evidence that whatever the Flex sends must be
 matched by code that looks nothing like a `CC880` comparison.
 
 **Consequence for third-party clients:** matching `CC880` exactly *and* keeping a

@@ -1231,6 +1231,93 @@ quietly, because the declaration looks like a specification.
   the client's own matcher is a `startsWith` prefix test, which is consistent
   with both readings.
 
+##### Closed 2026-10-15 — successor 2 (issue #132): documented negative. The suffix is **declared and unread**, and *inert*, not merely unused.
+
+**4 of a 8 cap**, `GET` only, 2.5 s apart under the shared per-host lock; **2 requests of static
+analysis**; [findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md].
+
+The row's close condition is met by its second half — *"a note records the suffix as
+undocumented-and-unused"*. Measured on the digest-pinned patient bundle
+(`0fb4fbd4…`, 3 417 255 B, re-fetched and re-anchored by this pass):
+
+| | measured | source |
+|---|---|---|
+| consumers of enum module `45559` | **1** — the module id occurs exactly twice, and one of the two is the definition | `census.txt` §C, bundle bytes 1 723 196 / 2 962 721 |
+| member reads, total | **3** | `census.txt` §D, bytes 2 964 176 / 2 964 215 / 2 964 259 |
+| distinct members read | **3 of 5** — `BLE`, `SIMPLERA`, `GUARDIAN` | `census.txt` §I |
+| **`BLE_X`, `SIMPLERA_X`** | **0 reads.** Each occurs twice, both inside the declaration's own key and value | `census.txt` §E |
+| consumption shapes other than `<binding>.G.<member>` | **0** across 8 explicit sweeps — bracket read, `Object.values`/`keys`/`entries`, spread, pass-the-object-as-a-whole | `census.txt` §D |
+
+The three reads are the three arms of one expression, and each is a `startsWith`
+**prefix** test (`p.startsWith(o.G.BLE)`). `"BLE_X".startsWith("BLE")` is already
+true, so **deleting both `_X` members would change no branch, for any input,
+including their own values** (`census.txt` §J, truth table). That is stronger than
+"unused": the members are **inert**, and inert is a property no authenticated
+response can overturn.
+
+So of the three readings the row offers, two are **excluded by this corpus** and
+the third is untouched by it:
+
+- **Not a transport axis *at this call site*.** The branch's consequence is a real
+  transport decision — `getUploadDeviceInfo` POSTs the CSR periodic-data endpoint
+  the public config supplies as `csr.cumulus.periodic.data.endpoints.display_message`,
+  else emits `of(null)` (`census.txt` §D, §K, bytes 3 373 390 / 3 373 507) — but it
+  is decided on the **base** token and does not distinguish the suffixed values.
+- **Not a model axis *at this call site*.** The model axis in this corpus is
+  nearby and separate: `deviceModelMapping` with its `StandaloneCGM` and
+  `SIMPLERACC` keys (bytes 580 904 / 2 136 000 / 2 136 604), keyed by model, none of
+  them enum members.
+- **Still open: whether `_X` means anything on the wire.** Values arrive from
+  `POST /patient/v2/monitor/data` (byte 3 372 491), and `getDeviceFamily` can
+  overwrite the response with `sessionStorage.getItem("deviceFamily")` (byte
+  3 372 603). **This pass says nothing about what the server sends** and does not
+  narrow the semantic-suffix vs build-discriminator choice.
+
+> **⚠ Scope limit, in the words the row requires.** This pass swept the **eager
+> main bundle only**. **"0 reads in the eager main" is a true statement; "0 reads
+> anywhere" is not one that can be made.** Area K swept the 211 patient lazy chunks
+> for *pointer* tokens, not for `_X` reads and not for module `45559`.
+
+> **⚠ Correction to the line above it, which this pass measured rather than
+> assumed.** The original row reads *"declares **four** `_X`-suffixed variants"*.
+> The enum has **two**: `BLE_X` and `SIMPLERA_X`, out of five members. Measured
+> case-sensitively, each occurs exactly twice in the corpus and both occurrences
+> are the declaration's own key and value (`census.txt` §E). The sentence above is
+> **left as written** rather than edited — it is the row's record of what was
+> believed when the area was opened, and a correction that overwrites the belief
+> leaves no evidence that the belief existed.
+
+Three successors, none of which needs a token:
+
+- **(a) The patient lazy corpus, for module `45559` and for `BLE_X`/`SIMPLERA_X`
+  reads.** The only thing standing between this result and "0 reads anywhere".
+  **Blocker:** none — the candidate list is already committed and closed
+  (`findings-log/2026-10-13-area-v-pde-clients/chunks.txt`, 211 entries), so the
+  sweep is bounded without enumeration. **Closes when:** either a chunk importing
+  `45559` is found (which would reopen the whole row), or the 211 are swept and the
+  eager-main negative is promoted to corpus-wide. **Assumptions (INFERRED):** that
+  the eager main holds the only importer of a module the main itself defines —
+  measured for the main, **assumed, not measured**, for the chunks.
+- **(b) The false-hit class as a first-class artefact.** `BLE` has **52**
+  case-sensitive hits in this bundle and **3 169** case-insensitively — a **60.9×**
+  multiplier — and 12 of the 52 are a Bluetooth-protocol debug table where `BLE`
+  abbreviates Bluetooth Low Energy, an unrelated third sense of the same token.
+  `SIMPLERACC` (byte 2 136 604) is a model-map key a substring grep reports as a
+  sixth enum member, and lowercase `guardian` (9 hits) is a **human** guardian of a
+  minor patient's account, not the CGM family. **Blocker:** none. **Closes when:**
+  these token shapes are in the repo's own false-positive register with their
+  offsets, so the next sweep reads them instead of rediscovering them.
+- **(c) The `NGP` figure does not reproduce.** This pass measures case-sensitive
+  `NGP` = **0**; the 94 case-insensitive hits are all `ngP` inside
+  `numberingPlan`-class identifiers. The 2026-10-08 note records "three apparent
+  matches … Samsung user-agent strings" and `docs/05`/`docs/09` repeat the figure;
+  the Samsung regexes are present but none carries `NGP`. **Blocker:** none, but
+  **this is a `docs/05` and `docs/09` call, not this lane's** — recorded here and in
+  the log as a disagreement with both readings given, and **neither page was
+  edited.** **Closes when:** one pass re-derives the figure on the pinned build and
+  the two pages are corrected together. **Assumptions (INFERRED):** that the
+  earlier figure was case-insensitive; nothing on disk states the matching mode.
+
 #### S. Two more evidence classes for third-party source material
 
 *(retained as a `####` subsection so the closed area does not re-enter the open-area count; area S is closed.)*
