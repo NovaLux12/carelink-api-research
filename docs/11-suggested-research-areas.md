@@ -939,7 +939,7 @@ reading of the three lines together, not of `:108` alone. Zero requests.
 > counts and the cell table: the next addendum on this page (area D, §"The correction"), and
 > [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §1a]. The correction is also
 > appended to the log this addendum came from
-> ([findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md](findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md),
+> ([`FINDINGS.md`](../findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md),
 > `## Correction (2026-10-15)`), so the correction is reachable from the source as well as
 > from here. **The superseded wording is retained above rather than deleted** — the same
 > convention the Closed-areas L row uses.
@@ -1043,8 +1043,18 @@ counts as the answer with the reason stated.** Any other mode observed counts eq
 
 **Assumptions (INFERRED):** that `actions/checkout@v4` with `fetch-depth: 0`
 (`research-gate.yml:15-17`) leaves `origin/main` resolvable for same-repo pull requests.
-Now supported by one observation (run `38762357329`, §4), which is one source and not
-corroboration. Not load-bearing: the verdict does not depend on it.
+⚠ **Corrected 2026-10-15 (verifier round 2) — two axes, and only one of them moved.**
+This row said "supported by one observation … which is one source". Both halves were right
+and the *observation* half then went stale: a second run (`38766246282`, head `d86a21b`,
+`GATE PASS`) has since printed the same `--- leak scan (mode: diff) ---` line, so **two
+runs are observed (`38762357329`, `38766246282`) from one source — this repository's own
+CI**. `AGENTS.md` §2.1's **independence count is unchanged at 1**: two runs of the same
+workflow file, on the same event type, in this repository, are two samples of one source
+(`docs/03` §3a.4), so *independently* is still unavailable. The count that was wrong was
+the observation count, and saying "once" about it was `AGENTS.md` §6 item 1 — a sentence no
+reader could point at. **The INFERRED boundaries are untouched by the second run:** the
+`push to main` event, a fork PR, and any checkout where `origin/main` does not resolve.
+Not load-bearing: the verdict does not depend on it.
 
 #### Successor to the area-D addendum — 2: a per-pattern liveness column, and the fact that no control set can be committed
 

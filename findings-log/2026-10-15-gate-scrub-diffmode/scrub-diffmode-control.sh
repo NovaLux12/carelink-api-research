@@ -497,17 +497,45 @@ self_test() {
   # the fix, gate :136's relative pattern path resolved to nothing there, the
   # subject list came back empty, and the run printed "no pattern fired" and
   # exited 0 — a green that had read no file at all.
-  local sdir sout
+  #
+  # ⚠ Round 2 (verifier finding 2): the first version of this test asserted two
+  # STRINGS and passed on the very defect it was written for. It never read the exit
+  # code, and `*"HEAD "*` matches the failure text `HEAD UNRESOLVED`. Deleting only
+  # the `cd "$REPO"` line — leaving the round-2 pre-flight intact — made --screen
+  # exit 1, and this test still printed `ok`. It is now three positive assertions:
+  # the exit code is 0, and BOTH subject modes report a non-zero file count. Each is
+  # a positive claim about what a healthy run produced, so the pre-flight guards
+  # cannot satisfy them by returning early — which is precisely what let the old
+  # test through.
+  local sdir sout rc
   sdir="$(mktemp -d)"
   sout="$( cd "$sdir" && bash "$HERE/scrub-diffmode-control.sh" --screen 2>&1 )"
-  case "$sout" in
-    *"HEAD "*) : ;;
-    *) note_fail "--screen from a foreign cwd did not report which tree it screened" ;;
-  esac
-  if printf '%s' "$sout" | grep -q 'subject files: 0'; then
-    note_fail "--screen from a foreign cwd screened 0 subject files — the F5 defect is back"
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    note_fail "--screen exited $rc from a foreign cwd (expected 0); output head: $(printf '%s' "$sout" | head -2 | tr '\n' '|')"
   else
-    note_ok "--screen is cwd-independent: from a foreign directory it still screens the repo root"
+    note_ok "--screen from a foreign cwd exits 0 (exit code read, not inferred)"
+  fi
+  # Both mode blocks must have screened at least one file. The pattern is pinned to
+  # the mode blocks specifically — a bare 'subject files: [1-9]' also matches the
+  # carve-out block's own line, which would let one mode vanish silently and still
+  # count 2.
+  local nsub bad_sub
+  nsub="$(printf '%s' "$sout" | grep -cE "gate leak scan over this branch's diff, mode=[a-z]+ \(requested [a-z]+\), subject files: [1-9][0-9]*")"
+  bad_sub="$(printf '%s' "$sout" | grep -cE "gate leak scan over this branch's diff, mode=[a-z]+ \(requested [a-z]+\), subject files: 0([^0-9]|$)")"
+  if [ "$nsub" -lt 2 ]; then
+    note_fail "--screen reported a non-zero subject count in $nsub mode(s), expected 2 — a mode screened nothing"
+  elif [ "$bad_sub" -ne 0 ]; then
+    note_fail "--screen reported 'subject files: 0' in $bad_sub mode(s) — the F5 defect is back"
+  else
+    note_ok "--screen from a foreign cwd screens the repo in both modes (subject files: [1-9] x$nsub)"
+  fi
+  # A failure of --screen must not be able to print the ok line: this is the
+  # property that was false in round 2.
+  if printf '%s' "$sout" | grep -q 'unreadable from'; then
+    note_fail "--screen from a foreign cwd hit the pre-flight guard — the cwd is still load-bearing"
+  else
+    note_ok "--screen from a foreign cwd never reaches the pre-flight guard"
   fi
   rm -rf "$sdir"
 }
@@ -613,12 +641,17 @@ screen() {
   # at all. That is the "check that cannot fail" shape this harness exists to
   # close, in the one mode a reader is told to re-run (verifier round 1, F5).
   cd "$REPO" || { echo "screen: cannot enter $REPO"; return 1; }
-  # Name the tree being screened. A transcript that does not say which commit it
-  # read cannot be re-derived, and its counts go stale the moment a doc line moves.
-  # Only the BASENAME is printed: the first version of this line printed $REPO
-  # whole, which put an absolute home path into a committed artefact, and the
-  # gate's own machine-path net fired on the transcript of its own screen.
-  echo "--- screen: repo $(basename "$REPO"), HEAD $(git rev-parse --verify HEAD 2>/dev/null || echo UNRESOLVED), dirty $(git status --porcelain 2>/dev/null | grep -c '') file(s) ---"
+  # Name the tree this RUN was made against — which is NOT necessarily the commit the
+  # transcript ships in, and cannot be: a file cannot contain the hash of the commit
+  # that contains it. Verifier round 1 (F6) and round 2 (finding 5) both landed here.
+  # Round 1's file recorded a line count matching neither candidate commit and named
+  # neither. Round 2's named 076c040 with "dirty 6 file(s)" while the prose said it was
+  # "regenerated at the commit this file ships in" — a provenance sentence the bytes
+  # contradicted. So: label this line for what it is, and make the DIGEST below the
+  # re-derivable key, since a digest is the one thing that does not move under an amend.
+  # Only the BASENAME is printed: printing $REPO whole put an absolute home path into a
+  # committed artefact and the machine-path net fired on the transcript of its own screen.
+  echo "--- screen: repo $(basename "$REPO"), run against HEAD $(git rev-parse --verify HEAD 2>/dev/null || echo UNRESOLVED) with $(git status --porcelain 2>/dev/null | grep -c '') dirty file(s) — the tree this RUN read, NOT the commit this transcript ships in; the digest below is the re-derivable key ---"
   # Pre-flight, before any count is printed: the path the gate's loop reads and
   # the absolute copy this harness parsed must be the same file.
   if [ ! -r scripts/scrub-patterns.txt ]; then

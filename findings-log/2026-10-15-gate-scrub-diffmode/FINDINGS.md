@@ -200,32 +200,56 @@ here and is a property of the pattern, not of the gate.
 
 `scripts/scrub-patterns.txt:47`, `(^|[^a-z])/[hH]ome/…`, fires in **4 of 4**
 cells in **all three modes**, including cell C (`++/home/…` behind a `+`,
-`run.log` line 129). The mechanism is not asserted, it is shown:
+`run.log` line 129). The mechanism is not asserted, it is run — and every line below is
+the verbatim output of the command above it, so this block is re-runnable as written:
 
 ```
-# the home segment is written <HOME> below: a committed instance of THIS net makes
-# the gate fire on this very file, which is §3c's point, not a contradiction of it.
-# substitute any /home/<lowercase-name> shape to reproduce.
-$ printf '+<HOME>/jle' | grep -oEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|)'
-+<HOME>/jle                 # [^a-z] consumed the '+'
-$ printf '+<HOME>/jle' | grep -cE '^[hH]ome/'
-0                            # the ^ branch alone cannot skip the plus
-$ printf '+<HOME>/jle' | grep -cEi '[^a-z]/[hH]ome/[a-z][a-z0-9_-]{2,}(/|)'
-1                            # [^a-z] alone is sufficient
+$ h=jle; printf "+/home/$h" | grep -cEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)'
+1
+$ h=jle; printf "+/home/$h" | grep -cEi '^[hH]ome/'
+0
+# the ^ branch alone cannot skip the plus
+$ h=jle; printf "+/home/$h" | grep -cEi '[^a-z]/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)'
+1
 ```
 
-⚠ **A negative control in this pass's own working notes failed, and it is why the rule
-below is stated one-directionally.** The intended control was a path that cannot match
-because the case is wrong (`/homE/`), but the gate counts with `grep -cEi` (`:126`), which
+⚠ **Two elisions are in play here and they are not interchangeable**, which is why the
+printed form is what it is. The **input** is assembled at run time (`h=jle` then
+`/home/$h`) and every printed line is a **bare integer**, never the matched text. That is
+deliberate: the path is split so the committed file contains no *instance* of the net it
+demonstrates, because this file is `.md` and therefore in the gate's own `--all` subject
+set — writing the path out whole makes the gate fire on this log, which is §3c's subject,
+not a contradiction of it. The **output** is not elided at all: `grep -c` prints only the
+count, so nothing needs redacting there. An earlier version of this block elided the
+*input* instead (`<HOME>/jle`) and printed the matched *text*, which reversed the result —
+`printf '+<HOME>/jle'` contains no `/home/` substring and reads **0**, not the **1** printed
+below its own command. Verifier round 2 caught that; it is the same class as a broken
+citation, a redaction that silently changes what the command means.
+
+**Controls, shape failures rather than case.** These are the replacement for a negative
+control this pass wrote in its working notes and then discarded: the intended control was a
+path that fails on *case* (`/homE/`), but the gate counts with `grep -cEi` (`:126`), which
 is **case-insensitive**, so `[hH]ome` accepts `homE` and the "certainly-absent" path
-matched. A case-based negative control is worthless against this gate. It was a scratch
-control, it reached no committed table, and **no number in §3 rests on it** — but it is
-recorded here because the corrected rule is the thing that would have caught it: applied to
-the *pattern*, "dead behind `+` iff every alternative is `^`-anchored" predicts nothing
-about case at all, so it never offered the false inference in the first place. The
-committed controls that do stand are the four cells per pattern plus three clean cells
-(§3, §3d), and the gate's own fail-closed behaviour is now exercised by a behavioural
-self-test rather than a string one (§2a).
+matched. A case-based negative control is worthless against this gate. Failing the *shape*
+works:
+
+```
+$ h=j; printf "+/home/$h" | grep -cEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)'
+0
+# one-char name: [a-z] then [a-z0-9_-]{2,} needs 3+
+$ h=1le; printf "+/home/$h" | grep -cEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)'
+0
+# digit first: the class is [a-z], not [a-z0-9]
+```
+
+And the control that isolates the leading `+` as the whole difference — the pattern is
+not the problem:
+
+```
+$ h=jle; printf "/home/$h" | grep -cEi '(^|[^a-z])/[hH]ome/[a-z][a-z0-9_-]{2,}(/|\b)'
+1
+# the pattern matches fine without a plus: the pattern is not the problem, the leading + is
+```
 
 #### The rule, in the form that actually classifies all ten
 
@@ -303,9 +327,14 @@ the same and only the first is this pass's:**
 | hits **with** the carve-out (gate `:124`) | **0** | **0** | **0** |
 | verdict | **not load-bearing** | **load-bearing** | **not load-bearing** |
 
-The right-hand column is `self-screen.txt`, regenerated at the commit this file ships in
-and byte-reproducible: the harness now screens a **snapshot** of this directory, so the
-transcript no longer depends on stdout buffering while it is being written into.
+The right-hand column is `self-screen.txt`, **byte-reproducible** from the tree named in
+its own first line, which records the tree the **run** read — explicitly *not* the commit
+the file ships in, because a file cannot contain the hash of the commit that contains it.
+That is why the transcript also carries a **digest** (`sha256` of the `--all` subject list,
+plus its non-empty line count): a digest is the one key that does not move under an amend.
+The harness screens a **snapshot** of this directory, so the transcript no longer depends
+on stdout buffering while it is being written into, and two consecutive runs are
+byte-identical.
 
 ⚠ **The middle column was measured, not constructed.** Writing the F4 fix, this pass
 put both the documented example and a real machine path on **one comment line** of its own
@@ -334,9 +363,25 @@ real machine path must fire, and must survive the carve-out. It does —
 
 ### 3d. Negatives
 
-**150 clean-cell rows — 3 clean cells × 10 patterns × 3 modes — all read 0.** A
-scanner that fires on a clean line would be reported here, not tolerated
-(`AGENTS.md` §6 item 2).
+**150 clean-cell rows — 5 cell types × 10 patterns × 3 modes — all read 0.** A scanner
+that fires on a clean line would be reported here, not tolerated (`AGENTS.md` §6 item 2).
+
+**Counting rule**, so the headline regenerates: every row of `cells.tsv` whose cell id
+matches `NEG-*`, `DROP-*` or `CARVE-*`, which is what `check_negatives()` counts. Those are
+**five** cell types, not three — **`NEG-bare`, `NEG-mid`, `NEG-plus`** are the clean-line
+negatives, and **`DROP-plusplus`** (the positional `^+++` drop) and **`CARVE-AGENTS`** (the
+documented machine-path example) are also required to read 0 under every pattern. So
+**5 × 10 × 3 = 150**, verified against `cells.tsv` by cell id rather than by trusting the
+arithmetic. ⚠ **Corrected 2026-10-15 (verifier round 2):** this line previously read *"3
+clean cells × 10 patterns × 3 modes"* beside the headline **150** — and 3 × 10 × 3 is **90**.
+The headline was right and the rule printed beside it was wrong, which is the wrong way
+round in the one section that certifies the negatives: a reader is entitled to the
+arithmetic to work. The five cell types are enumerated above and §2 already decomposed them
+correctly (*"3 negatives, 1 structural cell, and 1 carve-out cell"*); only this line was
+out of step. It matters beyond bookkeeping — `DROP-plusplus` and `CARVE-AGENTS` are the
+two rows whose zeros mean something *other* than "the pattern declined" (§3c), so a rule
+that silently excluded them would let a dropped line and a non-match look identical, which
+is the same shape as the carve-out defect recorded there.
 
 ---
 
@@ -352,24 +397,48 @@ rewritten — but `check_append_only` cannot see this either way: it handles `D`
 `M` and an `A` file rewritten in place on its own branch reports `A`
 (`docs/09` §4, the append-only-guard row).
 
-One of §4's own INFERRED claims is now **OBSERVED, once**. The `gate` job of
-run `38762357329` — event **`pull_request`**, head `research/D-scrub-diffmode-control`,
-SHA `33895ee` — printed, as its third line of output:
+Two of this pass's own INFERRED claims are now **OBSERVED**, on **two runs of one
+source**. The `gate` job printed, as its own mode line:
 
 ```
 --- leak scan (mode: diff) ---
 ```
 
-So for **one same-repository pull request**, CI did select **diff mode**, and the
-ten nets in §3's `diff` column are the nets that PR was actually checked by. The
-run concluded `GATE PASS` (`85 passed, 0 failed` on the 05 suite, all ten leak
-patterns `ok`, citations resolve, `CHECKS PASS`, `0 mermaid problem(s)`).
+| run | event | head SHA | verdict | created |
+|---|---|---|---|---|
+| `38762357329` | `pull_request` | `33895ee` | `GATE PASS` | 2026-10-15T15:40:12Z |
+| `38766246282` | `pull_request` | `d86a21b` | `GATE PASS` | round 2, same day |
 
-What this does **not** establish: the `push to main` event, which `research-gate.yml:47`
-routes to `--all`; a **fork** pull request, where `:76-82`'s fail-closed fallback
-is the interesting case; or any checkout in which `origin/main` does not resolve.
-One observation is one source (this repository's own CI log, one run) and is not
-corroboration of the general claim. §6 carries the full list of what is still open.
+Both runs are the `research-gate` workflow in **this** repository, on a same-repository
+`pull_request`, on this branch. Each concluded `GATE PASS` — the second re-ran `85 passed,
+0 failed` on the 05 suite, all ten leak patterns `ok`, citations resolve, `CHECKS PASS`,
+`0 mermaid problem(s)`, and the numbers check re-asserted `217` and `431`.
+
+⚠ **CORRECTED 2026-10-15 (verifier round 2). This section previously read "OBSERVED,
+once", and `once` has become a false statement of fact.** Two runs have happened; a reader
+— or a later agent grepping for "observed once" to decide whether re-checking is warranted
+— was being told the observation had not recurred. That is `AGENTS.md` §6 item 1: a sentence
+that cannot be pointed at. **The instinct to soften `once` because "the count went up" was
+the wrong reflex**, and the correction is worth stating because the two axes are different
+and only one of them moved:
+
+- **`AGENTS.md` §2.1's independence count is unchanged at 1.** §2.1 identifies a source by
+  **the person or organisation** that produced the measurement. Two runs of the *same
+  workflow file* on the *same event type* in *this repository* are two samples of one
+  source, not two sources — the `docs/03` §3a.4 precedent, one artefact plus a PR comment
+  on it. The word *independently* remains unavailable, and no strength word is used below.
+- **The observation count is 2.** This is an evidence-class fact, not an independence fact,
+  and it is the one that was wrong.
+
+**Two axes, stated separately so neither is read off the other: two runs observed
+(`38762357329`, `38766246282`), one source — this repository's own CI.**
+
+What this does **not** establish is unchanged by the second run: the `push to main` event,
+which `research-gate.yml:47` routes to `--all`; a **fork** pull request, where `:76-82`'s
+fail-closed fallback is the interesting case; or any checkout in which `origin/main` does
+not resolve. Two same-repo runs of one event type leave all three exactly where they were.
+§6 carries the full list of what is still open, and `docs/11`'s successor 1 is re-scoped to
+precisely those three.
 
 ---
 
@@ -388,21 +457,41 @@ corroboration of the general claim. §6 carries the full list of what is still o
 - **Committed artefacts contain no instance text and no absolute home path.**
   `--screen` runs the gate's own loop over every file in this directory across
   **all** extensions — `self-screen.txt` is its output, and it reports the loop's
-  `FAIL` flag at **0** in both modes over the branch diff (3 subject files) and
-  **0** hits on any file here. The one un-elided copy of the rendered subject
-  lines lives in the harness's scratch directory, created by `mktemp -d` and
-  removed on exit. ⚠ **This was nearly false, and the near-miss is the point:** writing
-  the F4 fix put a real machine path on a comment line of this pass's own harness,
-  which is a `.sh` file and therefore in both subject sets, and `--screen` went red
-  on the harness itself. The committed artefacts are clean because the instances are
-  assembled from fragments at runtime and never appear whole in a committed line —
-  see §3c and §7a.
+  `FAIL` flag at **0** in both modes and **0** hits on any file here. The one
+  un-elided copy of the rendered subject lines lives in the harness's scratch
+  directory, created by `mktemp -d` and removed on exit. ⚠ **This was nearly false,
+  and the near-miss is the point:** writing the F4 fix put a real machine path on a
+  comment line of this pass's own harness, which is a `.sh` file and therefore in
+  both subject sets, and `--screen` went red on the harness itself. Round 2 added a
+  second instance of the same mistake — printing `$REPO` whole put an absolute home
+  path into the transcript. The committed artefacts are clean because the instances
+  are assembled from fragments at runtime and never appear whole in a committed
+  line — see §3b, §3c and §7a.
 - **The 05 vendor suite was not run locally.** The pool serialises suites. The
   static portion of the gate this pass depends on — the leak scan, both subject
-  modes — was run verbatim via `--screen`: the branch diff reads **3** subject
-  files and the `--all` list **206** files at `ab28f58`, with the loop's own
-  `FAIL` flag at **0**. CI then ran the real gate on the pushed branch and it
-  concluded `GATE PASS` (§4).
+  modes — was run verbatim via `--screen`, with the loop's own `FAIL` flag at **0**.
+  CI then ran the real gate on the pushed branch and it concluded `GATE PASS` (§4).
+
+  ⚠ **CORRECTED 2026-10-15 (verifier round 2): every number in the bullet above is now
+  anchored to the commit it was measured at, because one sentence was carrying two numbers
+  from two different trees and read as though both belonged to the nearer one.** The rule
+  applied is the one lane B was given in the same round: **re-anchor each number to its own
+  commit, per number**, never to the tree the paragraph happens to be sitting in.
+
+  | figure | value | measured at | counting rule |
+  |---|---:|---|---|
+  | branch-diff subject files | **3** | `ab28f58..076c040` | `git diff --name-only --diff-filter=ACM` ∩ the gate's extension filter, minus the two excluded files |
+  | branch-diff subject files | **5** | `ab28f58..d86a21b` | as above; the two added are `docs/09` (F7) and `pool-f/FINDINGS.md` (F2) |
+  | `--all` subject files | **206** | **`ab28f58`** | `git ls-tree -r --name-only` ∩ extension filter, minus the two excluded files — **this is the tree the §3c carve-out measurement was taken on** |
+  | `--all` subject files | **208** | `076c040` and `d86a21b` | as above; +2 are this pass's own `FINDINGS.md` and harness |
+  | non-empty lines in the `--all` text | **43,687** | **`ab28f58`** | `grep -c '[^[:space:]]'` over the subject set above |
+
+  The original read *"the branch diff reads **3** subject files and the `--all` list **206**
+  files at `ab28f58`"*, where the trailing `at ab28f58` reads as scoping **both** clauses.
+  It scopes only the second. At `ab28f58` the branch diff is **0** subject files — that
+  commit *is* the base — and the diff figure of **3** was true only of `ab28f58..076c040`.
+  **No verdict moves:** both figures are inventory, and §3's tables are measured against the
+  scratch repo, not against either tree.
 
 ---
 
@@ -464,12 +553,18 @@ verifier and is disclosed here in the same spirit as the first two:
   against the number of parsed patterns), and prints the tree it read. The
   regression is asserted end-to-end in `--self-test`: `--screen` is invoked from a
   scratch directory and must not report `subject files: 0`.
-- **`self-screen.txt` named no commit.** Its `--all` subject-line count read **44,619**,
-  which matched **neither** `33895ee` (**44,621**) nor `076c040` (**44,652**) — it was a
-  transcript of an intermediate working tree. No prose cited it, and the file's four
-  substantive assertions still held, but a transcript a reader cannot re-derive is not
-  evidence. `--screen` now prints `repo …, HEAD <sha>, dirty <n> file(s)` as its first
-  line, and the file has been regenerated from the final commit.
+- **`self-screen.txt` named no commit, and naming one was not the fix.** Round 1: its
+  `--all` subject-line count read **44,619**, matching **neither** `33895ee` (**44,621**)
+  nor `076c040` (**44,652**) — a transcript of an intermediate tree. Round 1 "fixed" that
+  by printing `HEAD <sha>, dirty <n> file(s)` as line 1, and **round 2 caught that as
+  finding 5**: the file then read `HEAD 076c040…`, `dirty 6 file(s)` while §3c claimed it
+  was *"regenerated at the commit this file ships in"* — **a file cannot carry the hash of
+  the commit that contains it**, so that sentence was unsatisfiable and the bytes
+  contradicted it. The fix is not a commit hash, it is a key that survives an amend: line 1
+  now says **"the tree this RUN read, NOT the commit this transcript ships in"**, and the
+  re-derivable key is the **sha256 of the `--all` subject list plus its non-empty line
+  count**, printed on its own line. Anyone checking out any later commit re-runs `--screen`
+  and gets the same digest if and only if nothing the gate reads moved.
 
 ### 7b. The grep-first duplicate test (`CONTRIBUTING-research.md:199`)
 
@@ -523,3 +618,158 @@ $ grep -n "^#### Successor to" docs/11-suggested-research-areas.md
   2026-10-13 and the row itself says the counts move as passes land.
 - **The four `Successor to area F` blocks, the Closed table and `README.md` are
   untouched.**
+
+---
+
+## 8. Corrections from verifier round 2 (2026-10-15)
+
+A second independent verifier returned **NOT CLEAN** on `d86a21b`: **three blocking**
+findings, three non-blocking. **No measured number moved again**, and the verifier's own
+re-derivations matched every figure this log publishes — the `9 / 1 / 0` table rebuilt from
+`cells.tsv` by an independent implementation, `staged` identical cell-for-cell, `reCAPTCHA`
+firing on cell A only in `--all`, the 150 clean rows, the vacuity triple
+**450/450/37** and **440/440/36**, the carve-out's **206 / 43 687 / 4 / 4 / 0 / 0 / 1**, the
+one-directional rule at **10 predicted / 10 measured / 0** on the ten line numbers §3b
+claims, and F7's **326 / 208 / 3 418** at both commits. §1–§7 stand except where a
+correction is cited in place. **Section numbers 1–7 are unchanged; §8 is new.**
+
+| # | finding | where it now lives | nature |
+|---|---|---|---|
+| 1 | `docs/11:942` — a bare `findings-log/…` link target with no `../`, which resolves to `docs/findings-log/…` | fixed; whole-repo sweep run, §8a | **dead link, `AGENTS.md` §6 item 6** |
+| 2 | the F5 regression test **passed on the F5 defect** | three positive assertions; **both mutants committed**, §8b | test could not fail |
+| 3 | the §3b mechanism demo did not reproduce as printed | re-run and re-printed, every output line a bare integer, §8c | elision changed the result |
+| 4 | §3d's counting rule does not regenerate its own count (3×10×3=90, not 150) | counting rule restated and enumerated, §3d | arithmetic wrong, headline right |
+| 5 | `self-screen.txt` line 1 named a commit the file cannot ship in | line 1 relabelled; digest is the key, §8d | provenance unsatisfiable |
+| 6 | two stale figures in §5 carried each other's commit | per-number anchor table, §5 | scoping |
+| — | ruling: `once` is a false statement of fact, the independence count is not | §4 and `docs/11` successor 1, §8e | false statement (`AGENTS.md` §6 item 1) |
+
+### 8a. Finding 1 — the link sweep, and the instances I did **not** fix
+
+Every markdown link in `docs/` and `README.md` was resolved from the file's own directory.
+**Seven are broken**, in two shapes: a missing `../` (resolves to `docs/findings-log/…`) and
+an over-supplied `../../` (resolves to `../findings-log/…`). Only one is mine. The broken
+shape is written here as a bare link **target** rather than as a rendered link, so that this
+paragraph cannot itself become the defect it describes: the offending sequence — an opening
+square bracket, a closing parenthesis, then a bare relative path — still reads as a link to
+a Markdown renderer and to any future link checker, even inside an inline code span. The two
+shapes are therefore named by their **prefixes** rather than quoted whole.
+
+| location | target | resolves to | mine? | action |
+|---|---|---|:---:|---|
+| `docs/11:942` | `findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md` | `docs/findings-log/…` | ✅ | **fixed** → `../findings-log/…` |
+| `docs/05:188` | `findings-log/2026-10-13-area-h-report-naming/FINDINGS.md` | `docs/findings-log/…` | — | **reported, not fixed** |
+| `docs/09:204` | `findings-log/2026-10-13-cors-method/spacing.txt` | `docs/findings-log/…` | — | **reported, not fixed** |
+| `docs/11:198` | `../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md` | `../findings-log/…` | — | **reported, not fixed** |
+| `docs/11:770` | `../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md` | `../findings-log/…` | — | **reported, not fixed** |
+| `docs/11:1435` | `../../findings-log/2026-10-13-area-v-pde-clients/chunks.txt` | `../findings-log/…` | — | **reported, not fixed** |
+| `docs/11:1435` | `../../findings-log/…` (second target on the line) | `../findings-log/…` | — | **reported, not fixed** |
+
+⚠ **The six I did not fix are outside this lane, and that is a decision, not an
+oversight.** `docs/05`, `docs/07`, `docs/09` outside `:206`, and `docs/11` outside this
+addendum block belong to other passes; the round-2 brief scoped me to the addendum block,
+the one `docs/09:206` sentence, this log directory and the appended `pool-f` correction, and
+`AGENTS.md` §1 makes an edit to a page another lane owns a claim this pass cannot source.
+They are recorded here with the exact fix so the owner has it. **Three of the six are the
+over-`../../` shape, which the round-2 brief did not ask about and which the same sweep
+found** — the class is the same defect in the opposite direction, and it is in `docs/11`
+at three lines inside the same file I was editing.
+
+**Why no check would have caught any of them:** `check_findings_log_cites`
+(`research-checks.py:277`) reads `findings-log/**/*.md` as *sources* and `findings-log/`
+only as valid *targets*. A `docs/` page is a source and never a target, so **a link inside
+`docs/` is structurally invisible to the gate** — the same blind spot `docs/09` §4 records
+for a raw pass's internal cites. A check for it is a maintainer decision (widening a check
+in the PR the check passed), and it is **not** proposed here as done.
+
+### 8b. Finding 2 — the regression test that could not fail, and the mutants that prove it now can
+
+Round 2 fixed F5 and shipped a regression test for it **in the same commit**. The test
+asserted two *strings*: the output contains `HEAD `, and it does not contain
+`subject files: 0`. It never read the exit code, and `*"HEAD "*` matches the failure text
+**`HEAD UNRESOLVED`**. Deleting only the `cd "$REPO"` line — the round-2 pre-flight left
+intact — made `--screen` exit **1** while the test printed `ok` and `SELF-TEST PASS`. The
+sentinel it grepped for had become **unreachable the moment the fix landed**, because the
+new pre-flight returns before `subject files:` is ever printed: the assertion was shadowed
+by the fix it was written alongside.
+
+The replacement asserts three **positive** claims, so no early return can satisfy them:
+`rc = 0`; `subject files: [1-9]` in **both** mode blocks, pinned to the mode-block pattern
+so the carve-out block's own `subject files:` line cannot make a missing mode look present;
+and that the run never reached the pre-flight guard. **Both mutants are committed**
+(`mutants-round2.log`), built in scratch copies — the real worktree is never modified:
+
+| mutant | change | `--screen` from a foreign cwd | `--self-test` |
+|---|---|---|---|
+| baseline | none | exit **0**, both modes non-zero | **PASS** (13 assertions) |
+| **A** | delete **only** `cd "$REPO"` | exit **1**, pre-trip | **FAIL — 3 assertions, exit 1** |
+| **B** | delete `cd "$REPO"` **and** the pre-flight guards (the true round-1 shape) | exit **1**, `subject files: 0` in both modes | **FAIL — 2 assertions, exit 1** |
+
+Mutant A is the case that used to pass. **One honest limit:** the third assertion
+(*"never reaches the pre-flight guard"*) is descriptive and does not fire on mutant B,
+because mutant B **deleted** that guard — mutant B is caught by the other two. The test as
+a whole discriminates both; no single assertion is claimed to catch both.
+
+### 8c. Finding 3 — an elision that silently changed the result
+
+§3b printed a shell transcript whose *input* was elided (`<HOME>/jle`) and whose *output*
+was the matched text. The elision is required — the path is an instance of the net the
+block demonstrates, and this file is `.md`, so it is in the gate's own subject set — but it
+**destroys the substring the demonstration needs**: `printf '+<HOME>/jle'` contains no
+`/home/`, reads **0**, and a reader running the committed command got the **opposite** of
+the printed answer in a block whose only function is to be re-run.
+
+The fix moves the elision to where it costs nothing: **the input is assembled at run time
+(`h=jle` then `/home/$h`) and every printed line is a bare integer from `grep -c`**, so
+nothing needs redacting in the output at all. All six printed integers are verbatim output
+of the six commands above them, re-run for this revision; §3b also states *why* the two
+elisions are not interchangeable, so the next person does not trade one for the other.
+§3b additionally replaces this pass's discarded case-based negative control — `grep -cEi`
+is case-insensitive, so a `/homE/` "certainly-absent" path **matches** — with two
+**shape**-failure controls that do read 0.
+
+### 8d. Findings 5 and 6 — provenance, and per-number anchoring
+
+Finding 5 is the same root as F6 and my round-1 "fix" made it worse by asserting something
+unsatisfiable; the correction is in §3c and §7a and is summarised there. **A committed
+transcript cannot name the commit that contains it**, so line 1 now labels what it actually
+is — *the tree this run read* — and the **sha256 of the `--all` subject list plus its
+non-empty line count** is the re-derivable key, because a digest does not move under an
+amend.
+
+Finding 6 is §5's per-number anchor table: **3** diff subjects at `ab28f58..076c040`, **5**
+at `ab28f58..d86a21b`, **206** `--all` subjects at `ab28f58` (the carve-out tree), **208** at
+`076c040` and `d86a21b`, **43,687** non-empty lines at `ab28f58`. The original sentence put
+both numbers under one trailing `at ab28f58`; at `ab28f58` the branch diff is **0**. No
+verdict moves — both figures are inventory, and §3's tables are measured against the scratch
+repo.
+
+### 8e. The ruling on `once` — two axes, recorded at both sites
+
+§4 said **"OBSERVED, once"**. Verifier round 2 ruled that the reasoning behind keeping it
+was right and the wording wrong, and the ruling is adopted here and at `docs/11` successor 1.
+§2.1 governs **sources**: two runs of the same workflow file, on the same event type, in
+this repository, are two samples of one source — the `docs/03` §3a.4 precedent — so **the
+independence count is unchanged at 1** and *independently* remains unavailable. But `once`
+was an **evidence-class** statement, and it had become **false**: two runs have happened
+(`38762357329` at `33895ee`, `38766246282` at `d86a21b`), and a reader — or a later agent
+grepping for "observed once" to decide whether re-checking is warranted — was being told
+otherwise. `AGENTS.md` §6 item 1. **Both sites now state the two axes separately**: two runs
+observed, one source.
+
+### 8f. Verified this round, not inherited
+
+Round 2's verifier explicitly did **not** execute these, so they were run here and the
+results are recorded rather than assumed:
+
+- `python3 scripts/research-checks.py` → **CHECKS PASS**, exit 0, including
+  `findings-log append-only ok`.
+- `python3 scripts/measure_assertions.py --self-test` → **self-test passed (16 shapes)**,
+  exit 0. `python3 scripts/measure_assertions.py` → **217 431**, exit 0 — **both counts
+  unmoved**, no pin added.
+- **The grep-first duplicate test and the quality bar** (`CONTRIBUTING-research.md:195-200`)
+  were **re-run**, not re-read: all three targets (`docs/10` §1, the Closed table, `docs/11`
+  itself) return no duplicate for either successor, and the bar is applied to each in §7b's
+  table. Round 2's verifier read that transcript and called the conclusions "likely right"
+  while running none of the greps; they are run and their exit codes are in §7b.
+- `--self-test`, the full harness run, `--screen` twice for reproducibility, and **both
+  mutants** (§8b) — all re-run for this revision.
