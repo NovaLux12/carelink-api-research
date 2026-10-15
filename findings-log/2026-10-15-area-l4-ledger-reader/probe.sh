@@ -11,6 +11,7 @@
 # were actually run, in order; each is a local read.
 #
 #   python3 read-area-l.py population    # count the population, before reading it
+#   python3 read-area-l.py schemas       # the schema figures, under rules K1-K3
 #   python3 read-area-l.py manifest      # write manifest.tsv, precedence order
 #   python3 read-area-l.py census        # the census, compared cell by cell
 #   python3 read-area-l.py self-test     # the controls, exercised
@@ -21,6 +22,7 @@
 set -eu
 echo "0 of a 0 cap — this pass sends no requests. See run.log for what was run."
 python3 read-area-l.py population
+python3 read-area-l.py schemas
 python3 read-area-l.py manifest
 python3 read-area-l.py census
 python3 read-area-l.py self-test

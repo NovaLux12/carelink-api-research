@@ -293,16 +293,25 @@ def derive(recs):
         v, probe, any200 = verdict(rows, rows)
         # Verdict precedence: the last DATA row in manifest order wins, because
         # the manifest is chronological and a later pass is an addendum.
-        # Member precedence: the last DATA row THAT CARRIES A MEMBER FIELD wins.
+        # Member precedence: the last DATA row that (a) answered 200 AND (b)
+        # carries a member field wins. (a) is not decoration. An empty member
+        # list on a 404 or a 502 says nothing — the query returned no records, so
+        # there was nothing to find — and reading it as a zero would convert a
+        # FAILURE into an absence, which census-84.txt's own rule forbids
+        # ("502/504/503/400 is a FAILURE, never an absence"). CC-MAIN-2013-48 is
+        # the cell this fixes: its only member-carrying DATA row is a 502.
         # The two can disagree, and the reader reports that rather than picking.
-        mrows = [r for r in rows if r['cell'] == 'DATA' and r['members'] is not None]
+        mrows = [r for r in rows
+                 if r['cell'] == 'DATA' and r['status'] == 200 and r['members'] is not None]
         if mrows:
             m = mrows[-1]
             members, msrc = m['members'], '%s seq %s' % (m['src'], m['seq'])
         else:
             members, msrc = None, None
-        later_no_field = [r for r in rows if r['cell'] == 'DATA' and r['members'] is None
-                          and r is not probe]
+        # Every DATA row that could NOT supply a count, printed rather than hidden.
+        no_evidence = ['%s seq %s (%s)' % (r['src'], r['seq'], r['status'])
+                       for r in rows if r['cell'] == 'DATA'
+                       and not (r['status'] == 200 and r['members'] is not None)]
         out[crawl] = {
             'verdict': v,
             'probe': ('%s seq %s' % (probe['src'], probe['seq'])) if probe else None,
@@ -312,7 +321,7 @@ def derive(recs):
             'members_src': msrc,
             'n_members': len(members) if members is not None else None,
             'dates': sorted({d for d in (members or []) if d[2]}) if members is not None else None,
-            'late_no_member_field': ['%s seq %s' % (r['src'], r['seq']) for r in later_no_field],
+            'late_no_member_field': no_evidence,
             'rows': len(rows),
         }
     return out
@@ -368,6 +377,92 @@ def cmd_population(a):
         except OSError:
             area = '(no Area: line)'
         print('    %-40s %s' % (slug_of(p), area or '(states its area in prose, see FINDINGS.md)'))
+    return 0
+
+
+def cmd_schemas(a):
+    """SCHEMA CENSUS. The counting rule is printed before the number, because a
+    count of "how many schemas" is only meaningful with the rule that produced it.
+
+    COUNTING RULES, three separate questions, three separate answers:
+
+      K1  distinct row key-SETS   = the number of distinct `frozenset(row.keys())`
+                                    over every row of the population. Mechanical,
+                                    no judgement.
+      K2  distinct member FIELDS  = the number of distinct keys among
+                                    {ipro_hcp, ipro_hcp_urls, ipro_hcp_members}
+                                    present on any row. Mechanical.
+      K3  ledgers that break a reader, counted per PROPERTY rather than by a
+          single number: rows with no `role` key; rows whose raw `http_status`
+          does not EQUAL its 3-digit prefix (so a `== '200'` test misses them);
+          ledgers with no DATA cell.
+
+    There is deliberately no "number of schemas" headline. An earlier draft of
+    this pass published "five schemas, not three" and the number could not be
+    re-derived from any of these rules — it mixed a row-schema property with a
+    census-derivation property. Withdrawn; see the Correction section in
+    FINDINGS.md.
+
+    The DATA and CONTROL counts here come from `read_row()`, the SAME function
+    the census uses. A second rule for the same question would be a second
+    unverifiable claim.
+    """
+    pop = population(git=True)
+    rule()
+    print('SCHEMA CENSUS over the %d-ledger population (rules K1-K3 below)' % len(pop))
+    rule('-')
+    keysets = collections.Counter()
+    per = collections.OrderedDict()
+    for p in pop:
+        rows = [json.loads(l) for l in open(os.path.join(REPO, p)) if l.strip()]
+        parsed = [read_row(r, p) for r in rows]
+        norole = sum(1 for r in rows if 'role' not in r)
+        # The discriminator that matters: does a raw `== '200'` test find this row?
+        # A plain "200" string is fine. A "200 (curl)" is not — that is the shape
+        # that would silently read as "no status" to the comparison derive.py used.
+        opaque = sum(1 for r in rows
+                     if str(r.get('http_status', ''))[:3].isdigit()
+                     and str(r.get('http_status', '')) != str(r.get('http_status', ''))[:3])
+        ks = {frozenset(r.keys()) for r in rows}
+        flds = collections.Counter()
+        for r in rows:
+            for k in ('ipro_hcp', 'ipro_hcp_urls', 'ipro_hcp_members'):
+                if k in r:
+                    flds[k] += 1
+        for r in rows:
+            keysets[frozenset(r.keys())] += 1
+        data = sum(1 for r in parsed if r['cell'] == 'DATA')
+        per[p] = {'rows': len(rows), 'keysets': len(ks), 'norole': norole,
+                  'opaque': opaque, 'data': data, 'flds': flds}
+        print('  %-58s rows %3d | key-sets %2d | no-role %2d | opaque status %2d | DATA %2d | %s'
+              % (p, len(rows), len(ks), norole, opaque, data,
+                 ','.join(sorted(flds)) or 'no member field'))
+
+    rule('-')
+    print('K1  distinct row key-sets over the population      %d' % len(keysets))
+    for ks, n in keysets.most_common():
+        print('      %4d rows  %s' % (n, ','.join(sorted(ks))[:150]))
+    allflds = sorted({k for p in per for k in per[p]['flds']})
+    print()
+    print('K2  distinct member fields present                  %d  (%s)'
+          % (len(allflds), ', '.join(allflds)))
+    print('K3  ledgers with rows carrying NO `role` key        %d  (%s)'
+          % (len([p for p in per if per[p]['norole']]),
+             ', '.join(os.path.basename(os.path.dirname(p)) for p in per if per[p]['norole'])))
+    print('    ledgers with an OPAQUE status (raw != 3-digit prefix, so a `== "200"`'
+          ' test misses it)')
+    print('                                                     %d  (%s)'
+          % (len([p for p in per if per[p]['opaque']]),
+             ', '.join('%s: %d/%d rows' % (os.path.basename(os.path.dirname(p)),
+                                            per[p]['opaque'], per[p]['rows'])
+                       for p in per if per[p]['opaque']) or 'none'))
+    print('    ledgers with NO DATA cell                       %d  (%s)'
+          % (len([p for p in per if per[p]['data'] == 0]),
+             ', '.join(os.path.basename(os.path.dirname(p)) for p in per if per[p]['data'] == 0)))
+    print()
+    print('  K3 are three PROPERTIES, not one count. A ledger can fail a reader on any')
+    print('  of them, and "no DATA cell" is a property of what the pass chose to query,')
+    print('  not of the shape of a row. Do not add them into a single number.')
     return 0
 
 
@@ -490,6 +585,8 @@ def cmd_census(a):
     print('  in-window crawls in census-84.txt  %d' % len(win))
     print()
     print('  %-16s %-14s %-14s %-6s %-6s %s' % ('crawl', 're-derived', 'census-84.txt', 'mem', 'mem', 'member source / difference'))
+    print('  %-16s %-14s %-14s %-6s %-6s %s' % ('', '', '', '(mine)', '(file)',
+                                                 '`mem` = "-" means NOT DERIVABLE, which is not 0'))
     diffs, memdiffs, unresolved = [], [], []
     vc = collections.Counter()
     mine_carry = []
@@ -506,6 +603,9 @@ def cmd_census(a):
             continue
         vm = d['verdict']
         vc[vm] += 1
+        # `-` means NOT DERIVABLE, which is not the same claim as 0. A crawl whose
+        # only member-bearing DATA rows are non-200 has no member count in the tree,
+        # and this reader will not print 0 for it.
         nm = '-' if d['n_members'] is None else str(d['n_members'])
         fb = f['members']
         mark = ''
@@ -612,9 +712,10 @@ def cmd_census(a):
             continue
         print('  %-16s %-14s probe %s (%s)  members=%s from %s'
               % (c, d['verdict'], d['probe'], d['probe_status'],
-                 d['n_members'], d['members_src'] or 'no ledger row carries a member field'))
+                 'NOT DERIVABLE' if d['n_members'] is None else d['n_members'],
+                 d['members_src'] or 'no DATA row answered 200 with a member field'))
         for lf in d['late_no_member_field']:
-            print('  %-16s   later DATA row with NO member field: %s' % ('', lf))
+            print('  %-16s   DATA row that cannot supply a member count: %s' % ('', lf))
 
     rule()
     print('6. WHAT THE READER CANNOT SETTLE — the equivalence question, measured')
@@ -678,10 +779,12 @@ def cmd_census(a):
 def self_test():
     """Exercise the reader's failure paths. A reader that cannot fail is not evidence."""
     ok = True
+    n_checks = 0
 
     def check(name, cond, detail=''):
-        nonlocal ok
+        nonlocal ok, n_checks
         ok = ok and cond
+        n_checks += 1
         print('  %-58s %s %s' % (name, 'PASS' if cond else '** FAIL **', detail))
 
     print('SELF-TEST — synthetic rows, one per committed schema, plus the ones it must refuse')
@@ -726,11 +829,24 @@ def self_test():
     check('status resolves to int, not str (s7\'s "200 (curl)")',
           isinstance(parsed['D no role key at all (pool-s7, "200 (curl)")']['status'], int)
           and parsed['D no role key at all (pool-s7, "200 (curl)")']['status'] == 200)
-    check('a string comparison would have MISSED that 200 (AGENTS.md §6 item 3)',
-          ('200 (curl)' == '200') is False)
     check('the control row is not a DATA cell',
           parsed['E control row (must not become a data cell)']['cell'] == 'CONTROL/OTHER')
-    check('the four schemas agree on the member COUNT for the same fact',
+    # The substantive version of the "a string comparison would miss that 200" claim,
+    # over the REAL ledger. An earlier draft asserted it as
+    # `('200 (curl)' == '200') is False` — two literals compared to each other,
+    # False by construction, unchangeable by anything the reader does. That is a
+    # vacuous control wearing a control's name. These two read the committed file:
+    # if the reader stopped normalising, `resolved7` would collapse to 0 and the
+    # second check FAILS.
+    s7 = os.path.join(REPO, 'findings-log/2026-10-14-pool-s7-l7crawl/results.jsonl')
+    raw7 = [json.loads(l) for l in open(s7) if l.strip()]
+    str_eq = sum(1 for r in raw7 if r['http_status'] == '200')
+    resolved7 = sum(1 for r in raw7 if status_of(r) == 200)
+    check('REAL s7 ledger: a raw == "200" test finds %d of %d rows...' % (str_eq, len(raw7)),
+          str_eq == 0, '-> every row is the opaque "NNN (curl)" form')
+    check('...and the reader resolves %d of them to an int 200' % resolved7,
+          resolved7 > 0 and all(isinstance(status_of(r), int) for r in raw7))
+    check('the three fixtures agree on the member COUNT for the same fact',
           len(parsed['A ipro_hcp (2026-10-14/15 passes)']['members']) == 1
           and len(parsed['B ipro_hcp_urls (2026-10-13 reissue passes)']['members']) == 1
           and len(parsed['C ipro_hcp_members (2026-10-13 ipro-hcp)']['members']) == 1)
@@ -743,6 +859,24 @@ def self_test():
           and parsed['B ipro_hcp_urls (2026-10-13 reissue passes)']['members'][0][2] == '')
     check('a row with no member field reads None, not 0 (s7)',
           parsed['D no role key at all (pool-s7, "200 (curl)")']['members'] is None)
+
+    rule('-')
+    print('  MEMBER-SOURCE RULE — only a DATA row that answered 200 may supply a count')
+    # An empty member list on a 404 or a 502 is vacuous: the query returned no
+    # records, so there was nothing to find. Reading it as a zero would convert a
+    # FAILURE into an absence, which census-84.txt's own verdict rule forbids.
+    ok200 = dict(good['A ipro_hcp (2026-10-14/15 passes)'], http_status=200)
+    fail502 = dict(good['A ipro_hcp (2026-10-14/15 passes)'], http_status=502,
+                   ipro_hcp=[], records=0)
+    D2 = derive([read_row(ok200, 'f'), read_row(fail502, 'f')])
+    check('a 200 row supplies the count',
+          D2['CC-MAIN-2020-50']['n_members'] == 1
+          and D2['CC-MAIN-2020-50']['members_src'] is not None)
+    D3 = derive([read_row(fail502, 'f')])
+    check('a lone 502 row supplies NO count (not 0)',
+          D3['CC-MAIN-2020-50']['n_members'] is None,
+          '-> n_members=%r — the difference between "not derivable" and "none found"'
+          % D3['CC-MAIN-2020-50']['n_members'])
 
     rule('-')
     print('  NEGATIVE CONTROL — rows this reader must REFUSE, not guess at')
@@ -816,13 +950,18 @@ def self_test():
           % (len(recs2), n_before, len(bad2)))
     os.unlink(tmp)
     rule()
-    print('  self-test: %s' % ('PASS' if ok else 'FAIL'))
+    # The count is DERIVED here, not asserted in prose. `grep -c PASS` on this
+    # output would over-count by one, because the summary line below contains the
+    # word PASS — which is how an earlier draft of this pass published "23 checks"
+    # for 22 checks.
+    print('  self-test: %s (%d checks, counted by this function, not asserted)'
+          % ('PASS' if ok else 'FAIL', n_checks))
     return 0 if ok else 1
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['population', 'manifest', 'census', 'self-test'])
+    ap.add_argument('mode', choices=['population', 'schemas', 'manifest', 'census', 'self-test'])
     ap.add_argument('--allow-unreadable', action='store_true',
                     help='record unreadable rows as UNREADABLE instead of refusing to emit')
     a = ap.parse_args()
@@ -830,6 +969,8 @@ def main():
         return self_test()
     if a.mode == 'population':
         return cmd_population(a)
+    if a.mode == 'schemas':
+        return cmd_schemas(a)
     if a.mode == 'manifest':
         return cmd_manifest(a)
     return cmd_census(a)

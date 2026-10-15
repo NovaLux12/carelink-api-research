@@ -8,9 +8,14 @@
 # 0 of a 0 cap. Methods: none (GET 0, OPTIONS 0, POST 0). Delay: >=2s rule, not
 # applicable, 0 requests sent, so no inter-request gap exists to report.
 #
-# invocation                        exit  output lines  what it did
-# --------------------------------  ----  ------------  ------------------------------------
-read-area-l.py population            0            26  R1+R2, 8 ledgers / 380 rows, counted before reading
-read-area-l.py manifest              0             8  wrote manifest.tsv, precedence order
-read-area-l.py census                0           222  8 ledgers -> census, vs census-84.txt cell by cell
-read-area-l.py self-test             0            33  23 controls incl. 5 row + 1 integration negative
+# Line counts use grep -c '' on the captured output. wc -l on a capture that has no
+# trailing newline reports one line fewer than was printed, which is how an earlier
+# revision of this file understated every count.
+#
+# invocation                 exit  output lines  what it did
+# -------------------------  ----  ------------  ----------------------------------------
+read-area-l.py population     0            27  R1+R2, 8 ledgers / 380 rows, counted before reading
+read-area-l.py schemas        0            33  K1 distinct key-sets 10, K2 member fields 3, K3 properties
+read-area-l.py manifest       0             9  wrote manifest.tsv, precedence order
+read-area-l.py census         0           240  8 ledgers -> census, vs census-84.txt cell by cell
+read-area-l.py self-test      0            39  25 controls: 5 parses, 2 real-ledger, 3 normalisation, 2 member-source, 5 refuses, 3 exhaustiveness, 2 integration

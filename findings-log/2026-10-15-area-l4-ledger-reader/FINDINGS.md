@@ -27,7 +27,11 @@ none of them can be made to send a request by editing an argument.
 **Counting rule R1**, recorded here and implemented in `read-area-l.py`'s
 `population()` mode, in this order:
 
-1. `git ls-files 'findings-log/**/results.jsonl'` — **43** committed ledgers.
+1. `git ls-files 'findings-log/**/results.jsonl'` — **44** committed ledgers
+   **at this branch's head**. This number **moves as passes land**: it was 43
+   before this pass added its own ledger, and any later merge moves it again.
+   Only step 2's answer (8) is meant to be stable, and step 2 is re-checked
+   against rule R2 below rather than trusted.
 2. Keep a ledger iff its `<date>-<slug>` slug, **past its date prefix**, carries
    `area-l`, `pool-l` or `l7crawl` on a dash boundary. — **8** ledgers.
 
@@ -68,8 +72,8 @@ LEDGERS = sorted(glob.glob('../2026-10-1[34]-area-l-*/results.jsonl')) + \
 
 That is 4 from the glob plus 2 named — **6 ledgers**. It misses
 `2026-10-14-pool-l-crawlcontrol` (20 rows) and `2026-10-14-pool-s7-l7crawl`
-(19 rows): 39 rows, 9.7% of the population, **not in the corpus the census was
-derived from.** Both are area-L work by their own `**Area:**` lines above. This
+(19 rows): **39 rows, 10.3% of the 380-row population** (39 ÷ 380 = 0.10263),
+**not in the corpus the census was derived from.** Both are area-L work by their own `**Area:**` lines above. This
 is a finding, not a style note: a census that says "re-derived from the ledgers"
 was re-derived from six of the eight.
 
@@ -86,19 +90,43 @@ was re-derived from six of the eight.
 | `2026-10-14-pool-s7-l7crawl` | 19 | 10 | 9 | **none** | **no `role` key at all** |
 | `2026-10-15-pool-l-ipro-census-cont` | 188 | 99 | 89 | `ipro_hcp` | 2 |
 
-**This is the defect, measured: the three schemas S-L4 names are not three, they
-are five.** `pool-s7-l7crawl` carries **no `role` key** and a `crawl` field
-instead, and `pool-l-crawlcontrol` carries **no DATA cell at all** — all 20 of
-its rows are controls. Both facts are from the reader's output over the
-population above, and both are re-derivable with `python3 read-area-l.py census`.
+**The two component facts that broke the committed reader, each with its own
+count.** An earlier draft of this section tried to compress these into one
+number ("five schemas, not three") and **that number is withdrawn** — see the
+Correction at the end of this file and §2b. The measured facts are:
+
+| | count | command |
+|---|---|---|
+| rows carrying **no `role` key** | **19 of 19** in one ledger (`pool-s7-l7crawl`, all 19 rows; 0 in the other seven) | `read-area-l.py schemas` |
+| rows whose raw status is **opaque** to a `== "200"` test | **19 of 19** in the same ledger; **0** in the other seven | `read-area-l.py schemas` |
+| ledgers with **no DATA cell at all** | **1** (`pool-l-crawlcontrol`, 0 DATA of 20 rows) | `read-area-l.py schemas` |
+| distinct row **key-sets** across the population | **10** | `read-area-l.py schemas` (rule K1) |
+| distinct **member fields** | **3** (`ipro_hcp`, `ipro_hcp_urls`, `ipro_hcp_members`) — the three S-L4 names | `read-area-l.py schemas` (rule K2) |
+
+**S-L4's "three schemas" is not wrong; it is a count of member-field shapes, and
+that is exactly what rule K2 measures and returns.** The gap S-L4 named — a
+reader that only handles three shapes — is real, but it did not need a fourth or
+fifth *schema* to be real. It needed this population to include two ledgers the
+committed reader never read.
+
+## 2b. Why there is deliberately no "number of schemas" headline
+
+A count is only meaningful with the rule that produced it, and an earlier draft
+of this pass published one without either. `read-area-l.py schemas` now prints
+**three separate rules and three separate answers** — K1 distinct key-sets (**10**),
+K2 distinct member fields (**3**), K3 three *properties* (no-`role` rows,
+opaque statuses, no-DATA ledgers) — and refuses to sum them, because **"no DATA
+cell" is a property of what a pass chose to query, not of the shape of a row.**
+Adding a row-schema count to a query-derivation count is how "five" was
+manufactured from facts that were each individually true.
 
 ## 3. The reader, and why one code path is the right shape
 
-`read-area-l.py` resolves all five schemas **without ever reading `role`**.
+`read-area-l.py` resolves the whole population **without ever reading `role`**.
 
 The census's job for a row does not depend on what its author *called* it. It
 depends on **what the row queried** — and the query is in `path`, which every
-one of the five schemas carries. So:
+committed schema carries. So:
 
 - **CELL RULE** — a row is part of the DATA cell iff its `url=` parameter is
   `minimed.eu` or `carelink.minimed.eu`. Everything else is CONTROL/OTHER.
@@ -114,12 +142,21 @@ one of the five schemas carries. So:
   502/504/503/400 is a FAILURE, never an absence.
 - **PRECEDENCE** — a later ledger supersedes an earlier one's *verdict*, because
   the manifest is chronological and a later pass is an addendum. Member counts
-  are taken from the last DATA row **that carries a member field**, whichever
-  that is, and the reader prints every DATA row that superseded a verdict while
-  carrying no member field, so the asymmetry is visible rather than resolved
-  silently. This is not hypothetical: it decides `CC-MAIN-2014-10`, whose verdict
-  comes from `pool-s7-l7crawl` (2026-10-14) and whose member count can only come
-  from `7crawl-reissue` (2026-10-13).
+  are taken from the last DATA row **that both answered 200 and carries a member
+  field**, whichever that is; the reader prints every DATA row that could not
+  supply a count, so the asymmetry is visible rather than resolved silently.
+  This is not hypothetical: it decides `CC-MAIN-2014-10`, whose verdict comes
+  from `pool-s7-l7crawl` (2026-10-14) and whose member count can only come from
+  `7crawl-reissue` (2026-10-13).
+- **MEMBER-SOURCE RULE (the `200` requirement is load-bearing, not decoration).**
+  An empty member list on a **404 or a 502** says nothing — the query returned no
+  records, so there was nothing to find — and reading it as a zero would convert a
+  **FAILURE into an absence**, which `census-84.txt:20` forbids in terms. Only a
+  `200` row may supply a count. This is not hypothetical either: `CC-MAIN-2013-48`'s
+  only member-carrying DATA row is a **502**
+  (`2026-10-14-area-l-ipro-early-crawl-supplement` seq 3), so its count is
+  **not derivable from the tree** and the reader prints `NOT DERIVABLE` rather
+  than `0`. See the Correction at the end of this file.
 
 **A mapping table a human fills in would have been the wrong deliverable.** It
 would restate the free-text `role` vocabulary as a second table someone has to
@@ -134,20 +171,32 @@ reader uses, `r['http_status'] == '200'`, is **False** for every row of that
 ledger. This is `AGENTS.md` §6 item 3 in its most literal form in this tree: a
 comparison that cannot distinguish a `200` from nothing, and would report a
 crawl as unread rather than read. The reader resolves to `int` and asserts the
-type; `self-test` asserts both that the int is 200 **and** that the string
-comparison returns `False`, so the trap is exercised rather than described.
+type.
 
-**A row with no member field is not a row with zero members.**
-`members_of()` returns `None`, never `0`, when no recognised member field is
-present, and `derive()` prefers a member-bearing row over a member-less one. A
-zero and an absence are different facts and the reader does not merge them.
+⚠ **The first version of this section claimed `self-test` "exercised" that trap
+by asserting `('200 (curl)' == '200') is False`. That check was vacuous**: it
+compared two literals, so it was False by construction and could not fail
+whatever the reader did — a control wearing a control's name. It is replaced by
+two checks that read the **committed 19-row ledger**: a raw `== "200"` test finds
+**0 of 19** rows, while the reader resolves **10 of 19** to an `int` 200. If the
+reader stopped normalising, the second check fails. See the Correction.
+
+**A row with no member field is not a row with zero members, and an empty member
+list on a non-200 row is not a zero either.** `members_of()` returns `None`,
+never `0`, when no recognised member field is present; and `derive()` will only
+take a count from a row that **answered 200**. A zero, an absence and a
+not-derivable are three different facts and the reader does not merge them —
+`CC-MAIN-2013-48` is the cell where the third appears.
 
 ## 5. The controls — internal, and stated as such
 
 **These are internal controls. They are not network controls and nothing here
 speaks to a vendor surface.** They are the controls this area's own brief names,
-and each is exercised by `python3 read-area-l.py self-test` (exit 0, 23 checks,
-0 failures).
+and each is exercised by `python3 read-area-l.py self-test` (exit 0, **25
+checks, 0 failures**). The count is **printed by the test function itself** and
+is not asserted here: `grep -c PASS` over that output would over-count by one,
+because the summary line contains the word `PASS` — which is how an earlier
+draft of this pass published "23 checks" for 22.
 
 | control | what it does | how it can fail |
 |---|---|---|
@@ -156,6 +205,8 @@ and each is exercised by `python3 read-area-l.py self-test` (exit 0, 23 checks,
 | **Exhaustiveness** | every ledger in the population contributes ≥1 record; the manifest must equal the population exactly; an empty output over a non-empty population is a `SystemExit`, not `ok` | a crawl whose rows are all controls yields **no verdict** (`None`), which `self-test` asserts |
 | **Negative — rows** | 5 synthetic rows the reader must **refuse**: an `ipro_hcp` entry with no timestamp, a member field that is a bare string, `ipro_hcp_count` disagreeing with its list, a member dict with no `ts`/`path`, a URL that does not parse | each raises `Unreadable`; the check fails if the row *parses* |
 | **Negative — integration** | one unreadable row appended to a **real** 40-row ledger | `read_ledger` raises `SystemExit` — the census refuses to print over 40 of 41 rows; with `--allow-unreadable` it keeps 40 records and records 1 UNREADABLE instead of dropping it |
+| **Negative — vacuity** | the status trap is checked over the **committed 19-row `s7` ledger**, not over two literals | a raw `== "200"` finds 0 of 19; the reader must resolve 10 of 19. Stop normalising and this fails |
+| **Member-source** | only a `200` DATA row may supply a member count | a lone `502` row with an empty list must yield `None`, not `0` — checked both ways |
 
 The integration control is the one that matters. A reader that downgraded an
 unreadable row to a warning would emit a census over 8 of 9 rows and call it
@@ -176,7 +227,7 @@ reader prints that row's ledger and `seq` for each (§5 of its own output):
 
 | crawl | verdict | resolved from | members |
 |---|---|---|---|
-| `CC-MAIN-2013-48` | **ABSENCE** | `pool-s7-l7crawl` seq 6 (404, behind a 200) | 0 |
+| `CC-MAIN-2013-48` | **ABSENCE** | `pool-s7-l7crawl` seq 6 (404, behind a 200) | **NOT DERIVABLE** — no DATA row of this crawl answered 200 in any ledger, so the tree holds no member count. It is not a zero. |
 | `CC-MAIN-2014-10` | **RECORD** | `pool-s7-l7crawl` seq 9 (200) | **1** |
 | `CC-MAIN-2015-06` | **RECORD** | `ipro-hcp` seq 43 (200) | 0 |
 | `CC-MAIN-2015-22` | **RECORD** | `pool-s7-l7crawl` seq 12 (200) | 0 |
@@ -184,6 +235,15 @@ reader prints that row's ledger and `seq` for each (§5 of its own output):
 | `CC-MAIN-2019-51` | **RECORD** | `ipro-hcp` seq 29 (200) | 0 |
 | `CC-MAIN-2020-24` | **RECORD** | `ipro-hcp` seq 38 (200) | **3** |
 | `CC-MAIN-2021-25` | **RECORD** | `pool-s7-l7crawl` seq 16 (200) | 0 |
+
+**Five of the six `0`s above are the *same* kind of claim, and one now is not.**
+The five are read off `200` rows and rest on the internal-consistency argument
+in §7. The sixth — `CC-MAIN-2013-48` — has no `200` row at all, so under the
+member-source rule its count is **not derivable**. **No headline number moves
+either way**: `census-84.txt` scored it `0`, and a not-derivable cell is not
+carried in the member tally, so RECORD, ABSENCE, the member counts and the
+in-window total are unchanged. The difference is honesty about what the tree
+holds, not a different census.
 
 **Cell-by-cell against `census-84.txt`, both values standing** (`AGENTS.md` §2 —
 where sources disagree, give both; never pick one silently):
@@ -256,7 +316,7 @@ crawls `older-schema` with **0** members and its member tally excludes them. The
 pass that wrote `census-84.txt` did not have to be wrong about Common Crawl to
 produce that; it had only to have a reader that could not see two ledger shapes.
 
-### One cell is mis-framed in the committed census, independently of the schema
+### One cell is mis-framed in the committed census, and not because of any schema
 
 `census-84.txt:168` publishes **11** crawls carrying a member, and its list
 includes `CC-MAIN-2022-27` — which `census-84.txt:119` itself marks
@@ -266,6 +326,35 @@ tally directly above it on that file is scoped "IN-WINDOW crawls only"
 being chosen. This is a separate defect from the schema change and is left for a
 successor to close, because correcting `census-84.txt` is a page this pass does
 not own.
+
+### A third instance of this pass's own class, on the same page, found by its own figure
+
+`docs/11-suggested-research-areas.md:1650` and the closed-area table at `:2170`
+both publish:
+
+> **`/ipro/hcp/` is absent from 65 of the 84 in-window crawls**
+
+**That reconciles with neither available reading, and the arithmetic is the
+check:**
+
+| reading | in-window RECORD | absent = 84 − RECORD | states |
+|---|---|---|---|
+| `census-84.txt` as committed | **65** | **19** | absent from **19** |
+| this pass's re-derivation | **72** | **12** | absent from **12** |
+| `docs/11:1650` / `:2170` | — | — | absent from **65** |
+
+**65 is the census's RECORD cell read into the *absent* slot.** Under the
+committed census the correct absent count is 19, not 65; under the re-derivation
+it is 12. The same 65 cannot be an absence count under either, and 84 − 65 = 19
+is exactly the number the committed file supports.
+
+**Recorded, not fixed.** Both lines are out of this pass's lane — `:1650` sits in
+area prose and `:2170` is in the closed-area table, neither of which belongs to
+the S-L4 paragraph — so the finding is a successor (§8.5) with all three readings
+standing. It is worth naming that this pass hunted this exact class twice
+(`docs/11:1736`/`:1738` against `census-84.txt:36`/`:102`), wrote a successor for
+each, and **missed a third instance on the same page** that its own new figure
+made checkable in one subtraction.
 
 ## 7. What this reader cannot settle — the assumption, kept INFERRED
 
@@ -298,9 +387,33 @@ in §6 rest on this argument, and it is labelled INFERRED rather than folded int
 the table above.**
 
 **So: the reader closes the *defect*. It does not close the *assumption*.** One
-reader, five schemas, 8 of 8 resolved, no manual reading — and the equivalence
-claim left standing as INFERRED, with the specific field-level reason it is not
-yet a fact.
+reader over the whole population, 8 of 8 resolved, no manual reading — and the
+equivalence claim left standing as INFERRED, with the specific field-level reason
+it is not yet a fact.
+
+## 7a. The one thing that would have closed it, and did not
+
+Every **member** resolution in §6 rests on a `200` row whose ledger already
+carries the member list — the reader reads, it does not compute. So the
+assumption is not "can a reader normalise three shapes" (it can, and `self-test`
+asserts it); it is **"does a committed `200` row's member list enumerate every
+member in that crawl"**. That is a property of Common Crawl's NDJSON pagination,
+of what those bodies contained, and of what each pass chose to scan — and **no
+artefact in this tree can demonstrate it**, because the bodies are excluded by
+`AGENTS.md` §7.
+
+Two things follow, and both are limits rather than results:
+
+- **A non-zero count can be a floor.** A reader cannot distinguish "this crawl
+  holds 3 members" from "this crawl holds at least 3, and the pass read one page".
+  Nothing published here claims an upper bound on any crawl's members.
+- **A `0` is only as good as the row it came from.** Which is why `CC-MAIN-2013-48`
+  is now **NOT DERIVABLE** rather than `0`: its only member-bearing DATA row is a
+  **502**, and an empty list on a failed query carries no information at all.
+
+Closing this needs either the bodies (a disclosure decision, not a research pass's)
+or a ledger field distinguishing "computed, found none" from "not computed"
+(successor §8.3). Both are named; neither is claimed.
 
 ## 8. Successors
 
@@ -324,15 +437,27 @@ yet a fact.
    than one capture seen three times; the ledger's three distinct timestamps
    (`…212918`, `…212919` ×2) are consistent with either reading and the
    re-derivation does not settle it.
-3. **The five zeros rest on an internal-consistency argument that no artefact in
-   the tree can promote.** **Blocker:** the response bodies are outside the tree
-   by `AGENTS.md` §7. **Closes when** each of the five zero cells carries a row
-   whose own ledger field distinguishes "computed, found none" from "not
-   computed" — a `shape` field as `ipro-hcp` already has, or an explicit
-   `members_computed: true`. **Assumptions (INFERRED):** that a boolean in the
-   ledger is enough; nothing in the tree says a later pass would populate it.
-4. **One reader for the other 35 passes' ledgers** (the claim's own successor,
-   carried here unchanged in substance). **Blocker:** none, zero requests.
+3. **Every member count is a floor, not an exact total, and nothing in the tree can
+   say otherwise** (§7a). **Blocker:** the response bodies are outside the tree by
+   `AGENTS.md` §7, so "does a committed `200` row's member list enumerate every
+   member in that crawl" is undemonstrable offline. **Closes when** either the
+   bodies are made available under a disclosure decision, or every ledger row
+   carries a field distinguishing "computed, found none" from "not computed" — a
+   `shape` field as `ipro-hcp` already has, or an explicit `members_computed`.
+   **Zero requests** for the second route. **Assumptions (INFERRED):** that a
+   boolean in the ledger is enough for the second route; nothing in the tree says a
+   later pass would populate it.
+4. **One reader for the other 36 committed ledgers** (the claim's own successor,
+   carried here unchanged in substance). **Blocker, weakened from what this pass
+   first wrote:** **not** "none". The population contains at least one ledger that
+   is **not machine-readable at all** —
+   `findings-log/2026-10-13-cors-method/results.jsonl` is **16 of its 24 rows
+   malformed JSON** (`{"seq": "1", seq": "1", …` — an unquoted key mid-object),
+   and it is malformed **on `origin/main` too**, from commit `8b7b7e9`. A reader
+   that must handle it has to decide what a half-ledger counts as, and this pass
+   did not decide that. Observed and recorded here; **not fixed** — it is
+   pre-existing, outside this claim's lane, and rewriting another pass's committed
+   ledger is not a research pass's side effect (`AGENTS.md` §3: append-only).
    **Closes when** every committed ledger resolves under the same
    query-derived cell rule, or each non-resolving ledger is named with its schema
    and the reason. **A negative counts.** **Assumptions (INFERRED):** that the
@@ -340,18 +465,57 @@ yet a fact.
    different passes on different days, and nothing in the tree asserts the schema
    set is closed. **Note from this pass:** area L's own population was **not** 6,
    the number its name rule most obviously suggests, but 8 — so a first pass over
-   the other 35 should expect the name rule and the `**Area:**` line to disagree
+   the other 36 should expect the name rule and the `**Area:**` line to disagree
    and should report both.
+5. **`docs/11:1650` and `:2170` publish an absence count that reconciles with
+   neither reading — the census's own RECORD cell, read into the absent slot.**
+   `"/ipro/hcp/ is absent from 65 of the 84 in-window crawls"`. Under the committed
+   census the absent count is **19** (84 − 65); under this pass's re-derivation it is
+   **12** (84 − 72). **65 is neither.** **Blocker:** both lines are outside this
+   pass's lane — `:1650` is area prose, `:2170` is the closed-area table, neither is
+   the S-L4 paragraph. **Closes when** one of the three readings is chosen on stated
+   grounds and the other two are retired with their arithmetic shown, or the
+   sentence is re-derived from a named verdict rule. **Zero requests.**
+   **Assumptions (INFERRED):** that "absent from X of 84" means *no member found*
+   rather than *no `200`-bearing probe* — the two coincide only if RECORD and
+   member-carrying are the same set, and this pass's own re-derivation shows they
+   are not (12 crawls carry members; 72 answered `200`). **Stated because this pass
+   hunted this exact class twice and missed a third instance on the same page.**
 
-## 9. Artefacts
+## 8a. Correction (2026-10-15) — verifier round 1
+
+Nothing in this file had been merged or published at a commit of record when the
+independent verifier returned NOT CLEAN, so the figures below are corrected in
+place **and** named here (`AGENTS.md` §5 — corrections are preserved, not smoothed
+over; §6 item 7 — a count whose rule is not stated is how 44 became 93 here).
+
+| # | superseded | corrected to | why |
+|---|---|---|---|
+| 1 | "the three schemas S-L4 names are not three, they are **five**" (§2), and "all **five** schemas" (§3) | **withdrawn.** Replaced by rules **K1** (distinct row key-sets = **10**), **K2** (distinct member fields = **3**, which *is* S-L4's three) and **K3** (three properties: **19/19** no-`role` rows in `pool-s7-l7crawl`; **19/19** opaque statuses there; **1** ledger with no DATA cell). New mode `read-area-l.py schemas`. | **No counting rule produced 5.** It added a row-schema property (distinct key-sets) to a query-derivation property ("no DATA cell"), which are not the same kind of thing. `AGENTS.md` §6 item 7. |
+| 2 | "39 rows, **9.7%** of the population" (§1) | "**39 rows, 10.3% of the 380-row population** (39 ÷ 380 = 0.10263)" | 9.7% is not 39/380. The **rows (39) and the denominator (380) were right**; only the percentage was wrong. |
+| 3 | "exit 0, **23 checks**, 0 failures" (§5) | "**25 checks**, 0 failures", and the count is now **printed by the test function** | 22 `check()` calls were being counted as 23 because the summary line also contains the word `PASS`. Three real checks were added (two over the real `s7` ledger, one for the `200`-only member rule) and the vacuous one removed — see #7. |
+| 4 | "**43** committed ledgers" (§1, step 1 of R1) | "**44** … **at this branch's head**, and this number moves as passes land" | 43 was true before this pass added its own ledger. The recorded rule must reproduce at the commit under review; the **answer (8) is unchanged**. |
+| 5 | *(new §6 subsection + successor §8.5)* | — | `docs/11:1650`/`:2170` publish "absent from 65 of the 84", which reconciles with neither the committed census (19) nor this pass's re-derivation (12). Recorded as a successor; **out of lane, not fixed.** |
+| 6 | `CC-MAIN-2013-48` members = **0** (§6 table) | **NOT DERIVABLE** | Its only member-bearing DATA row is a **502** (`supplement` seq 3). An empty list on a failed query is vacuous, and `census-84.txt:20` says a 502 is a FAILURE, never an absence. The reader now takes counts **only from `200` rows** and has two new controls for it. **No headline number moves.** |
+| 7 | "self-test … so the trap is **exercised rather than described**" (§4) | The vacuous check is **removed** | `('200 (curl)' == '200')` compared two literals: False by construction, and unchangeable by anything the reader does. Replaced by two checks over the **committed 19-row `s7` ledger** — a raw `== "200"` finds **0 of 19**, the reader resolves **10 of 19**. |
+| 8 | "`self-test` name: the **four** schemas agree on the member COUNT" | "the **three** fixtures agree…" | The check compared three fixtures, not four. |
+| 9 | "an **independently** controlled crawl" (§2 R2 row) | "a **separately** controlled crawl" | `independently` is reserved for `AGENTS.md` §2.1 multiplicity, where the count is ≥2. Here it was ordinary English and would have been read as a corroboration claim. |
+| 10 | `run.log` line counts | recomputed with `grep -c ''` | `printf '%s' … \| wc -l` drops the final newline, so every count was one low. |
+| 11 | Successor "Blocker: none" for the other passes | weakened; **the malformed ledger is named** | `2026-10-13-cors-method/results.jsonl` is **16 of 24 rows malformed JSON**, on `origin/main` too (commit `8b7b7e9`). Pre-existing, outside this claim, **recorded and not fixed.** |
+
+**Not changed, and re-checked after every edit above:** the population (8 ledgers,
+380 rows), all five moved census cells, `older-schema` 8 → 0, the two
+member-carrying cells, and the INFERRED limits. The verifier reproduced all of
+them, and none of these corrections moves a cell the census prints.
 
 | file | what |
 |---|---|
-| `read-area-l.py` | the reader. `population` · `manifest` · `census` · `self-test` |
+| `read-area-l.py` | the reader. `population` · `schemas` · `manifest` · `census` · `self-test` |
 | `manifest.tsv` | the 8 ledgers in precedence order, generated by `manifest` |
 | `results.jsonl` | **0 rows** — correct for a 0-request pass, not a missing file |
-| `run.log` | the four invocations and their exit status; no per-request table, because there are no requests |
+| `run.log` | the five invocations and their exit status; no per-request table, because there are no requests |
 | `probe.sh` | the record of what was sent: nothing |
 
 Re-derive everything above with `python3 read-area-l.py census` — offline, no
-request, no response body needed.
+request, no response body needed. `python3 read-area-l.py schemas` re-derives
+every schema figure in §2 and §2b under rules K1–K3.
