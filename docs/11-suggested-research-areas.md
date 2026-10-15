@@ -983,26 +983,36 @@ It is the ordinary case, but `research-gate.sh:76-82` **fails closed into `--all
 `origin/main` is unresolvable, and this pass observed no CI run. The verdict table is
 therefore stated **per mode** and is not generalised.
 
-#### Successor to the area-D addendum — 1: which mode does CI actually select?
+> **Update, same day, after the branch was pushed.** The one CI run this PR triggered —
+> `pull_request`, head `research/D-scrub-diffmode-control`, SHA `33895ee` — printed
+> `--- leak scan (mode: diff) ---` as its own mode line and concluded `GATE PASS`
+> [source: findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §4]. So for **one**
+> same-repository pull request the mode is **OBSERVED**, not inferred, and the `diff`
+> column above is the column that PR was actually checked by. The remaining
+> INFERRED part narrows to the `push to main` event and to a **fork** pull request, and
+> successor 1 below is re-scoped to exactly those.
 
-**Derived from what this pass could not establish.** Every verdict above is per-mode, and
-the mode a pull request gets is read from the workflow rather than observed in a run. That
-gap is the whole of what stands between "the anchored net is dead on the PR path" and a
-statement about the gate as CI runs it.
+#### Successor to the area-D addendum — 1: which mode do the *other* two events get?
+
+**Derived from what this pass could not establish.** Every verdict above is per-mode. The
+`pull_request` case is now **observed once** (`FINDINGS.md` §4), which retires half of this
+row: what is left is the event CI takes when the diff is gone, and the checkout shape that
+makes the gate change mode without saying so.
 
 **Blocker:** none — zero requests. The gate prints its own mode at `:73`, and
 `research-gate.yml` keeps logs.
 
-**Closes when:** the `--- leak scan (mode: …) ---` line has been read from **one** real
-`research-gate` run of each event type — `pull_request` and `push` to `main` — and the
-verdict table is restated against the mode actually observed. **A `fork` pull request, or a
-checkout where `origin/main` does not resolve, is the interesting case** and counts
-equally. **Any other mode observed counts as the answer.**
+**Closes when:** the `--- leak scan (mode: …) ---` line has been read from a real
+`research-gate` run of **each** remaining shape — **`push` to `main`** (which `:47` routes
+to `--all`), and a **fork** pull request or any checkout where `origin/main` does not
+resolve, which is where `:76-82`'s fail-closed fallback decides the mode on its own. **A
+fork PR may not be constructible without an outside contributor's consent, and if so that
+counts as the answer with the reason stated.** Any other mode observed counts equally.
 
 **Assumptions (INFERRED):** that `actions/checkout@v4` with `fetch-depth: 0`
-(`research-gate.yml:15-17`) leaves `origin/main` resolvable for same-repo pull requests,
-which is why diff mode is the ordinary case. Not observed, and not load-bearing: the
-verdict does not depend on it.
+(`research-gate.yml:15-17`) leaves `origin/main` resolvable for same-repo pull requests.
+Now supported by one observation (run `38762357329`, §4), which is one source and not
+corroboration. Not load-bearing: the verdict does not depend on it.
 
 #### Successor to the area-D addendum — 2: a per-pattern liveness column, and the fact that no control set can be committed
 

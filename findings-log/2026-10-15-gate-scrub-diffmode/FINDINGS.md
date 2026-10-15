@@ -224,21 +224,36 @@ scanner that fires on a clean line would be reported here, not tolerated
 
 ---
 
-## 4. What this does **not** establish
+## 4. Observed in CI after the branch was pushed (2026-10-15)
 
-- **Which mode CI actually selects on a pull request.** `research-gate.yml:43-44`
-  runs bare `./scripts/research-gate.sh` (diff mode) for `pull_request` and `:47`
-  runs `--all` on push to `main` (**OBSERVED** in the workflow). But
-  `research-gate.sh:76-82` **fails closed into `--all`** when
-  `git rev-parse --verify origin/main` fails. This pass did not observe a CI run,
-  so "the PR path is diff mode" is **INFERRED** from `:43-44` plus the checkout
-  configuration at `:17` (`fetch-depth: 0`) — it is the ordinary case, and the
-  verdict above is stated per mode precisely so it need not be generalised.
-- **Whether the `--all` path would have caught a real key.** §3a shows the
-  anchored net would not, for a key not alone on a line. That is a statement about
-  the pattern, measured on synthetic lines; it is not a statement that a key is or
-  is not currently committed anywhere.
-- **Anything about the vendor's surface.** This pass touched no vendor host.
+This section is appended after the fact; §1-§3 above are unchanged. What this
+commit also changed in the file, stated rather than left for a reviewer to find:
+the former "What this does **not** establish" was renumbered §4 → §6, its three
+bullets were folded into §6, and one accounting bullet in §5 was corrected to say
+CI ran the gate on the pushed branch. No measurement, cell, count or verdict
+moved. The file is new on this branch and unmerged, so nothing published was
+rewritten — but `check_append_only` cannot see this either way: it handles `D` and
+`M` and an `A` file rewritten in place on its own branch reports `A`
+(`docs/09` §4, the append-only-guard row).
+
+One of §4's own INFERRED claims is now **OBSERVED, once**. The `gate` job of
+run `38762357329` — event **`pull_request`**, head `research/D-scrub-diffmode-control`,
+SHA `33895ee` — printed, as its third line of output:
+
+```
+--- leak scan (mode: diff) ---
+```
+
+So for **one same-repository pull request**, CI did select **diff mode**, and the
+ten nets in §3's `diff` column are the nets that PR was actually checked by. The
+run concluded `GATE PASS` (`85 passed, 0 failed` on the 05 suite, all ten leak
+patterns `ok`, citations resolve, `CHECKS PASS`, `0 mermaid problem(s)`).
+
+What this does **not** establish: the `push to main` event, which `research-gate.yml:47`
+routes to `--all`; a **fork** pull request, where `:76-82`'s fail-closed fallback
+is the interesting case; or any checkout in which `origin/main` does not resolve.
+One observation is one source (this repository's own CI log, one run) and is not
+corroboration of the general claim. §6 carries the full list of what is still open.
 
 ---
 
@@ -261,8 +276,22 @@ scanner that fires on a clean line would be reported here, not tolerated
   **0** hits on any file here. The one un-elided copy of the rendered subject
   lines lives in the harness's scratch directory, created by `mktemp -d` and
   removed on exit.
-- **The 05 vendor suite was not run.** The pool serialises suites. The static
-  portion of the gate this pass depends on — the leak scan, both subject modes —
-  was run verbatim via `--screen`: the branch diff reads **0** subject files
-  before the first commit and **206** in `--all` at `ab28f58`, with the loop's own
-  `FAIL` flag at **0**.
+- **The 05 vendor suite was not run locally.** The pool serialises suites. The
+  static portion of the gate this pass depends on — the leak scan, both subject
+  modes — was run verbatim via `--screen`: the branch diff reads **3** subject
+  files and the `--all` list **206** files at `ab28f58`, with the loop's own
+  `FAIL` flag at **0**. CI then ran the real gate on the pushed branch and it
+  concluded `GATE PASS` (§4).
+
+---
+
+## 6. What this does **not** establish
+
+- **The `push to main` event, a fork pull request, or any checkout where
+  `origin/main` does not resolve.** §4 observed **one** same-repository
+  `pull_request` run and one run is one source.
+- **Whether the `--all` path would have caught a real key.** §3a shows the
+  anchored net would not, for a key not alone on a line. That is a statement about
+  the pattern, measured on synthetic lines; it is not a statement that a key is or
+  is not currently committed anywhere.
+- **Anything about the vendor's surface.** This pass touched no vendor host.
