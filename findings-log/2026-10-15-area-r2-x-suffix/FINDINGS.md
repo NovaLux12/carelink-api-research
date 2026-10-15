@@ -174,7 +174,7 @@ without showing up in the member-read table.
 > undeclared until now, and a re-runner joining this log's own two tables got a
 > different answer.
 
-The single consumer, read in full — **bytes 2 964 111 – 2 964 344** inclusive, 234 B,
+The single consumer, read in full — **bytes 2 964 111 – 2 964 343** inclusive, 233 B,
 which is the whole `(0,a.n)(({deviceFamily:p})=>{…})` expression:
 
 ```js
@@ -237,8 +237,10 @@ meaningless claim and "0 case-sensitive hits" is not. Read individually
 
 > ⚠ **⚠ The span this section cited for the printed consumer, "bytes 2 964 176 –
 > 2 964 322", bounded neither end.** The block starts **65 bytes earlier**, at
-> 2 964 111, and ends **22 bytes later**, at 2 964 344. 2 964 176 is not the start of
-> the code at all — it is the first `o.G.` **read** inside it. Same class as the
+> 2 964 111, and ends **21 bytes later**, at 2 964 343 — round 4 moved this end one
+> byte back from the 2 964 344 this block originally carried, because 2 964 344
+> closes a *different* call; see *Correction (2026-10-15) — round 4*. 2 964 176 is
+> not the start of the code at all — it is the first `o.G.` **read** inside it. Same class as the
 > span fault below: a bound that is neither a start nor an end is not a bound.
 
 > ⚠ **⚠ This paragraph previously said "bytes 3 316 707 – 3 321 247 are the pump's
@@ -795,7 +797,7 @@ outside this corpus.
 > declared, three matched. A bridge that built its matcher on the declared five is
 > **no worse off, and arguably safer**, because `"BLE_X".startsWith("BLE")` already
 > holds — so no matcher this pass measured can be wrong. An independent verifier
-> re-derived that reading from the consumer's own bytes (2 964 111 – 2 964 344, the
+> re-derived that reading from the consumer's own bytes (2 964 111 – 2 964 343, the
 > three `startsWith` arms and the branch they feed) rather than taking it from this
 > log. **A notification about a value that did not change would be noise, and
 > `AGENTS.md` §5 wants a pinned constant named — so there is no pinned constant to
@@ -1081,7 +1083,7 @@ entry below names the check, not just the correction.**
    five is no worse off since `"BLE_X".startsWith("BLE")` already holds. **There is no
    pinned constant to name, so there is no issue to open, and none will be.** §12 now
    states the decision, the reasoning and the verifier's independent re-derivation from
-   the consumer's own bytes (2 964 111 – 2 964 344), instead of a promise. A
+   the consumer's own bytes (2 964 111 – 2 964 343), instead of a promise. A
    notification is owed **only** if a later pass finds a pinned value moving.
 
    **Secondary, same cell:** §12 said `"0 reads anywhere"` *"would become false"*, but
@@ -1097,7 +1099,8 @@ narrower (`site..site+3`) drops the token at `site+4` and yields **4 + 0 + 48** 
 **34 + 14** instead of the published **4 + 1 + 47** and **34 + 13**. The published
 numbers are right; the rule that selected them is now stated, in one table, at §3.1.
 **A second span bounded neither end:** §3.1 called the printed consumer *"bytes
-2 964 176 – 2 964 322"*, but the block runs **2 964 111 – 2 964 344** (234 B) — the
+2 964 176 – 2 964 322"*, but the block runs **2 964 111 – 2 964 343** (233 B; round 4
+moved this end one byte back — see *Correction (2026-10-15) — round 4*) — the
 cited start is the first `o.G.` read *inside* it, not the start of the code. **F4
 residue:** `census.txt` §D's 8th sweep still carried the old false **label**
 `o.G, o.G;` beside the correct `regex=` column; the label now reads *"o.G bare (no
@@ -1221,3 +1224,47 @@ in §13.2: `shellcheck probe.sh` → exit 0, 0 warnings; `shellcheck dup-test.sh
 exit 0, 0 warnings. The earlier §13.2 caveat was written under the (false)
 assumption that `shellcheck` was absent; it is corrected above, while the
 reading-based conclusion (stamps, exit-code contract) stands.
+
+
+## Correction (2026-10-15) — round 4
+
+Round 4 re-read this pass against the pinned body and found **one** defect, in the one
+number every earlier round had carried forward unexamined: the inclusive **end** of the
+printed consumer's span.
+
+| # | superseded | corrected to | why |
+|---|---|---|---|
+| 1 | the consumer "runs **2 964 111 – 2 964 344** (234 B)" — stated at §3.1, twice in §11, and in *Correction — round 3* | **2 964 111 – 2 964 343**, **233 B** | 2 964 344 is not part of the consumer. It closes the `(` at **2 964 008** — a **337-byte enclosing call** — while the consumer's own argument list opens at **2 964 118** and closes at **2 964 343**. The quoted JS is the arbiter: it ends `…(0,e.of)(null)`, `}`, `)` — the `}` at 2 964 342 closes the arrow, the `)` at 2 964 343 closes the call. The published span appended **one byte of a different expression** to a 233-byte block |
+| 2 | `docs/05`'s blockquote said the line pointers it withdrew were replaced by "a grep the reader can re-run, which is also why the count is given as a count and not as pointers" | the sentence now says what the command prints is produced on the reader's own tree, and publishes no number | the sentence promised a count it did not give. Same class as row 1: a claim about an artefact that does not match the artefact |
+
+**How row 1 was re-derived, so it can be disputed rather than believed.** Bracket
+matching over the digest-pinned body (`0fb4fbd4…`, 3 417 255 B) gives, for every
+opener in the region:
+
+```
+opener 2 964 008 -> closes 2 964 344   (337 B)   enclosing call
+opener 2 964 111 -> closes 2 964 117     (7 B)   the (0,a.n) group
+opener 2 964 118 -> closes 2 964 343   (226 B)   the call's argument list
+opener 2 964 119 -> closes 2 964 136    (18 B)   the parenthesised parameter
+```
+
+The consumer is `(0,a.n)` plus its argument list: **2 964 111 … 2 964 343**. The
+companion claim this pass makes about the same block — that 2 964 176 is the first
+`o.G.` **read** inside it, not the block's start — **reproduces**: the first `o.G.` at or
+after 2 964 111 is at 2 964 176, and the three reads fall at 2 964 176 / 2 964 215 /
+2 964 259, as §3.1 and `census.txt` §D already said. A bound is not a measurement, which
+is why round 3 could correct the *other* end of this same span and leave this one wrong.
+
+**Merge-order check, because three sibling passes are landing in the same `docs/11`.**
+Every counted figure in §10 was re-measured on a scratch clone with all four passes
+merged: `45559` = **9**, `false-positive` = **1**, `Samsung` = **3**, and `dup-test.sh`'s
+whole output is identical apart from the repo path and HEAD it prints — which is the
+point of printing them. The counts are bound to `3449e14` and no sibling pass moves them.
+`docs/05`, the other file this PR edits, is touched by none of the other three.
+
+**What did not move, and was re-checked rather than assumed.** The token census
+(`BLE_X` 2 occurrences / 0 reads, `BLE` 52 = 4 + 1 + 47, 47 = 34 + 13), the declaration
+range and all ten key/value offsets, the `@198635` figure, §13.3's 12/12 offsets, the
+§10 duplicate counts, and the `## 12` decision not to open a `downstream-bridge` issue
+with its stated reason. `run.log` was re-read for this section's counts and needed no
+change: it records no span.

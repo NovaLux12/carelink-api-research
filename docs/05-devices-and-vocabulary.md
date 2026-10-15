@@ -561,8 +561,9 @@ denominator is re-derivable from a clean clone:
 > ⚠ **"Quoted history inside a blockquote is evidence" is not a rule this page holds
 > to**, and this correction round's first attempt cited three line numbers to prove
 > it — all three of which this PR's own edits had moved off. Replaced by a grep the
-> reader can re-run, which is also why the count is given as a count and not as
-> pointers:
+> reader can re-run: what this correction publishes is the **command**, and the number
+> of ⚠-bearing blockquotes on this page is whatever that command prints on the
+> reader's own tree — not a set of pointers into a file this PR edits:
 >
 > ```
 > grep -n '^> .*\(⚠\|Correction\|Corrected\|Deleted\|RETRACTED\)' \
