@@ -15,10 +15,15 @@
 # `carelinkhp.minimed.com`. The second of those does not exist: area A closed
 # with "There is no `.com` `carelinkhp` variant: all five `carelinkhp*.minimed.
 # {eu,com}` names outside the baseline are NXDOMAIN"
-# [source: docs/11-suggested-research-areas.md:2082; PROBE-FINDINGS §1/§6,
-# findings-log/probe-2026-10-08/PROBE-FINDINGS.md:264]. The repository wins
-# over the brief (BRIEF.md:10-15), and the support build's own host is the one
-# the pinned suite already reads:
+# [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md:379-380
+#  (and its summary at :10); findings-log/probe-2026-10-08/PROBE-FINDINGS.md:29
+#  and :264. The Closed-table row restating it is FOUND BY GREP, not by line
+#  number — `grep -nF '| A — is `carelinkhp` really the clinician portal for
+#  every region?' docs/11-suggested-research-areas.md`, 1 hit — because this
+#  pass inserts 200+ lines above it and a line cite into a file you are editing
+#  rots by construction; that is FINDINGS.md §13 item 3.]
+# The repository wins over the brief (BRIEF.md:10-15), and the support build's
+# own host is the one the pinned suite already reads:
 #   clinic  pow -> carelinkhp.minimed.eu          (05-public-config.check.sh:329)
 #   support cua -> carelink-support.medtronic.eu   (05-public-config.check.sh:330)
 # Nothing outside those two hosts was contacted.

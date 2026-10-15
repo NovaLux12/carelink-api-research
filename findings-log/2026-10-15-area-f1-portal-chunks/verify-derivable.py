@@ -66,8 +66,11 @@ FAILS, CHECKS = [], [0]
 def ck(label, got, want):
     CHECKS[0] += 1
     if got == want:
-        shown = got if not (isinstance(got, list) and len(got) > 8) else \
-            f"{len(got)} values, {got[0]}..{got[-1]}"
+        if isinstance(got, (list, tuple, dict, set)) and len(got) > 8:
+            k = f"{len(got)} items" if not isinstance(got, dict) else f"{len(got)} keys"
+            shown = f"{k} (values elided)"
+        else:
+            shown = got
         print(f"  ok   {label}: {shown}")
     else:
         print(f"  FAIL {label}: got {got!r}, want {want!r}")
@@ -147,6 +150,28 @@ for b in ("clinic", "support"):
     ck(f"{b} every other token reads exactly 0",
        sorted(t for t in TOKENS if not agg[t]), sorted(t for t in TOKENS if t not in NONZERO[b]))
     ck(f"{b} m2m across all its cells", agg["m2m"], 0)
+
+# MAGNITUDES, not just the name set. docs/11 publishes these exact numbers, and a
+# name-set-only check let a mutated count through (verification round 2): the set
+# was unchanged, so every assertion above still passed on a wrong number.
+MAGNITUDE = {
+    "clinic": {"Timeline": 104, "timeline": 44, "personal.": 23, "hcp/patients": 1},
+    "support": {"Timeline": 4, "personal.": 14, "hcp/patients": 1},
+}
+for b in ("clinic", "support"):
+    cells = [r for r in rows if r["role"] in SWEEP_ROLES and r["build"] == b
+             and (r.get("content_type") or "").startswith("application/javascript")]
+    agg = Counter()
+    for r in cells:
+        agg.update({k: v for k, v in r["tokens"].items() if v})
+    for tok, want in MAGNITUDE[b].items():
+        ck(f"{b} census magnitude {tok}={want}", agg[tok], want)
+ck("the four scored clinic tokens sum to the published 148+23+1",
+   sum(MAGNITUDE["clinic"].values()), 172)
+ck("clinic timeline+Timeline == the published 148",
+   MAGNITUDE["clinic"]["timeline"] + MAGNITUDE["clinic"]["Timeline"], 148)
+ck("support timeline+Timeline == the published 4",
+   MAGNITUDE["support"]["Timeline"], 4)
 # support includes the seq-11 positive control, which is also its 2076 cell
 sup16 = [r for r in rows if r["build"] == "support"
          and (r["role"] in SWEEP_ROLES or r["seq"] == 11)
@@ -227,7 +252,38 @@ ck("the two unexplained sub-floor gaps",
 ck("overhead range", (min(x[4] for x in fits), max(x[4] for x in fits)), (0.086, 0.099))
 
 print("\nI. chunk map: id sets, shared hashes, the four that differ")
+# FINDINGS.md section 8a fact #2 cites special_case_id_to_name, which lives in
+# chunk-map.json -- so this section reads the JSON as well as the TSV. Before
+# verification round 2 the checker read the TSV only, which meant a claim sourced
+# from the JSON was checked nowhere.
 mp = list(csv.DictReader((HERE / "chunk-map.tsv").open(), delimiter="\t"))
+CM = json.loads((HERE / "chunk-map.json").read_text())
+for b in ("clinic", "support"):
+    d = CM["builds"][b]
+    ck(f"{b} JSON f.u special case is 2076 -> common",
+       d["special_case_id_to_name"], {"id": "2076", "name": "common"})
+    ck(f"{b} JSON entries", len(d["entries"]), 225)
+    ck(f"{b} JSON n_entries / duplicate ids / distinct hashes",
+       (d["n_entries"], d["n_duplicate_ids"], d["distinct_hashes"]), (225, 0, 225))
+    # the truncation note must survive, or the display field reads as the whole f.u
+    ck(f"{b} JSON marks the expression as a truncated prefix",
+       (d.get("f_u_expression_truncated_at"),
+        "DISPLAY PREFIX ONLY" in d.get("f_u_expression_note", "")),
+       (400, True))
+    ck(f"{b} JSON and TSV agree on all 225 (id, name, hash)",
+       {i: (r["name"], r["hash"]) for i, r in
+        {x["id"]: x for x in mp if x["build"] == b}.items()},
+       {i: (n, h) for i, h in d["entries"].items()
+        for n in [next(x["name"] for x in mp if x["build"] == b and x["id"] == i)]})
+ck("JSON cross_build shared_hashes", CM["cross_build"]["shared_hashes"], 221)
+ck("JSON vs_committed name/id differences are both empty",
+   (CM["vs_committed_clinic_map"]["name_differences"],
+    CM["vs_committed_clinic_map"]["id_differences"]), ([], []))
+ck("JSON vs_committed shared hashes", CM["vs_committed_clinic_map"]["shared_hashes"], 225)
+ck("JSON vs_committed only-in lists are both empty",
+   (CM["vs_committed_clinic_map"]["hashes_only_in_re_derived"],
+    CM["vs_committed_clinic_map"]["hashes_only_in_committed"]), ([], []))
+
 by = defaultdict(dict)
 for r in mp:
     by[r["build"]][r["id"]] = r

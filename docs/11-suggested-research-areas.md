@@ -864,13 +864,18 @@ CSS classes (`allTimelinePeriod`, `getSnapshotTimelinesRange`, `[1,"timeline-cha
 `personal.` (23 + 14) is i18n translation keys (`patient.invite.to.personal.message`) —
 which is why `personal.patient.timeline.config` is **0** while the prefix scores;
 `hcp/patients` (1 + 1) is one real call, `POST hcp/patients/checkPhoneNumber`, at the
-**identical byte offset in both builds**. Case-sensitivity control: in the busiest
+**identical byte offset in both builds**. ⚠ **Every count on this line is
+re-derivable from the committed ledger; every *byte offset* and quoted string is
+not** — the response bodies were transient and are gone, so those reads are OBSERVED
+as made and unverifiable now. The counts are what a later reader can check; the
+offsets are what the pass read. [caveat applies to this paragraph's offsets and
+quoted fragments; §1b carries the rule] Case-sensitivity control: in the busiest
 chunk `Timeline`=84 / `timeline`=44 / `TIMELINE`=**0**. `m2m` — the token area F included
 *expecting* a false hit — is **0** across all 240 chunk bodies. Both anchor gates pass
 (`2a7fa8e7…` 3 397 615 B; `a054555a…` 3 410 666 B) and both method gates fire
 (`hcp/configuration/public/`=15, `hcp/patients`=42 on each main bundle). 0 of 240 sweep
 cells returned the 5 518 B SPA shell. **252 of a 260 cap, GET only**, measured in the log.
-[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §3, §5]
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §3, §5, §8b]
 
 **The block's own INFERRED assumption is now answered — and the answer is "not
 quite".** The two builds **do not** share one corpus and **are not two unrelated
@@ -893,9 +898,16 @@ such claim individually and ships a zero-request script for the checkable half
 **⚠ The limit that travels with this negative, and it is measured, not asserted.**
 **A zero on a path-literal token list is a statement about literals, not about
 reachability.** Clinic chunk `9481.6977c1a7bd7461f8.js` scores **0 on all 24 tokens**
-and still calls the config namespace twice: `getLogBookConfig(){return this.http.get($.C40)`
+— a count a later reader **can** re-derive from the ledger — and still calls the
+config namespace twice: `getLogBookConfig(){return this.http.get($.C40)`
 at byte 6 756 and `$.C40` at 6 798, with `hcp/configuration/public/` **absent** from
-that body. The route literals live in the eager main bundle; the lazy chunk reaches
+that body. ⚠ **Those two offsets and the quoted source are OBSERVED as read and are
+not re-derivable from a clean clone** — the bodies are gone (§1b). The *scores* are
+verifiable; the *offsets* are the pass's own reading of bytes this repository does
+not retain. The point the offsets were read for does not depend on their exact
+positions: what matters is that a chunk scoring 0 on every token makes a live call
+into a namespace it does not spell.
+The route literals live in the eager main bundle; the lazy chunk reaches
 them through an imported constant. So `hcp/configuration/public/` = 0 in the lazy
 corpus reads as *"the lazy corpus adds no new route literals"*, **not** as *"the lazy
 corpus does not read the configuration namespace"* — and the same bound applies with
