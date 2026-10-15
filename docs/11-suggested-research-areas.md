@@ -1966,7 +1966,11 @@ carrying a member **12** vs **10** in-window (**13** vs **11** counting the one
 out-of-window crawl `census-84.txt:168` itself lists). 72+11+1+0 = 84, so the
 re-derived tally leaves none unassigned. **The repo already contradicted itself
 without any new evidence:** lines 1736 and 1738 above list both crawls' members
-as `(prior)`.
+as `(prior)`. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
+evidence is two sentences below and it governs every number printed here; it is
+stated here rather than only there because a limit separated from its figure by
+other prose reads as an exact figure (`AGENTS.md` §2).
 
 **Assumptions (INFERRED) — the equivalence is NOT closed, and this is the honest
 answer.** Measured field by field: all three member shapes normalise to the same
@@ -1989,12 +1993,18 @@ prints every data row that could not supply one. **No headline number moves
 either way** (the cell was `0`, and a not-derivable cell is not carried in the
 member tally): RECORD 72, ABSENCE 11, 39 in-window members all stand.
 
-**And every member count published anywhere above is a FLOOR, not an exact
-total.** A reader cannot distinguish "this crawl holds 3 members" from "this crawl
-holds at least 3, and the pass read one page" — that depends on Common Crawl's
-NDJSON pagination and on what each pass chose to scan, and **no artefact in this
-tree can demonstrate it** because the bodies are excluded by `AGENTS.md` §7.
-Nothing here claims an upper bound on any crawl's members.
+**And every member count published above is a LOWER BOUND, not an exact total.**
+A reader cannot distinguish "this crawl holds 3 members" from "this crawl holds at
+least 3, and the pass read one page". **Two of the three mechanisms are measured
+and excluded, and one is not:** of the 69 crawls' member-source rows, **67 carry no
+`limit=`** at all, so tail-truncation did not touch them; the whole-KiB detector
+`docs/10` §1 already defines (`account.py`) finds **0 candidates across 193
+successful `200`s** over this population. **What remains undemonstrated is
+completeness of the record set itself** — `docs/10` §1's own words anticipate it,
+*"clean for this test is not the same as complete"* — and no artefact in this tree
+can settle it because the bodies are excluded by `AGENTS.md` §7. **No upper bound
+on any crawl's members is claimed anywhere above, and the three moving cells are
+each ≥ their stated member count, not =.**
 
 **Successors from this pass:**
 
@@ -2036,12 +2046,20 @@ that pass:** area L's own population was **not** the 6 its name rule most
 obviously suggests but **8**, so expect the slug rule and the `**Area:**` line to
 disagree, and report both.
 
-**S-L4d — "absent from 65 of the 84" reconciles with neither reading, on this same
-page.** Lines **1650** and **2170** above both publish it. Under the committed
-census the absent count is **19** (84 − 65); under this pass's re-derivation it is
-**12** (84 − 72). **65 is neither** — it is the census's RECORD cell read into the
-absent slot. **Blocker:** both lines are out of this pass's lane (`:1650` is area
-prose, `:2170` the closed-area table, neither is the S-L4 paragraph).
+**S-L4d — "absent from 65 of the 84" reconciles with neither reading, and the
+sentence is in three places.** The **area-L addendum above** (this area's prose),
+this page's **Closed-area row `L`**, and **`docs/10-open-questions.md` §1** all
+publish it, while the same rows publish `65 RECORD · 10 ABSENCE · 1
+INDETERMINATE` — so the `docs/10` row **contradicts itself inside one table row**.
+Under the committed census the absent count is **19** (84 − 65); under this pass's
+re-derivation it is **12** (84 − 72). **65 is neither** — it is the census's RECORD
+cell read into the absent slot. **Find all three with
+`grep -rn 'absent from 65 of the 84' docs/`** — deliberately no line numbers here,
+because this page moves as other passes land and a pointer into it went stale
+before. (⚠ an earlier version of this successor pointed at `:2170`, which does
+**not** contain the sentence — it is the area-F dedicated-routes addendum. The
+finding was right; the pointer was wrong.) **Blocker:** all three are out of this
+pass's lane (`docs/10` §1, this area's prose, this page's Closed table).
 **Closes when** one reading is chosen on stated grounds and the other two retired
 with their arithmetic shown, or the sentence is re-derived from a named verdict
 rule. **Zero requests.** **Assumptions (INFERRED):** that "absent from X of 84"

@@ -69,6 +69,17 @@ STATUS_RE = re.compile(r'^(\d{3})')
 # it is a CONTROL or OTHER. Derived from the query, so it is identical under
 # every schema in the tree.
 DATA_TARGETS = ('minimed.eu', 'carelink.minimed.eu')
+
+# Member SHAPES are discovered by NAME PATTERN, not read from a hardcoded list.
+# `ipro_hcp_count` matches the pattern but is excluded for a stated reason: it is
+# a scalar count, and derive.py:122 sets it to len(members), so it carries nothing
+# the member list does not. The exclusion is explicit so a future fourth shape is
+# counted rather than silently missed.
+SHAPE_RE = re.compile(r'^ipro_hcp')
+EXCLUDED_FROM_K2 = {
+    'ipro_hcp_count': 'a scalar COUNT, not a list shape; derive.py:122 sets it to '
+                      'len(members), so it adds no information the list does not',
+}
 # `medtronic.eu` is a Medtronic domain but no area-L cell queries it; it is
 # therefore OTHER, not DATA. Stated because getting it wrong would silently fold
 # a 502 control into a data row.
@@ -424,11 +435,16 @@ def cmd_schemas(a):
                      if str(r.get('http_status', ''))[:3].isdigit()
                      and str(r.get('http_status', '')) != str(r.get('http_status', ''))[:3])
         ks = {frozenset(r.keys()) for r in rows}
+        # This is the per-ledger COLUMN only. It deliberately does not exclude:
+        # the column's job is to show what is on the rows, and hiding
+        # `ipro_hcp_count` here would make K2's exclusion list look like it had
+        # nothing to exclude. K2 prints the exclusion and its row count.
         flds = collections.Counter()
         for r in rows:
-            for k in ('ipro_hcp', 'ipro_hcp_urls', 'ipro_hcp_members'):
-                if k in r:
+            for k in r:
+                if SHAPE_RE.match(k):
                     flds[k] += 1
+                    break
         for r in rows:
             keysets[frozenset(r.keys())] += 1
         data = sum(1 for r in parsed if r['cell'] == 'DATA')
@@ -442,10 +458,44 @@ def cmd_schemas(a):
     print('K1  distinct row key-sets over the population      %d' % len(keysets))
     for ks, n in keysets.most_common():
         print('      %4d rows  %s' % (n, ','.join(sorted(ks))[:150]))
-    allflds = sorted({k for p in per for k in per[p]['flds']})
+    # K2 re-scans the population for member shapes by NAME PATTERN. Each ledger
+    # is read ONCE more here rather than reusing `per[p]['flds']`, because K2's
+    # answer must come from the same pattern scan that finds an UNEXPECTED fourth
+    # shape — reusing the per-ledger summary would make the two agree by
+    # construction and hide a shape that appeared on a row the summary skipped.
+    shapes = {}
+    excluded_seen = collections.Counter()
+    for p in pop:
+        with open(os.path.join(REPO, p)) as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                # Exclusions are counted over EVERY key, before the one-shape-per-row
+                # break. Counting them inside the break would report 0 whenever an
+                # excluded key co-occurs with an included one — which is exactly
+                # what `ipro_hcp_count` does — and the exclusion list would then
+                # look decorative.
+                for k in row:
+                    if k in EXCLUDED_FROM_K2:
+                        excluded_seen[k] += 1
+                for k in row:
+                    if not SHAPE_RE.match(k) or k in EXCLUDED_FROM_K2:
+                        continue
+                    shapes.setdefault(k, []).append(row)
+                    break
+    allflds = sorted(shapes)
     print()
     print('K2  distinct member fields present                  %d  (%s)'
           % (len(allflds), ', '.join(allflds)))
+    print('    found by the name pattern `^ipro_hcp` over every key on every row,')
+    print('    NOT from a hardcoded list. Excluded by name, and why:')
+    for k, why in sorted(EXCLUDED_FROM_K2.items()):
+        n = excluded_seen.get(k, 0)
+        print('      %-18s excluded on %4d rows — %s' % (k, n, why))
+    total_ex = sum(excluded_seen.values())
+    print('      (%d row(s) carried an excluded key; the rule was applied, not assumed)'
+          % total_ex)
     print('K3  ledgers with rows carrying NO `role` key        %d  (%s)'
           % (len([p for p in per if per[p]['norole']]),
              ', '.join(os.path.basename(os.path.dirname(p)) for p in per if per[p]['norole'])))
@@ -720,7 +770,25 @@ def cmd_census(a):
     rule()
     print('6. WHAT THE READER CANNOT SETTLE — the equivalence question, measured')
     rule('-')
-    shapes = {'ipro_hcp': [], 'ipro_hcp_urls': [], 'ipro_hcp_members': []}
+    # K2's shapes are FOUND, not listed, so a fourth shape in a future ledger is
+    # counted rather than silently missed. SHAPE_RE and EXCLUDED_FROM_K2 are
+    # module-level (see DATA_TARGETS) and shared with members_of()'s branch set.
+    shapes = {}
+    excluded_seen = collections.Counter()
+    for p in pop:
+        with open(os.path.join(REPO, p)) as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                for k in row:
+                    if not SHAPE_RE.match(k):
+                        continue
+                    if k in EXCLUDED_FROM_K2:
+                        excluded_seen[k] += 1
+                        continue
+                    shapes.setdefault(k, []).append(row)
+                    break
     # Each ledger is read ONCE. An earlier draft walked the record list and
     # re-opened the ledger inside the loop, which counted each row N times over
     # and printed 36944 for a 380-row population — the same class of silent
@@ -756,6 +824,37 @@ def cmd_census(a):
         got = {'path': bool(sample[0][0]), 'host': bool(sample[0][1]),
                'ts (YYYYMMDD)': bool(sample[0][2]), 'http status': bool(sample[0][3])}
         print('  %-20s %6d  %s' % (k, len(rows_), ', '.join('%s=%s' % kv for kv in got.items())))
+    print()
+    print('  ALL MEMBERS ARE FLOORS, NOT EXACT TOTALS — this sits here, next to the')
+    print('  figures, because a limit stated upstream of a number reads as an exact one')
+    print('  (AGENTS.md section 2). Measured per crawl: a member-source row whose')
+    print('  records reached its own limit= may have had its tail cut, so its count is a')
+    print('  lower bound; a row with no limit= is not truncated by that mechanism at all.')
+    print()
+    floors = []
+    for p in pop:
+        with open(os.path.join(REPO, p)) as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                r = json.loads(line)
+                q = query_of(r)
+                if q not in DATA_TARGETS or status_of(r) != 200:
+                    continue
+                if members_of(r) is None:
+                    continue
+                m = re.search(r'[?&]limit=([^&]*)', r.get('path', '') or '')
+                n = r.get('records', r.get('record_count'))
+                if m and isinstance(n, int) and n >= int(m.group(1)):
+                    floors.append((crawl_of(r), r['seq'], n, m.group(1), p))
+    print('    member-source rows AT their own limit=  %d of the population\'s 200-rows'
+          % len(floors))
+    for c, s, n, lim, src in floors:
+        print('      %-16s seq%-4s records=%-4s limit=%-5s %s  <== FLOOR: the tail may be cut'
+              % (c, s, n, lim, src.split("/")[1]))
+    print('    every other member-source row carries no limit=, so no limit truncated it.')
+    print('    That is NOT the same as completeness: it rules out ONE mechanism. The')
+    print('    body-set question needs the bodies, which AGENTS.md section 7 excludes.')
     print()
     print('  All three shapes yield a MEMBER COUNT. Two of the three yield a timestamp and')
     print('  an HTTP status. `ipro_hcp_urls` carries a URL and nothing else: the 2014-03-10')
