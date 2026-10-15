@@ -820,7 +820,6 @@ leak stage"* and its log records the same observation
 (area F's log, **at `origin/main` = `c712830` and not present in this branch** — see the exemption below). **`scripts/` is
 untouched by this PR — pre-existing, not a regression.**
 
-<!-- allow-unresolved-cites: findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md — area F's log exists at origin/main (c712830) and is not in this branch, because this branch has not been rebased onto it. A reader can reach it at that ref. Resolving it here would need the rebase this PR must not perform. -->
 that it is **orthogonal** to the extension-filter hole and **compounds** it: a file
 the filter does not open is one thing, and a net that would not have fired on it
 even if it did is another.
@@ -845,3 +844,26 @@ measured against a ref that had not finished updating; **20 is what
 than asserted.
 
 **Not acted on:** the merge conflict against `c712830` is the merge queue's.
+
+---
+
+## Correction (2026-10-15)
+
+**The area-F cite exemption is retired, and two claims that the merge made stale are recorded here.**
+
+1. **The exemption.** This file carried an `allow-unresolved-cites` exemption naming
+`findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md`, with the reason: *area F's log
+exists at origin/main (c712830) and is not in this branch, because this branch has not been
+rebased onto it. A reader can reach it at that ref. Resolving it here would need the rebase
+this PR must not perform.* That was true at `6c9ae9b`. **The merge of `c712830` into this branch
+brought area F's log in**, so the cited path now resolves, the exemption asserts something false,
+and `scripts/research-checks.py` reports it as `exemption … is stale — the path resolves; remove it
+from allow-unresolved-cites`. The line is removed. (The marker's literal text is deliberately not
+reproduced: the checker finds exemptions by regex over raw source, so quoting the marker verbatim
+would reinstate the very exemption being retired.)
+
+2. **The parenthetical at line 820**, which read *"(area F's log, at `origin/main` = `c712830` and not
+present in this branch — see the exemption below)"*. True at `6c9ae9b`; **false from the merge
+onward**, because the merge made the log present. Corrected here rather than in place, per §3.
+
+Both were superseded by the merge rather than by anything in this pass.
