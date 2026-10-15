@@ -1995,16 +1995,19 @@ member tally): RECORD 72, ABSENCE 11, 39 in-window members all stand.
 
 **And every member count published above is a LOWER BOUND, not an exact total.**
 A reader cannot distinguish "this crawl holds 3 members" from "this crawl holds at
-least 3, and the pass read one page". **Two of the three mechanisms are measured
-and excluded, and one is not:** of the 69 crawls' member-source rows, **67 carry no
-`limit=`** at all, so tail-truncation did not touch them; the whole-KiB detector
-`docs/10` §1 already defines (`account.py`) finds **0 candidates across 193
-successful `200`s** over this population. **What remains undemonstrated is
-completeness of the record set itself** — `docs/10` §1's own words anticipate it,
-*"clean for this test is not the same as complete"* — and no artefact in this tree
-can settle it because the bodies are excluded by `AGENTS.md` §7. **No upper bound
-on any crawl's members is claimed anywhere above, and the three moving cells are
-each ≥ their stated member count, not =.**
+least 3, and the pass read one page". **Two of the three candidate mechanisms are
+measured and excluded, and one is not** — and both measurements are now computed by
+a committed script under a stated rule, because a version of this paragraph carried a
+count no script produced:
+
+| mechanism | status | measurement — `python3 …/kib-detector.py` |
+|---|---|---|
+| `limit=` tail truncation | **excluded for 73 of 74** member-source rows | cell **B** (one per crawl, what the reader counts): 74 rows, **68** carry no `limit=`, **6** carry one, and only **1 reached it** — `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. **Carrying a limit and reaching it are different predicates**, and only the second can cut a tail |
+| whole-KiB truncation | **excluded** | **0 candidates across 193** successful `200`s. "Successful" means the reader's own `status_of(row) == 200`; the other two obvious rules give **0** (`raw == 200`) and **183** (`raw == "200"`, missing the 10 `"200 (curl)"` rows), which is why the rule is stated beside the number |
+| **completeness of the record set** | **NOT MEASUREDABLE OFFLINE** | `docs/10` §1 anticipates it — *"clean for this test is not the same as complete"* — and the bodies are excluded by `AGENTS.md` §7 |
+
+**No upper bound on any crawl's members is claimed anywhere above, and every figure
+here is ≥ its stated member count, not =.**
 
 **Successors from this pass:**
 
@@ -2068,7 +2071,21 @@ only if RECORD and member-carrying are the same set, and this pass's own
 re-derivation shows they are not (**12** crawls carry members; **72** answered
 `200`). **Stated because this pass hunted this exact class twice and missed a
 third instance on the same page.**
-[source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §8a]
+
+**S-L4e — `account.py` is handed on broken, and this successor exists so it is not.**
+`docs/10` §1's own successor tells the next pass to run that tool over **"every other
+committed CC ledger"**. Run exactly that way, it **crashes on a member of this very
+population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
+`account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
+another lane owns that file — and **that is why this successor exists**: recording
+the crash as observed is not enough while the row naming the tool still points the
+next pass straight at it. **Blocker:** the fix belongs to the lane that owns
+`account.py`. **Closes when** the tool tolerates an absent `t_sent` (the spacing
+oracle needs only the rows that have one), or its successor is reworded to name the
+ledgers it can read. **Zero requests.** **Assumptions (INFERRED):** that the null is
+a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
+all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+[source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a, §8a-2, §8a-3, §8b, §8c]
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the

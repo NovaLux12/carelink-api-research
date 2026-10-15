@@ -23,9 +23,10 @@
 read-area-l.py population     0            27  R1+R2, 8 ledgers / 380 rows, counted before reading
 read-area-l.py schemas        0            37  K1 key-sets 10, K2 member fields 3 by ^ipro_hcp scan, K3 properties
 read-area-l.py manifest       0             9  wrote manifest.tsv, precedence order
-read-area-l.py census         0           253  8 ledgers -> census + the member-floor block, vs census-84.txt
+read-area-l.py census         0           264  8 ledgers -> census + the member-limit block, vs census-84.txt
 read-area-l.py self-test      0            39  25 controls, decomposition below
-sh dup-test.sh                0            50  non-duplicate test for all 4 successors + this pass's line pointers
+sh dup-test.sh                0            64  non-duplicate test, all successors + the stale-pointer check
+python3 kib-detector.py       0            53  RULES 1-3: the whole-KiB detector, RULE 2, the 3 limit cells
 
 # self-test decomposition — the 25 checks, grouped so the groups SUM to the count
 # the function prints. Round 2 of the verifier found an earlier revision of this

@@ -16,7 +16,8 @@
 # PARTIAL overlap rather than a duplicate, the table says so.
 
 set -u
-cd "$(dirname "$0")/../.." || exit 1
+HERE=$(cd "$(dirname "$0")" && pwd)
+cd "$HERE/../.." || exit 1
 
 # Where the Closed table starts, derived rather than remembered — a hardcoded
 # line number here is exactly the defect this file exists to catch.
@@ -76,9 +77,29 @@ for spec in docs/10-open-questions.md docs/11-suggested-research-areas.md; do
   done
 done
 echo
-echo "   docs/11 Closed table begins at line $CLOSED; row L is at"
+echo "   docs/11 Closed table begins at line $CLOSED; Closed row L is at"
 echo "   $(grep -n '^| L — recovery of the retired' docs/11-suggested-research-areas.md | cut -d: -f1)"
-echo "   while 2170 (the line round 1 wrongly cited) reads:"
-printf '     %s\n' "$(sed -n '2170p' docs/11-suggested-research-areas.md | cut -c1-64)"
+echo
+echo "   Stale-pointer check. Round 1 cited line 2170 for the Closed-table instance;"
+echo "   round 2 published 2218; round 3 found 2218 stale and this pass publishes NO"
+echo "   docs/NN:NNNN pointer at all. Here is what each earlier number actually reads"
+echo "   at THIS commit — the check that would have caught the bad citation:"
+for ln in 2170 2218 2232 2236; do
+  printf '     :%s -> %s\n' "$ln" "$(sed -n "${ln}p" docs/11-suggested-research-areas.md | cut -c1-66)"
+done
+echo
+echo "   FINDINGS.md must publish no docs/NN:NNNN pointer into docs/10 or docs/11"
+echo "   OUTSIDE its two '## Correction' sections, which quote them as history —"
+echo "   AGENTS.md §5 requires corrections preserved, and a record that deleted the wrong"
+echo "   number would destroy the evidence it records. So the check excludes those:"
+LOG="$HERE/FINDINGS.md"
+HITS=$(awk '/^## 8a/ {skip=1} !skip {print NR": "$0}' "$LOG" \
+       | grep -E 'docs/(10|11)[^ ]*:[0-9]+')
+if [ -z "$HITS" ]; then
+  echo "     none outside the Correction sections — pass"
+else
+  echo "$HITS" | sed 's/^/     STALE: /'
+fi
+echo "     (the Correction sections this excludes begin at: $(grep -n '^## 8a' "$LOG" | cut -d: -f1 | tr '\n' ' '))"
 echo
 echo "exit 0 — this script reports; the reading of it is the reviewer's."

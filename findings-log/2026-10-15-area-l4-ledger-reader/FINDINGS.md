@@ -78,13 +78,17 @@ census was derived from.** Both are area-L work by their own `**Area:**` lines
 above. This is a finding, not a style note: a census that says "re-derived from
 the ledgers" was re-derived from six of the eight.
 
-**Rounding rule for that percentage, stated because round 2 of the verifier
-found it inline but unstated.** A share of a count is quoted to **one decimal
-place, truncated** (0.10263 → **10.3%**), and the exact quotient is printed
-beside it: **39 ÷ 380 = 0.10263**. Round 1 published **9.7%**, which is not
-39/380 under any rounding. The counts themselves — 39 rows, 380 rows — were right
-in both revisions; only the share was wrong, which is precisely why a share
-without its quotient is the thing to distrust.
+**Rounding rule for that percentage, stated because round 2 found it inline but
+unstated, and round 3 found the rule did not produce its own figure.** A share of a
+count is quoted to **one decimal place, ROUNDED half-up**, and the exact quotient is
+printed beside it: **39 ÷ 380 = 0.10263 → 10.3%**.
+
+⚠ **An earlier revision said "truncated", which is a different operation and yields
+10.2%, not 10.3%** — so that sentence's rule and its figure disagreed and only the
+figure was right. **Round 1 published `9.7%`, which is not 39/380 under either rule.**
+The counts — 39 rows, 380 rows — were right in every revision; only the share was
+ever wrong. Round 3's lesson generalises: **a rounding rule that does not reproduce
+its own figure is worse than no rule at all, because it looks checkable.**
 
 ## 2. What each pass actually wrote — counted, not remembered
 
@@ -318,8 +322,8 @@ lines 1736 and 1738, which already list both crawls' members and mark them
 `(prior)`. **One source, three times quoted.**
 
 **The repo therefore already contradicted itself, and the contradiction was
-visible without any new evidence.** `docs/11:1736` lists
-`CC-MAIN-2014-10 /ipro/hcp/login.jsf` at 2014-03-10, and `docs/11:1738` lists
+visible without any new evidence.** `docs/11`'s family table lists
+`CC-MAIN-2014-10 /ipro/hcp/login.jsf` at 2014-03-10, and the row below it lists
 `CC-MAIN-2020-24`'s three paths, while `census-84.txt:36` and `:102` score both
 crawls `older-schema` with **0** members and its member tally excludes them. The
 pass that wrote `census-84.txt` did not have to be wrong about Common Crawl to
@@ -338,19 +342,44 @@ not own.
 
 ### A third instance of this pass's own class, on the same page, found by its own figure
 
-> **⚠ THE SENTENCE IS THE CLAIM; THE LINE NUMBERS ARE A RECIPE.** This is the
-> third time this pass has published a `docs/11` line number, and the first two
-> needed correcting: round 1 pointed at `:2170`, which is an unrelated area-F
-> passage (§8a-2 #1). `docs/11` moves as other passes land — row `L` was at
-> `:2218`, then `:2232`, then `:2235` within this pass's own three commits — so
-> **any** pointer into it is only meaningful at a named commit.
-> `dup-test.sh` therefore derives every one of them by `grep` and prints what each
-> line actually contains, and `docs/11`'s own S-L4d now carries the grep command
-> instead of a number.
+> ### ⚠ THIS PASS PUBLISHES NO `docs/NN:NNNN` POINTERS. THE GREPS ARE THE CITATION.
+>
+> Every pointer of that shape that has appeared in this file is stale or was stale
+> within one commit. **The mechanism is not carelessness: this PR inserts 142 lines
+> into `docs/11` below most of the passages it cites, so any pointer past the S-L4
+> block moves the moment this PR lands.** Round 1 pointed at an unrelated area-F
+> passage; round 2 corrected it; round 3 found that one stale too. **Correcting the
+> numbers would fix four instances of a bug that has fired in every round**, so they
+> are removed instead.
+>
+> **`dup-test.sh` is the single source for all of them**, and it derives every line
+> number by `grep`, prints what each line actually contains, **and fails loudly** if
+> this file publishes a pointer of that shape outside its Correction sections:
+>
+> ```sh
+> sh findings-log/2026-10-15-area-l4-ledger-reader/dup-test.sh
+> ```
+>
+> **Measured, because "it moved" is not a measurement.** Closed row `L` sat at
+> **2094** at `ab28f58`, then **2170**, **2218**, **2232** and **2236** across this
+> pass's own commits: **main → head is +142 lines**, and **the single round before
+> this one added 18**. The figure an earlier revision carried — "17 lines" — is
+> **neither**, and that revision introduced it.
+>
+> **The one exception, deliberate.** The `## Correction` sections quote `docs/NN:NNNN`
+> pointers **as history** — "superseded: `:2218`" — because `AGENTS.md` §5 requires
+> corrections to be *preserved*, not smoothed over, and a record that deleted the
+> wrong number would destroy the evidence it records. `dup-test.sh` therefore checks
+> for pointers **outside** those sections and prints which it excludes.
 
 The sentence — `"/ipro/hcp/ is absent from 65 of the 84 in-window crawls"` —
-appears in **`docs/11`'s area-L addendum**, in **`docs/11`'s Closed-area row `L`**,
-and in **`docs/10:65`**:
+appears in three places, named here **without line numbers**:
+
+| where | how to find it |
+|---|---|
+| **`docs/11`'s area-L addendum** | `grep -rn 'absent from 65 of the 84' docs/` |
+| **`docs/11`'s Closed-area row `L`** | the same grep — this area's row in that table |
+| **`docs/10`'s §1 row for this area** | the same grep — and that row contradicts itself internally |
 
 > **`/ipro/hcp/` is absent from 65 of the 84 in-window crawls**
 
@@ -361,7 +390,7 @@ check:**
 |---|---|---|---|
 | `census-84.txt` as committed | **65** | **19** | absent from **19** |
 | this pass's re-derivation | **72** | **12** | absent from **12** |
-| area-L addendum in `docs/11` / Closed row `L` in `docs/11` / `docs/10:65` (line numbers derived by `grep -n`, not typed — see the recipe above) | — | — | absent from **65** |
+| area-L addendum in `docs/11` / Closed row `L` in `docs/11` / this area's row in `docs/10` §1 (no line numbers — see the recipe above) | — | — | absent from **65** |
 
 **65 is the census's RECORD cell read into the *absent* slot.** Under the
 committed census the correct absent count is 19, not 65; under the re-derivation
@@ -372,8 +401,9 @@ is exactly the number the committed file supports.
 (area prose, and its Closed table) and one in `docs/10` §1 — so the finding is a
 successor (§8c.5) with all three readings standing.
 
-**And the third instance is the one that makes the class undeniable:
-`docs/10:65`** (§1, the same area-L census row), which reads *"`/ipro/hcp/` is
+**And the third instance is the one that makes the class undeniable: the
+`docs/10` §1 row carrying this area's census** (found by the same grep), which
+reads *"`/ipro/hcp/` is
 absent from 65 of the 84"* in the same breath as *"`65 RECORD · 10 ABSENCE · 1
 INDETERMINATE · 0 FAILURE`"* — **two sentences contradicting each other within one
 table row**, checkable by reading a single line rather than by subtracting across
@@ -381,28 +411,24 @@ files. **It was found by the `grep` that finding 2 required**, not by a re-readi
 `grep -rn 'absent from 65 of the 84' docs/` returns five hits, three of them
 pre-existing instances. That is the honest account of how it was found — the
 mandated test found a finding the pass had missed twice. It is worth naming that this pass hunted this exact class twice
-(`docs/11:1736`/`:1738` against `census-84.txt:36`/`:102`), wrote a successor for
+(the `docs/11` family table against `census-84.txt:36`/`:102`), wrote a successor for
 each, and **missed a third instance on the same page** that its own new figure
 made checkable in one subtraction.
 
-**⚠ And this pass then pointed a reader at the wrong line, which is the same
-failure in a new costume.** It cited `docs/11:2170` for the Closed-table instance.
-**`:2170` does not contain the sentence** — it is `All three dedicated routes
-answer 200 application/json on both`, the area-F dedicated-routes addendum. At that
-commit the Closed table began at `:2189` and row `L` was at `:2218`, so both the
-pointer *and* the parenthetical describing it were wrong. **The finding was right
-and the pointer was wrong.** With this commit's own 14 added lines the row is at
-**`:2232`** and the table at **`:2203`** — so a line number into `docs/11` is only
-meaningful at a stated commit, which is why every citation above carries one.
+**⚠ And this pass then pointed a reader at the wrong line — in every round since.**
+Round 1 cited a `docs/11` line that does not contain the sentence; round 2 corrected
+it to another; round 3 found *that* one stale as well. Each pointer was wrong by
+roughly the number of lines **this PR inserts into `docs/11` below the target**, which
+is the whole mechanism: the citation dies when its own PR lands.
 
-**The irony is the lesson, so it is recorded rather than smoothed:** the exact
-test that would have produced `:2218` in one command is the **grep-first
-duplicate test** this same successor had failed to run (§8b). This pass ran a
-`grep` to *discover* the contradiction, and a `grep` to *check* its own citation
-would have caught the bad pointer before it shipped. `dup-test.sh` now prints
-the line numbers `grep -n` returns and what those lines actually say. A citation
-pointing at a passage that does not contain the claim is `AGENTS.md` §6 item 6,
-and it survived one review round because the claim it carried was true.
+**So the fix is the mechanism, not the number** — see the recipe at the head of this
+section. No `docs/NN:NNNN` pointer is published in this file outside the Correction
+sections, and `dup-test.sh` now *checks* that and prints **STALE** if one appears, so
+the policy is enforced by the artefact rather than asserted by the prose it is in.
+
+**A citation pointing at a passage that does not contain the claim is `AGENTS.md` §6
+item 6, and the reason it survived rounds here is that the claim it carried was true**
+— the worst way for a broken citation to survive.
 
 ## 7. What this reader cannot settle — the assumption, kept INFERRED
 
@@ -473,7 +499,7 @@ three mechanisms are measurable from the committed tree.** They now are:
 
 | mechanism | status | measurement |
 |---|---|---|
-| **`limit=` tail truncation** — `docs/10` §1: "a `limit` truncates from the **tail**, keeping the head of the SURT range" | **MEASURED, excluded for 67 of 69 member-source rows** | those 69 rows carry **no `limit=`**; the 2 that do are `CC-MAIN-2020-50` (seq 7, `limit=5`, records 5; seq 11, `limit=2`, records 2), printed as `FLOOR` by `read-area-l.py census` |
+| **`limit=` tail truncation** — `docs/10` §1: "a `limit` truncates from the **tail**, keeping the head of the SURT range" | **MEASURED, excluded for 73 of 74 member-source rows** (cell **B**, one per crawl — what `derive()` counts) | 74 rows: **68** carry no `limit=`, **6** carry one, and of those 6 only **1 reached it** — `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. **Carrying a limit and reaching it are different predicates**, and only the second can cut a tail. Computed by `kib-detector.py` RULE 3 (§8b) |
 | **whole-KiB truncation** — the detector `docs/10` §1 defines and `docs/10` §1's successor names | **MEASURED, excluded** | **0 candidates across 193 successful `200`s** over the whole population (§8b) |
 | **completeness of the record set** — did the pass enumerate every member, or only what one response body held | **NOT MEASUREDABLE OFFLINE** | the bodies are excluded by `AGENTS.md` §7; `docs/10` §1 says of its own detector that *"clean for this test is not the same as complete"* |
 
@@ -510,7 +536,7 @@ docs/11 Closed table begins at 2189    (grep '^## Closed areas')
 | **S-L4b** | `floor` | 2 | 31 | 17 | **PARTIAL OVERLAP — see below** |
 | **S-L4b** | `truncat` | 2 | 3 | 2 | **PARTIAL OVERLAP — see below** |
 | **S-L4c** | `schema` | 4 | 31 | 2 | **partial overlap** — no surface proposes a *reader* spanning all ledgers |
-| **S-L4d** | `65 of the 84` | 1 | 4 | 1 | **not duplicate, and the grep FOUND a third instance of the defect itself** — `docs/10:65` carries the sentence *and* the contradicting `65 RECORD · 10 ABSENCE` tally in **one row**. `dup-test.sh` prints every hit with what it contains |
+| **S-L4d** | `65 of the 84` | 1 | 4 | 1 | **not duplicate, and the grep FOUND a third instance of the defect itself** — this area's row in `docs/10` §1 carries the sentence *and* the contradicting `65 RECORD · 10 ABSENCE` tally in **one row**. `dup-test.sh` prints every hit with what it contains |
 
 **S-L4b's overlap is real and S-L4b is narrowed because of it.**
 `docs/10` §1 already carries the question *"how many already-committed Common
@@ -526,8 +552,92 @@ un-asked is narrower and is what S-L4b now says: the detector named there has
 never been run over **area L's** ledgers, and S-L4b's own contribution is the
 result of running its rule over this population.
 
-**Run now, at zero requests** (the detector's own rule, `account.py:14-16`: *a
-record response whose `body_bytes` is an exact multiple of 1024 was cut short*):
+**Run now, at zero requests**, by **`kib-detector.py`** — a committed script, because
+round 3 found this table had **no artefact behind it**: `grep -rniE '1024|kib|193'`
+over this pass's `.py`/`.sh` returned nothing, so the number was reproducible only by
+hand. `AGENTS.md` §6 item 7: a count whose rule is not shipped is a typed number
+wearing a script's name.
+
+```sh
+python3 findings-log/2026-10-15-area-l4-ledger-reader/kib-detector.py          # both cells
+python3 findings-log/2026-10-15-area-l4-ledger-reader/kib-detector.py --json   # machine-readable
+```
+
+**RULE 1** — the detector's own rule, quoted from `docs/10` §1: *a record response
+whose `body_bytes` is an exact multiple of 1024 was cut short, and one whose byte
+count is not, ran to completion.* A correlation over the rows observed, never a proven
+mechanism — `account.py`'s own docstring says so.
+
+**RULE 2 — and this is what round 3 flagged: "successful `200`" needed stating.**
+A row counts when the reader's own `status_of()` resolves it to the int 200. Every
+`http_status` in this population is a JSON **string** (all 380 rows), and
+`pool-s7-l7crawl` writes the opaque form `"200 (curl)"`. Three obvious rules give
+three different answers, and the script prints all three:
+
+| rule | rows |
+|---|---|
+| `raw == 200` (int) | **0** — misses every row |
+| `raw == "200"` (exact string equality) | **183** — misses the opaque rows |
+| **`status_of(row) == 200` (used)** | **193** |
+
+The gap between the last two is exactly the **10** `"200 (curl)"` rows in
+`pool-s7-l7crawl`. A reader applying the obvious rule gets 183 and concludes the
+published figure is wrong, with no way to tell which is right — `AGENTS.md` §6 item 3.
+
+**RULE 3 — the companion member-source cell, computed by the same script.** A
+**member-source row** is one where the reader's own predicates agree on all three:
+`query_of(row) in DATA_TARGETS`, `status_of(row) == 200`, and `members_of(row) is not
+None`. **There are three such populations**, and round 3 caught this pass publishing a
+numerator from one beside a denominator from another:
+
+| cell | rows | carrying a `limit=` | carrying none | **at** their own limit | carried one, did not reach it |
+|---|---|---|---|---|---|
+| **A** every qualifying row | **81** | 9 | 72 | **2** | 7 |
+| **B** one per crawl — what `derive()` uses | **74** | 6 | 68 | **1** | 5 |
+| **C** B restricted to in-window | **72** | 5 | 67 | **1** | 4 |
+
+**⚠ "Carrying a `limit=`" and "reaching it" are different predicates, and only the
+second can cut a tail.** Cell **B** — what `derive()` actually counts — has **1** such
+row: `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. Round 3's
+re-derivation, made by *importing* this reader's predicates rather than reimplementing
+them, returned **81 / 9 / 72 / 2** — cell **A** — which is right for the question it
+asked. **The pass's published `69 / 67` matched no cell at all**, and **67** is cell
+C's "carrying none" beside cell A's denominator. **Both cells are now computed by a
+shipped script under a stated rule, so a number can only be disputed by disputing the
+rule, which is visible.**
+
+| ledger | successful `200`s (RULE 2) | whole-KiB candidates (RULE 1) |
+|---|---|---|
+| `2026-10-13-area-l-7crawl-reissue` | 13 | **0** |
+| `2026-10-13-area-l-early-crawl-reissue` | 3 | **0** |
+| `2026-10-13-area-l-ipro-hcp` | 15 | **0** |
+| `2026-10-14-area-l-ipro-early-crawl-supplement` | 2 | **0** |
+| `2026-10-14-pool-l-crawlcontrol` | 10 | **0** |
+| `2026-10-14-pool-l-ipro-hcp-census` | 20 | **0** |
+| `2026-10-14-pool-s7-l7crawl` | 10 | **0** |
+| `2026-10-15-pool-l-ipro-census-cont` | 120 | **0** |
+| **total** | **193** | **0** |
+
+**Zero candidates across 193 successful answers — the member counts are not floors
+*by this detector*.** `body_bytes` is present on **193 of 193** of them, 143 distinct
+values from 40 B to 1 280 724 B, none ≡ 0 mod 1024.
+
+**⚠ And `docs/10` §1's own caution applies verbatim: "Clean for this test is not the
+same as complete" — a truncation not aligned to 1024 would be invisible to it.**
+
+**⚠ And `account.py` is handed on broken.** Run exactly as `docs/10` §1's successor
+directs ("the same one-command test over every other committed CC ledger"), it
+**crashes on a member of this very population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4
+carry a null `t_sent`, and `account.py:109` calls `strptime(None)` → `TypeError`.
+Recorded-not-fixed is right for the **code** — another lane's file — and **not enough
+for the handoff**, because the row naming the tool still stands. Carried as successor
+**S-L4e** (§8c.5).
+
+**So the floor claim of §7a is NARROWED, not retired.** Under cell **B** the `limit=`
+mechanism is measured and excluded for **73 of 74** member-source rows (1 is AT its
+limit); the whole-KiB mechanism for **all 193**. **What remains undemonstrated is
+completeness of the record set itself**, which no artefact in the tree can settle
+because the bodies are excluded by `AGENTS.md` §7.
 
 | ledger | successful `200`s | whole-KiB candidates |
 |---|---|---|
@@ -542,21 +652,29 @@ record response whose `body_bytes` is an exact multiple of 1024 was cut short*):
 | **total** | **193** | **0** |
 
 **Zero candidates across 193 successful answers — the member counts are not floors
-*by this detector*.** `account.py` itself was run over three of the ledgers and
-returns the same figures; it **crashes on `2026-10-13-area-l-ipro-hcp`**, whose
-seqs 1–4 carry a null `t_sent` (`TypeError` at `account.py:109`) — a pre-existing
-limitation in **another lane's** tool, recorded and **not fixed** here. The row
-above for that ledger comes from applying its documented rule directly.
+*by this detector*.** `body_bytes` is present on **193 of 193** of them: 143 distinct
+values from 40 B to 1 280 724 B, none ≡ 0 mod 1024.
 
 **⚠ And `docs/10` §1's own caution applies verbatim: "Clean for this test is not
 the same as complete" — a truncation not aligned to 1024 would be invisible to
-it.** So the floor claim of §7a is **narrowed, not retired**: the `limit=`
-mechanism is now *measured and excluded* for 67 of the 69 member-source rows, and
-the whole-KiB mechanism is *measured and excluded* for all 193 `200`s. **What
-remains undemonstrated is completeness of the record set itself**, which no
-artefact in the tree can settle because the bodies are excluded by `AGENTS.md` §7.
+it.**
 
-### 8c. The four successors
+**⚠ And `account.py` is handed on broken.** Run exactly as `docs/10` §1's successor
+directs ("the same one-command test over every other committed CC ledger"), it
+**crashes on a member of this very population**: `2026-10-13-area-l-ipro-hcp` seqs
+1–4 carry a null `t_sent`, and `account.py:109` calls `strptime(None)` →
+`TypeError`. Recorded-not-fixed is right for the **code** — another lane's file — and
+**not enough for the handoff**, because the row naming the tool still stands and still
+points the next pass at a crash. Carried as successor **S-L4e** (§8c.6).
+
+**So the floor claim of §7a is NARROWED, not retired.** Under cell **B** the
+`limit=` mechanism is measured and excluded for **73 of 74** member-source rows (1 is
+AT its limit, printed as `FLOOR` wherever a figure is published); the whole-KiB
+mechanism for **all 193**. **What remains undemonstrated is completeness of the record
+set itself**, which no artefact in the tree can settle because the bodies are excluded
+by `AGENTS.md` §7.
+
+### 8c. The successors
 
 1. **The eleven-crawl member tally is mis-scoped, and correcting it is a page
    this pass does not own.** `census-84.txt:168` counts 11 while every tally
@@ -615,7 +733,7 @@ artefact in the tree can settle because the bodies are excluded by `AGENTS.md` �
    and should report both.
 5. **An absence count that reconciles with neither reading, in three places this
    pass originally named two of.** The area-L addendum in `docs/11`, that page's
-   Closed-area row `L`, and **`docs/10:65`** all read *"`/ipro/hcp/` is absent from
+   Closed-area row `L`, and this area's row in **`docs/10` §1** all read *"`/ipro/hcp/` is absent from
    65 of the 84"*, while the same rows publish `65 RECORD · 10 ABSENCE · 1
    INDETERMINATE` — so the `docs/10` row **contradicts itself inside one table
    row**. Under the committed census the absent count is **19** (84 − 65); under
@@ -634,6 +752,20 @@ artefact in the tree can settle because the bodies are excluded by `AGENTS.md` �
    are not (12 crawls carry members; 72 answered `200`). **Stated because this pass
    hunted this exact class twice and missed a third instance on the same page.**
 
+7. **`account.py` is handed on broken, and this successor exists so it is not.**
+   `docs/10` §1's own successor tells the next pass to run that tool over **"every
+   other committed CC ledger"**. Run exactly that way it **crashes on a member of this
+   population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
+   `account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
+   another lane owns that file — and **that is why the successor exists**: recording the
+   crash as observed is not enough while the row naming the tool still points the next
+   pass straight at it. **Blocker:** the fix belongs to the lane that owns `account.py`.
+   **Closes when** the tool tolerates an absent `t_sent` (the spacing oracle needs only
+   the rows that have one), or its successor is reworded to name the ledgers it can
+   read. **Zero requests.** **Assumptions (INFERRED):** that the null is a malformed
+   row rather than a deliberately blank field — 4 of that ledger's 44 rows, all at
+   seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+
 ## 8a. Correction (2026-10-15) — verifier round 1
 
 Nothing in this file had been merged or published at a commit of record when the
@@ -647,7 +779,7 @@ over; §6 item 7 — a count whose rule is not stated is how 44 became 93 here).
 | 2 | "39 rows, **9.7%** of the population" (§1) | "**39 rows, 10.3% of the 380-row population** (39 ÷ 380 = 0.10263)" | 9.7% is not 39/380. The **rows (39) and the denominator (380) were right**; only the percentage was wrong. |
 | 3 | "exit 0, **23 checks**, 0 failures" (§5) | "**25 checks**, 0 failures", and the count is now **printed by the test function** | 22 `check()` calls were being counted as 23 because the summary line also contains the word `PASS`. Three real checks were added (two over the real `s7` ledger, one for the `200`-only member rule) and the vacuous one removed — see #7. |
 | 4 | "**43** committed ledgers" (§1, step 1 of R1) | "**44** … **at this branch's head**, and this number moves as passes land" | 43 was true before this pass added its own ledger. The recorded rule must reproduce at the commit under review; the **answer (8) is unchanged**. |
-| 5 | *(new §6 subsection + successor, now §8c.5)* | — | the `docs/11` area-L addendum, its Closed row `L`, and **`docs/10:65`** all publish "absent from 65 of the 84", which reconciles with neither the committed census (19) nor this pass's re-derivation (12). **The third instance was found by running the grep that finding 2 required** — the mandated test surfaced a finding this pass had missed twice. Recorded as a successor; **out of lane, not fixed.** ⚠ Round 1 wrote the Closed-table pointer as **`:2170`**, which does not contain the sentence — corrected in §8a-2 #1. |
+| 5 | *(new §6 subsection + successor, now §8c.5)* | — | the `docs/11` area-L addendum, its Closed row `L`, and this area's row in **`docs/10` §1** all publish "absent from 65 of the 84", which reconciles with neither the committed census (19) nor this pass's re-derivation (12). **The third instance was found by running the grep that finding 2 required** — the mandated test surfaced a finding this pass had missed twice. Recorded as a successor; **out of lane, not fixed.** ⚠ Round 1 wrote the Closed-table pointer as **`:2170`**, which does not contain the sentence — corrected in §8a-2 #1. |
 | 6 | `CC-MAIN-2013-48` members = **0** (§6 table) | **NOT DERIVABLE** | Its only member-bearing DATA row is a **502** (`supplement` seq 3). An empty list on a failed query is vacuous, and `census-84.txt:20` says a 502 is a FAILURE, never an absence. The reader now takes counts **only from `200` rows** and has two new controls for it. **No headline number moves.** |
 | 7 | "self-test … so the trap is **exercised rather than described**" (§4) | The vacuous check is **removed** | `('200 (curl)' == '200')` compared two literals: False by construction, and unchangeable by anything the reader does. Replaced by two checks over the **committed 19-row `s7` ledger** — a raw `== "200"` finds **0 of 19**, the reader resolves **10 of 19**. |
 | 8 | "`self-test` name: the **four** schemas agree on the member COUNT" | "the **three** fixtures agree…" | The check compared three fixtures, not four. |
@@ -686,25 +818,67 @@ and an arithmetic line that did not add up. Superseded text is named here
 **The floor claim is NARROWED, not retired, and the narrowing is the substantive
 result of this round.** `docs/10` §1 already asks the general floor question and
 already names its own successor — "the same one-command test over every other
-committed CC ledger". **That test has now been run over area L** (§8b): **193
-successful `200`s, 0 whole-KiB candidates**, and 67 of 69 member-source rows carry
-no `limit=` at all, so the tail-truncation mechanism `docs/10` §1 describes is
-measured and excluded for them. **What survives is narrower:** completeness of the
+committed CC ledger". **That test has now been run over area L** (§8b, by
+`kib-detector.py`): **193 successful `200`s, 0 whole-KiB candidates**, and under cell
+**B** the tail-truncation mechanism `docs/10` §1 describes is measured and excluded
+for **73 of 74** member-source rows — the one exception is `CC-MAIN-2020-50`, printed
+as `FLOOR` wherever a figure is published. **What survives is narrower:** completeness of the
 record set itself, which `docs/10` §1's own words anticipate — *"Clean for this
 test is not the same as complete"* — and which no artefact in the tree can settle
 because `AGENTS.md` §7 excludes the bodies. **A successor that re-asks the general
 floor question is a duplicate, and this one now says so.**
+## 8a-3. Correction (2026-10-15) — verifier round 3
+
+Round 3 returned NOT CLEAN on eight points. The reviewer re-derived and confirmed
+every substantive measurement across all three rounds — the population, all five moved
+cells, `older-schema` as a genuine parser bail-out, both member-carrying cells,
+`CC-MAIN-2013-48` as NOT DERIVABLE, the S-L4b narrowing, the §7a carriage, and
+`research-checks.py` + `measure_assertions.py --self-test` both exit 0 — and wrote the
+diagnosis plainly: **the defect class is pointers, predicates and prose, not
+measurements.** Every finding below is of that class and needs no request.
+
+| # | superseded | corrected to | why |
+|---|---|---|---|
+| 1 | this file published `docs/11:2218` for Closed row `L`, and "the Closed table begins at `:2189`" | **no `docs/NN:NNNN` pointer is published anywhere in this file.** The greps at the head of §6 are the citation; `dup-test.sh` resolves them all | every pointer of that shape has been stale within one commit, because this PR inserts 142 lines into `docs/11` below most of what it cites. Correcting the numbers would fix four instances of a bug that has fired in every round |
+| 2 | the no-line-numbers policy, while the same file published five `docs/NN:NNNN` pointers | the policy is now **enforced**: `dup-test.sh` greps `FINDINGS.md` for them outside the Correction sections and prints **STALE** if any exist | a policy the file stating it breaks is not a policy. The Correction sections are excluded **deliberately** — `AGENTS.md` §5 requires corrections preserved as history |
+| 3 | "moved row `L` by **17 lines**" | **2094 → 2170 → 2218 → 2232 → 2236**; main → head **+142**, the round before **+18** | "17" was neither figure, and this round introduced it. Measured, now |
+| 4 | "**67 of 69** member-source rows carry no `limit=`" | **RULE 3** stated and shipped in `kib-detector.py`. **A** every row **81 / 9 carry / 72 none / 2 at-limit** · **B** one per crawl, what `derive()` uses, **74 / 6 / 68 / 1** · **C** in-window, **72 / 5 / 67 / 1** | the published **69/67 matched no cell**, and **67** is cell C's "carrying none" beside cell A's denominator. The reviewer's re-derivation — *importing* this reader's predicates — returned **81/9/72/2**, cell **A**, which is right for its question |
+| 5 | `read-area-l.py` printed *"every other member-source row carries no `limit=`, so no limit truncated it"* | the block now counts **four** numbers and says **"AT their own limit"** is the only predicate that can cut a tail | the sentence asserted one predicate (carries none) about rows selected by another (reached it). **7** member-source rows carry a limit without reaching it |
+| 6 | "one decimal place, **truncated** (0.10263 → **10.3%**)" | "one decimal place, **rounded half-up** (39 ÷ 380 = 0.10263 → **10.3%**)" | truncating 10.2631…% gives **10.2%** — the rule did not reproduce its own figure |
+| 7 | `account.py`'s crash recorded as "not fixed" | carried as **successor S-L4e** here and in `docs/11` | recorded-not-fixed is right for the **code** (another lane's file) and not enough for the **handoff**: `docs/10` §1's successor still sends the next pass into a crash |
+| 8 | §7b's byte table citing "(§8b)" with **no artefact behind it** | **`kib-detector.py`** computes it, and **RULE 2** is stated: three obvious rules give **0**, **183**, **193** | `grep -rniE '1024\|kib\|193'` over this pass's `.py`/`.sh` returned nothing. An unstated counting rule is the class this repo has corrected twice |
+
+**The mechanism behind 1, 2 and 3 is one thing: this pass's own insertions.**
+Re-checked explicitly — nothing published now carries a pointer its own diff will move,
+and `dup-test.sh` is the artefact that proves it rather than the prose asserting it.
+
+**Unchanged and re-verified after every edit above:** the population (8 ledgers,
+380 rows), all five moved census cells, `older-schema` 8 → 0, both member-carrying
+cells, `CC-MAIN-2013-48` NOT DERIVABLE, the INFERRED limits. The only figures that moved
+are the two that had no artefact behind them.
+
+## 9. Artefacts
 
 | file | what |
 |---|---|
 | `read-area-l.py` | the reader. `population` · `schemas` · `manifest` · `census` · `self-test` |
-| `dup-test.sh` | the non-duplicate test `CONTRIBUTING-research.md:199` requires, run for all four successors (§8b) |
+| `dup-test.sh` | the non-duplicate test `CONTRIBUTING-research.md:199` requires, run for all four successors, **plus a stale-pointer check that prints STALE if this file publishes a `docs/NN:NNNN` pointer outside its Correction sections** (§8b) |
+| `kib-detector.py` | **RULES 1–3 of §8b**: the whole-KiB detector, the "successful `200`" counting rule, and the three member-source `limit=` cells. `--json` for machine-readable output. It computes the §7b table — before this script existed, that table had no artefact behind it |
 | `manifest.tsv` | the 8 ledgers in precedence order, generated by `manifest` |
 | `results.jsonl` | **0 rows** — correct for a 0-request pass, not a missing file |
-| `run.log` | the five invocations and their exit status; no per-request table, because there are no requests |
+| `run.log` | the six invocations and their exit status; no per-request table, because there are no requests |
 | `probe.sh` | the record of what was sent: nothing |
 
-Re-derive everything above with `python3 read-area-l.py census` — offline, no
-request, no response body needed. `python3 read-area-l.py schemas` re-derives
-every schema figure in §2 and §2b under rules K1–K3. `sh dup-test.sh` re-runs the
-non-duplicate test in §8b and re-checks this pass's own line pointers.
+Re-derive everything above with **no request and no response body**:
+
+```sh
+cd findings-log/2026-10-15-area-l4-ledger-reader
+python3 read-area-l.py population   # the population, counted before it is read
+python3 read-area-l.py schemas      # rules K1-K3, the schema figures
+python3 read-area-l.py census       # the census + the member-limit block
+python3 read-area-l.py self-test    # 25 controls, count derived in code
+sh       dup-test.sh                # the non-duplicate test + the stale-pointer check
+python3  kib-detector.py            # rules 1-3, the §7b table
+```
+
+Every number in this file comes out of one of those six.

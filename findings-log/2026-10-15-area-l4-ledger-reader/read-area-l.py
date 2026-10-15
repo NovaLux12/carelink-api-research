@@ -825,35 +825,56 @@ def cmd_census(a):
                'ts (YYYYMMDD)': bool(sample[0][2]), 'http status': bool(sample[0][3])}
         print('  %-20s %6d  %s' % (k, len(rows_), ', '.join('%s=%s' % kv for kv in got.items())))
     print()
-    print('  ALL MEMBERS ARE FLOORS, NOT EXACT TOTALS — this sits here, next to the')
-    print('  figures, because a limit stated upstream of a number reads as an exact one')
-    print('  (AGENTS.md section 2). Measured per crawl: a member-source row whose')
-    print('  records reached its own limit= may have had its tail cut, so its count is a')
-    print('  lower bound; a row with no limit= is not truncated by that mechanism at all.')
+    print('  EVERY MEMBER COUNT HERE IS A LOWER BOUND, NOT AN EXACT TOTAL — stated here,')
+    print('  next to the figures, because a limit placed upstream of a number reads as an')
+    print('  exact one (AGENTS.md section 2). The mechanism measured below is the one this')
+    print('  reader CAN see: a `limit=` parameter that the response actually reached.')
     print()
-    floors = []
+    # Cell A: EVERY qualifying row. Carrying a `limit=` and REACHING it are
+    # different predicates, and only the second means the tail may have been cut.
+    # An earlier revision printed "every other row carries no limit=" — which
+    # asserts the first predicate about rows selected by the second, and is false
+    # for every row that carried a limit without reaching it. Both are counted.
+    ms = []
     for p in pop:
         with open(os.path.join(REPO, p)) as fh:
             for line in fh:
                 if not line.strip():
                     continue
                 r = json.loads(line)
-                q = query_of(r)
-                if q not in DATA_TARGETS or status_of(r) != 200:
+                if query_of(r) not in DATA_TARGETS or status_of(r) != 200:
                     continue
                 if members_of(r) is None:
                     continue
                 m = re.search(r'[?&]limit=([^&]*)', r.get('path', '') or '')
                 n = r.get('records', r.get('record_count'))
-                if m and isinstance(n, int) and n >= int(m.group(1)):
-                    floors.append((crawl_of(r), r['seq'], n, m.group(1), p))
-    print('    member-source rows AT their own limit=  %d of the population\'s 200-rows'
-          % len(floors))
+                if not isinstance(n, int) or isinstance(n, bool):
+                    n = None
+                ms.append((crawl_of(r), r['seq'], n,
+                           int(m.group(1)) if m else None, p))
+    floors = [x for x in ms if x[3] is not None and x[2] is not None and x[2] >= x[3]]
+    carried = [x for x in ms if x[3] is not None]
+    carried_not_at = [x for x in carried if x not in floors]
+    nolit = [x for x in ms if x[3] is None]
+    print('    member-source rows (DATA + 200 + a member field)          %d' % len(ms))
+    print('      carrying a limit=                                      %3d' % len(carried))
+    print('      carrying no limit=                                     %3d' % len(nolit))
+    print('      AT their own limit (records >= limit) -> tail may be cut %3d' % len(floors))
+    print('      carried a limit WITHOUT reaching it                    %3d' % len(carried_not_at))
+    print()
     for c, s, n, lim, src in floors:
         print('      %-16s seq%-4s records=%-4s limit=%-5s %s  <== FLOOR: the tail may be cut'
               % (c, s, n, lim, src.split("/")[1]))
-    print('    every other member-source row carries no limit=, so no limit truncated it.')
-    print('    That is NOT the same as completeness: it rules out ONE mechanism. The')
+    print()
+    print('    ONLY "AT their own limit" means a limit could have truncated the tail.')
+    print('    A row that CARRIED a limit and did not reach it was not truncated by that')
+    print('    mechanism; a row carrying no limit was not truncated by it either. So the')
+    print('    count that bears on the figures is %d of %d, not "every other row".'
+          % (len(floors), len(ms)))
+    print('    Per-cell counts for the three populations are in kib-detector.py, which')
+    print('    computes this with the same three predicates rather than restating them.')
+    print()
+    print('    And that is NOT the same as completeness: it rules out ONE mechanism. The')
     print('    body-set question needs the bodies, which AGENTS.md section 7 excludes.')
     print()
     print('  All three shapes yield a MEMBER COUNT. Two of the three yield a timestamp and')
