@@ -1,0 +1,10 @@
+--- screen: gate leak scan over this branch's diff, mode=diff, subject files: 3 ---
+  gate loop FAIL flag: 0
+--- screen: gate leak scan over this branch's diff, mode=all, subject files: 208 ---
+  gate loop FAIL flag: 0
+--- carve-out over the real --all subject text (supplementary; pattern applied directly) ---
+  subject lines in the --all text: 44619
+  machine-specific paths, carve-out NOT applied: 0
+  machine-specific paths, carve-out applied (gate :124): 0
+--- screen: the gate's loop over EVERY file in this log dir, all extensions ---
+  ok no pattern fired on any committed artefact in this log directory

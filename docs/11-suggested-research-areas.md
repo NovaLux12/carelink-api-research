@@ -920,6 +920,120 @@ liveness is unstated is a net whose liveness nobody notices has stopped.
 mode at `:104` uses the same construction and `--all` at `:106` uses `cat`, so that is a
 reading of the three lines together, not of `:108` alone. Zero requests.
 
+#### Addendum (2026-10-15, area D, pool lane D, issue #134) — the measurement branch: a control cell for each of the ten
+
+**The close condition's second branch is now met on the measurement side, and the area's
+stated assumption above is corrected by the measurement rather than inherited.**
+
+**What was measured** [source: findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §3].
+Every verdict comes from running the gate's own bytes — the `84,94` subject selection, the
+`105,109` `ADDED` construction and the whole `114,136` matching loop are `eval`'d out of
+`scripts/research-gate.sh` at run time, not re-implemented — against a scratch git repo
+holding synthetic lines, in **all three modes**. **45 cells × 10 patterns × 3 modes = 1350
+rows.** Zero requests.
+
+| | `--all` | `staged` | `diff` |
+|---|---|---|---|
+| patterns **live** (≥1 cell fires) | **10 of 10** | **9 of 10** | **9 of 10** |
+| patterns **dead** (0 of 4 cells fire) | 0 | **1** | **1** |
+| patterns **undecidable** | 0 | 0 | 0 |
+| dead net | — | `reCAPTCHA site keys` | `reCAPTCHA site keys` |
+
+**The correction.** The assumption recorded above was that `:108` is the only `+`-prefixed
+subject path and that `staged` sits at `:104`. Both are wrong: **`:107` is a second
+`+`-prefixed path** with identical semantics, and `:104` is `[ -f "$f" ] || continue`, not
+a construction. Counted rather than read — the `105,109` block holds **exactly 2**
+occurrences of `grep '^+' | grep -v '^+++'` and **exactly 1** `cat "$f"`
+[FINDINGS.md §1a]. So the anchored net is dead on **two** paths, not one, and the area's
+premise *"dead on the path every PR is checked by"* understates it.
+
+**The finding the addendum did not have: the `$` end-anchor is the larger restriction.**
+`reCAPTCHA site keys` is anchored at **both** ends, so it does not merely miss a leading
+`+` — it misses **any token not alone on its line**, in `--all` mode too. Cell-for-cell: 1
+of 4 in `--all` (bare at line start), **0 of 4** in `staged` and in `diff`
+[FINDINGS.md §3a]. A key inside a captured response body — where a key of that shape
+actually arrives — would not be caught by this net **in any mode**.
+
+**The distinction the addendum named is now measured, not asserted.**
+`machine-specific paths` fires in **4 of 4** cells in **all three modes**, including behind
+a leading `+`, because `[^a-z]` accepts the plus. The dividing line is **anchored at `^`**
+versus **has an alternative accepting any non-letter**, and the pattern file records which
+is which for **none** of its ten entries [FINDINGS.md §3b].
+
+**Two zero-means-different-things cells** are recorded so a later reader does not merge
+them [FINDINGS.md §3c]: an added line whose **content** starts with `++` renders as `+++…`,
+is indistinguishable from the `+++ b/file` header, and is **dropped whole** by the
+`^+++` filter — no pattern ever sees it. And the loop's only per-pattern carve-out
+(`:123-124`) is currently **not load-bearing**: the documented machine-path example reads
+**0** with the carve-out and **0** without, and **0** either way across the real `--all`
+text at `ab28f58` (206 files, 43,687 non-empty lines).
+
+**Blocker:** the maintenance decision the area already names — strip the `+`, or record
+per pattern whether it survives one, or de-anchor the one anchored net. **Not attempted
+here**, for the `docs/09` §4 reason above.
+
+**Closes when:** that decision is taken and recorded, **and** the committed control set
+(`findings-log/2026-10-15-gate-scrub-diffmode/`) is re-run against it — the harness exits
+non-zero if the gate's blocks move, and its mutation test fails if the measurement stops
+responding to the thing it measures.
+
+**Assumptions (INFERRED):** that `research-gate.yml:43-44` — bare
+`./scripts/research-gate.sh`, i.e. diff mode — is the mode a pull request actually gets.
+It is the ordinary case, but `research-gate.sh:76-82` **fails closed into `--all`** when
+`origin/main` is unresolvable, and this pass observed no CI run. The verdict table is
+therefore stated **per mode** and is not generalised.
+
+#### Successor to the area-D addendum — 1: which mode does CI actually select?
+
+**Derived from what this pass could not establish.** Every verdict above is per-mode, and
+the mode a pull request gets is read from the workflow rather than observed in a run. That
+gap is the whole of what stands between "the anchored net is dead on the PR path" and a
+statement about the gate as CI runs it.
+
+**Blocker:** none — zero requests. The gate prints its own mode at `:73`, and
+`research-gate.yml` keeps logs.
+
+**Closes when:** the `--- leak scan (mode: …) ---` line has been read from **one** real
+`research-gate` run of each event type — `pull_request` and `push` to `main` — and the
+verdict table is restated against the mode actually observed. **A `fork` pull request, or a
+checkout where `origin/main` does not resolve, is the interesting case** and counts
+equally. **Any other mode observed counts as the answer.**
+
+**Assumptions (INFERRED):** that `actions/checkout@v4` with `fetch-depth: 0`
+(`research-gate.yml:15-17`) leaves `origin/main` resolvable for same-repo pull requests,
+which is why diff mode is the ordinary case. Not observed, and not load-bearing: the
+verdict does not depend on it.
+
+#### Successor to the area-D addendum — 2: a per-pattern liveness column, and the fact that no control set can be committed
+
+**Derived from the control set this pass committed.** Two facts fell out of building it, and
+neither is recorded anywhere.
+
+1. **All ten nets are self-referential**, so no control set can live in the repo as a
+   fixture: an instance that matches pattern P is by construction text that P matches, and
+   committing one makes the gate fire on its own control. The one literal pattern is worse —
+   its only positive instance is the published value itself, which only the file the gate
+   exempts at `:67` may hold. This pass therefore **assembles instances at runtime from
+   fragments** and commits only counts (`cells.tsv`). The generalisable form: *a gate whose
+   nets are self-referential has no testable fixture form, so "add a fixture" is not an
+   available repair for any of them.*
+2. **The `^+++` filter is positional** (`FINDINGS.md` §3c): a line whose content begins with
+   `++` is deleted before any pattern sees it, and a scan that reports only counts cannot
+   distinguish that from a pattern that did not match.
+
+**Blocker:** none — zero requests, all local.
+
+**Closes when:** `scripts/scrub-patterns.txt` carries a **per-pattern column** stating
+whether the net survives a leading `+`, and one in ten patterns ships a committed control
+that runs **without** writing an instance into a scanned file — e.g. instances derived from
+the exempt pattern file at run time, which is what this pass does and which works. **A
+negative counts**: if the maintainer judges per-pattern annotation unnecessary because
+`:108` is simply fixed, this successor is moot and should be closed with the reason.
+
+**Assumptions (INFERRED):** that a per-pattern annotation is cheaper than the alternative
+of stripping the `+`. The opposite is defensible — the area records both repairs, and this
+row does not argue for one.
+
 
 ## Tier 2 — cheap, moderate value
 

@@ -1,0 +1,206 @@
+scratch: <mktemp dir, removed on exit> — it holds the only un-elided copy of the rendered subject lines
+--- self-test: this harness must be able to fail ---
+ok    ADDED block carries exactly 2 '+'-prefixed paths (staged :107 + diff :108)
+ok    ADDED block carries exactly 1 cat path (all :106)
+ok    scan loop keeps all 6 signatures (parse, both skips, count, decide, carve-out)
+ok    parsed 10 patterns with the gate's own IFS='|' read
+ok    every pattern resolves to an instance + wrapper, and no name holds the hit separator
+ok    frag() concatenation is exact (3 cells)
+ok    diff construction still emits a leading '+' (rendered exactly +SENTINEL token here)
+ok    the ^+++ filter drops an added line whose content begins with '++' — positional, not a marker test
+--- measurement: 45 cells x 10 patterns x 3 modes, gate bytes eval'd ---
+--- mutation test: de-anchor the anchored net, expect the verdict to move ---
+ok    de-anchoring moved its diff-mode hits 0 -> 1: the measurement reacts to the construct
+ok    baseline restored after the mutation
+--- vacuity guard ---
+  ok mode=all     rows=450  rendered_lines_rows=450  non_zero_hit_rows=37
+  ok mode=staged  rows=450  rendered_lines_rows=440  non_zero_hit_rows=36
+  ok mode=diff    rows=450  rendered_lines_rows=440  non_zero_hit_rows=36
+--- negatives ---
+  ok all 150 clean-cell rows read 0 under every pattern in every mode
+--- per-cell detail (a cell row, plus every cross-match) ---
+  all     A[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  all     B[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  all     B2[vendor API key literal]                           vendor API key literal                         hits=1  rendered_lines=1
+  all     C[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  all     A[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  all     B[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  all     B2[reports-broker key fragments]                     reports-broker key fragments                   hits=1  rendered_lines=1
+  all     C[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  all     A[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=1  rendered_lines=1
+  all     B[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  all     B2[reCAPTCHA site keys]                              reCAPTCHA site keys                            hits=0  rendered_lines=1
+  all     C[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  all     A[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  all     B[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  all     B2[AWS VPC endpoint service name]                    AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  all     C[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  all     A[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  all     B[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  all     B2[internal Grafana/K8s/GitLab/DB/Prometheus host]   internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  all     C[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  all     A[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  all     B[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  all     B2[internal .corp host]                              internal .corp host                            hits=1  rendered_lines=1
+  all     C[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  all     A[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  all     B[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  all     B2[machine-specific paths]                           machine-specific paths                         hits=1  rendered_lines=1
+  all     C[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  all     A[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  all     B[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  all     B2[live jsession values]                             live jsession values                           hits=1  rendered_lines=1
+  all     C[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  all     A[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  all     B[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  all     B2[live sessionData values]                          live sessionData values                        hits=1  rendered_lines=1
+  all     C[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  all     A[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  all     B[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  all     B2[credential prefixes]                              credential prefixes                            hits=1  rendered_lines=1
+  all     C[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  staged  A[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  staged  B[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  staged  B2[vendor API key literal]                           vendor API key literal                         hits=1  rendered_lines=1
+  staged  C[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  staged  A[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  staged  B[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  staged  B2[reports-broker key fragments]                     reports-broker key fragments                   hits=1  rendered_lines=1
+  staged  C[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  staged  A[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  staged  B[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  staged  B2[reCAPTCHA site keys]                              reCAPTCHA site keys                            hits=0  rendered_lines=1
+  staged  C[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  staged  A[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  staged  B[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  staged  B2[AWS VPC endpoint service name]                    AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  staged  C[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  staged  A[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  staged  B[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  staged  B2[internal Grafana/K8s/GitLab/DB/Prometheus host]   internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  staged  C[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  staged  A[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  staged  B[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  staged  B2[internal .corp host]                              internal .corp host                            hits=1  rendered_lines=1
+  staged  C[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  staged  A[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  staged  B[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  staged  B2[machine-specific paths]                           machine-specific paths                         hits=1  rendered_lines=1
+  staged  C[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  staged  A[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  staged  B[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  staged  B2[live jsession values]                             live jsession values                           hits=1  rendered_lines=1
+  staged  C[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  staged  A[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  staged  B[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  staged  B2[live sessionData values]                          live sessionData values                        hits=1  rendered_lines=1
+  staged  C[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  staged  A[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  staged  B[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  staged  B2[credential prefixes]                              credential prefixes                            hits=1  rendered_lines=1
+  staged  C[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  diff    A[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  diff    B[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  diff    B2[vendor API key literal]                           vendor API key literal                         hits=1  rendered_lines=1
+  diff    C[vendor API key literal]                            vendor API key literal                         hits=1  rendered_lines=1
+  diff    A[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  diff    B[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  diff    B2[reports-broker key fragments]                     reports-broker key fragments                   hits=1  rendered_lines=1
+  diff    C[reports-broker key fragments]                      reports-broker key fragments                   hits=1  rendered_lines=1
+  diff    A[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  diff    B[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  diff    B2[reCAPTCHA site keys]                              reCAPTCHA site keys                            hits=0  rendered_lines=1
+  diff    C[reCAPTCHA site keys]                               reCAPTCHA site keys                            hits=0  rendered_lines=1
+  diff    A[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  diff    B[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  diff    B2[AWS VPC endpoint service name]                    AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  diff    C[AWS VPC endpoint service name]                     AWS VPC endpoint service name                  hits=1  rendered_lines=1
+  diff    A[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  diff    B[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  diff    B2[internal Grafana/K8s/GitLab/DB/Prometheus host]   internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  diff    C[internal Grafana/K8s/GitLab/DB/Prometheus host]    internal Grafana/K8s/GitLab/DB/Prometheus host hits=1  rendered_lines=1
+  diff    A[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  diff    B[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  diff    B2[internal .corp host]                              internal .corp host                            hits=1  rendered_lines=1
+  diff    C[internal .corp host]                               internal .corp host                            hits=1  rendered_lines=1
+  diff    A[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  diff    B[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  diff    B2[machine-specific paths]                           machine-specific paths                         hits=1  rendered_lines=1
+  diff    C[machine-specific paths]                            machine-specific paths                         hits=1  rendered_lines=1
+  diff    A[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  diff    B[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  diff    B2[live jsession values]                             live jsession values                           hits=1  rendered_lines=1
+  diff    C[live jsession values]                              live jsession values                           hits=1  rendered_lines=1
+  diff    A[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  diff    B[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  diff    B2[live sessionData values]                          live sessionData values                        hits=1  rendered_lines=1
+  diff    C[live sessionData values]                           live sessionData values                        hits=1  rendered_lines=1
+  diff    A[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  diff    B[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+  diff    B2[credential prefixes]                              credential prefixes                            hits=1  rendered_lines=1
+  diff    C[credential prefixes]                               credential prefixes                            hits=1  rendered_lines=1
+--- structural cells (rendered_lines 0 = the gate dropped the line before any pattern saw it) ---
+  all     DROP-plusplus    rendered_lines=1  patterns_with_hits=0/10
+  staged  DROP-plusplus    rendered_lines=0  patterns_with_hits=0/10
+  diff    DROP-plusplus    rendered_lines=0  patterns_with_hits=0/10
+  all     CARVE-AGENTS     rendered_lines=1  patterns_with_hits=0/10
+  staged  CARVE-AGENTS     rendered_lines=1  patterns_with_hits=0/10
+  diff    CARVE-AGENTS     rendered_lines=1  patterns_with_hits=0/10
+  all     NEG-bare         rendered_lines=1  patterns_with_hits=0/10
+  staged  NEG-bare         rendered_lines=1  patterns_with_hits=0/10
+  diff    NEG-bare         rendered_lines=1  patterns_with_hits=0/10
+  all     NEG-mid          rendered_lines=1  patterns_with_hits=0/10
+  staged  NEG-mid          rendered_lines=1  patterns_with_hits=0/10
+  diff    NEG-mid          rendered_lines=1  patterns_with_hits=0/10
+  all     NEG-plus         rendered_lines=1  patterns_with_hits=0/10
+  staged  NEG-plus         rendered_lines=1  patterns_with_hits=0/10
+  diff    NEG-plus         rendered_lines=1  patterns_with_hits=0/10
+--- classification (string properties of the pattern file; NOT the verdict) ---
+  pattern                                        anchored_at_^ caret_in_alt negated_letter_class
+  vendor API key literal                         no       no        no
+  reports-broker key fragments                   no       no        no
+  reCAPTCHA site keys                            yes      no        no
+  AWS VPC endpoint service name                  no       no        no
+  internal Grafana/K8s/GitLab/DB/Prometheus host no       no        no
+  internal .corp host                            no       no        no
+  machine-specific paths                         no       yes       yes
+  live jsession values                           no       no        no
+  live sessionData values                        no       no        no
+  credential prefixes                            no       no        no
+--- carve-out effect (supplementary: one pattern applied directly, NOT the gate loop) ---
+  machine-specific paths   pattern-only hits on the documented example (no carve-out): 0
+  machine-specific paths   hits the gate recorded on the same cell (gate :123-124 applied): 0
+--- verdicts ---
+pattern                                         mode    cells  rendered  firing  verdict
+vendor API key literal                          all     4      4         4       live
+vendor API key literal                          staged  4      4         4       live
+vendor API key literal                          diff    4      4         4       live
+reports-broker key fragments                    all     4      4         4       live
+reports-broker key fragments                    staged  4      4         4       live
+reports-broker key fragments                    diff    4      4         4       live
+reCAPTCHA site keys                             all     4      4         1       live
+reCAPTCHA site keys                             staged  4      4         0       dead
+reCAPTCHA site keys                             diff    4      4         0       dead
+AWS VPC endpoint service name                   all     4      4         4       live
+AWS VPC endpoint service name                   staged  4      4         4       live
+AWS VPC endpoint service name                   diff    4      4         4       live
+internal Grafana/K8s/GitLab/DB/Prometheus host  all     4      4         4       live
+internal Grafana/K8s/GitLab/DB/Prometheus host  staged  4      4         4       live
+internal Grafana/K8s/GitLab/DB/Prometheus host  diff    4      4         4       live
+internal .corp host                             all     4      4         4       live
+internal .corp host                             staged  4      4         4       live
+internal .corp host                             diff    4      4         4       live
+machine-specific paths                          all     4      4         4       live
+machine-specific paths                          staged  4      4         4       live
+machine-specific paths                          diff    4      4         4       live
+live jsession values                            all     4      4         4       live
+live jsession values                            staged  4      4         4       live
+live jsession values                            diff    4      4         4       live
+live sessionData values                         all     4      4         4       live
+live sessionData values                         staged  4      4         4       live
+live sessionData values                         diff    4      4         4       live
+credential prefixes                             all     4      4         4       live
+credential prefixes                             staged  4      4         4       live
+credential prefixes                             diff    4      4         4       live
+
+cells.tsv and verdicts.tsv written beside this script; they hold no instance text.
