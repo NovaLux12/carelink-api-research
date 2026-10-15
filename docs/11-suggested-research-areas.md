@@ -928,10 +928,10 @@ support build's own host is the one the pinned suite already reads. The pass use
 **⚠ And the denominator this repo already published for this corpus is 224 — it is
 225 minus one.** `docs/10`'s config-pointer row and this page's own text (found by
 `git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'`,
-**1 hit** at merge-base `ab28f58`, line 1254; this PR inserted +242 lines above it, so the
-target now sits at docs/11:1496. The same search run in-tree returns **3** — two are
+**1 hit** at merge-base `ab28f58`, line 1254; this PR inserted +241 lines above it, so the
+target now sits at docs/11:1495. The same search run in-tree returns **3** — two are
 this page's own command slots at docs/11:930 (self-quote #1) and docs/11:1063
-(self-quote #2), plus the target at docs/11:1496. In other words: two self-quotations
+(self-quote #2), plus the target at docs/11:1495. In other words: two self-quotations
 plus target; at merge-base only the target exists (= 1)) both say "224 chunks".
 
 The sites, counted at head vs merge-base `ab28f58`:
@@ -940,7 +940,7 @@ The sites, counted at head vs merge-base `ab28f58`:
 |---|---|---:|---:|
 | `docs/11:930` | command / self-quote #1 | 930 | — (not present at ab28f58) |
 | `docs/11:1063` | command / self-quote #2 | 1063 | — (not present at ab28f58) |
-| `docs/11:1496` | table prose / target | 1496 | 1254 (verifiable: `git show ab28f58:docs/11-… | grep -nF '224 lazy chunks are mined…'`) |
+| `docs/11:1495` | table prose / target | 1495 | 1254 (verifiable: `git show ab28f58:docs/11-… | grep -nF '224 lazy chunks are mined…'`) |
 
 **The pattern is the
 longer one on purpose:** the short form returns **3** at head, because this page
@@ -1061,7 +1061,7 @@ zero-request `verify-derivable.py` that machine-checks the half that *is* checka
 **Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
 config-pointer row and this page's own text (`git show ab28f58:docs/11-suggested-research-areas.md
 | grep -nF '224 lazy chunks are mined for endpoints and field names'`, **1 hit at
-merge-base `ab28f58` (line 1254; +242 → 1496 at head, where the in-tree grep returns 3,
+merge-base `ab28f58` (line 1254; +241 → 1495 at head, where the in-tree grep returns 3,
 two self-quotes plus the target)**) both say the portal lazy-chunk
 corpus is **224** chunks. **The count is pinned to merge-base so this passage cannot be
 counted into it.** The 2026-10-08 record
