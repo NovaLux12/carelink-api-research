@@ -1989,7 +1989,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 1 open plus 25 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 2 open plus 25 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
