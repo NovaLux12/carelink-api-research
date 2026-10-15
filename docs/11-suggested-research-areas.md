@@ -849,6 +849,122 @@ portal builds share one chunk corpus rather than two; area A and area G recorded
 builds' eager assets and their `runtime.*`/`polyfills.*` names differ, so the chunk list
 must be read from **each** build's own entry document rather than merged.
 
+##### Result (2026-10-15, pool lane A, issue #131) — **the clinic build is closed; the support build is 16 cells and named**
+
+**A negative, on the corpus, per build — never pooled.**
+
+| build | cells swept | verdict |
+|---|---:|---|
+| **clinic `pow`** | **225 of 225** — complete | **0** on every service-identifying token: `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both `personal.patient.timeline.*` spellings, `prodous`, `/patient/`, `hcp/configuration/public/`, `execute-api`, `clcloud`, `carelink.minimed`, `baseUrl`, `m2m`, and all five gateway ids. **Area F's scoped negative is now unqualified for this build's lazy corpus.** |
+| **support `cua`** | **16 of 225** — open | the same **0** on all of them, over 4 build-distinctive cells + 12 bridge cells |
+
+Four tokens score and **all four are code, not pointers**: `Timeline` (104 clinic +
+4 support) and `timeline` (44) are Angular state properties, service method names and
+CSS classes (`allTimelinePeriod`, `getSnapshotTimelinesRange`, `[1,"timeline-chart"]`);
+`personal.` (23 + 14) is i18n translation keys (`patient.invite.to.personal.message`) —
+which is why `personal.patient.timeline.config` is **0** while the prefix scores;
+`hcp/patients` (1 + 1) is one real call, `POST hcp/patients/checkPhoneNumber`, at the
+**identical byte offset in both builds**. Case-sensitivity control: in the busiest
+chunk `Timeline`=84 / `timeline`=44 / `TIMELINE`=**0**. `m2m` — the token area F included
+*expecting* a false hit — is **0** across all 240 chunk bodies. Both anchor gates pass
+(`2a7fa8e7…` 3 397 615 B; `a054555a…` 3 410 666 B) and both method gates fire
+(`hcp/configuration/public/`=15, `hcp/patients`=42 on each main bundle). 0 of 240 sweep
+cells returned the 5 518 B SPA shell. **252 of a 260 cap, GET only**, measured in the log.
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §3, §5]
+
+**The block's own INFERRED assumption is now answered — and the answer is "not
+quite".** The two builds **do not** share one corpus and **are not two unrelated
+ones**: they expose **the same 225 chunk ids**, **221** of them carrying an identical
+content hash, the **4** that differ differing by **exactly five bytes** — the webpack
+module id `37254` on clinic and `21981` on support, same five bytes in all four. The
+4 pairs' token censuses are identical, so those 4 cells carry no content difference
+between the builds. **12 of 12** sampled shared-hash cells fetched from the two
+different hosts came back **byte-identical** — OBSERVED for those 12, and the
+generalisation to the other 209 is **INFERRED** on one sample.
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §7]
+
+**⚠ The limit that travels with this negative, and it is measured, not asserted.**
+**A zero on a path-literal token list is a statement about literals, not about
+reachability.** Clinic chunk `9481.6977c1a7bd7461f8.js` scores **0 on all 24 tokens**
+and still calls the config namespace twice: `getLogBookConfig(){return this.http.get($.C40)`
+at byte 6 756 and `$.C40` at 6 798, with `hcp/configuration/public/` **absent** from
+that body. The route literals live in the eager main bundle; the lazy chunk reaches
+them through an imported constant. So `hcp/configuration/public/` = 0 in the lazy
+corpus reads as *"the lazy corpus adds no new route literals"*, **not** as *"the lazy
+corpus does not read the configuration namespace"* — and the same bound applies with
+more force to every service-identifying token reading 0. The `carelink.medtronic.*`
+and `carelink-support.medtronic.com` deployments were **not** probed: they serve the
+same builds, but that is a claim about the bundles, and nothing here tested their
+**chunk** URLs.
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §5d, §8]
+
+**A discrepancy between this block and the claim, recorded rather than papered over.**
+The block and issue #131 both name `carelinkhp.minimed.com` as the support host. **That
+host is NXDOMAIN** — area A closed with "there is no `.com` `carelinkhp` variant: all
+five `carelinkhp*.minimed.{eu,com}` names outside the baseline are NXDOMAIN" — and the
+support build's own host is the one the pinned suite already reads. The pass used
+`carelink-support.medtronic.eu` and named the swap in its log.
+[source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md; `regression/hurl/05-public-config.check.sh:329–330`]
+
+#### Successor to area F — 1a: the support build's **209 unswept** chunks — the one place the negative can still be wrong
+
+**Derived from the pass above, not from a topic.** The clinic corpus is closed; the
+support corpus was swept to **16 of its 225 cells** because 225 + 225 exceeds any cap
+in this repo. The remainder is not "the rest of the corpus" in the abstract — it is a
+specific, enumerated set: every support-host cell for the **221 shared-hash ids** except
+the **12** already drawn at stride 18, i.e. **209 cells**, all on one host.
+
+**Blocker:** **209 requests** on `carelink-support.medtronic.eu` at 2.5 s (≈ 9 min), and
+nothing else. **Zero requests to plan it and zero to resume it:** `chunk-map.tsv` is
+committed, `probe.sh` reads the ledger's highest `seq` and continues at 253, and
+`plan-cells.py` regenerates the cell list. **The two anchor gates do not need re-sending**
+— they were sent on this build in the same ledger and passed.
+
+**Closes when:** the remaining **209** support cells are fetched, discriminated on
+content-type, and swept with the same 24 tokens — and the bridge sample grows from
+**12 of 221** to **221 of 221**, which converts §6a's **INFERRED** content-identity
+step into an **OBSERVED** one. **Either outcome counts:** if the 209 are byte-identical
+to their clinic counterparts the support negative closes by arithmetic *and* by fetch;
+if any one of them is not, this repo has a content-difference-without-contenthash case
+and the support negative needs re-stating. **A negative counts.**
+
+**Assumptions (INFERRED):** that the support host serves its 225 chunk URLs at all.
+Nothing in this repository has ever fetched one — this pass fetched **16** and all 16
+answered `application/javascript`. The other 209 rest on the support runtime naming
+them, and a name in a document is not a served file (`AGENTS.md` §6 item 2). That is
+the whole reason the remainder is a successor and not a footnote.
+
+#### Successor to area F — 1b: the `$.C40` mechanism — **how many of this repo's "0 hits" sentences are negatives over literals?**
+
+**Derived from the demonstration in §5d, which is the transferable part.** One chunk in
+the corpus just closed scores 0 on every token and makes two live calls to the
+configuration namespace through an **imported webpack constant** whose literal lives in
+a different file. That is a *mechanism*, not an anecdote, and it applies to any negative
+in this repository that was produced by grepping for path literals: area F's two
+portal bundles, area P's `system.logbook.entry.validation.config` literal (which area K
+later found **has** a consumer, in lazy chunk 9481 — "no adjacent field definition" was
+true and the conclusion drawn from it was not), area V's `NGP`/`guardian` dictionary
+noise, this pass's own `hcp/configuration/public/` = 0.
+
+**Blocker:** **zero requests**, and the first half needs none at all. The eager main
+bundles already name their route literals (15 `hcp/configuration/public/` occurrences
+per bundle); what is missing is the **reverse index** from each lazy chunk back to the
+constants it reads. Countable offline from a corpus that has to be fetched once anyway,
+and the 225 chunk bodies are re-fetchable from the committed `chunk-map.tsv`.
+
+**Closes when:** every "0 hits in N chunks/bundles" sentence in `docs/` is either (a)
+carries a `Content-Type` and anchor gate, **and** (b) says whether the corpus it swept
+carries route **literals** or route **call sites** — and the ones that conflate the two
+are corrected with the original wording preserved. **A negative (every sentence already
+distinguishes them) counts.** The second half — do the `docs/` claims distinguish them —
+is a counting-rule check over committed text, no requests.
+
+**Assumptions (INFERRED):** that a lazy chunk reaches a service either by carrying a
+literal, by reading an imported constant, or by assembling the URL at run time from
+config — and that the third of those is rare. **The third is not tested and is not
+claimed**; it is named because it is the residual that no corpus sweep of any size can
+reach, and a reader deserves to know it is still there after 225 chunks read clean.
+
 #### Successor to area F — 2: the new pin's stated limit — the 69-key **count** is not the **set**
 
 **Derived from the pin this pass added.** `regression/hurl/05-public-config.check.sh` now

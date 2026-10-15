@@ -1,0 +1,217 @@
+{
+  "anchors": {
+    "clinic": true,
+    "support": true
+  },
+  "method_gate": {
+    "clinic": true,
+    "support": true
+  },
+  "corpus": {
+    "clinic": {
+      "sweep_rows": 225,
+      "chunks": 225,
+      "fallback_cells": [],
+      "distinct_body_digests": 225,
+      "duplicate_body_digests": [],
+      "empty_bodies": [],
+      "total_bytes": 4374660,
+      "control_rows": 5
+    },
+    "support": {
+      "sweep_rows": 15,
+      "chunks": 15,
+      "fallback_cells": [],
+      "distinct_body_digests": 15,
+      "duplicate_body_digests": [],
+      "empty_bodies": [],
+      "total_bytes": 861735,
+      "control_rows": 5
+    }
+  },
+  "census": {
+    "clinic": {
+      "bodies": 225,
+      "tokens": {
+        "/patient/": 0,
+        "0ptoikank6": 0,
+        "7r9xxd72kk": 0,
+        "TIMELINE": 0,
+        "Timeline": 104,
+        "app-patient-timeline": 0,
+        "baseUrl": 0,
+        "carelink.minimed": 0,
+        "clcloud": 0,
+        "d4mwt26mmi": 0,
+        "dialog-lite": 0,
+        "execute-api": 0,
+        "hcp/configuration/public/": 0,
+        "hcp/patients": 1,
+        "m2m": 0,
+        "oflhmnvbe6": 0,
+        "patient-timeline": 0,
+        "patientTimeline": 0,
+        "personal.": 23,
+        "personal.patient.timeline.config": 0,
+        "personal.patient.timeline.host": 0,
+        "prodous": 0,
+        "r5djbmetbb": 0,
+        "timeline": 44
+      }
+    },
+    "support": {
+      "bodies": 15,
+      "tokens": {
+        "/patient/": 0,
+        "0ptoikank6": 0,
+        "7r9xxd72kk": 0,
+        "TIMELINE": 0,
+        "Timeline": 4,
+        "app-patient-timeline": 0,
+        "baseUrl": 0,
+        "carelink.minimed": 0,
+        "clcloud": 0,
+        "d4mwt26mmi": 0,
+        "dialog-lite": 0,
+        "execute-api": 0,
+        "hcp/configuration/public/": 0,
+        "hcp/patients": 1,
+        "m2m": 0,
+        "oflhmnvbe6": 0,
+        "patient-timeline": 0,
+        "patientTimeline": 0,
+        "personal.": 14,
+        "personal.patient.timeline.config": 0,
+        "personal.patient.timeline.host": 0,
+        "prodous": 0,
+        "r5djbmetbb": 0,
+        "timeline": 0
+      }
+    }
+  },
+  "case_control": {
+    "clinic": [
+      [
+        36,
+        "9448.1ea5c77dff62bced.js",
+        "Timeline",
+        84,
+        44,
+        0
+      ]
+    ],
+    "support": []
+  },
+  "n_hit_contexts": 87,
+  "bridge": [
+    {
+      "seq": 241,
+      "path": "4650.0b5220bceb0ca876.js",
+      "hash": "0b5220bceb0ca876",
+      "clinic_seq": 22,
+      "support_sha256": "22ce48ff295681e5",
+      "clinic_sha256": "22ce48ff295681e5",
+      "byte_identical": true
+    },
+    {
+      "seq": 242,
+      "path": "838.21b9aee1735a40c2.js",
+      "hash": "21b9aee1735a40c2",
+      "clinic_seq": 40,
+      "support_sha256": "bebb9fd5205a38b4",
+      "clinic_sha256": "bebb9fd5205a38b4",
+      "byte_identical": true
+    },
+    {
+      "seq": 243,
+      "path": "5350.36ccdc4f25bc1183.js",
+      "hash": "36ccdc4f25bc1183",
+      "clinic_seq": 58,
+      "support_sha256": "7a648a2c6f325d88",
+      "clinic_sha256": "7a648a2c6f325d88",
+      "byte_identical": true
+    },
+    {
+      "seq": 244,
+      "path": "2350.47281e69656f8036.js",
+      "hash": "47281e69656f8036",
+      "clinic_seq": 76,
+      "support_sha256": "f9281e4829e32161",
+      "clinic_sha256": "f9281e4829e32161",
+      "byte_identical": true
+    },
+    {
+      "seq": 245,
+      "path": "7034.60f109e0d02b928d.js",
+      "hash": "60f109e0d02b928d",
+      "clinic_seq": 94,
+      "support_sha256": "002c6dbda320d7bc",
+      "clinic_sha256": "002c6dbda320d7bc",
+      "byte_identical": true
+    },
+    {
+      "seq": 246,
+      "path": "1604.7476932be1dcd7e8.js",
+      "hash": "7476932be1dcd7e8",
+      "clinic_seq": 112,
+      "support_sha256": "f307f481fe8a5675",
+      "clinic_sha256": "f307f481fe8a5675",
+      "byte_identical": true
+    },
+    {
+      "seq": 247,
+      "path": "4283.91f03738096dce37.js",
+      "hash": "91f03738096dce37",
+      "clinic_seq": 131,
+      "support_sha256": "fc301e646dd248d6",
+      "clinic_sha256": "fc301e646dd248d6",
+      "byte_identical": true
+    },
+    {
+      "seq": 248,
+      "path": "5008.a330b44eaefdcd11.js",
+      "hash": "a330b44eaefdcd11",
+      "clinic_seq": 149,
+      "support_sha256": "df43f7f45f928fad",
+      "clinic_sha256": "df43f7f45f928fad",
+      "byte_identical": true
+    },
+    {
+      "seq": 249,
+      "path": "2082.ba8b7cd844045160.js",
+      "hash": "ba8b7cd844045160",
+      "clinic_seq": 168,
+      "support_sha256": "cac7b709da8f7cae",
+      "clinic_sha256": "cac7b709da8f7cae",
+      "byte_identical": true
+    },
+    {
+      "seq": 250,
+      "path": "7093.cb31bbc8544a8eb4.js",
+      "hash": "cb31bbc8544a8eb4",
+      "clinic_seq": 187,
+      "support_sha256": "44edce5cea767387",
+      "clinic_sha256": "44edce5cea767387",
+      "byte_identical": true
+    },
+    {
+      "seq": 251,
+      "path": "7033.dd28cfe428ffd0c6.js",
+      "hash": "dd28cfe428ffd0c6",
+      "clinic_seq": 205,
+      "support_sha256": "eef975e70dc6ec37",
+      "clinic_sha256": "eef975e70dc6ec37",
+      "byte_identical": true
+    },
+    {
+      "seq": 252,
+      "path": "4818.edb73364143e92e4.js",
+      "hash": "edb73364143e92e4",
+      "clinic_seq": 223,
+      "support_sha256": "8b5b77883b53ca44",
+      "clinic_sha256": "8b5b77883b53ca44",
+      "byte_identical": true
+    }
+  ],
+  "bridge_identical": 12
+}

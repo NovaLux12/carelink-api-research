@@ -1,0 +1,32 @@
+{
+  "cap": 260,
+  "phase1_rows": 8,
+  "phase2_cells": 244,
+  "planned_total": 252,
+  "unspent": 8,
+  "clinic_cells": 225,
+  "support_build_distinctive_cells": [
+    "2076",
+    "2873",
+    "6831",
+    "8285"
+  ],
+  "support_bridge_cells": [
+    "4650",
+    "838",
+    "5350",
+    "2350",
+    "7034",
+    "1604",
+    "4283",
+    "5008",
+    "2082",
+    "7093",
+    "7033",
+    "4818"
+  ],
+  "shared_hash_ids": 221,
+  "bridge_stride": 18,
+  "bridge_start": 9,
+  "clinic_order": "ascending content-hash"
+}

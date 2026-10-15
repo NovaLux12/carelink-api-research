@@ -1,0 +1,30 @@
+# cells.txt — phase 1: controls + chunk-map derivation, BOTH builds.
+# One GET per line:  role | tag | url | build | chunk_id | chunk_hash
+#
+# ORDER IS THE POINT. Every control goes out before any phase-2 sweep cell it
+# judges, and the three controls the claim names go out per host before that
+# host's data cells.
+#
+# The positive control and the form-defect control are the SAME chunk on the
+# clinic build, because that is the pair area F's claim already measured
+# (findings-log/2026-10-13-pool-k-clinic-url-form/FINDINGS.md req 1 vs req 2):
+#   /common.a62bb847b4ea289e.js  200 application/javascript  20731 B  (name form)
+#   /2076.a62bb847b4ea289e.js    200 text/html 5518 B         (id form)
+# Re-measured here, each its own ledger row, rather than cited — a control that
+# was not sent in this ledger is not a control in this ledger.
+#
+# On the SUPPORT build the f.u name substitution is NOT assumed to be the same:
+# support's runtime name differs from clinic's
+# (runtime.0c0212e340fbafc0.js vs runtime.a752bb828cca4b2c.js,
+# findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md:269 and
+# 2026-10-13-area-k-clinic-controlflow/FINDINGS.md §1b C4), so the support
+# positive/defect pair is derived from the support runtime body fetched in this
+# same ledger and appended to cells-phase2.txt, not guessed here.
+control-absent|eu-absent|https://carelinkhp.minimed.eu/zzzz.0000000000000000.js|clinic|-|-
+corpus-entry|eu-entry|https://carelinkhp.minimed.eu/|clinic|-|-
+corpus-runtime|eu-runtime|https://carelinkhp.minimed.eu/runtime.a752bb828cca4b2c.js|clinic|-|-
+control-positive|eu-pos-common|https://carelinkhp.minimed.eu/common.a62bb847b4ea289e.js|clinic|2076|a62bb847b4ea289e
+control-formdefect|eu-defect-2076|https://carelinkhp.minimed.eu/2076.a62bb847b4ea289e.js|clinic|2076|a62bb847b4ea289e
+control-absent|sup-absent|https://carelink-support.medtronic.eu/zzzz.0000000000000000.js|support|-|-
+corpus-entry|sup-entry|https://carelink-support.medtronic.eu/|support|-|-
+corpus-runtime|sup-runtime|https://carelink-support.medtronic.eu/runtime.0c0212e340fbafc0.js|support|-|-
