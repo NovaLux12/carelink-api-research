@@ -1,0 +1,8 @@
+run start: 2026-10-15T15:27:03.561Z tmpbodies=<REDACTED> delay=2.5 cap=8 host=carelink.minimed.eu resume=0 from_seq=1
+2026-10-15T15:27:06.165Z seq=1 host=carelink.minimed.eu tag=b-absent code=404 ctype=text/html; charset=iso-8859-1 bytes=196 sha=80c3fe2ae1062abf56456f52518bd670f9ec3917b7f85e152b347ac6b6faf880 role=CONTROL-certainly-absent-proves-the-hosts-404-shape-on-this-path-family-is-not-a-chunk
+2026-10-15T15:27:09.621Z seq=2 host=carelink.minimed.eu tag=b-main code=200 ctype=application/javascript bytes=3417255 sha=0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa role=DATA-corpus-and-POSITIVE-control-anchor-gate-pinned-sha256-and-byte-length
+run end: 2026-10-15T15:27:09.116Z rows=2 cap=8
+run start: 2026-10-15T15:30:48.132Z tmpbodies=<REDACTED> delay=2.5 cap=8 host=carelink.minimed.eu resume=1 from_seq=3
+2026-10-15T15:30:50.753Z seq=3 host=carelink.minimed.eu tag=b-absent code=404 ctype=text/html; charset=iso-8859-1 bytes=196 sha=80c3fe2ae1062abf56456f52518bd670f9ec3917b7f85e152b347ac6b6faf880 role=CONTROL-certainly-absent-proves-the-hosts-404-shape-on-this-path-family-is-not-a-chunk-REISSUE-run1-ledger-timestamps-unusable
+2026-10-15T15:30:53.596Z seq=4 host=carelink.minimed.eu tag=b-main code=200 ctype=application/javascript bytes=3417255 sha=0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa role=DATA-corpus-and-POSITIVE-control-anchor-gate-pinned-sha256-and-byte-length-REISSUE-run1-ledger-timestamps-unusable
+run end: 2026-10-15T15:30:53.601Z rows=4 cap=8
