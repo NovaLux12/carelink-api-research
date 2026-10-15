@@ -206,7 +206,13 @@ deployment. A negative (all three identical) counts. **Assumptions (INFERRED):**
 that the per-key grammar is keyed off the same flat-name form on all three
 deployments — only one has ever been swept.
 
-### F. What the timeline and dialog-lite gateways actually are
+### F (closed 2026-10-14) What the timeline and dialog-lite gateways actually are
+
+**Closes on the letter's own condition — "you can name the caller and say whether a
+third-party client can reach these services" — as a negative on the naming half and as
+a negative on the reachability half, with the cause half explicitly left blocked.** The
+addenda below are preserved in place and unedited: they are the history this verdict
+rests on, and the closing addendum is at the bottom of this section.
 
 Both are AWS API Gateway stage-wide `ANY /{proxy+}` catch-alls. `dialog-lite` 500s
 on every invocation (the Lambda throws); `patient-timeline` 403s uniformly. Neither
@@ -726,6 +732,194 @@ host, on the two remaining patient hosts.
 Area F remains open: neither the caller nor the reachability question for
 `patient-timeline` moves, and this pass claims no closure. Successors 1 and 2 above stand.
 Area count unchanged.
+
+#### Closing addendum (2026-10-14, pool worker F, issue #123): the caller question closes NEGATIVE, and the cause half stays blocked
+
+**Derived from** 17 GETs across 7 hosts, **17 of a 40 cap**, GET only, ≥2.5 s same-host,
+**controls first on every host**, `results.jsonl` in
+`findings-log/2026-10-14-pool-f-timeline-caller/` ([FINDINGS.md](../findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md)).
+Every addendum above is preserved above, unedited.
+
+**1. The letter's naming half: closed NEGATIVE, and structurally so.** Both **portal**
+builds were re-fetched on their content-hashed asset names and both reproduce their
+pinned anchors in full (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…`
+3 410 666 B), so the corpus is the corpus. In **both** bodies these are **0**:
+`patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both
+`personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`,
+`clcloud`, `carelink.minimed` — and **each of the five 10-character gateway ids**
+(`OBSERVED`). The reason is larger than the absence, and it settles the "look for a
+server-side proxy in the portal bundle" half of the letter: **`personal.` is 4 hits
+per build, and not one of the eight is a key of the 69-name patient document** (the
+four literals are the same in each build; the byte offsets differ), while `hcp/patients` is 42 and
+`hcp/configuration/public/` 15 — **neither build reads the patient configuration
+document at all**, so the pointer is unreachable from that code and no proxy can exist
+there to follow it. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the
+letter proposed is **1 in each build** (2 across both) and it falls in the **middle** of
+`cum2me`, inside a leaked-password list; `baseUrl` is **2 in each build** (4 across both) and
+every one is inside an embedded Pusher SDK, not a CareLink base (`OBSERVED`).
+
+**2. The false-hit class, quantified — this is the pass's most reusable number.**
+`timeline` scores **196** (66 + 126 + 4, 74 signatures) against `patient-timeline`'s
+**0**, and all 196 are GSAP animation internals, Pusher SDK internals, Medtronic's own
+snapshot-timelines **report** service (`hcp/reports/getSnapshotTimelinesRange`,
+`TIMELINE_RANGE`), two leaked-password words, or one analytics label. Counting rule for
+the census is in the log §6.5; a right-context pattern returns **189** and that figure
+is a defect of the pattern, not a count.
+
+**3. The letter's reachability half: closed NEGATIVE for GET, unauthenticated.**
+The **`BLOCK 7` cells that had never run** ([`AWS-GATEWAYS.md`](../../findings-log/probe-2026-10-08/recon/AWS-GATEWAYS.md):240-242) ran: `v1/events` on
+all three deployments, `logbook` on one, plus the `v1` prefix root. **All 11 of 11
+`patient-timeline` cells** answer `403 MissingAuthenticationTokenException`, 42 B, one
+digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which
+reproduces this repo's published `f249b63cb2fc` **in full**, byte-identically, with the
+certainly-absent control indistinguishable from every plausible path. Under Oracle A
+that is **no matching GET route** on any of the three deployments. **Zero 404s in 17
+requests** on both families, which observes the "404 is not in this vocabulary" clause
+on this family directly instead of by analogy from `clcloud.*`. `dialog-lite` 500s on
+all 4 cells with **one** body digest (`660f19c0…`, 36 B, **new** — the 2026-10-10 pass
+recorded the size and no digest), and because the certainly-absent control is
+byte-identical to the published root on both regions, **the 500 cannot discriminate the
+path** — it is the catch-all's signature, exactly as recorded. Zero of 15 gateway
+responses carry any `Access-Control-*`, and the header set is still the same six keys,
+so this letter's "neither is browser-callable" premise is re-observed, not re-derived.
+
+**4. What does NOT close, stated before the verdict rather than after.** **Which of the
+three readings explains the `403`s — no routes deployed / routes for other verbs only /
+the live stage is not `prod` — is unchanged and still blocked**, because separating them
+needs an authentication attempt, which `AGENTS.md` §8 and §11 exclude. Four more cells
+went into that dead end and did not move it; `docs/10` §1 carries the row and this
+addendum does not supersede it. Also unchanged: *why* `dialog-lite` raises, and whether
+the raw `…timeline.config.host` value is publishable — **a disclosure judgement for a
+maintainer holding the value, not pre-committed here.** `docs/10` §1 gains a row for the
+client question that survives this closure.
+
+**5. One scope limit that travels with the negative.** Three builds exist and **only the
+patient build has ever named the timeline at all** — and there every hit is an Angular
+component selector, with `.featureEnabled` read for rendering and the gateway-host
+sibling read by nothing (area V, 2026-10-13; `carelink.minimed.eu` is outside #123's
+host set, so that record is **cited, not reproduced**). The negative's honest scope is
+*no web caller in any of the three builds this repo has read* (**INFERRED**), which is a
+claim about the corpus and not about every client the vendor ships.
+
+**6. What was pinned, and what deliberately was not.** One `check` site in
+`regression/hurl/05-public-config.check.sh`: the **EU** bulk document's
+`keys | length` = 69, at **zero extra vendor requests** because that body is already
+fetched at the top of the suite. `.com` and `-trials` already carried it; EU was the
+missing third. **No `regression/hurl/` pin for the gateway cells** — the
+`execute-api.*` hosts are in no suite, and adding them would widen the weekly drift
+sweep's ~80-request vendor budget from a research pass (area M's log records the same
+decision and the same reasoning). It pins the **count, not the set**.
+
+**Measured spacing floor 2.239 s** on the millisecond `t_sent` series (**1** of 10 gaps
+under the declared 2.5 s, **0** under the `>=2 s` floor) with **one negative duration**
+— seq 9's `t_done` is 552 ms before its `t_sent`, the known corrupt-`t0` class of
+`docs/09` §4, **no cause asserted**. The kernel body-mtime oracle puts the floor at
+**2.866 s with 0 gaps under 2.5 s**, so no gap was actually short; that oracle is **not
+re-derivable from a clean clone** (git does not preserve mtimes, bodies are transient),
+and the load-bearing figure is the `t_sent` series, which reproduces from
+`results.jsonl` alone.
+
+#### Successor to area F — 1: the portal **lazy-chunk** corpus, the one place a caller could still be hiding
+
+**Derived from what this session actually saw.** The two eager main bundles are now
+swept clean — every service-identifying literal, including all five gateway ids, is **0**
+in both, and neither build even contains the `app-patient-timeline` component selector the
+patient build carries 5 times. So a caller inside a portal build, if one exists, is **not
+in the eager main**. The place that leaves is the **lazy-chunk corpus of those two
+builds**, which has never been swept for these tokens: area K's 211 chunks are the
+**patient** corpus, and the 224 portal chunks are a different set
+([area K addendum](#k-the-chunk-corpus-for-real-this-time)).
+
+**Blocker:** **224 chunk requests**, which exceeds any single area's cap in this repo,
+and the chunk corpus is not committed — so it is a **multi-pass, hash-ordered** job, not
+a session. It also needs no new candidate list: the literal set already exists, gated,
+in [`grep.sh`](../findings-log/2026-10-14-pool-f-timeline-caller/grep.sh).
+
+**Closes when:** every chunk of **both** portal builds is hashed and swept with that
+token list, both anchor gates and both named method gates applied per build, and the
+result recorded **per build** — not as a pooled total, because the pooled form is what
+let area E's per-deployment split and area W's deployment-specific 404 content-types go
+unrecorded twice. **A negative (0 hits across all 224) counts** and is the likely answer.
+
+**Assumptions (INFERRED):** that a timeline caller, if present in a portal build, lives
+in a **lazy chunk** rather than in the eager main. That is **not** a general claim about
+where callers live — it is forced by the fact that the eager main is now swept clean, so
+this is the only place left in this corpus. **INFERRED, assumption stated:** that the two
+portal builds share one chunk corpus rather than two; area A and area G recorded the
+builds' eager assets and their `runtime.*`/`polyfills.*` names differ, so the chunk list
+must be read from **each** build's own entry document rather than merged.
+
+#### Successor to area F — 2: the new pin's stated limit — the 69-key **count** is not the **set**
+
+**Derived from the pin this pass added.** `regression/hurl/05-public-config.check.sh` now
+asserts `keys | length` = 69 on all **three** patient deployments, which completes the
+third copy the claim asked for. What it deliberately does **not** do is pin the key
+**set**: a deployment that swapped one key for another would keep 69 and pass. Area E
+proved the sets identical on 2026-10-13 from its own sweep, and that proof is
+**log-level and not re-derivable from a clean clone**, because the response bodies were
+transient by design.
+
+**Blocker:** none for the artefact, **zero requests, for the next sweep that is reading
+the bulk document anyway.** The bodies are already on disk inside
+`05-public-config.check.sh` at the point the three key-count checks run, so a committed
+`keys.tsv` — the **sorted key list** per deployment, which is a *vocabulary* and not a
+value — can be emitted from the same parse with **no additional request** and no value
+disclosure. Area E's `findings-log/2026-10-13-area-w-per-key/keys.txt` is the EU list and
+it **already exists**, so the EU row needs nothing new; only `.com` and `-trials` do.
+
+**Closes when:** the suite emits a sorted per-deployment key list alongside the count, or
+the prose says plainly that the count is a count and the set claim is log-only. **Either
+counts as closed.**
+
+**Assumptions (INFERRED):** none beyond the quoted addenda — this is arithmetic about a
+file this repo controls, and the only judgement is whether a *vocabulary* is publishable
+when the *values* are held back, which this row does not pre-decide.
+
+#### Addendum (2026-10-15, from pool worker F, issue #123, round 13) — successor: a `^`-anchored scrub pattern cannot work in the gate's diff path
+
+**Derived from this pass, not from a topic**, and **it is a gate finding rather than a
+research one**, which is why it is a successor and not a fix.
+
+**What is missing.** `scripts/research-gate.sh:108` builds its **diff-mode** subject text
+with a `git diff -U0 | grep '^+' | grep -v '^+++'` construction, which **keeps the
+leading plus**. Every line the gate greps on that path therefore begins with `+`, so **a
+`^`-anchored pattern can never reach its token.** Measured on the one anchored net in the
+list:
+
+| control placed… | `grep -cEi` against the reCAPTCHA pattern |
+|---|---:|
+| bare, at line start | **1** |
+| mid-line | **0** |
+| **at line start behind a leading `+` — diff mode** | **0** |
+
+**Which nets, exactly.** `reCAPTCHA site keys` is the **only** `^`-anchored pattern in
+`scripts/scrub-patterns.txt` — 1 anchored of 10, checked with the gate's own
+`IFS='|' read` parsing. The other nine are unanchored. **CI runs bare
+`./scripts/research-gate.sh` — diff mode — on every pull request**
+([`research-gate.yml`](../../.github/workflows/research-gate.yml):43-44), with `--all`
+running only on push to `main` (`:47`). **So the net is dead on the path every PR is
+checked by and live only on the post-merge path.**
+
+**The distinction that is easy to get wrong, recorded because it is the useful part.**
+`machine-specific paths|(^|[^a-z])/[hH]ome/…` **does** fire behind a `+`, because
+`[^a-z]` matches the plus. **So the dividing line is not "anchored versus unanchored"
+but "anchored at `^`" versus "has an alternative accepting any non-letter"** — and the
+pattern list records which is which for none of its ten entries.
+
+**Blocker:** **both** available repairs touch the gate's own machinery — strip the `+` at
+`research-gate.sh:108`, or rewrite the pattern to tolerate a leading `+` — and `docs/09`
+§4 records that widening or altering a check **in the same PR the check passed** is a
+maintainer decision, not a research pass's. **Neither is attempted here.**
+
+**Closes when:** either the `+` is stripped from the diff-mode subject lines, **or**
+`scripts/scrub-patterns.txt` records per pattern whether it survives a leading `+` —
+**and a control exists for each of the ten that proves the answer**, because a net whose
+liveness is unstated is a net whose liveness nobody notices has stopped.
+
+**Assumptions (INFERRED):** that `:108` is the only `+`-prefixed subject path — `staged`
+mode at `:104` uses the same construction and `--all` at `:106` uses `cat`, so that is a
+reading of the three lines together, not of `:108` alone. Zero requests.
+
 
 ## Tier 2 — cheap, moderate value
 
@@ -1514,7 +1708,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 4 open plus 22 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 3 open plus 23 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
@@ -1606,6 +1800,8 @@ being superseded — never silently. Letters are not reused.
 | E — is the per-key projection identical on `.com` and `-trials`? | 2026-10-13 | **Negative on the key set, and that is the answer: the 69-name vocabulary is deployment-portable.** All 69 names plus `captcha`'s four flat-name subkeys swept on both remaining patient hosts — **69 top-level keys on each, 0 outside the committed EU list, 0 of the EU list missing**, and **0 value mismatches across 123 valued cells** (62 `.com` + 61 trials VALUED-match), so the per-key form is a projection on all three deployments and the `docs/04` framing is retired rather than extended. **What is *not* identical is which keys 404** — and it is downstream of the bulk null set, not the grammar: EU and `.com` share the same five null-valued keys name for name, trials has six, adding `mmm.data.api.url`, `personal.linking.request.interval` (in no `docs/` page) and `personal.third.party.apps`. **Two positive findings area W could not have had.** (1) **The stray-`]` quirk does not reproduce** — `personal.common.core.reporting.enabled.countries` parses cleanly on `.com` (2 countries) and trials (13), matching their bulk subtrees exactly; the defect is EU-only as measured, and *EU-specific* and *length-dependent* are both left standing because nothing observed separates them. (2) **⚠ Area W's 404 content-type split does not hold on trials** — one real-key 404 there carries `application/vnd.nervana`, a value in no prior reading, so the header is three-valued and deployment-dependent and "the control carries `text/vnd.a` and real keys do not" is false on one deployment of three; `docs/04`'s standing "do not discriminate on it" is confirmed and strengthened. **152 of a 170 cap**, GET only, **all 4 controls first per host** reproducing W's shapes exactly (404 `text/vnd.a`; 200 `application/json` 281 B), measured spacing floor **2.020 s** by kernel body-mtimes (0 of 150 gaps under the ≥2 s floor); the harness `date` series shows 4 sub-floor gaps and **13 negative durations**, the known corrupt-`t0` class, no cause asserted. Successor: dated addendum to area F — the two dedicated-route escapes were read on `.eu` only | [findings-log/2026-10-13-area-e-perkey-deployments/FINDINGS.md] | #41 |
 | Q — the `appVersion` body gate — a second version axis our docs do not describe | 2026-10-13 | **Closed on the area's second close condition: recorded as community-reported-and-unverifiable, with the reason.** The two axes are now documented together in `docs/03` §3a. **Mechanism confirmed in code**: `appVersion` is a **body** field, at `CarlosJPV/carelink-cumulus-bridge src/carelink/cumulus.ts:146` @ `0180b89` (SOURCE-OBSERVED). **Boundary values not confirmed and not confirmable here** — a body field needs a POST, `AGENTS.md` §11 permits no vendor POST beyond the two already-pinned public-`client_id` requests, and the author's probe *outputs* are gitignored (`.gitignore:12` resolves exactly), so **no pin is possible either** — the claim is unpinned by necessity, loudly. **The finding the area did not ask for:** for the `X.Y` forms the discovery axis has been probed at, the two constraints **intersect in exactly `{3.7, 3.8}`** (`3.7.0`/`3.8.0` clear the body gate but are **unobserved** on the discovery path — no `X.Y.Z` cell was ever probed), and the readable client feeds **one constant** (`'3.8'`, `cumulus.ts:31`) into **both** axes — correct only because `3.8` is in that window, so raising it to `3.9` satisfies the body gate forever and breaks the discovery axis silently. **Zero drift**: all four subject files byte-identical between pinned commit and branch head (blob SHAs), so every `file:line` resolves identically in either revision. **⚠ Correction:** the area's *"corroborated by a xDrip maintainer on PR #4711"* is **withdrawn** — that PR's three comments are the table (**by the same author as the README that repeats it**), a question, and an approval that does not retest it, so it is **one source stated twice**. **21 requests against a cap of 20** — the overrun is **one** request, because `probe-followup.sh` sets `SEQ=18` rather than reading the ledger and was run twice, re-issuing request 19; **no ledger row was deleted to hide it**. **The cap was restated to 21 by owner authorisation on 2026-10-13, after the pass**, so the log's accounting line reads `21 of a 21 cap` with the declared 20 kept readable in its `## Correction (2026-10-13)`. 0 requests to any Medtronic host, by design. Spacing floor **2.765 s** (kernel body-mtime oracle, 18 measurable gaps, 0 under 2.5 s; harness series disagrees at 2.014 s with 3 impossible negative durations — no cause asserted). **Not verified:** the xDrip `CareLinkClient.java:664` half — the file is not at the package root, and that is **this pass's path-reconstruction error**, not a broken citation. Successor: dated addendum to area S (what *independently corroborated* requires) | [findings-log/2026-10-13-area-q-appversion-axis/FINDINGS.md] | #43 |
 | P — recover the request schema from the vendor's own app, statically | 2026-10-13 | **Partial positive, asks (a) and (b); documented negative on the validation-config field set.** Static pass over the hash-pinned patient bundle `0fb4fbd4…` (3,417,255 B), both portal bundles (`2a7fa8e7…` / `a054555a…`) and its 211 lazy chunks, **0 requests**: (a) per-entry logbook submission payload recovered in lazy chunk `k-9799-ae484032a07c9d4f-js.b` — `entryTs`, `type`, `id`, `comment`, `sensorInsertionInfo { sensorLocation, otherSensorLocation, timeCapUnscrewed }`, `removalInfo { sensorLocation, otherSensorLocation, removalType, removalReason, removalDescription }`, plus `physicalDisturbanceInfo`, `medicationInfo`, `adhesiveAndTapeInfo`, dynamic `attributes`; **casing correction `timecapUnscrewed` → `timeCapUnscrewed`**, and `sensorInsertionLocation` is a form-control, serialized as `sensorInsertionInfo.sensorLocation`. (b) `deviceFamily` routing-discriminator casing = client enum `{ BLE, BLE_X, SIMPLERA, SIMPLERA_X, GUARDIAN }` (bundle module 45559 / byte 1,723,245, compared at byte 2,964,121) — candidates for area R, still client-side. (c) **negative**: `system.logbook.entry.validation.config` occurs only as a route literal (offsets 2,768,979 / 2,769,017) and once in the patient config-key registry (`D.logbookConfiguration`, offset 2,190,314; selector `yt` at 96,883), with no field set. `alarmCode` occurs 0 times in patient + portals + 211 chunks. Compensating: NGP `lastAlarm.code` is a **number** on the wire (chunk byte 76,314 / 87,560), settling the shape half of `docs/10` row 39. Prior negative `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md` preserved as pass 1 | [findings-log/2026-10-13-area-p-static-schema/FINDINGS.md] | #80 |
+| F — what the timeline and dialog-lite gateways actually are | 2026-10-14 | **Closed NEGATIVE on the letter's own condition — no caller named, because none exists in the corpus, and no third-party client can reach either service by GET.** The caller half is a **structural** negative, not an absence of evidence: both portal builds were re-fetched on their content-hashed asset names and **reproduce their pinned anchors in full** (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…` 3 410 666 B), and in **both** bodies `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both `personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and **all five 10-character gateway ids** are **0** — while **`personal.` is 4 hits and not one is a key of the 69-name patient document** (`hcp/patients` 42, `hcp/configuration/public/` 15). **Neither build reads the patient configuration document at all**, so the pointer is unreachable from that code and no server-side proxy can exist there to follow it; that also settles the letter's "look for a proxy in the portal bundle" reading. **The `BLOCK 7` cells that had never run ran and are negative: 11 of 11 `patient-timeline` cells answer `403` `MissingAuthenticationTokenException`, 42 B, one digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which reproduces this repo's published `f249b63cb2fc` IN FULL — with the certainly-absent control byte-identical to every plausible path on all three deployments, so under Oracle A there is **no matching GET route**. Zero 404s in 17 requests, so that clause is observed on this family directly rather than by analogy from `clcloud.*`. `dialog-lite` 500s on all 4 cells with one body digest (`660f19c0…`, 36 B, **new** — the 2026-10-10 pass recorded the size and no digest) and the certainly-absent control is byte-identical to the published root on **both** regions, so **the 500 cannot discriminate the path**: it is the catch-all's signature. Zero of 15 gateway responses carry `Access-Control-*` and the header set is still the same six keys, so "neither is browser-callable" is **re-observed, not re-derived**. **Most reusable number:** `timeline` scores **196** (66+126+4, 74 signatures) against `patient-timeline`'s **0**, and all 196 are GSAP / Pusher internals, Medtronic's own snapshot-timelines **report** service, two leaked-password words, or one analytics label — `docs/09` §5's false-positive class quantified on the exact token this area hunts; a right-context census pattern returns **189** and that figure is a defect of the pattern, not a count. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the letter proposed is **1 in each build** (2 across both) and falls in the **middle** of `cum2me`, inside a leaked-password list; `baseUrl` is **2 in each build** (4 across both), every one an embedded Pusher SDK. **17 of a 40 cap**, GET only, 7 hosts, ≥2.5 s same-host, **controls first on every host**, no POST, no token exchange, no authentication. Spacing floor **2.239 s** on the `t_sent` series (1 of 10 gaps under 2.5 s, **0** under the ≥2 s floor) with **one negative duration** (seq 9, −552 ms — the known corrupt-`t0` class, **no cause asserted**); the kernel body-mtime oracle reads **2.866 s with 0 sub-2.5 s gaps**, so no gap was actually short, and that oracle is **not re-derivable from a clean clone**. ⚠ **NOT closed, and this row does not claim it:** the **three readings of the 403s** (no routes / other verbs only / the live stage is not `prod`) need an authentication attempt, excluded by `AGENTS.md` §8/§11 — four more cells went into that dead end and did not move it, and `docs/10` §1 carries the row unchanged. Also unchanged: *why* `dialog-lite` raises, and whether the raw `…timeline.config.host` value is publishable — **a disclosure judgement for a maintainer holding the value, not pre-committed here**. **Scope limit:** three builds exist and only the **patient** build has ever named the timeline at all (there every hit is an Angular component selector; area V, cited not reproduced, since `carelink.minimed.eu` is outside the claim's host set), so the negative's scope is *no web caller in any of the three builds this repo has read* (**INFERRED**, a corpus claim, not a claim about every client). **Pinned:** the EU `keys | length` = 69 assertion, **zero extra vendor requests**, completing the third copy. **Not pinned:** the gateway cells — the `execute-api.*` hosts are in no suite and adding them would widen the drift sweep's vendor budget from a research pass. Successors: the **portal lazy-chunk corpus** (224 chunks, never swept for these tokens) and the new pin's stated limit (**count ≠ set**) | [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md] | #123 |
+
 ---
 
 > **Consumer note.** Findings here are consumed by
