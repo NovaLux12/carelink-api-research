@@ -1000,6 +1000,7 @@ without re-reading.
 | 2 | the body of this section's blockquote is shredded: a **doubled `>` marker**, a bare `>` **opening** a blockquote straight after a paragraph, a bare `>` **closing** one straight before a paragraph, and one line reflowed to **107** characters | **fixed** — the paragraph is rewrapped, both orphan markers become blank lines | four whole-file scans (`^> >`; a run not preceded by a blank line; a run ending in a bare `>`; blockquote lines over 100 chars) return **exactly four** offenders, all in this region |
 | 3 | `dup-test.sh`'s rule B is narrower than its header claims — the **full path** as subject (`docs/11-suggested-research-areas.md lines 2236`) is said not to be caught | **REFUTED — no change made** | re-tested in a scratch clone at this SHA. With the mutant in **live** text the check exits **1** and names the line under rule B; it exits 0 only when the mutant sits inside a Correction section, which is the exemption working as designed |
 | 4 | — (self-caught while applying rows 1–3) | **fixed** — this section first landed *after* §9, so a Correction section became the file's last section and `dup-test.sh`'s "sections AFTER the last Correction" listing emptied, because the exemption ran to EOF | the whole file's heading order is now printed by that listing itself: the corrections run §8a … §8a-7 and `## 9. Artefacts` is the only section after them. It is the same coupling §8a-5 row 3 describes, caught this time before it shipped |
+| 5 | `docs/11`'s pointer at this pass cited the claim's evidence as "§8a, §8a-2, §8a-3" — naming two correction sections and stopping, in a file whose correction series had already grown to seven | **fixed** — now "§8a and the correction sections that follow it" | the enumeration was not exhaustive even as written (it omits §3–§5 and §8), so it could not be read as an inventory — but naming a *subset* of a growing series is the same shape as the count over a growing set this pass removed in §8a-6. The predicate is now open-ended, so the next round cannot make it stale |
 
 **On blocker 3, stated so it can be re-run rather than believed.** Rule B's subject test
 is `index(ed, W[i]) == 1` — the token must be a **prefix of** an edited path — so `docs/11`
@@ -1030,7 +1031,8 @@ the values inside it.**
 `sh dup-test.sh` entry goes **70 → 71**: the exempt-section listing prints one line
 per Correction heading, and there is now one more of them. Nothing measured moved —
 no count, offset, cell or figure in this pass changes this round. The repairs are
-whitespace and one relocated section; the refutation publishes an exit code.
+whitespace, one relocated section and one citation reworded to an open-ended form; the
+refutation publishes an exit code.
 
 ## 9. Artefacts
 

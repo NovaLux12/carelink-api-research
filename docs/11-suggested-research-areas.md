@@ -2090,7 +2090,7 @@ reworded to name the ledgers it can read, which costs nothing and is the smaller
 change. **Zero requests either way.** **Assumptions (INFERRED):** that the null is
 a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
 all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
-[source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a, §8a-2, §8a-3, §8b, §8c]
+[source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the
