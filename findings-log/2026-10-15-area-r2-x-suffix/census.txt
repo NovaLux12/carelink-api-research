@@ -1,0 +1,355 @@
+==============================================================================
+A. ANCHOR GATE — this pass reads nothing else unless it passes
+==============================================================================
+  bytes   : 3417255  (pinned 3417255)  MATCH
+  sha256  : 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa
+  pinned  : 0fb4fbd483b5f5d21320ffc595e1befad999eac170d1e7d484fd1c9b09c8ebaa  MATCH
+  last-modified note: etag/Last-Modified carried in the ledger row
+  RESULT  : PASS — the corpus is the build this pass names.
+
+==============================================================================
+B. THE ENUM, verbatim, with byte offsets
+==============================================================================
+  declaration byte range : 1723245..1723341
+  verbatim              : 'const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}'
+  verbatim (context)    : ...'ype=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46'...
+  member count          : 5
+    key='BLE' value='BLE'  key==value: True
+    key='BLE_X' value='BLE_X'  key==value: True
+    key='SIMPLERA' value='SIMPLERA'  key==value: True
+    key='SIMPLERA_X' value='SIMPLERA_X'  key==value: True
+    key='GUARDIAN' value='GUARDIAN'  key==value: True
+  module header at      : 1723196
+  verbatim (context)    : '45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BL'
+
+==============================================================================
+C. MODULE-ID CENSUS — every occurrence of the module id in the body.
+   A webpack module is reachable only by id, so this bounds the
+   population of possible consumers. 2 = 1 definition + 1 importer.
+==============================================================================
+  [1] @1723196: ' f._closeInteractionType=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G'
+  [2] @2962721: 'ar e=i(23007),a=i(79668),n=i(99040),o=i(45559),g=i(13048),h=i(33065),t=i(22618),'
+  importer sites        : 1
+    binding 'o' at @2962717
+
+==============================================================================
+D. EVERY READ OF THE EXPORTED BINDING — `<binding>.G`
+   Classified mechanically: a member read is `<binding>.G.<ident>`.
+   Anything else (a call `(0,b.G)(...)`) is a same-token/different
+   binding false hit and is listed so it cannot be mistaken for one.
+==============================================================================
+  @   198638  NOT-A-MEMBER-READ (next chars: ')((0,o.d')
+      window: ':!0}).afterDismissed().subscribe(J=>{J&&this.onUpdate.emit(J)})}mapWakeUpTime(Q){return(0,o.G)((0,o.d)(Q),!1,this.timeUnits,this.reportDateFormat)}}return(V=R).\\u0275fac=function(Q){r'
+  @  2964176  MEMBER-READ .BLE
+      window: '==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDI'
+  @  2964215  MEMBER-READ .SIMPLERA
+      window: 'ceFamily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDIAN);return F||T||v?this.userService.get'
+  @  2964259  MEMBER-READ .GUARDIAN
+      window: 'tsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDIAN);return F||T||v?this.userService.getUploadDeviceInfo(A):(0,e.of)(null)}))}}retur'
+  member reads          : 3
+  members actually read : ['BLE', 'SIMPLERA', 'GUARDIAN']
+  same-token false hits : 1
+
+  Non-`.G.` consumption shapes that would ALSO count as a read, swept
+  explicitly so their absence is measured rather than assumed:
+    bracket-literal  o.G["X"]            0 hit(s)   regex=\bo\.G\[\s*\"(\w+)\"
+    bracket-single   o.G['X']            0 hit(s)   regex=\bo\.G\[\s*'(\w+)'
+    Object.values(o.G)                   0 hit(s)   regex=Object\.values\(\s*o\.G\s*\)
+    Object.keys(o.G)                     0 hit(s)   regex=Object\.keys\(\s*o\.G\s*\)
+    Object.entries(o.G)                  0 hit(s)   regex=Object\.entries\(\s*o\.G\s*\)
+    spread           {...o.G}            0 hit(s)   regex=\.\.\.\s*o\.G\b
+    pass the object on  (o.G)            0 hit(s)   regex=(?<![.\w])\(o\.G\)
+    pass the object on  o.G bare (no member)   1 hit(s)  @[198638]   regex=(?<![.\w])o\.G(?![\w.])
+
+==============================================================================
+E. CASE-SENSITIVE TOKEN CENSUS — every occurrence, every one read.
+==============================================================================
+
+  --- BLE_X : 2 case-sensitive occurrence(s) ---
+  [1] @  1723264 DECLARATION  ident='BLE_X'                      in-code
+      window: 'onType=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)'
+  [2] @  1723271 DECLARATION  ident='BLE_X'                      in-string-literal
+      window: 'E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use'
+
+  --- SIMPLERA_X : 2 case-sensitive occurrence(s) ---
+  [1] @  1723298 DECLARATION  ident='SIMPLERA_X'                 in-code
+      window: ',i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e'
+  [2] @  1723310 DECLARATION  ident='SIMPLERA_X'                 in-string-literal
+      window: 'trict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e=i(26279),a='
+
+  --- BLE : 52 case-sensitive occurrence(s) ---
+  [1] @    97511 OTHER        ident='INELIGIBLE'                 in-string-literal
+      window: '"trace",t.status="status",t}(n||{}),h=function(t){return t.COMPLETED="COMPLETED",t.INELIGIBLE="INELIGIBLE",t.FAILED="FAILED",t.ACKNOWLEDGED="ACKNOWLEDGED",t.SENT="SENT",t.RECEIVED="RE'
+  [2] @    97523 OTHER        ident='INELIGIBLE'                 in-code
+      window: 'atus="status",t}(n||{}),h=function(t){return t.COMPLETED="COMPLETED",t.INELIGIBLE="INELIGIBLE",t.FAILED="FAILED",t.ACKNOWLEDGED="ACKNOWLEDGED",t.SENT="SENT",t.RECEIVED="RECEIVED",t}(h'
+  [3] @   371201 OTHER        ident='DATA_TABLE'                 in-string-literal
+      window: 'us="BOLUS_WIZARD_FOOD_BOLUS",n.InsulinAssessment="INSULIN_ASSESSMENT",n.DataTable="DATA_TABLE",n.PatientDashboard="PATIENT_DASHBOARD",n.SettingsHistory="SETTINGS_HISTORY",n}(e||{}),a='
+  [4] @   558287 OTHER        ident='ENABLED'                    in-code
+      window: '0),z=i.n(U),Y=i(60537),M=i.n(Y),x=i(16111),$=i.n(x),W=i(1518),Z=function($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);'
+  [5] @   558296 OTHER        ident='ENABLED'                    in-string-literal
+      window: 'U),Y=i(60537),M=i.n(Y),x=i(16111),$=i.n(x),W=i(1518),Z=function($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);const R={'
+  [6] @   558309 OTHER        ident='DISABLED'                   in-code
+      window: ',M=i.n(Y),x=i(16111),$=i.n(x),W=i(1518),Z=function($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);const R={[V.n.Assessme'
+  [7] @   558319 OTHER        ident='DISABLED'                   in-string-literal
+      window: 'x=i(16111),$=i.n(x),W=i(1518),Z=function($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);const R={[V.n.AssessmentAndProgr'
+  [8] @   558338 OTHER        ident='NOT_AVAILABLE'              in-code
+      window: ',W=i(1518),Z=function($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);const R={[V.n.AssessmentAndProgress]:"reportShowAss'
+  [9] @   558353 OTHER        ident='NOT_AVAILABLE'              in-string-literal
+      window: 'nction($e){return $e.ENABLED="ENABLED",$e.DISABLED="DISABLED",$e.NOT_AVAILABLE="NOT_AVAILABLE",$e}(Z||{}),V=i(16286);const R={[V.n.AssessmentAndProgress]:"reportShowAssessmentAndProgr'
+  [10] @   559659 OTHER        ident='DATA_TABLE'                 in-string-literal
+      window: '_FOOD_BOLUS","ADHERENCE","OVERVIEW","LOGBOOK","DEVICE_SETTINGS","EPISODE_SUMMARY","DATA_TABLE","SETTINGS_HISTORY"];var ee=i(59438),J=i(68940),ne=i(89312),fe=i(52308),ye=i(67370),be=i('
+  [11] @   571227 OTHER        ident='NOT_AVAILABLE'              in-code
+      window: ',this.detectDeviceService=bn,this.dialog=jn,this.blindedStatusWatcher=new e.t(Z.NOT_AVAILABLE),this.minSelectionTime=(new Date).setFullYear((new Date).getFullYear()-50),this.isCsrEnab'
+  [12] @   575898 OTHER        ident='NOT_AVAILABLE'              in-code
+      window: 'Nt.supportedReportsByDevice),this.blindedStatusWatcher.next(Nt.blindedStatus||Z.NOT_AVAILABLE)}))}updateFavoriteReports(Ye,Nt){return this.state.favoriteReports.pipe((0,F.s)(1),(0,G.n'
+  [13] @   578786 OTHER        ident='DATA_TABLE'                 in-string-literal
+      window: 'turn this.getReportsSupported().pipe((0,T.T)(Ye=>this.isCsrEnabled?[...Ye,{report:"DATA_TABLE",onlyFor:[],notFor:[]}]:Ye),(0,p.M)(Ye=>{this.setReportTypes(this.getSortedData(Ye,Q,"rep'
+  [14] @   593857 OTHER        ident='ENABLED'                    in-code
+      window: 'perCase()],an=this.state.reportsState.value;return(this.blindedStatusWatcher.value===Z.ENABLED?an.filter(yn=>null==gt?void 0:gt.includes(yn.reportType)):an).map(yn=>{const mn={...yn};'
+  [15] @   662276 OTHER        ident='INELIGIBLE'                 in-code
+      window: 'CEIVED:return"recent.activity.setting.transfer.carelink.status.received";case L._J.INELIGIBLE:return"recent.activity.setting.transfer.carelink.status.ineligible";default:return"recent'
+  [16] @  1037378 OTHER        ident='IS_POSSIBLE'                in-string-literal
+      window: 't,d,f){var E=f.type(d),c=E&&E.possibleLengths()||f.possibleLengths();if(!c)return"IS_POSSIBLE";if("FIXED_LINE_OR_MOBILE"===d){if(!f.type("FIXED_LINE"))return h(t,"MOBILE",f);var S=f.t'
+  [17] @  1038454 OTHER        ident='IS_POSSIBLE'                in-string-literal
+      window: 'gths()))}else if(d&&!E)return"INVALID_LENGTH";var k=t.length,w=c[0];return w===k?"IS_POSSIBLE":w>k?"TOO_SHORT":c[c.length-1]<k?"TOO_LONG":c.indexOf(k,1)>=0?"IS_POSSIBLE":"INVALID_LENG'
+  [18] @  1038529 OTHER        ident='IS_POSSIBLE'                in-string-literal
+      window: 'w===k?"IS_POSSIBLE":w>k?"TOO_SHORT":c[c.length-1]<k?"TOO_LONG":c.indexOf(k,1)>=0?"IS_POSSIBLE":"INVALID_LENGTH"}i.d(_e,{A:()=>g})},29332:(Je,_e,i)=>{"use strict";i.d(_e,{Zr:()=>G,_c:('
+  [19] @  1039454 OTHER        ident='DOUBLE_ZERO'                in-code
+      window: 'ACKSPACE="Backspace",p.DELETE="Delete",p.ARROW_LEFT="ArrowLeft",p.ARROW_UP="ArrowUp",p.DOUBLE_ZERO="00",p}(t||{});const d=new n.nKC("ngx-mask config"),f=new n.nKC("new ngx-mask config'
+  [20] @  1078793 OTHER        ident='DOUBLE_ZERO'                in-code
+      window: 'ion===t.HOURS_MINUTES_SECONDS&&this.apm()&&(this._justPasted()&&_.value.slice(0,2)===t.DOUBLE_ZERO&&(_.value=_.value.slice(1,2)+_.value.slice(2,_.value.length)),_.value=_.value===t.DO'
+  [21] @  1078887 OTHER        ident='DOUBLE_ZERO'                in-code
+      window: 'ZERO&&(_.value=_.value.slice(1,2)+_.value.slice(2,_.value.length)),_.value=_.value===t.DOUBLE_ZERO?t.NUMBER_ZERO:_.value),this._maskService.applyValueChanges(Y,this._justPasted(),this'
+  [22] @  1481906 OTHER        ident='IS_POSSIBLE'                in-string-literal
+      window: ' Perhaps the metadata has been generated before v1.0.18.\')}function o(g,h){return"IS_POSSIBLE"===(0,a.A)(g,h)}},37254:(Je,_e,i)=>{"use strict";i.d(_e,{O:()=>g});var e=i(46335),a=i(848'
+  [23] @  1723254 DECLARATION  ident='BLE'                        in-code
+      window: 'eInteractionType=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},460'
+  [24] @  1723259 DECLARATION  ident='BLE'                        in-string-literal
+      window: 'ractionType=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(J'
+  [25] @  1723264 DECLARATION  ident='BLE_X'                      in-code
+      window: 'onType=E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,'
+  [26] @  1723271 DECLARATION  ident='BLE_X'                      in-string-literal
+      window: 'E,f.close(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"u'
+  [27] @  1745264 OTHER        ident='IS_POSSIBLE'                in-string-literal
+      window: '[])}},{key:"format",value:function(Re,We){var Dt=this;if(function T(Ot,Wt){return"IS_POSSIBLE"===(0,G.A)(Ot,Wt)}(We.nationalSignificantNumber,this.metadata))for(var hn,Pt=q(this.match'
+  [28] @  1951934 OTHER        ident='ENABLED'                    in-string-literal
+      window: 'untry:this.country}),this.store.select(Ri.SW),this.userService.user$.pipe((0,Ii.T)(m=>"ENABLED"===(null==m?void 0:m.blindedStatus)))]).pipe((0,Oe.pQ)(this.destroyRef)).subscribe(([m,j'
+  [29] @  2132774 OTHER        ident='VISIBLE_RANGE'              in-code
+      window: 'Service.isWebView(),this.isWrongReturnRoute=this.webViewService.isReturnUrlBlank,this.VISIBLE_RANGE=Df.y,this.noDateShown=!1,this.isChartRendering=!1,this.userPreferredBgUnit=Ki.wV.MM'
+  [30] @  2159113 OTHER        ident='ENABLED'                    in-string-literal
+      window: ',Ii.T)(()=>{var Dn;const Ve=j.user$.value;if(j.isDashboardEnabled("",pe.isWebView())&&"ENABLED"!==(null==Ve?void 0:Ve.blindedStatus))return!0;if(pe.isWebView())return pe.navigateToMob'
+  [31] @  2275336 OTHER        ident='TABLETS_RE'                 in-string-literal
+      window: 'GENERAL:o,MOBILES_RE:h,OS:E,OS_RE:S,OS_VERSIONS:c,OS_VERSIONS_RE:B,OS_VERSIONS_RE_MAP:I,TABLETS_RE:t});class A{constructor(){this.regexCache=new Map}getRegex(N){return this.regexCache'
+  [32] @  2436634 OTHER        ident='DISABLED'                   in-code
+      window: 'andalone:!1,features:[n.Vt3]})),we})();const pt="VALID",yt="INVALID",Ye="PENDING",Nt="DISABLED";class Ht{}class gn extends Ht{constructor(we,mt){super(),(0,e.A)(this,"value",void 0),('
+  [33] @  2666975 OTHER        ident='NO_DATA_AVAILABLE'          in-string-literal
+      window: 'nslate"),e.k0s()),2&W&&(e.R7$(),e.SpI(" ",e.bMT(2,1,"cp-notifications.alarm.NO_DATA_AVAILABLE")," "))}k().extend(w);let $=(()=>{var W;class Z{set minDate(R){R&&this.availablePeriod$.n'
+  [34] @  2964180 READ         ident='BLE'                        in-string-literal
+      window: 'void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDIAN);'
+  [35] @  3029662 OTHER        ident='PUMP_DISABLE_REMOTE_BOLUS'  in-code
+      window: 'next(!0)}handleAcknowledgements(Y,M){M&&(Y=JSON.stringify([{acknowledgementType:"PUMP_DISABLE_REMOTE_BOLUS",translationKey:"acknowledgement.pump-system"},{acknowledgementType:"anonymi'
+  [36] @  3179191 OTHER        ident='VIRTUAL_SCROLLABLE'         in-code
+      window: 'en:ce,factory:ce.\\u0275fac,providedIn:"root"})),ie})();const ne=new n.nKC("VIRTUAL_SCROLLABLE");let fe=(()=>{var ce;class ie extends Q{constructor(){super()}measureViewportSize(ge){co'
+  [37] @  3196328 OTHER        ident='CDK_TABLE'                  in-code
+      window: ',Fe.justify),o.R7$(),o.SpI(" ",Fe.dataAccessor(dt,Fe.name)," ")}}const T=new n.nKC("CDK_TABLE"),v=new n.nKC("text-column-options");let _=(()=>{var Ke;class Xe{constructor(){(0,e.A)(th'
+  [38] @  3215883 OTHER        ident='TABLE'                      in-code
+      window: 'ibute("role","table"),this._isServer=!this._platform.isBrowser,this._isNativeHtmlTable="TABLE"===this._elementRef.nativeElement.nodeName,this._dataDiffer=this._differs.find([]).create'
+  [39] @  3228085 OTHER        ident='TABLE'                      in-code
+      window: 'iveElement;for(;Fe;){const tt=1===Fe.nodeType?Fe.nodeName:null;if(tt===dt)return Fe;if("TABLE"===tt)break;Fe=Fe.parentNode}return null}let et=(()=>{var Ke;class Xe{get name(){return t'
+  [40] @  3316707 OTHER        ident='BLE'                        in-code
+      window: 'o",description:"Glucose / ISIG sensor reading"},{type:"ConnectionParametersUpdate",label:"BLE Param Update",severity:"info",description:"BLE connection parameters updated"},{type:"Gap'
+  [41] @  3316754 OTHER        ident='BLE'                        in-code
+      window: ',{type:"ConnectionParametersUpdate",label:"BLE Param Update",severity:"info",description:"BLE connection parameters updated"},{type:"GapEvtConnParamUpdateCompl",label:"BLE Param Updat'
+  [42] @  3316832 OTHER        ident='BLE'                        in-code
+      window: 'escription:"BLE connection parameters updated"},{type:"GapEvtConnParamUpdateCompl",label:"BLE Param Update Complete",severity:"info",description:"BLE connection parameter update compl'
+  [43] @  3316888 OTHER        ident='BLE'                        in-code
+      window: 'apEvtConnParamUpdateCompl",label:"BLE Param Update Complete",severity:"info",description:"BLE connection parameter update completed"},{type:"RFConnected",label:"RF Connected",severity'
+  [44] @  3317301 OTHER        ident='BLE'                        in-code
+      window: 'erity:"info",description:"RF SAKE authentication succeeded"},{type:"GapEvtPairReq",label:"BLE Pair Request",severity:"info",description:"BLE GAP pairing request"},{type:"GapEvtKeyEx",'
+  [45] @  3317348 OTHER        ident='BLE'                        in-code
+      window: 'n succeeded"},{type:"GapEvtPairReq",label:"BLE Pair Request",severity:"info",description:"BLE GAP pairing request"},{type:"GapEvtKeyEx",label:"BLE Key Exchange",severity:"info",descri'
+  [46] @  3317401 OTHER        ident='BLE'                        in-code
+      window: 'equest",severity:"info",description:"BLE GAP pairing request"},{type:"GapEvtKeyEx",label:"BLE Key Exchange",severity:"info",description:"BLE GAP key exchange"},{type:"GapEvtKeyRx",lab'
+  [47] @  3317448 OTHER        ident='BLE'                        in-code
+      window: 'iring request"},{type:"GapEvtKeyEx",label:"BLE Key Exchange",severity:"info",description:"BLE GAP key exchange"},{type:"GapEvtKeyRx",label:"BLE Key Received",severity:"info",descripti'
+  [48] @  3317498 OTHER        ident='BLE'                        in-code
+      window: ' Exchange",severity:"info",description:"BLE GAP key exchange"},{type:"GapEvtKeyRx",label:"BLE Key Received",severity:"info",description:"BLE GAP key received"},{type:"NXPHostPair",lab'
+  [49] @  3317545 OTHER        ident='BLE'                        in-code
+      window: ' key exchange"},{type:"GapEvtKeyRx",label:"BLE Key Received",severity:"info",description:"BLE GAP key received"},{type:"NXPHostPair",label:"NXP Host Pairing",severity:"info",descripti'
+  [50] @  3317955 OTHER        ident='BLE'                        in-code
+      window: 'y resolving key detected"},{type:"LTK",label:"Long Term Key",severity:"info",description:"BLE long term key event"},{type:"Time",label:"Time Sync",severity:"info",description:"Sensor '
+  [51] @  3320354 OTHER        ident='BLE'                        in-code
+      window: 'CONNECTION PARAMETER UPDATE",label:"Connection Param Update",severity:"info",description:"BLE connection parameter update"},{type:"AUTHORIZATION EVENT",label:"Authorization Event",sev'
+  [52] @  3321247 OTHER        ident='BLE'                        in-code
+      window: 'nnection state change \\u2014 may indicate disconnects"},{type:"BleConnectionEvent",label:"BLE Connection",severity:"warning",description:"Bluetooth connection event \\u2014 may indicat'
+
+  --- SIMPLERA : 6 case-sensitive occurrence(s) ---
+  [1] @  1723278 DECLARATION  ident='SIMPLERA'                   in-code
+      window: 'se(c)}},45559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i'
+  [2] @  1723288 DECLARATION  ident='SIMPLERA'                   in-string-literal
+      window: '559:(Je,_e,i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:('
+  [3] @  1723298 DECLARATION  ident='SIMPLERA_X'                 in-code
+      window: ',i)=>{"use strict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var'
+  [4] @  1723310 DECLARATION  ident='SIMPLERA_X'                 in-string-literal
+      window: 'trict";i.d(_e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e=i(26279),'
+  [5] @  2136604 OTHER        ident='SIMPLERACC'                 in-code
+      window: 'ceDetails)?void 0:na.deviceModel)??"";this.isMinimedGoDevice=null==(gs=null==Dn?void 0:Dn.SIMPLERACC)?void 0:gs.includes(kn.split(",")[0]),this.isInpen=null==kn?void 0:kn.toLowerCase().inc'
+  [6] @  2964219 READ         ident='SIMPLERA'                   in-string-literal
+      window: 'mily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDIAN);return F||T||v?this.userService.getUploadDev'
+
+  --- GUARDIAN : 3 case-sensitive occurrence(s) ---
+  [1] @  1723322 DECLARATION  ident='GUARDIAN'                   in-code
+      window: 'e,{G:()=>e});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e=i(26279),a=i(15680),n'
+  [2] @  1723332 DECLARATION  ident='GUARDIAN'                   in-string-literal
+      window: '});const e={BLE:"BLE",BLE_X:"BLE_X",SIMPLERA:"SIMPLERA",SIMPLERA_X:"SIMPLERA_X",GUARDIAN:"GUARDIAN"}},46072:(Je,_e,i)=>{"use strict";i.d(_e,{F:()=>o});var e=i(26279),a=i(15680),n=i(80090);'
+  [3] @  2964263 READ         ident='GUARDIAN'                   in-string-literal
+      window: 'th(o.G.BLE),T=null==p?void 0:p.startsWith(o.G.SIMPLERA),v=null==p?void 0:p.startsWith(o.G.GUARDIAN);return F||T||v?this.userService.getUploadDeviceInfo(A):(0,e.of)(null)}))}}return(L=B).\\u'
+
+  --- NGP : 0 case-sensitive occurrence(s) ---
+
+==============================================================================
+F. CASE-SENSITIVITY CONTROL — the same token set, case-INsensitively.
+   Cost: 0 requests. Purpose: so a case-sensitive 0 is reported as a
+   case-sensitive 0, and the ci count shows what the noise floor is.
+==============================================================================
+  BLE_X        cs=2      ci=2      ratio=1.0
+  SIMPLERA_X   cs=2      ci=2      ratio=1.0
+  BLE          cs=52     ci=3169   ratio=60.9
+  SIMPLERA     cs=6      ci=6      ratio=1.0
+  GUARDIAN     cs=3      ci=12     ratio=4.0
+  NGP          cs=0      ci=94     ratio=inf(cs=0)
+
+==============================================================================
+G. LITERAL-VS-DIRECTIVE (POSITIVE) CONTROL — 0 requests.
+   A zero is only a zero if this searcher can find a literal that IS
+   present. These four are known-present in this build by committed
+   prior work; each must come back non-zero or the zero above is void.
+==============================================================================
+  PRESENT              x1    'system.logbook.entry.validation.config'
+      why it must be here: route literal, area P recorded at main-bundle byte 2768979/2769017
+      first @ 2190336: 'tedEntryTypes="logbook.supported.entry.types",D.logbookConfiguration="system.logbook.entry.validation.config",D.outagesNextUpdateAt="outages'
+  PRESENT              x5    'deviceFamily'
+      why it must be here: the destructured matcher parameter
+      first @ 2964121: 'is.userService.getDeviceFamily(null==p?void 0:p.username))),(0,a.n)(({deviceFamily:p})=>{const F=null==p?void 0:p.startsWith(o.G.BLE),T=null'
+  PRESENT              x4    'getUploadDeviceInfo'
+      why it must be here: the branch's taken arm
+      first @ 2963710: ',this.timeSettingsService=p}ngOnInit(){this.uploadDeviceDetails$=this.getUploadDeviceInfo()}get getUserLocale(){return this.languageService.'
+  PRESENT              x7    'deviceModelMapping'
+      why it must be here: the adjacent, DIFFERENT model axis
+      first @ 580904: '(0,T.T)(Nt=>this.consolidateCCIntegratedGraphData(Nt,this.userService.deviceModelMapping))):this.reportsApiService.getCosmosSnapshotTimeline'
+
+==============================================================================
+H. THE NEAR-MISS — a token a substring grep would report as a member
+==============================================================================
+  SIMPLERACC       1 occurrence(s)  [2136604]
+  BLEDevice        0 occurrence(s)  []
+  BLEConnection    0 occurrence(s)  []
+  SIMPLERACC is a key of the DEVICE-MODEL capability map, not a member
+  of the deviceFamily enum. It is a different axis that shares a prefix.
+
+==============================================================================
+I. VERDICT ARITHMETIC
+==============================================================================
+  declared members        : ['BLE', 'BLE_X', 'SIMPLERA', 'SIMPLERA_X', 'GUARDIAN']
+  members with >=1 read   : ['BLE', 'GUARDIAN', 'SIMPLERA']
+  declared, never read    : ['BLE_X', 'SIMPLERA_X']
+  total member reads      : 3   distinct members read: 3
+  consumers of module 45559 : 1
+
+  Does any read BRANCH on the `_X` suffix?  Answer is mechanical and
+  is what section D measured: reads are ['BLE', 'SIMPLERA', 'GUARDIAN'] and no other shape exists in this body.
+
+==============================================================================
+J. THE REDUNDANCY TEST — would deleting the `_X` members change
+   anything?  This is the shape of the finding, stated as arithmetic.
+==============================================================================
+  The one consumer applies, per declared member value, the predicate
+      value.startsWith(<member>)   ->   arm = CSR-or-null
+  Truth table under the declared set, and under the set with the two
+  `_X` members REMOVED. NOTE WHAT THE LAST COLUMN IS AND IS NOT: it
+  compares the ARM a wire value takes. It does not compare code
+  references — a member that is READ is not removable at all, which is
+  a different and stronger statement than 'removable with no effect'.
+
+    wire value      startsWith BLE/SIMPLERA/GUARDIAN   without _X members  verdict
+    BLE              True                               True                   READ - the code names it; not removable
+    BLE_X            True                               True                   INERT - removing it changes no arm
+    SIMPLERA         True                               True                   READ - the code names it; not removable
+    SIMPLERA_X       True                               True                   INERT - removing it changes no arm
+    GUARDIAN         True                               True                   READ - the code names it; not removable
+
+  Values the enum does not declare, for completeness of the predicate:
+    NGP              False                              (undeclared; arm unchanged by any edit)
+    CC880            False                              (undeclared; arm unchanged by any edit)
+    MINIMED          False                              (undeclared; arm unchanged by any edit)
+    PARADIGM         False                              (undeclared; arm unchanged by any edit)
+    SIMPLERACC       True                               (undeclared; arm unchanged by any edit)
+
+  Reading of that table, and it is the whole verdict:
+   - BLE_X and SIMPLERA_X take the SAME arm as BLE and SIMPLERA, because
+     startsWith('BLE') is already true of 'BLE_X'. Declaring them adds
+     nothing the consumer can observe, at any wire value.
+   - so the suffix is NOT a transport axis at this call site: the transport
+     choice (CSR endpoint vs null) does not distinguish the suffixed values.
+   - so the suffix is NOT a model axis at this call site either: the model
+     axis in this corpus is the separate deviceModelMapping, whose SIMPLERACC
+     key is not a member of this enum (section H).
+   - whether `_X` MEANS anything on the wire is still open, and this corpus
+     cannot close it: the discriminator's values arrive from an authenticated
+     POST /patient/v2/monitor/data, which this project does not make.
+
+==============================================================================
+K. THE TWO FUNCTIONS AROUND THE BRANCH — so every offset FINDINGS.md
+   cites for the branch's consequences is reproducible from this file.
+==============================================================================
+
+  getDeviceFamily  (produces deviceFamily)  @3372206
+    'getDeviceFamily(V){var ee;const R={deviceFamily:null,connectScreenSupported:null},X=V??(null==(ee=this.profile$.value)?void 0:ee.username);return(X?(0,a.of)(X):this.getProfile().pipe((0,E.T)(J=>null==J?void 0:J.username),(0,t.W)(()=>(0,a.of)(null)))).pipe((0,S.n)(J=>J?this.http.post("/patient/v2/monitor/data",{patientUsername:J}).pipe((0,t.W)(()=>(0,a.of)(R))):(0,a.of)(R)),(0,E.T)(J=>{const ne=sessionStorage.getItem("deviceFamily");return ne?{...J,deviceFamily:ne}:J}))}getIsM2MEnabled(){const V=this.cookieService.get(B.E$);return""!==V&&(0,I.O)(V)}fetchIsCCReportingEnabledSetting(){return this.store.select(p.Lm).'
+
+  getUploadDeviceInfo  (the CSR POST, in userService)  @3373390
+    'getUploadDeviceInfo(V){return(0,n.p)([this.getProfile(),this.store.select(p.cO).pipe((0,h.s)(1))]).pipe((0,S.n)(([R,{display_message:X}])=>{const Q={patientId:V||R.username,role:this.isCarePartner()?L.P.CARE_PARTNER:L.P.PATIENT,username:R.username};return this.http.post(X,Q)}),(0,E.T)(R=>({medicalDeviceSerialNumber:null==R?void 0:R.medicalDeviceSerialNumber,lastMedicalDeviceDataUpdateServerTime:null==R?void 0:R.lastMedicalDeviceDataUpdateServerTime})))}changeUserNickname(V){return this.http.post("/patient/updateNickname",V)}sendUserMFA(V){const R=this.co'
+
+  Offset of the pieces those two functions depend on:
+    POST /patient/v2/monitor/data                        @3372491
+    sessionStorage.getItem("deviceFamily")               @3372603
+    display_message  (the CSR endpoint the branch POSTs) @3373507
+    deviceModelMapping  (the adjacent model axis)        @580904
+    StandaloneCGM  (a model-map key)                     @2136000
+    SIMPLERACC  (a model-map key, the near-miss)         @2136604
+
+  `deviceModelMapping` is selected at the call site of StandaloneCGM; the
+  capability map it feeds is a runtime value, which is why SIMPLERACC
+  appears once — as a property READ — and has no definition in this body.
+
+==============================================================================
+L. THE CLOSURE ENUMERATION — sections C and D COUNT; this one CLOSES.
+   A global `<binding>.G` sweep finds one false hit belonging to some
+   OTHER module. That is a count, not a closure. Here the importing
+   MODULE is bounded by its own webpack delimiters, and EVERY use of the
+   imported binding inside it is enumerated — including uses that are not
+   member reads, which is where an alias or a bare pass-on would hide.
+==============================================================================
+  importing module id      : 83644
+  module byte span         : 2962630..2965093  (2464 B)
+  the import site          : 2962717  `o=i(45559),g`
+
+  every identifier `o` in that module : 4
+    member read      @2964176  'o.G.BLE),T=null='
+    member read      @2964215  'o.G.SIMPLERA),v='
+    member read      @2964259  'o.G.GUARDIAN);re'
+    NOT a member read @2962717  'o=i(45559),g=i(1'
+
+  module-level const/let/var `o` : []
+  function parameters named `o`  : 0
+  `i(45559)` sites in the WHOLE body : 1
+
+  VERDICT: the binding is never aliased, never passed bare and never shadowed inside the module that imports it.
+  With module 45559 exporting exactly one binding, the enum
+  object cannot leave module 83644 by any route this body contains,
+  so section D's 3 member reads are a CLOSED enumeration of
+  the consumer surface in this corpus, not a sample of one.
+
+  THE FALSE HIT, ADJUDICATED BY MODULE. Each `o.G` site section D lists as
+  NOT-A-MEMBER-READ is re-read here by module, not by token:
+    byte 198638 sits in module 8342 (bytes 191067..201118), which has its own 'o=i(57707)' import at 191153
+    — a different module's binding, same token, different sense.

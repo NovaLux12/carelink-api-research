@@ -1474,6 +1474,146 @@ quietly, because the declaration looks like a specification.
   the client's own matcher is a `startsWith` prefix test, which is consistent
   with both readings.
 
+##### Closed 2026-10-15 — successor 2 (issue #132): documented negative. The suffix is **declared and unread**, and *inert*, not merely unused.
+
+**4 of a 8 cap**, `GET` only, 2.5 s apart under the shared per-host lock; **2 requests of static
+analysis**; [findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md].
+
+The row's close condition is met by its second half — *"a note records the suffix as
+undocumented-and-unused"*. Measured on the digest-pinned patient bundle
+(`0fb4fbd4…`, 3 417 255 B, re-fetched and re-anchored by this pass):
+
+| | measured | source |
+|---|---|---|
+| consumers of enum module `45559` | **1** — the module id occurs exactly twice, and one of the two is the definition | `census.txt` §C, bundle bytes 1 723 196 / 2 962 721 |
+| member reads, total | **3** | `census.txt` §D, bytes 2 964 176 / 2 964 215 / 2 964 259 |
+| distinct members read | **3 of 5** — `BLE`, `SIMPLERA`, `GUARDIAN` | `census.txt` §I |
+| **`BLE_X`, `SIMPLERA_X`** | **0 reads.** Each occurs twice, both inside the declaration's own key and value | `census.txt` §E |
+| consumption shapes other than `<binding>.G.<member>` | **none** across 8 explicit sweeps — bracket read, `Object.values`/`keys`/`entries`, spread, pass-the-object-as-a-whole. **7 of the 8 return 0**; the 8th returns only the already-counted same-token false hit at byte 198 638 | `census.txt` §D |
+
+The three reads are the three arms of one expression, and each is a `startsWith`
+**prefix** test (`p.startsWith(o.G.BLE)`). `"BLE_X".startsWith("BLE")` is already
+true, so **deleting both `_X` members would change no branch, for any input,
+including their own values** (`census.txt` §J, truth table). That is stronger than
+"unused": the members are **inert**, and inert is a property no authenticated
+response can overturn.
+
+**And the enumeration is closed by the module boundary, not by a token count.** A
+global `\bo\.G\b` sweep finds **4** hits, one of them a different module's exported
+function; that is a count, not a closure. Bounding the *importing* module instead —
+webpack delimiter, module `83644`, bytes 2 962 630 – 2 965 093 — and enumerating
+every use of the imported binding gives **4 identifiers: the binding itself
+(`o=i(45559`) and three `o.G.<MEMBER>` reads, with no module-level `o`, no
+parameter named `o`, no alias and no bare pass-on**. With module `45559` exporting
+exactly one binding (`G`), the enum object cannot leave module `83644` by any
+route this body contains. So "0 reads" here is a closed enumeration, not a
+sampled one [source: findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §11].
+
+So of the three readings the row offers, two are **excluded by this corpus** and
+the third is untouched by it:
+
+- **Not a transport axis *at this call site*.** The branch's consequence is a real
+  transport decision — `getUploadDeviceInfo` POSTs the CSR periodic-data endpoint
+  the public config supplies as `csr.cumulus.periodic.data.endpoints.display_message`,
+  else emits `of(null)` (`census.txt` §D, §K, bytes 3 373 390 / 3 373 507) — but it
+  is decided on the **base** token and does not distinguish the suffixed values.
+- **Not a model axis *at this call site*.** The model axis in this corpus is
+  nearby and separate: `deviceModelMapping` with its `StandaloneCGM` and
+  `SIMPLERACC` keys (bytes 580 904 / 2 136 000 / 2 136 604), keyed by model, none of
+  them enum members.
+- **Still open: whether `_X` means anything on the wire.** Values arrive from
+  `POST /patient/v2/monitor/data` (byte 3 372 491), and `getDeviceFamily` can
+  overwrite the response with `sessionStorage.getItem("deviceFamily")` (byte
+  3 372 603). **This pass says nothing about what the server sends** and does not
+  narrow the semantic-suffix vs build-discriminator choice.
+
+> **⚠ Scope limit, in the words the row requires.** This pass swept the **eager
+> main bundle only**. **"0 reads in the eager main" is a true statement; "0 reads
+> anywhere" is not one that can be made.** Area K swept the 211 patient lazy chunks
+> for *pointer* tokens, not for `_X` reads and not for module `45559`.
+
+> **⚠ Correction to the line above it, which this pass measured rather than
+> assumed.** The original row reads *"declares **four** `_X`-suffixed variants"*.
+> The enum has **two**: `BLE_X` and `SIMPLERA_X`, out of five members. Measured
+> case-sensitively, each occurs exactly twice in the corpus and both occurrences
+> are the declaration's own key and value (`census.txt` §E). The sentence above is
+> **left as written** rather than edited — it is the row's record of what was
+> believed when the area was opened, and a correction that overwrites the belief
+> leaves no evidence that the belief existed.
+
+Three successors, none of which needs a token:
+
+- **(a) The patient lazy corpus, for module `45559` and for `BLE_X`/`SIMPLERA_X`
+  reads.** The only thing standing between this result and "0 reads anywhere".
+  **Blocker:** none — the candidate list is already committed and closed
+  (`findings-log/2026-10-13-area-v-pde-clients/chunks.txt`, 211 entries), so the
+  sweep is bounded without enumeration. **Closes when:** either a chunk importing
+  `45559` is found (which would reopen the whole row), or the 211 are swept and the
+  eager-main negative is promoted to corpus-wide. **Assumptions (INFERRED):** that
+  the eager main holds the only importer of a module the main itself defines —
+  measured for the main, **assumed, not measured**, for the chunks.
+- **(b) Add the `BLE`-shaped rows to the `docs/09` §4 trap list, with offsets.**
+  `BLE` has **52** case-sensitive hits in this bundle and **3 169**
+  case-insensitively — a **60.9×** multiplier — and those 52 partition as **4** in
+  the enum literal + **1** member read + **47** other. Of the 47, **34 are
+  substrings** of longer identifiers and **13 are standalone tokens** where `BLE`
+  abbreviates Bluetooth Low Energy inside a **debug-log event catalogue** — an
+  unrelated third sense of the same token.
+  ⚠ **⚠ The 13 are NOT one owner's, and this successor must not record them as one.**
+  They fall across **three** arrays in that catalogue, grouped by log source:
+  **11** in `source:"sensor"` *"Sensor Traces"* (array 3 314 809 – 3 318 475), **1** in
+  `source:"pump"` *"Pump Diagnostic Logs"* (3 318 533 – 3 320 922), **1** in
+  `source:"app"` *"Mobile App Logs"* (3 320 974 – 3 322 899). A byte span quoted over
+  all 13 — 3 316 707 – 3 321 247 — is **the span of the hits, not of any one
+  catalogue**, and calling it "the pump's" names one of three owners. **The register
+  rows must carry each hit's own group**, or no span at all [source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3.2].
+  ⚠ **The rule is stated so it does not mis-apply:** *substring* and *standalone* are
+  defined over the **47 "other"** hits. Applied to all 52 the same rule gives
+  **36 / 16**, because the declaration and member-read hits are themselves standalone
+  `BLE` tokens under it. Both splits are right on their own class; only the 47 answers
+  "what noise is this?". ⚠ **And the byte frame is named**, because the log publishes
+  two and they differ by `len("o.G.")`: a member read spans
+  `len("o.G." + MEMBER)`, so building it narrower — `site..site+3`, the length of the
+  token `BLE` — yields **4 + 0 + 48** and **34 + 14** instead of the published
+  **4 + 1 + 47** and **34 + 13** [source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3.1, §3.2, §11].
+  `SIMPLERACC` (byte 2 136 604) is a model-map key a substring
+  grep reports as a sixth enum member, and lowercase `guardian` (9 hits) is a **human**
+  guardian of a minor patient's account, not the CGM family. **Blocker:** none.
+  **Closes when:** these token shapes are rows in **`docs/09` §4**, the register that
+  already exists and already cites this token in §5 item 2 — so the next sweep reads
+  them instead of rediscovering them. ⚠ `docs/09` §4 carries **0** occurrences of
+  `BLE` today, so the rows are genuinely absent rather than duplicated. **Narrowed by
+  its own duplicate test** ([source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10b], re-runnable as
+  `dup-test.sh`, which prints the commit it counted at): the register is named rather
+  than implied, and area F's equivalent rows for the `timeline` family are the
+  precedent, not a second copy of this work.
+- **(c) The `NGP` figure does not reproduce.** This pass measures case-sensitive
+  `NGP` = **0**; the 94 case-insensitive hits are the letters `ngP` (93) or `ngp`
+  (1, inside `bingpreview`) inside `numberingPlan`-class identifiers. The 2026-10-08
+  note records "three apparent matches … Samsung user-agent strings" and
+  `docs/05:327` / `docs/09:236` repeat the figure; the Samsung regexes are present
+  but none carries `NGP`. **Blocker:** none, but **this is a `docs/05`, `docs/09`
+  and `docs/10` call, not this lane's** — recorded here and in the log as a
+  disagreement with both readings given, and **none of the three pages was
+  edited.** (`docs/10` row 38 is **adjacent, not the same figure** — it concerns
+  the bundle's `N\d\d` tokens and a Samsung *device* regex — but a human resolving
+  this should see it.) **Closes when:** one pass re-derives the figure on the pinned
+  build and the pages are corrected together. **Assumptions (INFERRED):** that the
+  earlier figure was case-insensitive; nothing on disk states the matching mode.
+
+> **Grep-first duplicate test, run for all three successors** against
+> `docs/10` §1, **both** tables that answer "the Closed table" (`docs/10` §2 *"Searched
+> and closed"* and this page's *Closed areas*, which disagree with each other) and this
+> page — commands, counts and a per-hit verdict for each, plus the two things it
+> surfaced that are recorded rather than acted on. **Every count is bound to the commit
+> it was taken on**, and the test is re-runnable as `dup-test.sh`, which prints the SHA
+> it counted at — a `docs/11` grep count can move whenever a lane edits this page, and
+> four lanes edit it at once in this pool [source:
+> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10, `dup-test.sh`].
+
 #### S. Two more evidence classes for third-party source material
 
 *(retained as a `####` subsection so the closed area does not re-enter the open-area count; area S is closed.)*
