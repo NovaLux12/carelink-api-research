@@ -1,0 +1,16 @@
+# run.log — 2026-10-15-area-l4-ledger-reader — ZERO requests, offline pass
+#
+# There is no per-request table here because no request was sent. The columns the
+# repo's ledger format requires (seq / method / status / t_queued / t_sent / t_done)
+# have zero rows to carry. What this file records instead is each tool invocation
+# this pass made, its exit status, and what it read.
+#
+# 0 of a 0 cap. Methods: none (GET 0, OPTIONS 0, POST 0). Delay: >=2s rule, not
+# applicable, 0 requests sent, so no inter-request gap exists to report.
+#
+# invocation                        exit  output lines  what it did
+# --------------------------------  ----  ------------  ------------------------------------
+read-area-l.py population            0            26  R1+R2, 8 ledgers / 380 rows, counted before reading
+read-area-l.py manifest              0             8  wrote manifest.tsv, precedence order
+read-area-l.py census                0           222  8 ledgers -> census, vs census-84.txt cell by cell
+read-area-l.py self-test             0            33  23 controls incl. 5 row + 1 integration negative
