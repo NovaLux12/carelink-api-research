@@ -928,24 +928,27 @@ support build's own host is the one the pinned suite already reads. The pass use
 **⚠ And the denominator this repo already published for this corpus is 224 — it is
 225 minus one.** `docs/10`'s config-pointer row and this page's own text (found by
 `git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'`,
-**1 hit** at merge-base `ab28f58`, line 1254; this PR inserted +241 lines above it, so the
-target now sits at docs/11:1495. The same search run in-tree returns **3** — two are
-this page's own command slots at docs/11:930 (self-quote #1) and docs/11:1063
-(self-quote #2), plus the target at docs/11:1495. In other words: two self-quotations
-plus target; at merge-base only the target exists (= 1)) both say "224 chunks".
+**1 hit**, anchored to the `ab28f58` object (line 1254) so the answer cannot drift as this
+page is edited) both say "224 chunks".
 
-The sites, counted at head vs merge-base `ab28f58`:
+Run *in-tree*, the same search returns **3**: two are this page's own command slots (the
+two places that quote the command) and one is the pre-existing target sentence. **No
+head-relative line number is published for those three sites, on purpose** — this PR
+inserts and edits above them, so any number would be false after the next edit, which is
+the very defect this passage documents. Count them yourself with
+`grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md`;
+the merge-base command above is fixed at 1.
 
-| site | what it is | head line | merge-base line |
-|---|---|---:|---:|
-| `docs/11:930` | command / self-quote #1 | 930 | — (not present at ab28f58) |
-| `docs/11:1063` | command / self-quote #2 | 1063 | — (not present at ab28f58) |
-| `docs/11:1495` | target prose (section K) | 1495 | 1254 (verifiable: `git show ab28f58:docs/11-… | grep -nF '224 lazy chunks are mined…'`) |
+| site | what it is | how to resolve it | merge-base |
+|---|---|---|---|
+| this page, first command slot | self-quote #1 | `grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md` | — (not present at ab28f58) |
+| this page, second command slot | self-quote #2 | same grep | — (not present at ab28f58) |
+| the pre-existing 224 sentence | target prose (section K) | `git show ab28f58:docs/11-… \| grep -nF '224 lazy chunks are mined…'` | 1254 |
 
 **The pattern is the
 longer one on purpose, but lengthening did not free it:** at head **both** the short and
 the long form return **3** — this page carries the *long* form in each of its own two
-command slots (`docs/11:930`, `:1063`), plus the target. The fix that works, and the one
+command slots, plus the target. The fix that works, and the one
 the table below records, is the merge-base qualification `git show ab28f58:…`, whose
 result set cannot see this pass's own text. The 2026-10-08 record those came from is explicit:
 the
@@ -1062,8 +1065,9 @@ zero-request `verify-derivable.py` that machine-checks the half that *is* checka
 **Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
 config-pointer row and this page's own text (`git show ab28f58:docs/11-suggested-research-areas.md
 | grep -nF '224 lazy chunks are mined for endpoints and field names'`, **1 hit at
-merge-base `ab28f58` (line 1254; +241 → 1495 at head, where the in-tree grep returns 3,
-two self-quotes plus the target)**) both say the portal lazy-chunk
+merge-base `ab28f58`, line 1254** — the in-tree count is 3 only because this page quotes
+the command twice; no head line number is published here, for the reason given above)
+both say the portal lazy-chunk
 corpus is **224** chunks. **The count is pinned to merge-base so this passage cannot be
 counted into it.** The 2026-10-08 record
 that number came from is explicit about

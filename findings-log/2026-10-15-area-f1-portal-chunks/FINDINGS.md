@@ -553,17 +553,16 @@ open-questions row for
 could still add is the portal **lazy-chunk** corpus (**224 chunks**, never swept
 for these tokens)"*, and `docs/11`'s own text repeats "224 lazy chunks" — found by
 `git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'`,
-**1 hit** at merge-base `ab28f58` (line 1254; +241 inserted lines in this PR put it
-at docs/11:1495 at head, where an unqualified in-tree grep returns 3 — two
-self-quotations at docs/11:930 and :1063, plus the target at :1495).
+**1 hit** at merge-base `ab28f58`, line 1254 — anchored to the `ab28f58` object, so it
+cannot drift. An unqualified in-tree grep returns 3: `docs/11` quotes the command twice
+and carries the pre-existing target. **No head-relative line number is published for
+those sites** — this PR edits above them, so a number would go stale with the next edit.
 
-Sites for the chunk-count pattern, counted at head vs merge-base `ab28f58`:
-
-| site | what it is | head line | merge-base line |
-|---|---|---:|---:|
-| `docs/11:930` | command / self-quote #1 | 930 | — (absent at ab28f58) |
-| `docs/11:1063` | command / self-quote #2 | 1063 | — (absent at ab28f58) |
-| `docs/11:1495` | target prose (section K) | 1495 | 1254 (`git show ab28f58:… | grep -nF …`) |
+| site | what it is | how to resolve it | merge-base |
+|---|---|---|---|
+| docs/11, first command slot | self-quote #1 | `grep -nF '224 lazy chunks are mined for endpoints and field names' docs/11-suggested-research-areas.md` | — (absent at ab28f58) |
+| docs/11, second command slot | self-quote #2 | same grep | — (absent at ab28f58) |
+| docs/11, the 224 sentence | target prose (section K) | `git show ab28f58:… \| grep -nF …` | 1254 |
 
 Both trace to
 `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`,
@@ -573,16 +572,15 @@ whose own heading reads **"Lazy-chunk corpus (224 files)"**.
 reproducing the moment this section was written.** This cite originally read
 `grep -nF '224 lazy chunks are mined for endpoints' …`, **1 hit**, and the count was
 true against `origin/main`. **At head the short form returns 3**: two self-quoting
-command slots (`docs/11:930` and `:1063`) plus the genuine target at `:1495`. The long
-form also returns 3 at head — lengthening alone did not free it. `AGENTS.md` §6 item 2 — and, as the verifier put it, the
+command slots on `docs/11` plus the genuine target. The long form also returns 3 at head
+— lengthening alone did not free it. `AGENTS.md` §6 item 2 — and, as the verifier put it, the
 same class as §13 row 10, committed in the sentence that documents closing row 10.
 
 **The rule this establishes, and it is applied to every recorded grep in this
 directory:** *a recorded grep must state its hit count **and** say whether the result
 set contains this pass's own text; where it does, the command must be written so it
 cannot.* Lengthening the pattern is **not** a fix here — `…endpoints and field names` is
-carried by this pass's own two command slots (`docs/11:930`, `:1063`) as well as the
-target. The fix that works is the merge-base qualification `git show ab28f58:…`, whose
+carried by this pass's own two command slots as well as the target. The fix that works is the merge-base qualification `git show ab28f58:…`, whose
 result set cannot see this pass's own text; the table below records that form.
 
 **The audit, so the next reader does not have to redo it.** Every reproduction grep this
@@ -591,7 +589,7 @@ pass records, measured at head and at `origin/main`:
 | recorded grep | subject | head | `origin/main` | stable? |
 |---|---|---:|---:|---|
 | `grep -nF '\| A — is \`carelinkhp\` really the clinician portal for every region?' docs/11-…` | `docs/11` | 1 | 1 | **yes** — this pass quotes only a fragment of it, never the full row prefix |
-| `git show ab28f58:docs/11-… \| grep -nF '224 lazy chunks are mined for endpoints and field names'` | `docs/11` | 1 (line 1254; +241 → 1495 at head) | 1 | **yes — qualified to merge-base, so self-text is excluded; the naive in-tree grep returns 3 (930 + 1063 + 1495); two self-quotations plus target; at merge-base only the target exists** |
+| `git show ab28f58:docs/11-… \| grep -nF '224 lazy chunks are mined for endpoints and field names'` | `docs/11` | 1 (merge-base line 1254) | 1 | **yes — qualified to merge-base, so self-text is excluded. The naive in-tree count is 3 while this PR is open (two self-quotations plus the target), but no head line numbers are published: they move with every edit above them.** |
 | `grep -rn 'docs/11-suggested-research-areas\.md:[0-9]' .` | this directory | 1 | n/a | **yes, and self-matching by design** — the one hit is row 3 quoting the cite it retracts (`AGENTS.md` §3), not a live cite |
 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-…` | `docs/10` | 0 | 0 | **yes** |
 | `grep -ciE 'portal .*chunk' docs/10-…` | `docs/10` | 4 | 4 | **yes** — `docs/10` is not edited here |
@@ -858,7 +856,7 @@ Each is a prose or tooling defect, fixed against the same committed artefacts.
 | 14 | `verify-derivable.py` | **checked the census by NAME SET only.** A mutation of `Timeline` at seq 200 changed 104 → 105 and **every check still passed**, because the set of non-zero tokens was unchanged — and `104` is a number `docs/11` publishes | **absence** of coverage — the checker was weaker than the prose it backed | **magnitude checks added** for every scored token on both builds, plus the three published sums (148 / 4 / 172). Re-proven non-vacuous by mutation: seq-200 `Timeline`+1 → **FAIL**; `t_sent`+1 s → **7 FAILs**; `chunk-map.json` support `2076→2077` → **FAIL**; restore → PASS |
 | 15 | `verify-derivable.py` | **never read `chunk-map.json`** — only the `.tsv` — while §8a fact #2 cites `special_case_id_to_name`, which lives in the JSON. A claim sourced from a file the checker does not open is checked nowhere | **absence** of coverage | the checker now reads the JSON and asserts, per build, the `2076 → common` special case, 225 entries / 0 duplicates / 225 distinct hashes, that the display-prefix note survived, and that **JSON and TSV agree on all 225 (id, name, hash)** |
 | 16 | `docs/11:866-867`, `:895-897` | the **caveats existed in the log but two of the three affected figures carried none in the canonical page.** §2's failure is a claim that reads as checkable in `docs/` with its caveat only in a pass's log. The "exactly five bytes" figure had a same-paragraph caveat; **"identical byte offset in both builds"** and **§5d's byte offsets 6 756 / 6 798** had none at their site | **absence**, and the verifier was right to stop short of judging sufficiency | each of the two sites now carries its caveat **before the reader finishes the sentence that states the figure**, naming what is re-derivable (the counts) and what is not (the offsets and quoted bytes), with §1b as the rule |
-| 17 | §8a, `docs/11:930` and `:1063` | **a recorded grep that stopped reproducing the moment this pass documented it.** The cite read `grep -nF '224 lazy chunks are mined for endpoints' docs/11-…`, **1 hit** — true against `origin/main`, and at head the **short** pattern returns **3**, because the sentence at `docs/11:930` and the command slot at `docs/11:1063` are both self-quoting hits, plus the target, and the second command slot (docs/11:1063) is a second self-quoting hit. `AGENTS.md` §6 item 2, and the same class as row 10 committed in the sentence that documents closing row 10 | **disagreement** — a reader running the recorded command got a different answer than the record stated | pattern **lengthened** to `…endpoints and field names` was tried and **did not** make it self-free: the paragraph documenting the command re-quotes the full pattern, so the in-tree count is **3 at head** (docs/11:930 — self-quote #1 — docs/11:1063 — self-quote #2 — and docs/11:1495, the target). Lengthening alone cannot fix a grep whose own description carries the pattern. **Class fix (2026-10-15, round 4):** the recorded command is now qualified to merge-base `ab28f58` — `git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'` — which resolves to **1 hit (line 1254; +241 inserted lines → 1495 at head)** and cannot see this pass's text. The naive in-tree count (3 at head / 1 at origin/main `ab28f58`) is stated alongside it: two self-quotations plus target; at merge-base only the target exists. **The rule from round 3 stands and is strengthened:** a recorded grep's result set must not contain the sentence that documents it; if exclusion is impossible, the count is a **property**, not a number. **The rule is audited over every recorded grep in this directory**, table below. Six of the seven remain stable; the chunk-count row was the one that could not be, and is now recorded as a property plus the merge-base adjustment. |
+| 17 | §8a (the recorded chunk-count grep cite) | **a recorded grep that stopped reproducing the moment this pass documented it.** The cite read `grep -nF '224 lazy chunks are mined for endpoints' docs/11-…`, **1 hit** — true against `origin/main`, and at head the **short** pattern returns **3**, because this page's own command slot and its documentation both quote the pattern, plus the target. `AGENTS.md` §6 item 2, and the same class as row 10 committed in the sentence that documents closing row 10 | **disagreement** — a reader running the recorded command got a different answer than the record stated | pattern **lengthened** to `…endpoints and field names` was tried and **did not** make it self-free: the paragraph documenting the command re-quotes the full pattern, so the in-tree count is **3 at head** (two self-quoting command slots on docs/11 plus the target). Lengthening alone cannot fix a grep whose own description carries the pattern. **Class fix (2026-10-15, round 4):** the recorded command is now qualified to merge-base `ab28f58` — `git show ab28f58:docs/11-suggested-research-areas.md | grep -nF '224 lazy chunks are mined for endpoints and field names'` — which resolves to **1 hit (merge-base line 1254)** and cannot see this pass's text. The naive in-tree count (3 at head / 1 at origin/main `ab28f58`) is stated alongside it: two self-quotations plus target; at merge-base only the target exists. **The rule from round 3 stands and is strengthened:** a recorded grep's result set must not contain the sentence that documents it; if exclusion is impossible, the count is a **property**, not a number. **The rule is audited over every recorded grep in this directory**, table below. Six of the seven remain stable; the chunk-count row was the one that could not be, and is now recorded as a property plus the merge-base adjustment. |
 | 18 | `verify-derivable.py` | **one check could not fail.** The "id differences" line read `[i for i in cl if i != com[i][0] and False]`: `com` is keyed **by id**, so `com[i][0]` is the *name*, and the trailing `and False` hard-wired the result to `[]`. It contradicted no published figure and the property was enforced elsewhere, but it **counted toward the headline while being incapable of failure** — which undercuts §14's own argument | **absence** of a real check, in a script whose whole value is that it can fail | **removed and replaced by three real ones**, checked *before* any per-id lookup so they fire by name in both directions: `committed id keys == re-derived id keys`, `committed rows whose id is absent from the re-derived map`, `re-derived ids the committed map never carried`. The old form was also **shadowed** — a *missing* key makes the per-id lookup raise `KeyError` and abort the run before any boolean could report it. Proven: a mutant with 225 rows and id `2873` relabelled `9999` fails all three by name (the `KeyError` remains as a backstop). **Headline recounted: 125 → 127**, every site that stated it moved |
 | 19 | `verify-derivable.py` | **`REPO = HERE.parents[1]` only resolved at exactly `<repo>/findings-log/<name>/`.** A copy anywhere else raised `FileNotFoundError` on `committed-map.txt` and **exited 1 before checking anything** — which reads as "the checker is red" rather than "the checker could not find its inputs" | **absence** of portability; a reader could not re-run the receipt without rebuilding a depth-correct mirror | replaced with an upward search for a directory holding **both `AGENTS.md` and `findings-log/`**. Proven: the same pass directory copied to `.loop/vr3/pass/` now exits **0 with 127 checks**. Named in §14 |
 
