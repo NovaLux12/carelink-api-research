@@ -592,8 +592,8 @@ pass records, measured at head and at `origin/main`:
 | `grep -rn 'docs/11-suggested-research-areas\.md:[0-9]' .` | this directory | 1 | n/a | **yes, and self-matching by design** — the one hit is row 3 quoting the cite it retracts (`AGENTS.md` §3), not a live cite |
 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-…` | `docs/10` | 0 | 0 | **yes** |
 | `grep -ciE 'portal .*chunk' docs/10-…` | `docs/10` | 4 | 4 | **yes** — `docs/10` is not edited here |
-| `awk '/^## Closed areas/,0' docs/11-suggested-research-areas.md \| grep -ciE '\b209\b\|unswept'` | `docs/11` | 0 | 0 | **yes** |
-| `grep -n '\b209\b' docs/11` | `docs/11` | *not published* (unstable) | **0** | **no — and declared**: every hit sits in this pass's inserted block, none in the pre-existing text (1 in the Result paragraph, the rest in successor 1a). The head count is deliberately not published: it moves with every edit above the block; run `grep -n '\b209\b' docs/11-suggested-research-areas.md` yourself. It is *expected* to fall to 0 if the block is removed, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number |
+| `awk '/^## Closed areas/,0' docs/11-suggested-research-areas.md \| grep -ciE -e '\b209\b' -e unswept` | `docs/11` | 0 | 0 | **yes** |
+| `grep -n '\b209\b' docs/11-suggested-research-areas.md` | `docs/11` | *not published* (unstable) | **0** | **no — and declared**: every hit sits in this pass's inserted block, none in the pre-existing text (1 in the Result paragraph, the rest in successor 1a). The head count is deliberately not published: it moves with every edit above the block; run `grep -n '\b209\b' docs/11-suggested-research-areas.md` yourself. It is *expected* to fall to 0 if the block is removed, so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number |
 
 ⚠ **Corrected 2026-10-15 after verification round 3 — this row was wrong twice, in the
 two ways the row above warns about.** Round 2 recorded this as *"8 at head, 3 at

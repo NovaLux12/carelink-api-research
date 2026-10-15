@@ -995,8 +995,8 @@ first"). Commands and hit counts, at head:
 |---|---|---:|---|
 | `docs/10` §1 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-open-questions.md` | **0** | not there |
 | `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 4 | all incidental — lines 61 (false-hit word list), 63 (config-pointer row), 83 (CHUNK-CORPUS citation), 92 (chunk identifier in a deployment row) |
-| Closed table | `awk '/^## Closed areas/,0' docs/11-suggested-research-areas.md \| grep -ciE '\b209\b\|unswept'` | **0** | not closed |
-| this page | `grep -n '\b209\b' docs/11` | **0 at `origin/main`** — every hit lands inside this pass's inserted block, none in the pre-existing text (1 in the Result paragraph above, the rest in successor 1a). The **head count is not published**: it moves with every edit above the block; run the grep yourself. It is **inherently unstable** — delete the block (or the finding) and the count returns to its pre-pass 0 — so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number | not a duplicate of itself |
+| Closed table | `awk '/^## Closed areas/,0' docs/11-suggested-research-areas.md \| grep -ciE -e '\b209\b' -e unswept` | **0** | not closed |
+| this page | `grep -n '\b209\b' docs/11-suggested-research-areas.md` | **0 at `origin/main`** — every hit lands inside this pass's inserted block, none in the pre-existing text (1 in the Result paragraph above, the rest in successor 1a). The **head count is not published**: it moves with every edit above the block; run the grep yourself. It is **inherently unstable** — delete the block (or the finding) and the count returns to its pre-pass 0 — so it is recorded as a property ("every hit is inside this pass's own text"), not as a fixed number | not a duplicate of itself |
 
 **Non-duplicate, recorded.** ⚠ One related hit **is** a real staleness and is **not**
 this successor: `docs/10`'s config-pointer row still reads *"The one thing a web sweep
