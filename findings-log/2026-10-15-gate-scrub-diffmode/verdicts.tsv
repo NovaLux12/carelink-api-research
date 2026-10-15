@@ -1,0 +1,31 @@
+pattern	mode	cells	rendered	firing	verdict
+vendor API key literal	all	4	4	4	live
+vendor API key literal	staged	4	4	4	live
+vendor API key literal	diff	4	4	4	live
+reports-broker key fragments	all	4	4	4	live
+reports-broker key fragments	staged	4	4	4	live
+reports-broker key fragments	diff	4	4	4	live
+reCAPTCHA site keys	all	4	4	1	live
+reCAPTCHA site keys	staged	4	4	0	dead
+reCAPTCHA site keys	diff	4	4	0	dead
+AWS VPC endpoint service name	all	4	4	4	live
+AWS VPC endpoint service name	staged	4	4	4	live
+AWS VPC endpoint service name	diff	4	4	4	live
+internal Grafana/K8s/GitLab/DB/Prometheus host	all	4	4	4	live
+internal Grafana/K8s/GitLab/DB/Prometheus host	staged	4	4	4	live
+internal Grafana/K8s/GitLab/DB/Prometheus host	diff	4	4	4	live
+internal .corp host	all	4	4	4	live
+internal .corp host	staged	4	4	4	live
+internal .corp host	diff	4	4	4	live
+machine-specific paths	all	4	4	4	live
+machine-specific paths	staged	4	4	4	live
+machine-specific paths	diff	4	4	4	live
+live jsession values	all	4	4	4	live
+live jsession values	staged	4	4	4	live
+live jsession values	diff	4	4	4	live
+live sessionData values	all	4	4	4	live
+live sessionData values	staged	4	4	4	live
+live sessionData values	diff	4	4	4	live
+credential prefixes	all	4	4	4	live
+credential prefixes	staged	4	4	4	live
+credential prefixes	diff	4	4	4	live

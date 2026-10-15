@@ -1,0 +1,58 @@
+# mutants-round2.log — evidence that the round-2 F5 regression test can FAIL.
+#
+# Verifier round 2, finding 2: the round-2 test asserted two strings and passed on the
+# defect it was written for. These two mutants are the proof that the replacement
+# discriminates. A regression test that has never failed on its defect is not evidence.
+#
+#   mutantA  delete ONLY `cd "$REPO"`; the pre-flight guards left intact.
+#            --screen exits 1, and --self-test now FAILS with 3 assertions.
+#   mutantB  delete `cd "$REPO"` AND the pre-flight guards — the true round-1 shape.
+#            --screen exits 1, and --self-test FAILS with 2 assertions.
+#
+# Mutants are built in a scratch COPY; the real worktree is never modified.
+# Every absolute path is replaced with <SCRATCH>: a committed transcript must carry no
+# home path (AGENTS.md §7), and the failure messages quote mktemp directories verbatim.
+# Re-derive by re-running the mutant build described in FINDINGS.md §8.
+
+==============================================================
+=== mutantA : --screen invoked from a foreign cwd
+==============================================================
+  --- screen: repo mutantA, HEAD UNRESOLVED, dirty 0 file(s) ---
+  screen: !! gate :136 reads scripts/scrub-patterns.txt relative to the cwd, unreadable from <SCRATCH>
+    >>> --screen exit=1
+  --- now --self-test on the mutant:
+  FAIL  --screen exited 1 from a foreign cwd (expected 0); output head: --- screen: repo mutantA, HEAD UNRESOLVED, dirty 0 file(s) ---|screen: !! gate :136 reads scripts/scrub-patterns.txt relative to the cwd, unreadable from <SCRATCH>
+  FAIL  --screen reported a non-zero subject count in 0 mode(s), expected 2 — a mode screened nothing
+  FAIL  --screen from a foreign cwd hit the pre-flight guard — the cwd is still load-bearing
+  SELF-TEST FAILED — 3 assertion(s). No verdict from this harness is admissible.
+  >>> --self-test exit=1
+==============================================================
+=== mutantB : --screen invoked from a foreign cwd
+==============================================================
+    .. origin/main unavailable — falling back to --all (fail closed)
+  --- screen: gate leak scan over this branch's diff, mode=all (requested diff), subject files: 0 ---
+    !! no subject files for mode all — a scan that reads nothing is not a clean scan
+    .. origin/main unavailable — falling back to --all (fail closed)
+  --- screen: gate leak scan over this branch's diff, mode=all (requested all), subject files: 0 ---
+    !! no subject files for mode all — a scan that reads nothing is not a clean scan
+    .. origin/main unavailable — falling back to --all (fail closed)
+  --- re-derivable key: --all subject list sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, non-empty subject lines 0 ---
+  --- carve-out over the real --all subject text (supplementary; pattern applied directly) ---
+    .. origin/main unavailable — falling back to --all (fail closed)
+    !! no --all subject files — the carve-out would read nothing and 0 would mean nothing
+    subject files: 0
+    subject lines in the --all text: 0
+    lines the carve-out drops (grep -v '<SCRATCH> 0
+    lines carrying the literal <SCRATCH> 0
+    machine-specific paths, carve-out NOT applied: 0
+    machine-specific paths, carve-out applied (gate :124): 0
+    control, a real machine path, carve-out NOT applied: 1 (expect 1)
+    control, the same line, carve-out applied:           1 (expect 1 — the carve-out must not blanket-disable the net)
+  --- screen: the gate's loop over EVERY file in this log dir, all extensions ---
+    >>> --screen exit=1
+  --- now --self-test on the mutant:
+  FAIL  --screen exited 1 from a foreign cwd (expected 0); output head:   .. origin/main unavailable — falling back to --all (fail closed)|--- screen: gate leak scan over this branch's diff, mode=all (requested diff), subject files: 0 ---|
+  FAIL  --screen reported a non-zero subject count in 0 mode(s), expected 2 — a mode screened nothing
+  ok    --screen from a foreign cwd never reaches the pre-flight guard
+  SELF-TEST FAILED — 2 assertion(s). No verdict from this harness is admissible.
+  >>> --self-test exit=1

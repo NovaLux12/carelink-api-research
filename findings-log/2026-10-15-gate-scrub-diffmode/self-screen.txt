@@ -1,0 +1,17 @@
+--- screen: repo D, run against HEAD d86a21b2b46f7350aeb9f263df363e5a32f305df with 5 dirty file(s) — the tree this RUN read, NOT the commit this transcript ships in; the digest below is the re-derivable key ---
+--- screen: gate leak scan over this branch's diff, mode=diff (requested diff), subject files: 5 ---
+  gate loop FAIL flag: 0, loop verdicts recorded: 10
+--- screen: gate leak scan over this branch's diff, mode=all (requested all), subject files: 208 ---
+  gate loop FAIL flag: 0, loop verdicts recorded: 10
+--- re-derivable key: --all subject list sha256 52b11bd85479178ab69c9f6941a5ee32839e6f7d22a2f9bc8686b38f4b2d877b, non-empty subject lines 45346 ---
+--- carve-out over the real --all subject text (supplementary; pattern applied directly) ---
+  subject files: 208
+  subject lines in the --all text: 45346
+  lines the carve-out drops (grep -v '/home/<user>'): 11
+  lines carrying the literal /home/<user>: 11
+  machine-specific paths, carve-out NOT applied: 0
+  machine-specific paths, carve-out applied (gate :124): 0
+  control, a real machine path, carve-out NOT applied: 1 (expect 1)
+  control, the same line, carve-out applied:           1 (expect 1 — the carve-out must not blanket-disable the net)
+--- screen: the gate's loop over EVERY file in this log dir, all extensions ---
+  ok no pattern fired on any committed artefact in this log directory

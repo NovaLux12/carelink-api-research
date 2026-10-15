@@ -1145,9 +1145,16 @@ checked by and live only on the post-merge path.**
 
 **The distinction that is easy to get wrong, recorded because it is the useful part.**
 `machine-specific paths|(^|[^a-z])/[hH]ome/…` **does** fire behind a `+`, because
-`[^a-z]` matches the plus. **So the dividing line is not "anchored versus unanchored"
-but "anchored at `^`" versus "has an alternative accepting any non-letter"** — and the
-pattern list records which is which for none of its ten entries.
+`[^a-z]` matches the plus. **⚠ Corrected 2026-10-15 (area D, #134): this addendum stated that as a two-way
+division — anchored at `^` versus has an alternative accepting any non-letter — and it
+is not a partition.** The right-hand side is satisfied by **1 of the 10** patterns; the
+other eight are unanchored *and* carry no such alternative, and are live anyway. The
+rule is **one-directional**: **a net is dead behind `+` iff every alternative is
+`^`-anchored.** Carrying a non-letter alternative is one *sufficient* way to satisfy
+that, not a necessary one. The mechanism above is unchanged and survives the correction
+— it is the partition that was wrong, and all ten patterns are re-classified against the
+one-directional rule in [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §3b].
+**The pattern list records which is which for none of its ten entries.**
 
 **Blocker:** **both** available repairs touch the gate's own machinery — strip the `+` at
 `research-gate.sh:108`, or rewrite the pattern to tolerate a leading `+` — and `docs/09`
@@ -1162,6 +1169,188 @@ liveness is unstated is a net whose liveness nobody notices has stopped.
 **Assumptions (INFERRED):** that `:108` is the only `+`-prefixed subject path — `staged`
 mode at `:104` uses the same construction and `--all` at `:106` uses `cat`, so that is a
 reading of the three lines together, not of `:108` alone. Zero requests.
+
+> ⚠ **CORRECTED 2026-10-15 (area D, #134) — both halves of the sentence above are false.**
+> Read at the file: `:104` is
+> `[ -f "$f" ] || continue`, a guard inside the per-file loop, **not** the `staged`
+> construction, which is at **`:107`**; and `:108` is **not** the only `+`-prefixed path —
+> `:107` is a second one with identical semantics, so the count is **2, not 1**. The
+> `105,109` block carries exactly 2 occurrences of `grep '^+' | grep -v '^+++'` and exactly
+> 1 `cat "$f"`, counted rather than read. The premise this sentence supports — *"dead on the
+> path every PR is checked by"* — also **understates** it: the anchored net is dead on
+> **two** paths, `diff` **and** `staged`, and is only partly live in `--all`. Correction,
+> counts and the cell table: the next addendum on this page (area D, §"The correction"), and
+> [findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §1a]. The correction is also
+> appended to the log this addendum came from
+> ([`FINDINGS.md`](../findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md),
+> `## Correction (2026-10-15)`), so the correction is reachable from the source as well as
+> from here. **The superseded wording is retained above rather than deleted** — the same
+> convention the Closed-areas L row uses.
+
+#### Addendum (2026-10-15, area D, pool lane D, issue #134) — the measurement branch: a control cell for each of the ten
+
+**The close condition's second branch is now met on the measurement side, and the area's
+stated assumption above is corrected by the measurement rather than inherited.**
+
+**What was measured** [source: findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §3].
+Every verdict comes from running the gate's own bytes — the `84,94` subject selection, the
+`105,109` `ADDED` construction and the whole `114,136` matching loop are `eval`'d out of
+`scripts/research-gate.sh` at run time, not re-implemented — against a scratch git repo
+holding synthetic lines, in **all three modes**. **45 cells × 10 patterns × 3 modes = 1350
+rows.** Zero requests.
+
+| | `--all` | `staged` | `diff` |
+|---|---|---|---|
+| patterns **live** (≥1 cell fires) | **10 of 10** | **9 of 10** | **9 of 10** |
+| patterns **dead** (0 of 4 cells fire) | 0 | **1** | **1** |
+| patterns **undecidable** | 0 | 0 | 0 |
+| dead net | — | `reCAPTCHA site keys` | `reCAPTCHA site keys` |
+
+**The correction.** The assumption recorded above was that `:108` is the only `+`-prefixed
+subject path and that `staged` sits at `:104`. Both are wrong: **`:107` is a second
+`+`-prefixed path** with identical semantics, and `:104` is `[ -f "$f" ] || continue`, not
+a construction. Counted rather than read — the `105,109` block holds **exactly 2**
+occurrences of `grep '^+' | grep -v '^+++'` and **exactly 1** `cat "$f"`
+[FINDINGS.md §1a]. So the anchored net is dead on **two** paths, not one, and the area's
+premise *"dead on the path every PR is checked by"* understates it.
+
+**The finding the addendum did not have: the `$` end-anchor is the larger restriction.**
+`reCAPTCHA site keys` is anchored at **both** ends, so it does not merely miss a leading
+`+` — it misses **any token not alone on its line**, in `--all` mode too. Cell-for-cell: 1
+of 4 in `--all` (bare at line start), **0 of 4** in `staged` and in `diff`
+[FINDINGS.md §3a]. A key inside a captured response body — where a key of that shape
+actually arrives — would not be caught by this net **in any mode**.
+
+**The distinction the addendum named is now measured, not asserted — and restated, because
+the phrasing it used is not a partition.**
+`machine-specific paths` fires in **4 of 4** cells in **all three modes**, including behind
+a leading `+`, because `[^a-z]` accepts the plus. ⚠ **Corrected 2026-10-15 (verifier round
+1, F3):** the area-F addendum stated the dividing line as a two-way partition — anchored at
+`^` *versus* has an alternative accepting any non-letter — and **1 of the 10** patterns
+satisfies its right-hand side. The other eight are unanchored and carry no such alternative,
+and are live anyway. **The rule is one-directional: a net is dead behind `+` iff every
+alternative is `^`-anchored.** A non-letter alternative is one *sufficient* way to satisfy
+that, not a necessary one — and that is the only correction, because the mechanism is
+unchanged and was independently re-derived rather than read back. All ten patterns are
+re-classified against the one-directional rule in [FINDINGS.md §3b], and the pattern file
+records which is which for **none** of its ten entries.
+
+**Two zero-means-different-things cells** are recorded so a later reader does not merge
+them [FINDINGS.md §3c]: an added line whose **content** starts with `++` renders as `+++…`,
+is indistinguishable from the `+++ b/file` header, and is **dropped whole** by the
+`^+++` filter — no pattern ever sees it. And the loop's only per-pattern carve-out
+(`:123-124`) is currently **not load-bearing**: the documented machine-path example reads
+**0** with the carve-out and **0** without, and **0** either way across the real `--all`
+text at `ab28f58` (206 files, 43,687 non-empty lines).
+
+**Blocker:** the maintenance decision the area already names — strip the `+`, or record
+per pattern whether it survives one, or de-anchor the one anchored net. **Not attempted
+here**, for the `docs/09` §4 reason above.
+
+**Closes when:** that decision is taken and recorded, **and** the committed control set
+(`findings-log/2026-10-15-gate-scrub-diffmode/`) is re-run against it — the harness exits
+non-zero if the gate's blocks move, and its mutation test fails if the measurement stops
+responding to the thing it measures.
+
+**Assumptions (INFERRED):** that `research-gate.yml:43-44` — bare
+`./scripts/research-gate.sh`, i.e. diff mode — is the mode a pull request actually gets.
+It is the ordinary case, but `research-gate.sh:76-82` **fails closed into `--all`** when
+`origin/main` is unresolvable, and this pass observed no CI run. The verdict table is
+therefore stated **per mode** and is not generalised.
+
+> **Update, same day, after the branch was pushed.** The one CI run this PR triggered —
+> `pull_request`, head `research/D-scrub-diffmode-control`, SHA `33895ee` — printed
+> `--- leak scan (mode: diff) ---` as its own mode line and concluded `GATE PASS`
+> [source: findings-log/2026-10-15-gate-scrub-diffmode/FINDINGS.md §4]. So for **one**
+> same-repository pull request the mode is **OBSERVED**, not inferred, and the `diff`
+> column above is the column that PR was actually checked by. The remaining
+> INFERRED part narrows to the `push to main` event and to a **fork** pull request, and
+> successor 1 below is re-scoped to exactly those.
+
+#### Successor to the area-D addendum — 1: which mode do the *other* two events get?
+
+**Derived from what this pass could not establish.** Every verdict above is per-mode. The
+`pull_request` case is now **observed once** (`FINDINGS.md` §4), which retires half of this
+row: what is left is the event CI takes when the diff is gone, and the checkout shape that
+makes the gate change mode without saying so.
+
+**Blocker:** none — zero requests. The gate prints its own mode at `:73`, and
+`research-gate.yml` keeps logs.
+
+**Closes when:** the `--- leak scan (mode: …) ---` line has been read from a real
+`research-gate` run of **each** remaining shape — **`push` to `main`** (which `:47` routes
+to `--all`), and a **fork** pull request or any checkout where `origin/main` does not
+resolve, which is where `:76-82`'s fail-closed fallback decides the mode on its own. **A
+fork PR may not be constructible without an outside contributor's consent, and if so that
+counts as the answer with the reason stated.** Any other mode observed counts equally.
+
+**Assumptions (INFERRED):** that `actions/checkout@v4` with `fetch-depth: 0`
+(`research-gate.yml:15-17`) leaves `origin/main` resolvable for same-repo pull requests.
+⚠ **Corrected 2026-10-15 (verifier round 2) — two axes, and only one of them moved.**
+This row said "supported by one observation … which is one source". Both halves were right
+and the *observation* half then went stale: a second run (`38766246282`, head `d86a21b`,
+`GATE PASS`) has since printed the same `--- leak scan (mode: diff) ---` line, so **two
+runs are observed (`38762357329`, `38766246282`) from one source — this repository's own
+CI**. `AGENTS.md` §2.1's **independence count is unchanged at 1**: two runs of the same
+workflow file, on the same event type, in this repository, are two samples of one source
+(`docs/03` §3a.4), so *independently* is still unavailable. The count that was wrong was
+the observation count, and saying "once" about it was `AGENTS.md` §6 item 1 — a sentence no
+reader could point at. **The INFERRED boundaries are untouched by the second run:** the
+`push to main` event, a fork PR, and any checkout where `origin/main` does not resolve.
+Not load-bearing: the verdict does not depend on it.
+
+#### Successor to the area-D addendum — 2: a per-pattern liveness column, and the fact that no control set can be committed
+
+**Derived from the control set this pass committed.** Two facts fell out of building it: one
+is new to the page, the other restates the addendum above.
+
+⚠ **Partly a restatement, and said so.** The **close condition** below is not new *in shape*
+— the addendum's F3 already asks for the same thing: annotate each pattern's `+`-liveness
+**and** ship a control that proves the answer. It differs in strength: F3 asks for a control
+for **each of the ten**, this successor for **one in ten** (a sample), and it adds the escape
+hatch that fact 1 forces — the control must be assembled at run time, because a committed
+instance would make the gate fire on itself. Of the two facts below, **only the first is new
+to the page** — that no control set can be committed at all; the second (that the `^+++`
+filter is positional) is **carried forward** from **this pass's own addendum above**, not
+from F3: it is new to `main`, and it is only *not new* to a reader who has just read this
+page. Restated here only to keep this successor self-contained. A maintainer reading only
+`main` has seen the close condition's **shape** (F3) and neither fact; one reading this page
+has seen all of it.
+
+1. **All ten nets are self-referential**, so no control set can live in the repo as a
+   fixture: an instance that matches pattern P is by construction text that P matches, and
+   committing one makes the gate fire on its own control. The one literal pattern is worse —
+   its only positive instance is the published value itself, which only the file the gate
+   exempts at `:67` may hold. This pass therefore **assembles instances at runtime from
+   fragments** and commits only counts (`cells.tsv`). The generalisable form: *a gate whose
+   nets are self-referential has no testable fixture form, so "add a fixture" is not an
+   available repair for any of them.*
+2. **The `^+++` filter is positional** (`FINDINGS.md` §3c): a line whose content begins with
+   `++` is deleted before any pattern sees it, and a scan that reports only counts cannot
+   distinguish that from a pattern that did not match.
+
+**Blocker:** none — zero requests, all local.
+
+**Closes when:** `scripts/scrub-patterns.txt` carries a **per-pattern column** stating
+whether the net survives a leading `+`, and one in ten patterns ships a committed control
+that runs **without** writing an instance into a scanned file — e.g. instances derived from
+the exempt pattern file at run time, which is what this pass does and which works. **A
+negative counts**: if the maintainer judged per-pattern annotation unnecessary because
+`:108` is simply fixed, this successor is moot and should be closed with the reason.
+⚠ **The column must state the one-directional rule, not the two-way one this pass first
+published.** A column whose test is *"anchored at `^` versus has an alternative accepting
+any non-letter"* leaves **8 of 10** entries unclassified (verifier round 1, F3): the test
+is **dead behind `+` iff every alternative is `^`-anchored**
+[`FINDINGS.md` §3b], which classifies **10 of 10** with **0** disagreements. **Also here:
+the `docs/09` §4 `.txt` extension-blindness row (`docs/09:206`) has counts measured at
+`cd626d6` that are now stale, and it is annotated in place rather than re-derived** — its
+own counting rule is `git ls-files '*.txt'` against `git ls-files '*.md' '*.yml' '*.yaml'
+'*.sh' '*.hurl'` minus the two excluded files, so whoever picks it up has the command
+already written down and this pass does not vouch for `31`, `126` or `1216`.
+
+**Assumptions (INFERRED):** that a per-pattern annotation is cheaper than the alternative
+of stripping the `+`. The opposite is defensible — the area records both repairs, and this
+row does not argue for one.
 
 
 ## Tier 2 — cheap, moderate value
