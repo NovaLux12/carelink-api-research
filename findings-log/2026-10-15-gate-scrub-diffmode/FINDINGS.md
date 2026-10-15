@@ -451,7 +451,9 @@ precisely those three.
   not exercised and no delay is claimed.
 - **Files:** `FINDINGS.md` (this file), `scrub-diffmode-control.sh` (the probe
   record — the thing that produced every number here), `run.log` (full
-  transcript), `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
+  transcript, taken at revision `d86a21b` — before the five round-2 `--self-test`
+  assertions were added; every *measured* number in it is unchanged at this revision, only
+  the self-test line count differs, §8b), `cells.tsv` (1350 rows: mode · cell · pattern · hits ·
   rendered_lines), `verdicts.tsv` (the derived per-pattern table), `self-screen.txt` (the `--screen`
   transcript), `results.jsonl` (empty).
 - **Committed artefacts contain no instance text and no absolute home path.**
@@ -564,13 +566,18 @@ verifier and is disclosed here in the same spirit as the first two:
   now says **"the tree this RUN read, NOT the commit this transcript ships in"**, and the
   re-derivable key is the **sha256 of the `--all` subject list plus its non-empty line
   count**, printed on its own line. Anyone checking out any later commit re-runs `--screen`
-  and gets the same digest if and only if nothing the gate reads moved.
+  and gets the same **pair** if and only if nothing the gate reads moved. The digest is over
+  the *filename list* only, so it does not move when a file's content does; it is the line
+  count beside it that moves — the pair, not the digest, is the key.
 
 ### 7b. The grep-first duplicate test (`CONTRIBUTING-research.md:199`)
 
 Both successors were checked against `docs/10` §1, the `docs/11` Closed table and
 `docs/11` itself **before** publication, and the commands and results are recorded here
-rather than asserted. **Neither successor is a duplicate; neither was narrowed.**
+rather than asserted. **Successor 1 is not a duplicate. Successor 2 is a partial
+restatement, and is disclosed as one rather than claimed clean:** its *close condition* is
+the one the addendum's F3 already carries (third grep below); only its *two facts* are new.
+Neither was narrowed.
 
 ```
 $ grep -nEi "mode: diff|leak scan|fail.closed|fork (PR|pull request)|push to main" \
@@ -587,12 +594,15 @@ $ grep -nE "leak scan|scrub pattern|scrub-patterns|research-gate\.sh" \
 $ grep -nEi "per-pattern|survives a leading|liveness column|no control set|self-referential net" \
       docs/10-open-questions.md docs/09-methodology-and-oracles.md
   exit=1 — no match
-$ grep -c "#### Successor to the area-D addendum" docs/11-suggested-research-areas.md
+$ grep -c "^#### Successor to" docs/11-suggested-research-areas.md
+  7   (4 area F — untouched; 2 area D — this pass's successors 1 and 2; 1 area K. Counted,
+       not line-numbered: this pass's own successors move with every edit above them.)
+$ grep -c "^#### Successor to the area-D addendum" docs/11-suggested-research-areas.md
   2   (successors 1 and 2, both this pass)
-$ grep -n "^#### Successor to" docs/11-suggested-research-areas.md
-  564, 618, 822, 852   (area F — untouched, different area)
-  995, 1017            (area D — this pass)
-  1710                 (area K)
+$ grep -cE "records per pattern whether it survives a leading|carries a \*\*per-pattern column\*\*" \
+      docs/11-suggested-research-areas.md
+  2   (the pre-existing F3 close condition AND successor 2's restatement of it — the arm
+       the block greps above did NOT test; see the disclosure below)
 ```
 
 **Against the quality bar (`CONTRIBUTING-research.md:195-200`):**

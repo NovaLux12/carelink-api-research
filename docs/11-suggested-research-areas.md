@@ -1061,6 +1061,13 @@ Not load-bearing: the verdict does not depend on it.
 **Derived from the control set this pass committed.** Two facts fell out of building it, and
 neither is recorded anywhere.
 
+⚠ **Partly a restatement, and said so.** The **close condition** below is *not* new — the
+addendum's F3 already states the same one: strip the `+` from the diff-mode subject lines,
+**or** annotate every pattern for `+`-liveness **and** ship a control per pattern that proves
+the answer. What is new here is **only the two facts** below: that no control set can be
+committed at all, and that the `^+++` filter is positional. A maintainer who has read the
+addendum has already seen the close condition.
+
 1. **All ten nets are self-referential**, so no control set can live in the repo as a
    fixture: an instance that matches pattern P is by construction text that P matches, and
    committing one makes the gate fire on its own control. The one literal pattern is worse —
