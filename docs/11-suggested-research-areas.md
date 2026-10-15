@@ -1608,7 +1608,7 @@ is the trap:** a `200` carrying `{}` is not evidence of an empty schema.
 complete public config set the clinic app uses. A client may call a subset, so a
 404 on a key the client calls would be drift, not absence.
 
-### L. Recovery of the retired `ipro/hcp` JSF surface
+#### L. Recovery of the retired `ipro/hcp` JSF surface
 
 #### Addendum (2026-10-15, from pool L continuation, claim #126): **the window census is complete — 0 of 84 unread — and the family has dates in 2017, 2019, 2020 and 2021**
 
@@ -1989,7 +1989,7 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 2 open plus 25 closed — and the priorities page's own gate
+**Every letter A–Z is now in use** — 1 open plus 25 closed — and the priorities page's own gate
 `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
 at once: it is invisible to the pattern, and the page's stated count would then disagree with its
 own contents. This was already recorded for the sub-declared-gap question in
