@@ -516,8 +516,11 @@ is adjudicated below.
 > pass recorded bare counts and round 2 of verification found all three had gone
 > stale **in the very commit that invalidated them** — this pass edited `docs/11` in
 > six hunks and did not re-run or re-state them. Re-running and pasting new numbers
-> would have fixed one instance of a bug that fires every time the page is edited,
-> and it fires anyway, because four lanes in this pool edit `docs/11` at once.
+> would have fixed one instance of a bug that fires each time the page moves under a
+> count that did not travel with it — and four lanes in this pool edit `docs/11` at
+> once, so the page moves. **That the four lanes' merges happened to leave every count
+> in this section unchanged is a measurement, not a reprieve**: see the merge-order
+> note in *Correction (2026-10-15) — round 4*.
 >
 > **Counts below are as of `3449e14bc0349c4e35b5f03342b701d1ed3ab267`** (this
 > branch's head at the time of writing). The +2 over round 1 arrived with **that**
@@ -1236,6 +1239,7 @@ printed consumer's span.
 |---|---|---|---|
 | 1 | the consumer "runs **2 964 111 – 2 964 344** (234 B)" — stated at §3.1, twice in §11, and in *Correction — round 3* | **2 964 111 – 2 964 343**, **233 B** | 2 964 344 is not part of the consumer. It closes the `(` at **2 964 008** — a **337-byte enclosing call** — while the consumer's own argument list opens at **2 964 118** and closes at **2 964 343**. The quoted JS is the arbiter: it ends `…(0,e.of)(null)`, `}`, `)` — the `}` at 2 964 342 closes the arrow, the `)` at 2 964 343 closes the call. The published span appended **one byte of a different expression** to a 233-byte block |
 | 2 | `docs/05`'s blockquote said the line pointers it withdrew were replaced by "a grep the reader can re-run, which is also why the count is given as a count and not as pointers" | the sentence now says what the command prints is produced on the reader's own tree, and publishes no number | the sentence promised a count it did not give. Same class as row 1: a claim about an artefact that does not match the artefact |
+| 3 | §10's blockquote said the stale-count bug "fires every time the page is edited … because four lanes in this pool edit `docs/11` at once", and `dup-test.sh`'s printed NOTE said any later commit touching `docs/10`/`docs/11` "**will** move these counts" | both now say **can** move, and state that a count is evidence only at the SHA the script printed; the merge note in this section is named as the measurement | measured: merging all four pool lanes moved **none** of §10's counts, and a second merge order gives a byte-identical `docs/11`. The absolute was a prediction shipped in the **same commit** as its own disproof, unreconciled — the failure this pass names twice elsewhere |
 
 **How row 1 was re-derived, so it can be disputed rather than believed.** Bracket
 matching over the digest-pinned body (`0fb4fbd4…`, 3 417 255 B) gives, for every
@@ -1259,8 +1263,11 @@ is why round 3 could correct the *other* end of this same span and leave this on
 Every counted figure in §10 was re-measured on a scratch clone with all four passes
 merged: `45559` = **9**, `false-positive` = **1**, `Samsung` = **3**, and `dup-test.sh`'s
 whole output is identical apart from the repo path and HEAD it prints — which is the
-point of printing them. The counts are bound to `3449e14` and no sibling pass moves them.
-`docs/05`, the other file this PR edits, is touched by none of the other three.
+point of printing them. The counts are bound to `3449e14`, and **no sibling pass moves them** — that is a
+measurement of *these four passes*, not a property of the pool: a fifth pass editing
+`docs/11` would have to be re-measured, which is exactly why `dup-test.sh` prints the
+SHA it counted at rather than a bare number. `docs/05`, the other file this PR edits,
+is touched by none of the other three.
 
 **What did not move, and was re-checked rather than assumed.** The token census
 (`BLE_X` 2 occurrences / 0 reads, `BLE` 52 = 4 + 1 + 47, 47 = 34 + 13), the declaration

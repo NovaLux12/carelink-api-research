@@ -52,9 +52,13 @@ if git rev-parse --verify HEAD >/dev/null 2>&1; then
   echo "  tree counted  : the working tree as of the line above."
   echo "  NOTE          : any later commit touching docs/10 or docs/11 — INCLUDING"
   echo "                  this pass's own hunks, and including any other lane's, since"
-  echo "                  four lanes edit docs/11 in this pool — will move these"
-  echo "                  counts. That is expected. Re-run this script and cite the new"
-  echo "                  SHA; do not carry a count forward un-pinned."
+  echo "                  four lanes edit docs/11 in this pool — CAN move these counts:"
+  echo "                  a count is evidence only at the SHA printed above. (Measured,"
+  echo "                  not assumed: merging all four pool lanes moved none of them —"
+  echo "                  see FINDINGS.md section 10's merge-order note. That is a"
+  echo "                  result for these four passes, not a guarantee for the next"
+  echo "                  edit.) Re-run this script and cite the new SHA; do not carry"
+  echo "                  a count forward un-pinned."
 else
   echo "  HEAD          : (no git — counts below are unpinned and should not be cited)"
 fi
