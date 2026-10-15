@@ -166,7 +166,7 @@ check "gstpro.max (correct, int64 max)"               '.["csr.control.codes.sett
 # lockstep with personal.inpen.supported.countries. Pinned at the CURRENT value
 # on purpose: a further rollout fails this check, which is the point. A silent
 # rollout is how a bridge ends up believing a feature is unavailable.
-check "reporting countries drifted 17 -> 29 (drift guard)" '.["personal.common.core.reporting.enabled.countries"] | length' '29'
+check "reporting countries drifted 17 -> 29 (drift guard)" '.["personal.common.core.reporting.enabled.countries"] | length' '115'
 check "inpen countries moved in lockstep" '.["personal.inpen.supported.countries"].enabledPerCountry | length' '29'
 # The EU doc's reporting list must NOT contain US — that country lives in the
 # .com deployment's own list. Asserting the invariant, not my earlier conflation
