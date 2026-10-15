@@ -1,0 +1,41 @@
+seq	role	host_tag	path	http	bytes	records	ipro	minimed_hosts	t_queued	t_sent	t_done
+1	inventory	COLLINFO	/collinfo.json	200	35226	0	0		2026-10-14T22:54:46.204Z	2026-10-14T22:54:50.156Z	2026-10-14T22:54:50.162Z
+2	control	CTRL-2022-05	/CC-MAIN-2022-05-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	504	167	0	0		2026-10-14T22:55:05.954Z	2026-10-14T22:55:19.781Z	2026-10-14T22:55:19.786Z
+3	control	CTRL-2022-05	/CC-MAIN-2022-05-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	2214	5	0	commoncrawl.org	2026-10-14T22:55:19.817Z	2026-10-14T22:55:26.981Z	2026-10-14T22:55:26.986Z
+4	probe-domain	IPRO-2022-05	/CC-MAIN-2022-05-index?url=minimed.eu&output=json&matchType=domain	404	48	0	0		2026-10-14T22:55:27.264Z	2026-10-14T22:55:39.380Z	2026-10-14T22:55:39.385Z
+5	control-absent	ABSENT-2020-50	/CC-MAIN-2020-50-index?url=zz-area-l-absent-20261013.minimed.eu&output=json&matchType=host	404	74	0	0		2026-10-14T22:55:39.413Z	2026-10-14T22:55:45.763Z	2026-10-14T22:55:45.768Z
+6	control-positive	POS-2020-50	/CC-MAIN-2020-50-index?url=carelink.minimed.eu&output=json&matchType=host&limit=5	502	157	0	0		2026-10-14T22:55:45.798Z	2026-10-14T22:55:55.849Z	2026-10-14T22:55:55.901Z
+7	control-positive	POS-2020-50	/CC-MAIN-2020-50-index?url=carelink.minimed.eu&output=json&matchType=host&limit=5	200	2234	5	3	carelink.minimed.eu	2026-10-14T22:55:55.121Z	2026-10-14T22:56:06.417Z	2026-10-14T22:56:06.421Z
+8	control	CTRL-2013-20	/CC-MAIN-2013-20-index?url=google.com&output=json&matchType=domain&limit=5	200	1764	5	0	www.google.com	2026-10-14T22:56:11.570Z	2026-10-14T22:56:16.874Z	2026-10-14T22:56:16.880Z
+9	probe-host	IPRO-2013-20	/CC-MAIN-2013-20-index?url=carelink.minimed.eu&output=json&matchType=host	404	57	0	0		2026-10-14T22:56:16.913Z	2026-10-14T22:56:21.481Z	2026-10-14T22:56:21.542Z
+10	control	CTRL-2021-04	/CC-MAIN-2021-04-index?url=google.com&output=json&matchType=domain&limit=5	200	1966	5	0	google.com,www.google.com	2026-10-14T22:56:21.861Z	2026-10-14T22:56:33.143Z	2026-10-14T22:56:33.194Z
+11	probe-host	IPRO-2021-04	/CC-MAIN-2021-04-index?url=carelink.minimed.eu&output=json&matchType=host	404	57	0	0		2026-10-14T22:56:33.485Z	2026-10-14T22:56:42.260Z	2026-10-14T22:56:42.265Z
+12	control	CTRL-2014-15	/CC-MAIN-2014-15-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	1942	5	0	commoncrawl.org	2026-10-14T22:56:45.562Z	2026-10-14T22:56:52.274Z	2026-10-14T22:56:52.278Z
+13	probe-domain	IPRO-2014-15	/CC-MAIN-2014-15-index?url=minimed.eu&output=json&matchType=domain	502	157	0	0		2026-10-14T22:56:52.306Z	2026-10-14T22:57:03.984Z	2026-10-14T22:57:03.990Z
+14	probe-domain	IPRO-2014-15	/CC-MAIN-2014-15-index?url=minimed.eu&output=json&matchType=domain	504	167	0	0		2026-10-14T22:57:04.292Z	2026-10-14T22:57:17.832Z	2026-10-14T22:57:17.837Z
+15	probe-domain	IPRO-2014-15	/CC-MAIN-2014-15-index?url=minimed.eu&output=json&matchType=domain	200	1590	4	4	carelink.minimed.eu	2026-10-14T22:57:17.864Z	2026-10-14T22:57:25.371Z	2026-10-14T22:57:25.376Z
+16	control	CTRL-2014-23	/CC-MAIN-2014-23-index?url=google.com&output=json&matchType=domain&limit=5	400	85	0	0		2026-10-14T22:57:25.408Z	2026-10-14T22:57:34.722Z	2026-10-14T22:57:34.727Z
+17	control	CTRL-2014-23	/CC-MAIN-2014-23-index?url=google.com&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T22:57:34.755Z	2026-10-14T22:57:46.979Z	2026-10-14T22:57:46.984Z
+18	control	CTRL-2014-23	/CC-MAIN-2014-23-index?url=google.com&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T22:57:47.223Z	2026-10-14T22:57:55.196Z	2026-10-14T22:57:55.201Z
+19	probe-domain	IPRO-2014-23	/CC-MAIN-2014-23-index?url=minimed.eu&output=json&matchType=domain	404	48	0	0		2026-10-14T22:57:55.229Z	2026-10-14T22:58:09.148Z	2026-10-14T22:58:09.196Z
+20	control	CTRL-2015-11	/CC-MAIN-2015-11-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	1640	5	0	commoncrawl.org	2026-10-14T22:58:09.480Z	2026-10-14T22:58:16.951Z	2026-10-14T22:58:16.956Z
+21	probe-domain	IPRO-2015-11	/CC-MAIN-2015-11-index?url=minimed.eu&output=json&matchType=domain	200	327	1	0	carelink.minimed.eu	2026-10-14T22:58:16.985Z	2026-10-14T22:58:21.970Z	2026-10-14T22:58:21.974Z
+22	control	CTRL-2016-07	/CC-MAIN-2016-07-index?url=google.com&output=json&matchType=domain&limit=5	200	1787	5	0	www.google.com	2026-10-14T22:58:22.441Z	2026-10-14T22:58:26.422Z	2026-10-14T22:58:26.962Z
+23	probe-domain	IPRO-2016-07	/CC-MAIN-2016-07-index?url=minimed.eu&output=json&matchType=domain	200	369	1	0	carelink.minimed.eu	2026-10-14T22:58:26.388Z	2026-10-14T22:58:30.951Z	2026-10-14T22:58:30.956Z
+24	control	CTRL-2017-09	/CC-MAIN-2017-09-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	1819	5	0	commoncrawl.org,www.commoncrawl.org	2026-10-14T22:58:30.984Z	2026-10-14T22:58:35.223Z	2026-10-14T22:58:35.228Z
+25	probe-domain	IPRO-2017-09	/CC-MAIN-2017-09-index?url=minimed.eu&output=json&matchType=domain	200	2413	6	0	carelink.minimed.eu,www.carelink.minimed.eu	2026-10-14T22:58:35.257Z	2026-10-14T22:58:45.172Z	2026-10-14T22:58:45.176Z
+26	control	CTRL-2019-04	/CC-MAIN-2019-04-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	2303	5	0	commoncrawl.org	2026-10-14T22:58:52.428Z	2026-10-14T22:58:56.642Z	2026-10-14T22:58:56.647Z
+27	probe-domain	IPRO-2019-04	/CC-MAIN-2019-04-index?url=minimed.eu&output=json&matchType=domain	502	157	0	0		2026-10-14T22:58:56.676Z	2026-10-14T22:59:05.487Z	2026-10-14T22:59:05.492Z
+28	probe-domain	IPRO-2019-04	/CC-MAIN-2019-04-index?url=minimed.eu&output=json&matchType=domain	200	5012	12	0	carelink.minimed.eu,minimed.eu	2026-10-14T22:59:05.520Z	2026-10-14T22:59:09.759Z	2026-10-14T22:59:09.764Z
+29	control	CTRL-2020-05	/CC-MAIN-2020-05-index?url=google.com&output=json&matchType=domain&limit=5	504	167	0	0		2026-10-14T22:59:09.792Z	2026-10-14T22:59:23.592Z	2026-10-14T22:59:23.597Z
+30	control	CTRL-2020-05	/CC-MAIN-2020-05-index?url=google.com&output=json&matchType=domain&limit=5	200	1974	5	0	www.google.com	2026-10-14T22:59:23.626Z	2026-10-14T22:59:37.248Z	2026-10-14T22:59:37.253Z
+31	probe-domain	IPRO-2020-05	/CC-MAIN-2020-05-index?url=minimed.eu&output=json&matchType=domain	200	1385	3	0	carelink.minimed.eu	2026-10-14T22:59:37.281Z	2026-10-14T22:59:47.829Z	2026-10-14T22:59:47.890Z
+32	control	CTRL-2021-10	/CC-MAIN-2021-10-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	200	2417	5	0	commoncrawl.org	2026-10-14T22:59:47.123Z	2026-10-14T22:59:52.649Z	2026-10-14T22:59:52.653Z
+33	probe-domain	IPRO-2021-10	/CC-MAIN-2021-10-index?url=minimed.eu&output=json&matchType=domain	200	1257	3	0	carelink.minimed.eu	2026-10-14T22:59:52.682Z	2026-10-14T23:00:00.921Z	2026-10-14T23:00:00.927Z
+34	control	CTRL-2022-27	/CC-MAIN-2022-27-index?url=google.com&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T23:00:00.957Z	2026-10-14T23:00:13.862Z	2026-10-14T23:00:13.867Z
+35	control	CTRL-2022-27	/CC-MAIN-2022-27-index?url=google.com&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T23:00:13.894Z	2026-10-14T23:00:25.198Z	2026-10-14T23:00:25.203Z
+36	control	CTRL-2022-27	/CC-MAIN-2022-27-index?url=google.com&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T23:00:25.232Z	2026-10-14T23:00:34.375Z	2026-10-14T23:00:34.379Z
+37	probe-domain	IPRO-2022-27	/CC-MAIN-2022-27-index?url=minimed.eu&output=json&matchType=domain	502	157	0	0		2026-10-14T23:00:34.407Z	2026-10-14T23:00:43.589Z	2026-10-14T23:00:43.593Z
+38	probe-domain	IPRO-2022-27	/CC-MAIN-2022-27-index?url=minimed.eu&output=json&matchType=domain	400	99	0	0		2026-10-14T23:00:43.623Z	2026-10-14T23:00:55.305Z	2026-10-14T23:00:55.310Z
+39	probe-domain	IPRO-2022-27	/CC-MAIN-2022-27-index?url=minimed.eu&output=json&matchType=domain	200	4403	9	1	carelink.minimed.eu	2026-10-14T23:00:55.342Z	2026-10-14T23:01:06.781Z	2026-10-14T23:01:06.786Z
+40	control	CTRL-2014-23-cc	/CC-MAIN-2014-23-index?url=commoncrawl.org&output=json&matchType=domain&limit=5	502	157	0	0		2026-10-14T23:01:19.677Z	2026-10-14T23:01:30.254Z	2026-10-14T23:01:30.259Z

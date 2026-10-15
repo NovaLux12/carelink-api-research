@@ -1,0 +1,6 @@
+probe-domain	IPRO-CC-MAIN-2016-50	/CC-MAIN-2016-50-index?url=minimed.eu&output=json&matchType=domain	domain-2016-50
+probe-domain	IPRO-CC-MAIN-2019-09	/CC-MAIN-2019-09-index?url=minimed.eu&output=json&matchType=domain	domain-2019-09
+probe-domain	IPRO-CC-MAIN-2020-45	/CC-MAIN-2020-45-index?url=minimed.eu&output=json&matchType=domain	domain-2020-45
+probe-domain	IPRO-CC-MAIN-2021-49	/CC-MAIN-2021-49-index?url=minimed.eu&output=json&matchType=domain	domain-2021-49
+control	CTRL-CC-MAIN-2020-40	/CC-MAIN-2020-40-index?url=google.com&output=json&matchType=domain&limit=5	ctrl-2020-40-google
+probe-domain	IPRO-CC-MAIN-2020-40	/CC-MAIN-2020-40-index?url=minimed.eu&output=json&matchType=domain	domain-2020-40
