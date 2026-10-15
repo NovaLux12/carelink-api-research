@@ -431,13 +431,16 @@ with a Guardian-era device reaching that code by a different route.
 > **Scope:** the eager main only. The patient lazy corpus was not swept for `_X`
 > reads, so this is **not** a claim that the two members are read nowhere in the
 > client's code. The earlier reading is preserved above rather than edited out
-> (`AGENTS.md` §3). ⚠ **A downstream consumer still owes this correction.** The
-> declared-vs-matched distinction moves the **family vocabulary**, one of the
-> constants `AGENTS.md` §3 names as bridge-pinned; a matcher built on the declared
-> five is no worse off, but the *documented basis* for it is now known to be the
-> declared set rather than the matched set. **The `downstream-bridge` issue for this
-> does not exist yet and the orchestrator opens it** — this pass is not authorised to
-> open issues [source:
+> (`AGENTS.md` §3). ⚠ **No downstream notification is owed, and the reason is worth
+> recording.** The declared-vs-matched distinction bears on the **family vocabulary**,
+> one of the constants `AGENTS.md` §3 names as bridge-pinned — but §3 fires *"when a
+> finding changes a value the bridge pins"*, and **no value changes here.** The six
+> family values are exactly as they were; what moved is a **consumption** fact about
+> the *vendor's own client* (five declared, three matched). A bridge matcher built on
+> the declared five is no worse off, and arguably safer, since
+> `"BLE_X".startsWith("BLE")` already holds. **§3's trigger therefore does not fire,
+> and no `downstream-bridge` issue is owed.** One would be owed only if a later pass
+> finds a pinned value actually moving [source:
 > findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §4, §11, §12].
 
 **Also resolved:** the casing correction `timecapUnscrewed` → `timeCapUnscrewed` is real
@@ -554,12 +557,23 @@ denominator is re-derivable from a clean clone:
 > `key == value` for all five — so there is nothing false in it to overwrite. The
 > defect is the *label* calling a declared set a "matcher", and that defect lives
 > in the reading, not in the number; so the correction goes where a reader of the
-> table meets it, without rewriting quoted history (`AGENTS.md` §3). ⚠ **This is not
-> a convention this page follows** — `:497`, `:515` and `:524` are corrections from
-> earlier passes sitting *inside* blockquotes — so the reason is stated rather than
-> assumed, and the reason is the number being true, not a house style. The rows
-> concerned are **"the client matcher enum | 5"** and **"the client's comparison set,
-> incl. `NGP` | 6"**:
+> table meets it, without rewriting quoted history (`AGENTS.md` §3).
+> ⚠ **"Quoted history inside a blockquote is evidence" is not a rule this page holds
+> to**, and this correction round's first attempt cited three line numbers to prove
+> it — all three of which this PR's own edits had moved off. Replaced by a grep the
+> reader can re-run, which is also why the count is given as a count and not as
+> pointers:
+>
+> ```
+> grep -n '^> .*\(⚠\|Correction\|Corrected\|Deleted\|RETRACTED\)' \
+>      docs/05-devices-and-vocabulary.md | grep -v '#132' | wc -l
+> ```
+>
+> The clearest instance is **inside this very blockquote**: area R wrote a correction
+> into its own audit, *"⚠ **What is and is not pinned here, stated rather than left to
+> be discovered.**"* So the reason for leaving this table verbatim is **the number
+> being true**, not a house style. The rows concerned are **"the client matcher enum |
+> 5"** and **"the client's comparison set, incl. `NGP` | 6"**:
 >
 > - **`5` is a correct *declared* count and an incorrect *matched* count.** The enum
 >   at byte 1,723,245 — the very declaration this row cites — declares five members,

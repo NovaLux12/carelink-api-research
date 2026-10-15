@@ -155,7 +155,27 @@ without showing up in the member-read table.
 **Member reads: 3. Distinct members read: 3 of 5.** `BLE_X` and `SIMPLERA_X` have
 **0 reads**.
 
-The single consumer, read in full (bytes 2 964 176 – 2 964 322):
+> **THE BYTE FRAME, stated once and used everywhere.** This log reports offsets in
+> **two** frames and they differ by 4, so a reader joining two of its own tables can
+> come out with a different partition. Stated here, once:
+>
+> | frame | the three member reads | used for |
+> |---|---|---|
+> | **site offset** — the first byte of the whole `o.G.<MEMBER>` expression | 2 964 176 / 2 964 215 / 2 964 259 | §3.1's read table, `§8`, `census.txt` §D and §L |
+> | **token offset** — the first byte of the member name itself | 2 964 180 / 2 964 219 / 2 964 263 | §3.2's `BLE`/`SIMPLERA`/`GUARDIAN` census and §11's partition |
+>
+> **The delta is 4: `len("o.G.")`.** And the *span width* matters as much as the
+> frame: a "member read" spans `len("o.G." + MEMBER)` — 7 bytes for `.BLE`, 12 for
+> `.SIMPLERA` and `.GUARDIAN`. Build that span any narrower — say `site..site+3`, the
+> length of the token `BLE` — and the token at `site+4` falls outside it, and the
+> §3.2 partition comes out **4 + 0 + 48** and **34 + 14** instead of the published
+> **4 + 1 + 47** and **34 + 13**. **The published numbers are the correct ones**,
+> because a member read *is* `o.G.<MEMBER>`, but the rule that selects them was
+> undeclared until now, and a re-runner joining this log's own two tables got a
+> different answer.
+
+The single consumer, read in full — **bytes 2 964 111 – 2 964 344** inclusive, 234 B,
+which is the whole `(0,a.n)(({deviceFamily:p})=>{…})` expression:
 
 ```js
 (0,a.n)(({deviceFamily:p})=>{
@@ -195,17 +215,43 @@ meaningless claim and "0 case-sensitive hits" is not. Read individually
     `TABLETS_RE` counts once, under its own identifier, and not again as `TABLE`.
     These are summed in `census.txt` §E and total **34**.
   - **13 are standalone `BLE` tokens** — the maximal run *is* `BLE` — and they are a
-    **third, unrelated sense of the same three letters**: bytes 3 316 707 – 3 321 247
-    are the pump's Bluetooth debug-event catalogue, whose records carry the shape
-    `{type:…, label:…, severity:…, description:…}`. All 13 are a `label:` or a
-    `description:` value: **6 `label:`** (`"BLE Param Update"`, `"BLE Param Update
-    Complete"`, `"BLE Pair Request"`, `"BLE Key Exchange"`, `"BLE Key Received"`,
-    `"BLE Connection"`) and **7 `description:`** (`"BLE connection parameters
-    updated"`, `"BLE connection parameter update completed"`, `"BLE GAP pairing
-    request"`, `"BLE GAP key exchange"`, `"BLE GAP key received"`, `"BLE long term
-    key event"`, `"BLE connection parameter update"`). `BLE` abbreviates Bluetooth
-    Low Energy in both fields. Same token, different sense, same file. A pass that
-    counted `BLE` hits would have reported a 52-member surface.
+    **third, unrelated sense of the same three letters**: `BLE` abbreviates
+    Bluetooth Low Energy inside a **debug-log event catalogue**, whose records carry
+    the shape `{type:…, label:…, severity:…, description:…}` and which is grouped
+    into **three** arrays by log source. **The hits do not belong to one of them:**
+
+    | group header | its own array | entries | of the 13 |
+    |---|---|---:|---:|
+    | `source:"sensor", label:"Sensor Traces"` @3 314 760 | 3 314 809 – 3 318 475 | 33 | **11** |
+    | `source:"pump", label:"Pump Diagnostic Logs"` @3 318 479 | 3 318 533 – 3 320 922 | 20 | **1** |
+    | `source:"app", label:"Mobile App Logs"` @3 320 926 | 3 320 974 – 3 322 899 | 17 | **1** |
+
+    All 13 are a `label:` or a `description:` value: **6 `label:`** (`"BLE Param
+    Update"`, `"BLE Param Update Complete"`, `"BLE Pair Request"`, `"BLE Key
+    Exchange"`, `"BLE Key Received"`, `"BLE Connection"`) and **7 `description:`**
+    (`"BLE connection parameters updated"`, `"BLE connection parameter update
+    completed"`, `"BLE GAP pairing request"`, `"BLE GAP key exchange"`, `"BLE GAP
+    key received"`, `"BLE long term key event"`, `"BLE connection parameter
+    update"`). Same token, different sense, same file. A pass that counted `BLE`
+    hits would have reported a 52-member surface.
+
+> ⚠ **⚠ The span this section cited for the printed consumer, "bytes 2 964 176 –
+> 2 964 322", bounded neither end.** The block starts **65 bytes earlier**, at
+> 2 964 111, and ends **22 bytes later**, at 2 964 344. 2 964 176 is not the start of
+> the code at all — it is the first `o.G.` **read** inside it. Same class as the
+> span fault below: a bound that is neither a start nor an end is not a bound.
+
+> ⚠ **⚠ This paragraph previously said "bytes 3 316 707 – 3 321 247 are the pump's
+> Bluetooth debug-event catalogue", and that was wrong twice over.** The span is the
+> span of **the 13 hits**, not the span of any catalogue — the first of them sits
+> **1 898 bytes inside** the array it belongs to. And **only 1 of the 13 is the
+> pump's**: 11 are `source:"sensor"`, 1 `source:"pump"`, 1 `source:"app"`. Calling a
+> span that spans three owners by one of their names is `AGENTS.md` §6 item 5 — and
+> it is F8's defect recurring verbatim, in the paragraph F8's own correction was
+> written beside. It had also propagated into `docs/11` successor **(b)**, which
+> proposes to enshrine it in the `docs/09` §4 register; both are corrected. The
+> three-way split is re-derivable: `grep -o 'source:"[a-z]*"'` over each hit's own
+> array.
 
 > ⚠ **The enumeration above previously read "three hits … and **nine** more", which
 > summed to 12 — one short of its own total.** The bytes give **6 `label:` + 7
@@ -260,13 +306,21 @@ are zeros.
 `findings-log/probe-2026-10-08/recov/PATIENT-APP-VOCABULARY.md:62-63` records that
 the patient bundle's NGP search produced "three apparent matches … Samsung
 user-agent strings", and `docs/09` §4 and `docs/05` repeat the figure. This pass
-measures, on the digest-pinned 2026-10-13 build: **`NGP` case-sensitive = 0**; 94
-case-insensitive hits, and **every one** of them the letters `ngP` inside a longer
-identifier — 93 as `ngP` and **one** as lower-case `ngp` (inside `bingpreview`) —
-in `numberingPlan` / `pendingPageScroll` / `marketingParams`-class names. The
+measures, on the digest-pinned 2026-10-13 build: **`NGP` case-sensitive = 0**. All 94
+case-insensitive hits sit inside a longer identifier — **93** carry the letters `ngP`,
+and **one** carries lower-case `ngp` (inside `bingpreview`) — in
+`numberingPlan` / `pendingPageScroll` / `marketingParams`-class names. The
 Samsung user-agent regexes *are* present (**17** `Samsung` occurrences, first at byte
 2 240 566, last **starting** at 2 888 910 and ending at 2 888 916 inclusive — a
 browser-sniffing library) — and none of them carries `NGP`.
+
+> ⚠ **⚠ The word "every" was removed from the sentence above, not softened.** Round 2
+> corrected the count beneath it and left the universal standing — *"**every one** of
+> them the letters `ngP`"* — which its own next clause denied eight words later. A
+> universal that its own sentence refutes is false, and `AGENTS.md` §1 says fix it or
+> delete it. It is deleted: the claim that survives is the one that is true, namely
+> that **all 94 sit inside a longer identifier**, and the 93/1 split is stated as a
+> fact rather than as an exception to a rule that does not hold.
 
 > ⚠ **The span's upper bound was wrong and is corrected above.** This section
 > previously read *"bytes 2 240 566 – 2 888 911"*. The **count (17)** and the
@@ -712,33 +766,52 @@ would be no worse off — `"BLE_X".startsWith("BLE")` already holds, which is th
 inertness this pass measured — so **no bridge behaviour is wrong today**.
 
 **But the reasoning is only as good as its scope, and the scope is the eager
-main.** §6: "0 reads anywhere" is **not claimed**. A bridge reading `BLE_X` (§5's
-note) is consistent with a consumer outside this corpus.
+main.** §8 records `"0 reads anywhere"` as **NOT CLAIMED** — a claim never made, so
+there is nothing here for a later pass to falsify; what a later pass can falsify is
+§6's scope limit. A bridge reading `BLE_X` (§5's note) is consistent with a consumer
+outside this corpus.
 
 > **My decision: this is a downstream-relevant finding, and it is NOT a stop
 > condition for this merge.** No pinned value is demonstrated to have moved, and the
 > consumption change is one that provably cannot alter a correct matcher.
 >
-> **What is still owed, and by whom.** `AGENTS.md` §3 and §5 make the finding
-> incomplete until the consumer knows, and §5 requires the `downstream-bridge`
-> label, the named constant **and a linked issue**. **That issue does not exist yet.**
-> The state is re-derivable, and was checked rather than assumed:
+> **The `downstream-bridge` trigger did not fire, so no issue is owed.** Round 2 of
+> this pass wrote that the orchestrator *would* open a `downstream-bridge` issue.
+> **That was a promise about an artefact that was never going to exist** — the same
+> class as round 2's other blocking finding, and `AGENTS.md` §1's: a claim you cannot
+> point at is a claim you delete. The owner has ruled that `AGENTS.md` §3's trigger
+> **does not fire**, and the ruling is right, on this pass's own evidence:
+>
+> §3 fires *"when a finding changes a value the bridge pins"*. **No value changes
+> here.** The family vocabulary's **values** — `BLE`, `BLE_X`, `SIMPLERA`,
+> `SIMPLERA_X`, `GUARDIAN`, `NGP` — are exactly as they were and as this pass found
+> them. What moved is a **consumption** fact *about the vendor's own client*: five
+> declared, three matched. A bridge that built its matcher on the declared five is
+> **no worse off, and arguably safer**, because `"BLE_X".startsWith("BLE")` already
+> holds — so no matcher this pass measured can be wrong. An independent verifier
+> confirmed that reading from the consumer's own bytes (2 964 176 – 2 964 322, the
+> three `startsWith` arms and the branch they feed) rather than taking it from this
+> log. **A notification about a value that did not change would be noise, and
+> `AGENTS.md` §5 wants a pinned constant named — so there is no pinned constant to
+> name.**
+>
+> **What I have and have not done.** I have **not** opened a `downstream-bridge`
+> issue, and I am not going to: this pass is not authorised to open issues, and
+> `AGENTS.md` §11 forbids automation writing the record. **No issue will be opened,
+> because the trigger has not fired.** The state is re-derivable and was checked
+> rather than assumed:
 >
 > ```
 > gh issue list --label downstream-bridge --state all
 >   -> #29 [CLOSED] "finding: bgUnits and glucoseUnitsDefault disagree in 30
 >      countries, not 2 — a bridge reading one key mis-scales glucose"
->      (closed 2026-10-12)  — unrelated to this pass
+>      (closed 2026-10-12)  — unrelated to this pass; none for #132
 > gh issue view 132 --json labels
 >   -> labels: research-area, claimed, automation      (no downstream-bridge)
 > ```
 >
-> **I have not opened a `downstream-bridge` issue and I am not going to** — this
-> pass is not authorised to open issues, and `AGENTS.md` §11 forbids automation
-> writing the record. **The orchestrator opens the in-repo `downstream-bridge`
-> issue** for this finding, and it had not done so when this line was written.
-> **This sentence stays true after the issue appears**, which is why it is written
-> this way rather than as a report of an action taken.
+> **A `downstream-bridge` issue would be owed only if a later pass finds a pinned
+> value moving** — which is successor (a)'s clause below, and nothing more.
 
 **What successor (a) would change, precisely — and what it would not.** If the 211
 lazy chunks contain an importer of module `45559`, then two things follow and they
@@ -747,7 +820,7 @@ are *not* the same thing:
 | | changes? | why |
 |---|---|---|
 | the **matcher-correctness** conclusion | **no** | §4's arithmetic is a property of the *predicate* `value.startsWith(member)`, not of the corpus size. `"BLE_X".startsWith("BLE")` holds whether the read set is 3 members or whether a second call site also reads `BLE_X`. A lazy importer reading `BLE_X` would make the declaration **load-bearing**, not the matching **wrong** |
-| the **disclosure** obligation | **yes, and this is the real consequence** | §6's scope limit would be **falsified**: "0 reads anywhere" would become false, the §10(a) note about `docs/10` row 37 would harden from "unmeasured" to "refuted", and the six-member comparison set on that row would need correcting alongside `docs/05` |
+| the **disclosure** obligation | **yes, and this is the real consequence** | ⚠ **§6's *scope limit* would be falsified, not a claim** — §8 records `"0 reads anywhere"` as **NOT CLAIMED**, and a never-made claim cannot become false. What changes is the *warrant*: "0 reads **in the eager main**, and the lazy corpus was swept" would stop being true. The §10(a) note about `docs/10` row 37 would harden from "unmeasured" to "refuted", and the six-member comparison set on that row would need correcting alongside `docs/05` |
 
 So a successor (a) hit **does not by itself stop the merge**; it converts an
 **unmeasured** question into a **measured** one and hands a second correction to
@@ -891,20 +964,35 @@ neither a start nor an end is not a bound.
 reason for leaving `:512` alone did not match this page's own practice.** `:416`
 asserts no count at all, so calling it "an over-count" was wrong; it now invokes the
 **declared-vs-matched** distinction. And the justification for editing outside the
-area-R blockquote was post-hoc — `docs/05:497`, `:515` and `:524` are corrections
-from earlier passes sitting **inside** that same blockquote. The outcome was right
-and is unaffected; the reason is now the real one: **the row's `5` is a true
-*declared* count, so the correction belongs where a reader of the table meets it,
-outside the quoted history.**
+area-R blockquote was post-hoc — I cited `docs/05:497`, `:515` and `:524` as
+corrections sitting inside blockquotes, and **all three had been moved off those
+lines by this PR's own edits**; two of them hold prose, not corrections. The outcome
+was right and is unaffected. ⚠ **The pointer form is withdrawn and replaced by a
+grep**, per round 3's finding that this lane had now shipped line pointers its own
+edits invalidated three times:
+
+```
+grep -n '^> .*\(⚠\|Correction\|Corrected\|Deleted\|RETRACTED\)' \
+     docs/05-devices-and-vocabulary.md | grep -v '#132' | wc -l
+```
+
+**No count is recorded, on purpose** — the same lesson as §10's SHA binding: a
+number over a page this PR keeps editing is a property of a tree, not a fact, and
+round 3 caught three of my own. The specific instance that settles it needs no
+count: **area R wrote a correction into its own audit blockquote** — *"⚠ **What is and
+is not pinned here, stated rather than left to be discovered.**"* — so the reason for
+leaving that table verbatim is **the number being true**, not a convention the page
+holds to.
 
 **Successor (a) — one clause tightened.** §12 previously read "the answer changes and
 the merge queue should stop", which invites the stronger reading that a found
 importer falsifies the matcher conclusion. It does not. §4's arithmetic is a property
 of the **predicate** `value.startsWith(member)`, not of the corpus: a second reader
 of `BLE_X` would make the declaration **load-bearing**, not the matching **wrong**.
-What a successor (a) hit changes is the **disclosure** obligation — "0 reads anywhere"
-goes from unmeasured to false, and `docs/10` row 37's six-member set goes from
-"unmeasured" to "refuted". §12 now tabulates the two separately.
+What a successor (a) hit changes is the **disclosure** obligation — §6's **scope
+limit** is what stops holding (not a claim: `"0 reads anywhere"` is `NOT CLAIMED`, and
+a never-made claim cannot become false), and `docs/10` row 37's six-member set goes
+from "unmeasured" to "refuted". §12 now tabulates the two separately.
 
 6. **A deletion of mine that had not been recorded here.** In round 1 I rewrote
    §3.4's *"**every one** of them the substring `ngP`"* — a claim that was **false**,
@@ -923,3 +1011,173 @@ goes from unmeasured to false, and `docs/10` row 37's six-member set goes from
 **Scope unchanged and still stated wherever the negative appears:** the eager main
 bundle only. "0 reads in the eager main" is true; "0 reads anywhere" is not a claim
 this pass can make.
+
+## Correction (2026-10-15) — round 3
+
+**Round 3 confirmed the central claim and the closure enumeration a third time — the
+latter by a *different* method, brace-matching module boundaries with the verifier's
+own identifier definition, to the same answers — and `xsuffix-analyse.py` reproduces
+`census.txt` byte-for-byte at exit 0.** It also confirmed F2's tense, F3, F4, F6, F8 and
+F11's substance, and held up the successor-(a) clause against a real test: the
+predicate `p.startsWith(o.G.BLE)` is code, and `"BLE_X".startsWith("BLE")` is a
+property of `String.prototype.startsWith`, not of the three reads on disk.
+
+**What follows is four blocking findings and two advisories. Three of the four are
+the same failure this lane has now produced in three consecutive rounds — a claim
+whose scope is wider than its evidence — and two of those three were in the sentences
+I had just written while fixing the previous round's. That pattern is the reason each
+entry below names the check, not just the correction.**
+
+1. **A span that named one owner where there are three.** §3.2 said *"bytes
+   3 316 707 – 3 321 247 are the pump's Bluetooth debug-event catalogue"*. **Only 1
+   of the 13 hits is the pump's**: 11 are in `source:"sensor"` *"Sensor Traces"*
+   (array 3 314 809 – 3 318 475), 1 in `source:"pump"` *"Pump Diagnostic Logs"*
+   (3 318 533 – 3 320 922), 1 in `source:"app"` *"Mobile App Logs"*
+   (3 320 974 – 3 322 899). The quoted span is **the span of the hits, not of any
+   catalogue** — the first hit sits 1 898 bytes inside the array it belongs to. This
+   is F8's defect recurring verbatim, **in the paragraph F8's own correction was
+   written beside**, and it had propagated into `docs/11` successor **(b)**, which
+   proposes to enshrine it in the `docs/09` §4 register. Both are corrected, and
+   successor (b) now states that a register row must carry each hit's own group or no
+   span at all. Re-derived with `grep -o 'source:"[a-z]*"'` over each hit's own array.
+2. **A supporting citation whose targets had moved.** The F11 entry and `docs/05`
+   both cited `docs/05:497`, `:515` and `:524` as corrections sitting inside
+   blockquotes. **`:497` holds an R-5 scoping fragment and `:524` holds "One declared
+   vocabulary is NOT admitted" — prose, not corrections** — and this round's own 34
+   added lines had moved all three off what they cited. **The pointer form is
+   withdrawn and replaced by a grep** in both places, and **no count is recorded**,
+   because a number over a page this PR keeps editing is a property of a tree (§10's
+   SHA-binding lesson, now applied to my own text). The instance that settles it needs
+   no count: **area R wrote a correction into its own audit blockquote**, so the
+   reason for leaving that table verbatim is that the number is *true*, not a house
+   style this page holds to.
+3. **A false universal, softened rather than removed.** §3.4 still read *"**every one**
+   of them the letters `ngP`"* while its own next clause reported one hit as lower-case
+   `ngp`. **The word is deleted.** What survives is the claim that is true: all 94 sit
+   inside a longer identifier, 93 carrying `ngP` and one `ngp`.
+4. **§12 promised an issue that will not exist.** Round 2 wrote that *"the orchestrator
+   opens the in-repo `downstream-bridge` issue"*. **The owner has ruled that `AGENTS.md`
+   §3's trigger does not fire**, and the ruling is right on this pass's own evidence:
+   §3 fires *"when a finding changes a value the bridge pins"*, and **no value changes
+   here** — the six family values are exactly as they were; what moved is a
+   **consumption** fact about the vendor's own client, and a matcher on the declared
+   five is no worse off since `"BLE_X".startsWith("BLE")` already holds. **There is no
+   pinned constant to name, so there is no issue to open, and none will be.** §12 now
+   states the decision, the reasoning and the verifier's independent confirmation from
+   the consumer's own bytes (2 964 176 – 2 964 322), instead of a promise. A
+   notification is owed **only** if a later pass finds a pinned value moving.
+
+   **Secondary, same cell:** §12 said `"0 reads anywhere"` *"would become false"*, but
+   §8 records it as **NOT CLAIMED**. **A never-made claim cannot become false.** What
+   successor (a) would falsify is §6's **scope limit** — the warrant behind the
+   negative — not a claim. Corrected in both places.
+
+**Advisories.** **Byte frame now declared once.** This log published two frames 4 apart
+— *site* offsets 2 964 176/215/259 (`§3.1`, `§8`, `census.txt` §D and §L) and *token*
+offsets 2 964 180/219/263 (`§3.2`, §11`) — and never said so. **Span width matters as
+much as the frame**: a member read spans `len("o.G." + MEMBER)`, and building it
+narrower (`site..site+3`) drops the token at `site+4` and yields **4 + 0 + 48** and
+**34 + 14** instead of the published **4 + 1 + 47** and **34 + 13**. The published
+numbers are right; the rule that selected them is now stated, in one table, at §3.1.
+**A second span bounded neither end:** §3.1 called the printed consumer *"bytes
+2 964 176 – 2 964 322"*, but the block runs **2 964 111 – 2 964 344** (234 B) — the
+cited start is the first `o.G.` read *inside* it, not the start of the code. **F4
+residue:** `census.txt` §D's 8th sweep still carried the old false **label**
+`o.G, o.G;` beside the correct `regex=` column; the label now reads *"o.G bare (no
+member)"*, so the two columns agree, and `census.txt` was **regenerated** rather than
+hand-edited.
+
+**Left deliberately unchanged, because fixing it here would be the wrong move.** The
+pointer form in §12's propagation list (`docs/05:498`, `docs/05:536-537`) names
+*prose anchors a reader navigates by*, not a proof the gate can check; the F11 case was
+different because it was offered as **evidence for a rule**. And the 13-hits census
+keeps **offsets, not spans**, because a span is what started this.
+
+**Scope unchanged and still stated wherever the negative appears:** the eager main
+bundle only. "0 reads in the eager main" is true; "0 reads anywhere" is not a claim
+this pass can make.
+
+## 13. Four things no round had audited — audited here
+
+Round 3 listed these as *unaudited rather than passing*, which is the honest way to
+say "nobody looked". Four answers, three of them narrow the pass's own claims.
+
+### 13.1 Should a pinned assertion exist for the declared-vs-matched change?
+
+**No — and not because the pin would be inconvenient, but because the suite cannot
+express it.** `regression/hurl/05-public-config.check.sh` asserts against **JSON
+configuration documents**: `https://carelink.minimed.eu/patient/v2/configuration/public`
+(line 31), `…/patient/countries/settings` (292), and an HCP config (130). Its
+family-vocabulary pin is therefore on the **map axis** —
+`check "family count is 16"` over
+`["personal.device.family.to.model.mapping"]` (89). The declared-vs-matched
+distinction is about **bytes inside a JavaScript bundle**
+(`/main.6595daf83bd6d4b1.js`, `application/javascript`, 3 417 255 B).
+
+> **`grep -rc 'main\.6595daf83bd6d4b1' regression/hurl/` returns 0.** No suite in
+> this repository fetches the client bundle at all. A pin for this finding would
+> require a new suite that fetches a 3.4 MB minified bundle and asserts on token
+> offsets — a different instrument with a different vendor-request budget, and
+> `docs/09` §4 records that widening a gate in the same PR the gate passed is a
+> maintainer's decision. **So: the absence of a pin is correct and is now reasoned
+> rather than merely true.** The re-derivation path stands in its place — `census.txt`
+> §B, §D, §E and §L, all reproducible from one digest-pinned body.
+
+### 13.2 `probe.sh` and `send.sh`, read line by line
+
+- **`set -u` with no `set -e` is deliberate**, and the file is right not to have it:
+  `req()` signals by `return 8` (stamp-order violation, 119) and `return 9` (cap,
+  105), and `probe.sh` must still attempt the remaining cell and still write its
+  `run end:` line. With `set -e` the first refusal would abort the pass.
+- ⚠ **A property worth recording, found by reading: `probe.sh`'s exit code does not
+  report whether a cell was refused.** The last statement is the `run end:` `echo`, so
+  the script exits **0** after a guard refusal — which is exactly what the §7 dry-run
+  shows (2 refusals, `exit=0`, **0 ledger rows**). Anyone scripting this harness must
+  read `run.log` or count ledger rows, **not** the exit code. Recorded here rather than
+  "fixed", because changing the exit contract is a change to the instrument, not to a
+  finding, and no request in this pass depends on it.
+- **`send.sh` is the fix for §7's defect and holds:** `t_lock` at 24, `sleep` at 25,
+  `t_sent` at 27 **immediately before** `curl` at 28, `t_done` at 30 — four stamps in
+  one process, in order, with the sleep inside the shared lock. `probe.sh:115` asserts
+  `t_lock < t_sent < t_done` **before** the row is written.
+- **Caveat on this review:** `shellcheck` is not installed here, so §13.2 is a reading,
+  not a lint. The §7 dry-runs exercise the guard's behaviour end to end, which covers
+  the part that mattered, but a shellcheck pass is not something this pass performed.
+
+### 13.3 Every byte offset §4 and §K cite, re-checked against the body
+
+Twelve citations, each tested by asserting the offset lands **exactly** on the needle:
+
+```
+@198638 (0,o.G)((0,o.d)(  @580904 deviceModelMapping   @1723196 45559:
+@2136000 StandaloneCGM    @2136604 SIMPLERACC           @2190336 system.logbook.entry.validation.config
+@2962721 45559)           @3372206 getDeviceFamily(V){  @3372491 /patient/v2/monitor/data
+@3372603 sessionStorage.getItem("deviceFamily")        @3373390 getUploadDeviceInfo(V){
+@3373507 display_message:X
+```
+
+**12 of 12 land on the cited needle.** The three `docs/05` prose offsets the brief also
+listed (`416`, `512`, `537`) are prose anchors rather than byte claims; `416` and `537`
+are quoted verbatim in this log's §12 and in `docs/05`'s own corrections, and the table
+row at `512` is quoted in the correction beside it, so none of the three is load-bearing
+as a pointer.
+
+### 13.4 What CI's green settles about this round's findings
+
+**None of them, and the reason is uniform.** Not one is a citation to a missing *file*,
+not one is a count the numbers check reads, and the append-only arm accepts *any*
+dated Correction heading as a licence for *any* in-place edit. Concretely:
+
+| round-3 finding | why the gate cannot see it |
+|---|---|
+| the 3-owner span (blocking 1) | the file exists and the number is a byte offset, not an assertion |
+| the moved citations (blocking 2) | `docs/05:497` **is** a valid line — it just holds the wrong thing |
+| the false universal (blocking 3) | prose, and a Correction heading already exists for that section |
+| the promised issue (blocking 4) | nothing in the gate reads `gh` output |
+
+**CI settles** that no credential or internal hostname entered the diff, that every
+`[source: …]` path resolves, that the 217/431 counts still agree, that no pre-existing
+dated log was deleted or rewritten, and that the live 05 suite passes. It settles
+nothing about whether a sentence is true, a span owns what it names, or a promise is
+owed. That is what the independent rounds are for, and it is why the three of four
+blocking findings here were in prose rather than in anything the gate reads.

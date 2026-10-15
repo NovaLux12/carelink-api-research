@@ -1313,14 +1313,29 @@ Three successors, none of which needs a token:
   `BLE` has **52** case-sensitive hits in this bundle and **3 169**
   case-insensitively — a **60.9×** multiplier — and those 52 partition as **4** in
   the enum literal + **1** member read + **47** other. Of the 47, **34 are
-  substrings** of longer identifiers and **13 are standalone tokens** in the pump's
-  Bluetooth debug-event catalogue (bytes 3 316 707 – 3 321 247), where `BLE`
-  abbreviates Bluetooth Low Energy — an unrelated third sense of the same token.
+  substrings** of longer identifiers and **13 are standalone tokens** where `BLE`
+  abbreviates Bluetooth Low Energy inside a **debug-log event catalogue** — an
+  unrelated third sense of the same token.
+  ⚠ **⚠ The 13 are NOT one owner's, and this successor must not record them as one.**
+  They fall across **three** arrays in that catalogue, grouped by log source:
+  **11** in `source:"sensor"` *"Sensor Traces"* (array 3 314 809 – 3 318 475), **1** in
+  `source:"pump"` *"Pump Diagnostic Logs"* (3 318 533 – 3 320 922), **1** in
+  `source:"app"` *"Mobile App Logs"* (3 320 974 – 3 322 899). A byte span quoted over
+  all 13 — 3 316 707 – 3 321 247 — is **the span of the hits, not of any one
+  catalogue**, and calling it "the pump's" names one of three owners. **The register
+  rows must carry each hit's own group**, or no span at all [source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3.2].
   ⚠ **The rule is stated so it does not mis-apply:** *substring* and *standalone* are
   defined over the **47 "other"** hits. Applied to all 52 the same rule gives
   **36 / 16**, because the declaration and member-read hits are themselves standalone
   `BLE` tokens under it. Both splits are right on their own class; only the 47 answers
-  "what noise is this?". `SIMPLERACC` (byte 2 136 604) is a model-map key a substring
+  "what noise is this?". ⚠ **And the byte frame is named**, because the log publishes
+  two and they differ by `len("o.G.")`: a member read spans
+  `len("o.G." + MEMBER)`, so building it narrower — `site..site+3`, the length of the
+  token `BLE` — yields **4 + 0 + 48** and **34 + 14** instead of the published
+  **4 + 1 + 47** and **34 + 13** [source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3.1, §3.2, §11].
+  `SIMPLERACC` (byte 2 136 604) is a model-map key a substring
   grep reports as a sixth enum member, and lowercase `guardian` (9 hits) is a **human**
   guardian of a minor patient's account, not the CGM family. **Blocker:** none.
   **Closes when:** these token shapes are rows in **`docs/09` §4**, the register that

@@ -175,7 +175,14 @@ def main():
         "Object.entries(o.G)": rf"Object\.entries\(\s*{binding}\.G\s*\)",
         "spread           {...o.G}": rf"\.\.\.\s*{binding}\.G\b",
         "pass the object on  (o.G)": rf"(?<![.\w])\({binding}\.G\)",
-        "pass the object on  o.G, o.G;": rf"(?<![.\w]){binding}\.G(?![.\w.])",
+
+        # The LABEL describes the shape; the REGEX is the authority. Round 2 found
+        # the 8th sweep described in prose as "`o.G` followed by a comma or a
+        # semicolon", which returns 0. Round 3 found the residue: this label still
+        # read "o.G, o.G;" while the regex beside it returned 1. A label that
+        # contradicts its own regex is a contradiction a re-runner cannot see
+        # through (AGENTS.md section 6.2), so both columns print and they agree.
+        "pass the object on  o.G bare (no member)": rf"(?<![.\w]){binding}\.G(?![\w.])",
     }
     for label, pat in shapes.items():
         hits = [mm.start() for mm in re.finditer(pat, T)]

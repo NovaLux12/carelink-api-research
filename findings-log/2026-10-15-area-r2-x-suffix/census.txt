@@ -59,7 +59,7 @@ D. EVERY READ OF THE EXPORTED BINDING — `<binding>.G`
     Object.entries(o.G)                  0 hit(s)   regex=Object\.entries\(\s*o\.G\s*\)
     spread           {...o.G}            0 hit(s)   regex=\.\.\.\s*o\.G\b
     pass the object on  (o.G)            0 hit(s)   regex=(?<![.\w])\(o\.G\)
-    pass the object on  o.G, o.G;        1 hit(s)  @[198638]   regex=(?<![.\w])o\.G(?![.\w.])
+    pass the object on  o.G bare (no member)   1 hit(s)  @[198638]   regex=(?<![.\w])o\.G(?![\w.])
 
 ==============================================================================
 E. CASE-SENSITIVE TOKEN CENSUS — every occurrence, every one read.
