@@ -1068,9 +1068,11 @@ for **each of the ten**, this successor for **one in ten** (a sample), and it ad
 hatch that fact 1 forces — the control must be assembled at run time, because a committed
 instance would make the gate fire on itself. Of the two facts below, **only the first is new
 to the page** — that no control set can be committed at all; the second (that the `^+++`
-filter is positional) is **carried forward** from the addendum above, restated here only to
-keep this successor self-contained. A maintainer who has read the addendum has already seen
-the close condition and fact 2.
+filter is positional) is **carried forward** from **this pass's own addendum above**, not
+from F3: it is new to `main`, and it is only *not new* to a reader who has just read this
+page. Restated here only to keep this successor self-contained. A maintainer reading only
+`main` has seen the close condition's **shape** (F3) and neither fact; one reading this page
+has seen all of it.
 
 1. **All ten nets are self-referential**, so no control set can live in the repo as a
    fixture: an instance that matches pattern P is by construction text that P matches, and
