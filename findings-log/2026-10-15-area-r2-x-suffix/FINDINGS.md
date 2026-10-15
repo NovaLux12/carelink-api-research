@@ -518,12 +518,14 @@ is adjudicated below.
 > and it fires anyway, because four lanes in this pool edit `docs/11` at once.
 >
 > **Counts below are as of `3449e14bc0349c4e35b5f03342b701d1ed3ab267`** (this
-> branch's head at the time of writing) **plus this commit's own §10 hunks**, which
-> are inside the successor-2 block and therefore add hits — so **expect
-> `docs/11` `45559` = 9, not the 7 recorded at round 1.** Re-derive with
-> `dup-test.sh` and cite the SHA it prints. **A count that names the tree it was
-> taken on is re-derivable; a count that says "this branch's head" is a promise
-> about a moving object** (`AGENTS.md` §1).
+> branch's head at the time of writing). The +2 over round 1 arrived with **that**
+> commit, not this one — `git show 3449e14:docs/11-suggested-research-areas.md`
+> piped through `grep -c 45559` already prints **9**, and the working tree prints
+> **9** too — so **expect `docs/11` `45559` = 9, not the 7 recorded at round 1**
+> (round 1's tree, `1e96ec2`, prints 7). Re-derive with `dup-test.sh` and cite the
+> SHA it prints. **A count that names the tree it was taken on is re-derivable; a
+> count that says "this branch's head" is a promise about a moving object**
+> (`AGENTS.md` §1).
 >
 > **The per-hit verdicts below are the finding. The counts are evidence of where to
 > look.** Verification round 2 re-derived every verdict; none of them moved, and none
