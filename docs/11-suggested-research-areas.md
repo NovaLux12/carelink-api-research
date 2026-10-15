@@ -940,13 +940,14 @@ The sites, counted at head vs merge-base `ab28f58`:
 |---|---|---:|---:|
 | `docs/11:930` | command / self-quote #1 | 930 | — (not present at ab28f58) |
 | `docs/11:1063` | command / self-quote #2 | 1063 | — (not present at ab28f58) |
-| `docs/11:1495` | table prose / target | 1495 | 1254 (verifiable: `git show ab28f58:docs/11-… | grep -nF '224 lazy chunks are mined…'`) |
+| `docs/11:1495` | target prose (section K) | 1495 | 1254 (verifiable: `git show ab28f58:docs/11-… | grep -nF '224 lazy chunks are mined…'`) |
 
 **The pattern is the
-longer one on purpose:** the short form returns **3** at head, because this page
-quotes the short pattern inside its own command — a recorded grep whose result set
-cannot tell this pass's own footprint from its target stops being true the moment the
-paragraph documenting it is written. The 2026-10-08 record those came from is explicit:
+longer one on purpose, but lengthening did not free it:** at head **both** the short and
+the long form return **3** — this page carries the *long* form in each of its own two
+command slots (`docs/11:930`, `:1063`), plus the target. The fix that works, and the one
+the table below records, is the merge-base qualification `git show ab28f58:…`, whose
+result set cannot see this pass's own text. The 2026-10-08 record those came from is explicit:
 the
 runtime holds a **225-entry** map, it built filenames as `<id>.<hash>.js` — the **id**
 form — and *"**224 fetched. One entry returned the SPA fallback**"*. The entry it lost
