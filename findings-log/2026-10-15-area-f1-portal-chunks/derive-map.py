@@ -67,7 +67,20 @@ def parse(body: bytes, build: str):
     entries = {cid: h for cid, h in pairs}
     if not entries:
         raise SystemExit(f"{build}: f.u found but the id->hash table parsed empty")
-    return {"build": build, "f_u_expression": m.group(1)[:400],
+    return {"build": build,
+            # ⚠ TRUNCATED FOR DISPLAY, and this field must never be read as the
+            # whole f.u. It is the first 400 characters of the matched expression
+            # and nothing more. It is identical for both builds BY TRUNCATION, not
+            # because the two runtimes share an f.u: entry id 2076 sorts near the
+            # END of the table and falls outside the cut, which is precisely the
+            # entry that differs between the builds. `entries` below, and
+            # chunk-map.tsv, are the complete artefact -- 225 ids each.
+            "f_u_expression_first_400_chars": m.group(1)[:400],
+            "f_u_expression_truncated_at": 400,
+            "f_u_expression_note": ("DISPLAY PREFIX ONLY -- not the full f.u. "
+                                    "Identical across builds by truncation, not "
+                                    "by identity; id 2076 lies past the cut. "
+                                    "Use `entries` / chunk-map.tsv."),
             "special_case_id_to_name": special,
             "entries": entries,
             "n_entries": len(entries),

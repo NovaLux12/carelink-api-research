@@ -881,7 +881,14 @@ module id `37254` on clinic and `21981` on support, same five bytes in all four.
 between the builds. **12 of 12** sampled shared-hash cells fetched from the two
 different hosts came back **byte-identical** — OBSERVED for those 12, and the
 generalisation to the other 209 is **INFERRED** on one sample.
-[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §7]
+⚠ **What a reader can check, per claim:** the "exactly five bytes" rests on a body
+comparison this repository does not retain (bodies are transient, `AGENTS.md` §7), so
+**its exhaustiveness is not re-derivable from a clean clone**; what *is* re-derivable is
+that each pair has equal `body_bytes` and different `body_sha256`, and that
+`prefix + 5 + suffix` equals the body length exactly in all four. The log names every
+such claim individually and ships a zero-request script for the checkable half
+(§1b).
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §7, §8b]
 
 **⚠ The limit that travels with this negative, and it is measured, not asserted.**
 **A zero on a path-literal token list is a statement about literals, not about
@@ -905,6 +912,20 @@ five `carelinkhp*.minimed.{eu,com}` names outside the baseline are NXDOMAIN" —
 support build's own host is the one the pinned suite already reads. The pass used
 `carelink-support.medtronic.eu` and named the swap in its log.
 [source: findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md; `regression/hurl/05-public-config.check.sh:329–330`]
+
+**⚠ And the denominator this repo already published for this corpus is 224 — it is
+225 minus one.** `docs/10`'s config-pointer row and this page's own text (found by
+`grep -nF '224 lazy chunks are mined for endpoints' docs/11-suggested-research-areas.md`,
+1 hit) both say "224 chunks". The 2026-10-08 record those came from is explicit: the
+runtime holds a **225-entry** map, it built filenames as `<id>.<hash>.js` — the **id**
+form — and *"**224 fetched. One entry returned the SPA fallback**"*. The entry it lost
+is the one whose id form is not the name `f.u` emits: id **2076**, which `f.u` maps to
+`common` (this ledger, OBSERVED on **both** builds — `2076.<hash>.js` → 200 `text/html`
+5518 B, `common.<hash>.js` → 200 `application/javascript`). This pass requested the
+**emitted** names and got **225 of 225** with **0** fallbacks. **Use 225.** Which entry
+the 2026-10-08 run lost is **INFERRED** — that record says "one entry" and does not name
+it — and `docs/10` is not this pass's lane to correct, so it is carried as successor §1c.
+[source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §8a]
 
 #### Successor to area F — 1a: the support build's **209 unswept** chunks — the one place the negative can still be wrong
 
@@ -933,6 +954,25 @@ Nothing in this repository has ever fetched one — this pass fetched **16** and
 answered `application/javascript`. The other 209 rest on the support runtime naming
 them, and a name in a document is not a served file (`AGENTS.md` §6 item 2). That is
 the whole reason the remainder is a successor and not a footnote.
+
+**Duplicate test, run and recorded** (`CONTRIBUTING-research.md:195-200`, "grep both
+first"). Commands and hit counts, at head:
+
+| where | command | hits | verdict |
+|---|---|---:|---|
+| `docs/10` §1 | `grep -ciE '209 cells\|209 chunk\|unswept' docs/10-open-questions.md` | **0** | not there |
+| `docs/10` §1, wider | `grep -ciE 'portal .*chunk' docs/10-open-questions.md` | 2 | both incidental — line 61 is the false-hit word list, line 63 is the config-pointer row |
+| Closed table | `awk 'NR>=2181' docs/11 \| grep -ciE '\b209\b\|unswept'` | **0** | not closed |
+| this page | `grep -n '\b209\b' docs/11` | 8, **all inside this successor** | not a duplicate of itself |
+
+**Non-duplicate, recorded.** ⚠ One related hit **is** a real staleness and is **not**
+this successor: `docs/10`'s config-pointer row still reads *"The one thing a web sweep
+could still add is the portal lazy-chunk corpus (**224 chunks**, never swept for these
+tokens)"*. **224 is the wrong denominator** — it is 225 minus the one entry lost to
+the `f.u` id-vs-name form, and the pass that swept 224 said so and left the fallback
+unexplained ([findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §8a]). That row
+now points at a corpus this pass swept, so it needs restating; **`docs/10` is not this
+pass's lane to edit** and the correction is named in §1c below.
 
 #### Successor to area F — 1b: the `$.C40` mechanism — **how many of this repo's "0 hits" sentences are negatives over literals?**
 
@@ -964,6 +1004,56 @@ literal, by reading an imported constant, or by assembling the URL at run time f
 config — and that the third of those is rare. **The third is not tested and is not
 claimed**; it is named because it is the residual that no corpus sweep of any size can
 reach, and a reader deserves to know it is still there after 225 chunks read clean.
+
+**The second half is now concrete, and it is a rule about what a corpus pass must
+commit.** Verification of the pass above showed the failure this section is about: its
+per-hit **byte offsets** and quoted minified source — and the exhaustiveness of its
+"exactly five bytes" — are **not re-derivable from a clean clone**, because the bodies
+were transient (`AGENTS.md` §7) and were written to a `mktemp -d` that no longer exists.
+The *counts* are re-derivable and a stranger can check them; **the reads behind the
+counts cannot be checked at all.** That is a gap between what a pass asserts and what a
+later reader can verify, and it is cheap to close on the next sweep:
+
+> **A corpus pass commits a per-cell evidence index at capture time** — the offset list
+> plus a ~160-byte excerpt for every non-zero hit, and a fixed-width window around each
+> distinct-pair divergence. Roughly 30 KB for this corpus, no vendor secret, and it makes
+> the literal-vs-code reads and the byte-difference claims checkable from a clone.
+
+The pass above cannot be back-filled without re-fetching 240 bodies, which would break
+its closed request accounting; its log names every affected claim individually instead
+([source: findings-log/2026-10-15-area-f1-portal-chunks/FINDINGS.md §8b]), and ships a
+zero-request `verify-derivable.py` that machine-checks the half that *is* checkable.
+**Closing this means the next corpus pass writes the index while the bodies are on disk.**
+
+#### Successor to area F — 1c: the **224** two pages still publish for a **225**-chunk corpus
+
+**Derived from the pass above, and it is a denominator, not a topic.** `docs/10`'s
+config-pointer row and this page's own text (`grep -nF '224 lazy chunks are mined for
+endpoints' docs/11-suggested-research-areas.md`, 1 hit) both say the portal lazy-chunk
+corpus is **224** chunks. The 2026-10-08 record that number came from is explicit about
+why:
+*"holds a 225-entry webpack chunk map … so the filenames are `<id>.<hash>.js`"* and
+*"**224 fetched. One entry returned the SPA fallback**"* — it built URLs in the **id**
+form, and the one entry whose id form is not the name `f.u` emits is id **2076**, which
+`f.u` maps to `common`. This pass re-derived both builds' `f.u`, requested the emitted
+names, and got **225 of 225** with **0** fallbacks.
+
+**Blocker:** **zero requests.** Both figures are already in committed text; the question
+is which is right, and the arithmetic answers it. **Attribution of the lost entry to
+2076 is INFERRED, not tested** — the 2026-10-08 record says "one entry" and does not
+name it.
+
+**Closes when:** `docs/10`'s row and this page's own "224 lazy chunks" sentence both read
+**225**, with the 224 named as the id-form count and the `f.u` substitution named as the
+cause; and area K's §8 successor — *"the 224-chunk clinic sweep had 'One entry returned
+the SPA fallback' — never explained"* — is answered by that same sentence. **A negative
+counts.**
+
+**Assumptions (INFERRED):** that the unnamed fallback entry is id 2076 rather than a
+fetch error, resting on three OBSERVED facts (the id form answers the 5 518 B shell and
+the `common` form answers `application/javascript`, on **both** builds — this ledger,
+seq 4/5/11/12 — plus `f.u` naming `common` for 2076 and no other id) **and** that
+assumption. **Not claimed.**
 
 #### Successor to area F — 2: the new pin's stated limit — the 69-key **count** is not the **set**
 

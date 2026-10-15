@@ -73,10 +73,30 @@ The nine sub-floor gaps on the clinic host, shortest first:
 requests to `carelinkhp.minimed.eu` **9 times under the repo's `>= 2 s` floor**,
 the shortest at 1.801 s. That is the number a reader should hold.
 
-The two large maxima are **explained by the harness itself and by nothing else**:
-seq 5 → 9 (101.048 s) and seq 12 → 238 (602.961 s) are the **phase-1 → phase-2
-boundaries**, where `probe.sh` was invoked twice and the chunk map was derived,
-planned and diffed in between. Every other gap on either host is ≤ 11.892 s.
+**Three** gaps exceed 11.892 s, and **each has its own cause** — measured, not
+narrated. **Counting rule:** every same-host gap > 11.892 s, of which there are 3.
+
+| gap | host | value | cause |
+|---|---|---:|---|
+| seq 5 → 9 | clinic | 101.048 s | **phase-1 → phase-2 boundary.** `cells.txt` is 8 data rows (seq 1–8) and `cells-phase2.txt` is 244 (seq 9–252); the clinic rows of phase 1 are seq 1–5 and phase 2 opens at seq 9, where `probe.sh` was re-invoked and the chunk map derived, planned and diffed in between |
+| seq 8 → 10 | support | 95.997 s | **the same boundary on the other host.** The phase boundary falls between global seq 8 and seq 9, so it opens a same-host gap on **both** hosts, not on one — support's phase 1 is seq 6–8 and its phase 2 opens at seq 10 |
+| seq 12 → 238 | support | 602.961 s | **not a phase boundary — the support host was idle while the clinic sweep ran.** Both rows are phase 2. Between them the harness sent the 225 clinic cells, seq 13 → 237, whose `t_sent` span is **597.040 s** (mean 2.665 s/request). The support host was not asked during that window because the harness was busy on the clinic host |
+
+Every other gap on either host is ≤ **11.892 s** (the largest is clinic seq 9 → 13;
+support's largest after the three above is 3.136 s). The kernel `body_mtime`
+series corroborates all three independently — its only large values are **102 s**
+(clinic) and **97 s / 603 s** (support), against 2 s and 3 s everywhere else.
+
+⚠ **Corrected 2026-10-15 after verification round 1.** This paragraph previously
+named **two** of these gaps and called both "phase-1 → phase-2 boundaries",
+closing *"Every other gap on either host is ≤ 11.892 s."* **All three halves were
+wrong**: the support seq 8 → 10 gap (95.997 s) was not named at all, and
+seq 12 → 238 is not a phase boundary — attributing it to a harness pause would
+tell a reader the run stalled for ten minutes when it was fully occupied 225
+rows away. The wrong sentence is kept in git history rather than deleted
+(`AGENTS.md` §3), and the numbers above replace it. **No vendor request changed;
+every figure re-derives from the same `results.jsonl`** by `spacing.py` and,
+independently, by a second implementation.
 
 ### 2b. `body_mtime` — the kernel clock, independent of the harness
 
@@ -111,6 +131,70 @@ know that the independent series puts every gap at ≥ 2.0 s. This pass therefor
 contributes **1 more occurrence** to the `docs/09` §4 "a gap below the harness's
 own declared sleep" row, and the merge queue reconciles that row's `n`, not this
 log.
+
+### 2d. The arithmetic behind 26 of the 30 short gaps — published so a reader does not have to derive it
+
+**This explains a gap. It does not explain the impossible duration, so no cause
+is asserted and nothing below promotes a guess.** The harness sleeps inside the
+lock and stamps `t_sent` immediately pre-`curl` (`probe.sh:150-153`), so for two
+consecutive same-host rows **A → B**:
+
+```
+t_sent[B] - t_sent[A]  =  LOCKD (2.5)  +  dur[A]  +  overhead
+dur[A]                   = t_done[A] - t_sent[A]
+overhead                  = gap - 2.5 - dur[A]
+```
+
+A negative `dur[A]` therefore *shortens* the following gap. **All 30 gaps under
+the declared 2.5 s are tested against that identity** — clinic 29, support 1.
+
+**26 of the 30 fit, and the residual is a constant to within 13 ms** across gaps
+spanning 0.70 s of range. **Every one of the 26 has a negative predecessor
+duration.** Representative rows, shortest first:
+
+| seq A → B | host | `dur[A]` | predicted `2.5 + dur[A]` | observed gap | overhead |
+|---|---|---:|---:|---:|---:|
+| 182 → 183 | clinic | −0.792 | 1.708 | **1.801** | +0.093 |
+| 164 → 165 | clinic | −0.782 | 1.718 | **1.805** | +0.087 |
+| 134 → 135 | clinic | −0.764 | 1.736 | **1.824** | +0.088 |
+| 137 → 138 | clinic | −0.759 | 1.741 | **1.827** | +0.086 |
+| 236 → 237 | clinic | +0.089 | 2.589 | **1.849** | −0.740 ⚠ |
+| 155 → 156 | clinic | −0.673 | 1.827 | **1.915** | +0.088 |
+| 16 → 17 | clinic | −0.655 | 1.845 | **1.932** | +0.087 |
+| 230 → 231 | clinic | +0.051 | 2.551 | **1.969** | −0.582 ⚠ |
+| 215 → 216 | clinic | −0.641 | 1.859 | **1.950** | +0.091 |
+| 128 → 129 | clinic | −0.539 | 1.961 | **2.049** | +0.088 |
+| 116 → 117 | clinic | −0.094 | 2.406 | **2.499** | +0.093 |
+| **7 → 8** | **support** | −0.378 | 2.122 | **2.213** | +0.091 |
+
+`overhead` over all **26** conforming rows: **min +0.086 s, max +0.099 s.**
+
+**The four that do NOT fit** are named rather than folded in, and **all four have
+a *positive* predecessor duration** — the one thing every conforming row lacks:
+
+| seq A → B | host | `dur[A]` | predicted | observed gap | overhead |
+|---|---|---:|---:|---:|---:|
+| 236 → 237 | clinic | +0.089 | 2.589 | **1.849** | −0.740 |
+| 230 → 231 | clinic | +0.051 | 2.551 | **1.969** | −0.582 |
+| 221 → 222 | clinic | +0.548 | 3.048 | **2.299** | −0.749 |
+| 22 → 23 | clinic | +0.561 | 3.061 | **2.347** | −0.714 |
+
+So, against the headline: **seven of the nine clinic sub-floor gaps and the one
+support sub-2.5 s gap are arithmetically accounted for by the preceding row's
+impossible duration. Two of the nine — seq 230 → 231 (1.969 s) and
+seq 236 → 237 (1.849 s) — are not, and neither is any other mechanism this
+directory can test.** The kernel series, which never saw a negative duration,
+reports **0** under 2.0 s on both hosts. **That is the reading that counts**, and
+it is unchanged by this section; the arithmetic explains the *size* of the short
+readings, not their existence.
+
+**What this does and does not license.** It is consistent with the clock fault
+`docs/09` §4 already records, and equally consistent with a post-hoc edit to
+`run.log` followed by a regeneration of `results.jsonl`, since the ledger is
+downstream of the same clock. **No cause is asserted.** What is asserted is the
+arithmetic, which is re-derivable: `verify-derivable.py` recomputes all 30 rows
+of both tables from `results.jsonl`, zero requests, and prints the overhead
+range so the 13 ms spread is checkable rather than taken on trust.
 
 ---
 
@@ -194,6 +278,17 @@ f.u = e => (2076===e ? "common" : e) + "." + { 225 entries }[e] + ".js"
 | duplicate ids | 0 | 0 |
 | distinct hashes | 225 | 225 |
 | `f.u` special case | id `2076` → name **`common`** | id `2076` → name **`common`** |
+
+⚠ **`chunk-map.json`'s `f_u_expression_first_400_chars` is a display prefix and
+nothing else.** It is the first 400 characters of the matched expression, and it
+is **identical for the two builds by truncation, not by identity** — id 2076 sorts
+near the end of the table and falls outside the cut, which is exactly the entry
+that differs between the builds. The field is renamed and carries
+`f_u_expression_note` and `f_u_expression_truncated_at` in the JSON itself (fixed
+2026-10-15, verification round 1, where the field was called `f_u_expression` and
+said nothing about being cut). **`entries` (225 ids each) and `chunk-map.tsv` are
+the complete artefact**; the expression string is a human-readable echo of them and
+is not evidence on its own.
 
 **Against the committed clinic list** (`findings-log/2026-10-14-area-k-clinic-controlflow/committed-map.txt`,
 copied there from the 2026-10-13 pass), joined **by hash**:
@@ -449,6 +544,111 @@ have differed between the builds did not differ in any token.
 
 ---
 
+## 8a. ⚠ The 224 this repo already published is 225 − 1, and the missing one has a name
+
+**This settles a denominator that two other pages still carry, and it closes a
+successor area K left open.** `docs/10`'s open-questions row for
+`personal.patient.timeline.config.host` still reads *"The one thing a web sweep
+could still add is the portal **lazy-chunk** corpus (**224 chunks**, never swept
+for these tokens)"*, and `docs/11`'s own text repeats "224 lazy chunks" — found by
+`grep -nF '224 lazy chunks are mined for endpoints' docs/11-suggested-research-areas.md`,
+1 hit. Both trace to `findings-log/probe-2026-10-08/CHUNK-CORPUS-FINDINGS.md`,
+whose own heading reads **"Lazy-chunk corpus (224 files)"**.
+
+That record is not wrong about the map. It says, at `:9-10`:
+
+> `hp-runtime.js` holds a **225-entry** webpack chunk map, `{12:"cfb28faf…", …}`, and
+> chunks resolve against the portal root (`.p=""`), so the filenames are
+> `<id>.<hash>.js`.
+
+and at `:13`: **"224 fetched, 4.4 MB. One entry returned the SPA fallback."**
+
+**225 entries in the map, 224 real chunks, 1 SPA fallback.** This pass measured
+**225 entries** in the clinic build's `f.u` (OBSERVED, `chunk-map.json`) and
+fetched **225 of 225** under the names `f.u` emits, with **0 fallbacks**
+(OBSERVED, `results.jsonl` seq 13–237). So the arithmetic closes exactly: the
+missing 224th chunk is the entry whose **id form is not the name `f.u` emits**.
+
+**Which entry that is: INFERRED, with the assumption named.** The 2026-10-08
+record says "One entry returned the SPA fallback" and **does not name it**. The
+attribution to id **2076** rests on three OBSERVED facts and one assumption:
+
+| | fact | class | where |
+|---|---|---|---|
+| 1 | that pass built filenames as `<id>.<hash>.js` — the **id** form | SOURCE-OBSERVED | `CHUNK-CORPUS-FINDINGS.md:9-10` |
+| 2 | `f.u` in this build emits `common` for id 2076 and for **no other id** | OBSERVED | `chunk-map.json` `special_case_id_to_name`; `derive-map.py` |
+| 3 | `2076.<hash>.js` answers `200 text/html` 5 518 B while `common.<hash>.js` answers `200 application/javascript`, on **both** builds | OBSERVED | this ledger, C5/C12 vs C4/C11, seq 4/5/11/12 |
+| *assumption* | the unnamed fallback entry in the 2026-10-08 run **is** that one, rather than a fetch error or a different defect | **INFERRED — not tested** | — |
+
+**Not claimed:** that the 2026-10-08 pass erred. It recorded the fallback
+explicitly rather than hiding it, and `docs/09` §4's trap row — *"A committed
+filename list is not a URL list … the defect is invisible to any control that
+does not compare the list against its generator"* — was written from that class
+of event. **The trap reproduced in the repo's own 2026-10-08 record, and this
+pass's `derive-map.py` is the fix it asks for.**
+
+**What this closes.** Area K's `FINDINGS.md:246-249` names the open item: *"`CHUNK-CORPUS-FINDINGS.md:13` records that the 224-chunk clinic sweep had **'One entry returned the SPA fallback'** — never explained. That is the successor (§8)."* **This is the named cause for that entry**, conditional on the assumption above. Area K's §8 is **not** in this pass's lane to close, and this log does not close it — it supplies the explanation and points at the two pages that still publish 224.
+
+**The denominator a reader should use: 225 per portal build**, OBSERVED here and
+re-derivable from `chunk-map.tsv`. The 224 is a different measurement of the same
+corpus with one entry lost to a name form, not a separate population.
+
+---
+
+## 8b. What is re-derivable from a clean clone, and what is not
+
+Stated because a stranger must not have to guess which half of this log they can
+check. **The response bodies are not committed** (`AGENTS.md` §7), and this pass
+went further: they were written to `SCRATCH=$(mktemp -d)` and are **gone from the
+machine as well**, so they cannot be recovered even by re-running anything offline.
+
+**RE-DERIVABLE from this directory, zero requests — `verify-derivable.py` runs
+all of it and exits non-zero on any mismatch:**
+
+| claim | checked against |
+|---|---|
+| 252 ledger rows, seq 1–252 contiguous and unique; 252 of 252 `GET`; hosts 231/21; all `200` | `results.jsonl` |
+| 12 controls + 240 sweep cells; **0 of 240** returned the 5 518 B shell | `results.jsonl`, by content-type |
+| the redundant request is present and counted: seq 4 ≡ seq 151, same URL, same `body_sha256` | `results.jsonl` |
+| the per-build token census, every one of the 24 tokens, including `m2m` = 0 across all 240 bodies | `results.jsonl` `tokens` |
+| the method gate: 15 / 42 / 66+126+4 = 196 on **both** main bundles | `results.jsonl` seq 9, 10 |
+| the case control: seq 36 `Timeline`=84 / `timeline`=44 / `TIMELINE`=0 | `results.jsonl` seq 36 |
+| **all of §2** — both spacing series, the 28 negative durations, the three >11.892 s gaps, and the §2d arithmetic with its overhead range | `results.jsonl` |
+| 225 ids per build, identical id sets, **221** shared hashes, **4** differing (2076/2873/6831/8285), 0 duplicate ids, 225 distinct hashes each | `chunk-map.tsv` |
+| the by-hash diff against area K's committed map: 225 shared, 0 either side, **0 name / 0 id differences** | `chunk-map.tsv` + `committed-map.txt` |
+| the 12-cell bridge selection (stride 18 from index 9) and **12 of 12** byte-identity | `chunk-map.tsv`, `results.jsonl` |
+| `distinct-diff.json` is internally consistent: `prefix + 5 + suffix == body_bytes` in all four | `distinct-diff.json` |
+| `run.log` regenerates byte-identically from `results.jsonl` | `results.jsonl` |
+| **0 scrub hits** over all 271 committed artefacts, all 10 patterns | `scrub-check.sh` |
+
+**LOG-LEVEL, NOT RE-DERIVABLE from a clean clone.** Named rather than left for a
+reader to assume:
+
+| claim | why | class it actually is |
+|---|---|---|
+| §5c's per-hit **byte offsets** and the quoted minified source for the `timeline`/`Timeline`/`personal.` reads | bodies gone; `sweep.py` printed contexts to stdout and persisted only `n_hit_contexts: 87` | OBSERVED **when made**; unverifiable now |
+| `hcp/patients/checkPhoneNumber` at offset **259 411** "in both" | same | same |
+| `$.C40` at **6 798**, `getLogBookConfig` at **6 756**, `hcp/configuration/public/` absent from that body | same | same |
+| the **shape** signatures behind "all code, not pointers" | same | same |
+| **"exactly five bytes"** — specifically that **no other divergence exists** between each distinct pair | needs both full bodies | the `37254`→`21981` **excerpt** at each offset IS committed (90 B, `distinct-diff.json`); the *exhaustiveness* is not |
+
+**What survives of the 5-byte claim, precisely.** Committed and checkable: both
+members of each pair have **equal `body_bytes`** and **different `body_sha256`**
+(OBSERVED, `results.jsonl`); the 90-byte excerpts at each first-divergence offset
+show `37254` against `21981`; and `prefix + 5 + suffix` equals the body length
+exactly in all four. Not checkable: that the five bytes are the *only* difference.
+**The claim is therefore published at its evidence class and not above it** —
+`docs/11` states "differing by exactly five bytes", which is what
+`distinct-diff.json` measures, and this section is the receipt for that.
+
+**The fix, named rather than left open:** a future sweep should commit a small
+per-cell evidence index at capture time — an offset list plus a ~160-byte excerpt
+per non-zero hit, and a fixed-width window per distinct pair. Roughly 30 KB, no
+vendor secret, and it makes §5c and the 5-byte claim checkable from a clone. It
+**cannot** be back-filled for this pass without re-fetching 240 bodies, which
+would break the closed request accounting in §1. Filed as the successor in
+`docs/11` §1b.
+
 ## 9. Not pinned, and why
 
 **No `regression/hurl/` pin was added.** The only pin this finding could support
@@ -495,7 +695,7 @@ hosts, one request shape; not generalised in either direction.**
 | 12 of 12 sampled shared-hash cells are byte-identical across the two hosts | OBSERVED | `results.jsonl` seq 241–252 vs the clinic cells at the same hash; `sweep.py` §BRIDGE |
 | a shared contenthash denotes the same emitted chunk, so the support remainder carries no content difference | **INFERRED** — supported by 12 of 221, not tested on the other 209 | §6a; assumption stated there |
 | the support build's remaining 209 chunks carry no service-identifying token | **NOT CLAIMED** — the remainder is open | §6 |
-| `carelinkhp.minimed.com` is NXDOMAIN, so the claim's second host does not exist and the support build was read from its own pinned host | SOURCE-OBSERVED (this repo) | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md]; `docs/11-suggested-research-areas.md:2082`; the host pair is pinned at `regression/hurl/05-public-config.check.sh:329–330` |
+| `carelinkhp.minimed.com` is NXDOMAIN, so the claim's second host does not exist and the support build was read from its own pinned host | SOURCE-OBSERVED (this repo) | [findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md] (`:379-380`, and its summary at `:10`); the Closed-table row restating it is `docs/11-suggested-research-areas.md`, **found by grep not by line number** — `grep -nF '| A — is \`carelinkhp\` really the clinician portal for every region?' docs/11-suggested-research-areas.md` (1 hit); the host pair is pinned at `regression/hurl/05-public-config.check.sh:329–330`, read as the `for spec in` pair, **stable because `regression/hurl/` is not edited by this PR** |
 | `t_sent` floor 1.801 s, 29 gaps under the declared 2.5 s, **9 under the repo's 2 s floor**; kernel-mtime series 0 under 2.0 s; 28 negative durations | OBSERVED (both series), no cause asserted | `spacing.json`; `spacing.py` |
 | a `200` on this host family means nothing without the content-type discriminator | OBSERVED | seq 1, 5, 6, 12 — each fallback byte-identical to its host's entry document |
 | the declared 2.5 s delay | SOURCE-OBSERVED (the harness) | `probe.sh`, `sleep $LOCKD` inside the `flock` |
@@ -515,8 +715,38 @@ hosts, one request shape; not generalised in either direction.**
 | `chunk-map.json` · `chunk-map.tsv` | the two maps and the diff. 225 ids per build. |
 | `sweep.py` | the four gates, the per-build census, the case-sensitivity control, every non-zero hit with context, the bridge. |
 | `spacing.py` · `spacing.json` | both spacing series and the negative-duration count. |
+| `verify-derivable.py` | **the receipt for §8b.** Re-derives, offline and zero requests, every figure this pass says is re-derivable from its committed artefacts — ledger shape, the content-type gate, the token census, both spacing series, the §2d arithmetic, the chunk map and its by-hash diff, the bridge, `distinct-diff.json`'s internal arithmetic, and `run.log`'s regeneration. **101 checks; exits non-zero on any mismatch.** It also prints, on exit, the two claims it deliberately does **not** check and why. |
 | `diff-distinct.py` · `distinct-diff.json` | what the 4 build-distinctive chunks differ by. |
 | `runlog.py` · `run.log` | `run.log` is **generated from `results.jsonl`**. The harness's own `run.log` printf had one conversion too few for its argument list, and bash `printf` reuses the format string when arguments outnumber conversions, so it emitted extra lines instead of failing. Found by reading the file; the ledger was never affected (one `python3` row per request) and is the record. |
-| `scrub-check.sh` | every pattern in `scripts/scrub-patterns.txt` against every file here, **whatever its extension** — the gate reads no `.txt`, `.jsonl`, `.tsv` or `.json` file in any mode (`docs/09` §4). |
+| `scrub-check.sh` | every pattern in `scripts/scrub-patterns.txt` against **all 271 files this pass adds** — the 20 top-level artefacts plus **all 252 `.h` header captures** — because the gate reads no `.txt`, `.jsonl`, `.tsv`, `.json`, `.log` or `.h` file in any mode, `--all` included (`docs/09` §4, "a leak scan that cannot see the file it was written for"). Measured: **271 files, 10 patterns, 0 hits, 0 `Set-Cookie`**. It also **fails closed** — unreadable pattern list, fewer than 5 parsed patterns, or zero subject files each exit 1. ⚠ **Corrected 2026-10-15 (verification round 1): the first version of this script screened 19 of 271 files** — its `for f in "$DIR"/*` loop did not recurse into `headers/`, so every one of the 252 captures went unread — **and printed PASS having iterated zero patterns** when run from a partial tree. The verifier screened `headers/` by hand: **0 hits**, so nothing had escaped and no published claim was affected; the *sentence* was the defect. Both are fixed; the wrong claim is kept here rather than deleted (`AGENTS.md` §3). |
 | `results.jsonl` | 252 rows, millisecond `t_queued`/`t_sent`/`t_done` plus the kernel `body_mtime`. |
 | `headers/` | 252 response heads. |
+---
+
+## 13. Corrections (2026-10-15, verification round 1)
+
+Kept rather than silently edited (`AGENTS.md` §3). **None of these changed a vendor
+request, a body, a digest or a headline figure** — the request accounting in §1 is
+unchanged at 252 of a 260 cap and the token census in §5 re-derives identically.
+Each is a prose or tooling defect, fixed against the same committed artefacts.
+
+| # | where | what was wrong | class | now |
+|---|---|---|---|---|
+| 1 | §2a | named **two** gaps above 11.892 s, called both "phase-1 → phase-2 boundaries", and closed "every other gap on either host is ≤ 11.892 s". There are **three**: support seq 8 → 10 (95.997 s) was unnamed, and seq 12 → 238 is not a phase boundary — the support host was idle while the 225-row clinic sweep (597.040 s) ran | **disagreement** — contradicted by this pass's own ledger | §2a rewritten with all three, each with its own measured cause; both wrong sentences kept in git history |
+| 2 | §12 | claimed `scrub-check.sh` screened "every file here". It screened **19 of 271** — `"$DIR"/*` does not recurse into `headers/` — and **printed PASS having iterated 0 patterns** from a partial tree | **disagreement** — the sentence, not the corpus; verifier screened `headers/` by hand, 0 hits | script rewritten to `find -type f` incl. `.h`, with three fail-closed guards; now 271 files / 10 patterns / 0 hits; sentence narrowed to the measured coverage |
+| 3 | §11 | cited `docs/11-suggested-research-areas.md:2082` for the NXDOMAIN source row. Correct against `origin/main`; **on this branch line 2082 is the area-Y addendum** and the row is at 2198, because this PR inserted 116 lines above it | **disagreement** — §6 item 6 in line-number form | replaced with a grep that hits exactly one line, plus the `committed-map.txt` / area-A `file:line` forms. **The `05-public-config.check.sh:329–330` half was always correct** — `regression/hurl/` is not edited here. The verifier's report named a second site at `docs/11:906`; **that file carries no such citation** and its existing cite is correct, so nothing was changed there |
+| 4 | `docs/11` §1a | no recorded grep-first duplicate test, which `CONTRIBUTING-research.md:195-200` requires ("grep both first") | **absence** of a check, not a disagreement — the successor is substantively non-duplicate | test run and recorded in `docs/11` with its commands and hit counts |
+| 5 | §5c, `distinct-diff.json` | per-hit byte offsets, the quoted minified source, `checkPhoneNumber` at 259 411, `$.C40` at 6 798, and the exhaustiveness of "exactly five bytes" are **not re-derivable from a clean clone**: bodies were written to a `mktemp -d` and are gone from the machine | **absence** of the artefact | `verify-derivable.py` added (101 checks, zero requests) so the re-derivable half is machine-checked; **§8b names, per claim, what remains log-level** and why; the fix is filed as a successor |
+| 6 | §2a/§2c | under-claimed: `gap = 2.5 + dur[prev] + overhead` accounts for **26 of the 30** sub-2.5 s gaps at a constant **+0.086…+0.099 s**, and every one of the 4 it does not fit has a *positive* predecessor duration | **addition**, not a defect | §2d added. **No cause is still asserted** — the identity explains the size of a short reading, not the impossible duration it rests on |
+| 7 | `chunk-map.json` | `f_u_expression` was a 400-char prefix with nothing saying so, and is identical across builds **by truncation, not by identity** — id 2076 falls outside the cut, which is the entry that differs | **disagreement** — the field invited a false reading | renamed `f_u_expression_first_400_chars` with `f_u_expression_truncated_at` and `f_u_expression_note` in the JSON, and `derive-map.py` updated to emit the same keys so a regeneration cannot lose them |
+| 8 | `docs/10` | still publishes "**224 chunks**, never swept for these tokens" for this corpus; our denominator is **225** | **disagreement**, but **not this PR's file** | resolved and published as **§8a**: 224 = 225 − 1, the lost entry being the `f.u` `2076 → common` id-vs-name form, which closes the explanation area K left open. `docs/10` is not this pass's lane; it is named as a successor in `docs/11` |
+
+**On finding 5, stated plainly rather than dressed up.** The instruction was to
+commit a per-cell evidence index so §5c becomes checkable from a clone. **That
+cannot be done for this pass**: the bodies no longer exist on the machine, so
+producing 30 KB of excerpts would mean re-fetching 240 chunks, which breaks the
+closed request accounting in §1 and would be a different pass with a different
+ledger. **The honest resolution is the one taken here** — machine-check the half
+that is checkable, and label the other half by claim. The 148+4
+`timeline`/`Timeline` hits, the byte offsets, and the exhaustiveness of the 5-byte
+claim are **OBSERVED when made and unverifiable now**, and this log says so.

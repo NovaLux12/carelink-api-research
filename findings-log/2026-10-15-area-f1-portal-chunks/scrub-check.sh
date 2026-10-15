@@ -1,64 +1,98 @@
 #!/usr/bin/env bash
-# scrub-check.sh — screen THIS PASS's own artefacts against
-# scripts/scrub-patterns.txt. Zero requests, no network.
+# Screen EVERY artefact this pass produced against scripts/scrub-patterns.txt.
+# Zero requests, no network.
 #
 # WHY THIS EXISTS AND WHY IT IS NOT OPTIONAL. docs/09 §4, trap row "A leak scan
 # that cannot see the file it was written for": all three of the gate's leak
 # scan modes choose their subjects by file extension (md/yml/yaml/sh/hurl), so
-# the tracked .txt files — and, by the same mechanism, .jsonl / .tsv / .json —
-# are read by no scrub pattern in ANY mode, --all included. A .txt artefact
-# written this pass would be scanned by nothing.
+# every other extension — .txt, .jsonl, .tsv, .json, .log, .py, and the .h header
+# captures this pass wrote — is read by no scrub pattern in ANY mode, --all
+# included. This pass adds 271 files of which 252 are .h header captures, so
+# this script is the only thing that reads them.
 #
-# So this script does what the gate cannot: it takes every pattern from the ONE
-# scrub list and applies it to every file this pass adds, whatever the
-# extension. It is deliberately independent of the gate so that a green gate is
-# never mistaken for a clean artefact.
+# It is deliberately independent of the gate so that a green gate is never
+# mistaken for a clean artefact.
 #
 # A pattern that fires on a file in this directory is a STOP, not a warning.
+#
+# ⚠ TWO DEFECTS FIXED 2026-10-15 (verification round 1). The first version of
+# this script was wrong twice, and both are recorded because the failure shape
+# is the one docs/09 §4 warns about:
+#
+#   1. IT DID NOT RECURSE. Its loop was `for f in "$DIR"/*` with a `[ -f "$f" ]`
+#      guard, so it screened the 19 top-level files and NONE of the 252 header
+#      captures — 19 of 271 files, against a FINDINGS.md sentence that claimed
+#      "every file here". The verifier screened headers/ by hand: 0 hits, so no
+#      leak had escaped. The sentence was the defect, not the corpus; both are
+#      fixed. Now `find -type f`, which cannot silently drop a directory.
+#   2. IT PRINTED PASS HAVING SCREENED NOTHING. Run from a partial tree it
+#      resolved the pattern file to nothing, iterated zero patterns, reported
+#      "screened 19 files against 0 patterns: 0 hits" and then printed PASS — a
+#      scrub that reads no patterns reporting clean (AGENTS.md §6 item 1). The
+#      guards below are the fix, in the script rather than in a note, because a
+#      note is what the first version had. Precedent: area K's scrub-check.sh.
 set -uo pipefail
-cd "$(dirname "$0")/../.." || exit 1
+cd "$(cd "$(dirname "$0")" && pwd)"
+# <checkout>/findings-log/<dir>/ -> two levels up is the checkout root.
+ROOT="$(cd ../.. && pwd)"
+PATS="$ROOT/scripts/scrub-patterns.txt"
 
-DIR="findings-log/2026-10-15-area-f1-portal-chunks"
-PATS="scripts/scrub-patterns.txt"
+# ---- FAIL LOUDLY IF THE NET IS EMPTY -------------------------------------
+if [ ! -r "$PATS" ]; then
+  printf 'scrub-check: FAIL — pattern list not readable at %s\n' "$PATS" >&2
+  printf '  A scrub that reads no patterns is not a clean result; it is no result.\n' >&2
+  exit 1
+fi
+NPATTERNS=$(grep -v '^[[:space:]]*#' "$PATS" | grep -c '|' || true)
+if [ "$NPATTERNS" -lt 5 ]; then
+  printf 'scrub-check: FAIL — only %s pattern lines parsed from %s; expected the full list.\n' \
+    "$NPATTERNS" "$PATS" >&2
+  exit 1
+fi
 
-# Patterns are "<name>|<regex>", one per line; comment lines start with '#'.
-mapfile -t PATTERNS < <(grep -v '^#' "$PATS" | grep -v '^[[:space:]]*$' | while IFS='|' read -r name rx; do
-  printf '%s\t%s\n' "$name" "$rx"
-done)
+# ---- SUBJECTS: recurse, every extension this pass actually wrote ----------
+# .h is in this list because that is what the 252 header captures are called.
+SUBJECTS=$(find . -type f \
+  ! -name 'scrub-check.sh' \
+  \( -name '*.md' -o -name '*.txt' -o -name '*.json' -o -name '*.jsonl' \
+     -o -name '*.sh' -o -name '*.py' -o -name '*.log' -o -name '*.tsv' \
+     -o -name '*.h' \) | sort)
 
-# The one file allowed to contain the literals: the scrub list itself, and the
-# gate script (both excluded by the gate for exactly this reason). Neither is
-# in this directory, so nothing needs exempting here — and that is asserted
-# rather than assumed.
-if grep -ql 'scrub-patterns' "$DIR"/* 2>/dev/null && [ -e "$DIR/scrub-patterns.txt" ]; then
+NFILE=$(printf '%s\n' "$SUBJECTS" | grep -c . || true)
+if [ "$NFILE" -eq 0 ]; then
+  printf 'scrub-check: FAIL — no subjects found; the glob found nothing.\n' >&2
+  exit 1
+fi
+
+# The one file allowed to contain the literals is the scrub list itself, and the
+# gate script; neither is in this directory, so nothing needs exempting here.
+if [ -e ./scrub-patterns.txt ]; then
   printf 'FAIL: the scrub list has been copied into this pass log\n'; exit 1
 fi
 
 hits=0
-files=0
-for f in "$DIR"/*; do
-  [ -f "$f" ] || continue
-  files=$((files + 1))
-  while IFS=$'\t' read -r name rx; do
-    [ -z "$name" ] && continue
-    # -a: treat binary as text. Bodies are not committed, but headers and the
-    # ledger can hold bytes that are not printable.
-    n=$(grep -a -c -E -e "$rx" "$f" 2>/dev/null || true)
-    n=${n:-0}
-    if [ "$n" -gt 0 ]; then
-      printf 'HIT  %s  pattern "%s"  %s line(s)  in  %s\n' "$n" "$name" "$f"
-      grep -a -n -E -e "$rx" "$f" | head -3 | cut -c1-160
-      hits=$((hits + 1))
-    fi
-  done < <(printf '%s\n' "${PATTERNS[@]}")
-done
+while IFS='|' read -r name rx; do
+  [ -z "$name" ] && continue
+  case "$name" in \#*) continue ;; esac
+  [ -z "$rx" ] && continue
+  if [ "$name" = "machine-specific paths" ]; then
+    n=$(cat $SUBJECTS 2>/dev/null | grep -v '/home/<user>' | grep -a -c -E -e "$rx" || true)
+  else
+    n=$(cat $SUBJECTS 2>/dev/null | grep -a -c -E -e "$rx" || true)
+  fi
+  n=${n:-0}
+  if [ "$n" -gt 0 ]; then
+    printf 'HIT  %s  pattern "%s"  %s line(s)\n' "$n" "$name" "$rx"
+    grep -a -n -E -e "$rx" $SUBJECTS 2>/dev/null | head -3 | cut -c1-160 | sed 's/^/       /'
+    hits=$((hits + 1))
+  fi
+done < <(grep -v '^[[:space:]]*#' "$PATS")
 
-# The scrub list also carries a live-value pattern for .corp hosts and home
-# paths that the regex list covers; this pass adds one more shape the list does
-# not: a body head or header value carrying a Set-Cookie. Not a pattern above,
-# so it is checked by hand here and reported either way.
+# The scrub list carries no shape for a Set-Cookie in a header capture, and this
+# pass writes 252 of them. Not a pattern above, so it is checked by hand and
+# reported either way.
 cookies=0
-for f in "$DIR"/headers/* "$DIR"/results.jsonl; do
+for f in ./headers/* ./results.jsonl; do
   [ -f "$f" ] || continue
   if grep -a -i -q '^set-cookie:' "$f" 2>/dev/null; then
     printf 'NOTE %s carries a Set-Cookie header — read it before publishing\n' "$f"
@@ -66,7 +100,9 @@ for f in "$DIR"/headers/* "$DIR"/results.jsonl; do
   fi
 done
 
-printf '\nscreened %s files against %s patterns: %s hits, %s files with Set-Cookie\n' \
-  "$files" "$(printf '%s\n' "${PATTERNS[@]}" | grep -c .)" "$hits" "$cookies"
+# ---- REPORT WHAT WAS ACTUALLY COVERED ------------------------------------
+nhead=$(printf '%s\n' "$SUBJECTS" | grep -c '/headers/.*\.h$' || true)
+printf '\nscreened %s files (%s of them .h header captures) against %s patterns: %s hits, %s files with Set-Cookie\n' \
+  "$NFILE" "$nhead" "$NPATTERNS" "$hits" "$cookies"
 [ "$hits" -eq 0 ] || { printf 'FAIL — do not push\n'; exit 1; }
-printf 'PASS — no scrub pattern fires on any artefact in %s\n' "$DIR"
+printf 'PASS — no scrub pattern fires on any of the %s artefacts this pass adds\n' "$NFILE"

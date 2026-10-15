@@ -2,7 +2,9 @@
   "builds": {
     "clinic": {
       "build": "clinic",
-      "f_u_expression": "(2076===e?\"common\":e)+\".\"+{12:\"cfb28fafc1fe9cf5\",40:\"9cffbe2c518352c0\",50:\"dcab8cd0fa8efd2c\",90:\"374d52dd04c4ab49\",124:\"e1b2432a2079e017\",186:\"fb93c12aabd48467\",213:\"676d124170faee05\",245:\"0e31da2c91b41506\",259:\"465abef10506aa4a\",276:\"486fa68d5853501f\",288:\"41b004e341041fe1\",298:\"5d9a9220016d5fa4\",342:\"371f32d002a4db6b\",346:\"06f728e92fd58449\",347:\"402d6eb48d682090\",390:\"18710ca5b08ce4f9\",391:\"6eb3",
+      "f_u_expression_first_400_chars": "(2076===e?\"common\":e)+\".\"+{12:\"cfb28fafc1fe9cf5\",40:\"9cffbe2c518352c0\",50:\"dcab8cd0fa8efd2c\",90:\"374d52dd04c4ab49\",124:\"e1b2432a2079e017\",186:\"fb93c12aabd48467\",213:\"676d124170faee05\",245:\"0e31da2c91b41506\",259:\"465abef10506aa4a\",276:\"486fa68d5853501f\",288:\"41b004e341041fe1\",298:\"5d9a9220016d5fa4\",342:\"371f32d002a4db6b\",346:\"06f728e92fd58449\",347:\"402d6eb48d682090\",390:\"18710ca5b08ce4f9\",391:\"6eb3",
+      "f_u_expression_truncated_at": 400,
+      "f_u_expression_note": "DISPLAY PREFIX ONLY -- not the full f.u. Identical across builds by truncation, not by identity; id 2076 lies past the cut. Use `entries` / chunk-map.tsv.",
       "special_case_id_to_name": {
         "id": "2076",
         "name": "common"
@@ -243,7 +245,9 @@
     },
     "support": {
       "build": "support",
-      "f_u_expression": "(2076===e?\"common\":e)+\".\"+{12:\"cfb28fafc1fe9cf5\",40:\"9cffbe2c518352c0\",50:\"dcab8cd0fa8efd2c\",90:\"374d52dd04c4ab49\",124:\"e1b2432a2079e017\",186:\"fb93c12aabd48467\",213:\"676d124170faee05\",245:\"0e31da2c91b41506\",259:\"465abef10506aa4a\",276:\"486fa68d5853501f\",288:\"41b004e341041fe1\",298:\"5d9a9220016d5fa4\",342:\"371f32d002a4db6b\",346:\"06f728e92fd58449\",347:\"402d6eb48d682090\",390:\"18710ca5b08ce4f9\",391:\"6eb3",
+      "f_u_expression_first_400_chars": "(2076===e?\"common\":e)+\".\"+{12:\"cfb28fafc1fe9cf5\",40:\"9cffbe2c518352c0\",50:\"dcab8cd0fa8efd2c\",90:\"374d52dd04c4ab49\",124:\"e1b2432a2079e017\",186:\"fb93c12aabd48467\",213:\"676d124170faee05\",245:\"0e31da2c91b41506\",259:\"465abef10506aa4a\",276:\"486fa68d5853501f\",288:\"41b004e341041fe1\",298:\"5d9a9220016d5fa4\",342:\"371f32d002a4db6b\",346:\"06f728e92fd58449\",347:\"402d6eb48d682090\",390:\"18710ca5b08ce4f9\",391:\"6eb3",
+      "f_u_expression_truncated_at": 400,
+      "f_u_expression_note": "DISPLAY PREFIX ONLY -- not the full f.u. Identical across builds by truncation, not by identity; id 2076 lies past the cut. Use `entries` / chunk-map.tsv.",
       "special_case_id_to_name": {
         "id": "2076",
         "name": "common"
