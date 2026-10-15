@@ -135,11 +135,22 @@ table, so they were swept explicitly rather than assumed absent (`census.txt` §
 `o.G["X"]` **0**, `o.G['X']` **0**, `Object.values(o.G)` **0**,
 `Object.keys(o.G)` **0**, `Object.entries(o.G)` **0**, `{...o.G}` **0**,
 `o.G` passed as a whole call argument, `**(o.G)**` **0** — that is **7 of the 8
-sweeps at zero**. The 8th, `o.G` followed by a comma or a semicolon, returns
-exactly **1** hit, and it is the row-198 638 false hit already listed above: a
-*different* module's exported function, called. So no iteration, no
-destructuring and no bracket read can be consuming a member without showing up in
-the member-read table.
+sweeps at zero**. The 8th returns exactly **1** hit, and it is the row-198 638
+false hit already listed above: a *different* module's exported function, called.
+So no iteration, no destructuring and no bracket read can be consuming a member
+without showing up in the member-read table.
+
+> ⚠ **The 8th sweep's pattern is now printed in `census.txt`, and this sentence's
+> description of it was wrong.** It previously read *"the 8th, `o.G` followed by a
+> comma or a semicolon"*. **The pattern actually run is `(?<![.\w])o\.G(?![\w.])`** —
+> a negative lookbehind, and a negative lookahead that excludes a following word
+> character **or a dot**. Reproducing the sweep as it was described —
+> `o\.G[,;]` — returns **0**, not 1: the character after `o.G` at byte 198 638 is
+> **`)`**, a comma and a semicolon appear nowhere at that site. The count was right
+> and the hit was correctly adjudicated, but the description was false and
+> `census.txt` printed only the label, never the regex, so a re-runner following
+> this log would have reproduced a contradiction (`AGENTS.md` §6.2).
+> `xsuffix-analyse.py` now prints `regex=` beside every sweep's label and count.
 
 **Member reads: 3. Distinct members read: 3 of 5.** `BLE_X` and `SIMPLERA_X` have
 **0 reads**.
@@ -185,18 +196,35 @@ meaningless claim and "0 case-sensitive hits" is not. Read individually
     These are summed in `census.txt` §E and total **34**.
   - **13 are standalone `BLE` tokens** — the maximal run *is* `BLE` — and they are a
     **third, unrelated sense of the same three letters**: bytes 3 316 707 – 3 321 247
-    are the pump's Bluetooth debug-event catalogue
-    (`label:"BLE Param Update"`, `label:"BLE Pair Request"`,
-    `description:"BLE long term key event"`, `type:"BleConnectionEvent"`, and nine
-    more `label:`/`description:` values in the same
-    `{type:…, label:…, severity:…, description:…}` records), where `BLE` abbreviates
-    Bluetooth Low Energy. Same token, different sense, same file. A pass that counted
-    `BLE` hits would have reported a 52-member surface.
+    are the pump's Bluetooth debug-event catalogue, whose records carry the shape
+    `{type:…, label:…, severity:…, description:…}`. All 13 are a `label:` or a
+    `description:` value: **6 `label:`** (`"BLE Param Update"`, `"BLE Param Update
+    Complete"`, `"BLE Pair Request"`, `"BLE Key Exchange"`, `"BLE Key Received"`,
+    `"BLE Connection"`) and **7 `description:`** (`"BLE connection parameters
+    updated"`, `"BLE connection parameter update completed"`, `"BLE GAP pairing
+    request"`, `"BLE GAP key exchange"`, `"BLE GAP key received"`, `"BLE long term
+    key event"`, `"BLE connection parameter update"`). `BLE` abbreviates Bluetooth
+    Low Energy in both fields. Same token, different sense, same file. A pass that
+    counted `BLE` hits would have reported a 52-member surface.
+
+> ⚠ **The enumeration above previously read "three hits … and **nine** more", which
+> summed to 12 — one short of its own total.** The bytes give **6 `label:` + 7
+> `description:` = 13**, so the word is **ten**. Corrected here because successor
+> (b) proposes to enshrine this figure and its offsets in the false-positive
+> register, where an off-by-one would propagate (`AGENTS.md` §6.5).
 
 The arithmetic, so the split is checkable rather than asserted:
 **52 = 4 (declaration) + 1 (member read) + 47 (other), and 47 = 34 (substrings) + 13
 (standalone)**. An independent verifier re-derived all three numbers from the bytes
-and reproduced them; see §10.
+and reproduced them; see §11.
+
+**The rule's scope, stated because it does not self-apply.** *Substring* and
+*standalone* are defined here over the **47 hits in the "other" class** — the ones
+that are neither in the declaration nor the member read. Applied to all 52 hits the
+same rule gives **36 substrings / 16 standalone**, because the 4 declaration hits and
+the 1 member-read hit are themselves standalone `BLE` tokens under it. Both splits
+are correct on their own class; only one of them is the answer to "what noise is
+this?", and that is the 47.
 
 `SIMPLERA`'s near-miss at byte **2 136 604** is the one that would have produced a
 wrong finding:
@@ -236,9 +264,15 @@ measures, on the digest-pinned 2026-10-13 build: **`NGP` case-sensitive = 0**; 9
 case-insensitive hits, and **every one** of them the letters `ngP` inside a longer
 identifier — 93 as `ngP` and **one** as lower-case `ngp` (inside `bingpreview`) —
 in `numberingPlan` / `pendingPageScroll` / `marketingParams`-class names. The
-Samsung user-agent regexes *are* present (17 `Samsung` occurrences, bytes
-2 240 566 – 2 888 911, a browser-sniffing library) — and none of them carries
-`NGP`.
+Samsung user-agent regexes *are* present (**17** `Samsung` occurrences, first at byte
+2 240 566, last **starting** at 2 888 910 and ending at 2 888 916 inclusive — a
+browser-sniffing library) — and none of them carries `NGP`.
+
+> ⚠ **The span's upper bound was wrong and is corrected above.** This section
+> previously read *"bytes 2 240 566 – 2 888 911"*. The **count (17)** and the
+> **lower bound** were exact; the upper bound matched neither reading available:
+> the last occurrence **starts at 2 888 910**, and its 7-byte span **ends at
+> 2 888 916** inclusive. A bound that is neither a start nor an end is not a bound.
 
 Both readings are recorded. This pass does not claim the earlier figure was wrong;
 it records that the figure does not reproduce as 3 on the build this pass names,
@@ -376,15 +410,15 @@ All rows are OBSERVED in one artefact, the digest-pinned patient bundle
 | claim | class | source |
 |---|---|---|
 | Corpus reproduced its pinned digest and byte length | OBSERVED | `results.jsonl` seq 4; `census.txt` §A |
-| The anchor gate **refuses** a corpus that does not reproduce its pin (exit 3, no findings printed) | OBSERVED | §10, fired against a deliberately wrong body |
+| The anchor gate **refuses** a corpus that does not reproduce its pin (exit 3, no findings printed) | OBSERVED | §11, fired against a deliberately wrong body |
 | Enum is 5 members, no comment, no sibling map, one export `G` | OBSERVED | `census.txt` §B, bundle bytes 1 723 196 – 1 723 341 |
 | Module id `45559` occurs exactly twice → exactly one importer | OBSERVED | `census.txt` §C, bytes 1 723 196 / 2 962 721 |
 | Exactly 3 member reads: `BLE`, `SIMPLERA`, `GUARDIAN` | OBSERVED | `census.txt` §D, bytes 2 964 176 / 2 964 215 / 2 964 259 |
-| The imported binding `o` is used **only** as `o.G.<MEMBER>` — no alias, no bare pass-on | OBSERVED | §10, module `83644` bounded by webpack delimiter (2 962 630 – 2 965 094) |
+| The imported binding `o` is used **only** as `o.G.<MEMBER>` — no alias, no bare pass-on | OBSERVED | §11 and `census.txt` §L, module `83644` bounded by webpack delimiter (2 962 630 – 2 965 093) |
 | `BLE_X`, `SIMPLERA_X`: **0 reads** in this corpus | OBSERVED | `census.txt` §D, §E, §I |
 | No bracket / iteration / spread / pass-on consumption shape | OBSERVED | `census.txt` §D (8 explicit shape sweeps: **7 return 0**; the 8th returns only the already-counted same-token false hit @198 638) |
 | Byte 198 638 `o.G` is a different binding, not a member read | OBSERVED | `census.txt` §D window |
-| The 52 `BLE` hits partition as 4 declaration + 1 member read + 47 other, and the 47 as **34 substrings + 13 standalone tokens** | OBSERVED | `census.txt` §E; re-derived from the bytes, §10 |
+| The 52 `BLE` hits partition as 4 declaration + 1 member read + 47 other, and the 47 as **34 substrings + 13 standalone tokens** | OBSERVED | `census.txt` §E; re-derived from the bytes, §11 |
 | Case-insensitivity is a 60.9× noise multiplier on `BLE` | OBSERVED | `census.txt` §F |
 | `SIMPLERACC` is a `deviceModelMapping` key, not an enum member | OBSERVED | `census.txt` §H, byte 2 136 604 |
 | The branch is a transport decision made on the **base** token | OBSERVED | `census.txt` §D, §J; byte 3 373 390 |
@@ -408,34 +442,86 @@ recorded as two readings from two passes on two captures, not as agreement.
 | `results.jsonl` | 4 rows, one per request, `t_queued`/`t_lock_acquired`/`t_sent`/`t_done` |
 | `run.log` | the same stamps per request |
 | `headers/` | response headers. The re-issue reused run 1's tag names, so these are **run 2's** (rows 3–4); run 1's header files were overwritten. They carry `etag: W/"3424a7-659f36d017140"` and `last-modified: Wed, 26 Aug 2026 13:45:01 GMT`, byte-equal to the values recorded at `findings-log/2026-10-13-area-k-patient-chunks/results.jsonl` seq 2 — a **coherence** check (`AGENTS.md` §2.1: agreement, not multiplicity; same repository, same artefact, so no strength word is earned), not corroboration |
-| `census.txt` | the full read: every occurrence of every token with offset, enclosing token, literal-vs-code and a 90-byte window |
-| `xsuffix-analyse.py` | the analysis; the census, the controls and the truth table |
+| `census.txt` | the full read: every occurrence of every token with offset, enclosing token, literal-vs-code and a 90-byte window; §D prints each shape sweep's **regex** beside its count, §L is the closure enumeration |
+| `xsuffix-analyse.py` | the analysis; the census, the controls, the truth table and (§L) the closure enumeration. Offline, 0 requests; refuses to print past a failed anchor gate |
+| `dup-test.sh` | the grep-first duplicate test, re-runnable, **printing the commit it counted at** and naming both tables that answer "the Closed table" (§10) |
 
 ## 10. The grep-first duplicate test, run and recorded
 
 `CONTRIBUTING-research.md:196` requires a successor to be tested against
 `docs/10-open-questions.md` §1, the Closed table and the page itself — **"grep
-both first"**. Run 2026-10-15, **0 requests**, against `docs/11` at this branch's
-head. Counts are not verdicts, so each hit is adjudicated below.
+both first"**. Run 2026-10-15, **0 requests**. Counts are not verdicts, so each hit
+is adjudicated below.
+
+> **Every count in this section is bound to a commit, and the test is a script.**
+> Re-run it: **`./dup-test.sh`**, which prints the SHA it counted at. Round 1 of this
+> pass recorded bare counts and round 2 of verification found all three had gone
+> stale **in the very commit that invalidated them** — this pass edited `docs/11` in
+> six hunks and did not re-run or re-state them. Re-running and pasting new numbers
+> would have fixed one instance of a bug that fires every time the page is edited,
+> and it fires anyway, because four lanes in this pool edit `docs/11` at once.
+>
+> **Counts below are as of `3449e14bc0349c4e35b5f03342b701d1ed3ab267`** (this
+> branch's head at the time of writing) **plus this commit's own §10 hunks**, which
+> are inside the successor-2 block and therefore add hits — so **expect
+> `docs/11` `45559` = 9, not the 7 recorded at round 1.** Re-derive with
+> `dup-test.sh` and cite the SHA it prints. **A count that names the tree it was
+> taken on is re-derivable; a count that says "this branch's head" is a promise
+> about a moving object** (`AGENTS.md` §1).
+>
+> **The per-hit verdicts below are the finding. The counts are evidence of where to
+> look.** Verification round 2 confirmed every verdict; none of them moved, and none
+> of them depends on a count staying still.
+
+### The two tables that both answer "the Closed table"
+
+`CONTRIBUTING-research.md:196` says "the Closed table" in the singular. **Two
+tables answer that name and they disagree**, so both are tested explicitly and
+neither is assumed:
+
+| id | what it is | `45559` | `BLE_X` | `false-positive` | `Samsung` |
+|---|---|---:|---:|---:|---:|
+| **T1** | `docs/10-open-questions.md` §2, *"Searched and closed — do not re-run these"* | 0 | 0 | 0 | 0 |
+| **T2** | `docs/11-suggested-research-areas.md` § *Closed areas*, the row table | 1 | 1 | 1 | 0 |
+
+A test written against the bare placeholder `<Closed table>` cannot be re-run
+without guessing which one was meant. `dup-test.sh` names both.
 
 ### (a) the patient lazy corpus, for module `45559` and `_X` reads
 
 ```
-grep -c 45559 docs/10-open-questions.md          -> 0
-grep -c BLE_X docs/10-open-questions.md          -> 1
-grep -c 45559 <Closed table>                     -> 1
-grep -c BLE_X <Closed table>                     -> 1
-grep -c 45559 docs/11-suggested-research-areas.md -> 7
+grep -c 45559 docs/10 section 1 (open questions)  -> 0
+grep -c BLE_X docs/10 section 1 (open questions)  -> 1
+grep -c 45559 T1 docs/10 section 2                -> 0
+grep -c BLE_X T1 docs/10 section 2                -> 0
+grep -c 45559 T2 docs/11 Closed areas             -> 1
+grep -c BLE_X T2 docs/11 Closed areas             -> 1
+grep -c 45559 docs/11 whole page                  -> 9
 ```
 
 **Not a duplicate.** `docs/10`'s single `BLE_X` hit is row 37's *prescription* for
 a future authenticated response — "the client's own comparison set (`BLE`, `BLE_X`,
 `SIMPLERA`, `SIMPLERA_X`, `GUARDIAN`, `NGP`)" — not a proposal to sweep the lazy
-corpus. The Closed-table hits are **area R's own row** ("Two successors filed under
-the area: read-side echo casing, and whether the `_X` suffixes mean anything"),
-i.e. the parent this pass closes. `docs/11`'s 7 hits are area P's block (2), this
-area's row and closed block (5), and area P's Closed row — none proposes the lazy
-sweep except successor (a) itself.
+corpus. The T2 hits are **area R's own row** ("Two successors filed under the area:
+read-side echo casing, and whether the `_X` suffixes mean anything"), i.e. the
+parent this pass closes.
+
+⚠ **The `docs/11` breakdown was wrong at round 1 and is corrected here.** The 7 then
+recorded **summed to 8 under a heading of 7**, and at this commit the true count is
+**9**. The partition at this tree:
+
+| where | n |
+|---|---:|
+| area P's `docs/11` block (the byte-anchored declaration) | 1 |
+| area P's `docs/11` Closed row | 1 |
+| this area's successor-2 row (`Blocker:` line) | 1 |
+| this area's successor-2 closed block, **including the §10 pointer added this round** | 6 |
+| **total** | **9** |
+
+None of the nine proposes the lazy sweep except successor (a) itself. T1, the other
+table answering the same name, is **0** for both tokens — so on T1's reading this
+successor is not merely non-duplicate, it is **unrecorded**, which is why it is
+worth filing.
 
 ⚠ **One thing this grep surfaced, recorded rather than acted on:** `docs/10` row 37
 prescribes matching a future value against that 6-member comparison set, two of
@@ -447,43 +533,58 @@ is worth running and why the row must not be read as confirmed by this pass.
 ### (b) the false-positive class, as offsets
 
 ```
-grep -c false-positive docs/10-open-questions.md -> 0
-grep -c "false positive" docs/10-open-questions.md -> 1
-grep -c false-positive <Closed table>            -> 1
-grep -c false-positive docs/11                    -> 2
+grep -c false-positive   docs/10 whole file -> 0
+grep -c "false positive" docs/10 whole file -> 1
+grep -c false-positive   T2 docs/11 Closed areas -> 1
+grep -c false-positive   docs/11 whole page  -> 1
+grep -c BLE              docs/09 section 4 (the trap list) -> 0
 ```
 
 **Not a duplicate, but the successor is narrowed by the grep.** `docs/10`'s one hit
-is a *hostname* false positive (`carelink.medtronic.eu`), unrelated. The Closed
-table's is **area F**, which did this for a different token family (`timeline`) —
-so the deliverable exists once, not twice. The register itself already exists and
-is named: it is **`docs/09` §4 "The trap list"**, whose rows carry Detail and Fix
-columns, and `docs/09` §5 item 2 is where this class is already written up — it
-cites *this very token*: "the apparent `ngp`/`guardian` matches … were zxcvbn
-dictionary noise (case-sensitive grep: 0 hits), and the patient bundle's three
-'NGP' hits were Samsung user-agent strings." Successor (b) is therefore restated
-in `docs/11` as **adding the `BLE`-shaped rows and offsets to the existing
-`docs/09` §4 trap list**, not as creating a new register. A successor that says
-"the repo's own false-positive register" without naming it is the kind of claim
-that turns out to describe nothing; naming it is what the grep bought.
+is a *hostname* false positive (`carelink.medtronic.eu`), unrelated. T2's is **area
+F**, which did this for a different token family (`timeline`) — so the deliverable
+exists once, not twice.
+
+The register itself already exists and is named: it is **`docs/09` §4 "The trap
+list"**, whose rows carry Detail and Fix columns, and `docs/09` §5 item 2 is where
+this class is already written up — it cites *this very token*: "the apparent
+`ngp`/`guardian` matches … were zxcvbn dictionary noise (case-sensitive grep: 0
+hits), and the patient bundle's three 'NGP' hits were Samsung user-agent strings."
+⚠ **`docs/09` §4 currently has 0 occurrences of `BLE`**, so the `BLE`-shaped rows are
+genuinely absent rather than duplicated — which is what makes successor (b) real
+work and not a rewrite of something already there. Successor (b) is therefore
+restated in `docs/11` as **adding the `BLE`-shaped rows and offsets to the existing
+`docs/09` §4 trap list**, not as creating a new register. A successor that says "the
+repo's own false-positive register" without naming it is the kind of claim that
+turns out to describe nothing; naming it is what the grep bought.
 
 ### (c) the `NGP` figure that does not reproduce
 
 ```
-grep -c Samsung docs/10-open-questions.md -> 1
-grep -c Samsung docs/09-methodology-and-oracles.md -> 1
-grep -c Samsung <Closed table>            -> 0
-grep -c Samsung docs/11                    -> 2
+grep -c Samsung docs/09 whole file                  -> 1
+grep -c Samsung docs/05 whole file                  -> 1
+grep -c Samsung docs/10 whole file                  -> 1
+grep -c Samsung T1 docs/10 section 2                -> 0
+grep -c Samsung T2 docs/11 Closed areas             -> 0
+grep -c Samsung docs/11 whole page                  -> 3
 ```
 
 **Not a duplicate.** `docs/09`'s hit *is* the claim in dispute
 (`docs/09:236`, "the patient bundle's three 'NGP' hits were Samsung user-agent
 strings"), and `docs/05:327` carries the same figure — both confirmed present, so
-§3.4's "docs/09 §4 and docs/05 repeat the figure" is accurate. `docs/11`'s two
-hits are successor (c) itself. ⚠ `docs/10` row 38 is **adjacent but not the same
-figure** — it concerns the patient bundle's `N\d\d` tokens ("minify to Angular
-internals and a Samsung device regex"), not `NGP`, so it is named here rather than
-folded into the disagreement, and the human resolving it should see it.
+§3.4's "docs/09 §4 and docs/05 repeat the figure" is accurate. ⚠ **`docs/10` also
+carries one**, which round 1 of this pass did not report: row 38's "the patient
+bundle's `N\d\d` tokens minify to Angular internals and a Samsung device regex". It
+is **adjacent but not the same figure** — `N\d\d` tokens, not `NGP` — so it is named
+here rather than folded into the disagreement, and the human resolving this should
+see it. Both closed tables read **0**, so on either reading this disagreement is
+recorded nowhere a future reader would meet it — which is precisely why it is
+written down here rather than left to be rediscovered.
+
+⚠ **`docs/11`'s count moved 2 → 3** between round 1 and this commit, because the
+correction block above is itself inside the successor-2 block and contains the word.
+This is the exact failure the SHA-binding above exists to make visible instead of
+silent.
 
 ## 11. Re-derivation from the bytes, and two guards demonstrated
 
@@ -515,16 +616,40 @@ BLE cs total       : 52
 
 The global `\bo\.G\b` sweep counts **4** and stops there; one of the four is a
 different module's function. Closing it properly means bounding the *module* and
-enumerating every use of the imported binding:
+enumerating every use of the imported binding.
+
+**This is not a transcript of a reading — it is `census.txt` §L**, a mode of
+`xsuffix-analyse.py` that runs against the digest-pinned body and prints all of it.
+Verification round 2 found that the claim was previously labelled OBSERVED with no
+artefact on disk that produced it, which is the one thing that makes a claim
+un-re-derivable; the mode is the fix. Its output, verbatim:
 
 ```
-enclosing module of the importer : 83644, bytes 2962630..2965093 (2464 B)
-every identifier `o` in it       : 4
-   followed by `.G`              : 3   -> o.G.BLE | o.G.SIMPLERA | o.G.GUARDIAN
-   anything else                 : 1   -> o=i(45559
-module-level const/let/var `o`   : []
-function parameters named `o`    : 0
-i(45559) sites in the whole body : 1   [2962719]
+  importing module id      : 83644
+  module byte span         : 2962630..2965093  (2464 B)
+  the import site          : 2962717  `o=i(45559),g`
+
+  every identifier `o` in that module : 4
+    member read      @2964176  'o.G.BLE),T=null='
+    member read      @2964215  'o.G.SIMPLERA),v='
+    member read      @2964259  'o.G.GUARDIAN);re'
+    NOT a member read @2962717  'o=i(45559),g=i(1'
+
+  module-level const/let/var `o` : []
+  function parameters named `o`  : 0
+  `i(45559)` sites in the WHOLE body : 1
+
+  VERDICT: the binding is never aliased, never passed bare and never shadowed
+  inside the module that imports it.
+```
+
+And the false hit, re-read **by module** rather than by token — which is what turns
+a count into an adjudication:
+
+```
+  byte 198638 sits in module 8342 (bytes 191067..201118), which has its own
+  'o=i(57707)' import at 191153
+  — a different module's binding, same token, different sense.
 ```
 
 So the binding is **never aliased, never passed bare, and never shadowed** inside
@@ -532,6 +657,11 @@ the module that imports it. With module `45559` exporting exactly one binding
 (`G`), the enum object cannot leave module `83644` by any route this body
 contains. This is a stronger closure than §3.1 argues, and it is why "0 reads" is
 not a sampling result.
+
+⚠ **The module span is `2 962 630 – 2 965 093` inclusive**, as `census.txt` §L
+prints. An earlier draft of this section said `…094`, which is the exclusive end.
+The verifier read the exclusive end; both describe the same span, and §L is the
+authority.
 
 ### The anchor gate's failure branch, fired
 
@@ -562,8 +692,8 @@ written**, and the in-order control writes **2**. Both offline against a stubbed
 pin, `BLE_API_VERSIONS`, **the family vocabulary**, the error taxonomy — the
 finding is incomplete until the consumer knows."* §5 of this log is also evidence
 that a non-vendor consumer reads `BLE_X` at all. So the question is not whether to
-look, but whether a pinned constant moves. **Decided here, with the constants
-named.**
+look, but whether a pinned constant moves. **I have decided it, below, with the
+constants named.**
 
 | pinned constant | moves? | why |
 |---|---|---|
@@ -583,20 +713,47 @@ inertness this pass measured — so **no bridge behaviour is wrong today**.
 
 **But the reasoning is only as good as its scope, and the scope is the eager
 main.** §6: "0 reads anywhere" is **not claimed**. A bridge reading `BLE_X` (§5's
-note) is consistent with a consumer outside this corpus. So:
+note) is consistent with a consumer outside this corpus.
 
-> **This is a downstream-relevant finding and it is NOT a stop condition for this
-> merge** — no pinned value is demonstrated to have moved, and the consumption
-> change is one that provably cannot alter a correct matcher. **It is, however,
-> owed to the consumer before a bridge release**, because the *documented* basis
-> for its family vocabulary (5 members) is now known to be the declared set rather
-> than the matched set, and that correction is the kind that should reach a
-> consumer before it reaches a release note. Filed as `downstream-bridge` on issue
-> #132's follow-up, naming the family vocabulary and stating plainly that the
-> scope is the eager main and that successor (a) may widen it.
+> **My decision: this is a downstream-relevant finding, and it is NOT a stop
+> condition for this merge.** No pinned value is demonstrated to have moved, and the
+> consumption change is one that provably cannot alter a correct matcher.
+>
+> **What is still owed, and by whom.** `AGENTS.md` §3 and §5 make the finding
+> incomplete until the consumer knows, and §5 requires the `downstream-bridge`
+> label, the named constant **and a linked issue**. **That issue does not exist yet.**
+> The state is re-derivable, and was checked rather than assumed:
+>
+> ```
+> gh issue list --label downstream-bridge --state all
+>   -> #29 [CLOSED] "finding: bgUnits and glucoseUnitsDefault disagree in 30
+>      countries, not 2 — a bridge reading one key mis-scales glucose"
+>      (closed 2026-10-12)  — unrelated to this pass
+> gh issue view 132 --json labels
+>   -> labels: research-area, claimed, automation      (no downstream-bridge)
+> ```
+>
+> **I have not opened a `downstream-bridge` issue and I am not going to** — this
+> pass is not authorised to open issues, and `AGENTS.md` §11 forbids automation
+> writing the record. **The orchestrator opens the in-repo `downstream-bridge`
+> issue** for this finding, and it had not done so when this line was written.
+> **This sentence stays true after the issue appears**, which is why it is written
+> this way rather than as a report of an action taken.
 
-If successor (a) finds an importer in the lazy corpus, **the answer changes** and
-the merge queue should stop.
+**What successor (a) would change, precisely — and what it would not.** If the 211
+lazy chunks contain an importer of module `45559`, then two things follow and they
+are *not* the same thing:
+
+| | changes? | why |
+|---|---|---|
+| the **matcher-correctness** conclusion | **no** | §4's arithmetic is a property of the *predicate* `value.startsWith(member)`, not of the corpus size. `"BLE_X".startsWith("BLE")` holds whether the read set is 3 members or whether a second call site also reads `BLE_X`. A lazy importer reading `BLE_X` would make the declaration **load-bearing**, not the matching **wrong** |
+| the **disclosure** obligation | **yes, and this is the real consequence** | §6's scope limit would be **falsified**: "0 reads anywhere" would become false, the §10(a) note about `docs/10` row 37 would harden from "unmeasured" to "refuted", and the six-member comparison set on that row would need correcting alongside `docs/05` |
+
+So a successor (a) hit **does not by itself stop the merge**; it converts an
+**unmeasured** question into a **measured** one and hands a second correction to
+the same human who owes `docs/05` and `docs/09` the `NGP` figure. It becomes a
+stop condition only if it also shows a bridge-relevant pinned value moving — which
+is a separate finding from this one, and is not implied by an importer existing.
 
 ## Correction (2026-10-15)
 
@@ -647,6 +804,121 @@ asserted (§11, §7): the anchor gate's failure branch, against a body with the
 **right length and one flipped byte**, which exits 3 and prints no finding past
 the gate verdict; and the stamp-order guard, which refuses on a violating triple
 (0 rows) and writes 2 rows on an in-order one.
+
+**Scope unchanged and still stated wherever the negative appears:** the eager main
+bundle only. "0 reads in the eager main" is true; "0 reads anywhere" is not a claim
+this pass can make.
+
+## Correction (2026-10-15) — round 2
+
+**Verification round 2 returned NOT CLEAN on two blocking findings and nine
+advisories. The central claim was confirmed again, by re-derivation from the bytes:
+module `83644` bounded to 2 962 630–2 965 093, four bare `o` identifiers (three `.G`,
+one the binding itself), no module-level `o`, zero parameters named `o`, and
+`i(45559)` at exactly one site body-wide. The `docs/05` resolution was judged
+correct. What follows is what moved — plus one deletion of mine that had not been
+recorded, which is item 6 and is the reason this heading exists twice.**
+
+**Blocking 1 — §12 asserted an action that had not occurred.** This log said the
+`downstream-bridge` notification was *"Filed as `downstream-bridge` on issue #132's
+follow-up"*. It had not been. `gh issue list --label downstream-bridge --state all`
+returns only **#29** (closed, `bgUnits`, unrelated); **#132** carries
+`research-area, claimed, automation`. That was a claim about an artefact that did
+not exist — the `AGENTS.md` §1 failure — and it sat in past tense, which is the one
+unacceptable answer. §12 is now present tense and first person, states plainly that
+the issue **does not exist yet**, names who opens it (the orchestrator; this pass is
+not authorised to open issues), and prints the two `gh` commands so the state is
+re-derivable. Deciding *not* to block was within remit; recording the notification
+as already filed was not.
+
+**Blocking 2 — §10's counts went stale in the commit that invalidated them.**
+Round 1 recorded `docs/11` counts of **7** / **2** / **2** for `45559` /
+`false-positive` / `Samsung`. At the round-2 head they were **9** / **1** / **3**:
+this pass edited `docs/11` in six hunks and did not re-run or re-state them. All
+three reproduce at `1e96ec2` and none at head. **Re-running and pasting new numbers
+was rejected**: four lanes in this pool edit `docs/11` simultaneously, so a count
+over that page moves under this pass whether or not it touches it. Instead:
+
+- **`dup-test.sh` now exists** and prints **the commit it counted at**, with an
+  explicit warning that its own §10 pointer and any other lane's hunks will move
+  the numbers. The §10 verdicts are unchanged and none depends on a count.
+- **Every count in §10 is bound to a SHA**, and the rule is stated: *a count that
+  names the tree it was taken on is re-derivable; a count that says "this branch's
+  head" is a promise about a moving object* (§1).
+- **The `docs/11` `45559` breakdown was also arithmetically wrong** — the 7 summed
+  to 8 under a heading of 7. The real partition at this tree is **1 + 1 + 1 + 6 = 9**,
+  now tabulated.
+- **`<Closed table>` was ambiguous and is now named twice.** Round 2 found two
+  tables answer that singular name and they **disagree**: `docs/10` §2 *"Searched
+  and closed"* reads 0/0/0/0 for `45559`/`BLE_X`/`false-positive`/`Samsung`, while
+  `docs/11`'s closed-areas table reads 1/1/1/0. Both are tested explicitly; the
+  adjudication content was unaffected.
+
+**F3 — the enumeration I corrected still summed wrong.** Having fixed "12" to 13, the
+sentence read *"three hits … and **nine** more"* = 12. The bytes give **6 `label:` +
+7 `description:` = 13**, so the word is **ten**; both lists are now printed in full,
+because successor (b) proposes to enshrine this figure in the false-positive
+register. The same finding noted the rule does not self-apply: applied to **all 52**
+hits it yields 36/16, and it is applied to the **47** "other" hits. Both splits are
+correct on their own class; §3.2 now says which is which.
+
+**F4 — the 8th shape sweep was described by a pattern that returns 0.** The prose
+said *"`o.G` followed by a comma or a semicolon"*; the pattern run is
+`(?<![.\w])o\.G(?![\w.])`, and the character after `o.G` at byte 198 638 is `)`.
+Reproducing it as described, `o\.G[,;]`, returns **0**. The count was right and the
+hit was correctly adjudicated — `census.txt` **§L** now re-reads it **by module**:
+byte 198 638 sits in **module 8342**, which has its own `o=i(57707)`. **`census.txt`
+now prints `regex=` beside every sweep's label and count**, so the label can never
+again be mistaken for the pattern.
+
+**F7 — my strongest claim had no committed artefact.** The closure enumeration was
+labelled OBSERVED with nothing on disk that produced it: `census.txt` ran A–K and
+none of them closed anything. **`xsuffix-analyse.py` now has the closure mode
+(`census.txt` §L)**, which bounds the importing module by its own webpack delimiters
+and enumerates every use of the binding, alias and bare-pass-on included. §11 cites
+it and prints its output. The module span is `2 962 630 – 2 965 093` **inclusive**;
+an earlier draft of §11 said `…094`, the exclusive end.
+
+**F6 — four cross-refs pointed at §10 for content in §11.** `:199`, `:379`, `:383`
+and `:387` now name §11, and the module-row cite names both §11 and `census.txt` §L.
+
+**F8 — the Samsung span's upper bound matched nothing.** It read *"bytes 2 240 566 –
+2 888 911"*. Count (17) and lower bound were exact; the last occurrence **starts at
+2 888 910** and its 7-byte span **ends at 2 888 916** inclusive. A bound that is
+neither a start nor an end is not a bound.
+
+**F11 — `docs/05:420` mis-characterised the sentence it corrects, and my stated
+reason for leaving `:512` alone did not match this page's own practice.** `:416`
+asserts no count at all, so calling it "an over-count" was wrong; it now invokes the
+**declared-vs-matched** distinction. And the justification for editing outside the
+area-R blockquote was post-hoc — `docs/05:497`, `:515` and `:524` are corrections
+from earlier passes sitting **inside** that same blockquote. The outcome was right
+and is unaffected; the reason is now the real one: **the row's `5` is a true
+*declared* count, so the correction belongs where a reader of the table meets it,
+outside the quoted history.**
+
+**Successor (a) — one clause tightened.** §12 previously read "the answer changes and
+the merge queue should stop", which invites the stronger reading that a found
+importer falsifies the matcher conclusion. It does not. §4's arithmetic is a property
+of the **predicate** `value.startsWith(member)`, not of the corpus: a second reader
+of `BLE_X` would make the declaration **load-bearing**, not the matching **wrong**.
+What a successor (a) hit changes is the **disclosure** obligation — "0 reads anywhere"
+goes from unmeasured to false, and `docs/10` row 37's six-member set goes from
+"unmeasured" to "refuted". §12 now tabulates the two separately.
+
+6. **A deletion of mine that had not been recorded here.** In round 1 I rewrote
+   §3.4's *"**every one** of them the substring `ngP`"* — a claim that was **false**,
+   broken by one lower-case `ngp` inside `bingpreview` — and recorded no Correction
+   entry for it. Five of round 1's six deletions were covered; that one was not, and
+   `scripts/research-checks.py` accepts *any* dated Correction heading as a licence
+   for *any* in-place edit, deletions included, which is why it passed CI silently.
+   A pre-existing property of the repo, not something this pass changed, and not
+   fixed here — widening or re-scoping a gate check in the same PR the gate passed is
+   a maintainer's decision (`docs/09` §4). **The deleted wording was:** *"94
+   case-insensitive hits, **every one** of them the substring `ngP` inside
+   `numberingPlan` / `pendingPageScroll` / `marketingParams`-class identifiers."*
+   It is now *"93 as `ngP` and one as lower-case `ngp` (inside `bingpreview`)"*, and
+   the correction is written beside the claim rather than over it.
 
 **Scope unchanged and still stated wherever the negative appears:** the eager main
 bundle only. "0 reads in the eager main" is true; "0 reads anywhere" is not a claim

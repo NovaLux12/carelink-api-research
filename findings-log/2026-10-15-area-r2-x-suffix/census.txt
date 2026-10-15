@@ -52,14 +52,14 @@ D. EVERY READ OF THE EXPORTED BINDING — `<binding>.G`
 
   Non-`.G.` consumption shapes that would ALSO count as a read, swept
   explicitly so their absence is measured rather than assumed:
-    bracket-literal  o.G["X"]            0 hit(s)
-    bracket-single   o.G['X']            0 hit(s)
-    Object.values(o.G)                   0 hit(s)
-    Object.keys(o.G)                     0 hit(s)
-    Object.entries(o.G)                  0 hit(s)
-    spread           {...o.G}            0 hit(s)
-    pass the object on  (o.G)            0 hit(s)
-    pass the object on  o.G, o.G;        1 hit(s)  @[198638]
+    bracket-literal  o.G["X"]            0 hit(s)   regex=\bo\.G\[\s*\"(\w+)\"
+    bracket-single   o.G['X']            0 hit(s)   regex=\bo\.G\[\s*'(\w+)'
+    Object.values(o.G)                   0 hit(s)   regex=Object\.values\(\s*o\.G\s*\)
+    Object.keys(o.G)                     0 hit(s)   regex=Object\.keys\(\s*o\.G\s*\)
+    Object.entries(o.G)                  0 hit(s)   regex=Object\.entries\(\s*o\.G\s*\)
+    spread           {...o.G}            0 hit(s)   regex=\.\.\.\s*o\.G\b
+    pass the object on  (o.G)            0 hit(s)   regex=(?<![.\w])\(o\.G\)
+    pass the object on  o.G, o.G;        1 hit(s)  @[198638]   regex=(?<![.\w])o\.G(?![.\w.])
 
 ==============================================================================
 E. CASE-SENSITIVE TOKEN CENSUS — every occurrence, every one read.
@@ -320,3 +320,36 @@ K. THE TWO FUNCTIONS AROUND THE BRANCH — so every offset FINDINGS.md
   `deviceModelMapping` is selected at the call site of StandaloneCGM; the
   capability map it feeds is a runtime value, which is why SIMPLERACC
   appears once — as a property READ — and has no definition in this body.
+
+==============================================================================
+L. THE CLOSURE ENUMERATION — sections C and D COUNT; this one CLOSES.
+   A global `<binding>.G` sweep finds one false hit belonging to some
+   OTHER module. That is a count, not a closure. Here the importing
+   MODULE is bounded by its own webpack delimiters, and EVERY use of the
+   imported binding inside it is enumerated — including uses that are not
+   member reads, which is where an alias or a bare pass-on would hide.
+==============================================================================
+  importing module id      : 83644
+  module byte span         : 2962630..2965093  (2464 B)
+  the import site          : 2962717  `o=i(45559),g`
+
+  every identifier `o` in that module : 4
+    member read      @2964176  'o.G.BLE),T=null='
+    member read      @2964215  'o.G.SIMPLERA),v='
+    member read      @2964259  'o.G.GUARDIAN);re'
+    NOT a member read @2962717  'o=i(45559),g=i(1'
+
+  module-level const/let/var `o` : []
+  function parameters named `o`  : 0
+  `i(45559)` sites in the WHOLE body : 1
+
+  VERDICT: the binding is never aliased, never passed bare and never shadowed inside the module that imports it.
+  With module 45559 exporting exactly one binding, the enum
+  object cannot leave module 83644 by any route this body contains,
+  so section D's 3 member reads are a CLOSED enumeration of
+  the consumer surface in this corpus, not a sample of one.
+
+  THE FALSE HIT, ADJUDICATED BY MODULE. Each `o.G` site section D lists as
+  NOT-A-MEMBER-READ is re-read here by module, not by token:
+    byte 198638 sits in module 8342 (bytes 191067..201118), which has its own 'o=i(57707)' import at 191153
+    — a different module's binding, same token, different sense.

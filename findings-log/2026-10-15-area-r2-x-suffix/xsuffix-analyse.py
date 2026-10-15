@@ -179,8 +179,13 @@ def main():
     }
     for label, pat in shapes.items():
         hits = [mm.start() for mm in re.finditer(pat, T)]
+        # The REGEX IS PRINTED, not just its label. Verification round 2 found the
+        # 8th sweep described in prose as "`o.G` followed by a comma or semicolon",
+        # which returns 0 — the real pattern returns 1. A re-runner who had only the
+        # label would have reproduced a contradiction (AGENTS.md section 6.2).
         print(f"    {label:<34} {len(hits):>3} hit(s)"
-              + (f"  @{hits}" if hits else ""))
+              + (f"  @{hits}" if hits else "")
+              + f"   regex={pat}")
 
     print()
     print("=" * 78)
@@ -339,6 +344,89 @@ def main():
     print("  capability map it feeds is a runtime value, which is why SIMPLERACC")
     print("  appears once — as a property READ — and has no definition in this body.")
 
+
+    print()
+    print("=" * 78)
+    print("L. THE CLOSURE ENUMERATION — sections C and D COUNT; this one CLOSES.")
+    print("   A global `<binding>.G` sweep finds one false hit belonging to some")
+    print("   OTHER module. That is a count, not a closure. Here the importing")
+    print("   MODULE is bounded by its own webpack delimiters, and EVERY use of the")
+    print("   imported binding inside it is enumerated — including uses that are not")
+    print("   member reads, which is where an alias or a bare pass-on would hide.")
+    print("=" * 78)
+    MODDEF = re.compile(r"(?:^|[,}{])(\d{3,6}):\((?:Je|J|e|_e)\s*,\s*(?:_e|e)\s*,")
+    if binding:
+        needle_imp = f"{binding}=i({ENUM_MODULE})"
+        imp_sites = [m.start() for m in re.finditer(re.escape(needle_imp), T)]
+        if len(imp_sites) != 1:
+            print(f"  NOTE: `{needle_imp}` occurs {len(imp_sites)} time(s), not 1 — "
+                  "this section does not close the consumer population and must not "
+                  "be read as if it did.")
+        imp_off = imp_sites[0]
+        bounds = [(m.start(), int(m.group(1))) for m in MODDEF.finditer(T)]
+        before = [b for b in bounds if b[0] < imp_off]
+        after = [b for b in bounds if b[0] > imp_off]
+        if not before or not after:
+            fail("could not bound the importing module — the section D result below "
+                 "does not bound the consumer population and must not be read as if "
+                 "it did")
+        m_lo, m_id = before[-1]
+        m_hi = after[0][0]
+        seg = T[m_lo:m_hi]
+        print(f"  importing module id      : {m_id}")
+        print(f"  module byte span         : {m_lo}..{m_hi - 1}  ({len(seg)} B)")
+        print(f"  the import site          : {imp_off}  `{T[imp_off:imp_off + 12]}`")
+        print()
+        uses = [m.start() for m in
+                re.finditer(rf"(?<![A-Za-z0-9_$.$]){re.escape(binding)}(?![A-Za-z0-9_$])", seg)]
+        as_g, not_g = [], []
+        for s in uses:
+            (as_g if seg[s + 1:s + 3] == ".G" else not_g).append(s)
+        print(f"  every identifier `{binding}` in that module : {len(uses)}")
+        for s in as_g:
+            print(f"    member read      @{m_lo + s}  {seg[s:s + 16]!r}")
+        for s in not_g:
+            print(f"    NOT a member read @{m_lo + s}  {seg[s:s + 16]!r}"
+                  + ("   <- the import binding itself"
+                     if seg[s:s + 12] == f"{binding}=i({ENUM_MODULE}" else ""))
+        decls = [m.start() for m in
+                 re.finditer(rf"(?<![A-Za-z0-9_$.$])(?:const|let|var)\s+{re.escape(binding)}\b", seg)]
+        params = [m.start() for m in
+                  re.finditer(rf"function\s*\w*\s*\([^)]*\b{re.escape(binding)}\b[^)]*\)", seg)]
+        print()
+        print(f"  module-level const/let/var `{binding}` : {decls}")
+        print(f"  function parameters named `{binding}`  : {len(params)}")
+        print(f"  `i({ENUM_MODULE})` sites in the WHOLE body : "
+              f"{len(re.findall(re.escape(f'i({ENUM_MODULE})'), T))}")
+        print()
+        shadowed = bool(decls or params)
+        print("  VERDICT: the binding is "
+              + ("SHADOWED inside this module — the enumeration below does NOT "
+                 "close the consumer population and must not be read as if it did."
+                 if shadowed else
+                 "never aliased, never passed bare and never shadowed inside the "
+                 "module that imports it."))
+        if not shadowed:
+            print(f"  With module {ENUM_MODULE} exporting exactly one binding, the enum")
+            print(f"  object cannot leave module {m_id} by any route this body contains,")
+            print(f"  so section D's {len(reads)} member reads are a CLOSED enumeration of")
+            print("  the consumer surface in this corpus, not a sample of one.")
+        print()
+        print("  THE FALSE HIT, ADJUDICATED BY MODULE. Each `o.G` site section D lists as")
+        print("  NOT-A-MEMBER-READ is re-read here by module, not by token:")
+        for s in others:
+            fb = [(m.start(), int(m.group(1))) for m in MODDEF.finditer(T)]
+            fbefore = [b for b in fb if b[0] < s][-1]
+            fafter = [b for b in fb if b[0] > s][0]
+            fseg = T[fbefore[0]:fafter[0]]
+            own = re.findall(rf"{re.escape(binding)}\s*=\s*i\((\d+)\)", fseg)
+            own_mod = own[0] if own else "?"
+            needle = binding + "=i(" + own_mod + ")"
+            own_off = fbefore[0] + fseg.index(needle) if needle in fseg else -1
+            print(f"    byte {s} sits in module {fbefore[1]} "
+                  f"(bytes {fbefore[0]}..{fafter[0] - 1}), which has its own "
+                  + repr(needle) + f" import at {own_off}")
+            print("    — a different module's binding, same token, different sense.")
 
 if __name__ == "__main__":
     main()

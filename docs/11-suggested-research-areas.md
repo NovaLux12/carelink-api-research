@@ -1312,18 +1312,26 @@ Three successors, none of which needs a token:
 - **(b) Add the `BLE`-shaped rows to the `docs/09` §4 trap list, with offsets.**
   `BLE` has **52** case-sensitive hits in this bundle and **3 169**
   case-insensitively — a **60.9×** multiplier — and those 52 partition as **4** in
-  the enum literal + **1** member read + **47** other, the 47 being **34
-  substrings** of longer identifiers and **13 standalone tokens** in the pump's
+  the enum literal + **1** member read + **47** other. Of the 47, **34 are
+  substrings** of longer identifiers and **13 are standalone tokens** in the pump's
   Bluetooth debug-event catalogue (bytes 3 316 707 – 3 321 247), where `BLE`
   abbreviates Bluetooth Low Energy — an unrelated third sense of the same token.
-  `SIMPLERACC` (byte 2 136 604) is a model-map key a substring grep reports as a
-  sixth enum member, and lowercase `guardian` (9 hits) is a **human** guardian of a
-  minor patient's account, not the CGM family. **Blocker:** none. **Closes when:**
-  these token shapes are rows in **`docs/09` §4**, the register that already exists
-  and already cites this token in §5 item 2 — so the next sweep reads them instead
-  of rediscovering them. **Narrowed by its own duplicate test** (`FINDINGS.md` §10b):
-  the register is named rather than implied, and area F's equivalent rows for the
-  `timeline` family are the precedent, not a second copy of this work.
+  ⚠ **The rule is stated so it does not mis-apply:** *substring* and *standalone* are
+  defined over the **47 "other"** hits. Applied to all 52 the same rule gives
+  **36 / 16**, because the declaration and member-read hits are themselves standalone
+  `BLE` tokens under it. Both splits are right on their own class; only the 47 answers
+  "what noise is this?". `SIMPLERACC` (byte 2 136 604) is a model-map key a substring
+  grep reports as a sixth enum member, and lowercase `guardian` (9 hits) is a **human**
+  guardian of a minor patient's account, not the CGM family. **Blocker:** none.
+  **Closes when:** these token shapes are rows in **`docs/09` §4**, the register that
+  already exists and already cites this token in §5 item 2 — so the next sweep reads
+  them instead of rediscovering them. ⚠ `docs/09` §4 carries **0** occurrences of
+  `BLE` today, so the rows are genuinely absent rather than duplicated. **Narrowed by
+  its own duplicate test** ([source:
+  findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10b], re-runnable as
+  `dup-test.sh`, which prints the commit it counted at): the register is named rather
+  than implied, and area F's equivalent rows for the `timeline` family are the
+  precedent, not a second copy of this work.
 - **(c) The `NGP` figure does not reproduce.** This pass measures case-sensitive
   `NGP` = **0**; the 94 case-insensitive hits are the letters `ngP` (93) or `ngp`
   (1, inside `bingpreview`) inside `numberingPlan`-class identifiers. The 2026-10-08
@@ -1339,10 +1347,14 @@ Three successors, none of which needs a token:
   earlier figure was case-insensitive; nothing on disk states the matching mode.
 
 > **Grep-first duplicate test, run for all three successors** against
-> `docs/10` §1, the Closed table and this page — commands, counts and a per-hit
-> verdict for each, plus the two things it surfaced that are recorded rather than
-> acted on: [source:
-> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10].
+> `docs/10` §1, **both** tables that answer "the Closed table" (`docs/10` §2 *"Searched
+> and closed"* and this page's *Closed areas*, which disagree with each other) and this
+> page — commands, counts and a per-hit verdict for each, plus the two things it
+> surfaced that are recorded rather than acted on. **Every count is bound to the commit
+> it was taken on**, and the test is re-runnable as `dup-test.sh`, which prints the SHA
+> it counted at — a `docs/11` grep count moves whenever any lane edits this page, which
+> in this pool is four lanes at once [source:
+> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §10, `dup-test.sh`].
 
 #### S. Two more evidence classes for third-party source material
 

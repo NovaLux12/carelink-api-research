@@ -417,19 +417,28 @@ The five-token enum above is still the client matcher set. `NGP` is compared by 
 rather than through `startsWith`, so it sits outside that matcher — which is consistent
 with a Guardian-era device reaching that code by a different route.
 
-> ⚠ **Corrected 2026-10-15 (issue #132), scoped — the sentence above over-counts.**
-> It previously read *"The five-token enum above is still the client matcher set"* and
-> treated all five declared members as matched. Measured in the digest-pinned eager
-> main bundle (`0fb4fbd4…`, 3 417 255 B), the enum declares **five** members but only
-> **three** are ever passed to `startsWith` — `BLE`, `SIMPLERA`, `GUARDIAN`. `BLE_X`
-> and `SIMPLERA_X` are declared and never read: `"BLE_X".startsWith("BLE")` already
-> holds, so both are **inert** — removing them would change no branch for any input.
-> The `NGP` clause of the sentence is unaffected and still stands.
+> ⚠ **Corrected 2026-10-15 (issue #132) — the sentence above uses *declared* where it
+> means *matched*.** ⚠ It asserts no count, so it is not an over-count; the defect is
+> the word "matcher", which claims the declared set is the matched set. Measured in
+> the digest-pinned eager main bundle (`0fb4fbd4…`, 3 417 255 B), the enum **declares**
+> **five** members but only **three** are ever passed to `startsWith` — `BLE`,
+> `SIMPLERA`, `GUARDIAN`. `BLE_X` and `SIMPLERA_X` are declared and never read:
+> `"BLE_X".startsWith("BLE")` already holds, so both are **inert** — removing them
+> would change no branch for any input. The `NGP` clause of the sentence is
+> unaffected and still stands. **The declared count of five is correct and is not
+> disputed anywhere on this page** — see the correction on the quoted audit table
+> below, which keeps `| the client matcher enum | 5 |` for the same reason.
 > **Scope:** the eager main only. The patient lazy corpus was not swept for `_X`
 > reads, so this is **not** a claim that the two members are read nowhere in the
 > client's code. The earlier reading is preserved above rather than edited out
-> (`AGENTS.md` §3) [source:
-> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §4, §11].
+> (`AGENTS.md` §3). ⚠ **A downstream consumer still owes this correction.** The
+> declared-vs-matched distinction moves the **family vocabulary**, one of the
+> constants `AGENTS.md` §3 names as bridge-pinned; a matcher built on the declared
+> five is no worse off, but the *documented basis* for it is now known to be the
+> declared set rather than the matched set. **The `downstream-bridge` issue for this
+> does not exist yet and the orchestrator opens it** — this pass is not authorised to
+> open issues [source:
+> findings-log/2026-10-15-area-r2-x-suffix/FINDINGS.md §3, §4, §11, §12].
 
 **Also resolved:** the casing correction `timecapUnscrewed` → `timeCapUnscrewed` is real
 but was mis-stated. Both forms exist, with different jobs: **`timecapUnscrewed`** (42
@@ -539,11 +548,18 @@ denominator is re-derivable from a clean clone:
 > PR number, not a commit); `Ut.Ey.all` (a *filter* key, not a family value); and
 > the `deviceType` set `CC`/`COSMOS`/`COSMOS_WHITELISTED`/`DEVICE`.
 
-> ⚠ **Correction 2026-10-15 (issue #132) to two rows of the quoted table above,
-> which is left verbatim.** The blockquote is area R's audit and is preserved as
-> history (`AGENTS.md` §3), so this correction sits *beside* it rather than inside
-> it. The rows concerned are **"the client matcher enum | 5"** and **"the client's
-> comparison set, incl. `NGP` | 6"**:
+> ⚠ **Correction 2026-10-15 (issue #132) to two rows of the quoted table above.
+> The table itself is left verbatim.** **Why it is not edited:** the row's `5` is a
+> **true declared count** — the enum at byte 1,723,245 carries five members, with
+> `key == value` for all five — so there is nothing false in it to overwrite. The
+> defect is the *label* calling a declared set a "matcher", and that defect lives
+> in the reading, not in the number; so the correction goes where a reader of the
+> table meets it, without rewriting quoted history (`AGENTS.md` §3). ⚠ **This is not
+> a convention this page follows** — `:497`, `:515` and `:524` are corrections from
+> earlier passes sitting *inside* blockquotes — so the reason is stated rather than
+> assumed, and the reason is the number being true, not a house style. The rows
+> concerned are **"the client matcher enum | 5"** and **"the client's comparison set,
+> incl. `NGP` | 6"**:
 >
 > - **`5` is a correct *declared* count and an incorrect *matched* count.** The enum
 >   at byte 1,723,245 — the very declaration this row cites — declares five members,
