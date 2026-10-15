@@ -15,6 +15,9 @@
 #   python3 read-area-l.py manifest      # write manifest.tsv, precedence order
 #   python3 read-area-l.py census        # the census, compared cell by cell
 #   python3 read-area-l.py self-test     # the controls, exercised
+#   sh       dup-test.sh                 # the non-duplicate test + the position check
+#   sh       locate.sh                   # every landmark, resolved by content
+#   python3 kib-detector.py              # rules 1-3, the truncation cells
 #
 # Network egress: none. No vendor host, no archive host, no Common Crawl API.
 # Nothing here can be made to send a request by editing an argument.
@@ -26,3 +29,6 @@ python3 read-area-l.py schemas
 python3 read-area-l.py manifest
 python3 read-area-l.py census
 python3 read-area-l.py self-test
+sh       dup-test.sh
+sh       locate.sh
+python3 kib-detector.py

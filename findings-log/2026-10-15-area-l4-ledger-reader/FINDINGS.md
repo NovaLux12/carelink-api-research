@@ -17,9 +17,10 @@
   "sleep ≥2s between requests to the same host". Nothing was sent under a host
   lock, because nothing was sent.
 - **Where the scope drifted, it was recorded and not sent.** Twice this pass
-  wanted a request and did not issue it — see §6, *Successors* 1 and 2.
+  wanted a request and did not issue it. Both became successors — **S-L4a** and
+  **S-L4b**, the sixth and third entries of the list under `## 8c. Successors`.
 
-The work is a local read. `probe.sh` records the four commands that were run;
+The work is a local read. `probe.sh` records the commands that were run; none
 none of them can be made to send a request by editing an argument.
 
 ## 1. The population, counted before it is read
@@ -205,7 +206,7 @@ not-derivable are three different facts and the reader does not merge them —
 
 **These are internal controls. They are not network controls and nothing here
 speaks to a vendor surface.** They are the controls this area's own brief names,
-and each is exercised by `python3 read-area-l.py self-test` (exit 0, **25
+and each is exercised by `python3 read-area-l.py self-test` (exit 0, **33
 checks, 0 failures**). The count is **printed by the test function itself** and
 is not asserted here: `grep -c PASS` over that output would over-count by one,
 because the summary line contains the word `PASS` — which is how an earlier
@@ -345,26 +346,35 @@ not own.
 > ### ⚠ THIS PASS PUBLISHES NO `docs/NN:NNNN` POINTERS. THE GREPS ARE THE CITATION.
 >
 > Every pointer of that shape that has appeared in this file is stale or was stale
-> within one commit. **The mechanism is not carelessness: this PR inserts 142 lines
-> into `docs/11` below most of the passages it cites, so any pointer past the S-L4
-> block moves the moment this PR lands.** Round 1 pointed at an unrelated area-F
+> > within one commit. **The mechanism is not carelessness: this PR inserts lines into
+> `docs/11` above most of the passages it cites, so any pointer past the S-L4 block
+> moves the moment this PR lands.** (Round 4 recorded the inserted-line count as a
+> number; the number is now itself a position, for the same reason.) Round 1 pointed at an unrelated area-F
 > passage; round 2 corrected it; round 3 found that one stale too. **Correcting the
 > numbers would fix four instances of a bug that has fired in every round**, so they
 > are removed instead.
 >
 > **`dup-test.sh` is the single source for all of them**, and it derives every line
-> number by `grep`, prints what each line actually contains, **and fails loudly** if
-> this file publishes a pointer of that shape outside its Correction sections:
+> number by `grep`, prints what each line actually contains, **and exits non-zero**
+> if this file publishes a position in any spelling outside its Correction
+> sections — so the policy is enforced by the artefact rather than asserted by the
+> prose that states it:
 >
 > ```sh
 > sh findings-log/2026-10-15-area-l4-ledger-reader/dup-test.sh
 > ```
 >
-> **Measured, because "it moved" is not a measurement.** Closed row `L` sat at
-> **2094** at `ab28f58`, then **2170**, **2218**, **2232** and **2236** across this
-> pass's own commits: **main → head is +142 lines**, and **the single round before
-> this one added 18**. The figure an earlier revision carried — "17 lines" — is
-> **neither**, and that revision introduced it.
+**No terminal position is published here, deliberately.** Round 4 caught this file
+asserting one that was stale on the very SHA it shipped in: a "measured, now"
+figure naming the *previous* commit's value. **Any position stated here expires on
+the commit that adds lines above it, and this file is the thing adding them.** So:
+
+> A position is never published in this file. Cite `locate.sh` — which resolves
+> every landmark by content and prints the commit it measured at — or cite the grep.
+
+The positions this file published and has now **withdrawn** are named in the
+Correction sections below, because `AGENTS.md` §5 requires a correction to say what
+it withdrew.
 >
 > **The one exception, deliberate.** The `## Correction` sections quote `docs/NN:NNNN`
 > pointers **as history** — "superseded: `:2218`" — because `AGENTS.md` §5 requires
@@ -399,7 +409,7 @@ is exactly the number the committed file supports.
 
 **Recorded, not fixed.** All three are out of this pass's lane — two in `docs/11`
 (area prose, and its Closed table) and one in `docs/10` §1 — so the finding is a
-successor (§8c.5) with all three readings standing.
+successor **S-L4d** in §8c, with all three readings standing.
 
 **And the third instance is the one that makes the class undeniable: the
 `docs/10` §1 row carrying this area's census** (found by the same grep), which
@@ -524,19 +534,39 @@ surfaces — `docs/10` §1, the `docs/11` Closed table, and `docs/11` whole — 
 derives the section boundaries **by grep rather than by typing them**:
 
 ```
-docs/10 §1 spans lines 33 .. 67        (grep '^## 1\. Open questions' / '^## 2\.')
-docs/11 Closed table begins at 2189    (grep '^## Closed areas')
+docs/10 section 1        the span between the '## 1. Open questions' and
+                         '## 2. Searched and closed' headings
+docs/11 Closed table     the line matching '^## Closed areas'
 ```
 
-| successor | subject | docs/10 §1 | docs/11 | Closed | verdict |
-|---|---|---|---|---|---|
-| **S-L4a** | `window basis` | 0 | 1 | 0 | **not duplicate** — the single `docs/11` hit is this pass's own S-L4d block |
-| **S-L4a** | `CC-MAIN-2022-27` | 1 | 9 | 1 | **partial overlap, not duplicate** — `docs/10` §1 mentions the crawl in a *different* question (record-count truncation); no surface states the member tally's window basis |
-| **S-L4b** | `members_computed` | 0 | 1 | 0 | **not duplicate** — the single `docs/11` hit is this pass's own block |
-| **S-L4b** | `floor` | 2 | 31 | 17 | **PARTIAL OVERLAP — see below** |
-| **S-L4b** | `truncat` | 2 | 3 | 2 | **PARTIAL OVERLAP — see below** |
-| **S-L4c** | `schema` | 4 | 31 | 2 | **partial overlap** — no surface proposes a *reader* spanning all ledgers |
-| **S-L4d** | `65 of the 84` | 1 | 4 | 1 | **not duplicate, and the grep FOUND a third instance of the defect itself** — this area's row in `docs/10` §1 carries the sentence *and* the contradicting `65 RECORD · 10 ABSENCE` tally in **one row**. `dup-test.sh` prints every hit with what it contains |
+**Both are stated as greps because this PR edits `docs/11`, so every number a
+reader copied from it expired when the PR landed.** Four review rounds found that
+same defect at a new coordinate each time — `:2189` -> `docs/11:2170` ->
+`docs/11:2218` -> `:2232` -> `:2236` -> `:2253` — because every fix added lines.
+**`locate.sh` resolves every landmark this file names, by content, bound to the
+commit it measured at:**
+
+```sh
+sh findings-log/2026-10-15-area-l4-ledger-reader/locate.sh
+```
+
+### The recorded table — and why this file does NOT carry one
+
+Round 4 compared the table this section used to record against live output from
+the script that produces it and found it **did not reproduce**: S-L4b `floor`
+recorded **31** and read **30**; S-L4b `truncat` recorded **3** and read **5**.
+**Transcription is what let it drift**, and §9's entire purpose was to make that
+manual step unnecessary. So there is no table here, only the command:
+
+```sh
+sh findings-log/2026-10-15-area-l4-ledger-reader/dup-test.sh
+```
+
+It prints the hit count for every successor-subject against **three** surfaces —
+`docs/10` §1, `docs/11` whole, and the Closed table — with the section boundaries
+derived by grep. **What the reader must take from those counts, and nothing more,
+is written below**; a count that a reader might want to quote is quoted by
+re-running the script, never by copying this file.
 
 **S-L4b's overlap is real and S-L4b is narrowed because of it.**
 `docs/10` §1 already carries the question *"how many already-committed Common
@@ -601,10 +631,12 @@ second can cut a tail.** Cell **B** — what `derive()` actually counts — has 
 row: `CC-MAIN-2020-50`, `pool-l-ipro-hcp-census` seq 7, records 5, limit 5. Round 3's
 re-derivation, made by *importing* this reader's predicates rather than reimplementing
 them, returned **81 / 9 / 72 / 2** — cell **A** — which is right for the question it
-asked. **The pass's published `69 / 67` matched no cell at all**, and **67** is cell
-C's "carrying none" beside cell A's denominator. **Both cells are now computed by a
-shipped script under a stated rule, so a number can only be disputed by disputing the
-rule, which is visible.**
+asked. **The withdrawn figure `69 / 67` matched no cell at all** — `69` is not any
+cell's row count (A is **81**, B **74**, C **72**), and `67` is cell **C**'s
+"carrying none". The clause therefore mixed two cells in *both* directions, and
+**the row counts, not just the split, were unverifiable from any rule this file
+had shipped.** Both cells are now computed by a shipped script under a stated
+rule, so a number can only be disputed by disputing the rule, which is visible.
 
 | ledger | successful `200`s (RULE 2) | whole-KiB candidates (RULE 1) |
 |---|---|---|
@@ -631,48 +663,13 @@ directs ("the same one-command test over every other committed CC ledger"), it
 carry a null `t_sent`, and `account.py:109` calls `strptime(None)` → `TypeError`.
 Recorded-not-fixed is right for the **code** — another lane's file — and **not enough
 for the handoff**, because the row naming the tool still stands. Carried as successor
-**S-L4e** (§8c.5).
+**S-L4e** (the sixth entry in §8c).
 
 **So the floor claim of §7a is NARROWED, not retired.** Under cell **B** the `limit=`
 mechanism is measured and excluded for **73 of 74** member-source rows (1 is AT its
 limit); the whole-KiB mechanism for **all 193**. **What remains undemonstrated is
 completeness of the record set itself**, which no artefact in the tree can settle
 because the bodies are excluded by `AGENTS.md` §7.
-
-| ledger | successful `200`s | whole-KiB candidates |
-|---|---|---|
-| `2026-10-13-area-l-7crawl-reissue` | 13 | **0** |
-| `2026-10-13-area-l-early-crawl-reissue` | 3 | **0** |
-| `2026-10-13-area-l-ipro-hcp` | 15 | **0** |
-| `2026-10-14-area-l-ipro-early-crawl-supplement` | 2 | **0** |
-| `2026-10-14-pool-l-crawlcontrol` | 10 | **0** |
-| `2026-10-14-pool-l-ipro-hcp-census` | 20 | **0** |
-| `2026-10-14-pool-s7-l7crawl` | 10 | **0** |
-| `2026-10-15-pool-l-ipro-census-cont` | 120 | **0** |
-| **total** | **193** | **0** |
-
-**Zero candidates across 193 successful answers — the member counts are not floors
-*by this detector*.** `body_bytes` is present on **193 of 193** of them: 143 distinct
-values from 40 B to 1 280 724 B, none ≡ 0 mod 1024.
-
-**⚠ And `docs/10` §1's own caution applies verbatim: "Clean for this test is not
-the same as complete" — a truncation not aligned to 1024 would be invisible to
-it.**
-
-**⚠ And `account.py` is handed on broken.** Run exactly as `docs/10` §1's successor
-directs ("the same one-command test over every other committed CC ledger"), it
-**crashes on a member of this very population**: `2026-10-13-area-l-ipro-hcp` seqs
-1–4 carry a null `t_sent`, and `account.py:109` calls `strptime(None)` →
-`TypeError`. Recorded-not-fixed is right for the **code** — another lane's file — and
-**not enough for the handoff**, because the row naming the tool still stands and still
-points the next pass at a crash. Carried as successor **S-L4e** (§8c.6).
-
-**So the floor claim of §7a is NARROWED, not retired.** Under cell **B** the
-`limit=` mechanism is measured and excluded for **73 of 74** member-source rows (1 is
-AT its limit, printed as `FLOOR` wherever a figure is published); the whole-KiB
-mechanism for **all 193**. **What remains undemonstrated is completeness of the record
-set itself**, which no artefact in the tree can settle because the bodies are excluded
-by `AGENTS.md` §7.
 
 ### 8c. The successors
 
@@ -740,8 +737,10 @@ by `AGENTS.md` §7.
    this pass's re-derivation it is **12** (84 − 72). **65 is neither** — it is the
    RECORD cell read into the absent slot. **Find them all with
    `grep -rn 'absent from 65 of the 84' docs/`**; no line numbers are published
-   here because this pass's own three commits moved row `L` by 17 lines and a
-   stale pointer is the failure this successor exists to report. **Blocker:** all
+   here because this pass's own commits move Closed row `L` on every landing, and a
+   stale pointer is the failure this successor exists to report. **No position is
+   published here either**; `locate.sh` resolves that row by content, bound to a
+   commit. **Blocker:** all
    three are outside this pass's lane (`docs/10` §1, `docs/11` area prose,
    `docs/11`'s Closed table). **Closes when** one of the three readings is chosen
    on stated grounds and the others retired with their arithmetic shown, or the
@@ -752,19 +751,29 @@ by `AGENTS.md` §7.
    are not (12 crawls carry members; 72 answered `200`). **Stated because this pass
    hunted this exact class twice and missed a third instance on the same page.**
 
-7. **`account.py` is handed on broken, and this successor exists so it is not.**
+6. **`account.py` is handed on broken, and this successor exists so it is not.**
    `docs/10` §1's own successor tells the next pass to run that tool over **"every
    other committed CC ledger"**. Run exactly that way it **crashes on a member of this
    population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
    `account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
    another lane owns that file — and **that is why the successor exists**: recording the
    crash as observed is not enough while the row naming the tool still points the next
-   pass straight at it. **Blocker:** the fix belongs to the lane that owns `account.py`.
-   **Closes when** the tool tolerates an absent `t_sent` (the spacing oracle needs only
-   the rows that have one), or its successor is reworded to name the ledgers it can
-   read. **Zero requests.** **Assumptions (INFERRED):** that the null is a malformed
-   row rather than a deliberately blank field — 4 of that ledger's 44 rows, all at
-   seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+   pass straight at it.
+
+   **Blocker: none — and the earlier wording here was a routing note, not a blocker.**
+   It said "the fix belongs to the lane that owns `account.py`", which names no owner
+   and no route: `account.py` is a committed analysis script, not a live surface, and
+   the next pass that runs it is a person reading `docs/10`. A successor that names an
+   unowned fix and no owner describes the crash without stopping it. **What this
+   successor actually asks for is a maintainer decision, and saying so plainly is the
+   honest form.** **Closes when** EITHER the tool tolerates an absent `t_sent` — the
+   spacing oracle needs only the rows that have one, so skipping them is sufficient and
+   correct, not a loosening — OR the `docs/10` §1 successor is reworded to name the
+   ledgers it can read, which costs nothing and is the smaller change. **Zero
+   requests either way.** **Assumptions (INFERRED):** that the null is a malformed row
+   rather than a deliberately blank field — 4 of that ledger's 44 rows, all at seqs
+   1–4, and nothing in the tree says which. **Not fixed here; that is not this
+   lane's file.**
 
 ## 8a. Correction (2026-10-15) — verifier round 1
 
@@ -779,7 +788,7 @@ over; §6 item 7 — a count whose rule is not stated is how 44 became 93 here).
 | 2 | "39 rows, **9.7%** of the population" (§1) | "**39 rows, 10.3% of the 380-row population** (39 ÷ 380 = 0.10263)" | 9.7% is not 39/380. The **rows (39) and the denominator (380) were right**; only the percentage was wrong. |
 | 3 | "exit 0, **23 checks**, 0 failures" (§5) | "**25 checks**, 0 failures", and the count is now **printed by the test function** | 22 `check()` calls were being counted as 23 because the summary line also contains the word `PASS`. Three real checks were added (two over the real `s7` ledger, one for the `200`-only member rule) and the vacuous one removed — see #7. |
 | 4 | "**43** committed ledgers" (§1, step 1 of R1) | "**44** … **at this branch's head**, and this number moves as passes land" | 43 was true before this pass added its own ledger. The recorded rule must reproduce at the commit under review; the **answer (8) is unchanged**. |
-| 5 | *(new §6 subsection + successor, now §8c.5)* | — | the `docs/11` area-L addendum, its Closed row `L`, and this area's row in **`docs/10` §1** all publish "absent from 65 of the 84", which reconciles with neither the committed census (19) nor this pass's re-derivation (12). **The third instance was found by running the grep that finding 2 required** — the mandated test surfaced a finding this pass had missed twice. Recorded as a successor; **out of lane, not fixed.** ⚠ Round 1 wrote the Closed-table pointer as **`:2170`**, which does not contain the sentence — corrected in §8a-2 #1. |
+| 5 | *(new subsection + successor, now **S-L4d** in §8c)* | — | the `docs/11` area-L addendum, its Closed row `L`, and this area's row in **`docs/10` §1** all publish "absent from 65 of the 84", which reconciles with neither the committed census (19) nor this pass's re-derivation (12). **The third instance was found by running the grep that finding 2 required** — the mandated test surfaced a finding this pass had missed twice. Recorded as a successor; **out of lane, not fixed.** ⚠ Round 1 wrote the Closed-table pointer as **`:2170`**, which does not contain the sentence — corrected in §8a-2 #1. |
 | 6 | `CC-MAIN-2013-48` members = **0** (§6 table) | **NOT DERIVABLE** | Its only member-bearing DATA row is a **502** (`supplement` seq 3). An empty list on a failed query is vacuous, and `census-84.txt:20` says a 502 is a FAILURE, never an absence. The reader now takes counts **only from `200` rows** and has two new controls for it. **No headline number moves.** |
 | 7 | "self-test … so the trap is **exercised rather than described**" (§4) | The vacuous check is **removed** | `('200 (curl)' == '200')` compared two literals: False by construction, and unchangeable by anything the reader does. Replaced by two checks over the **committed 19-row `s7` ledger** — a raw `== "200"` finds **0 of 19**, the reader resolves **10 of 19**. |
 | 8 | "`self-test` name: the **four** schemas agree on the member COUNT" | "the **three** fixtures agree…" | The check compared three fixtures, not four. |
@@ -791,6 +800,7 @@ over; §6 item 7 — a count whose rule is not stated is how 44 became 93 here).
 380 rows), all five moved census cells, `older-schema` 8 → 0, the two
 member-carrying cells, and the INFERRED limits. The verifier reproduced all of
 them, and none of these corrections moves a cell the census prints.
+
 
 ## 8a-2. Correction (2026-10-15) — verifier round 2
 
@@ -827,6 +837,7 @@ record set itself, which `docs/10` §1's own words anticipate — *"Clean for th
 test is not the same as complete"* — and which no artefact in the tree can settle
 because `AGENTS.md` §7 excludes the bodies. **A successor that re-asks the general
 floor question is a duplicate, and this one now says so.**
+
 ## 8a-3. Correction (2026-10-15) — verifier round 3
 
 Round 3 returned NOT CLEAN on eight points. The reviewer re-derived and confirmed
@@ -839,8 +850,8 @@ measurements.** Every finding below is of that class and needs no request.
 
 | # | superseded | corrected to | why |
 |---|---|---|---|
-| 1 | this file published `docs/11:2218` for Closed row `L`, and "the Closed table begins at `:2189`" | **no `docs/NN:NNNN` pointer is published anywhere in this file.** The greps at the head of §6 are the citation; `dup-test.sh` resolves them all | every pointer of that shape has been stale within one commit, because this PR inserts 142 lines into `docs/11` below most of what it cites. Correcting the numbers would fix four instances of a bug that has fired in every round |
-| 2 | the no-line-numbers policy, while the same file published five `docs/NN:NNNN` pointers | the policy is now **enforced**: `dup-test.sh` greps `FINDINGS.md` for them outside the Correction sections and prints **STALE** if any exist | a policy the file stating it breaks is not a policy. The Correction sections are excluded **deliberately** — `AGENTS.md` §5 requires corrections preserved as history |
+| 1 | this file published `docs/11:2218` for Closed row `L`, and "the Closed table begins at `:2189`" | **no position is published in this file, in any spelling.** `locate.sh` resolves every landmark by content, bound to a commit; `dup-test.sh` enforces it and exits non-zero | every pointer of that shape has been stale within one commit, because this PR inserts 142 lines into `docs/11` below most of what it cites. Correcting the numbers would fix four instances of a bug that has fired in every round |
+| 2 | the no-line-numbers policy, while the same file published five `docs/NN:NNNN` pointers | the policy is now **enforced and fatal**: `dup-test.sh` greps `FINDINGS.md` for a position in any spelling, outside the Correction sections, and **exits non-zero** | a policy the file stating it breaks is not a policy. The Correction sections are excluded **deliberately** — `AGENTS.md` §5 requires corrections preserved as history |
 | 3 | "moved row `L` by **17 lines**" | **2094 → 2170 → 2218 → 2232 → 2236**; main → head **+142**, the round before **+18** | "17" was neither figure, and this round introduced it. Measured, now |
 | 4 | "**67 of 69** member-source rows carry no `limit=`" | **RULE 3** stated and shipped in `kib-detector.py`. **A** every row **81 / 9 carry / 72 none / 2 at-limit** · **B** one per crawl, what `derive()` uses, **74 / 6 / 68 / 1** · **C** in-window, **72 / 5 / 67 / 1** | the published **69/67 matched no cell**, and **67** is cell C's "carrying none" beside cell A's denominator. The reviewer's re-derivation — *importing* this reader's predicates — returned **81/9/72/2**, cell **A**, which is right for its question |
 | 5 | `read-area-l.py` printed *"every other member-source row carries no `limit=`, so no limit truncated it"* | the block now counts **four** numbers and says **"AT their own limit"** is the only predicate that can cut a tail | the sentence asserted one predicate (carries none) about rows selected by another (reached it). **7** member-source rows carry a limit without reaching it |
@@ -857,16 +868,72 @@ and `dup-test.sh` is the artefact that proves it rather than the prose asserting
 cells, `CC-MAIN-2013-48` NOT DERIVABLE, the INFERRED limits. The only figures that moved
 are the two that had no artefact behind them.
 
+## 8a-4. Correction (2026-10-15) — verifier round 4
+
+Round 4 returned NOT CLEAN on six points and, more usefully, said why four rounds
+had not converged. The reviewer's own summary: *"the defect class is exactly what
+three rounds of verifiers said it was: pointers, predicates and prose"* — and
+*"fix 1 removed the spelling of the stale pointer and left the class intact."*
+
+**The shape of the problem, recorded because it is the finding.** Every round fixed
+a *coordinate*: `:2189` -> `docs/11:2170` -> `docs/11:2218` -> `:2232` ->
+`:2236` -> `:2253`. **Each fix added lines, which moved what the log measured,
+which required the next fix.** That is not bookkeeping error. It is a write-up
+that cannot converge, because prose in this directory cited positions into a file
+this PR edits. **So this round changes the shape, not the instances.**
+
+| # | superseded | corrected to | why |
+|---|---|---|---|
+| 1 | §8b published `docs/11 Closed table begins at 2189` | **a grep**, no position | live on the shipped SHA, in §8b's body, **outside every Correction section** — the exact defect fix 1 was written to prevent, surviving the apparatus. Now a `grep '^## Closed areas'` |
+| 2 | a verbatim duplicated block (the KiB table, "Zero candidates", the caution, the `account.py` paragraph, the narrowing paragraph) with **two broken cross-references**: one pointing at the wrong successor, one at `§8c.6` which did not exist | **deleted**; one canonical copy remains and §8c is now numbered contiguously `1 2 3 4 5 6` | the duplicate was the disclosed `git checkout` double-write, present in the shipped file. Two broken pointers **inside the file whose thesis is that broken pointers are the defect** |
+| 3 | this file published a terminal position and "measured, now", plus an inserted-line count | **no terminal position, and no line count, is published anywhere in this file** | the "measured, now" figure named the *previous* commit's value on the SHA it shipped in. Any position stated here expires on the commit that adds lines above it — **and this file is the thing adding them** |
+| 4 | §8b carried a **transcribed** copy of `dup-test.sh`'s output, which had drifted (`floor` 31 recorded / 30 live; `truncat` 3 / 5) | **the table is gone; only the command remains** | transcription is what let it drift, and §9's whole purpose was to remove that manual step. The script prints the counts live |
+| 5 | "no line numbers are published here because this pass's own three commits moved row `L` by **17 lines**" — superseded in a Correction section, still live in §8c's body | **the body text is updated**; the Correction entries stay, because they are history | a correction recorded and not applied to the body is a correction that changes nothing |
+| 6 | "see §6, *Successors* 1 and 2" (no such list) and "`probe.sh` records the **four** commands" (it runs five) | both corrected | the successor list is under `## 8c`; `probe.sh` now runs five |
+
+**THE STRUCTURAL CHANGE, which is the point of this round.**
+
+- **`locate.sh` is new.** It resolves every landmark this file names **by content**
+  and prints `file:line` **bound to the commit it measured at**, exiting non-zero
+  if any landmark cannot be found. **Every landmark is matched by its text, never by
+  a typed line number** — that is what keeps it true when the file moves. Positions
+  are now the output of a script, not claims in prose.
+- **`dup-test.sh` enforces the CLASS, not the spelling, and is fatal.** The earlier
+  regex required a colon, so a bare `2189` walked past it — which is `AGENTS.md` §6
+  item 2 aimed at this repo's own check. It now matches a position in four
+  spellings, scoped to files **this PR edits** (derived from the diff, not
+  hardcoded), and **exits non-zero**. The prose's "fails loudly" and "enforced by the
+  artefact" are now true rather than aspirational.
+- **The exemption is a kind, not a position.** It covers Correction **sections**,
+  recognised by heading and ending at the next heading. The earlier `awk
+  '/^## 8a/ {skip=1}'` skipped to EOF, exempting `## 9. Artefacts` and anything
+  appended after it, forever. The script also **reports** a heading that looks like
+  a Correction section and is not one, so the exemption cannot be widened by
+  renaming.
+- **Population rule R1 is pinned in `self-test`** (`AGENTS.md` §3: a claim that
+  should not rot gets a check). It produced this pass's most consequential finding —
+  `derive.py` read **6** ledgers where R1 finds **8** — and it was prose until now.
+  **8 checks**, covering both edges: a lane-lettered slug is caught, an unrelated
+  letter is not. No vendor pin needed; it is string analysis over committed ledgers.
+
+**Unchanged and re-verified:** the population (8 ledgers / 380 rows), all five moved
+census cells, `older-schema` 8 -> 0, both member-carrying cells, `CC-MAIN-2013-48` as
+NOT DERIVABLE, the INFERRED limits, 193/0 whole-KiB, and zero members lost. **No
+figure the verifier confirmed moved in this round** — the measurements were already
+right, and the finding was that three of them had been *presented* in a form that
+could not survive the next commit.
+
 ## 9. Artefacts
 
 | file | what |
 |---|---|
 | `read-area-l.py` | the reader. `population` · `schemas` · `manifest` · `census` · `self-test` |
-| `dup-test.sh` | the non-duplicate test `CONTRIBUTING-research.md:199` requires, run for all four successors, **plus a stale-pointer check that prints STALE if this file publishes a `docs/NN:NNNN` pointer outside its Correction sections** (§8b) |
+| `dup-test.sh` | the non-duplicate test `CONTRIBUTING-research.md:199` requires, run for every successor — **printed, never transcribed**, plus the **position check**, which exits non-zero on a position in any spelling outside the Correction sections (§8b) |
+| `locate.sh` | **resolves every landmark this file names, by content, bound to a commit.** The replacement for publishing a position: it prints `file:line` for a named SHA and exits non-zero if a landmark cannot be found |
 | `kib-detector.py` | **RULES 1–3 of §8b**: the whole-KiB detector, the "successful `200`" counting rule, and the three member-source `limit=` cells. `--json` for machine-readable output. It computes the §7b table — before this script existed, that table had no artefact behind it |
 | `manifest.tsv` | the 8 ledgers in precedence order, generated by `manifest` |
 | `results.jsonl` | **0 rows** — correct for a 0-request pass, not a missing file |
-| `run.log` | the six invocations and their exit status; no per-request table, because there are no requests |
+| `run.log` | the eight invocations and their exit status; no per-request table, because there are no requests |
 | `probe.sh` | the record of what was sent: nothing |
 
 Re-derive everything above with **no request and no response body**:
@@ -876,9 +943,10 @@ cd findings-log/2026-10-15-area-l4-ledger-reader
 python3 read-area-l.py population   # the population, counted before it is read
 python3 read-area-l.py schemas      # rules K1-K3, the schema figures
 python3 read-area-l.py census       # the census + the member-limit block
-python3 read-area-l.py self-test    # 25 controls, count derived in code
-sh       dup-test.sh                # the non-duplicate test + the stale-pointer check
-python3  kib-detector.py            # rules 1-3, the §7b table
+python3 read-area-l.py self-test    # 33 controls, count derived in code
+sh       dup-test.sh                # the non-duplicate test + the position check
+sh       locate.sh                  # every landmark, resolved by content, bound to a commit
+python3  kib-detector.py            # rules 1-3, the truncation cells
 ```
 
 Every number in this file comes out of one of those six.

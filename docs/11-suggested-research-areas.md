@@ -2079,10 +2079,15 @@ population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**,
 `account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
 another lane owns that file — and **that is why this successor exists**: recording
 the crash as observed is not enough while the row naming the tool still points the
-next pass straight at it. **Blocker:** the fix belongs to the lane that owns
-`account.py`. **Closes when** the tool tolerates an absent `t_sent` (the spacing
-oracle needs only the rows that have one), or its successor is reworded to name the
-ledgers it can read. **Zero requests.** **Assumptions (INFERRED):** that the null is
+next pass straight at it. **Blocker: none — the closer is a maintainer decision, and
+the earlier wording here ("the fix belongs to the lane that owns `account.py`") named
+neither an owner nor a route, so it described the crash without stopping anything.**
+`account.py` is a committed analysis script, not a live surface; the next pass that
+runs it is whoever reads `docs/10`. **Closes when** EITHER the tool tolerates an
+absent `t_sent` — the spacing oracle needs only the rows that have one, so skipping
+them is sufficient and correct, not a loosening — OR the `docs/10` §1 successor is
+reworded to name the ledgers it can read, which costs nothing and is the smaller
+change. **Zero requests either way.** **Assumptions (INFERRED):** that the null is
 a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
 all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
 [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a, §8a-2, §8a-3, §8b, §8c]

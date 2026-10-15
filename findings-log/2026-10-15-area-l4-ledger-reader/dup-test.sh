@@ -2,7 +2,8 @@
 # dup-test.sh — the NON-DUPLICATE test `CONTRIBUTING-research.md:199` requires for
 # every successor, run for real, with the commands and their results recorded.
 #
-#     sh dup-test.sh          # exit 0 always; read the table
+#     sh dup-test.sh            # report; exit 0 unless the POSITION check fails
+#     sh dup-test.sh --advisory # report only, exit 0 even on a position hit
 #
 # The bar it enforces: "it is already in `docs/10` section 1, already in the
 # Closed table, or already on the page — grep both first". A successor that
@@ -11,38 +12,73 @@
 #
 # SCOPE NOTE: this tests whether a successor's SUBJECT is already recorded
 # somewhere. It cannot prove novelty — docs/10 section 2 ("Searched and closed")
-# is a second surface the grep below deliberately does not claim to cover, and a
+# is a surface the grep below deliberately does not claim to cover, and a
 # re-derivation is welcome per CONTRIBUTING-research.md:212. Where a hit is a
 # PARTIAL overlap rather than a duplicate, the table says so.
+#
+# ══ THE POSITION CHECK — the class, not the spelling ══════════════════════════
+#
+# Four review rounds found the same defect at a new coordinate: `:2189` ->
+# `docs/11:2170` -> `docs/11:2218` -> `:2232` -> `:2236` -> `:2253`. Every fix
+# added lines, which moved what the log measured, which required the next fix.
+# That is not bookkeeping. It is a write-up shape that cannot converge, because
+# prose in this directory cites positions into a file this PR edits.
+#
+# So: FINDINGS.md publishes NO POSITION, in ANY SPELLING. Not `docs/11:NNNN`,
+# not a bare `2189`, not "line 363-366", not "the table begins at 2224". A
+# position is a number a reader is invited to look up, and this PR moves those
+# numbers. What prose cites instead is a grep, or `locate.sh` bound to a commit.
+#
+# THE REGEX BELOW MATCHES THE CLASS, NOT THE SYNTAX IT WAS WRITTEN FOR. An
+# earlier revision matched `docs/(10|11)[^ ]*:[0-9]+` — a colon — and a bare
+# `2189` walked straight past it. That is `AGENTS.md` section 6 item 2 aimed at
+# this repo's own check: a test that only catches the spelling it was written
+# for is not a test of the thing. This one matches a bare 3-4 digit number too,
+# so B3 cannot survive the apparatus built to stop it.
+#
+# THE EXEMPTION IS A KIND, NOT A POSITION. It exempts SECTIONS whose heading is a
+# Correction section (`^## 8a…`), recognised by their HEADING and running to the
+# next `^## ` heading. An earlier revision used `awk '/^## 8a/ {skip=1}'`, which
+# skipped from that line to EOF — so `## 9. Artefacts` was exempt although it is
+# not a Correction section, and anything appended after it inherited a free pass
+# forever. That exemption is implemented here by kind, and a heading matching the
+# Correction pattern that is NOT one is reported.
+#
+# WHY THE EXEMPTION EXISTS AT ALL: `AGENTS.md` section 5 requires corrections to
+# be PRESERVED, not smoothed over. A correction record must be able to quote the
+# wrong number it withdrew, or the retraction history stops being evidence.
 
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE/../.." || exit 1
+LOG="$HERE/FINDINGS.md"
+ADVISORY=0
+[ "${1:-}" = "--advisory" ] && ADVISORY=1
 
-# Where the Closed table starts, derived rather than remembered — a hardcoded
-# line number here is exactly the defect this file exists to catch.
-CLOSED=$(grep -n '^## Closed areas' docs/11-suggested-research-areas.md | cut -d: -f1)
-S10_S1_START=$(grep -n '^## 1\. Open questions' docs/10-open-questions.md | cut -d: -f1)
-S10_S2_START=$(grep -n '^## 2\. Searched and closed' docs/10-open-questions.md | cut -d: -f1)
+D10=docs/10-open-questions.md
+D11=docs/11-suggested-research-areas.md
 
 echo "dup-test.sh — the non-duplicate test, run against docs/10 section 1,"
 echo "the docs/11 Closed table, and docs/11 itself."
 echo
-echo "  docs/10 section 1 spans   lines $S10_S1_START .. $((S10_S2_START - 1))"
-echo "  docs/11 Closed table      begins at line $CLOSED"
-echo "  (both derived by grep above, never typed in)"
+CLOSED=$(grep -n '^## Closed areas' "$D11" | cut -d: -f1)
+S10_A=$(grep -n '^## 1\. Open questions' "$D10" | cut -d: -f1)
+S10_B=$(grep -n '^## 2\. Searched and closed' "$D10" | cut -d: -f1)
+echo "  docs/10 section 1 spans lines $S10_A .. $((S10_B - 1))"
+echo "  docs/11 Closed table begins at line $CLOSED"
+echo "  (both derived by grep above, never typed in — a typed one is the defect)"
 echo
 
 # grep_subject LABEL PATTERN -- greps three surfaces and reports each count.
 grep_subject() {
   label="$1"; pat="$2"
-  d10=$(awk -v a="$S10_S1_START" -v b="$S10_S2_START" 'NR>=a && NR<b' docs/10-open-questions.md | grep -ci "$pat" || true)
-  d11=$(grep -ci "$pat" docs/11-suggested-research-areas.md || true)
-  cl=$(awk -v a="$CLOSED" 'NR>=a' docs/11-suggested-research-areas.md | grep -ci "$pat" || true)
+  d10=$(awk -v a="$S10_A" -v b="$S10_B" 'NR>=a && NR<b' "$D10" | grep -ci -- "$pat" || true)
+  d11=$(grep -ci -- "$pat" "$D11" || true)
+  cl=$(awk -v a="$CLOSED" 'NR>=a' "$D11" | grep -ci -- "$pat" || true)
   printf '  %-11s %-26s docs/10 s1=%-3s docs/11=%-3s Closed=%-3s\n' "$label" "$pat" "${d10:-0}" "${d11:-0}" "${cl:-0}"
 }
 
-echo "-- S-L4a  the member tally's window basis (census-84.txt:168 lists an out-of-window crawl)"
+echo "-- S-L4a  the member tally's window basis (census-84.txt lists an out-of-window crawl)"
 grep_subject S-L4a "window basis"
 grep_subject S-L4a "CC-MAIN-2022-27"
 echo
@@ -59,47 +95,128 @@ echo "-- S-L4d  'absent from 65 of the 84' reconciling with neither reading"
 grep_subject S-L4d "65 of the 84"
 grep_subject S-L4d "absent from"
 echo
-echo "-- The exact line pointers this pass cites, verified by grep FIRST."
-echo "   (round 2 of the verifier found docs/11:2170 pointed at an unrelated"
-echo "    area-F passage; the real second instance is the Closed-table row L)"
-echo "   Every docs/11 line number below is re-derived by grep, never typed in."
-echo "   Files carrying the sentence, with their line numbers:"
-grep -rn 'absent from 65 of the 84' docs/ | cut -d: -f1,2 | while IFS=: read -r f ln; do
-  printf '     %-40s :%s\n' "$f" "$ln"
-done
-echo "   (docs/11 hits: $(grep -n 'absent from 65 of the 84' docs/11-suggested-research-areas.md | cut -d: -f1 | tr '\n' ' '))"
-echo "   (docs/10 hits: $(grep -n 'absent from 65 of the 84' docs/10-open-questions.md | cut -d: -f1 | tr '\n' ' '))"
+echo "-- S-L4e  account.py handed on broken; its successor is docs/10 section 1"
+grep_subject S-L4e "account.py"
+grep_subject S-L4e "t_sent"
 echo
-echo "   Verifying each one actually contains the sentence:"
-for spec in docs/10-open-questions.md docs/11-suggested-research-areas.md; do
-  for ln in $(grep -n 'absent from 65 of the 84' "$spec" | cut -d: -f1); do
-    printf '     %-40s :%-5s %s\n' "$spec" "$ln" "$(sed -n "${ln}p" "$spec" | grep -o 'absent from 65 of the 84' | head -1)"
-  done
-done
+echo "  ⚠ THE COUNTS ABOVE ARE LIVE. They are printed, not transcribed: round 4"
+echo "    found a recorded table that no longer matched the script producing it"
+echo "    (floor recorded 31 / live 30, truncat recorded 3 / live 5). FINDINGS.md"
+echo "    therefore does NOT carry a copy of this table — it carries the command."
 echo
-echo "   docs/11 Closed table begins at line $CLOSED; Closed row L is at"
-echo "   $(grep -n '^| L — recovery of the retired' docs/11-suggested-research-areas.md | cut -d: -f1)"
+
+echo "═══ THE POSITION CHECK ═══"
+echo "  FINDINGS.md must publish no position into any file, in any spelling:"
+echo "    docs/NN:NNNN | bare 3-4 digit numbers | 'line NNNN' | 'lines NNNN-NNNN'"
+echo "  Exempt: Correction SECTIONS, recognised by heading, which must be able to"
+echo "  quote a withdrawn number (AGENTS.md section 5). Everything after them is"
+echo "  checked — an earlier revision skipped to EOF and let later sections inherit"
+echo "  the exemption."
+
+# ── WHAT IS FLAGGED, AND WHY IT IS BOUNDED ─────────────────────────────────
+# A position is a NUMBER THE READER IS INVITED TO LOOK UP IN A FILE.
+#
+# THE BOUND THAT MAKES IT A CHECK RATHER THAN A NUISANCE: only positions into a
+# file THIS PR ITSELF EDITS. This PR's entire diff outside its own log directory
+# is `docs/11-suggested-research-areas.md` — so a pointer into `docs/11` is
+# invalidated by this PR landing, and a pointer into `census-84.txt`,
+# `derive.py` or `account.py` is not, because this PR does not touch them. That
+# is a property of the diff, so it is derived below rather than hardcoded, and it
+# will stay true as this PR's scope changes.
+#
+#   A  <edited-file>:NUMBER        the colon form
+#   B  "line"/"lines" + number     incl. a range, when the subject is an edited file
+#   C  a positional verb + number  "begins at 2189" — the B3 spelling, no colon
+#
+# WHAT IS DELIBERATELY NOT FLAGGED: a bare number with no positional context. This
+# file is full of legitimate ones — `200` and `502` as HTTP statuses, `1024` in a
+# byte rule, `193` in a count, `2014-03-10` in a date. An earlier revision of this
+# check flagged all of them and reported **115 positions on a file that had 3** —
+# a check nobody runs, hiding the 3 it was built to find. That was `AGENTS.md`
+# section 6 item 2 aimed at this repo's own check: a test that only catches what
+# it was written to catch is not a test.
+#
+# A line is reported once, by first match.
+
+EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v '^findings-log/')
+EDRE=$(printf '%s\n' "$EDITED" | sed 's/[][\\.*^$(){}?+|/]/\\&/g' | paste -sd'|' -)
+[ -z "$EDRE" ] && EDRE='$^'
+
+HITS=$(awk -v ed="$EDRE" '
+  BEGIN { split(ed, A, "|"); for (i in A) E[A[i]] = 1 }
+  # A Correction section is a SECTION: it starts at a "^## " heading and ENDS at
+  # the next one. That is what makes the exemption a kind, not a position.
+  /^## / { insec = ($0 ~ /^## 8a/ || $0 ~ /^## Correction/) }
+  insec  { next }
+  {
+    line = $0
+    why = ""
+    n = split(line, W, /[^A-Za-z0-9._\/-]+/)
+    # A — a colon position into a file this PR edits
+    for (i = 1; i <= n; i++)
+      if (W[i] ~ /:[0-9]+$/ && E[W[i]]) { why = "A file:NUMBER   "; break }
+    # B/C — a positional phrase whose SUBJECT is an edited file, named either by
+    # its full path (`docs/11-suggested-research-areas.md`) or by any leading
+    # directory of one (`docs/11`). Getting this direction wrong is how the
+    # bare-`2189` defect survived one more round: an earlier revision tested
+    # whether the WORD started with the full path, but this pass writes the
+    # subject as `docs/11`, so the word is a PREFIX OF the path, not the reverse.
+    subject = 0
+    for (i = 1; i <= n; i++)
+      if (W[i] != "" && length(W[i]) > 2 && index(ed, W[i]) == 1) { subject = 1; break }
+    if (why == "" && subject && line ~ /(begins|starts|ends) +(at )?[0-9]{3,4}/)
+      why = "C positional verb"
+    if (why == "" && subject && line ~ /[Ll]ines? +[0-9]{3,4}/)
+      why = "B line NUMBER   "
+    if (why != "") print NR": " why"  " line
+  }
+' "$LOG")
+
+# Headings that LOOK like Correction sections but are not one — so the exemption
+# cannot be widened by renaming.
+FAKE=$(grep -n '^## ' "$LOG" | grep -i 'correction' | grep -vE '^\s*[0-9]+:## 8a' || true)
+
+N=$(printf '%s' "$HITS" | grep -c '' || true)
 echo
-echo "   Stale-pointer check. Round 1 cited line 2170 for the Closed-table instance;"
-echo "   round 2 published 2218; round 3 found 2218 stale and this pass publishes NO"
-echo "   docs/NN:NNNN pointer at all. Here is what each earlier number actually reads"
-echo "   at THIS commit — the check that would have caught the bad citation:"
-for ln in 2170 2218 2232 2236; do
-  printf '     :%s -> %s\n' "$ln" "$(sed -n "${ln}p" docs/11-suggested-research-areas.md | cut -c1-66)"
-done
-echo
-echo "   FINDINGS.md must publish no docs/NN:NNNN pointer into docs/10 or docs/11"
-echo "   OUTSIDE its two '## Correction' sections, which quote them as history —"
-echo "   AGENTS.md §5 requires corrections preserved, and a record that deleted the wrong"
-echo "   number would destroy the evidence it records. So the check excludes those:"
-LOG="$HERE/FINDINGS.md"
-HITS=$(awk '/^## 8a/ {skip=1} !skip {print NR": "$0}' "$LOG" \
-       | grep -E 'docs/(10|11)[^ ]*:[0-9]+')
-if [ -z "$HITS" ]; then
-  echo "     none outside the Correction sections — pass"
+if [ "$N" -eq 0 ] && [ -z "$FAKE" ]; then
+  echo "  PASS — 0 positions published outside the Correction sections."
+  POS=0
 else
-  echo "$HITS" | sed 's/^/     STALE: /'
+  POS=1
+  printf '%s\n' "$HITS" | sed 's/^/  HIT: /'
+  [ -n "$FAKE" ] && printf '%s\n' "$FAKE" | sed 's/^/  FAKE CORRECTION HEADING: /'
+  echo "  ** $N position(s) outside Correction sections — every one expires on the"
+  echo "     next commit that adds lines above its target. **"
 fi
-echo "     (the Correction sections this excludes begin at: $(grep -n '^## 8a' "$LOG" | cut -d: -f1 | tr '\n' ' '))"
 echo
-echo "exit 0 — this script reports; the reading of it is the reviewer's."
+echo "  Correction sections (exempt, by heading):"
+awk '/^## /{ if ($0 ~ /^## 8a/) print "    " NR": "$0 }' "$LOG"
+echo
+echo "  Sections AFTER the last Correction section, which the exemption does NOT reach:"
+awk -v last="$(grep -n '^## 8a' "$LOG" | tail -1 | cut -d: -f1)" '
+  /^## / && NR > last { print "    " NR": "$0 }
+' "$LOG"
+echo
+echo "  Stale pointers from earlier rounds — what each number reads NOW. A citation"
+echo "  pointing at a passage that does not contain the claim is AGENTS.md section 6 item 6:"
+for ln in 2170 2218 2232 2236 2253; do
+  printf '     :%s -> %s\n' "$ln" "$(sed -n "${ln}p" "$D11" | cut -c1-62)"
+done
+echo
+echo "  The positions are NOT cited anywhere; they are printed here so a reader can"
+echo "  confirm for themselves that a pointer would have been wrong. locate.sh"
+echo "  resolves every landmark this prose refers to, by content, bound to a commit."
+
+if [ "$POS" -eq 1 ] && [ "$ADVISORY" -eq 0 ]; then
+  echo
+  echo "dup-test.sh: FAILED — $N position(s) outside the Correction sections."
+  exit 1
+fi
+if [ "$POS" -eq 1 ]; then
+  echo
+  echo "dup-test.sh: ADVISORY ONLY (--advisory) — $N position(s), not enforced."
+  exit 0
+fi
+echo
+echo "dup-test.sh: PASS (non-duplicate table printed; 0 positions outside Corrections)"
+exit 0

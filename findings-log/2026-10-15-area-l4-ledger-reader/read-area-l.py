@@ -1042,6 +1042,31 @@ def self_test():
           isinstance(len(one), int) and len(one) == 2)
 
     rule('-')
+    print('  POPULATION RULE R1 — PINNED HERE, because it produced this pass\'s most')
+    print('  consequential finding (derive.py read 6 ledgers where R1 finds 8) and')
+    print('  AGENTS.md section 3 says a claim that should not rot gets a check. It is')
+    print('  pure string analysis over committed ledgers: no vendor pin is needed.')
+    all_ledgers = sorted(glob.glob(os.path.join(LOGROOT, '*', 'results.jsonl')))
+    keep = [os.path.relpath(f, REPO) for f in all_ledgers if area_l_slug(slug_of(f))]
+    check('R1 selects 8 area-L ledgers from the committed population',
+          len(keep) == 8, '-> %d of %d committed ledgers' % (len(keep), len(all_ledgers)))
+    check('R1 selects none of the 6-ledger subset derive.py actually read, unreached',
+          'findings-log/2026-10-14-pool-l-crawlcontrol/results.jsonl' in keep
+          and 'findings-log/2026-10-14-pool-s7-l7crawl/results.jsonl' in keep)
+    # The rule is a SLUG rule, so its two edges are what could rot: a lane-lettered
+    # slug must still be caught, and an unrelated letter must not be.
+    check('R1 catches a lane-lettered slug (pool-l-)',
+          area_l_slug('2026-10-14-pool-l-crawlcontrol'))
+    check("R1 catches the l7crawl token", area_l_slug('2026-10-14-pool-s7-l7crawl'))
+    check('R1 ignores the date prefix (which is not a lane token)',
+          area_l_slug('2026-10-15-pool-l-ipro-census-cont'))
+    check('R1 rejects an unrelated lane (area-k)', not area_l_slug('2026-10-14-area-k-clinic-controlflow'))
+    check('R1 rejects a substring that is not a lane token (csr-method)',
+          not area_l_slug('2026-10-13-cors-method'))
+    check('R1 is order-stable (date, then slug)',
+          keep == sorted(keep, key=lambda p: (os.path.basename(os.path.dirname(p)), p)))
+
+    rule('-')
     print('  INTEGRATION NEGATIVE CONTROL — one unreadable row appended to a REAL ledger')
     # The row-level refusals above prove the parser notices. This proves the
     # CENSUS refuses to be printed at all, which is the control that matters: a

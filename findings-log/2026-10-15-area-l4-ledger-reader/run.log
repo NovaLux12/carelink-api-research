@@ -24,16 +24,16 @@ read-area-l.py population     0            27  R1+R2, 8 ledgers / 380 rows, coun
 read-area-l.py schemas        0            37  K1 key-sets 10, K2 member fields 3 by ^ipro_hcp scan, K3 properties
 read-area-l.py manifest       0             9  wrote manifest.tsv, precedence order
 read-area-l.py census         0           264  8 ledgers -> census + the member-limit block, vs census-84.txt
-read-area-l.py self-test      0            39  25 controls, decomposition below
-sh dup-test.sh                0            64  non-duplicate test, all successors + the stale-pointer check
+read-area-l.py self-test      0            52  33 controls, decomposition below
+sh dup-test.sh                0            66  non-duplicate table (printed) + the position check, fatal
+sh locate.sh                  0            33  every landmark, resolved by content, bound to a commit
 python3 kib-detector.py       0            53  RULES 1-3: the whole-KiB detector, RULE 2, the 3 limit cells
 
-# self-test decomposition — the 25 checks, grouped so the groups SUM to the count
+# self-test decomposition — the 33 checks, grouped so the groups SUM to the count
 # the function prints. Round 2 of the verifier found an earlier revision of this
 # line listing 7 groups that summed to 22 against a stated 25: three middle checks
-# were uncounted (the three fixtures agreeing on the member COUNT, on the path and
-# host, and NOT on the timestamp). In a pass whose subject IS counted arithmetic, a
-# decomposition that does not sum is the defect this repo keeps paying for.
+# were uncounted. In a pass whose subject IS counted arithmetic, a decomposition
+# that does not sum is the defect this repo keeps paying for.
 #
 #     5  parses         one fixture per committed schema (A/B/C/D) + the control row
 #     8  normalisation  status resolves to int; control row is not DATA; the 2 real-ledger
@@ -46,8 +46,13 @@ python3 kib-detector.py       0            53  RULES 1-3: the whole-KiB detector
 #                        yields no verdict; row arithmetic is an int comparison
 #     2  integration    unreadable row in a real 40-row ledger: refuses to emit, and
 #                        --allow-unreadable records it rather than dropping it
+#     8  population R1  the rule that produced this pass's most consequential finding
+#                        (derive.py read 6 where R1 finds 8), PINNED per AGENTS.md s3:
+#                        selects 8; includes the 2 derive.py missed; catches pool-l- and
+#                        l7crawl; ignores the date prefix; rejects area-k and a
+#                        non-token substring (csr-method); order-stable
 #   ----
-#    25  total (5 + 8 + 2 + 5 + 3 + 2). read-area-l.py self-test prints '(25 checks,
+#    33  total (5 + 8 + 2 + 5 + 3 + 2 + 8). read-area-l.py self-test prints '(33 checks,
 #         counted by this function, not asserted)' — the number is derived in code, not
-#         asserted here. `grep -c PASS` over its output returns 26, because the summary
-#         line contains the word PASS; the 25 are the check() calls.
+#         asserted here. `grep -c PASS` over its output returns 34, because the summary
+#         line contains the word PASS; the 33 are the check() calls.
