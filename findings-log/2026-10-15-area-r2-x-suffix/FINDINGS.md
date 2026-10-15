@@ -972,17 +972,26 @@ grep**, per round 3's finding that this lane had now shipped line pointers its o
 edits invalidated three times:
 
 ```
-grep -n '^> .*\(⚠\|Correction\|Corrected\|Deleted\|RETRACTED\)' \
-     docs/05-devices-and-vocabulary.md | grep -v '#132' | wc -l
+# pre-pass (merge base ab28f58) — where the correction blockquote actually lives:
+git show ab28f58:docs/05-devices-and-vocabulary.md \
+  | grep -nF '⚠ **What is and is not pinned here, stated rather than left to be discovered.**'
+#   472
+# post-pass (current tree) — same blockquote, shifted by this pass's edits:
+grep -nF '⚠ **What is and is not pinned here, stated rather than left to be discovered.**' \
+  docs/05-devices-and-vocabulary.md
+#   509   (a third match at 573 is this pass's own quoted prose — the self-slice;
+#          the naive grep below counts it, which is why it must not be trusted)
 ```
 
 **No count is recorded, on purpose** — the same lesson as §10's SHA binding: a
 number over a page this PR keeps editing is a property of a tree, not a fact, and
 round 3 caught three of my own. The specific instance that settles it needs no
 count: **area R wrote a correction into its own audit blockquote** — *"⚠ **What is and
-is not pinned here, stated rather than left to be discovered.**"* — so the reason for
-leaving that table verbatim is **the number being true**, not a convention the page
-holds to.
+is not pinned here, stated rather than left to be discovered.**"* (merge base
+`ab28f58`, line 472; current tree, line **509** — **not 506**, the naive count's
+self-sliced position; the naive grep also catches this pass's own quoted prose at 573) —
+so the reason for leaving that table verbatim is **the number being true**, not a
+convention the page holds to.
 
 **Successor (a) — one clause tightened.** §12 previously read "the answer changes and
 the merge queue should stop", which invites the stronger reading that a found
@@ -1140,9 +1149,13 @@ distinction is about **bytes inside a JavaScript bundle**
   `t_sent` at 27 **immediately before** `curl` at 28, `t_done` at 30 — four stamps in
   one process, in order, with the sleep inside the shared lock. `probe.sh:115` asserts
   `t_lock < t_sent < t_done` **before** the row is written.
-- **Caveat on this review:** `shellcheck` is not installed here, so §13.2 is a reading,
-  not a lint. The §7 dry-runs exercise the guard's behaviour end to end, which covers
-  the part that mattered, but a shellcheck pass is not something this pass performed.
+- **Caveat on this review:** the original reading was performed **without** `shellcheck`
+  installed, so §13.2 started as a reading, not a lint. `shellcheck` **is** installed here
+  (v0.10.0); a shellcheck pass is now added alongside the reading:
+  `shellcheck probe.sh` exits **0** with no warnings, and `shellcheck dup-test.sh`
+  exits **0** with no warnings (run on 2026-10-15, both files). The reading stands;
+  the lint corroborates the hand-checked stamps rather than replacing them, and the
+  §7 dry-runs still exercise the guard end to end.
 
 ### 13.3 Every byte offset §4 and §K cite, re-checked against the body
 
@@ -1161,6 +1174,15 @@ listed (`416`, `512`, `537`) are prose anchors rather than byte claims; `416` an
 are quoted verbatim in this log's §12 and in `docs/05`'s own corrections, and the table
 row at `512` is quoted in the correction beside it, so none of the three is load-bearing
 as a pointer.
+
+**Forward-verification note.** No vendor fetch was reopened this round (zero budget), so
+the twelve offsets were re-checked against this pass's already pinned artefact,
+`census.txt` §§B–D, rather than against a fresh body: every entry in the list above is
+present in that file at the cited byte, and `xsuffix-analyse.py` reproduces the census
+from the digest-pinned body at exit 0 (see `## Correction (2026-10-15) — round 3`).
+Items re-verified this round against that artefact: `@198638`, `@580904`, `@1723196`,
+`@2136000`, `@2136604`, `@2190336`, `@2962721`, `@3372206`, `@3372491`, `@3372603`,
+`@3373390`, `@3373507` (12/12).
 
 ### 13.4 What CI's green settles about this round's findings
 
@@ -1181,3 +1203,13 @@ dated log was deleted or rewritten, and that the live 05 suite passes. It settle
 nothing about whether a sentence is true, a span owns what it names, or a promise is
 owed. That is what the independent rounds are for, and it is why the three of four
 blocking findings here were in prose rather than in anything the gate reads.
+
+
+### 13.5 Shell environment
+
+`shellcheck` is **installed**, v0.10.0 (on `PATH` as `shellcheck`); proof:
+`shellcheck --version` exits 0 and prints `version: 0.10.0`. Probe results recorded
+in §13.2: `shellcheck probe.sh` → exit 0, 0 warnings; `shellcheck dup-test.sh` →
+exit 0, 0 warnings. The earlier §13.2 caveat was written under the (false)
+assumption that `shellcheck` was absent; it is corrected above, while the
+reading-based conclusion (stamps, exit-code contract) stands.
