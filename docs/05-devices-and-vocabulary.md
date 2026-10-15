@@ -577,7 +577,7 @@ denominator is re-derivable from a clean clone:
 >
 > - **`5` is a correct *declared* count and an incorrect *matched* count.** The enum
 >   at byte 1,723,245 — the very declaration this row cites — declares five members,
->   and this pass confirms **5** there. But only **three** are compared by
+>   and this pass measures **5** there. But only **three** are compared by
 >   `startsWith` in the digest-pinned eager main: `BLE`, `SIMPLERA`, `GUARDIAN`.
 >   `BLE_X` and `SIMPLERA_X` are read **nowhere in that artefact**.
 > - **`6` is not refuted, only scoped.** The set is the *declared* vocabulary plus

@@ -482,9 +482,11 @@ All rows are OBSERVED in one artefact, the digest-pinned patient bundle
 
 **Independence (AGENTS.md §2.1).** Every row above rests on **one** source: this
 pass's own measurement of one digest-pinned file, plus the areas whose byte offsets
-it reproduces (P, S4) — the same repository, so one source. Nothing here is
-labelled *independently*, *corroborated* or *confirms*. §3.4's disagreement is
-recorded as two readings from two passes on two captures, not as agreement.
+it reproduces (P, S4) — the same repository, so one source. **No claim here earns a
+strength word**: everything this pass measures comes from one repository, so
+`AGENTS.md` §2.1's independence count is 1 throughout, and the prose is written to
+that count. §3.4's disagreement is recorded as two readings from two passes on two
+captures, not as agreement.
 
 ## 9. Artefacts
 
@@ -524,7 +526,7 @@ is adjudicated below.
 > about a moving object** (`AGENTS.md` §1).
 >
 > **The per-hit verdicts below are the finding. The counts are evidence of where to
-> look.** Verification round 2 confirmed every verdict; none of them moved, and none
+> look.** Verification round 2 re-derived every verdict; none of them moved, and none
 > of them depends on a count staying still.
 
 ### The two tables that both answer "the Closed table"
@@ -556,9 +558,11 @@ grep -c 45559 docs/11 whole page                  -> 9
 **Not a duplicate.** `docs/10`'s single `BLE_X` hit is row 37's *prescription* for
 a future authenticated response — "the client's own comparison set (`BLE`, `BLE_X`,
 `SIMPLERA`, `SIMPLERA_X`, `GUARDIAN`, `NGP`)" — not a proposal to sweep the lazy
-corpus. The T2 hits are **area R's own row** ("Two successors filed under the area:
-read-side echo casing, and whether the `_X` suffixes mean anything"), i.e. the
-parent this pass closes.
+corpus. The T2 hits are **not area R's own row**: both fall on the **area P** Closed-table
+row ("recover the request schema from the vendor's own app, statically") — the row that
+*proposed* this candidate, naming the `deviceFamily` enum and module `45559` as
+"candidates for area R". Area R's own row contains neither token, so the grep found
+the parent proposal, not a second one to sweep the corpus.
 
 ⚠ **The `docs/11` breakdown was wrong at round 1 and is corrected here.** The 7 then
 recorded **summed to 8 under a heading of 7**, and at this commit the true count is
@@ -582,7 +586,7 @@ prescribes matching a future value against that 6-member comparison set, two of
 whose members this pass has just measured as unread in the eager main. That is
 **not** a refutation of the row — `BLE_X`/`SIMPLERA_X` are unmeasured in the lazy
 corpus, which is exactly what successor (a) would settle. It is why successor (a)
-is worth running and why the row must not be read as confirmed by this pass.
+is worth running and why the row must not be read as settled by this pass.
 
 ### (b) the false-positive class, as offsets
 
@@ -625,7 +629,7 @@ grep -c Samsung docs/11 whole page                  -> 3
 
 **Not a duplicate.** `docs/09`'s hit *is* the claim in dispute
 (`docs/09:236`, "the patient bundle's three 'NGP' hits were Samsung user-agent
-strings"), and `docs/05:327` carries the same figure — both confirmed present, so
+strings"), and `docs/05:327` carries the same figure — both present in the bytes, so
 §3.4's "docs/09 §4 and docs/05 repeat the figure" is accurate. ⚠ **`docs/10` also
 carries one**, which round 1 of this pass did not report: row 38's "the patient
 bundle's `N\d\d` tokens minify to Angular internals and a Samsung device regex". It
@@ -789,7 +793,7 @@ outside this corpus.
 > declared, three matched. A bridge that built its matcher on the declared five is
 > **no worse off, and arguably safer**, because `"BLE_X".startsWith("BLE")` already
 > holds — so no matcher this pass measured can be wrong. An independent verifier
-> confirmed that reading from the consumer's own bytes (2 964 176 – 2 964 322, the
+> re-derived that reading from the consumer's own bytes (2 964 111 – 2 964 344, the
 > three `startsWith` arms and the branch they feed) rather than taking it from this
 > log. **A notification about a value that did not change would be noise, and
 > `AGENTS.md` §5 wants a pinned constant named — so there is no pinned constant to
@@ -885,7 +889,7 @@ this pass can make.
 ## Correction (2026-10-15) — round 2
 
 **Verification round 2 returned NOT CLEAN on two blocking findings and nine
-advisories. The central claim was confirmed again, by re-derivation from the bytes:
+advisories. The central claim was re-derived again, from the bytes:
 module `83644` bounded to 2 962 630–2 965 093, four bare `o` identifiers (three `.G`,
 one the binding itself), no module-level `o`, zero parameters named `o`, and
 `i(45559)` at exactly one site body-wide. The `docs/05` resolution was judged
@@ -988,8 +992,10 @@ number over a page this PR keeps editing is a property of a tree, not a fact, an
 round 3 caught three of my own. The specific instance that settles it needs no
 count: **area R wrote a correction into its own audit blockquote** — *"⚠ **What is and
 is not pinned here, stated rather than left to be discovered.**"* (merge base
-`ab28f58`, line 472; current tree, line **509** — **not 506**, the naive count's
-self-sliced position; the naive grep also catches this pass's own quoted prose at 573) —
+`ab28f58`, line 472 — resolved by content, not position: the full sentence as a needle returns
+exactly one line of `docs/05`, while a shorter needle returns two, the second being
+this pass's own quoted prose. No head line number is reproduced here, because this PR
+edits that file) —
 so the reason for leaving that table verbatim is **the number being true**, not a
 convention the page holds to.
 
@@ -1023,10 +1029,10 @@ this pass can make.
 
 ## Correction (2026-10-15) — round 3
 
-**Round 3 confirmed the central claim and the closure enumeration a third time — the
+**Round 3 re-derived the central claim and the closure enumeration a third time — the
 latter by a *different* method, brace-matching module boundaries with the verifier's
 own identifier definition, to the same answers — and `xsuffix-analyse.py` reproduces
-`census.txt` byte-for-byte at exit 0.** It also confirmed F2's tense, F3, F4, F6, F8 and
+`census.txt` byte-for-byte at exit 0.** It also re-derived F2's tense, F3, F4, F6, F8 and
 F11's substance, and held up the successor-(a) clause against a real test: the
 predicate `p.startsWith(o.G.BLE)` is code, and `"BLE_X".startsWith("BLE")` is a
 property of `String.prototype.startsWith`, not of the three reads on disk.
@@ -1072,8 +1078,8 @@ entry below names the check, not just the correction.**
    **consumption** fact about the vendor's own client, and a matcher on the declared
    five is no worse off since `"BLE_X".startsWith("BLE")` already holds. **There is no
    pinned constant to name, so there is no issue to open, and none will be.** §12 now
-   states the decision, the reasoning and the verifier's independent confirmation from
-   the consumer's own bytes (2 964 176 – 2 964 322), instead of a promise. A
+   states the decision, the reasoning and the verifier's independent re-derivation from
+   the consumer's own bytes (2 964 111 – 2 964 344), instead of a promise. A
    notification is owed **only** if a later pass finds a pinned value moving.
 
    **Secondary, same cell:** §12 said `"0 reads anywhere"` *"would become false"*, but
@@ -1154,7 +1160,7 @@ distinction is about **bytes inside a JavaScript bundle**
   (v0.10.0); a shellcheck pass is now added alongside the reading:
   `shellcheck probe.sh` exits **0** with no warnings, and `shellcheck dup-test.sh`
   exits **0** with no warnings (run on 2026-10-15, both files). The reading stands;
-  the lint corroborates the hand-checked stamps rather than replacing them, and the
+  the lint reproduces the hand-checked stamps rather than replacing them, and the
   §7 dry-runs still exercise the guard end to end.
 
 ### 13.3 Every byte offset §4 and §K cite, re-checked against the body
@@ -1162,7 +1168,7 @@ distinction is about **bytes inside a JavaScript bundle**
 Twelve citations, each tested by asserting the offset lands **exactly** on the needle:
 
 ```
-@198638 (0,o.G)((0,o.d)(  @580904 deviceModelMapping   @1723196 45559:
+@198635 (0,o.G)((0,o.d)(  @580904 deviceModelMapping   @1723196 45559:
 @2136000 StandaloneCGM    @2136604 SIMPLERACC           @2190336 system.logbook.entry.validation.config
 @2962721 45559)           @3372206 getDeviceFamily(V){  @3372491 /patient/v2/monitor/data
 @3372603 sessionStorage.getItem("deviceFamily")        @3373390 getUploadDeviceInfo(V){
