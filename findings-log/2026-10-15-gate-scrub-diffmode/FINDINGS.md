@@ -597,11 +597,11 @@ $ grep -nE "leak scan|scrub pattern|scrub-patterns|research-gate\.sh" \
 $ grep -nEi "per-pattern|survives a leading|liveness column|no control set|self-referential net" \
       docs/10-open-questions.md docs/09-methodology-and-oracles.md
   exit=1 — no match
-$ grep -c "^#### Successor to" docs/11-suggested-research-areas.md
-  7   (4 area F — untouched; 2 area D — this pass's successors 1 and 2; 1 area K. Counted,
-       not line-numbered: this pass's own successors move with every edit above them.)
 $ grep -c "^#### Successor to the area-D addendum" docs/11-suggested-research-areas.md
-  2   (successors 1 and 2, both this pass)
+  2   (successors 1 and 2, both this pass — resolved by heading TEXT, never by a line
+       number, because this pass's own successors move with every edit above them. A
+       whole-file successor count is deliberately **not** published: other passes land
+       successors in this same file, so that count is not this PR's to fix.)
 $ grep -cE "records per pattern whether it survives a leading|carries a \*\*per-pattern column\*\*" \
       docs/11-suggested-research-areas.md
   2   (the pre-existing F3 close condition AND successor 2's restatement of it — the arm
