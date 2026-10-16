@@ -1,0 +1,495 @@
+{
+ "clinic_keys": [
+  "cms-config.json",
+  "cua.control.codes.settings",
+  "cua.crm.settings",
+  "hcp.banner.notifications",
+  "logbook.supported.entry.types",
+  "personal/media/config",
+  "pow.common.core.report.generation",
+  "pow.country.media.groups",
+  "pow.crm.settings",
+  "pow.follow.up.settings",
+  "pow.invite.to.personal.uri",
+  "pow.nutrino.cc.broker.service.config",
+  "pow.nutrino.cc.metadata.service.config",
+  "system.logbook.entry.validation.config",
+  "user-identifier-settings?countryCode=EU"
+ ],
+ "clinic_occurrences": 15,
+ "support_keys": [
+  "cms-config.json",
+  "cua.control.codes.settings",
+  "cua.crm.settings",
+  "hcp.banner.notifications",
+  "logbook.supported.entry.types",
+  "personal/media/config",
+  "pow.common.core.report.generation",
+  "pow.country.media.groups",
+  "pow.crm.settings",
+  "pow.follow.up.settings",
+  "pow.invite.to.personal.uri",
+  "pow.nutrino.cc.broker.service.config",
+  "pow.nutrino.cc.metadata.service.config",
+  "system.logbook.entry.validation.config",
+  "user-identifier-settings?countryCode=EU"
+ ],
+ "support_occurrences": 15,
+ "clinic_direct": [
+  "access/config",
+  "appContext",
+  "application",
+  "productContext",
+  "user",
+  "whitelisted"
+ ],
+ "support_direct": [
+  "access/config",
+  "appContext",
+  "application",
+  "productContext",
+  "user",
+  "whitelisted"
+ ],
+ "templated_substitutions": [
+  {
+   "literal": "user-identifier-settings?countryCode=EU",
+   "marker": "countryCode=((countryCode))",
+   "value": "countryCode=EU"
+  },
+  {
+   "literal": "user-identifier-settings?countryCode=EU",
+   "marker": "countryCode=((countryCode))",
+   "value": "countryCode=EU"
+  }
+ ],
+ "shared": [
+  "cms-config.json",
+  "cua.control.codes.settings",
+  "cua.crm.settings",
+  "hcp.banner.notifications",
+  "logbook.supported.entry.types",
+  "personal/media/config",
+  "pow.common.core.report.generation",
+  "pow.country.media.groups",
+  "pow.crm.settings",
+  "pow.follow.up.settings",
+  "pow.invite.to.personal.uri",
+  "pow.nutrino.cc.broker.service.config",
+  "pow.nutrino.cc.metadata.service.config",
+  "system.logbook.entry.validation.config",
+  "user-identifier-settings?countryCode=EU"
+ ],
+ "clinic_only": [],
+ "support_only": [],
+ "plan": [
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.crm.settings",
+   "role": "CONTROL-1 positive: `pow.crm.settings` with X-System-ID: ProWeb. Known live \u2014 HCP-CONFIG-SCHEMA.md:148 recorded 200/96 B `application/octet-stream` on carelinkhp, and area A results.jsonl seq 6 recorded this exact host answering 200/97 B. Proves the header is ACCEPTED on this host and that the verdict rule is live here rather than uniform.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "positive control \u2014 a 200 here is what a parked page cannot fake"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/zzz.this.does.not.exist.zzz",
+   "role": "CONTROL-2 absent: `zzz.this.does.not.exist.zzz` \u2014 certainly not a route (HCP-CONFIG-SCHEMA.md:108, 404 with 0 bytes on carelinkhp). Proves a 404 on THIS host is distinguishable from the SPA fallback and therefore that a 404 on a key here is a true absence.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "absent control"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/cua.control.codes.settings",
+   "role": "CONTROL-3a case, correct spelling: `cua.control.codes.settings` \u2014 200/778 B on carelinkhp (HCP-CONFIG-SCHEMA.md:155).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "case control, correct spelling"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/CSU.CONTROL.CODES.SETTINGS",
+   "role": "CONTROL-3b case, UPPER spelling: `CSU.CONTROL.CODES.SETTINGS` \u2014 404 on carelinkhp (HCP-CONFIG-SCHEMA.md:188). 3a+3b together re-derive docs/07's case-sensitivity half ON THIS HOST instead of inheriting it from .eu.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "case control, wrong case"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/logbook.supported.entry.types",
+   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:154-161 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
+   "header": null,
+   "kind": "control",
+   "note": "header-absent control, expected 412"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.crm.settings",
+   "role": "CONTROL-1 positive: `pow.crm.settings` with X-System-ID: ProWeb. Known live \u2014 HCP-CONFIG-SCHEMA.md:148 recorded 200/96 B `application/octet-stream` on carelinkhp, and area A results.jsonl seq 6 recorded this exact host answering 200/97 B. Proves the header is ACCEPTED on this host and that the verdict rule is live here rather than uniform.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "positive control \u2014 a 200 here is what a parked page cannot fake"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/zzz.this.does.not.exist.zzz",
+   "role": "CONTROL-2 absent: `zzz.this.does.not.exist.zzz` \u2014 certainly not a route (HCP-CONFIG-SCHEMA.md:108, 404 with 0 bytes on carelinkhp). Proves a 404 on THIS host is distinguishable from the SPA fallback and therefore that a 404 on a key here is a true absence.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "absent control"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/cua.control.codes.settings",
+   "role": "CONTROL-3a case, correct spelling: `cua.control.codes.settings` \u2014 200/778 B on carelinkhp (HCP-CONFIG-SCHEMA.md:155).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "case control, correct spelling"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/CSU.CONTROL.CODES.SETTINGS",
+   "role": "CONTROL-3b case, UPPER spelling: `CSU.CONTROL.CODES.SETTINGS` \u2014 404 on carelinkhp (HCP-CONFIG-SCHEMA.md:188). 3a+3b together re-derive docs/07's case-sensitivity half ON THIS HOST instead of inheriting it from .eu.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": "case control, wrong case"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/logbook.supported.entry.types",
+   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:154-161 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
+   "header": null,
+   "kind": "control",
+   "note": "header-absent control, expected 412"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.crm.settings",
+   "role": "CONTROL-1 positive: `pow.crm.settings` WITH the header. Area A results.jsonl seq 10 recorded this exact host answering it 200/97 B with NO header at all, so the headered cell is the one that carries the verdict. Proves X-System-ID: ProWeb is accepted on the support deployment.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": ""
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/zzz.this.does.not.exist.zzz",
+   "role": "CONTROL-2 absent: `zzz.this.does.not.exist.zzz` \u2014 certainly not a route (HCP-CONFIG-SCHEMA.md:108). Proves a 404 on the support deployment is distinguishable from the SPA fallback.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": ""
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/cua.control.codes.settings",
+   "role": "CONTROL-3a case, correct spelling: `cua.control.codes.settings`. **The POW/CUA cell.** `cua.*` returned 200 on the CLINIC build (HCP-CONFIG-SCHEMA.md:155) and `pow.*` returned 200 on this SUPPORT host (area A seq 10), so the two products may both be published everywhere; docs/07:148-149 says `cua.crm.settings` was never probed on this host and the split 'stands as recorded'.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": ""
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/CSU.CONTROL.CODES.SETTINGS",
+   "role": "CONTROL-3b case, UPPER spelling: `CSU.CONTROL.CODES.SETTINGS` \u2014 404 on the clinic build (HCP-CONFIG-SCHEMA.md:188). Re-derives case-sensitivity on the support build.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "control",
+   "note": ""
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/logbook.supported.entry.types",
+   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412. Proves 412 means 'header rejected at the edge' on the support deployment.",
+   "header": null,
+   "kind": "control",
+   "note": ""
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/cms-config.json",
+   "role": "KEY `cms-config.json` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/cua.crm.settings",
+   "role": "KEY `cua.crm.settings` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/hcp.banner.notifications",
+   "role": "KEY `hcp.banner.notifications` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/personal/media/config",
+   "role": "KEY `personal/media/config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.common.core.report.generation",
+   "role": "KEY `pow.common.core.report.generation` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.country.media.groups",
+   "role": "KEY `pow.country.media.groups` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.follow.up.settings",
+   "role": "KEY `pow.follow.up.settings` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.invite.to.personal.uri",
+   "role": "KEY `pow.invite.to.personal.uri` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.broker.service.config",
+   "role": "KEY `pow.nutrino.cc.broker.service.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.metadata.service.config",
+   "role": "KEY `pow.nutrino.cc.metadata.service.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/system.logbook.entry.validation.config",
+   "role": "KEY `system.logbook.entry.validation.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.com",
+   "path": "/hcp/configuration/public/user-identifier-settings?countryCode=EU",
+   "role": "KEY `user-identifier-settings?countryCode=EU` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/cms-config.json",
+   "role": "KEY `cms-config.json` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/cua.crm.settings",
+   "role": "KEY `cua.crm.settings` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/hcp.banner.notifications",
+   "role": "KEY `hcp.banner.notifications` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/personal/media/config",
+   "role": "KEY `personal/media/config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.common.core.report.generation",
+   "role": "KEY `pow.common.core.report.generation` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.country.media.groups",
+   "role": "KEY `pow.country.media.groups` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.follow.up.settings",
+   "role": "KEY `pow.follow.up.settings` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.invite.to.personal.uri",
+   "role": "KEY `pow.invite.to.personal.uri` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.broker.service.config",
+   "role": "KEY `pow.nutrino.cc.broker.service.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.metadata.service.config",
+   "role": "KEY `pow.nutrino.cc.metadata.service.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/system.logbook.entry.validation.config",
+   "role": "KEY `system.logbook.entry.validation.config` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink.medtronic.eu",
+   "path": "/hcp/configuration/public/user-identifier-settings?countryCode=EU",
+   "role": "KEY `user-identifier-settings?countryCode=EU` \u2014 extracted offline from the CLINIC build's own route table (asset /main.fb5f8cb7eb60c4d5.js, sha256 2a7fa8e7af519c2b\u2026, asserted above). Not typed from memory and not taken from docs/07. clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared).",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "clinic build literal; also present in the SUPPORT build's route table (0 support-only literals, 15 shared)"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/cms-config.json",
+   "role": "KEY `cms-config.json` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/cua.crm.settings",
+   "role": "KEY `cua.crm.settings` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/hcp.banner.notifications",
+   "role": "KEY `hcp.banner.notifications` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/personal/media/config",
+   "role": "KEY `personal/media/config` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.common.core.report.generation",
+   "role": "KEY `pow.common.core.report.generation` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.country.media.groups",
+   "role": "KEY `pow.country.media.groups` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.follow.up.settings",
+   "role": "KEY `pow.follow.up.settings` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.invite.to.personal.uri",
+   "role": "KEY `pow.invite.to.personal.uri` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.broker.service.config",
+   "role": "KEY `pow.nutrino.cc.broker.service.config` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/pow.nutrino.cc.metadata.service.config",
+   "role": "KEY `pow.nutrino.cc.metadata.service.config` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/system.logbook.entry.validation.config",
+   "role": "KEY `system.logbook.entry.validation.config` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  },
+  {
+   "host": "carelink-support.medtronic.com",
+   "path": "/hcp/configuration/public/user-identifier-settings?countryCode=EU",
+   "role": "KEY `user-identifier-settings?countryCode=EU` \u2014 extracted offline from the SUPPORT build's own route table (asset /main.759cddab23085086.js, sha256 a054555a0f22176e\u2026, asserted above). Not typed from memory, not inherited from the clinic list, not taken from docs/07. also present in the clinic build's route table.",
+   "header": "X-System-ID: ProWeb",
+   "kind": "key",
+   "note": "also present in the clinic build's route table"
+  }
+ ]
+}
