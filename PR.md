@@ -1,55 +1,51 @@
 ## What this PR does
 
-**Research area I — Auth0 tenant behavioural differences.** Negative on the difference the area hunted (five tenants, byte-identical discovery documents), positive on one it did not name (`x-ratelimit-limit` splits `.eu` from the rest), and two corrections to `kid` strings already published. Closes #23.
+**finding + correction.** It corrects `docs/10` §1 row 51 in its own commit (`5508de9`,
+before a single request) and then measures the half that row never stated: whether the
+`hcp/configuration/public/*` existence verdicts are **deployment-portable**, and whether the
+**POW/CUA product split** appears in the verdicts rather than only in one `base.uri`.
 
-The area asked for **behaviour**, not just the policy surface. Re-derived the tenant set from the corpus first: the estate is **five** `carelink-login.*` tenants, and "three" (`AUTH-TENANT` §1, a policy axis) against "four" (`docs/11`/`docs/10`, a key-material axis) were two different sets over those same five hosts. Neither number was an error. Their union exposed the real gap — **`carelink-login.minimed.com` was in nobody's policy comparison, and `-trials` was in nobody's key set.**
+Answer: the verdicts **are** portable — **15 of 15** on three further deployments — and the
+split is **not** there, in three independent ways.
 
 ## Evidence
 
 | Claim | Class | Source |
 |---|---|---|
-| The five discovery documents are **byte-identical** once the tenant hostname is substituted out — one digest `sha256:0c0db635f5e9b08b…`, 2640 B, 5 of 5 | OBSERVED | `findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md` §2; ledger seq 2, 5, 8, 11, 15; `verdict.txt` §B0 |
-| 30 field names, **0 absent from any document**; exactly 12 of 30 differ raw and all 12 are URLs containing that tenant's hostname | OBSERVED | same file §2; `verdict.txt` §B, §C |
-| **`registration_endpoint` is not a separate difference** — it differs only by hostname, like the other 11. Corrects `AUTH-TENANT` §1 / `docs/02` §1 | OBSERVED | same file §2 |
-| `x-ratelimit-limit` is **500 on both `.eu` tenants, 100 on the other three** — 10 observations, 2 per tenant, constant within a tenant, invisible in byte-identical documents | OBSERVED | same file §3; ledger seq 2/3/5/6/8/9/11/12/15/16 |
-| That 500/100 is *tenant configuration* rather than a negotiated tier | **INFERRED** | same file §3 — labelled, with the assumption stated; nothing a client does depends on it |
-| ⚠ **RETRACTED (was: "`registration_endpoint` is advertised by all five tenants and absent on all five")** — **false**. The endpoint is **live and POST-only** on the three patient tenants: `OPTIONS /oidc/register` → **204** + `access-control-allow-methods: POST`, against a per-tenant certainly-absent control (`/oidc/registerx`) at 404 + `x-auth0-not-found: 1` + `text/plain` 10 B. The two shadow tenants are **routed but CORS-refused**: 404, 107 B, `"CORS error: Missing Access-Control-Request-Method header"`, **no** `access-control-*` header — and the header its error names was proven present on the wire by a verbose capture, so this is server behaviour, not a client bug. **The error was the method**: a GET-only sweep cannot see a POST-only route, which `PULL_REQUEST_TEMPLATE.md:15` and `PROBE-FINDINGS.md` §5 both state outright. The GET capture survives as a GET observation. | OBSERVED | same file §3 + §Correction, §7 C4-C8; ledger seq 20-29 OPTIONS probes + 30-32 diagnostics |
-| Trials tenant publishes 2 RSA/RS256 keys; **10 keys across 5 tenants, 0 shared** — discharges `docs/02` §9's "Unknown" | OBSERVED | same file §5; `jwks-keys.json` |
-| `AUTH-TENANT` §8's `medtronic.com` kid (`…_lLOJ`) is **wrong**; live is `…_lOOJ`, matching `RECON-SUBDOMAINS` §4.1. **Resolves `docs/02` §8's unresolved disagreement against the spelling `docs/02` recommended** | OBSERVED | same file §6 |
-| `minimed.com`'s second kid is the live string **minus one `Q`** — a *deletion*, so no second reading existed to compare and `docs/02` §8's method could not have found it | OBSERVED | same file §6; `corpus-audit.txt` §E |
-| On `carelink-login.*` a `404` is **two different things**: `x-auth0-not-found: 1` + `text/plain` 10 B (path unknown) vs `application/json` 60 B (routed, nothing to return) | OBSERVED | same file §4; `docs/09` §Oracle C |
-| That those two signatures mean different *routing states* | **INFERRED** | same file §4; `docs/09` §Oracle C — the separation is observed, the meaning is not |
-| All 10 observed `kid`s are 21 chars | OBSERVED | `verdict.txt` §A — corroborating for the two transcription defects, **not** the proof; the live fetch is |
-| A POST to `/oauth/token` to test the `device_code` grant on the trials client | **NOT ATTEMPTED** — area J's subject; out of scope by the claim issue's hard limit | same file §9 |
+| `docs/10` §1 row 51 was wrong on **both** halves, corrected before any request | SOURCE-OBSERVED | commit `5508de9`; `findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md` §10 ("Do not re-run"); `docs/07:112-124`, `:247-262` |
+| All 4 bundle digests reproduce their recorded values (`2a7fa8e7af519c2b…` ×3, `a054555a0f22176e…`) | OBSERVED | `results.jsonl` seq 1–4; `plan.md` §Corpus control |
+| **Both builds carry an identical `hcp/configuration` route table** — 15 `public/*` + 6 direct, name for name | OBSERVED (shipped code) | `plan.md` §The two route tables, `plan.py` extraction |
+| That extraction returns the same population §10 records (15 and 6) | OBSERVED | `plan.md` self-check line |
+| **Each build names the other's product namespace** | OBSERVED (shipped code) | `plan.md` shared-15 list against the two empty clinic-only / support-only lists |
+| **15 of 15** route literals carry the same status verdict on all three hosts | OBSERVED | `analysis.md` §3; `results.jsonl` seq 5–61 |
+| All 4 controls passed on all 3 hosts; `412` = header rejected; namespace case-sensitive | OBSERVED | `analysis.md` §6 |
+| **9 of 15** keys byte-identical across all three hosts; **6** differ, and only `.eu`-vs-`.com` | OBSERVED | `analysis.md` §4 |
+| **15 of 15** byte-identical between clinic `.com` and support `.com`, across two different builds | OBSERVED | `analysis.md` §5 |
+| `cua.crm.settings` ships `"product": "pow"` on all three hosts | OBSERVED | `headers/k021-…`, `k033-…`, `k045-…` |
+| `carelink-support.medtronic.com` serves **no** CSP / HSTS / `x-content-type-options` — **0 of 19** vs **19 of 19** | OBSERVED | `analysis.md` §7; `headers/*.h` |
+| A credential-shaped `x-api-key` is served by this surface on `.com`, a placeholder on `.eu` | OBSERVED, **value redacted** | `headers/k028-…`, `k029-…`, `k052-…`, `k053-…`; `REDACTIONS.md`; `docs/08` F2 |
+| That key is **already known** and does not authenticate against production | SOURCE-OBSERVED | `docs/08-security-findings.md` §F2; `findings-log/probe-2026-10-08/SECURITY-FINDINGS.md` §S3 |
+| Area A's "the base tracks the deployment, not the product" | now OBSERVED, 15 keys × 3 hosts | `findings-log/2026-10-12-area-a-clinic-portal-region/FINDINGS.md` §5 vs `analysis.md` §4 |
+| `carelink-support.medtronic.eu`'s verdicts | **INFERRED**, excluded from every figure | same build digests asserted on its `.com` pair; body never requested |
+| Whether `carelinkhp`'s `application/json` vs this pass's `application/octet-stream` is per-host or a loose record | **not determined** | `carelinkhp`'s config surface not re-probed; §10 says do not re-run it |
+| The sub-floor spacing reading (2.276 s, 1 of 57 gaps) | OBSERVED; **no cause asserted** | `analysis.md` §2 |
 
-### Controls, and what each proved
-
-| # | seq | Request | Result | Proved |
-|---|---|---|---|---|
-| C1 | 1 | `…trials…/.well-known/openid-configurationx` | `404 text/plain` 10 B, `x-auth0-not-found: 1` | A missing well-known doc on this family is a **404**, not a 200 fallback page. **The oracle held** — without it, "field absent" and "fallback document" are indistinguishable. Sent first, before any candidate on the host. |
-| C2 | 2 | `…trials…/.well-known/openid-configuration` | `200 application/json` 2825 B | The live counterpart on the same host: C1's 404 is a property of the *path*, not the host. |
-| C3 | 14 | `…medtronic.com/.well-known/openid-configurationx` | `404 text/plain` 10 B, **same digest as C1** | The absent-signature is not host-specific — and one host's 404 says nothing about the next host's front door, which is why it cost a second request. |
-
-**No stop condition fired.** Both absent-path controls returned 404.
+Three defects in **this pass's own tooling** are on the record rather than smoothed over —
+a lost ledger batch, a `%3N` timestamp bug, and a body-in-a-status-field bug. See
+`FINDINGS.md` §2. No ledger row was deleted, reordered or edited to absorb any of them.
 
 ## Requests used
 
-- [x] **GET only in the original pass; GET + empty-body OPTIONS in the owner-authorised supplementary pass** — **no POST anywhere**, no `-d`, no token exchange, no authentication, no port scan, no DNS brute force. The supplementary OPTIONS method is the one `PULL_REQUEST_TEMPLATE.md:15` permits for finding POST-only routes
-- [x] Slept ≥2s between requests to the same host (`sleep 2.5` **inside** the per-host `flock` in both harnesses) — declared **2.5 s**, `sleep` inside the per-host `flock`. **Measured floor 2.000 s, and this ledger's timestamps are 1-second resolution so it cannot resolve the declared 2.5 s** — a lower bound, not a measurement, recorded rather than rounded away (`docs/09` §4 gains a trap row for this; 4th pass in a row)
-- [x] Stated cap respected: **19 of a 20 cap** (17 `curl` + 2 `hurl` pin-validation, both exit 0), **plus a separate owner-authorised supplementary budget of 14, of which 13 were used** (10 OPTIONS probes + 3 diagnostics; 1 left unused). **Total area traffic: 32 requests, no POST.** The supplementary budget was authorised to complete a claim a verifier refuted and is accounted separately from the original cap
-
-**Not run, deliberately:** the full `02-sso-oidc.hurl` suite. I validated the **two new pin cells** live through a different client (`hurl`); re-running the file's ~10 pre-existing cells would have breached the committed cap. Those cells are unchanged and are covered by the weekly drift sweep.
+- [x] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted. **This pass issued no POST and no OPTIONS at all.** The 26 requests the pinned suite issued are the suite's own, under `AGENTS.md` §11, and are recorded in the ledger with `kind: gate-suite`.
+- [x] Slept ≥2s between requests to the same host — `sleep 2.5` **inside** the shared per-host `flock`. **Measured `t_sent` floor 2.276 s over 57 same-host gaps, 1 sub-floor reading, no cause asserted.** The 26 gate-suite rows are excluded from that figure: their `t_sent` is a shim's pre-exec stamp, not a stamp taken inside a lock.
+- [x] Stated cap respected: **87 requests of a 90 cap** — and this is the **one bounded cap revision** claim #144 allows, taken after the fact with the reason in the log head. The claim's arithmetic budgeted the sweep (≤80) and **not** the `05-public-config.check.sh` traffic `./scripts/research-gate.sh` issues on every run; the sweep landed at 61 and the gate ran twice (13 + 13). **A third run was refused** — 13 more requests for a third reading of a suite already green twice. `wc -l results.jsonl` = 87 = the accounting number.
 
 ## The rules
 
-- [x] No credential, session value, or patient identifier anywhere in the diff. The surface carries client IDs and JWKS material: `kid`s are published by the vendor at an unauthenticated URI and are recorded; the RSA moduli and `x5c` chains are **not committed** (`bodies/` is gitignored, `jwks-keys.json` carries `kid`/`kty`/`alg`/`use` only, with the reason in the file). One Auth0 custom-domain hostname appears in those chains and stays out of this repo's history.
-- [x] Any internal hostname redacted to `<service>.<internal>`
-- [x] Corrections and retractions preserved, not smoothed over — `docs/02` §8 keeps its original recommendation with the correction attached, and `docs/00`'s dated 2026-10-11 record was **left saying "four tenants"** with an addendum rather than rewritten to "five"
-- [x] Claims the regression suite pins updated in this PR; `./scripts/research-gate.sh` exits 0
-
-**Assertion counts**, re-measured with the one counting rule (`scripts/measure_assertions.py`): **167 → 184 static, 359 → 380 execute per run**. All four static sites and both runtime sites updated, then **re-grepped by hand** — including `README.md:386`, the site the gate's regex cannot see because it is wrapped across a line break inside a bold span (`docs/09` §4).
-
-**Open areas** 18 → 17: `docs/11` updated and `.github/ISSUE_TEMPLATE/config.yml` agrees (the gate checks both).
+- [x] No credential, session value, or patient identifier anywhere in the diff — `redact.py` applied the gate's **own** pattern list from `scripts/scrub-patterns.txt` to every committed body, and `REDACTIONS.md` records each substitution. The key's *shape* is recorded; the value is not.
+- [x] Any internal hostname redacted to `<service>.<internal>` — none appears; this pass touched no Medtronic host outside the five already named in this repository.
+- [x] Corrections and retractions in the sources are preserved, not smoothed over — `docs/10`'s row 51 keeps its superseded wording verbatim inside the cell; `docs/07` keeps area A's inference and adds the measured result beside it.
+- [x] Any claim the regression suite pins has been updated in this PR, and `./scripts/research-gate.sh` still exits 0 — **no pin moved**; the suite ran green twice at `85 passed, 0 failed`.
 
 ## Gate
 
@@ -59,35 +55,60 @@ The area asked for **behaviour**, not just the policy surface. Re-derived the te
 
 ```
 research-gate.sh exit: 0
+GATE PASS — safe to open a PR.
+  ok  85 passed, 0 failed
 ```
-
-Run under the pool gate lock (`flock -w 1800 .loop/gate.lock`), write phase only.
 
 ## If this changes what a newcomer needs to know first
 
-- [x] `README.md` updated — "Four auth tenants, four completely disjoint signing keys" → five tenants / ten keys, with the byte-identical-document fact
-- [x] `docs/00-summary-the-map.md` updated — tenant count, plus the dated-record addendum
+- [ ] README.md updated — the map's claims are unchanged; this refines one row's reading rather than a headline.
+- [ ] docs/00-summary-the-map.md updated — likewise unchanged; `docs/07` and `docs/10` carry the result.
 
 ## Downstream consumer impact
 
-- [ ] No pinned consumer value affected
-- [x] A pinned value moved — **the trials tenant is new to the regression suite** and two `kid` strings in `docs/02` were wrong. The bridge's `drift:check` now runs two additional pin cells against `carelink-login-trials.minimed.com`; a **key rotation there will turn the suite red, and that is expected drift to re-record, not a bridge outage**. `docs/02` §1's table (which the bridge reads for issuer/client configuration) changed on three rows. This is additive and affects no client constant — `login.ts` behaviour is unchanged, because §1's "no separate clinical auth handling" conclusion **survives** and is now confirmed at five tenants. Filing as `downstream-bridge` for visibility rather than because a release is blocked.
-
-## Priorities
-
-**Successor added as a dated addendum to open area J** (`docs/11`), with a mirrored row in `docs/10` §1 — not a new letter, since every A–Z is in use and a two-letter heading is invisible to the gate's area checks.
-
-**J addendum — sweep the three remaining advertised Auth0 endpoints across all five tenants** (`/bc-authorize`, `/mfa/challenge`, `/oauth/global-token-revocation/connection/*`). ⚠ **Rewritten 2026-10-12: the method was wrong.** It previously read *GET only*, justified by this pass's (now retracted) "`registration_endpoint` is absent on all five". **All three endpoints are POST-only by OAuth/OIDC specification**, so a GET sweep would return "absent" on every tenant and be false every time — it would have repeated this pass's own error three more times. *Blocker:* none — **empty-body OPTIONS** (per `PULL_REQUEST_TEMPLATE.md:15` and the `docs/09:64-71` oracle), bounded list (3 paths × 5 tenants, every one named inside a discovery document this project already holds), plus a certainly-absent control per host. *Closes when:* each has a verdict on all five tenants **by OPTIONS**, controls first per host; **a negative closes it**, where negative means *no `access-control-*` header and `x-auth0-not-found: 1`* — **not** "a 404", since §3 showed a routed path returns 404 too, and this pass found a **third** signature (routed-but-CORS-refused: 404, 107 B, no CORS headers) that a status-only or GET-only sweep cannot distinguish from absence. *Why it's derived from what this pass saw:* the advertisement-versus-reality question is real and the three siblings are still recorded on the EU tenant only, with `/mfa/challenge` unknown in any source. A client coding against an advertised endpoint that fails produces a failure mode area J's `login-errors.ts` classification does not enumerate.
-
-The claim issue had proposed the issuer-count leg of `docs/10` §1 instead. That leg is **now discharged inside this PR** rather than left as a successor: the inventory it needed is complete for probeable hosts at five, and all seven archive-only hosts are dev/stage/test by name, which policy enumerates and never probes. `docs/10` still records `COMMONCRAWL` §4e's self-disagreement (prose says 12, its own list says 7) because **that arithmetic is not mine to resolve** — both readings remain given.
+- [x] No pinned consumer value affected — `carelink-bridge` pins the discovery pin, `BLE_API_VERSIONS`, the family vocabulary and the error taxonomy. None of the four moved. The suite the bridge runs before a release (`npm run drift:check`) is `05-public-config`, which reports **85 passed, 0 failed**.
+- [ ] A pinned value moved — none did.
 
 ---
 
 <details>
+<summary>Notes for the reviewer</summary>
+
+**Why this PR corrects a row before probing it.** `docs/10` §1 asked the next pass to issue
+15 `GET`s that `HCP-CONFIG-SCHEMA.md` §10 says were already issued — §10 is *titled* "Do not
+re-run" — and said `docs/07` publishes no per-key verdict when `docs/07:112-124` publishes
+exactly that. Both halves were refuted against source before the first request, the
+correction landed as its own commit, and the row was re-scoped to the unstated half.
+
+**The two traps this pass was built around.** On this host family the catch-all *is* the
+entry document, so a document path cannot detect a deployment — only a content-hashed chunk
+can, and every one of the four corpus controls discriminates on `content-type` + size +
+sha256 together. And `plan.py` **refuses to write `plan.json` if any digest fails to
+reproduce**, so the stop condition is mechanical rather than a promise.
+
+**Every candidate is derived.** No key was typed from memory. Each host's 15 candidates were
+extracted offline from that host's own bundle route table, and `plan.md` carries the
+per-candidate reasoning — written **before** the first request of batch 2.
+
+**One gap this pass created and closed.** `logbook.supported.entry.types` was spent as the
+header-absent control, which left its *headered* verdict unmeasured on all three hosts — a
+14-of-15 claim. Three requests bought the cell. A first attempt at those three carried a
+doubled slash; those rows are left on the ledger uncorrected and counted, and the finding is
+that the route normalises a doubled slash rather than 404ing.
+
+**Shared-surface note.** This PR mints successor area **`AB`**, not `AA` — lane l3 minted
+`AA` in PR #148 on the same day, and a two-letter id is only a namespace if allocated once.
+Both branches mint exactly one area and both edit the same live count sentence in the
+"Why there is no area AA" amendment: **that one line is the merge conflict the queue must
+reconcile**, and the headings do not clash.
+
+</details>
+
+<details>
 <summary>Diagrams checklist</summary>
 
-- [x] Mermaid only (GitHub renders it natively)
-- [x] Every branch is labelled — an unlabelled branch is an INFERRED claim in disguise. `docs/02` §1's diagram now has a single labelled sink instead of the old unlabelled dashed "never fetched" edge that the trials tenant used to dead-end into
-- [x] One diagram answers one question
+- [x] Mermaid only (GitHub renders it natively) — none added; this pass produces tables, not topology.
+- [x] Every branch is labelled — n/a, no diagram.
+- [x] One diagram answers one question — n/a.
 
 </details>
