@@ -182,12 +182,13 @@ document or a template — is not established here*, and §5 says so.
 body** (`sha256 e3b0c44298fc…`, the digest of zero bytes) and **no**
 `x-cum-signature`; `-trials` answers `200` with the **20 345 B `v11` document**.
 This is a status split the matrix could not see, because `v10` was probed on
-`.eu` only. `docs/09`'s oracle has no class for `204`; it is carried here as
-`served-empty` and flagged in §5 rather than being quietly folded into the
-served class.
+`.eu` only. `docs/09` Oracle A tabulates `200` and `204` in **one** row
+(*"no errortype (200/204) → public"*), so the two answers are the same class to
+that oracle; this pass separates them as `served-empty` vs `served-signed`,
+which is a refinement of the oracle and not a contradiction of it (see §5).
 
-**`v10` on `-trials` also has a consequence for the pin.** The 20 345 B document
-served at `-trials` `/v10/discover/android/3.6` is byte-identical to the one at
+**The `-trials` `v10` document, specifically.** The 20 345 B document served at
+`-trials` `/v10/discover/android/3.6` is byte-identical to the one at
 `-trials` `/v11/discover/android/3.6` (`94b739dda478…`), and both carry the same
 `x-cum-signature`. So the trials deployment answers `v11`'s document for `v10`
 as well — **not** the empty `204` both patient hosts give at `v10`.
@@ -222,11 +223,12 @@ as well — **not** the empty `204` both patient hosts give at `v10`.
   "per-request", and the cross-host triple is what rules out "per-document".
   `docs/03` §1 already recorded the host-specificity; this pass supplies the
   within-host control that reading was missing.
-- **The `204` class is new to the oracle.** `docs/09` Oracle A tabulates `403`,
-  `401` and `200/204` together as "public"; this pass found `204` and `200` on
-  the **same base path across hosts** (`v10`), which is a distinction that table
-  does not currently make. Recorded here as a refinement of the oracle, from
-  one pass on one base path.
+- **The `204` split is new to the oracle, not a contradiction of it.**
+  `docs/09` Oracle A tabulates `403`, `401` and `200/204` in one row reading
+  "public"; this pass found `204` **and** `200` on the **same base path across
+  hosts** (`v10`), which is a distinction that grouping does not make. Recorded
+  as a refinement, from one pass on one base path — the grouping is not wrong,
+  it is coarser than one axis needs.
 - **One pass, one day.** Every verdict is `2026-10-17`. Nothing here is pinned,
   so none of it is drift-guarded — see §7.
 - **Nothing was pinned in `regression/hurl/`, deliberately.** The natural pins
@@ -280,7 +282,7 @@ gains nothing from this pass, which has none.
 | The `-trials` gateway **discriminates** on the base-path segment (not a catch-all) | OBSERVED | `v1`, `v7`, `v14`–`v16` and the `v99` control all `403` at `f249b63cb2fc…` on the same host, seq 35, 37, 43, 49, 50, 51 |
 | `-trials` serves the `v11` document at `v10` too (`94b739dda478…`, same signature) | OBSERVED | seq 46 vs seq 36 |
 | `v10` is a status split: `204`+empty body on `.eu`/`.com`, `200` on `-trials` | OBSERVED | seq 12, 29, 46 |
-| `v13` byte-identical across all three hosts (`f8488626…`, 20 256 B) | OBSERVED | seq 14, 31, 48 |
+| `v13` byte-identical across all three hosts (`f8488626…`, 20 256 B) — **a re-derivation, not a new fact**: `docs/03` §1 already publishes it and area Y refuted an earlier "`.eu` only" premise off area X's 2026-10-12 capture | OBSERVED | seq 14, 31, 48 |
 | `.com` `v11` is the other document (`2103b7e850c4…`, 18 105 B) — `docs/03` §7 reproduced | OBSERVED | seq 19 |
 | `x-cum-signature` is **not** per-document; `(document, host)` is consistent, per-request is refuted | OBSERVED for the two refutations, INFERRED for the `(document, host)` reading | `headers/*.h`, derived offline; 17 signed cells |
 | `-trials` `200` on this path does not by itself prove a per-route registration | stated as a limit | §5; needs the `OPTIONS` axis, not run |

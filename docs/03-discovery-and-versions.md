@@ -506,11 +506,17 @@ that needs the `OPTIONS` axis, which this pass did not run
   probed `v10` on `.eu` only): `.eu` and `.com` answer `204` with an **empty
   body** and no `x-cum-signature`; `-trials` answers `200` with the **20 345 B
   `v11` document**, at the same digest and the same signature as its own `/v11`
-  cell. **`docs/09` Oracle A's table does not separate `204` from `200`; this
-  pass found them on the same base path across hosts**, so the class is recorded
-  here rather than left merged.
-- **`v13` is byte-identical on all three hosts** (`f8488626…`, 20 256 B), which
-  reproduces `docs/03` §2's claim on all three cells rather than on one.
+  cell. **`docs/09` Oracle A tabulates `200` and `204` in one row** (*"no
+  errortype (200/204) → public"*), so the two answers are one class to that
+  oracle; the split here is a **refinement** of it, not a contradiction — it
+  shows the grouping loses a real distinction on this base path.
+- **`v13` is byte-identical on all three hosts** (`f8488626…`, 20 256 B). **This is
+  a re-derivation, not a new claim** — `docs/03` §1 already publishes "all three
+  hosts return the same document" and area Y's audit refuted an earlier
+  "`.eu` only" premise off the back of area X's 2026-10-12 three-host capture
+  ([findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md]). This pass
+  reproduces the same digest on the same three cells for a **third** time; it is
+  listed only so the grid above is complete, and it adds nothing.
 
 **What is not claimed.** The *why* — what makes `-trials` serve a legacy
 document at these base paths — is **not closable from outside** and is not
