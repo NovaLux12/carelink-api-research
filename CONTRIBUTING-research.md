@@ -126,6 +126,11 @@ took, it eventually says nothing and the repo loses its front door. **This step
 is mandatory and it lands in the same PR as your finding** — amend, or add a
 second commit, before you ask for review.
 
+Successors are claimable areas again: the single letters `A`–`Z` are spent, so
+the next bounded successor **mints a two-letter id** (`AA`, `AB`, …) — every
+gate pattern that counts areas reads `^### [A-Z]{1,2}\.`. Park a successor as an
+addendum or a `docs/10` §1 row only when it genuinely fails the quality bar below.
+
 **(a) Close what you closed.** Move the area out of the live tiers into the dated
 `## Closed areas` table at the bottom of the page. One row per area, with the
 verdict, the evidence path, and the issue that claimed it:
@@ -146,8 +151,8 @@ did not write fails the gate. Do not try to make it pass by deleting the cite.
 
 **(b) Add at least one successor area**, derived from what you actually saw this
 session — the thing you now know that you did not know when you started,
-twisted into a question. One is the minimum. Two or three is better. Use the
-template below.
+twisted into a question. One is the minimum. Two or three is better. Mint the
+next free id if `A`–`Z` is spent (`AA`, `AB`, …). Use the template below.
 
 **(c) Label the assumptions behind any successor that is INFERRED.** If any line
 of it rests on reasoning rather than observation, mark it INFERRED and state the
@@ -173,7 +178,7 @@ files an issue when the page falls below three open areas.
 ### Successor-area template
 
 ```markdown
-### <Letter>. <Name — a question, not a topic>
+### <Letter or two-letter id>. <Name — a question, not a topic>
 
 <What is known, with evidence labels and [source: findings-log/…] cites.>
 
@@ -350,7 +355,8 @@ not yours to start.
 5. Refill the priority page (step 7): move the closed area into the dated Closed
    table with its evidence, and add at least one successor area with a stated
    blocker, a definition of done, and INFERRED labels on any assumption behind
-   it. If you genuinely cannot name one, write the reason in the PR.
+   it — minting the next free id (`AA`, `AB`, …) when `A`–`Z` is spent. If you
+   genuinely cannot name one, write the reason in the PR.
 6. Run the gate. Open the PR.
 7. Flip your area's line in .loop/worklist.md from - [ ] to - [x], and append
    this to .loop/last-report.md:
@@ -366,7 +372,7 @@ Stop when any of: the gate exits 0 and the PR is open; your request cap is
 reached; you hit a blocker you can name precisely (then record it as the area's
 blocker and still submit what you have); or the area is already claimed.
 
-Final output: area letter and one-line verdict · requests used, of what cap, at
+Final output: area id and one-line verdict · requests used, of what cap, at
 what spacing · the evidence table · paths changed and the gate exit code · the
 successor area(s) added · the Loop report block verbatim.
 ```

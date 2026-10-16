@@ -96,7 +96,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ ! -s "$WORKLIST" ]; then
   if [ -f docs/11-suggested-research-areas.md ]; then
-    grep '^### [A-Z]\.' docs/11-suggested-research-areas.md \
+    grep -E '^### [A-Z]{1,2}\.' docs/11-suggested-research-areas.md \
       | sed 's/^### /- [ ] /' >"$WORKLIST"
     echo ".. seeded $WORKLIST with $(grep -c '^- \[ \]' "$WORKLIST") areas"
   else
@@ -160,8 +160,9 @@ Then:
 4. **Refill the priority page** (CONTRIBUTING-research.md step 7): move the
    closed area into the dated Closed table with its evidence, and add at least
    ONE successor area with a stated blocker, a definition of done, and INFERRED
-   labels on any assumption behind it. If you genuinely cannot name one, write
-   the reason in the PR.
+   labels on any assumption behind it — minting the next free id (AA, AB, …)
+   when A–Z is spent. If you genuinely cannot name one, write the reason in
+   the PR.
 5. Run \`./scripts/research-gate.sh\`. It must exit 0. Then open the PR.
 6. Flip your area's line in $WORKLIST from \`- [ ]\` to \`- [x]\`.
 7. Append this to $REPORT:

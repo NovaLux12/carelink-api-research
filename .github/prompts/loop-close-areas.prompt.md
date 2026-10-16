@@ -26,7 +26,8 @@ own ordering; token-gated areas are at the bottom and are not yours to start.
 5. **Refill the priority page (step 7):** move the closed area into the dated
    Closed table with its evidence, and add at least one successor area with a
    stated blocker, a definition of done, and INFERRED labels on any assumption
-   behind it. If you genuinely cannot name one, write the reason in the PR.
+   behind it — minting the next free id (`AA`, `AB`, …) when `A`–`Z` is spent.
+   If you genuinely cannot name one, write the reason in the PR.
 6. Run `./scripts/research-gate.sh`. Open the PR.
 7. Flip your area's line in `.loop/worklist.md` from `- [ ]` to `- [x]`, and
    append a Loop report to `.loop/last-report.md`:
@@ -43,6 +44,6 @@ reached; you hit a blocker you can name precisely (record it as the area's
 blocker and still submit what you have); or the area is already claimed. Do not
 open a PR if the gate is red.
 
-Final output: area letter and one-line verdict · requests used, of what cap, at
+Final output: area id and one-line verdict · requests used, of what cap, at
 what spacing · the evidence table · paths changed and the gate exit code · the
 successor area(s) added · the Loop report block verbatim.
