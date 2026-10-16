@@ -662,3 +662,43 @@ the three rounds of verification that preceded it — measured `t_sent` floor **
 **57** same-host gaps with 1 sub-floor reading and no cause asserted; portability **15 of 15**;
 **9 of 15** bodies byte-identical and **6** differing, all `.eu`-against-`.com`; clinic `.com`
 against support `.com` **15 of 15**; security headers **0 of 19** against **19 of 19**.
+
+### §E — the forecast conflict has landed, and this pass does not resolve it
+
+PR **#148** merged into `main` while this PR was open (`98766df`). The merge analysis published
+in this pass's PR body has therefore stopped being a forecast:
+
+| | `main` @ `98766df` | this branch | **merged result must be** |
+|---|---|---|---|
+| open-area headings | `### AA.` (the `android/<app-version>` axis) | `### AB.` (direct `hcp/configuration/*`) | **both** — 2 headings |
+| live count sentence | **1 open plus 26 closed** | **1 open plus 26 closed** | **2 open plus 26 closed** |
+| `config.yml` | `about: 1 open areas` | `about: 1 open areas` | `about: 2 open areas` |
+
+Both branches write `1`, so the merged tree needs `2` in all three places. `scripts/research-checks.py`
+`check_prose_counts` will fail on a merged tree that still says `1`, which is the check working.
+
+**This pass is not fixing it.** The run's standing instruction is that a conflict in `docs/`,
+`README.md` or `regression/hurl/` is **parked and reported, never resolved by this run**, and a
+lane resolving a shared-surface count unilaterally is how two lanes each end up believing they
+minted the same area. **So the conflict is reported, with the exact three numbers above, and
+handed to the merge queue.** What this pass will not do is pre-write `2` into its own branch:
+that number is only correct on a tree that does not exist, and `docs/07`/`docs/10` elsewhere in
+this repo hold to the same rule — a claim belongs to the tree it was measured on.
+
+### §F — CI could not run on this commit, and the reason is the conflict
+
+`gh pr view 149` reports **`mergeable=CONFLICTING`**, and **no `research-gate` check has been
+reported for this branch** since `38981018042` (success, on the previous commit `b8beadc`). The
+other three lanes' branches ran normally throughout, so this is not a CI outage.
+
+Tested rather than assumed: an **empty commit with a fresh push** (`010ac2f`, no content
+change) produced **no new workflow run**. `research-gate.yml` triggers on `pull_request`, which
+GitHub evaluates against the PR's **merge ref** — and a merge ref cannot be computed for a
+conflicting PR, so the workflow is never dispatched. **The blocker is §E, not this branch.**
+
+**The local gate at this exact tree, for the record:** `./scripts/research-gate.sh` →
+**`GATE PASS`, exit 0**, `CAP_STATE=ok`, suite **`85 passed, 0 failed`**, leak scan 10/10 clean,
+all citation paths resolve, `CHECKS PASS`. That is the same script CI runs, and it is the
+strongest signal available while the PR cannot be made mergeable. **It is not a substitute for
+the CI check and is not offered as one** — the check exists to run against the merged tree, and
+§E has to be cleared before that tree exists.
