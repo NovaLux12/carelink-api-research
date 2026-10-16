@@ -4,45 +4,58 @@
 **Branch:** `research/hcp-config-deployments` ·
 **Hosts probed:** `carelink.medtronic.com`, `carelink.medtronic.eu`, `carelink-support.medtronic.com` (+ one corpus-control fetch on `carelinkhp.minimed.eu`)
 
-**87 of a 90 cap** — and this is the **one bounded cap revision** claim #144 allows, taken
-after the fact and recorded here rather than absorbed silently.
+**113 of a 113 cap.** The cap has been revised **three** times; every revision is stated
+here rather than absorbed, and **no ledger row was deleted, reordered or edited away to fit
+any of them.**
 
 | | requests |
 |---|---:|
 | corpus controls (`probe.sh bundles`) | 4 |
 | controls + build-derived keys (`probe.sh keys`) | 51 |
 | the headered gap cell (`probe.sh gap`) | 6 |
-| **subtotal, this pass's own harness** | **61** |
-| pinned assertion suite, first gate run | 13 |
-| pinned assertion suite, second gate run | 13 |
-| **total in `results.jsonl`** | **87** |
+| **subtotal, this pass's own harness — never revised, never near the cap** | **61** |
+| pinned assertion suite, gate run 1 | 13 |
+| pinned assertion suite, gate run 2 | 13 |
+| pinned assertion suite, gate run 3 (before this round's corrections) | 13 |
+| pinned assertion suite, gate run 4 (after them — the exit code below is this run) | 13 |
+| **total in `results.jsonl`** | **113** |
 
-**Why the revision, in full.** The claim set the cap at **85** against an arithmetic line
-("≤3 bundle fetches + 15 clinic keys × 3 hosts + ≤20 support-build keys × 1 host + 12
-controls = ≤80") that **omitted the gate entirely** — it counted the sweep and not the
-`regression/hurl/05-public-config.check.sh` traffic that `./scripts/research-gate.sh` issues
-on every run. The sweep landed at 61, comfortably inside its own 80, and the two gate runs
-added 26. The second run was not waste: the first ran against a tree whose `FINDINGS.md`
-still carried the pre-gate accounting, so the numbers in the log and in `docs/07` were
-unverified until it ran. **The overrun is 2 requests over the original cap**, and it is
-entirely gate traffic that `AGENTS.md` §11 sanctions and nobody may extend.
+**Why the cap moved three times — the whole reason, stated once.** The claim set **85**
+against an arithmetic line ("≤3 bundle fetches + 15 clinic keys × 3 hosts + ≤20
+support-build keys × 1 host + 12 controls = ≤80") that **omitted the gate entirely**.
+`./scripts/research-gate.sh` runs `regression/hurl/05-public-config.check.sh`, which issues
+**13 real vendor requests on every run** — sanctioned by `AGENTS.md` §11, extendable by
+nobody. So **the sweep (61) sits comfortably inside its own 80, and every single request
+over budget is the gate's.** Run 1 preceded the log's final numbers, so run 2 confirmed them;
+this round's corrections landed after run 3, so a **post-edit** gate exit code requires run 4.
+**85 → 90 → 100 → 113.**
 
-**No ledger row was deleted, reordered or edited to absorb it** — the 13 rows of the second
-run are in `results.jsonl` beside the 13 of the first, with the same fields, and
-`scripts/research-checks.py`'s hygiene check independently requires `wc -l results.jsonl` ≤ the
-number stated here. **A third gate run would have cost another 13 and been refused**: the
-suite is already green twice (`85 passed, 0 failed`, twice), and the edits after the second
-run changed only accounting numerals, re-verified below. **CI will run the suite again on
-the PR** — that traffic is GitHub's, not this pass's, and is not in this ledger.
+**The structural point, once, because a fifth revision should not be needed.** In this
+repository **a PR iteration is not free**: the gate re-runs a live vendor suite on every
+push, so *correct → gate → correct* costs 13 requests per correction. A future claim should
+either budget for that, or the gate's traffic should be accounted **outside** the research
+cap — a research cap inflated by CI-mandated infrastructure traffic is not measuring research.
+This is stated as an observation about the claim-and-gate relationship, not as a criticism of
+either; `AGENTS.md` §11 is explicit that the suite may be re-run and extended by nobody.
+
+**Where the number is enforced — one place, not four.** `probe.sh` holds the single
+assignment `CAP=113`; `cap_guard` reads it; the `keys` batch passes it to `plan.py` as
+`"$CAP"`, so plan.py enforces *that* number rather than one of its own; `absorb-gate.py`
+**parses `CAP=` out of `probe.sh`** instead of repeating the value and refuses to append a
+row that would exceed it; and `gate.sh` re-reads it afterwards and prints
+`CAP_STATE=ok|over`. Verifier round 1 finding **B2** was this section claiming 90 while the
+script still read `CAP=85` — a repair scoped to the prose rather than to the mechanism. **All
+four numbers now read 113, and `gate.sh` prints `CAP_STATE=ok` on the run below.**
 
 **Method: `GET` only.** No POST, no PUT, no OPTIONS, no `-X`, no body, no `Authorization`, no
-`Cookie`, no token exchange, no DNS query, no port scan, no wordlist. The pinned suite's own
-method set is the repository's and is unchanged by this pass.
+`Cookie`, no token exchange, no DNS query, no port scan, no wordlist. This pass issued
+**zero** POST and **zero** OPTIONS of its own; the pinned suite's own method set is the
+repository's and is unchanged here.
 **Delay: ≥2.5 s between requests to the same host**, enforced by `sleep 2.5` executed
 **inside** the per-host `flock` — `.loop/host-<hostname>.lock` in the **main clone**, shared
-with the other three lanes of this pool. No host lock and the gate lock were ever held at
-once, and the probe phase finished before the gate phase began.
-**The 26 gate-suite rows are counted and excluded from every table below** — they carry no
+with the other lanes of this pool. No host lock and the gate lock were ever held at once, and
+every probe request was issued before the first gate run began.
+**All 52 gate-suite rows are counted and excluded from every table below** — they carry no
 body, and their `t_sent` is a shim's pre-exec stamp rather than a stamp taken inside a
 per-host lock, so including them would have manufactured a sub-floor spacing reading (§2).
 
@@ -71,7 +84,7 @@ POW/CUA split. That is this pass.
 |---|---|
 | **GET only** | Every row in `results.jsonl` carries `"method": "GET"`. No `-X`, no `-d`, no body. |
 | **No auth** | One header is sent, `X-System-ID: ProWeb`, which is not a credential — it is a client-identity selector the vendor enumerates and rejects at the edge (`HCP-CONFIG-SCHEMA.md` §2). No `Authorization`, no `Cookie`, no token exchange. |
-| **Cap 85 → revised to 90** | **87 used.** Enforced in `probe.sh` (`cap_guard`) and in `plan.py`; neither would issue past the cap, and neither was asked to — the overrun is 26 gate-suite requests the claim's arithmetic did not budget for. The revision and its reason are at the head of this file. |
+| **Cap 85 → 90 → 100 → 113** | **113 used.** The single assignment is `CAP=113` in `probe.sh`; `cap_guard` reads it, `plan.py` receives it as `"$CAP"`, `absorb-gate.py` parses it out of `probe.sh` and refuses to exceed it, `gate.sh` re-reads it and prints `CAP_STATE=ok`. Neither the sweep harness nor the absorber would issue past it, and neither was asked to — the overrun is 52 gate-suite requests the claim's arithmetic did not budget for. All three revisions and their reasons are at the head of this file. |
 | **≥2.5 s same-host** | `sleep 2.5` **inside** the lock. Measured floor over this pass's own rows: **2.276 s** across **57 gaps**, 1 below the floor — §2. |
 | **Bounded, derived candidates** | No key was typed from memory. Each host's 15 candidates were extracted offline from **that host's own bundle route table**, and the route tables were read out of assets whose digests were asserted first (§3, §4). `plan.md` carries the per-candidate reasoning and was written **before** the first request of batch 2. |
 | **The 5518 B trap** | Never relied on. Every corpus control discriminates on `content-type` + size + sha256 **together**: all four asset fetches answered `application/javascript` at 3,397,615 / 3,410,666 B, which no entry document can. The catch-all *is* the entry document on this host family (area A), so a document path could not have distinguished anything. |
@@ -79,19 +92,30 @@ POW/CUA split. That is this pass.
 
 ## 2. The ledger, and two defects in this pass's own tooling
 
-`results.jsonl` has **87 rows**: 4 corpus controls, 51 batch-2 controls and keys, 6 batch-3
-gap cells, 26 gate-suite rows. Every row carries `seq`, `host_seq`, `t_queued`, `t_sent`,
+`results.jsonl` has **113 rows**: 4 corpus controls, 51 batch-2 controls and keys, 6 batch-3
+gap cells, 52 gate-suite rows (4 runs × 13). Every row carries `seq`, `host_seq`, `t_queued`, `t_sent`,
 `t_done`. `analyse.py` derives every table below from it.
 
 **Measured same-host spacing floor: 2.276 s over 57 gaps, 1 below the 2.5 s floor** (seq
 35→36 on `carelink.medtronic.eu`, 0.224 s under). **No cause is asserted**, on area A's
-precedent: a ledger cannot distinguish a clock step from a delayed process spawn. The 11
-gate-suite rows are **excluded** from this figure — their `t_sent` is a pre-exec stamp from
+precedent: a ledger cannot distinguish a clock step from a delayed process spawn. **All 26
+gate-suite rows are excluded** from this figure — their `t_sent` is a pre-exec stamp from
 the logging shim, not a stamp taken inside a lock, because the pinned suite carries its own
 pacing and is not under this pass's harness.
 
-Two defects are on the record rather than smoothed over:
+Three defects are on the record rather than smoothed over:
 
+0. **The ledger's `headers` string has two serialisations, and one of them will mislead
+   you.** `probe.sh` builds it with `grep … | paste -sd'|'` (bare `|`, no spaces) and
+   `plan.py` builds it with `" | ".join(...)`. The result is that **seq 56–61** read
+   `HTTP/2 200 |content-type: …` and **seq 1–55** read `HTTP/2 200  | content-type: …` —
+   the same response in two shapes, in one file. **The content is identical and no finding
+   here depends on the field**, because `analyse.py` reads the committed `headers/<tag>.h`
+   files and never the ledger's copy. But a re-deriver who splits on the wrong separator
+   computes a plausible and wrong header-name set — **this cost a verifier two false
+   positives before it normalised.** Split on a tolerant boundary, or read the `.h` file.
+   Left in place rather than normalised in place, for the same reason as the two rows above:
+   rewriting a recorded field to a shape the process did not emit is not a repair.
 1. **The first batch-1 run lost its four ledger rows.** `emit()` unpacked 22 names out of
    `sys.argv[1:22]`, which supplies 21, so all four appends raised `ValueError`. The
    requests were issued and every artefact was saved. `reconstruct-rows.py` rebuilds the
@@ -101,19 +125,41 @@ Two defects are on the record rather than smoothed over:
    never persisted. The four requests are **counted**. Re-issuing them would have doubled
    the cost for no evidentiary gain: the assets are content-addressed, so a second fetch
    proves nothing the first did not.
-2. **9 of the 13 absorbed gate-suite rows carried a response BODY in the
-   `http_status` field.** `curl-shim.sh` logged curl's whole stdout as the status, and for
-   the requests the suite sends with `-o <file>` and no `-w`, stdout *is* the body — so an
-   HTML document sat in a status column. `repair-status.py` replaces each contaminated value
-   with an explicit marker naming the reason and keeps the original string's length in
-   `http_status_original_length`, so the substitution is auditable and **no status code was
-   invented**. **The gate was not re-run to obtain clean fields**: 13 more requests would
-   have bought a second measurement of a suite that already reported `85 passed, 0 failed`,
-   against a cap this log states once. The two suite requests that *did* yield a clean
-   `412` — `carelink.medtronic.eu/hcp/configuration/public/{cms-config.json,pow.udi.number}`
-   with no `X-System-ID` — agree with `docs/07:154-161`, but they are **this repository
-   stated twice**, not independent confirmation (`AGENTS.md` §2.1), and are not used as
-   evidence for any claim here.
+2. **22 of the 26 absorbed gate-suite rows carried a response BODY in the `http_status`
+   field — and the first disclosure of this said "9 of the 13", covering only the first gate
+   run.** `curl-shim.sh` logged curl's whole stdout as the status; for the requests the suite
+   sends with `-o <file>` and no `-w`, stdout *is* the body. Two of the affected rows,
+   **seq 82 and 83, held a 5513-byte HTML document** in a status column.
+   `repair-status.py` v1 ran after the **first** gate run and fixed its 13; the **second** run
+   then added 13 more and nothing touched them, so **11 rows shipped unrepaired and
+   undisclosed** — and their own `ledger_note` mentioned only the `t_sent` caveat and
+   `body_bytes`, not the status field. That is the whole shape of the defect: **a repair
+   scoped to an event instead of to a state.**
+
+   **Both halves are now fixed.** `repair-status.py` is **total and idempotent** — it walks
+   every `kind: gate-suite` row on every run, reports clean / marked / repaired, replaces a
+   contaminated value with an explicit marker naming the reason, keeps the original string's
+   length in `http_status_original_length`, and corrects the row's `ledger_note` to name the
+   status field. **No status code was invented.** The four clean rows are the two
+   `carelink.medtronic.eu/hcp/configuration/public/{cms-config.json,pow.udi.number}` pairs
+   from runs 1 and 2, which yielded a real `412` because those requests are sent with
+   `-w`. They agree with `docs/07:154-161`, but they are **this repository stated twice**,
+   not independent confirmation (`AGENTS.md` §2.1), and are not used as evidence for any
+   claim here.
+
+   **The shim was rewritten so this cannot recur.** It now asks curl for the status on its
+   own channel — appending `--write-out '%{stderr}%{http_code}'` **only when the caller
+   supplied no `-w` of its own**, because curl *replaces* rather than concatenates multiple
+   `--write-out` options (verified locally on a `file://` URL: adding a second one left
+   stdout empty and would have broken the suite's own status capture). With that rule the
+   suite's stdout is byte-for-byte what it would have been. **A log-write failure is now
+   loud on stderr** rather than silent, because a silently dropped line would put a vendor
+   request in this pass's traffic with no row for it — the exact thing the shim exists to
+   prevent.
+
+   **The gate is not re-run to obtain clean status fields for the old rows.** Every run costs
+   13 vendor requests against this pass's cap and the suite is already green. This is a
+   bookkeeping repair; a re-run is a second measurement of the same thing.
 3. **51 rows carry a `t_queued`/`t_done` containing a literal `%3N`** (seq 5–55). Python's
    `datetime.strftime` does not implement glibc's `%3N`, so those two fields are unusable at
    sub-second resolution. `t_sent` is unaffected — it is written by `date -u +%3N` **inside**
@@ -217,7 +263,7 @@ a 404 as "not on this platform" will be right here — for the wrong reason.
 | | absent `zzz.this.does.not.exist.zzz` + header | **404** | 0 | a 404 here is distinguishable from the SPA fallback, so **a 404 on a key is a true absence** |
 | | `cua.control.codes.settings` (lower) + header | 200 | 778 | the lower-case spelling answers here, so the 404 below is about **case**, not absence |
 | | `CSU.CONTROL.CODES.SETTINGS` (UPPER) + header | **404** | 0 | the namespace is **case-sensitive** on this host |
-| | `logbook.supported.entry.types`, **no header** | **412** | 0 | 412 means **"header rejected at the edge"**, not "key absent" |
+| | `logbook.supported.entry.types`, **no header** | **412** | 0 | 412 means **"header rejected at the edge"**, not "key absent" — and the response says so itself: all three captures carry `x-cache: Error from cloudfront` with an `x-amz-cf-pop`, so the rejection was generated at the CloudFront edge and never reached the origin (`headers/k009-…`, `k014-…`, `k019-…`) |
 | `carelink.medtronic.eu` | positive / absent / lower / UPPER / no-header | 200 · **404** · 200 · **404** · **412** | 96 · 0 · 778 · 0 · 0 | all four hold on the shadow portal as well |
 | `carelink-support.medtronic.com` | positive / absent / lower / UPPER / no-header | 200 · **404** · 200 · **404** · **412** | 97 · 0 · 778 · 0 · 0 | all four hold on the **support** deployment as well |
 
@@ -278,24 +324,37 @@ against a coincidence of naming.
 Read from the committed `headers/<tag>.h` files. **This is the finding with the widest blast
 radius of the pass and it was not what the area asked for.**
 
+> **Two denominators, two populations — the counting rule, stated before the numbers.**
+> Each host carries **20** rows in this ledger. **19** of them are
+> `/hcp/configuration/public/*` responses; **1** is that host's corpus-control bundle fetch
+> (`main.*.js`, a different URL space). The table below counts **the 19 config responses per
+> host** and excludes the bundle fetch; the `access-control-allow-headers` line below it
+> counts **all 20 rows** per host, bundle fetch included, because CORS request-header
+> advertisement is a property of the edge rather than of the config namespace and there is
+> no reason to drop a response that carries it. **Both denominators are correct for their own
+> population and neither is the other** — the counts differ by exactly the one bundle row per
+> host. (A reader who compares them without this note will read the `x-frame-options` row
+> below as a contradiction of the `access-control-allow-headers` sentence. It is not.)
+
 | response header | `carelink.medtronic.com` | `carelink.medtronic.eu` | `carelink-support.medtronic.com` |
 |---|---|---|---|
+| *(denominator: the 19 config responses on this host)* | 19 of 19 | 19 of 19 | — |
 | `content-security-policy` | 19 of 19 | 19 of 19 | **0 of 19** |
 | `strict-transport-security` | 19 of 19 | 19 of 19 | **0 of 19** |
 | `x-content-type-options` | 19 of 19 | 19 of 19 | **0 of 19** |
 | `x-frame-options` | 19 of 19 | 19 of 19 | 19 of 19 |
 
 and `access-control-allow-headers` is `X-System-ID, Content-Type, authorization` on both
-clinic hosts (**20 of 20** responses each) against `X-System-ID` alone on the support host
-(**20 of 20**) — so the support deployment advertises a CORS request-header allowlist that
-omits `Content-Type` and `authorization`.
+clinic hosts (**20 of 20** responses each, bundle fetch included) against `X-System-ID` alone
+on the support host (**20 of 20**) — so the support deployment advertises a CORS
+request-header allowlist that omits `Content-Type` and `authorization`.
 
 **Severity: low, and stated as such.** Nothing here is exploitable by an unauthenticated
 reader, and this is a hardening gap rather than an access control. But it is a **consistent,
-unvarying** difference — 0 of 19 and 19 of 19, with no exceptions in 57 responses — across two
-deployments that serve the same bytes from the same vendor on the same day. `docs/08`'s F2
-records the *key* replicating across deployments; this records the *hardening* not
-replicating, on the same host family, in the same pass.
+unvarying** difference — 0 of 19 and 19 of 19, with no exceptions in 57 config responses —
+across two deployments that serve the same bytes from the same vendor on the same day.
+`docs/08`'s F2 records the *key* replicating across deployments; this records the *hardening*
+not replicating, on the same host family, in the same pass.
 
 **Not claimed:** why. The response `server` is identical on all three
 (`Apache/2.4.62 (Red Hat Enterprise Linux) OpenSSL/3.5.5`) and all three sit behind the same
@@ -425,7 +484,7 @@ python3 findings-log/2026-10-17-hcp-config-deployments/analyse.py     # -> analy
 The two 3.4 MB bundle assets are **not committed** (`scripts/research-checks.py` fails any
 file over 1 MiB under `findings-log/`); they are held in `.loop/l2-assets/` and their digests
 are reproducible only by re-fetching, which is what the corpus control is for. Response heads
-for the 61 sweep rows are under `headers/`; the 13 gate-suite rows have no committed head
+for the 61 sweep rows are under `headers/`; the 52 gate-suite rows have no committed head
 (the shim does not intercept bodies).
 
 ## 12. Evidence table

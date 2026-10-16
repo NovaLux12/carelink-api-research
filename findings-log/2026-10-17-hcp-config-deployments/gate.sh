@@ -39,6 +39,20 @@ echo "GATE_EXIT=$GATE_RC"
 cp "${SUITE_LOG:-/tmp/_gate_suite.log}" "$HERE/gate-suite.log" 2>/dev/null || true
 
 python3 "$HERE/absorb-gate.py" "$CURLLOG" "$LEDGER" "$RUNLOG" 2>&1 | tail -20
+# Repair is TOTAL, not per-run: verifier round 1 finding B1 was a repair scoped to one
+# gate run while a second run's rows shipped with a response body in `http_status`.
+python3 "$HERE/repair-status.py" "$LEDGER"
 
-echo "GATE_EXIT=$GATE_RC LEDGER_ROWS=$(wc -l < "$LEDGER" | tr -d ' ') CAP=85"
+# The cap is read from probe.sh, never repeated here — see absorb-gate.py. If the ledger
+# is at or over it after absorbing, that is a stop, not a warning.
+CAP=$(sed -n 's/^CAP=\([0-9]*\).*/\1/p' "$HERE/probe.sh" | head -1)
+ROWS=$(wc -l < "$LEDGER" | tr -d ' ')
+if [ "${ROWS:-0}" -gt "${CAP:-0}" ]; then
+  echo "GATE_LEDGER_OVER_CAP rows=$ROWS cap=$CAP" >&2
+  CAP_STATE=OVER
+else
+  CAP_STATE=ok
+fi
+
+echo "GATE_EXIT=$GATE_RC LEDGER_ROWS=$ROWS CAP=$CAP CAP_STATE=$CAP_STATE"
 exit $GATE_RC

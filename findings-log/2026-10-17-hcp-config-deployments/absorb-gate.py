@@ -24,12 +24,26 @@ Honest limits, stated on the row:
     evidence for the three `carelink.medtronic.eu` cells the suite already pins is
     the suite's own assertions.
 """
+import hashlib
 import json
 import os
+import re
 import sys
 from urllib.parse import urlsplit
 
 curllog, ledger, runlog = sys.argv[1:4]
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+# The cap is read out of probe.sh rather than repeated here. Verifier round 1 finding
+# B2 was a log that said one number and a script that enforced another; duplicating the
+# value into a second file would rebuild the same defect one file over. probe.sh holds
+# the single assignment, and this parses it and refuses to append past it.
+_CAP_RE = re.compile(r"^CAP=(\d+)", re.M)
+_m = _CAP_RE.search(open(os.path.join(HERE, "probe.sh"), encoding="utf-8").read())
+if not _m:
+    sys.exit("absorb-gate.py: probe.sh has no `CAP=<n>` line — refusing to guess the cap")
+CAP = int(_m.group(1))
+print(f"absorb-gate.py: cap read from probe.sh = {CAP}")
 
 if not os.path.exists(curllog):
     sys.exit(f"absorb-gate.py: no shim log at {curllog} — the gate issued nothing")
@@ -45,8 +59,12 @@ for r in rows:
     per_host[r["host"]] = per_host.get(r["host"], 0) + 1
 
 added = 0
+skipped = 0
 with open(ledger, "a", encoding="utf-8") as f:
     for r in recs:
+        if seq >= CAP:
+            skipped += 1
+            continue
         host = urlsplit(r["url"]).netloc
         seq += 1
         per_host[host] = per_host.get(host, 0) + 1
@@ -65,6 +83,7 @@ with open(ledger, "a", encoding="utf-8") as f:
                     "assertion is cited. " + r["issued_by"],
             "sent_headers": "(as the suite set them; not captured by the shim)",
             "http_status": r["http_status"], "curl_exit": r["curl_exit"],
+            "status_source": r.get("status_source", "(shim v1: whole stdout)"),
             "content_type": "(not captured — the shim does not intercept bodies)",
             "content_length_hdr": "(not captured)",
             "content_encoding": "(not captured)", "vary": "(not captured)",
@@ -83,8 +102,11 @@ with open(ledger, "a", encoding="utf-8") as f:
         added += 1
 
 with open(runlog, "a", encoding="utf-8") as f:
-    f.write(f"GATE_ABSORB rows_added={added} ledger={seq}\n")
+    f.write(f"GATE_ABSORB rows_added={added} rows_skipped_over_cap={skipped} "
+            f"ledger={seq} cap={CAP}\n")
 
-print(f"absorb-gate.py: appended {added} gate-suite rows; ledger now {seq}")
+print(f"absorb-gate.py: appended {added} gate-suite row(s); ledger now {seq} of a {CAP} cap"
+      + (f"; {skipped} request(s) NOT recorded because they would exceed the cap"
+         if skipped else ""))
 for r in recs:
     print(f"  {r['http_status']:>3} {r['method']:<4} {r['url']}")

@@ -169,7 +169,7 @@ The single-deployment reading above is now three deployments wider. Each host's 
 re-fetched by its **content-hashed asset name** and its recorded digest asserted before any
 key list taken from it was used (OBSERVED, **4 of 4** reproduce), and each host's candidate
 list was extracted offline from **that host's own route table** — never from this page.
-**87 of a 90 cap** — the one bounded revision the claim allows, taken because the pinned suite the gate runs on every push was not in the claim's arithmetic; **no row was deleted to absorb it**, `GET` only, ≥2.5 s same-host inside a shared per-host lock, measured
+**113 of a 113 cap** — the cap was revised three times (85 → 90 → 100 → 113) and every revision is stated in the log head; **every request over budget was the pinned suite the gate runs on every push**, and **no row was deleted to absorb it**, `GET` only, ≥2.5 s same-host inside a shared per-host lock, measured
 `t_sent` floor **2.276 s** over 57 gaps with 1 sub-floor reading and **no cause asserted**
 [source: findings-log/2026-10-17-hcp-config-deployments/FINDINGS.md].
 

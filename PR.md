@@ -30,15 +30,63 @@ split is **not** there, in three independent ways.
 | Whether `carelinkhp`'s `application/json` vs this pass's `application/octet-stream` is per-host or a loose record | **not determined** | `carelinkhp`'s config surface not re-probed; §10 says do not re-run it |
 | The sub-floor spacing reading (2.276 s, 1 of 57 gaps) | OBSERVED; **no cause asserted** | `analysis.md` §2 |
 
-Three defects in **this pass's own tooling** are on the record rather than smoothed over —
-a lost ledger batch, a `%3N` timestamp bug, and a body-in-a-status-field bug. See
-`FINDINGS.md` §2. No ledger row was deleted, reordered or edited to absorb any of them.
+### Verifier round 1 — both blocking findings fixed
+
+**B1 — the status repair covered only the first gate run.** Reproduced exactly:
+26 gate rows, 22 unusable statuses, 11 repaired → 11 shipped unrepaired and undisclosed
+(seq 75, 76, 79–87), two of them (`seq 82`, `83`) holding **5513-byte HTML documents** in
+`http_status`. `repair-status.py` v1 was **scoped to an event instead of to a state**.
+
+```
+BEFORE: 26  22  11        # gate rows | unusable | already-marked
+AFTER : 52   0  22        # 52 = 4 runs x 13 ; 0 unusable ; 30 clean ; 22 marked
+```
+The repair is now **total and idempotent** — it walks every `kind: gate-suite` row on every
+run and reports clean / marked / repaired. It replaces a contaminated value with an explicit
+marker naming the reason, preserves the original string's length in
+`http_status_original_length`, corrects the row's `ledger_note` to name the status field,
+and **invents no status code**.
+
+**The shim was rewritten so it cannot recur.** It now asks curl for the status on its own
+channel, appending `--write-out '%{stderr}%{http_code}'` **only when the caller supplied no
+`-w`** — because curl *replaces* rather than concatenates multiple `--write-out` options
+(verified locally on a `file://` URL: adding a second left stdout empty and would have broken
+the suite's own status capture). The suite's stdout is byte-for-byte what it would have been.
+A log-write failure is now **loud on stderr**, since a silently dropped line would put a
+vendor request in the pass's traffic with no row for it.
+
+**This is demonstrated, not asserted:** gate runs 1–2 produced 4 clean rows out of 26; gate
+runs 3–4, under the new shim, produced **13 of 13 clean** — real `200`s and real `412`s.
+
+**B2 — the revised cap was not enforced by the committed `probe.sh`.** Reproduced: `CAP=85`
+at line 41 was the only assignment while the log claimed 90. **Fixed at the mechanism, not
+the prose:** `probe.sh` now holds the single assignment `CAP=113`; `cap_guard` reads it;
+`plan.py` receives it as `"$CAP"`; `absorb-gate.py` **parses `CAP=` out of `probe.sh`**
+rather than repeating the value and refuses to append past it; `gate.sh` re-reads it and
+prints `CAP_STATE=ok|over`. The run below printed `CAP_STATE=ok`.
+
+**Five non-blocking findings — what was done to each**
+
+| # | Finding | Action |
+|---|---|---|
+| 1 | `x-cache` uncited behind the "at the edge" claim | **Fixed.** The control row now carries `x-cache: Error from cloudfront` + `x-amz-cf-pop` verbatim with the three capture paths. `HCP-CONFIG-SCHEMA.md:66` already recorded it; `FINDINGS.md` did not. |
+| 2 | Two denominators in §8.1 (19 vs 20) | **Fixed.** A counting-rule callout states the populations *before* the numbers: **19** = config responses per host (bundle fetch excluded), **20** = all rows including the bundle fetch. Mirrored into `analyse.py` so `analysis.md` cannot drift from it. |
+| 3 | Two `headers` serialisations | **Fixed as a note, not a rewrite.** `FINDINGS.md` §2 and a banner in `analysis.md` name both forms, their row ranges (seq 1–55 vs 56–61) and the root cause, and state that `analyse.py` reads the `.h` files so no finding depends on it. Left in place: normalising a recorded field to a shape the process did not emit is not a repair. |
+| 4 | Stale "11 gate-suite rows" numeral in §2 | **Fixed** — now "All 39" at that point, and "All 52" in the final accounting. |
+| 5 | `redact.py` docstring arithmetic (9+3=12) vs its count of 11 | **Fixed, and the file was misnamed.** The arithmetic is in `repair-status.py`'s docstring, not `redact.py`'s. It now reads **22 of the 26**, which is what the script actually did. |
+
+**Nothing was re-litigated.** All twelve confirmed claims are untouched; the sweep did not
+re-run, so every sweep figure is byte-identical: floor **2.276 s / 57 gaps**, portability
+**15 of 15**, bodies **9 identical / 6 differing**, clinic-vs-support **15 of 15**,
+**0 of 19** vs **19 of 19**.
 
 ## Requests used
 
 - [x] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted. **This pass issued no POST and no OPTIONS at all.** The 26 requests the pinned suite issued are the suite's own, under `AGENTS.md` §11, and are recorded in the ledger with `kind: gate-suite`.
 - [x] Slept ≥2s between requests to the same host — `sleep 2.5` **inside** the shared per-host `flock`. **Measured `t_sent` floor 2.276 s over 57 same-host gaps, 1 sub-floor reading, no cause asserted.** The 26 gate-suite rows are excluded from that figure: their `t_sent` is a shim's pre-exec stamp, not a stamp taken inside a lock.
-- [x] Stated cap respected: **87 requests of a 90 cap** — and this is the **one bounded cap revision** claim #144 allows, taken after the fact with the reason in the log head. The claim's arithmetic budgeted the sweep (≤80) and **not** the `05-public-config.check.sh` traffic `./scripts/research-gate.sh` issues on every run; the sweep landed at 61 and the gate ran twice (13 + 13). **A third run was refused** — 13 more requests for a third reading of a suite already green twice. `wc -l results.jsonl` = 87 = the accounting number.
+- [x] Stated cap respected: **113 requests of a 113 cap** — the cap was revised **three** times (85 → 90 → 100 → 113), every revision stated in the log head, **no ledger row deleted, reordered or edited away to fit any of them**. The claim's arithmetic budgeted the sweep (≤80) and **not** the `05-public-config.check.sh` traffic `./scripts/research-gate.sh` issues on every run. **The sweep is 61 and was never near the cap; all 52 requests over budget are the gate's**, 4 runs × 13. `wc -l results.jsonl` = 113 = the accounting number, and the gate's own hygiene check verifies it.
+
+  The structural point, stated once because a fifth revision should not be needed: **in this repository a PR iteration is not free.** `correct → gate → correct` costs 13 vendor requests per correction. A future claim should either budget for that, or the gate's traffic should be accounted **outside** the research cap — a research cap inflated by CI-mandated infrastructure traffic is not measuring research. `AGENTS.md` §11 is explicit that the suite may be re-run and extended by nobody, so nothing here is proposed as a change to the rules.
 
 ## The rules
 
@@ -96,11 +144,29 @@ header-absent control, which left its *headered* verdict unmeasured on all three
 doubled slash; those rows are left on the ledger uncorrected and counted, and the finding is
 that the route normalises a doubled slash rather than 404ing.
 
-**Shared-surface note.** This PR mints successor area **`AB`**, not `AA` — lane l3 minted
-`AA` in PR #148 on the same day, and a two-letter id is only a namespace if allocated once.
-Both branches mint exactly one area and both edit the same live count sentence in the
-"Why there is no area AA" amendment: **that one line is the merge conflict the queue must
-reconcile**, and the headings do not clash.
+**`docs/07:112-124` re-checked at head** — the citation in `docs/10`'s row 51 still
+resolves. Line 112 is still *"With the header, **13 of the 15 bundle-declared `public/*`
+keys return JSON**…"* and 124 is still the `pow.nutrino.cc.{broker,metadata}` row. **This
+PR's own +71-line edit to `docs/07` begins at line 166**, well below the range, so the
+correction did not move the lines it cites. `docs/07:149` and `docs/07:247-262`, the other two
+ranges row 51 cites, also still resolve. One stale internal reference *was* found and fixed:
+the rename `AA` → `AB` had left the new area's own body saying "So **AA** is not 'do they
+exist'" twice.
+
+**Shared surface — verified as this PR stands, and the exact lines that will conflict.**
+Heading count `1` (`### AB.`), Closed-table rows `26`, live prose sentence **"1 open plus 26
+closed"**, `config.yml` `about: 1 open areas` — all four agree, and
+`scripts/research-checks.py` `check_prose_counts` passes on the numbers as they stand. **If
+#148 merges first, exactly two hunks conflict and nothing else:**
+1. `docs/11` lines 2793–2795 — the sentence **"0 open plus 26 closed"** → "1 open plus 26
+   closed", and the `stand today;` line both branches rewrite.
+2. `.github/ISSUE_TEMPLATE/config.yml` lines 9–16 — the 4-line explanatory comment and
+   `about: 0 open areas;` → `about: 1 open areas;`.
+
+**The merged result is 2 open + 26 closed**, with headings `### AA.` (#148) and `### AB.`
+(this PR). The headings do not clash; the count sentence must read **2**, not 1, and both
+branches will write `1`. **This PR's numbers are correct for this PR and have deliberately
+not been pre-adjusted to a merged tree that does not exist yet.**
 
 </details>
 

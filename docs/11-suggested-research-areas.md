@@ -2860,7 +2860,7 @@ clear. `plan.md` in that log prints all six.
 
 **Non-duplicate, and this is the part that matters.** `HCP-CONFIG-SCHEMA.md` §10 says those
 six "have been resolved to an existence verdict" — **on `carelinkhp.minimed.eu`, on
-2026-10-08**, and §10 is titled *Do not re-run*. So AA is **not** "do they exist". AA is the
+2026-10-08**, and §10 is titled *Do not re-run*. So AB is **not** "do they exist". AB is the
 question that §10's own scope leaves open and that lane l2's result makes sharp: those six
 verdicts are, like the fifteen, a **single-deployment reading**. On the recorded host 3 are
 POST-only (`application`, `productContext`, `user` → `405`) and 3 are token-gated
