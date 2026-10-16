@@ -372,7 +372,7 @@ Stop when any of: the gate exits 0 and the PR is open; your request cap is
 reached; you hit a blocker you can name precisely (then record it as the area's
 blocker and still submit what you have); or the area is already claimed.
 
-Final output: area letter and one-line verdict · requests used, of what cap, at
+Final output: area id and one-line verdict · requests used, of what cap, at
 what spacing · the evidence table · paths changed and the gate exit code · the
 successor area(s) added · the Loop report block verbatim.
 ```

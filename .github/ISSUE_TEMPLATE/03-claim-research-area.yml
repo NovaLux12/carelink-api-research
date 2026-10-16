@@ -22,7 +22,7 @@ body:
     attributes:
       label: Which area
       description: |
-        The letter and title from docs/11-suggested-research-areas.md.
+        The id (a letter, or a two-letter id like `AA`) and title from docs/11-suggested-research-areas.md.
         If it is not on that page, it is not claimable here — propose it as a
         new area first.
       placeholder: "G — cross-check the three model tables"

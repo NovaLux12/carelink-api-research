@@ -1,7 +1,7 @@
 ---
 name: research-area
 description: Run one bounded read-only research session on the CareLink API and submit it as a PR
-argument-hint: [area letter, or "pick for me"]
+argument-hint: [area id, or "pick for me"]
 ---
 
 You are contributing to https://github.com/NovaLux12/carelink-api-research — a

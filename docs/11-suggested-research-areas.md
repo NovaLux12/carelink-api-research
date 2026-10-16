@@ -338,7 +338,8 @@ hosts, no `commoncore*` cell was ever matched, and none has ever varied `Origin`
 a documented placement problem and the reason was missing.** Every letter A—Z is in use, so a
 new `### ` heading would leave this page's own "N open plus M closed" sentence disagreeing
 with its contents — which is the failure `docs/11`'s own addenda have already been written to repair
-twice. Of the five open areas, **F is the only one whose subject is the CORS behaviour of an
+twice. ⚠ **Superseded 2026-10-16: the namespace continues past Z and two-letter headings now
+count** — see the Amendment in "Why there is no area AA". Of the five open areas, **F is the only one whose subject is the CORS behaviour of an
 AWS-API-Gateway-behind-CloudFront deployment**: its own text turns on "zero of 90 responses
 carried `Access-Control-*`", which is the same question on the `clcloud.*` stage. The host
 family differs and this addendum says so in every sentence that could be misread; the
@@ -1629,7 +1630,9 @@ stay distinct; that table strings are the wire vocabulary.
 
 Attached to closed area R rather than opened under a new letter — every letter
 A–Z is in use, and a two-letter heading is invisible to this page's own count
-(**Why there is no area AA**, below). **0 requests of a 0 cap**;
+(**Why there is no area AA**, below). *(⚠ Superseded 2026-10-16: two-letter
+headings now count — see the Amendment in that section. The successors above
+stand.)* **0 requests of a 0 cap**;
 [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md].
 
 **1. The read-side echo casing of the recovered logbook keys.** Area P and area S4
@@ -2687,7 +2690,7 @@ number it checks.
 ## How to claim one
 
 1. Open an issue using the **Claim a research area** form (labels
-   `research-area,claimed`). State the area letter and title from this page —
+   `research-area,claimed`). State the area id and title from this page —
    if it is not on this page, it is not claimable here.
 2. Say what you will probe, the request cap, and what "closed" means for that area.
 3. When you have a result — positive **or negative** — open a PR with the finding
@@ -2744,7 +2747,9 @@ Amendment in this subsection. Kept as written:**
 rows while the arbiter's pattern measures 25, and the difference is the `S6`
 row** — a closed area that fails this page's own rule in exactly the way the rule
 two lines above describes. The number is not wrong; it is measured on a stated
-pattern, and the pattern cannot see `S6`. Both figures are given rather than one
+pattern, and the pattern cannot see `S6` — ⚠ **both figures are as of 2026-10-15** and move
+as rows land (K's row arrived 2026-10-16); re-derive rather than copy. Both figures are given
+rather than one
 being quietly chosen (`AGENTS.md` §2). Neither is adjusted here: the `S6` row
 stays, the counting rule stays, and widening the pattern is a maintainer decision
 that `docs/09` §4 already rules out of a research pass — "changing the gate's own
