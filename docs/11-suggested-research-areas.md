@@ -2545,8 +2545,22 @@ stand.** Re-derived vs committed: RECORD **72** vs **65**, ABSENCE **11** vs
 carrying a member **12** vs **10** in-window (**13** vs **11** counting the one
 out-of-window crawl `census-84.txt:168` itself lists). 72+11+1+0 = 84, so the
 re-derived tally leaves none unassigned. **The repo already contradicted itself
-without any new evidence:** lines 1736 and 1738 above list both crawls' members
-as `(prior)`. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+without any new evidence:** this page's own family table lists both crawls' members
+in its two `(prior)` rows — `CC-MAIN-2014-10` / `/ipro/hcp/login.jsf`, and
+`CC-MAIN-2020-24` / `index.jsp`, `login.jsf`, `main/home.jsf` — findable with
+`grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
+content and deliberately with no line number, because this page moves as other
+passes land.** ⚠ **Two corrections to this sentence, both recorded because each
+replaced one broken citation with another — the failure `AGENTS.md` §6 item 6
+names, and the one this pass's own §8a-6 row 4 was written to stop.** It once read
+**"lines 1736 and 1738 above"**, stale on the commit it shipped in (those lines are
+two successor bullets); the rows are now named above instead. And the replacement
+recipe first read **`grep -n '…' docs/` without `-r`**, which GNU grep rejects —
+`grep: docs/: Is a directory`, exit 2, no rows — so the fix for a stale pointer
+published a pointer that **did not execute**. **The `-r` is load-bearing; the
+recipe is quoted with it, and it is re-run verbatim before this page ships.** A
+citation that cannot be executed is worse than a wrong line number, because the
+wrong number at least fails visibly. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
 vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
 evidence is two sentences below and it governs every number printed here; it is
 stated here rather than only there because a limit separated from its figure by
@@ -2656,10 +2670,11 @@ third instance on the same page.**
 `docs/10` §1's own successor tells the next pass to run that tool over **"every other
 committed CC ledger"**. Run exactly that way, it **crashes on a member of this very
 population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
-`account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
-another lane owns that file — and **that is why this successor exists**: recording
-the crash as observed is not enough while the row naming the tool still points the
-next pass straight at it. **Blocker: none — the closer is a maintainer decision, and
+`account.py`'s `spacing()` called `strptime(None)` → `TypeError`. This pass did not
+fix it — another lane owns that file — and **that is why this successor exists**:
+recording the crash as observed is not enough while the row naming the tool still
+points the next pass straight at it. **Blocker: none — the closer is a maintainer
+decision, and
 the earlier wording here ("the fix belongs to the lane that owns `account.py`") named
 neither an owner nor a route, so it described the crash without stopping anything.**
 `account.py` is a committed analysis script, not a live surface; the next pass that
@@ -2670,7 +2685,34 @@ reworded to name the ledgers it can read, which costs nothing and is the smaller
 change. **Zero requests either way.** **Assumptions (INFERRED):** that the null is
 a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
 all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+⚠ **Three clauses of the entry above are superseded — *"This pass did not fix it —
+another lane owns that file"*, the `account.py:109` line number (which this change
+invalidated, since `account.py` is a file this correction edits; the call is named by
+function instead), and *"**Not fixed here**"* — and this successor is CLOSED
+2026-10-17: the
+first branch of its own closer was taken, not the cheaper reword.** `account.py` now
+tolerates an absent `t_sent`: `parse()` returns `None` for a non-string rather than
+letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching
+a row that carries no timestamp **and prints how many it skipped**, and the
+inverted-row test reads both keys with `.get()`. **All eight area-L ledgers open
+under `python3 account.py <ledger>`**, and a 9th crash fell out of the same
+verification — a 0-row ledger raised `IndexError`, so the newest committed CC
+ledger in the repository was one the tool could not read; it now says in words that
+such a ledger records a pass that sent nothing. **Skipping the rows was the right
+fix, not a loosening:** the spacing oracle needs only the rows that carry a
+timestamp, and a gap measured *across* a row with none would be a guess. **The
+INFERRED assumption above is untouched** — a null may still be a malformed row; the
+tool no longer has to assume either way to answer. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17) — correction issue #139's eight findings, re-derived at this head]
 [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
+
+⚠ **The other seven of #139's eight findings were already fixed when PR #135
+merged** (`aa401b7`, 2026-10-15), by that pass's own **seven** further commits, self-labelled rounds **3–9** (`git log --oneline aa401b7^1..aa401b7`) — a stale
+pointer withdrawn, a policy made fatal, an unstated counting rule shipped in
+`kib-detector.py`, a reader sentence corrected to the predicate it means, and a
+rounding rule that now produces its own figure. **Re-derived at this head rather
+than taken from the issue's wording**, with one live instance of the pointer class
+found on this page and fixed above. **None of the measurements moved**, and none was
+restated. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17)]
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the

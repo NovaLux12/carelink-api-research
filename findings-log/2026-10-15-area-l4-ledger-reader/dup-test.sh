@@ -16,6 +16,18 @@
 # re-derivation is welcome per CONTRIBUTING-research.md:212. Where a hit is a
 # PARTIAL overlap rather than a duplicate, the table says so.
 #
+## Correction (2026-10-17) — the Correction-section pattern widened, not loosened
+#
+# One pattern below, CORR_RE, gained a second alternative so that a heading
+# written as `## Correction (YYYY-MM-DD)` — the form `scripts/research-checks.py`
+# requires before the GATE will accept any edit to a file under `findings-log/` —
+# is recognised here as a Correction section too. Before this it was reported as
+# a FAKE heading, i.e. this check would have failed a pass that followed the
+# gate's own rule. Nothing else here changed: the position spellings, the
+# fail-closed guard, the enumerated residual and the exit code are as they were.
+# Recorded because a check edited by a correction pass is a check that needs its
+# own correction note (AGENTS.md section 3).
+#
 # ══ THE POSITION CHECK — the class, not the spelling ══════════════════════════
 #
 # Four review rounds found the same defect at a new coordinate: `:2189` ->
@@ -80,7 +92,21 @@ D10=docs/10-open-questions.md
 D11=docs/11-suggested-research-areas.md
 # The single canonical test for a Correction SECTION heading. Used by the
 # exemption, the FAKE check and the listing below, so they cannot diverge.
-CORR_RE='^## 8a(-[0-9]+)?[.] Correction([^A-Za-z]|$)'
+#
+# WIDENED 2026-10-17, and the reason is a conflict between two of this repo's
+# own checks rather than a preference. This file's pass numbers its corrections
+# `## 8a-N. Correction (...)`, and that is the first alternative below. But
+# `scripts/research-checks.py` -- the check the GATE runs -- requires
+# `^## Correction (YYYY-MM-DD)` before it will accept ANY edit to a file under
+# findings-log/, because findings-log is append-only and a dated correction
+# section is what makes an in-place change legible (AGENTS.md section 3). So the
+# two patterns disagreed: a correction written in the form the gate requires was
+# invisible to this check, and this check reported it as a FAKE heading, i.e. the
+# one thing that means "you have renamed the exemption". A pass following the
+# gate's own rule would have been failed by the artefact that enforces the
+# gate's rules. Second alternative added; both now count, and the FAKE check
+# still fires for a heading that mentions correction but matches neither.
+CORR_RE='^(## 8a(-[0-9]+)?[.] Correction([^A-Za-z]|$)|## Correction [(][0-9]{4}-[0-9]{2}-[0-9]{2}[)])'
 
 # FAIL CLOSED, AND FAIL EARLY. `git diff origin/main...HEAD` is the only source of
 # the edited-file list; with no `origin/main` (a shallow clone, a detached merge
