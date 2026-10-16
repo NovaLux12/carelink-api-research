@@ -2535,7 +2535,7 @@ of **2014-03-10 → 2026-06-10** and no member anywhere else — **17 of the 128
 published indexes whole-corpus. **The in-window `12` is re-derived, not inherited**,
 and it is **two higher than the figure this page inherited**: `census-84.txt:168`
 publishes `11` while its own header at `:161` declares the tally IN-WINDOW-only, and
-its list includes `CC-MAIN-2022-27`, which `:104` marks `in_window=no` — the defect
+its list includes `CC-MAIN-2022-27`, which `:119` marks `in_window=no` — the defect
 successor **S-L4a** already names, left unreconciled until this pass. The area's own
 committed reader (`read-area-l.py census`, which parses the three row schemas its
 predecessor could not) re-derives **12 in-window** and **39 in-window member

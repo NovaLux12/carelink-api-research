@@ -239,8 +239,7 @@ a 2014-and-2020 artifact, and it is not a 2022 artifact either**: it was being
 fetched, and answered `404`, four years after the date this repository had
 recorded as its end.
 
-### F3c — the in-window member count is **re-derived here**, and the inherited
-### figure was wrong by two
+### F3c — the in-window member count is **re-derived here**, and the inherited figure was wrong by two
 
 **The claim under correction.** This log's first version of F3 rested `10 of the
 84` on `census-84.txt:168` and labelled it *"inherited, not re-derived"*. That
@@ -251,7 +250,7 @@ and the inherited number was wrong.
 **What the inherited artefact says, and the contradiction inside it.**
 `census-84.txt:161` declares *"every tally below is IN-WINDOW crawls only"*, and
 `census-84.txt:168` then prints **`crawls carrying >=1 /ipro/hcp/* member  11`**
-with a list that **includes `CC-MAIN-2022-27`**, which `:104` of the same file
+with a list that **includes `CC-MAIN-2022-27`**, which `:119` of the same file
 marks `in_window=no`. So the tally is out-of-window where its header says
 in-window, and the `11` was never an in-window figure. **This is the defect
 `docs/11`'s successor **S-L4a** already names** — it is not a new discovery here,
@@ -785,7 +784,7 @@ CC-MAIN-2022-27 : 6      all in 2026-10-14-pool-l-ipro-hcp-census/results.jsonl
 (`FINDINGS.md:193`, `:226`, `:598`).** This log rested `10 of the 84` on
 `census-84.txt:168` and labelled it *"inherited, not re-derived"*. `census-84.txt:161`
 declares its tallies IN-WINDOW-only while `:168`'s list includes `CC-MAIN-2022-27`,
-which `:104` marks `in_window=no` — **the defect `docs/11`'s S-L4a already names**,
+which `:119` marks `in_window=no` — **the defect `docs/11`'s S-L4a already names**,
 and this pass's own headline finding is a live defect in an inherited artefact, so
 declaring a number inherited was not a safe economy. Re-derived with the area's own
 committed reader, over its stated 8-ledger population (which **does not** include
@@ -848,4 +847,77 @@ in-window crawls and this pass read **zero** of them. Recomputing it here would 
 publishing a number this pass has no population for. It is flagged in place on
 `docs/10` and in "what this pass does not say" so the next reader inherits the
 warning with the figure.
+
+## Correction (2026-10-17) — verification round 2: **two tokens, and the second one is the same defect round 1's C6 named**
+
+Round 2 returned **NOT CLEAN** on `ee40d34`. **The substantive work was confirmed
+again and is not re-argued**: the headline re-derivation was rebuilt with an
+*independent* classifier — its own slug population rule, its own `in_window` parse,
+its own three-shape normaliser, deliberately not calling this pass's `derive()` —
+and returned **13 / 12 / 39** robust under **three different tie-break rules**;
+**17** was judged a measurement rather than a further inference (`12 + 5` over
+disjoint populations, 84 + 44 = 128, all five F2 crawls `in_window=no`); the two
+crawls that move were confirmed to resolve to **raw member arrays** rather than a
+bail-out; the 43-of-44 controls sentence, the `docs/11` heading fix and the pure
+insertion into `docs/10` were all confirmed sound. **Zero vendor requests.** What
+did not hold was two **single tokens**.
+
+**C7 — a citation pointed at the wrong line of `census-84.txt`, in three places.**
+`FINDINGS.md:253` and `:787` (the F3c section and the round-1 C3 correction) and
+`docs/11:2538` all cited **`:104`** for the row marking `CC-MAIN-2022-27`
+`in_window=no`. It is on **`:119`**:
+
+```
+$ grep -n "CC-MAIN-2022-27" findings-log/2026-10-15-pool-l-ipro-census-cont/census-84.txt
+119:CC-MAIN-2022-27	2022-06-24T21:39:08	2022-07-07T18:43:29	no	RECORD	1	20220703	…
+$ sed -n '104p' findings-log/2026-10-15-pool-l-ipro-census-cont/census-84.txt
+CC-MAIN-2020-34	2020-08-03T08:31:23	2020-08-15T21:47:56	yes	RECORD	0		.
+```
+
+**All three corrected to `:119`; `:161` and `:168` in the same sentences were
+checked first and are correct, so they were not moved.** This was not a nit: a
+reader following the pointer landed on a different crawl entirely, and this pass's
+own reader already says `119` in two places (`read-area-l.py:645` comment and its
+printed output at `:707-708`) — the log and the page disagreed with the script
+three times over.
+
+**C8 — the F3c heading was a two-line ATX heading, which renders as two headings.**
+Under CommonMark an ATX heading ends at the line end, so `### F3c — …` followed by
+`### figure was wrong by two` rendered as a heading plus a fragment reading
+*figure was wrong by two*. **Joined onto one line.** The sting is the part worth
+recording: **round 1's C6 documented exactly this defect class, and the correction
+section documenting it reintroduced it two hundred lines below in the same commit.**
+Round 1 also fixed the same shape in `docs/11`; three occurrences of one lesson in
+two rounds says the lesson is not "avoid wrapped headings" but **render the region
+you touched and read it** — which is what caught C6, and what would have caught
+C8.
+
+**One non-blocking item, taken.** `census-84.txt` printed `11`, `10` and `35` with
+no in-file notice, and `docs/10` §1 sends a reader there; that reader landed on the
+old numbers with nothing pointing back. **A dated cross-reference is now appended to
+that file — 12 lines added, 0 removed** (`git diff --numstat` = `12 0`) — naming the
+three superseded figures and pointing at §F3c. **No existing line was edited**,
+because `findings-log/` is append-only and the corrected values belong to the
+correction that measured them. The `65 RECORD` tally at
+`2026-10-15-pool-l-ipro-census-cont/FINDINGS.md:107` is **left as it stands** and
+remains flagged in place on `docs/10` and in "what this pass does not say".
+
+**And one more instance of C8's shape, found while checking C8, and NOT fixed
+because it is out of scope for this round — stated rather than left silent.**
+`headers/voided/README.md` lines 3–7 and 10–11 are `#`-prefixed prose that renders
+as **six** consecutive H1 lines. They are in a file this pass wrote in round 1, so
+the same class is present twice more. **It is not in the verifier's two findings
+and this round's scope is two tokens**, so it is reported here and left alone
+rather than quietly folded in.
+
+**Two gaps the verifier did not close, closed here, zero requests.**
+**The `git grep -c` split behind `0 / 0 / 0 / 0 / 6`** — re-run, same output:
+`CC-MAIN-2024-22`, `-2024-26`, `-2026-17`, `-2026-25` **0** prior ledger rows;
+`CC-MAIN-2022-27` **6**, all in `2026-10-14-pool-l-ipro-hcp-census`. **And the
+`12`-of-84 / `39` carry into the PR body**, read off the live PR rather than the
+local copy: `gh pr view 150 --body` carries **12** of the 84, **17** of 128 and
+**39** in-window member records, and carries **0** occurrences of the superseded
+`10 of the 84`, `3 open plus`, `at least 14`, `exactly one of them` or `:104`.
+**The block-level emphasis-marker sweep was not attempted**, on the verifier's
+advice — a per-line checker cannot do it and 76 flags were its own false positives.
 

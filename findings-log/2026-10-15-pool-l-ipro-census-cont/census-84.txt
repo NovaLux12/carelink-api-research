@@ -169,3 +169,15 @@ crawls carrying >=1 /ipro/hcp/* member	11	CC-MAIN-2014-15 CC-MAIN-2017-26 CC-MAI
 
 The one crawl this area read OUTSIDE the window, on purpose: CC-MAIN-2022-27
 (2022-06-24 -> 2022-07-07) carries the 2022 capture and is the crawl AFTER the window.
+
+## Correction (2026-10-17) — the three tallies above are superseded, and the reader is sent here
+
+**`11` (member-bearing crawls), `10` (of which in window) and `35` (in-window member
+records) are all re-derived, and every one of the three is wrong.**
+`findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md` §F3c carries the
+arithmetic and the two rows that move (`CC-MAIN-2014-10` 0 -> 1 and `CC-MAIN-2020-24`
+0 -> 3), both of them among the eight `older-schema` crawls this file's reader could
+not parse. `docs/10` section 1 sends the reader of that row here; **no number above
+has been edited**, because `findings-log/` is append-only and the corrected values
+belong to the correction that measured them. Zero requests.
+
