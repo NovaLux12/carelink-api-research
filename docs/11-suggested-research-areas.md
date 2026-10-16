@@ -2472,7 +2472,10 @@ this successor is no longer "read more crawls". Same two-cell shape
 (per-crawl positive control, then `minimed.eu` `matchType=domain`, `output=json`,
 **no `limit`**) was the right one and it worked **188 requests against a
 predicted 211** — the corrected per-crawl cost below, budgeted conservatively.
-## What is left (as S-L2 read it before 2026-10-17): **44 of the 128 published indexes lie outside
+**What is left** *(as S-L2 read it before 2026-10-17 — **superseded in full by the
+closure immediately below**, and kept as written so the reasoning survives; both of
+its facts are now measured and one of them is wrong, see the correction at the end
+of this block)*: **44 of the 128 published indexes lie outside
 2013-05-17 → 2022-05-13** — **3 entirely before** (2008–2013) and **41 entirely
 after** (2022-06 onward) — this area has read exactly **one** of them, and that
 one carried a member. **Blocker:** budget, and the fact that the window is a choice
@@ -2527,23 +2530,41 @@ absences, and the earliest member is still **2014-03-10**, inside the window. Th
 window is **loose at the start and four years short at the end.**
 
 **What is now measured, in place of the window:** `/ipro/hcp/` is present in **5 of
-the 44** out-of-window crawls and **10 of the 84** in-window (`census-84.txt`,
-inherited — a *different population*; this pass read **zero** in-window crawls, so
-the two figures are **not** added together), with an observed span of **2014-03-10
-→ 2026-06-10** and no member anywhere else. **Not claimed:** that the surface is
+the 44** out-of-window crawls and **12 of the 84** in-window, with an observed span
+of **2014-03-10 → 2026-06-10** and no member anywhere else — **17 of the 128**
+published indexes whole-corpus. **The in-window `12` is re-derived, not inherited**,
+and it is **two higher than the figure this page inherited**: `census-84.txt:168`
+publishes `11` while its own header at `:161` declares the tally IN-WINDOW-only, and
+its list includes `CC-MAIN-2022-27`, which `:104` marks `in_window=no` — the defect
+successor **S-L4a** already names, left unreconciled until this pass. The area's own
+committed reader (`read-area-l.py census`, which parses the three row schemas its
+predecessor could not) re-derives **12 in-window** and **39 in-window member
+records**, against `census-84.txt`'s **10** and **35**; the whole difference is two
+of the eight `older-schema` crawls, `CC-MAIN-2014-10` (**1** member) and
+`CC-MAIN-2020-24` (**3**). **Both figures stand, both are published, and `12` is a
+floor** — the reader says so in its own output
+[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F3c]. **Not claimed:** that the surface is
 retired. Every status above is the **archived** status of a capture — not a live
 answer, and no body was fetched; a `404` is equally consistent with long
 retirement, a gate, and path rewriting, and **nothing observed separates the
 three**. INFERRED, and labelled because area L drew the same line for the
 in-window `403`s.
 
-**Two corrections to `docs/`, applied in place rather than left standing.** (1)
+**Four corrections to `docs/`, applied in place rather than left standing.** (1)
 *"This area has read exactly **one**"* of the out-of-window crawls is **two**:
 `CC-MAIN-2022-21` was read too, with a `200` control and a `200` probe carrying
 **0** members — only one of the two carried a member. Repo-wide the figure is
 **six** and **38 of the 44** had never been read by any pass. The committed
 `crawl-window.txt` tagged it correctly all along, so the prose had contradicted a
 committed file. (2) This block's own *"exactly one"*, same defect, same fix.
+(3) A **third site reached only on verification** — the same sentence, live in
+**`docs/10` §1**, which the first pass did not touch; a reader of `docs/10` was
+still getting the wrong count, uncorrected and unlabelled. Three sites, all
+corrected in place with their correction attached; none deleted.
+(4) And the in-window member figure this block published as inherited — **10** — is
+**12**, re-derived; see the paragraph above and the log's §F3c. **Four edits, not
+two:** the count of corrections a page claims is itself a figure, and this one was
+understated.
 
 **What this pass narrows and does not close.** The three pre-window crawls are
 **served** — the CDX API answers `200` on the **2008–2009** and **2009–2010**

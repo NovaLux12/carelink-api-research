@@ -87,7 +87,7 @@ implemented in `derive.py --census`, not applied by eye.
 
 | control | shape | rows | what it proved |
 |---|---|---|---|
-| positive, per crawl | `url=google.com&matchType=domain&limit=5` on that exact crawl | 57 attempts over 44 crawls | **all 44 logical controls answered `200` on some attempt** (43 of 57 first-or-later attempts, 5 needing a retry) — so **every** `404` in F5 is a readable absence and **no crawl in the out-of-window set is unserved** |
+| positive, per crawl | `url=google.com&matchType=domain&limit=5` on that exact crawl | 57 attempts over 44 crawls | **43 of the 44** controls answered `200` on some attempt. **`CC-MAIN-2023-06`'s control did not** — seq 23 `502`, seq 24 `504`, seq 25 `504`, and no fourth attempt — but its **probe** answered `200` with 8 records at seq 26, so under F5's own rule (*no row of any kind answered `200`*) the crawl **is** served; it is a RECORD cell, and never an absence. The 43 answered controls cover the 43 other crawls, **including all four absence cells**, so **every** `404` in F5 still has a `200` control on its own crawl and **no crawl in the out-of-window set is unserved** |
 | certainly-absent, **oldest** crawl | `url=zz-sl2-absent-20261017.minimed.eu&matchType=host` on `CC-MAIN-2008-2009` | seq 5 | **404**, 71 B — the absence oracle, established on the **2008** index |
 | certainly-absent, **newest** crawl | same sibling on `CC-MAIN-2026-39` | seq 114 | **404**, 71 B — the oracle re-established at the other end of the sweep |
 
@@ -167,7 +167,15 @@ out-of-window crawl. This pass read all 44, and **five carry a member**:
 | `CC-MAIN-2026-25` | **2026-06-10 02:55:55** | `carelink.minimed.eu` | `/ipro/hcp/index.jsp` | **404** | 106 |
 
 **All five are on one host, and the four new ones were never read by any pass in
-this repository before today** (`crawl-window-out.txt`, `prior_touch` column).
+this repository before today** — `git grep -c` over every committed
+`findings-log/*/results.jsonl` **excluding this pass** returns **0** rows for
+`CC-MAIN-2024-22`, `CC-MAIN-2024-26`, `CC-MAIN-2026-17` and `CC-MAIN-2026-25`, and **6** for
+`CC-MAIN-2022-27`, every one of them in
+`findings-log/2026-10-14-pool-l-ipro-hcp-census/results.jsonl`. **The `prior_touch` column of
+`crawl-window-out.txt` is NOT the source and is not derived:** it is a hand-maintained dict in
+`derive.py` (`PRIOR_TOUCHED`) that the writer copies out, so it was a typed annotation wearing a
+derived file's name — the defect area L's round-3 correction names. The command above is the
+evidence, and it is re-runnable from a clean clone.
 `/ipro/hcp/privacy.jsf` out of window is a path the area has seen only in-window
 (`CC-MAIN-2021-17`, 2021-04-20, `403`).
 
@@ -190,7 +198,8 @@ repo's own record already flags exactly this reading for the in-window `403`s
 `403`s mark the surface closing rather than a crawler meeting a gate"*).
 
 **The census product: `5 of 44` out-of-window crawls carry a member**, against
-`10 of the 84` in-window (`census-84.txt`, inherited, not re-derived here — see
+**12 of the 84** in-window — **re-derived here, not inherited**; see F3c for
+the arithmetic and the inherited figure it replaces — see
 "what this pass does not say"). The family's **observed span across the whole
 published corpus is 2014-03-10 → 2026-06-10** — twelve and a half years — where
 the corpus previously read 2014-03-10 → 2022-07-03.
@@ -223,12 +232,74 @@ bound does not.
 **What replaces it.** Not "the window is wrong", which would be its own
 unverified claim. The supported statement is narrower and is a **negative plus a
 span**: across every published index this repository has read, `/ipro/hcp/` is
-present in **at least 14 of 128** indexes — **10 of the 84** in-window
-(`census-84.txt`) and **5 of the 44** outside (F2) — with an observed span of
+present in **17 of the 128** indexes — **12 of the 84** in-window (F3c) and
+**5 of the 44** outside (F2) — with an observed span of
 **2014-03-10 → 2026-06-10**, and **no member anywhere else**. **The family is not
 a 2014-and-2020 artifact, and it is not a 2022 artifact either**: it was being
 fetched, and answered `404`, four years after the date this repository had
 recorded as its end.
+
+### F3c — the in-window member count is **re-derived here**, and the inherited
+### figure was wrong by two
+
+**The claim under correction.** This log's first version of F3 rested `10 of the
+84` on `census-84.txt:168` and labelled it *"inherited, not re-derived"*. That
+was a false economy in a pass whose own headline finding is a **live defect in an
+inherited artefact**: declaring a number inherited is not the same as checking it,
+and the inherited number was wrong.
+
+**What the inherited artefact says, and the contradiction inside it.**
+`census-84.txt:161` declares *"every tally below is IN-WINDOW crawls only"*, and
+`census-84.txt:168` then prints **`crawls carrying >=1 /ipro/hcp/* member  11`**
+with a list that **includes `CC-MAIN-2022-27`**, which `:104` of the same file
+marks `in_window=no`. So the tally is out-of-window where its header says
+in-window, and the `11` was never an in-window figure. **This is the defect
+`docs/11`'s successor **S-L4a** already names** — it is not a new discovery here,
+which is exactly why it was left un-reconciled.
+
+**What re-deriving gives.** The area's own committed reader resolves all three
+row schemas, including the eight `older-schema` crawls its predecessor could not
+parse. Run over its stated 8-ledger population (it enumerates
+`git ls-files 'findings-log/**/results.jsonl'` and then selects the area-L ledgers;
+**this pass's own ledger is not in that population**, so the two figures do not
+overlap):
+
+```
+$ python3 findings-log/2026-10-15-area-l4-ledger-reader/read-area-l.py census
+    crawls carrying >=1 member (any) census-84.txt 11  re-derived 13
+    ...of which IN window                census-84.txt 10  re-derived 12
+  total in-window members, census-84.txt: 35
+  total in-window members, re-derived    : 39
+    CC-MAIN-2014-10  census-84.txt=0  re-derived=1  from ...2026-10-13-area-l-7crawl-reissue/results.jsonl seq 22
+    CC-MAIN-2020-24  census-84.txt=0  re-derived=3  from ...2026-10-13-area-l-ipro-hcp/results.jsonl seq 38
+```
+
+**Both values stand and both are published.** The difference is entirely the
+**eight `older-schema` crawls**, two of which carry members their own reader
+could not see:
+
+| crawl | `census-84.txt` | re-derived | members | source row |
+|---|---|---|---|---|
+| `CC-MAIN-2014-10` | `older-schema` / 0 | RECORD | **1** | `2026-10-13-area-l-7crawl-reissue` seq 22 |
+| `CC-MAIN-2020-24` | `older-schema` / 0 | RECORD | **3** | `2026-10-13-area-l-ipro-hcp` seq 38 |
+| the other six | `older-schema` | 1 ABSENCE + 5 RECORD | 0 | — |
+
+**So the corrected figures are: 12 of the 84 in-window crawls carry a member, 39
+in-window member records (not 10 and 35), and 17 of the 128 published indexes
+whole-corpus once this pass's 5 out-of-window crawls are added.** `CC-MAIN-2014-10`
+is the 2014-03-10 capture the family's earliest member already rested on, so the
+span F3 quotes is unchanged — it was always right; only the *count* of crawls was
+understated by two.
+
+**Not claimed, and the limit that stays.** The reader prints, in its own words,
+that **every member count it emits is a lower bound**, that the
+`ipro_hcp_urls` schema carries no timestamp or status so the reader *"refuses to
+invent"*, and that an empty member list on a `200` row is read as a zero on an
+**internal-consistency argument inside one pass's ledger**, not a demonstration.
+**12 is therefore a floor too**, and this log publishes it as one. The reader also
+resolves `CC-MAIN-2013-48` to **ABSENCE**, which moves the verdict tally that
+this pass does **not** recompute — left for whoever owns it, and named here so it
+is not mistaken for agreement.
 
 **A second, quieter refutation, on the area's own terms.** The archive's row is
 for `ipro/hcp/*.jsf`. The **only** member the area ever recorded as a `200` is a
@@ -354,7 +425,9 @@ evidence** — zero requests:
 `findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md:374-381`.
 
 **The correct figure is two out-of-window crawls read by area L, one of them
-carrying a member.** `crawl-window.txt` in area L's own log directory already
+carrying a member.** `crawl-window.txt` — at
+`findings-log/2026-10-14-pool-l-ipro-hcp-census/crawl-window.txt`, in area L's
+own log directory — already
 carried the right tag — `CC-MAIN-2022-21 … no  prior-L-pass` — so the correct
 number was on disk while the prose said one. That is the failure `docs/09` §4
 records as *derived prose contradicting its own source table*, one level up: the
@@ -534,12 +607,15 @@ area's records.
   outside the tree by `AGENTS.md` §7.
 - **It does not say "absent from Common Crawl."** It says absent from **every
   crawl this pass could read**, and on the out-of-window side that is now all 44.
-- **It does not re-derive the in-window census.** The `10 of 84` in F3 is
-  inherited from `census-84.txt`, whose own reader states that **every member
-  count it prints is a floor** and that `CC-MAIN-2014-23` remains indeterminate.
-  This pass read **zero** in-window crawls, so `absent from 65 of the 84` and
-  `10 of 44` are two separate statements about two separate populations and are
-  not added together.
+- **It does not re-derive the in-window *verdict* census, but it does re-derive
+  the in-window *member* count.** The `65 RECORD · 10 ABSENCE · 1 INDETERMINATE ·
+  0 FAILURE · 8 older-schema` tally in `census-84.txt:161-167`, and the `65 of the
+  84` that `docs/11` and `docs/10` both publish from it, are **not** recomputed
+  here and **not** published by this pass: they are a verdict tally over 84
+  in-window crawls, and this pass read **zero** in-window crawls. The **member**
+  figure is different and is recomputed in **F3c**, because it is a count over the
+  area-L ledgers rather than a verdict over crawls. **`CC-MAIN-2014-23` remains
+  indeterminate** and no pass here changes that.
 - **It makes no claim about `data.commoncrawl.org`**, the `cluster.idx` bulk path,
   or whether `CC-MAIN-2014-23` is served. Out of scope, unbuilt, and **S-L1 stays
   open** — this pass narrows its question and does not close it.
@@ -595,7 +671,7 @@ and `findings-log/` is append-only.
 | failures 24 of 114 (21.1%); 502 ×12, 504 ×9, 400 ×3; 23 rows are retries | OBSERVED | `results.jsonl`, all rows |
 | `spacing.txt` — `t_sent` floor 3.339 s (1 gap under 3.5 s); mtime floor 3.992 s (0 under) | OBSERVED | `spacing.py` → `spacing.txt` |
 | budget: 114 rows / 44 crawls = **2.5909** measured, **2.5097** derived, p = 0.2105 | OBSERVED | `budget.py --population s-l2-out` |
-| `10 of the 84` in-window crawls carry a member | PUBLISHED (this repo) | `census-84.txt` — inherited, not re-derived |
+| **12** of the 84 in-window crawls carry a member; **17** of 128 whole-corpus; 39 in-window member records | OBSERVED, re-derived here | `read-area-l.py census` over the 8 area-L ledgers — against `census-84.txt:168`'s `11` and `:168`'s `35`. F3c |
 | area L read **two** out-of-window crawls, not one | OBSERVED | `2026-10-13-area-l-ipro-hcp` seqs 24/26; `2026-10-14-pool-l-ipro-hcp-census` seq 39 |
 | the window = `ARCHIVE-URLS` §3's first/last archived dates for `ipro/hcp/*.jsf` | PUBLISHED (this repo) | `findings-log/probe-2026-10-08/recon/ARCHIVE-URLS.md` §3 |
 | `CC-MAIN-2022-27` / `-2022-21` / `-2024-42` reproduce prior readings | OBSERVED, **independent count 1** | this pass's seqs 14, 12, 56 vs the cited ledgers |
@@ -613,6 +689,7 @@ python3 derive.py                    # the window decision, three variants (need
 python3 derive.py --census           # every table in F5, F7 and F10a, from results.jsonl alone
 python3 budget.py --population s-l2-out   # F9's row, plus the two predecessor populations
 python3 spacing.py                   # F8's series, clock A; clock B prints a notice when bodies are absent
+python3 ../2026-10-15-area-l4-ledger-reader/read-area-l.py census   # F3c's re-derivation
 wc -l results.jsonl                  # 114 — must equal the "114 of a 170 cap" line above
 ```
 
@@ -639,4 +716,136 @@ and its close condition was *"either that justification is re-examined, or those
 44 crawls are read too."* **Both are now satisfied**, and the re-examination has
 a verdict (F3): the justification **does not survive**. What S-L2 becomes is the
 statement of the measured span, plus the one question the census raised and
-cannot answer — which is minted as area **AA**.
+cannot answer — which is minted as area **`AC`**, not `AA`: `AA` and `AB` were
+taken by two parallel lanes of the same run, so `AC` was the next free id at this
+branch's base.
+
+## Correction (2026-10-17) — verification round 1: six items, **one of which this pass introduced**, and one inherited figure that was two wrong
+
+Round 1 returned **NOT CLEAN** on `f151e7c`. **The spine was confirmed and not
+re-argued:** the per-crawl classification re-derived from the committed ledger by
+a classifier written independently of this pass's `derive.py` (44 crawls, RECORD 40
+· readable ABSENCE 4 · 0 indeterminate · 0 unservable, no failure read as an
+absence, no RECORD cell resting on a non-`200` probe); the four absence bodies
+byte-identical at 48 B with no `{pages: 0}` shape in play; the `ARCHIVE-URLS` §3
+quote and the `.jsp`-vs-`.jsf` INFERRED label; the `t_sent` semantics and the
+**structural** delay conclusion; the reproduction of the `budget.py:crawl_of()`
+defect; the accounting in both directions; the truncation detector; §2.1. **Zero
+vendor requests.** What did not hold was bookkeeping, and **five of the six items
+were false premises or mis-pointed citations under conclusions that survive**.
+Every fix below was executed, not asserted, and the command that produced each
+number is named.
+
+**The body above is not edited** — `findings-log/` is append-only. **The
+correction section immediately above this one still reads "two live on `docs/`",
+and that is now wrong: three sites carry the "exactly one" figure, not two, and a
+fourth edit changed a number.** It is superseded, not fixed.
+
+**C1 — the controls table contradicted this log's own ledger (`FINDINGS.md:90`).**
+The row read *"all 44 logical controls answered `200` on some attempt (43 of 57
+first-or-later attempts, 5 needing a retry)"* and used it to support *"every `404`
+in F5 is a readable absence"* and *"no crawl … is unserved"*. **`CC-MAIN-2023-06`'s
+control never answered `200`**, and the "5 needing a retry" was wrong by 8.
+Re-derived:
+
+```
+$ python3 -  # over results.jsonl, group by crawl
+crawls whose CONTROL answered 200 at some attempt: 43 of 44
+    CC-MAIN-2023-06 [(23, '502'), (24, '504'), (25, '504')]
+CONTROL rows: 57 | returned 200: 43 | retry rows (attempt>0): 13 across 11 crawls
+PROBE   rows: 54 | returned 200: 40 | 404: 4 | retry rows (attempt>0): 10 across 10 crawls
+```
+
+**Both conclusions survive on other rows, and the row now says so**: the four
+absence cells each have a `200` control on their own crawl (all four are among the
+43), and `CC-MAIN-2023-06` is served under F5's own rule — its **probe** answered
+`200` with 8 records at seq 26 — so it is a RECORD cell and never an absence. **This
+was a false premise under true conclusions, in hand-written prose that neither
+`derive.py` nor the gate can read**: `grep -n 'logical control\|44 logical\|57
+attempts' derive.py` returns nothing. **The lesson is the repo's, not new: a
+counting rule implemented in code is only enforced where the code is, and a
+narrative sentence over the same ledger can drift from it silently.**
+
+**C2 — a citation pointed at a hand-typed column (`FINDINGS.md:169-170`).** The
+"never read before today" claim cited `crawl-window-out.txt`'s `prior_touch`
+column. **The column is populated — for 6 rows**, and empty for the four new
+member crawls *because* they were never touched, which is the column doing its
+job. The real defect is one level down and it is the area's own: **`PRIOR_TOUCHED`
+is a hand-maintained dict in `derive.py` that the writer copies out**, so the
+column was a typed annotation wearing a derived file's name. The claim is true and
+now rests on a re-runnable command over the committed ledgers:
+
+```
+$ git grep -c 'CC-MAIN-2024-22' -- 'findings-log/*/results.jsonl' ':!findings-log/2026-10-17-sl2-outwindow-census/*'
+CC-MAIN-2024-22 : 0      (same for -2024-26, -2026-17, -2026-25)
+CC-MAIN-2022-27 : 6      all in 2026-10-14-pool-l-ipro-hcp-census/results.jsonl
+```
+
+**C3 — an inherited figure, declared inherited instead of checked, was two wrong
+(`FINDINGS.md:193`, `:226`, `:598`).** This log rested `10 of the 84` on
+`census-84.txt:168` and labelled it *"inherited, not re-derived"*. `census-84.txt:161`
+declares its tallies IN-WINDOW-only while `:168`'s list includes `CC-MAIN-2022-27`,
+which `:104` marks `in_window=no` — **the defect `docs/11`'s S-L4a already names**,
+and this pass's own headline finding is a live defect in an inherited artefact, so
+declaring a number inherited was not a safe economy. Re-derived with the area's own
+committed reader, over its stated 8-ledger population (which **does not** include
+this pass's ledger, so the two figures cannot overlap):
+
+```
+$ python3 findings-log/2026-10-15-area-l4-ledger-reader/read-area-l.py census
+    crawls carrying >=1 member (any) census-84.txt 11  re-derived 13
+    ...of which IN window                census-84.txt 10  re-derived 12
+  total in-window members, census-84.txt: 35
+  total in-window members, re-derived    : 39
+```
+
+The whole difference is two of the eight `older-schema` crawls their own reader
+could not parse: **`CC-MAIN-2014-10` 0 → 1** and **`CC-MAIN-2020-24` 0 → 3**.
+**Corrected in F3 (new section), in this log's evidence map, and on `docs/11`: the
+in-window figure is 12, the in-window member records 39, and the whole-corpus
+figure 17.** **Both values stand and `12` is a floor** — the reader says so in its
+own output. **The span F3 quotes is unchanged**: `CC-MAIN-2014-10` is the
+2014-03-10 capture the earliest member already rested on, so only the *count* of
+member-bearing crawls moved. **The in-window *verdict* tally is a different
+population and is not recomputed here** — named in "what this pass does not say"
+so it is not mistaken for agreement.
+
+**C4 — the successor was named with the wrong id (`FINDINGS.md:642`).** This log
+said the successor is minted as **`AA`**. It is minted as **`AC`**; `AA` and `AB`
+were taken by two parallel lanes of the same run. `research-checks.py`'s
+priorities-sync check only catches *"area X closed"* declarations, so **the gate
+could not see this**, and the append-only record was carrying a wrong id.
+
+**C5 — correction 1 of the body above reached two sites of three.** The identical
+sentence is live in **`docs/10-open-questions.md` §1**, which this pass never
+touched, so a reader of `docs/10` still received the wrong count uncorrected and
+unlabelled. Corrected in place with a dated notice. **The correction list in the
+S-L2 block now names four edits, not two** — the count of corrections a page claims
+is itself a figure, and it was understated.
+
+**C6 — this pass introduced a markdown defect in `docs/11` and fixed it.** The
+first version of this pass's S-L2 edit opened its superseded paragraph with a
+`## What is left (as S-L2 read it before 2026-10-17): …` line. **A heading cannot
+carry a paragraph**, so the next six lines of S-L2's own prose rendered *inside* a
+giant heading and lost their lead-in — the section a reader sees no longer said
+"**0 of the 84 in-window crawls are unread** … 188 requests against a predicted
+211". **Found by rendering the block and reading it, not by reading the diff.**
+Now a bold lead-in with an in-place supersession marker, which is this page's own
+convention. **Stated here because a defect this pass introduced is still a defect
+this pass introduced, and the log is where the next reader looks for it.**
+
+**Two non-blocking items, taken because each is one line and both were true
+statements about numbers.** The body read *"at least **14** of 128"* while
+decomposing it as *10 + 5* — which is **15**; with C3 it is **12 + 5 = 17**. And
+`crawl-window.txt` was attributed to area L's log directory without a path; it is
+at `findings-log/2026-10-14-pool-l-ipro-hcp-census/crawl-window.txt`.
+
+**Not changed, and why.** The **`65 RECORD · 10 ABSENCE · 1 INDETERMINATE` verdict
+tally** on `docs/10` §1 and `docs/11` is **known to be stale** — the reader resolves
+its eight `older-schema` crawls to 1 ABSENCE and 7 RECORD — and it is **left
+standing and named rather than recomputed**, because it is a verdict tally over 84
+in-window crawls and this pass read **zero** of them. Recomputing it here would be
+publishing a number this pass has no population for. It is flagged in place on
+`docs/10` and in "what this pass does not say" so the next reader inherits the
+warning with the figure.
+
