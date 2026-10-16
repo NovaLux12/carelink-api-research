@@ -2560,7 +2560,7 @@ recipe first read **`grep -n '…' docs/` without `-r`**, which GNU grep rejects
 published a pointer that **did not execute**. **The `-r` is load-bearing; the
 recipe is quoted with it, and it is re-run verbatim before this page ships.** A
 citation that cannot be executed is worse than a wrong line number, because the
-wrong number at least fails visibly. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13 **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+wrong number at least fails visibly. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
 vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
 evidence is two sentences below and it governs every number printed here; it is
 stated here rather than only there because a limit separated from its figure by

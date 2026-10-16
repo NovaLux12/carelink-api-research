@@ -1044,9 +1044,11 @@ three rounds; claim holds, pointers and prose do not` (#139) filed **2026-10-15
 head, self-labelled rounds 3 through 9** — `24b9601` (round 3), `227a95c` (4),
 `bfc8f55` (5), `741cca1` (6), `228519f` (7), `d88a879` (8), `f83137d` (9) — before
 that merge. **The count is stated by the command, not by hand:**
-`git log --oneline aa401b7^1..aa401b7` lists them, and rounds 4–7 are the ones that
-carry a §8a-* correction section (rounds 8–9 changed the live sections and added
-none, which is why the series still ends at §8a-7). **So #139 is not an open list
+`git log --oneline aa401b7^1..aa401b7` lists them, and **rounds 3, 4, 6 and 7** are the
+commits that added a `## 8a-*` correction section — **round 5 added none**, and round 6
+added both `§8a-5` and `§8a-6` — measured one commit at a time with
+`git show <sha> -- …/FINDINGS.md | grep '^+## 8a'` (rounds 8–9 added none either, which
+is why the series still ends at `§8a-7`). **So #139 is not an open list
 of eight unfixed defects at this head: seven of the eight were answered by §8a-3 and
 refined by rounds 4–9, and one was not.** Every row below was re-derived from the
 tree, not from the issue's wording, and each carries the command that produced it.
@@ -1181,9 +1183,13 @@ corrected: a statement that does not survive being run.**
 is not evidence of a negative.** Three of the four defects above — no `-r`, an escaped
 alternation, no file argument — all produce *no output*, and all three read as "none
 found" to anyone who does not look at the exit code. The discriminator is the exit
-code: **0** for a pattern that ran and matched nothing, **2** for a usage error. So
-each recipe published here carries its exit code, and each correction is applied to
-the body **and** recorded here — §8a-4 row 5's lesson, that *a correction recorded
+code, **measured on this host's `grep` (GNU grep 3.12): `1` for a pattern that ran and
+matched nothing, `2` for a usage error, `0` for a match** — so the separation is 1
+against 2. ⚠ **This sentence first read "**0** for a pattern that ran and matched
+nothing", which is the inversion of the discrimination it claims to supply**, and it
+also claimed that each recipe published here carries its exit code; none does, so the
+three codes are given here once instead. The correction is applied to the body **and**
+recorded here — §8a-4 row 5's lesson, that *a correction recorded
 and not applied to the body is a correction that changes nothing*.
 
 **Nothing measured moved, and nothing was re-probed.** This remains a 0-request
