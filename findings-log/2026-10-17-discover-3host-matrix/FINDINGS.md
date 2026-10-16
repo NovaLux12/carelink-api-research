@@ -313,10 +313,10 @@ conclusion is unchanged; the count is corrected.
 
 **Affected sites, verbatim:**
 
-| site | as written | corrected to |
+| site | as written | disposition |
 |---|---|---|
-| `FINDINGS.md` **line 220** (§5) | *"What is consistent with all **17** signed cells here is a function of **(document, host)**"* | **14** |
-| `FINDINGS.md` **line 287** (§7 evidence table) | *"derived offline; **17** signed cells"* | **14** |
+| `FINDINGS.md` **line 220** (§5) | *"What is consistent with all **17** signed cells here is a function of **(document, host)**"* | **superseded by this section; the log is left verbatim** (`AGENTS.md` §3) |
+| `FINDINGS.md` **line 287** (§7 evidence table) | *"derived offline; **17** signed cells"* | **superseded by this section; the log is left verbatim** (`AGENTS.md` §3) |
 | `docs/03` §1 (the same sentence, canonical) | *"consistent with all **17** signed cells in that pass"* | **14** — corrected in place, with the `17` and its provenance left visible beside it (`docs/` supersedes but does not erase, `AGENTS.md` §3) |
 
 **`17` is withdrawn and replaced by `14`.**
@@ -354,7 +354,7 @@ an `x-cum-signature` value. Of this pass's 51 cells:
 | 46 | `-trials` | `v10` | `200` | 20 345 | `94b739dda478…` | `17afd412…` |
 | 48 | `-trials` | `v13` | `200` | 20 256 | `f84886265667…` | `1303f30d…` |
 
-**How the `17` happened — reconstructed from the ledger, not guessed.**
+**How the `17` happened — the arithmetic is OBSERVED, the attribution is INFERRED.**
 Grouping `results.jsonl` by body digest gives **seven** groups:
 
 | body `sha256` | bytes | cells | status | signed? |
@@ -368,11 +368,18 @@ Grouping `results.jsonl` by body digest gives **seven** groups:
 | `2103b7e850c4…` | 18 105 | 1 | `200` | **yes** |
 
 **17 = 51 − 32 − 2** — every cell that was neither a no-route `403` nor an empty
-`204`. The error was therefore exactly one thing: **the three `401` cells were
-counted as signed, and they carry no `x-cum-signature` at all** (36 B,
-`{"message":"Authentication failure"}`, `x-cache: Error from cloudfront`).
-Dropping them gives 7 + 3 + 3 + 1 = **14**, which is the four **signed** groups
-above and agrees with the rule in the previous section.
+`204`. That arithmetic is OBSERVED and re-checkable from the table above.
+
+**INFERRED, not OBSERVED:** that the error was **exactly one thing** — the three
+`401` cells being counted as signed, when they carry no `x-cum-signature` at all
+(36 B, `{"message":"Authentication failure"}`, `x-cache: Error from cloudfront`).
+No committed artefact witnesses how the `17` was produced: `matrix.py` builds the
+verdict grid and never tallies signed cells, `spacing.py` does not touch the
+signature, and `cells.md` records signature *presence* only. **Assumption:** the
+original `17` was tallied over a digest- or status-class grouping rather than over
+headers read per cell. Dropping the three `401` cells gives 7 + 3 + 3 + 1 = **14**,
+which is the four **signed** groups above and agrees with the rule in the previous
+section.
 
 *(A first attempt at this paragraph reconstructed `17` as the five small groups
 and produced 15 and 18 — neither is 17, and both were wrong. The table above is
@@ -407,3 +414,53 @@ on `-trials`), so the defect was in the synthesis, not in the evidence. The
 canonical page is fixed: **all 16 base paths now have their own row**, and §3's
 counting rule is carried onto the page so "8 of 16" is re-derivable from `docs/`
 and not only from here (`AGENTS.md` §10).
+
+## Correction (2026-10-17) — verifier round 2: `v11` is **two** documents, not three, and the `17` attribution is INFERRED
+
+Two defects, both confined to wording this pass introduced. **No cell, digest,
+byte count, spacing figure or verdict changes**; all 51 cells were re-derived
+from the committed captures at **0 vendor requests**.
+
+**1. `v11` is two different documents across three hosts, not three.**
+`FINDINGS.md` **line 118** (§3's grid) reads *"uniform **status**, three different
+documents (`docs/03` §7)"*. It is **two**: `.eu` and `-trials` are byte-identical,
+and only `.com` differs.
+
+| cell | bytes | body `sha256` |
+|---|---|---|
+| `.eu` `v11` | 20 345 | `94b739dda4784c7b…` |
+| `-trials` `v11` | 20 345 | `94b739dda4784c7b…` |
+| `.com` `v11` | 18 105 | `2103b7e850c4ad9c…` |
+
+`cmp 02-clcloud.minimed.eu-v11.b 36-clcloud-trials.minimed.com-v11.b` exits **0**
+(byte-identical); the `.com` pair exits **1**. `docs/03` §7 — the authority §3's
+own row cites — already says this: it tabulates `-trials` as *"byte-identical to
+the `.eu` doc (same sha `94b739dda478`)"* and concludes that for `v11` it selects
+between **two** structurally different documents. So line 118 contradicted the
+authority it cites, **and its own row** — the same row lists `200` 20 345 B for
+both `.eu` and `-trials`.
+
+**Provenance, recorded because the shape is the point.** The phrase has been in
+**this log since the first commit** (`FINDINGS.md:118`). Verifier round 2's
+finding is that the fix round **propagated it onto the canonical page**, where it
+did not exist before — measured, not asserted:
+`git show a4d9b68:docs/03-discovery-and-versions.md | grep -c "three different
+documents"` → **0**, and the same against `origin/main` → **0**. That is
+`AGENTS.md` §6 item 5 verbatim: derived prose contradicting its own source table,
+then propagated into a second file. `docs/03` §8a now reads **two**, and names
+why. **This log is left verbatim** (`AGENTS.md` §3), so line 118 still reads
+"three" above; that line is the seed and this section is the retraction.
+
+**2. The `17` attribution is INFERRED and now says so.** The paragraph above
+stated as fact *"the error was therefore exactly one thing"*, and `docs/03` stated
+*"The error was counting the three `401` cells as signed"*. **No committed
+artefact witnesses how the `17` was produced** — `matrix.py` builds the verdict
+grid and never tallies signed cells, `spacing.py` never reads the signature, and
+`cells.md` records signature *presence* only — so it is a claim about a past
+computation, and it was stated as fact. Both sites now carry **`INFERRED, not
+OBSERVED`**, with the assumption named: *that the original `17` was tallied over a
+digest- or status-class grouping rather than over headers read per cell.* The set
+arithmetic beside it — `17 = 51 − 32 − 2`, and 7 + 3 + 3 + 1 = 14 — is **unchanged
+and stays OBSERVED**, as does the conclusion that `(document, host)` holds for all
+**14** signed cells. **What the previous round withdrew, `17` itself, is not
+reopened here.**

@@ -73,7 +73,7 @@ nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-
 > response whose captured headers carry an `x-cum-signature` value. Of the 51 cells,
 > **32** are the no-route `403` envelope, **3** are the `v12` `401` envelope
 > (36 B, one digest `d551247201fc…`) and **2** are the `v10` `204` empties —
-> **none of those five groups carries a signature** — leaving **14**, at `seq` **2,
+> **none of those three groups carries a signature** — leaving **14**, at `seq` **2,
 > 14, 19, 31, 36, 38, 39, 40, 41, 42, 44, 45, 46, 48**. All **14** are fresh origin
 > responses (`x-cache: Miss from cloudfront`, none an edge replay), which is what makes
 > the `/v11/`–`/v10/` pair a genuine origin result rather than a cache hit. The step
@@ -84,10 +84,15 @@ nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-
 > was checked and stands; only the population was wrong, and it is reconstructible from
 > the ledger rather than mysterious: grouping the 51 cells by body digest gives **seven**
 > groups — 32 no-route `403`, 7 trials-legacy `200`, 3 `v11` `200`, 3 `401`, 3 `v13` `200`,
-> 2 empty `204`, 1 `.com` `v11` `200` — and **`17 = 51 − 32 − 2`**, i.e. every cell that was
-> neither a no-route `403` nor an empty `204`. The error was counting the **three `401`
-> cells as signed**, and they carry no `x-cum-signature` at all. Dropping them leaves the
-> four signed groups: 7 + 3 + 3 + 1 = **14**. The `17` is **withdrawn**
+> 2 empty `204`, 1 `.com` `v11` `200` — and **`17 = 51 − 32 − 2`**, i.e. every cell that
+> was neither a no-route `403` nor an empty `204`. **INFERRED, not OBSERVED:** that the
+> error was counting the **three `401` cells as signed** — they carry no
+> `x-cum-signature` at all. No committed artefact witnesses how the `17` was produced
+> (`matrix.py` builds the verdict grid, not a signed-cell tally; `cells.md` records
+> signature *presence* only), so this is a claim about a past computation.
+> **Assumption:** the original `17` was tallied over a digest- or status-class grouping
+> rather than over headers read per cell. Dropping the three `401` cells leaves the four
+> signed groups: 7 + 3 + 3 + 1 = **14**. The `17` is **withdrawn**.
 > [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §Correction (2026-10-17)]
 > [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5].
 
@@ -521,7 +526,7 @@ All **16** base paths, one row each, so the tally can be counted off the page:
 | `v8` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
 | `v9` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
 | `v10` | **`204`, empty body** | **`204`, empty body** | **`200` 20 345 B `94b739dda478…`** | **split** |
-| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B | uniform **status**, three different documents (§7) |
+| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B | uniform **status**, **two** different documents — `.eu` and `-trials` are byte-identical (§7) |
 | `v12` | `401` | `401` | `401` | uniform |
 | `v13` | `200` 20 256 B `f8488626…` | same bytes | same bytes | uniform, byte-identical |
 | `v14` | no route | no route | no route | uniform |
