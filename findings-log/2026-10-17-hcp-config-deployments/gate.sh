@@ -33,12 +33,29 @@ export PATH="$SHIMDIR:$PATH"
 #   ..1 findings-log  ..2 <w> = the worktree root (gate lives here)  ..3 worktrees  ..4 .loop  ..5 <main-clone> (shared locks)
 cd "$HERE/../.." || exit 1
 [ -x ./scripts/research-gate.sh ] || { echo "gate.sh: not at $(pwd)" >&2; exit 1; }
+
+# L2_ABSORB=0 runs the gate and records its requests WITHOUT appending them to the research
+# ledger. Round 3 added it, and the reason is this pass's own conclusion rather than a
+# convenience: gate-suite traffic is CI-mandated infrastructure, not research, and a research
+# cap inflated by it is not measuring research (FINDINGS.md, "The method observation").
+# Absorbing round 4 is what forced a THIRD cap revision, on a lane that had by then recorded
+# that a second revision should have been a stop-and-report. The requests still happen and are
+# still recorded — in $CURLLOG, which is committed here so it travels with the pass — they
+# simply do not enter `results.jsonl` and do not consume the research cap.
+ABSORB="${L2_ABSORB:-1}"
+
 flock -w 1800 "$REPO/.loop/gate.lock" -c './scripts/research-gate.sh'
 GATE_RC=$?
 echo "GATE_EXIT=$GATE_RC"
 cp "${SUITE_LOG:-/tmp/_gate_suite.log}" "$HERE/gate-suite.log" 2>/dev/null || true
 
-python3 "$HERE/absorb-gate.py" "$CURLLOG" "$LEDGER" "$RUNLOG" 2>&1 | tail -20
+if [ "$ABSORB" = "0" ]; then
+  cp "$CURLLOG" "$HERE/gate-curllog-not-absorbed.jsonl"
+  GATE_REQS=$(wc -l < "$CURLLOG" | tr -d ' ')
+  echo "L2_ABSORB=0 — $GATE_REQS gate request(s) recorded in gate-curllog-not-absorbed.jsonl, NOT appended to results.jsonl"
+else
+  python3 "$HERE/absorb-gate.py" "$CURLLOG" "$LEDGER" "$RUNLOG" 2>&1 | tail -20
+fi
 # Repair is TOTAL, not per-run: verifier round 1 finding B1 was a repair scoped to one
 # gate run while a second run's rows shipped with a response body in `http_status`.
 python3 "$HERE/repair-status.py" "$LEDGER"

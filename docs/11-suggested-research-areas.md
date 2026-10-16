@@ -2866,13 +2866,27 @@ verdicts are, like the fifteen, a **single-deployment reading**. On the recorded
 POST-only (`application`, `productContext`, `user` → `405`) and 3 are token-gated
 (`appContext`, `access/config`, `whitelisted` → `401`).
 
-**Bounded: 44 requests.** 6 candidates × 3 hosts = 18, plus 4 controls × 3 hosts = 12, plus
-**empty-body `OPTIONS`** on the 3 POST-only routes × 3 hosts = 9 — `OPTIONS` rather than
-`POST`, on area J's established precedent that a GET-only sweep cannot see method
-sensitivity and an empty-body preflight can (`AGENTS.md` §11 permits the suite's existing
-POSTs and nothing more; `OPTIONS` is not a POST). Plus a corpus-control re-assertion of the
-two build digests = 2. Slack is deliberate: if the support build's route table turns out
-larger than 6 the claim is revised once, with the reason written into the log.
+**Bounded: 43 requests, and the arithmetic closes.** 6 candidates × 3 hosts = **18**;
+4 controls × 3 hosts = **12**; empty-body `OPTIONS` on the 3 POST-only routes × 3 hosts =
+**9**; corpus-control re-assertion of the build digests = **4**, one content-hashed asset
+fetch per host — the three clinic hosts on `main.fb5f8cb7eb60c4d5.js` and the support host
+on `main.759cddab23085086.js`, each asserted against its recorded sha256 **before** any key
+list taken from that build is used. **18 + 12 + 9 + 4 = 43**, and the cap is the itemisation,
+with no unstated slack. (`OPTIONS` rather than `POST`, on area J's established precedent that
+a GET-only sweep cannot see method sensitivity and an empty-body preflight can; `AGENTS.md`
+§11 permits the suite's existing POSTs and nothing more, and `OPTIONS` is not a POST.)
+
+> ⚠ **Corrected 2026-10-17, verifier round 2.** This row first read **"Bounded: 44
+> requests"** over an itemisation summing to **41**, and described the corpus control as
+> **"two build digests"**. Neither number closed against a count a stranger can check
+> (`AGENTS.md` §1, §6 item 7): 44 ≠ 18 + 12 + 9 + 2, and l2's own sweep used **four** build
+> captures (`b01`–`b04`, one per host), not two — see
+> `findings-log/2026-10-17-hcp-config-deployments/plan.md` §Corpus control, which prints all
+> four with their recorded digests. **Both defects are the same mistake**: the corpus control
+> was counted per *build* where it is performed per *host*, and `2` and `4` are the two ends
+> of that. The superseded wording is **preserved verbatim in this blockquote** rather than
+> edited away — the same principle `findings-log/` follows at `AGENTS.md` §3, and
+> `docs/` carries a dated correction block rather than a silent rewrite for the same reason.
 
 **What would close it:** every one of the 6 carries a verdict under `docs/07`'s oracle **on
 each deployment**, with `405`/`401` confirmed per deployment rather than inherited from

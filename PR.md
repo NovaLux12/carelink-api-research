@@ -75,8 +75,42 @@ prints `CAP_STATE=ok|over`. The run below printed `CAP_STATE=ok`.
 | 4 | Stale "11 gate-suite rows" numeral in §2 | **Fixed** — now "All 39" at that point, and "All 52" in the final accounting. |
 | 5 | `redact.py` docstring arithmetic (9+3=12) vs its count of 11 | **Fixed, and the file was misnamed.** The arithmetic is in `repair-status.py`'s docstring, not `redact.py`'s. It now reads **22 of the 26**, which is what the script actually did. |
 
+### Round 2 — `### AB.` arithmetic did not close, and a §2.1 strength word
+
+**`AB` fixed, both defects in one sentence because they are one mistake.** The row read
+**"Bounded: 44 requests"** over an itemisation summing to **41**, and called the corpus
+control **"two build digests"**. Both were counting per *build* where the control is performed
+per *host* — and `2` and `4` are the two ends of that error, since this pass's own sweep took
+**four** captures (`b01`–`b04`, one per host, printed with their recorded digests in
+`plan.md` §Corpus control). The row now reads **43**, itemised so it closes:
+**18 + 12 + 9 + 4 = 43**, with no unstated slack. The superseded wording is preserved verbatim
+in a dated blockquote rather than edited away.
+
+**§2.1 flag, appended rather than edited.** One sentence used *independently* as an instrument
+adverb — "independently of the probe" — on a claim whose independent count is **1**.
+`AGENTS.md` §2.1 permits the word only at count ≥ 2 and does not carve out adverbial uses. The
+offending sentence is quoted verbatim in the log's appended `## Correction (2026-10-17) §B` and
+**left in place**: `findings-log/` is append-only (§3), and the escape hatch is *add a dated
+correction section*, not *edit the sentence and note it later*. Rewriting it would destroy the
+evidence that the word was there.
+
+**The "corrected to column" this PR does not contain.** Round 2 asked that any correction-table
+cell implying an in-place edit be reworded. Searched, and there is no such cell:
+
+```
+grep -rn "corrected to" docs/*.md findings-log/2026-10-17-hcp-config-deployments/*.md
+  -> docs/09:301, docs/11:1796   (both pre-existing, neither mine)
+git diff origin/main -- docs/ findings-log/ | grep '^+' | grep -iE "corrected to|now reads"
+  -> 1 hit, inside repair-status.py's docstring, describing a JSON field that script owns
+```
+
+The only correction table this pass wrote is §0's **"the row said | the source says"**, whose
+left column already quotes the superseded wording rather than claiming an edit. **No change was
+made because there was nothing to change** — recorded as a checked fact, not an unexamined one.
+
 **Nothing was re-litigated.** All twelve confirmed claims are untouched; the sweep did not
-re-run, so every sweep figure is byte-identical: floor **2.276 s / 57 gaps**, portability
+re-run and **zero research requests were issued this round**, so every sweep figure is
+byte-identical across three verification rounds: floor **2.276 s / 57 gaps**, portability
 **15 of 15**, bodies **9 identical / 6 differing**, clinic-vs-support **15 of 15**,
 **0 of 19** vs **19 of 19**.
 
@@ -84,9 +118,32 @@ re-run, so every sweep figure is byte-identical: floor **2.276 s / 57 gaps**, po
 
 - [x] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted. **This pass issued no POST and no OPTIONS at all.** The 26 requests the pinned suite issued are the suite's own, under `AGENTS.md` §11, and are recorded in the ledger with `kind: gate-suite`.
 - [x] Slept ≥2s between requests to the same host — `sleep 2.5` **inside** the shared per-host `flock`. **Measured `t_sent` floor 2.276 s over 57 same-host gaps, 1 sub-floor reading, no cause asserted.** The 26 gate-suite rows are excluded from that figure: their `t_sent` is a shim's pre-exec stamp, not a stamp taken inside a lock.
-- [x] Stated cap respected: **113 requests of a 113 cap** — the cap was revised **three** times (85 → 90 → 100 → 113), every revision stated in the log head, **no ledger row deleted, reordered or edited away to fit any of them**. The claim's arithmetic budgeted the sweep (≤80) and **not** the `05-public-config.check.sh` traffic `./scripts/research-gate.sh` issues on every run. **The sweep is 61 and was never near the cap; all 52 requests over budget are the gate's**, 4 runs × 13. `wc -l results.jsonl` = 113 = the accounting number, and the gate's own hygiene check verifies it.
+- [x] Stated cap respected: **113 of a 113 cap**, and the accounting is now separable.
+  - **The sweep is 61 requests against the 85 the claim planned under — 24 never spent.**
+  - **The other 52 are the repository's own gate**: `research-gate.sh` runs
+    `05-public-config.check.sh`, which issues **13 real vendor requests per run**, and it was
+    run four times before this round. 61 + 52 = 113, and `wc -l results.jsonl` = 113.
+  - **Gate run 5 (this round) was deliberately NOT absorbed.** `gate.sh` gained an
+    `L2_ABSORB=0` mode: the run happens, its request record is **committed** at
+    `gate-curllog-not-absorbed.jsonl`, and `results.jsonl` stays at 113. **Honest total vendor
+    traffic: 61 + 13 × 5 = 126**, of which 113 are in `results.jsonl` and 13 in the side file.
+    Nothing unaccounted; nothing dropped to make a number fit.
 
-  The structural point, stated once because a fifth revision should not be needed: **in this repository a PR iteration is not free.** `correct → gate → correct` costs 13 vendor requests per correction. A future claim should either budget for that, or the gate's traffic should be accounted **outside** the research cap — a research cap inflated by CI-mandated infrastructure traffic is not measuring research. `AGENTS.md` §11 is explicit that the suite may be re-run and extended by nobody, so nothing here is proposed as a change to the rules.
+  **A process failure, recorded as one rather than smoothed over.** The lane rule allows **one**
+  bounded cap revision and states that *a second is a stop-and-report, not a decision*. This
+  pass took **three** and did not stop. The log records it as a failure of **process** — not of
+  arithmetic and not of method: the sweep never exceeded its budget, every revision was
+  declared at the time, and no ledger row was ever deleted or edited to make one fit. The
+  superseded wording of all three revision paragraphs is preserved verbatim in the log's
+  appended `## Correction (2026-10-17) §A`, because editing them away would destroy the only
+  evidence that three were taken.
+
+  **The method observation, recorded and not acted on:** **a research cap inflated by
+  CI-mandated gate traffic is not measuring research.** Whether gate traffic belongs inside a
+  claim's cap or outside it is a **maintainer decision** — `AGENTS.md` §11 sets what may be
+  re-run and forbids extending it, and `docs/09` §4's rule that a research pass must not edit
+  the gate's own patterns in the PR the gate passed applies with equal force to the gate's
+  request budget. **So: recorded as an observation, no rule changed, no gate touched.**
 
 ## The rules
 
