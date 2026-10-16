@@ -2793,8 +2793,8 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **0 open plus 26 closed**
-stand today; the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **1 open plus 26 closed**
+stand today (minted 2026-10-17 by lane l2: **AB**, the direct `/hcp/configuration/*` endpoints); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 
 - The area-counting patterns are widened to `^### [A-Z]{1,2}\.` wherever they live —
@@ -2812,6 +2812,12 @@ stand today; the next bounded successor that clears the step 7 quality bar is mi
 
 This restores what the paragraphs above lost: a bounded successor is a **claimable area** again,
 and [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 is the rule that says so.
+
+> **Letter allocation, 2026-10-17.** This area is **`AB`**, not `AA`. Lane l3 minted `AA`
+> in PR #148 (`research/discover-3host-matrix`, *the `android/<app-version>` axis*) on the same
+> day, and a two-letter id is only a namespace if it is allocated once. Both branches mint
+> exactly one area and both touch the same live count sentence below, so the merge queue
+> reconciles that one line; it does not need to reconcile the headings.
 
 #### Addendum (2026-10-14, from issue #102): dedicated-route envelopes on `.com` and `-trials` — byte-identical, language-independent
 
@@ -2836,6 +2842,53 @@ and [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 is the rule
 **Successor (per issue #102):** a pinned cell-digest artefact in any future
 per-key sweep (0 requests), so the "0 mismatches" line becomes re-hashable.
 **Assumptions (INFERRED):** none beyond the quoted addendum claims.
+
+### AB. The six direct `/hcp/configuration/*` endpoints — portable, or only on `carelinkhp`?
+
+**What:** the 6 route literals that sit **directly** under `hcp/configuration/` in both
+portal builds' route tables, read on the same three deployments lane l2 just swept for the
+15 `public/*` siblings: `access/config`, `appContext`, `application`, `productContext`,
+`user`, `whitelisted`.
+
+**Why this and not something else.** Lane l2's sweep
+([findings-log/2026-10-17-hcp-config-deployments/FINDINGS.md]) closed the `public/*` half on
+**15 of 15** and, in the same pass, published — at **zero request cost** — the fact that
+**both builds carry an identical 6-literal direct route table**, extracted offline from
+assets whose digests were asserted. The candidate list is therefore derived and checkable
+before a single request goes out, which is the bar the other candidates on this page do not
+clear. `plan.md` in that log prints all six.
+
+**Non-duplicate, and this is the part that matters.** `HCP-CONFIG-SCHEMA.md` §10 says those
+six "have been resolved to an existence verdict" — **on `carelinkhp.minimed.eu`, on
+2026-10-08**, and §10 is titled *Do not re-run*. So AA is **not** "do they exist". AA is the
+question that §10's own scope leaves open and that lane l2's result makes sharp: those six
+verdicts are, like the fifteen, a **single-deployment reading**. On the recorded host 3 are
+POST-only (`application`, `productContext`, `user` → `405`) and 3 are token-gated
+(`appContext`, `access/config`, `whitelisted` → `401`).
+
+**Bounded: 44 requests.** 6 candidates × 3 hosts = 18, plus 4 controls × 3 hosts = 12, plus
+**empty-body `OPTIONS`** on the 3 POST-only routes × 3 hosts = 9 — `OPTIONS` rather than
+`POST`, on area J's established precedent that a GET-only sweep cannot see method
+sensitivity and an empty-body preflight can (`AGENTS.md` §11 permits the suite's existing
+POSTs and nothing more; `OPTIONS` is not a POST). Plus a corpus-control re-assertion of the
+two build digests = 2. Slack is deliberate: if the support build's route table turns out
+larger than 6 the claim is revised once, with the reason written into the log.
+
+**What would close it:** every one of the 6 carries a verdict under `docs/07`'s oracle **on
+each deployment**, with `405`/`401` confirmed per deployment rather than inherited from
+`carelinkhp`; the `401` body digest is compared across hosts (the recorded body is
+`{"error":{"type":"InvalidToken","group":"AUTH"}}`, 48 B — if a deployment answers `401` with
+a *different* body that is a finding, and if it answers `200` that is a much larger one);
+and the `OPTIONS` cells establish `allow-methods` per deployment, which nothing on this page
+records for this family. **A negative counts** — "the six verdicts are deployment-portable"
+closes it as firmly as a positive.
+
+**Assumptions (INFERRED), stated so a pass can falsify them:** that the edge rejects a
+header-less request to the direct subtree the way it rejects one under `public/` (untested —
+the `412` behaviour was measured only under `public/`, and the header gate may not cover the
+direct subtree at all); and that `405` on the recorded host reflects the route rather than a
+method filter that differs per deployment. **Controls first per host** settles the first: a
+header-absent cell on a direct route is a control here, not a candidate.
 
 ## Closed areas
 
