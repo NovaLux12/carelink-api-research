@@ -60,6 +60,17 @@ and it **differs between `.eu` and `.com` even though the documents are byte-ide
 so the signing key or binding is host/region specific. `git grep x-cum-signature` finds
 nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-09.md].
 
+> **⚠ The signature is not per-document, and the within-host control that settles it
+> was missing until 2026-10-17.** `VERSION-AXIS §1` infers from 6 documents on 6 hosts
+> that this is "a per-document integrity signature". One byte-identical document served
+> at **three** hosts carries **three** distinct signature values, so *document* alone does
+> not determine it. The converse is now settled too: on `-trials`, the same document
+> requested under **two different base paths** (`/v10/discover/android/3.6` and `/v11/…`)
+> carries **one** signature, which rules out *per-request*. A function of
+> **(document, host)** is consistent with all 17 signed cells in that pass; the step from
+> those two controls to "it is exactly that" is INFERRED, on the assumption that no third
+> variable moves with it [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5].
+
 `certificates[]` is always exactly **8 entries** and **identical between the v13 and v11
 documents**, so it is **not a tenant discriminator** — only a cert-rotation tripwire
 [source: work/METHOD-FACTS.md; VERSION-AXIS §4].
@@ -455,6 +466,58 @@ the **GET method is not defined**, it is POST-only, matching `work/METHOD-FACTS.
 > outright instead of implied by the word.
 > [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
 > row 9].
+
+### 8a. ⚠ The `-trials`-only cell is **not** `v6`-specific — seven base paths return one identical document
+
+The paragraph above is **true of `v6`** and still is: `/v6/discover/android/3.6`
+is `200` on `clcloud-trials.minimed.com` and no-route on both patient hosts. What
+it does not survive is the implicature that **`v6` is what makes the cell
+trials-only**. Swept across all three hosts — `GET /connect/carepartner/<ver>/discover/android/3.6`,
+16 versions × 3 hosts, controls first per host — **8 of the 16 base paths split**
+(OBSERVED, [source: findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]):
+
+| base path | `.eu` | `.com` | `-trials` |
+|---|---|---|---|
+| `v1`, `v7`, `v14`–`v16` | no route | no route | no route |
+| **`v2`–`v5`, `v8`, `v9`** | no route | no route | **`200` — 10 053 B, `sha256 1aab9bb1e721…`** |
+| **`v10`** | **`204`, empty body** | **`204`, empty body** | **`200` — the 20 345 B `v11` document** |
+| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B |
+| `v12` | `401` | `401` | `401` |
+| `v13` | `200`, **byte-identical on all three** | | |
+
+**So `v6` is one of seven base paths — `v2`, `v3`, `v4`, `v5`, `v6`, `v8`, `v9` —
+whose `-trials` response is the *same 10 053 B body*, byte for byte (`cmp`,
+7 of 7).** That body echoes `"config":"android,3.6"` and **nothing else** about
+the request: no byte of it varies with the base path. The trials-only cell is a
+property of **that one document on that one deployment**, not of `v6`.
+
+**And the `-trials` column is not a catch-all**, which is what makes this a
+finding rather than an artefact: on the same host, in the same run, `v1`, `v7`,
+`v14`–`v16` **and the `v99` absent control** all answer `403
+MissingAuthenticationTokenException` at the corpus 42 B digest. The trials
+gateway **does** key on the base-path segment. *Whether each matched base path
+has its own route registration, or one rule covers seven, is not established* —
+that needs the `OPTIONS` axis, which this pass did not run
+([findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5]).
+
+**Two smaller new facts, both OBSERVED in that pass.**
+
+- **`v10` is a second split, and a status split the matrix could not see** (it had
+  probed `v10` on `.eu` only): `.eu` and `.com` answer `204` with an **empty
+  body** and no `x-cum-signature`; `-trials` answers `200` with the **20 345 B
+  `v11` document**, at the same digest and the same signature as its own `/v11`
+  cell. **`docs/09` Oracle A's table does not separate `204` from `200`; this
+  pass found them on the same base path across hosts**, so the class is recorded
+  here rather than left merged.
+- **`v13` is byte-identical on all three hosts** (`f8488626…`, 20 256 B), which
+  reproduces `docs/03` §2's claim on all three cells rather than on one.
+
+**What is not claimed.** The *why* — what makes `-trials` serve a legacy
+document at these base paths — is **not closable from outside** and is not
+claimed. `VERSION-AXIS §4`'s filename reading (`sso_cp_us_v6.json`) stands as
+recorded, and this pass neither supports nor contradicts it: the body it
+measured under seven base paths carries that same filename, which is a fact
+about **one document** and not a mechanism.
 
 ## 9. PDE, `csr`, bare cumulus — refined, with a caveat
 
