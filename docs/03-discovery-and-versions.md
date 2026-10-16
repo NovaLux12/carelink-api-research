@@ -67,9 +67,29 @@ nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-
 > not determine it. The converse is now settled too: on `-trials`, the same document
 > requested under **two different base paths** (`/v10/discover/android/3.6` and `/v11/…`)
 > carries **one** signature, which rules out *per-request*. A function of
-> **(document, host)** is consistent with all 17 signed cells in that pass; the step from
-> those two controls to "it is exactly that" is INFERRED, on the assumption that no third
-> variable moves with it [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5].
+> **(document, host)** is consistent with **all 14** signed cells in that pass.
+>
+> **Counting rule, so "14" is re-derivable rather than typed:** a *signed cell* is a
+> response whose captured headers carry an `x-cum-signature` value. Of the 51 cells,
+> **32** are the no-route `403` envelope, **3** are the `v12` `401` envelope
+> (36 B, one digest `d551247201fc…`) and **2** are the `v10` `204` empties —
+> **none of those five groups carries a signature** — leaving **14**, at `seq` **2,
+> 14, 19, 31, 36, 38, 39, 40, 41, 42, 44, 45, 46, 48**. All **14** are fresh origin
+> responses (`x-cache: Miss from cloudfront`, none an edge replay), which is what makes
+> the `/v11/`–`/v10/` pair a genuine origin result rather than a cache hit. The step
+> from those two controls to "it is exactly `(document, host)`" is INFERRED, on the
+> assumption that no third variable moves with it.
+>
+> ⚠ **Corrected 2026-10-17 (verifier round 1): this figure read `17`.** The conclusion
+> was checked and stands; only the population was wrong, and it is reconstructible from
+> the ledger rather than mysterious: grouping the 51 cells by body digest gives **seven**
+> groups — 32 no-route `403`, 7 trials-legacy `200`, 3 `v11` `200`, 3 `401`, 3 `v13` `200`,
+> 2 empty `204`, 1 `.com` `v11` `200` — and **`17 = 51 − 32 − 2`**, i.e. every cell that was
+> neither a no-route `403` nor an empty `204`. The error was counting the **three `401`
+> cells as signed**, and they carry no `x-cum-signature` at all. Dropping them leaves the
+> four signed groups: 7 + 3 + 3 + 1 = **14**. The `17` is **withdrawn**
+> [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §Correction (2026-10-17)]
+> [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5].
 
 `certificates[]` is always exactly **8 entries** and **identical between the v13 and v11
 documents**, so it is **not a tenant discriminator** — only a cert-rotation tripwire
@@ -474,16 +494,42 @@ is `200` on `clcloud-trials.minimed.com` and no-route on both patient hosts. Wha
 it does not survive is the implicature that **`v6` is what makes the cell
 trials-only**. Swept across all three hosts — `GET /connect/carepartner/<ver>/discover/android/3.6`,
 16 versions × 3 hosts, controls first per host — **8 of the 16 base paths split**
-(OBSERVED, [source: findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]):
+(OBSERVED, [source: findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]).
 
-| base path | `.eu` | `.com` | `-trials` |
-|---|---|---|---|
-| `v1`, `v7`, `v14`–`v16` | no route | no route | no route |
-| **`v2`–`v5`, `v8`, `v9`** | no route | no route | **`200` — 10 053 B, `sha256 1aab9bb1e721…`** |
-| **`v10`** | **`204`, empty body** | **`204`, empty body** | **`200` — the 20 345 B `v11` document** |
-| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B |
-| `v12` | `401` | `401` | `401` |
-| `v13` | `200`, **byte-identical on all three** | | |
+**Counting rule, carried here so "8 of 16" is re-derivable from this page and not
+only from the log.** Classes are **no route** = `403`
+`MissingAuthenticationTokenException` at the corpus 42 B digest · **401** =
+`401 UnauthorizedException` · **200** = a served document · **204** = served,
+empty body. A **split** is a base path whose three cells fall into **two or more
+different** classes, counting **`204` as its own class** and not merging it into
+`200` — the grouping `docs/09` Oracle A uses is coarser than this axis needs (see
+the `v10` bullet below). All 48 cells carry a class: **0 ambiguous**, and status
+alone is never consulted — each verdict is status + `x-amzn-errortype` +
+content-type + body digest (`AGENTS.md` §7, §8).
+
+All **16** base paths, one row each, so the tally can be counted off the page:
+
+| base path | `.eu` | `.com` | `-trials` | verdict |
+|---|---|---|---|---|
+| `v1` | no route | no route | no route | uniform |
+| `v2` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v3` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v4` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v5` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| **`v6`** | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v7` | no route | no route | no route | uniform |
+| `v8` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v9` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v10` | **`204`, empty body** | **`204`, empty body** | **`200` 20 345 B `94b739dda478…`** | **split** |
+| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B | uniform **status**, three different documents (§7) |
+| `v12` | `401` | `401` | `401` | uniform |
+| `v13` | `200` 20 256 B `f8488626…` | same bytes | same bytes | uniform, byte-identical |
+| `v14` | no route | no route | no route | uniform |
+| `v15` | no route | no route | no route | uniform |
+| `v16` | no route | no route | no route | uniform |
+
+**8 split** (`v2`, `v3`, `v4`, `v5`, `v6`, `v8`, `v9`, `v10`) · **8 uniform**
+(`v1`, `v7`, `v11`, `v12`, `v13`, `v14`, `v15`, `v16`).
 
 **So `v6` is one of seven base paths — `v2`, `v3`, `v4`, `v5`, `v6`, `v8`, `v9` —
 whose `-trials` response is the *same 10 053 B body*, byte for byte (`cmp`,

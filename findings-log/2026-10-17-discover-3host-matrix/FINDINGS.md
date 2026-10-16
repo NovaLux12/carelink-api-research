@@ -304,3 +304,106 @@ run.log             # send order with t_queued/t_sent/t_done
 `LOCKDIR=` overrides where the shared per-host locks are found; the script
 locates them itself otherwise. Every claim above is a direct read of
 `results.jsonl`, `headers/` or `run.log`.
+
+## Correction (2026-10-17) — verifier round 1: the signed-cell population is **14**, not 17
+
+**One figure in this log is withdrawn, and it is the population figure inside the
+sentence whose whole credibility is "I checked every signed cell".** The
+conclusion is unchanged; the count is corrected.
+
+**Affected sites, verbatim:**
+
+| site | as written | corrected to |
+|---|---|---|
+| `FINDINGS.md` **line 220** (§5) | *"What is consistent with all **17** signed cells here is a function of **(document, host)**"* | **14** |
+| `FINDINGS.md` **line 287** (§7 evidence table) | *"derived offline; **17** signed cells"* | **14** |
+| `docs/03` §1 (the same sentence, canonical) | *"consistent with all **17** signed cells in that pass"* | **14** — corrected in place, with the `17` and its provenance left visible beside it (`docs/` supersedes but does not erase, `AGENTS.md` §3) |
+
+**`17` is withdrawn and replaced by `14`.**
+
+**Counting rule — what qualifies as a signed cell, so the number is re-derivable
+rather than typed.** A *signed cell* is a response whose captured headers carry
+an `x-cum-signature` value. Of this pass's 51 cells:
+
+| group | count | carries a signature? |
+|---|---|---|
+| no-route `403` envelope, 42 B, `f249b63cb2fc…` | 32 | no |
+| `v12` `401` envelope, 36 B, `d551247201fc…` | 3 | no |
+| `v10` `204`, empty body, on `.eu` and `.com` | 2 | no |
+| **signed cells** | **14** | **yes** |
+
+32 + 3 + 2 + **14** = **51**. ✔
+
+**The 14 signed cells, verbatim, by `seq`:** **2, 14, 19, 31, 36, 38, 39, 40,
+41, 42, 44, 45, 46, 48** —
+
+| seq | host | base path | status | bytes | body `sha256` | signature value |
+|---|---|---|---|---|---|---|
+| 2 | `.eu` | `v11` | `200` | 20 345 | `94b739dda478…` | `a275f08e…` |
+| 14 | `.eu` | `v13` | `200` | 20 256 | `f84886265667…` | `640e0f93…` |
+| 19 | `.com` | `v11` | `200` | 18 105 | `2103b7e850c4…` | `e185ef39…` |
+| 31 | `.com` | `v13` | `200` | 20 256 | `f84886265667…` | `5c14c13d…` |
+| 36 | `-trials` | `v11` | `200` | 20 345 | `94b739dda478…` | `17afd412…` |
+| 38 | `-trials` | `v2` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 39 | `-trials` | `v3` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 40 | `-trials` | `v4` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 41 | `-trials` | `v5` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 42 | `-trials` | `v6` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 44 | `-trials` | `v8` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 45 | `-trials` | `v9` | `200` | 10 053 | `1aab9bb1e721…` | `f96b2a51…` |
+| 46 | `-trials` | `v10` | `200` | 20 345 | `94b739dda478…` | `17afd412…` |
+| 48 | `-trials` | `v13` | `200` | 20 256 | `f84886265667…` | `1303f30d…` |
+
+**How the `17` happened — reconstructed from the ledger, not guessed.**
+Grouping `results.jsonl` by body digest gives **seven** groups:
+
+| body `sha256` | bytes | cells | status | signed? |
+|---|---|---|---|---|
+| `f249b63cb2fc…` | 42 | 32 | `403` no-route | no |
+| `1aab9bb1e721…` | 10 053 | 7 | `200` | **yes** |
+| `94b739dda478…` | 20 345 | 3 | `200` | **yes** |
+| `d551247201fc…` | 36 | 3 | `401` | **no** |
+| `f8488626…` | 20 256 | 3 | `200` | **yes** |
+| `e3b0c44298fc…` | 0 | 2 | `204` | no |
+| `2103b7e850c4…` | 18 105 | 1 | `200` | **yes** |
+
+**17 = 51 − 32 − 2** — every cell that was neither a no-route `403` nor an empty
+`204`. The error was therefore exactly one thing: **the three `401` cells were
+counted as signed, and they carry no `x-cum-signature` at all** (36 B,
+`{"message":"Authentication failure"}`, `x-cache: Error from cloudfront`).
+Dropping them gives 7 + 3 + 3 + 1 = **14**, which is the four **signed** groups
+above and agrees with the rule in the previous section.
+
+*(A first attempt at this paragraph reconstructed `17` as the five small groups
+and produced 15 and 18 — neither is 17, and both were wrong. The table above is
+the version that survives checking against `results.jsonl`; recording the failed
+arithmetic because it is the `AGENTS.md` §6 item 7 shape.)*
+
+**The conclusion was checked and stands.** `(document, host)` holds for all
+**14**: every one of the seven `(document, host)` groups above carries exactly
+**one** signature value. Both refutations are unaffected and do not depend on the
+population figure at all —
+
+- *per-document* is refuted by body `f8488626…` at three hosts carrying three
+  values (seq 14, 31, 48);
+- *per-request* is refuted by body `94b739dda478…` on `-trials` at two base paths
+  carrying one (seq 36, 46).
+
+**Evidence the verifier added, which strengthens the second refutation.** All
+**14** signed cells carry `x-cache: Miss from cloudfront` — every one is a fresh
+origin response, none an edge replay. That is what makes the `seq 36` / `seq 46`
+identity an **origin** result about the document rather than a cache hit that
+happened to match, which is the only way that control could have been a false
+refutation. The verifier spent **0 vendor requests** establishing it, from the
+committed `headers/*.h` alone; re-derived here independently and identical.
+
+**Second defect from the same round, recorded here because it was found by the
+same re-derivation.** `docs/03` §8a's grid **omitted `v6` entirely** — the
+section's own subject — listing the row label as `v2–v5, v8, v9`, six base paths
+where there are seven, so the page showed 15 of 16 and a reader could not see or
+re-check the three `v6` cells. **This log's §3 table always carried `v6`**
+(`seq` 8 no-route on `.eu`, 25 no-route on `.com`, 42 served-signed `1aab9bb1e721…`
+on `-trials`), so the defect was in the synthesis, not in the evidence. The
+canonical page is fixed: **all 16 base paths now have their own row**, and §3's
+counting rule is carried onto the page so "8 of 16" is re-derivable from `docs/`
+and not only from here (`AGENTS.md` §10).
