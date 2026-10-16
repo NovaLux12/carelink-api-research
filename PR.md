@@ -220,10 +220,25 @@ closed"**, `config.yml` `about: 1 open areas` — all four agree, and
 2. `.github/ISSUE_TEMPLATE/config.yml` lines 9–16 — the 4-line explanatory comment and
    `about: 0 open areas;` → `about: 1 open areas;`.
 
-**The merged result is 2 open + 26 closed**, with headings `### AA.` (#148) and `### AB.`
-(this PR). The headings do not clash; the count sentence must read **2**, not 1, and both
-branches will write `1`. **This PR's numbers are correct for this PR and have deliberately
-not been pre-adjusted to a merged tree that does not exist yet.**
+**This is no longer a forecast — #148 has merged (`98766df`).** `main` now carries `### AA.`
+and says "1 open plus 26 closed"; this branch carries `### AB.` and says the same. **The merged
+tree needs `2 open plus 26 closed` in all three places** — heading count, the live count
+sentence, and `config.yml` — and `check_prose_counts` will fail on a merged tree still reading
+`1`, which is that check working.
+
+**This pass does not resolve it.** A conflict in `docs/` is parked and reported for the merge
+queue, and a lane writing `2` into its own branch would be claiming a tree that does not exist.
+Reported in the log's appended `## Correction (2026-10-17) §E` with the exact three numbers.
+
+**CI could not run on this commit, and §E is why.** No `research-gate` check has been reported
+for this branch since `b8beadc`; the other three lanes ran normally throughout, so it is not an
+outage. Tested rather than assumed: an **empty commit with a fresh push** produced **no run**.
+`research-gate.yml` triggers on `pull_request`, which GitHub evaluates against the PR's **merge
+ref**, and a merge ref cannot be computed for a conflicting PR — so the workflow is never
+dispatched. **Local gate at this exact tree: `GATE PASS`, exit 0, `CAP_STATE=ok`, suite
+`85 passed, 0 failed`, leak scan 10/10, all citations resolve.** Same script CI runs; **not a
+substitute for the CI check**, which must run against the merged tree §E has to unblock.
+Recorded in `## Correction (2026-10-17) §F`.
 
 </details>
 
