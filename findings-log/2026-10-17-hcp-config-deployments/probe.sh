@@ -38,7 +38,25 @@ mkdir -p "$HDR" "$ASSETS" "$SCRATCH"
 export L2_ASSETS="$ASSETS"
 
 UA="carelink-bridge-research/1.0"
-CAP=85
+# THE SINGLE SOURCE OF THE CAP. One assignment, here. `cap_guard` below reads it, the
+# `keys` batch passes it to plan.py as "$CAP" (so plan.py enforces THIS number, not one
+# of its own), and absorb-gate.py parses THIS line rather than repeating the value — so
+# the script and the accounting line in FINDINGS.md cannot drift apart, which is exactly
+# what verifier round 1 finding B2 was: the log said 90 while this line still read 85.
+#
+# History: claim #144 set 85. Round 1 revised it to 90 because the pinned suite
+# research-gate.sh runs on every push (13 requests) was never in the claim's arithmetic
+# and the gate ran twice. Round 2 raised it to 100 for the same reason (run 3), and then
+# to 113 for a fourth and final run: run 3 happened before this round's corrections were
+# written, so a post-edit gate exit code requires one more run. Every revision is stated
+# in FINDINGS.md; none deleted a ledger row.
+#
+# THE STRUCTURAL POINT, once, because four revisions should not be needed a fifth time:
+# 13 of every request above this line is the repository's own gate, which AGENTS.md §11
+# sanctions and nobody may extend. A future claim should either budget for it, or the
+# gate's traffic should be accounted outside the research cap altogether — a research
+# cap inflated by a CI-mandated suite is not measuring research.
+CAP=113
 DELAY=2.5
 PROWEB="X-System-ID: ProWeb"
 PFX="/hcp/configuration/public"
