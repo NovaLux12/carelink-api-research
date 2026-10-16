@@ -1034,6 +1034,108 @@ no count, offset, cell or figure in this pass changes this round. The repairs ar
 whitespace, one relocated section and one citation reworded to an open-ended form; the
 refutation publishes an exit code.
 
+## Correction (2026-10-17) — correction issue #139's eight findings, re-derived at this head
+
+**This is a correction lane, not a probe: 0 of a 0 cap, no vendor host, no DNS, no
+`curl`, no `hurl`.** Issue `correction: PR #135 S-L4 — eight blocking findings after
+three rounds; claim holds, pointers and prose do not` (#139) filed **2026-10-15
+15:55Z** against branch head `23c4451`. **PR #135 merged at 21:47Z the same day**
+(merge commit `aa401b7`), and the branch carried **four further rounds** —
+`24b9601` (round 3), `227a95c` (4), `bfc8f55` (5), `741cca1` (6), `228519f` (7),
+`d88a879` (8), `f83137d` (9) — before that merge. **So #139 is not an open list of
+eight unfixed defects at this head: seven of the eight were answered by §8a-3 and
+refined by rounds 4–7, and one was not.** Every row below was re-derived from the
+tree, not from the issue's wording, and each carries the command that produced it.
+
+| # | as filed in #139 | disposition at this head | re-derived by |
+|---|---|---|---|
+| 1 | `FINDINGS.md:673` publishes `docs/11:2218` as Closed-table row **L** | **already fixed** — no position is published in this file in any spelling outside the Correction sections (§8a-3 row 1). `grep -nE 'docs/(10\|11)[^ ]*:[0-9]+' FINDINGS.md` returns **5** hits and all five are inside §8a-2/§8a-3/§8a-4, which quote withdrawn values as history (`AGENTS.md` §5). **But the class is still live in `docs/11` itself** — see the note under the table | `grep` + `sh dup-test.sh` (position check, fatal) |
+| 2 | the no-line-numbers policy is contradicted one line-number away in the file that states it | **already fixed, and now enforced rather than asserted** — the policy is fatal in `dup-test.sh`, which exits non-zero on a position in any spelling outside a Correction section (§8a-3 row 2, widened in round 5 to cover the colon form) | `sh dup-test.sh` |
+| 3 | "moved row `L` by **17 lines**" is neither measured figure | **already fixed** — the phrase survives in **two** places, both inside Correction sections (the §8a-3 row that withdrew it, and the §8a-4 row that applied the withdrawal to §8c's body). `grep -n '17 lines' FINDINGS.md` returns those two lines and no live one | `grep -n '17 lines'` |
+| 4 | "67 of 69 member-source rows carry no `limit=`" mixes two cells | **already fixed** — RULE 3 is stated and shipped in `kib-detector.py`, which prints three cells: **A** every row **81 / 9 carry / 72 none / 2 AT limit**, **B** one per crawl **74 / 6 / 68 / 1**, **C** in-window **72 / 5 / 67 / 1**. `69` is no cell's row count and `67` is cell C's "carrying none" — the withdrawn clause mixed a numerator from one cell with a denominator from another (§8a-3 row 4) | `python3 kib-detector.py` |
+| 5 | the reader prints "every other member-source row carries no `limit=`, so no limit truncated it" — a predicate it does not mean | **already fixed** — `python3 read-area-l.py census` now prints **four** numbers (`carrying a limit=` / `carrying no limit=` / **`AT their own limit`** / `carried a limit WITHOUT reaching it`) and says *"ONLY \"AT their own limit\" means a limit could have truncated the tail"*, with the count that bears on the figures given as *2 of 81* (§8a-3 row 5) | `python3 read-area-l.py census` |
+| 6 | `10.3%` published beside a rule that does not produce it ("truncated") | **already fixed** — §1 now states *"one decimal place, **ROUNDED half-up**, and the exact quotient is printed beside it: **39 ÷ 380 = 0.10263 → 10.3%**"*, and carries the retraction of the `10.2%` that truncation would give (§8a-3 row 6) | `sed -n '82,92p' FINDINGS.md` |
+| 7 | `account.py` is handed on broken and the successor that names it would run it | **FIXED HERE — the one finding still open at this head, and it is now closed by the branch this pass named.** `account.py` tolerates an absent `t_sent`: `parse()` returns `None` for a non-string instead of letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching a row that carries no timestamp and **prints how many it skipped**, and `inverted` uses `.get()`. The crash reproduced before the fix and does not after — see the reproduction below. **Also fixed, and found while verifying:** a **second** crash on the same handoff — a 0-row ledger raised `IndexError` at `rows[-1]['seq']`, so the newest committed CC ledger in the repo was one this tool could not open. It now prints that the ledger records a pass that sent nothing | `python3 account.py findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl` |
+| 8 | the `193` byte table cites `(§8b)`, which computes nothing, and the counting rule for "successful `200`" is unstated | **already fixed, and the finding's second half re-derives as WRONG at this head.** `kib-detector.py` **is** a committed artefact that performs the byte arithmetic: RULE 1 at its `body_bytes % 1024` test, RULE 2 as `status_of(row) == 200`, and it prints all three obvious rules (**0** / **183** / **193**). §8b exists, RULE 2 states the rule beside the number, and `docs/11`'s own floor table states it again. **What §7b still does not carry is the rule beside its own `193`** — it cites §8b instead — and this section is where that gap is recorded, because §7b is append-only (§8a-3 row 8) | `python3 kib-detector.py`, `grep -n '1024\|kib\|193' *.py *.sh` |
+
+**One live instance of finding 1's class survived all of that, in `docs/11`.**
+§8a-6 row 4 recorded that the log's copy of it was removed; the `docs/11` sentence
+it was describing was not touched, and it read *"lines 1736 and 1738 above list both
+crawls' members as `(prior)`"* — a position into the file its own PR edits, **wrong
+at this head**: those lines are two successor bullets, and the two rows are found by
+content with `grep -n 'CC-MAIN-2020-24.*(prior)' docs/11-suggested-research-areas.md`.
+Fixed in place in the S-L4 block, with the withdrawn numbers left visible. **This is
+the class finding 1 named, surviving its own fix on the other side of the file.**
+
+**The counting rule for §7b's `193`, stated here because §7b cannot be edited
+(AGENTS.md §3).** A row counts when the reader's own `status_of(row)` resolves it to
+the **int** 200 — every `http_status` in this population is a JSON string, and
+`pool-s7-l7crawl` writes the opaque form `"200 (curl)"`. The other two obvious rules
+give **0** (`raw == 200`, the int) and **183** (`raw == "200"`, exact string
+equality, missing the opaque rows). The gap is exactly the **10** `"200 (curl)"`
+rows. **So the `193` is `status_of(row) == 200` and only that rule produces it** —
+a reader applying the obvious one gets 183 and concludes the figure is wrong, which
+is why the rule sits next to the number in `docs/11` and in `kib-detector.py` RULE 2.
+
+**The crash, before and after — the reproduction for row 7, and the whole of it.**
+
+```
+$ python3 findings-log/2026-0{9,8}-14-lane-s6-public-index/account.py \
+      findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl          # BEFORE
+  File ".../account.py", line 109, in spacing
+    a, b = parse(sel[i]["t_sent"]), parse(sel[i + 1]["t_sent"])
+TypeError: strptime() argument 1 must be str, not None
+
+$ … the same command                                                       # AFTER
+    pairs skipped, no usable t_sent    4
+    min gap, harness t_sent            4.102 s
+  exit 0
+```
+
+**All eight area-L ledgers now open, which is the whole of what `docs/10` §1's
+successor asks for** (`for f in …; do python3 account.py "$f"; done`, exit 0 on
+each; the 0-row ledger included). **Skipping a row without a `t_sent` is the correct
+fix, not a loosening**: the spacing oracle needs only the rows that have one, and a
+gap measured *across* a row with no timestamp would be a guess. The floor is still a
+minimum over real gaps, and the number of skipped pairs is printed rather than
+absorbed — because a floor computed over a subset that says so is a claim, and one
+that does not is `AGENTS.md` §6 item 7.
+
+**Inert for the tool's own lane, and checked rather than asserted.** That ledger has
+**151** rows, **0** null and **0** absent `t_sent`. `python3 account.py` on it is
+byte-identical before and after except for three added lines, and both new counters
+read **0** — no gap, no sub-floor count, no inverted row and no detector figure moved.
+
+**One disclosure added while fixing it, because the next reader will hit it.** This
+tool's rule for *"successful 200 answers"* is `http_status == "200"` **exactly**, and
+an opaque `"200 (curl)"` is **not** counted by it. Run over
+`2026-10-14-pool-s7-l7crawl` it therefore reports **0** where RULE 2 reports **10** —
+the same ledger, two rules, and no way to tell which is right from the number alone.
+The count is deliberately **unchanged**: changing it would move a figure that lane has
+published, for a ledger it has never run over. What was added is the rule beside the
+number, the count of opaque-200 rows, and the name of the detector that resolves
+them. **Stating the rule was the fix; changing the count would have been a new
+claim.**
+
+**`dup-test.sh` changed too, and it is a check, so it is recorded here.** Its
+`CORR_RE` — the single pattern that decides what counts as a Correction section —
+recognised only this pass's `## 8a-N. Correction (…)` headings. `scripts/research-checks.py`,
+which **the gate runs**, requires `^## Correction (YYYY-MM-DD)` before it will accept
+any edit to a file under `findings-log/`. The two disagreed, and the disagreement
+punished correctness: a pass that wrote its correction in the form the gate demands
+was reported by `dup-test.sh` as a **FAKE CORRECTION HEADING**, i.e. as an attempt to
+widen the exemption by renaming. One alternative was added, and the position
+spellings, the fail-closed guard, the enumerated residual and the exit code are
+unchanged.
+
+**Nothing measured moved in this correction.** The population, all five census cells,
+`older-schema` 8 → 0, the member-shape cells, `CC-MAIN-2013-48` NOT DERIVABLE, the
+193/0 whole-KiB cells and the INFERRED limits all re-derive unchanged from the
+committed artefacts, and none was edited. **The seven rows marked *already fixed*
+were not fixed by this lane** — they were fixed by this pass's own rounds 3–7 before
+`aa401b7` merged, and this lane's contribution is the re-derivation that says so,
+with the commands, rather than a second edit of the same text.
+
 ## 9. Artefacts
 
 | file | what |
