@@ -1040,23 +1040,30 @@ refutation publishes an exit code.
 `curl`, no `hurl`.** Issue `correction: PR #135 S-L4 — eight blocking findings after
 three rounds; claim holds, pointers and prose do not` (#139) filed **2026-10-15
 15:55Z** against branch head `23c4451`. **PR #135 merged at 21:47Z the same day**
-(merge commit `aa401b7`), and the branch carried **four further rounds** —
-`24b9601` (round 3), `227a95c` (4), `bfc8f55` (5), `741cca1` (6), `228519f` (7),
-`d88a879` (8), `f83137d` (9) — before that merge. **So #139 is not an open list of
-eight unfixed defects at this head: seven of the eight were answered by §8a-3 and
-refined by rounds 4–7, and one was not.** Every row below was re-derived from the
+(merge commit `aa401b7`), and the branch carried **seven further commits after that
+head, self-labelled rounds 3 through 9** — `24b9601` (round 3), `227a95c` (4),
+`bfc8f55` (5), `741cca1` (6), `228519f` (7), `d88a879` (8), `f83137d` (9) — before
+that merge. **The count is stated by the command, not by hand:**
+`git log --oneline aa401b7^1..aa401b7` lists them, and rounds 4–7 are the ones that
+carry a §8a-* correction section (rounds 8–9 changed the live sections and added
+none, which is why the series still ends at §8a-7). **So #139 is not an open list
+of eight unfixed defects at this head: seven of the eight were answered by §8a-3 and
+refined by rounds 4–9, and one was not.** Every row below was re-derived from the
 tree, not from the issue's wording, and each carries the command that produced it.
+⚠ **This sentence first read "four further rounds" beside the same seven SHAs — the
+defect #139's finding 3 names, committed in the paragraph whose whole job is to get
+the history right.** See the Correction section below.
 
 | # | as filed in #139 | disposition at this head | re-derived by |
 |---|---|---|---|
-| 1 | `FINDINGS.md:673` publishes `docs/11:2218` as Closed-table row **L** | **already fixed** — no position is published in this file in any spelling outside the Correction sections (§8a-3 row 1). `grep -nE 'docs/(10\|11)[^ ]*:[0-9]+' FINDINGS.md` returns **5** hits and all five are inside §8a-2/§8a-3/§8a-4, which quote withdrawn values as history (`AGENTS.md` §5). **But the class is still live in `docs/11` itself** — see the note under the table | `grep` + `sh dup-test.sh` (position check, fatal) |
+| 1 | `FINDINGS.md:673` publishes `docs/11:2218` as Closed-table row **L** | **already fixed** — no position is published in this file in any spelling outside the Correction sections (§8a-3 row 1). Find them with `grep -nE 'docs/(10\|11)[^ ]*:[0-9]+' findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md`, run **from the repo root**: **every hit is inside a Correction section**, and that invariant is the claim — a Correction section may quote a withdrawn value (`AGENTS.md` §5). `sh dup-test.sh` is what enforces it, fatally. **No count is printed beside that recipe, deliberately: the row you are reading quotes `docs/11:2218` itself, so the recipe counts its own quotation and the number moves whenever this sentence is edited.** ⚠ The recipe also first carried an escaped `\|`, which in an ERE is a *literal* pipe — it matched nothing and returned **0**, which reads exactly like the clean negative it was not. **But the class is still live in `docs/11` itself** — see the note under the table | `sh dup-test.sh` (position check, fatal) |
 | 2 | the no-line-numbers policy is contradicted one line-number away in the file that states it | **already fixed, and now enforced rather than asserted** — the policy is fatal in `dup-test.sh`, which exits non-zero on a position in any spelling outside a Correction section (§8a-3 row 2, widened in round 5 to cover the colon form) | `sh dup-test.sh` |
-| 3 | "moved row `L` by **17 lines**" is neither measured figure | **already fixed** — the phrase survives in **two** places, both inside Correction sections (the §8a-3 row that withdrew it, and the §8a-4 row that applied the withdrawal to §8c's body). `grep -n '17 lines' FINDINGS.md` returns those two lines and no live one | `grep -n '17 lines'` |
+| 3 | "moved row `L` by **17 lines**" is neither measured figure | **already fixed** — the phrase survives **only inside Correction sections** (the §8a-3 row that withdrew it, and the §8a-4 row that applied the withdrawal to §8c's body), and **in no live section**. That invariant is the claim: `grep -n '17 lines' findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md`, run **from the repo root**, returns the §8a-* rows and **this row**, which quotes the phrase; the earlier form of this cell also omitted the file argument, so the recipe read **stdin** and hung rather than answering | `grep -n '17 lines' findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md` |
 | 4 | "67 of 69 member-source rows carry no `limit=`" mixes two cells | **already fixed** — RULE 3 is stated and shipped in `kib-detector.py`, which prints three cells: **A** every row **81 / 9 carry / 72 none / 2 AT limit**, **B** one per crawl **74 / 6 / 68 / 1**, **C** in-window **72 / 5 / 67 / 1**. `69` is no cell's row count and `67` is cell C's "carrying none" — the withdrawn clause mixed a numerator from one cell with a denominator from another (§8a-3 row 4) | `python3 kib-detector.py` |
 | 5 | the reader prints "every other member-source row carries no `limit=`, so no limit truncated it" — a predicate it does not mean | **already fixed** — `python3 read-area-l.py census` now prints **four** numbers (`carrying a limit=` / `carrying no limit=` / **`AT their own limit`** / `carried a limit WITHOUT reaching it`) and says *"ONLY \"AT their own limit\" means a limit could have truncated the tail"*, with the count that bears on the figures given as *2 of 81* (§8a-3 row 5) | `python3 read-area-l.py census` |
 | 6 | `10.3%` published beside a rule that does not produce it ("truncated") | **already fixed** — §1 now states *"one decimal place, **ROUNDED half-up**, and the exact quotient is printed beside it: **39 ÷ 380 = 0.10263 → 10.3%**"*, and carries the retraction of the `10.2%` that truncation would give (§8a-3 row 6) | `sed -n '82,92p' FINDINGS.md` |
 | 7 | `account.py` is handed on broken and the successor that names it would run it | **FIXED HERE — the one finding still open at this head, and it is now closed by the branch this pass named.** `account.py` tolerates an absent `t_sent`: `parse()` returns `None` for a non-string instead of letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching a row that carries no timestamp and **prints how many it skipped**, and `inverted` uses `.get()`. The crash reproduced before the fix and does not after — see the reproduction below. **Also fixed, and found while verifying:** a **second** crash on the same handoff — a 0-row ledger raised `IndexError` at `rows[-1]['seq']`, so the newest committed CC ledger in the repo was one this tool could not open. It now prints that the ledger records a pass that sent nothing | `python3 account.py findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl` |
-| 8 | the `193` byte table cites `(§8b)`, which computes nothing, and the counting rule for "successful `200`" is unstated | **already fixed, and the finding's second half re-derives as WRONG at this head.** `kib-detector.py` **is** a committed artefact that performs the byte arithmetic: RULE 1 at its `body_bytes % 1024` test, RULE 2 as `status_of(row) == 200`, and it prints all three obvious rules (**0** / **183** / **193**). §8b exists, RULE 2 states the rule beside the number, and `docs/11`'s own floor table states it again. **What §7b still does not carry is the rule beside its own `193`** — it cites §8b instead — and this section is where that gap is recorded, because §7b is append-only (§8a-3 row 8) | `python3 kib-detector.py`, `grep -n '1024\|kib\|193' *.py *.sh` |
+| 8 | the `193` byte table cites `(§8b)`, which computes nothing, and the counting rule for "successful `200`" is unstated | **already fixed, and the finding's second half re-derives as WRONG at this head.** `kib-detector.py` **is** a committed artefact that performs the byte arithmetic: RULE 1 at its `body_bytes % 1024` test, RULE 2 as `status_of(row) == 200`, and it prints all three obvious rules (**0** / **183** / **193**). §8b exists, RULE 2 states the rule beside the number, and `docs/11`'s own floor table states it again. **What §7b still does not carry is the rule beside its own `193`** — it cites §8b instead — and this section is where that gap is recorded, because §7b is append-only (§8a-3 row 8) | `python3 kib-detector.py` (run in this directory); `cd findings-log/2026-10-15-area-l4-ledger-reader && grep -n '1024\|kib\|193' *.py *.sh` — **the `cd` is part of the recipe, because a bare `*.py *.sh` expands against whatever directory the reader is standing in** |
 
 **One live instance of finding 1's class survived all of that, in `docs/11`.**
 §8a-6 row 4 recorded that the log's copy of it was removed; the `docs/11` sentence
@@ -1135,6 +1142,54 @@ committed artefacts, and none was edited. **The seven rows marked *already fixed
 were not fixed by this lane** — they were fixed by this pass's own rounds 3–7 before
 `aa401b7` merged, and this lane's contribution is the re-derivation that says so,
 with the commands, rather than a second edit of the same text.
+
+## Correction (2026-10-17) — verifier round 1 on PR #147: two prose defects, and a recipe that returned nothing
+
+A fresh-context verifier returned NOT CLEAN on PR #147 (this lane's correction of
+#139) with **seven claims CONFIRMED** — the history claim re-derived from a
+`git archive origin/main` extract, the `account.py` fix on the crashing ledgers, both
+crashes, the inertness diff, the `71 → 72` count move, the `CORR_RE` conflict, and
+all eight ledger exits. **Nothing measured was contradicted. Both blocking findings
+are in prose this lane wrote, and both are the same class as the findings being
+corrected: a statement that does not survive being run.**
+
+| # | as filed | corrected to | why |
+|---|---|---|---|
+| 1 | the Correction (2026-10-17) introduction read **"the branch carried four further rounds"** beside a list of **seven** SHAs, and *"refined by rounds 4–7"* | **seven further commits after `23c4451`, self-labelled rounds 3 through 9**, and *"refined by rounds 4–9"*; the count is stated by the command, not by hand | `git log --oneline aa401b7^1..aa401b7 \| grep -cE '^(24b9601\|227a95c\|bfc8f55\|741cca1\|228519f\|d88a879\|f83137d)'` → **7**. "four" appears to have migrated from the neighbouring clause — which is precisely **#139's finding-3 defect class**: a stated figure matching neither measurement, committed in the one paragraph whose job is to get the history right |
+| 2 | the replacement recipe published in `docs/11` was `grep -n '…' docs/` — **no `-r`** | `grep -rn '…' docs/`, **re-run verbatim before the page ships**; the two rows it returns are quoted in the correction note in `docs/11` itself | GNU `grep` does not recurse without `-r`: `grep: docs/: Is a directory`, **exit 2, zero rows**. The fix for one unresolvable pointer published another, and §8a-6 row 4 of this file had already recorded that a check "could not see" that shape for want of a predicate |
+
+**Two more instances of finding 2, in this lane's own recipes, found while fixing it
+— which is round 8's lesson one level up.**
+
+- **Row 1's recipe carried an escaped `\|` inside an ERE.** In an ERE `\|` is a
+  **literal** pipe, so `(10\|11)` matches the text `10|11`, and the pattern matched
+  **nothing**: `grep -nE 'docs/(10\|11)[^ ]*:[0-9]+' …` → **0 hits**. A zero that
+  looks exactly like the clean negative it is not.
+- **Row 3's recipe had no file argument**, so it read **stdin** and hung instead of
+  answering. Both are now `grep` invocations that name their file, carry no escape,
+  and are re-run from the repo root before this ships.
+- **Two published counts were falsified by the quotations beside them.** Row 1 said
+  its recipe "returns **5** hits"; it returns **6**, because row 1 itself quotes
+  `docs/11:2218`. Row 3 said *"two lines"*; that recipe returns **3**, for the same
+  reason. **So no count is printed beside either recipe now** — the invariant is
+  published instead (*every hit is inside a Correction section*; the phrase survives
+  **only** inside Correction sections), and `sh dup-test.sh` is the artefact that
+  enforces the first. A recipe that counts the sentence quoting it is a then-value
+  wearing a count's clothes.
+
+**The generalisable finding, and the one worth keeping: a recipe that returns nothing
+is not evidence of a negative.** Three of the four defects above — no `-r`, an escaped
+alternation, no file argument — all produce *no output*, and all three read as "none
+found" to anyone who does not look at the exit code. The discriminator is the exit
+code: **0** for a pattern that ran and matched nothing, **2** for a usage error. So
+each recipe published here carries its exit code, and each correction is applied to
+the body **and** recorded here — §8a-4 row 5's lesson, that *a correction recorded
+and not applied to the body is a correction that changes nothing*.
+
+**Nothing measured moved, and nothing was re-probed.** This remains a 0-request
+correction pass; `research-gate.sh` re-run under the run's lock, exit 0. The verifier
+found no credential, hostname or live-session material, and no value pinned in
+`regression/hurl/` is touched by this PR.
 
 ## 9. Artefacts
 

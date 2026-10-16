@@ -2548,13 +2548,19 @@ re-derived tally leaves none unassigned. **The repo already contradicted itself
 without any new evidence:** this page's own family table lists both crawls' members
 in its two `(prior)` rows — `CC-MAIN-2014-10` / `/ipro/hcp/login.jsf`, and
 `CC-MAIN-2020-24` / `index.jsp`, `login.jsf`, `main/home.jsf` — findable with
-`grep -n 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
+`grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
 content and deliberately with no line number, because this page moves as other
-passes land.** ⚠ **That sentence once read "lines 1736 and 1738 above", and it was
-stale on the commit it shipped in** — those lines are two successor bullets, and the
-two rows are named above instead. A citation pointing at a passage that does not
-contain the claim is `AGENTS.md` §6 item 6, and it survived because the claim it
-carried was true. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+passes land.** ⚠ **Two corrections to this sentence, both recorded because each
+replaced one broken citation with another — the failure `AGENTS.md` §6 item 6
+names, and the one this pass's own §8a-6 row 4 was written to stop.** It once read
+**"lines 1736 and 1738 above"**, stale on the commit it shipped in (those lines are
+two successor bullets); the rows are now named above instead. And the replacement
+recipe first read **`grep -n '…' docs/` without `-r`**, which GNU grep rejects —
+`grep: docs/: Is a directory`, exit 2, no rows — so the fix for a stale pointer
+published a pointer that **did not execute**. **The `-r` is load-bearing; the
+recipe is quoted with it, and it is re-run verbatim before this page ships.** A
+citation that cannot be executed is worse than a wrong line number, because the
+wrong number at least fails visibly. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13 **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
 vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
 evidence is two sentences below and it governs every number printed here; it is
 stated here rather than only there because a limit separated from its figure by
@@ -2700,7 +2706,7 @@ tool no longer has to assume either way to answer. [source: findings-log/2026-10
 [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
 
 ⚠ **The other seven of #139's eight findings were already fixed when PR #135
-merged** (`aa401b7`, 2026-10-15), by that pass's own verifier rounds 3–7 — a stale
+merged** (`aa401b7`, 2026-10-15), by that pass's own **seven** further commits, self-labelled rounds **3–9** (`git log --oneline aa401b7^1..aa401b7`) — a stale
 pointer withdrawn, a policy made fatal, an unstated counting rule shipped in
 `kib-detector.py`, a reader sentence corrected to the predicate it means, and a
 rounding rule that now produces its own figure. **Re-derived at this head rather
