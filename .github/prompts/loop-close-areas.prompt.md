@@ -26,7 +26,8 @@ own ordering; token-gated areas are at the bottom and are not yours to start.
 5. **Refill the priority page (step 7):** move the closed area into the dated
    Closed table with its evidence, and add at least one successor area with a
    stated blocker, a definition of done, and INFERRED labels on any assumption
-   behind it. If you genuinely cannot name one, write the reason in the PR.
+   behind it — minting the next free id (`AA`, `AB`, …) when `A`–`Z` is spent.
+   If you genuinely cannot name one, write the reason in the PR.
 6. Run `./scripts/research-gate.sh`. Open the PR.
 7. Flip your area's line in `.loop/worklist.md` from `- [ ]` to `- [x]`, and
    append a Loop report to `.loop/last-report.md`:

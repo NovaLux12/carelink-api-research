@@ -2697,7 +2697,8 @@ number it checks.
    a good contribution.
 5. **Your PR must leave this page fuller than it found it.** Close the area into
    the Closed table with its evidence, and add at least one successor area with a
-   blocker and a definition of done — see
+   blocker and a definition of done — minting the next free id (`AA`, `AB`, … now
+   that `A`–`Z` is spent) — see
    [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 for the
    template and the quality bar. A weekly job files an issue if this page drops
    below three open areas.
@@ -2730,11 +2731,14 @@ markdown logs (`VERSION-AXIS.md`, `AWS-GATEWAYS.md`) carry host evidence too; no
 defective on the index alone.
 
 
-**Every letter A–Z is now in use** — 0 open plus 26 closed — and the priorities page's own gate
-`.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
-at once: it is invisible to the pattern, and the page's stated count would then disagree with its
-own contents. This was already recorded for the sub-declared-gap question in
-[`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
+⚠ **Superseded 2026-10-16 — the namespace now continues past `Z`; see the 2026-10-16
+Amendment in this subsection. Kept as written:**
+
+> **Every letter A–Z is now in use** — 0 open plus 26 closed — and the priorities page's own gate
+> `.github/ISSUE_TEMPLATE/config.yml`. A two-letter heading therefore fails that count in two ways
+> at once: it is invisible to the pattern, and the page's stated count would then disagree with its
+> own contents. This was already recorded for the sub-declared-gap question in
+> [`docs/09`](09-methodology-and-oracles.md) §4; area Z hit the same wall.
 
 ⚠ **Disclosed 2026-10-15 (area R): the Closed table below physically holds 26
 rows while the arbiter's pattern measures 25, and the difference is the `S6`
@@ -2771,13 +2775,38 @@ residual is a known one-cell divergence, not a hidden one.
 > the gate passed is a maintainer decision, for the reason `docs/09` §4 already records
 > about its count-pattern defect. Recorded as the successor instead.
 
-**So a pass that discovers a successor cannot mint a letter.** The options are: attach it to an
-existing open area as a dated addendum (what area Z did — see area Y), or record it in
-[`docs/10`](10-open-questions.md) §1 as an open question rather than a claimable area. **Neither
-is as good as a real area, and the honest reading is that this repository has exhausted its
-area namespace.** Extending the gate's area pattern to `AA`-style headings is a maintainer
-decision, not a side effect of a research pass — same reasoning as the gate's own pattern in
-[`docs/09`](09-methodology-and-oracles.md) §4.
+⚠ **Superseded 2026-10-16 — minting is restored; see the Amendment immediately below. Kept as
+written:**
+
+> **So a pass that discovers a successor cannot mint a letter.** The options are: attach it to an
+> existing open area as a dated addendum (what area Z did — see area Y), or record it in
+> [`docs/10`](10-open-questions.md) §1 as an open question rather than a claimable area. **Neither
+> is as good as a real area, and the honest reading is that this repository has exhausted its
+> area namespace.** Extending the gate's area pattern to `AA`-style headings is a maintainer
+> decision, not a side effect of a research pass — same reasoning as the gate's own pattern in
+> [`docs/09`](09-methodology-and-oracles.md) §4.
+
+#### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
+
+**The maintainer decision the paragraphs above deferred has been taken.** **0 open plus 26 closed**
+stand today; the next bounded successor that clears the step 7 quality bar is minted as a
+**two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
+
+- The area-counting patterns are widened to `^### [A-Z]{1,2}\.` wherever they live —
+  [`scripts/research-checks.py`](../scripts/research-checks.py),
+  [`scripts/research-loop.sh`](../scripts/research-loop.sh), and
+  [`.github/workflows/priorities-alarm.yml`](../.github/workflows/priorities-alarm.yml) alike.
+- The `N + M = 26` invariant is **retired**: every live "N open plus M closed" sentence must merely
+  **agree with the page** — heading count, Closed-table rows, and
+  [`.github/ISSUE_TEMPLATE/config.yml`](../.github/ISSUE_TEMPLATE/config.yml) — at whatever total.
+  The count sentence in this amendment is **live**: `scripts/research-checks.py` parses every
+  non-blockquoted "N open plus M closed" and fails on drift, so a minting pass updates it here.
+- `S6` stays outside the count exactly as the disclosure above states — it never matched the
+  single-letter pattern and does not match the two-letter one, so the physical-row count and the
+  measured count keep being given side by side.
+
+This restores what the paragraphs above lost: a bounded successor is a **claimable area** again,
+and [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 is the rule that says so.
 
 #### Addendum (2026-10-14, from issue #102): dedicated-route envelopes on `.com` and `-trials` — byte-identical, language-independent
 

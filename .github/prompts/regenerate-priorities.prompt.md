@@ -19,7 +19,8 @@ in the last 14 days · the Closed areas table at the bottom of docs/11.
 3. Check each candidate against docs/10 §1 and the Closed table. Drop duplicates.
    Downgrade anything that needs a token into the already-blocked table.
 4. Write **two or three** new areas into docs/11 using the successor-area
-   template in `CONTRIBUTING-research.md` step 7, each with: what is known
+   template in `CONTRIBUTING-research.md` step 7 (minting the next free id —
+   `AA`, `AB`, … once `A`–`Z` is spent), each with: what is known
    (labelled, cited), what is missing, a **specific blocker**, a **checkable**
    "closes when" that states whether a negative counts, and an
    `Assumptions (INFERRED)` line for anything reasoned rather than observed.

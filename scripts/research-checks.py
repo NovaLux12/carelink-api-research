@@ -50,7 +50,9 @@ What it enforces:
   5. APPEND-ONLY — findings-log/ deletions fail; modifications without a
      dated `## Correction (YYYY-MM-DD)` section fail. Additions are free.
   6. PROSE COUNTS — docs/11's "N open plus M closed" sentence must equal the
-     heading count, the Closed-table row count and config.yml (N+M=26).
+     heading count, the Closed-table row count and config.yml. The N+M=26
+     clause was retired 2026-10-16 when the namespace widened past Z (AA,
+     AB, … — see the page's own amendment); the total is unbounded again.
      Quoted history inside blockquotes is excluded.
   7. LOG CITES — cites inside findings-log/ must resolve, or carry a reasoned
      `allow-unresolved-cites` exemption. Findings-log files were previously
@@ -176,13 +178,14 @@ def check_numbers(suite_log):
             fail(f'README.md:{i} states {m.group(1)} canonical pages, measured {pages}')
 
     # Open research areas: docs/11 lettered headings vs config.yml's claim.
-    areas = len(re.findall(r'^###\s+[A-Z]\.\s', read('docs/11-suggested-research-areas.md'), re.M))
+    # Area ids are one or two letters: A–Z, then AA, AB, … (widened 2026-10-16).
+    areas = len(re.findall(r'^###\s+[A-Z]{1,2}\.\s', read('docs/11-suggested-research-areas.md'), re.M))
     areas_fail = False
     for i, line in enumerate(read('.github/ISSUE_TEMPLATE/config.yml').splitlines(), 1):
         m = re.search(r'about: (\d+) (?:open )?areas', line)
         if m and int(m.group(1)) != areas:
             fail(f'.github/ISSUE_TEMPLATE/config.yml:{i} states {m.group(1)} areas, '
-                 f'measured {areas} (^### [A-Z]. headings in docs/11)')
+                 f'measured {areas} (^### [A-Z]{1,2}. headings in docs/11)')
             areas_fail = True
     if not areas_fail:
         ok(f'{areas} open areas listed in docs/11; config.yml agrees')
@@ -208,22 +211,24 @@ def check_numbers(suite_log):
 def check_prose_counts():
     """docs/11 states its own open/closed count in prose — nothing else read it.
 
-    The "Every letter A–Z is now in use — N open plus M closed" sentence carries
-    the page's no-new-letter argument, and it has drifted twice (area Z's log
-    records the first; area M's correction the second) while every check stayed
-    green, because check_numbers compares config.yml against the heading count
-    and nothing compares the prose against either. This check parses the prose
-    instead of the structure: every live (non-blockquote) "N open plus M closed"
-    must equal the heading count, the Closed-table row count, and config.yml —
-    and N+M must be 26, the sentence's own thesis. Quoted history inside
+    The "N open plus M closed" sentence carries the page's own count, and it
+    has drifted twice (area Z's log records the first; area M's correction the
+    second) while every check stayed green, because check_numbers compares
+    config.yml against the heading count and nothing compared the prose against
+    either. This check parses the prose instead of the structure: every live
+    (non-blockquote) "N open plus M closed" must equal the heading count, the
+    Closed-table row count, and config.yml — whatever the total. The old
+    N+M=26 clause ("every letter A–Z exactly once") was retired 2026-10-16 when
+    the namespace widened past Z: ids are one or two letters (A–Z, then AA,
+    AB, …), so the total is no longer capped at 26. Quoted history inside
     blockquotes is excluded: a correction quoting a past count is evidence, not
     a claim. Zero vendor requests — pure string analysis.
     """
     print('--- prose counts ---')
     text = read('docs/11-suggested-research-areas.md')
-    areas = len(re.findall(r'^###\s+[A-Z]\.\s', text, re.M))
+    areas = len(re.findall(r'^###\s+[A-Z]{1,2}\.\s', text, re.M))
     closed_section = text.split('## Closed areas', 1)
-    closed = len(re.findall(r'^\| [A-Z] —', closed_section[1], re.M)) \
+    closed = len(re.findall(r'^\| [A-Z]{1,2} —', closed_section[1], re.M)) \
         if len(closed_section) > 1 else 0
     cfg = None
     for line in read('.github/ISSUE_TEMPLATE/config.yml').splitlines():
@@ -234,8 +239,8 @@ def check_prose_counts():
             if not re.match(r'\s*>', line)
             for m in re.finditer(r'(\d+) open plus (\d+) closed', line)]
     if not live:
-        warn('docs/11: no live "N open plus M closed" prose — the no-new-letter '
-             'argument states no count for this check to read')
+        warn('docs/11: no live "N open plus M closed" prose — the page states '
+             'no count for this check to read')
         return
     for i, m in live:
         n, c = int(m.group(1)), int(m.group(2))
@@ -244,9 +249,6 @@ def check_prose_counts():
                  f'{areas} open + {closed} closed')
         elif cfg is not None and n != cfg:
             fail(f'docs/11:{i} states {n} open, but config.yml states {cfg}')
-        elif n + c != 26:
-            fail(f'docs/11:{i} states {n} open plus {c} closed = {n + c}, '
-                 f'expected 26 (every letter A–Z exactly once)')
         else:
             ok(f'docs/11:{i} prose count {n} + {c} agrees with the page')
 
@@ -370,13 +372,13 @@ def check_log_hygiene():
 
 def check_priorities_sync():
     print('--- priorities sync ---')
-    open_ = set(re.findall(r'^###\s+([A-Z])\.\s',
+    open_ = set(re.findall(r'^###\s+([A-Z]{1,2})\.\s',
                            read('docs/11-suggested-research-areas.md'), re.M))
     # "Closes docs/11… area C" but not "does not close area C" (the
     # negation lookbehinds are fixed-width, so both are valid regexes).
     close_re = re.compile(
         r'(?<!not )(?<!does not )\bCloses\s+`?docs/11(?:-suggested-research-areas)?'
-        r'(?:\.md)?`?\s+areas?\s+([A-Z](?:\s*(?:,|and|/|&)\s*[A-Z])*)')
+        r'(?:\.md)?`?\s+areas?\s+([A-Z]{1,2}(?:\s*(?:,|and|/|&)\s*[A-Z]{1,2})*)')
     violations = 0
     for f in glob.glob('findings-log/**/*.md', recursive=True):
         for i, line in enumerate(read(f).splitlines(), 1):
