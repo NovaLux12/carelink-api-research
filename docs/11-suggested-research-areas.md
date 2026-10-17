@@ -144,6 +144,51 @@ here demonstrates an actual cross-origin call.
 
 ## Tier 1 — no token needed, high value
 
+### AC. After the window: what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled?
+
+The out-of-window census is **complete** — **0 of 44 unread**, every cell
+classified under the counting rule (a `404` reads as an absence only behind a `200`
+on that same crawl; a `502`/`504`/`503`/`400` is a failure and is re-issued, never
+an absence) — and it returned **165 records over 27 distinct host-relative paths
+and six hosts** in its 40 record cells. **Five of the 44 carry a `/ipro/hcp/`
+member**, the last dated **2026-06-10**, archived **`404`**
+[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F2, §F5, §F10].
+
+**What is known, and what is missing.** Every status in those cells is the
+**archived** status of a capture — the answer the origin gave when a crawler
+fetched that URL — so a `404` is consistent with retirement, a gate, and path
+rewriting, and **nothing observed separates the three**. The census also produced
+a pattern nobody has looked at: **`javascript-warning.html` appears in 29 of the
+40 record cells**, in **five** distinct shapes, four of them nested under `/app/` at
+up to `/app/assets/assets/assets/assets/javascript-warning.html`. Area L saw five
+such captures on one crawl in 2026-10 and explicitly declined to interpret them.
+
+**Closes when** the post-2022 `minimed.eu` record set is **enumerated rather than
+sampled** — every path and status across the 41 out-of-window crawls from 2022-06,
+under a stated completeness rule, with the nested-asset shapes either explained or
+recorded as unexplained. **A negative counts**, and a negative is the likely answer:
+if the nested shapes turn out to be a crawler artefact rather than a served path
+structure, that is the finding. **Budget:** derivable from
+`findings-log/2026-10-17-sl2-outwindow-census/budget.py` — **2.59 requests per
+crawl measured**, 2.51 derived, so ~106 rows for the 41 post-window crawls — and
+the crawl list must again be derived from `GET /collinfo.json`.
+
+**Blocker:** none — a read of a published index, not a vendor surface. The real
+blocker on the *interpretation* is `AGENTS.md` §7: the record bodies are outside
+the tree, so **"did `carelink.minimed.eu` serve a catch-all on those nested asset
+paths" cannot be settled from a Common Crawl ledger at all** — the 404s and 200s
+here are indistinguishable from a SPA fallback without one bounded live probe on
+the named path. **That live probe is the sharp question this area exists for**, and
+it is cheap and GET-only.
+
+**Assumptions (INFERRED):** that the 165 records enumerate what the crawler
+requested rather than what exists (the API is queried by URL, so it answers about
+requested paths only); that `carelink.minimed.eu` and `carelink.minimed.com` behave
+alike on these asset paths (untested — the census never queried `.com`); and that
+the archived status is a faithful record of the origin's answer (it is a third
+party's record of a third party's fetch, and this repository has not
+independently checked one).
+
 
 ### AA. Does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`?
 
@@ -2294,7 +2339,7 @@ captured in 2014, 2017, 2019 (×2), 2020 (×3), 2021 (×4) and 2022, on one host
 could read"**, and **"absent from Common Crawl" stays disclaimed**: **44 of the 128
 published indexes lie outside the window** — **3 entirely before it** (2008–2013) and
 **41 entirely after it** (2022-06 onward), `128 − 84 = 44` — and this area has read
-exactly **one** of
+**one** of
 them, and that one — `CC-MAIN-2022-27` — carried a member. **A member outside the
 window has already refuted the window's sufficiency once.** The eight `403`
 bodies are unread. `cluster.idx` is still unbuilt. **`CC-MAIN-2018-05`**, which the
@@ -2302,6 +2347,22 @@ first pass selected and never enqueued, is in this pass's queue and **answered: 
 readable absence** — control `commoncrawl.org` **200 / 5 records** (seq 82), then
 `minimed.eu` domain **404** `No Captures found for: minimed.eu` (seq 83), one
 attempt each, no retry.
+⚠ **CORRECTED 2026-10-17 (the out-of-window census, #146): "this area has read
+exactly **one** of them" is wrong — the figure is two.** `CC-MAIN-2022-21`
+(2022-05-16 → 2022-05-29) is also outside the window, and an area-L pass read it
+with the same two-cell shape: control `example.com` **200 / 5 records**
+(`2026-10-13-area-l-ipro-hcp` seq 26), probe `minimed.eu` **200 / 4 records**
+(seq 24), **0** `/ipro/hcp/` members, enumerated at
+[findings-log/2026-10-13-area-l-ipro-hcp/FINDINGS.md:374-381]. **Only one of the
+two carried a member** — that half stands. The committed inventory in this area's
+own log directory carried the right tag all along (`crawl-window.txt`, row
+`CC-MAIN-2022-21 … no  prior-L-pass`), so **the prose contradicted a committed
+file**: `docs/09` §4's *derived prose contradicting its own source table*, one
+level up. Repo-wide the figure is **six** (area M and lane S6 also touched
+`-2022-40`, `-2024-42`, `-2025-30`, `-2026-39`) and **38** of the 44 had never been
+read by any pass — every figure named, because "this area" and "this repository"
+are different populations
+[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F6].
 
 #### Addendum (2026-10-15, from pool L #126): the census pass — two new crawls, both ends now carried by captures, and area L **closes**
 
@@ -2469,7 +2530,10 @@ this successor is no longer "read more crawls". Same two-cell shape
 (per-crawl positive control, then `minimed.eu` `matchType=domain`, `output=json`,
 **no `limit`**) was the right one and it worked **188 requests against a
 predicted 211** — the corrected per-crawl cost below, budgeted conservatively.
-**What is left:** **44 of the 128 published indexes lie outside
+**What is left** *(as S-L2 read it before 2026-10-17 — **superseded in full by the
+closure immediately below**, and kept as written so the reasoning survives; both of
+its facts are now measured and one of them is wrong, see the correction at the end
+of this block)*: **44 of the 128 published indexes lie outside
 2013-05-17 → 2022-05-13** — **3 entirely before** (2008–2013) and **41 entirely
 after** (2022-06 onward) — this area has read exactly **one** of them, and that
 one carried a member. **Blocker:** budget, and the fact that the window is a choice
@@ -2479,6 +2543,94 @@ the window is the valuable cell** — one has already been found. (per-crawl pos
 `output=json`, **no `limit`**), continuing with the **64** unread in-window
 crawls, in dated batches, against `data.commoncrawl.org` only if a second lock is
 held. The crawl list is derived from `GET /collinfo.json`, never guessed.
+
+#### ⚠ CLOSED 2026-10-17 by [`findings-log/2026-10-17-sl2-outwindow-census/`](../../findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md) — **both** halves of S-L2's close condition are met, and the justification does not survive
+
+**114 of a 170 cap**, GET only, **`index.commoncrawl.org` alone, zero requests to
+any Medtronic host**, ≥ 3.5 s inside `flock` (`t_sent` floor **3.339 s** over 113
+gaps, with **one** gap under the declared delay — which is a corrupt `t_sent`
+rather than a short delay: the kernel-mtime oracle puts the floor at **3.992 s**
+with **0 of 113** under). **All 44 out-of-window crawls now carry a classified
+cell: 40 RECORD · 4 readable ABSENCE · 0 indeterminate · 0 unservable-candidate**,
+so the census is complete on **both** sides of the window — **0 of 84 in-window
+unread, 0 of 44 out-of-window unread.** **24 of 114 rows were failures**
+(502 ×12, 504 ×9, 400 ×3 — **21.1%**), every one labelled a failure and re-issued,
+and **23 rows are retries**, each a request with its own row and header capture.
+
+**The census itself reproduces, derived in code.** `GET /collinfo.json` (seq 1,
+`200`, 35 226 B) yields **128** indexes; the window count is **84** and the
+out-of-window count **44 = 41 after + 3 before**. **This is S-L3's close
+condition, satisfied as a by-product of the method the sweep needed anyway:**
+comparing `YYYY-MM-DD` on both sides gives **84**, full ISO-8601 gives **84**, and
+the area-L dashless-bound variant is re-run and printed as its own **negative
+control at 87** — `-` is `0x2D` and sorts below both `0` and `2`.
+
+**The valuable cell: four more out-of-window members, and the family outlives the
+window by four years.** All five out-of-window members are on one host,
+`carelink.minimed.eu`, and **the four new ones had never been read by any pass in
+this repository**:
+
+| crawl | capture timestamp | path | archived status |
+|---|---|---|---|
+| `CC-MAIN-2022-27` | 2022-07-03 14:09:27 | `/ipro/hcp/index.jsp` | **200** |
+| `CC-MAIN-2024-22` | **2024-05-23 08:39:53** | `/ipro/hcp/index.jsp` | **404** |
+| `CC-MAIN-2024-26` | **2024-06-24 09:36:38** | `/ipro/hcp/index.jsp` | **404** |
+| `CC-MAIN-2026-17` | **2026-04-14 09:26:05** | `/ipro/hcp/privacy.jsf` | **404** |
+| `CC-MAIN-2026-25` | **2026-06-10 02:55:55** | `/ipro/hcp/index.jsp` | **404** |
+
+**So the window's inherited justification does not survive, and it fails
+asymmetrically.** Its upper bound is `ARCHIVE-URLS` §3's *"last archived
+2022-05-13"* for `ipro/hcp/*.jsf`; the last member in the whole published corpus
+is dated **2026-06-10** — **4 years and 1 month** past it — and it is a **`.jsp`**
+member, so that bound was never on the family at all. Its **lower** bound survives
+and is *generous*: the **three** crawls entirely before the window are all readable
+absences, and the earliest member is still **2014-03-10**, inside the window. The
+window is **loose at the start and four years short at the end.**
+
+**What is now measured, in place of the window:** `/ipro/hcp/` is present in **5 of
+the 44** out-of-window crawls and **12 of the 84** in-window, with an observed span
+of **2014-03-10 → 2026-06-10** and no member anywhere else — **17 of the 128**
+published indexes whole-corpus. **The in-window `12` is re-derived, not inherited**,
+and it is **two higher than the figure this page inherited**: `census-84.txt:168`
+publishes `11` while its own header at `:161` declares the tally IN-WINDOW-only, and
+its list includes `CC-MAIN-2022-27`, which `:119` marks `in_window=no` — the defect
+successor **S-L4a** already names, left unreconciled until this pass. The area's own
+committed reader (`read-area-l.py census`, which parses the three row schemas its
+predecessor could not) re-derives **12 in-window** and **39 in-window member
+records**, against `census-84.txt`'s **10** and **35**; the whole difference is two
+of the eight `older-schema` crawls, `CC-MAIN-2014-10` (**1** member) and
+`CC-MAIN-2020-24` (**3**). **Both figures stand, both are published, and `12` is a
+floor** — the reader says so in its own output
+[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F3c]. **Not claimed:** that the surface is
+retired. Every status above is the **archived** status of a capture — not a live
+answer, and no body was fetched; a `404` is equally consistent with long
+retirement, a gate, and path rewriting, and **nothing observed separates the
+three**. INFERRED, and labelled because area L drew the same line for the
+in-window `403`s.
+
+**Four corrections to `docs/`, applied in place rather than left standing.** (1)
+*"This area has read exactly **one**"* of the out-of-window crawls is **two**:
+`CC-MAIN-2022-21` was read too, with a `200` control and a `200` probe carrying
+**0** members — only one of the two carried a member. Repo-wide the figure is
+**six** and **38 of the 44** had never been read by any pass. The committed
+`crawl-window.txt` tagged it correctly all along, so the prose had contradicted a
+committed file. (2) This block's own *"exactly one"*, same defect, same fix.
+(3) A **third site reached only on verification** — the same sentence, live in
+**`docs/10` §1**, which the first pass did not touch; a reader of `docs/10` was
+still getting the wrong count, uncorrected and unlabelled. Three sites, all
+corrected in place with their correction attached; none deleted.
+(4) And the in-window member figure this block published as inherited — **10** — is
+**12**, re-derived; see the paragraph above and the log's §F3c. **Four edits, not
+two:** the count of corrections a page claims is itself a figure, and this one was
+understated.
+
+**What this pass narrows and does not close.** The three pre-window crawls are
+**served** — the CDX API answers `200` on the **2008–2009** and **2009–2010**
+indexes, which are *older than* `CC-MAIN-2014-23`. So **"the API does not serve
+crawls that old"** is now **falsified**, and that cell needs a different answer.
+**S-L1 stays open and is not closed here:** this pass did not test that crawl, and
+its condition — served/unserved from `cluster.idx` *as well as* from the CDX API —
+is untouched. The follow-on this pass *can* name is minted as **AC**.
 **Budget 3.3 requests per crawl — not 2 — and take the figure from
 `budget.py`, not from prose.** *Counting rule: every `results.jsonl` row whose
 crawl is one of the nine first-read crawls, ÷ 9.*
@@ -2851,8 +3003,8 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **1 open plus 26 closed**
-stand today; the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 26 closed**
+stand today (`AA`, `AC`); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
 the `android/<app-version>` axis on the two hosts that have never had it swept.
