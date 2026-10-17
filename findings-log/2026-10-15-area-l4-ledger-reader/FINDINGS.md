@@ -1186,10 +1186,18 @@ found" to anyone who does not look at the exit code. The discriminator is the ex
 code, **measured on this host's `grep` (GNU grep 3.12): `1` for a pattern that ran and
 matched nothing, `2` for a usage error, `0` for a match** — so the separation is 1
 against 2. ⚠ **This sentence first read "**0** for a pattern that ran and matched
-nothing", which is the inversion of the discrimination it claims to supply**, and it
-also claimed that each recipe published here carries its exit code; none does, so the
-three codes are given here once instead. The correction is applied to the body **and**
-recorded here — §8a-4 row 5's lesson, that *a correction recorded
+nothing", which is the inversion of the discrimination it claims to supply**, and
+the values are re-measured here, not carried: an absent token → **1**, a usage error → **2** (the
+no-`-r` directory form is one — `Is a directory` exits **2**), a matched phrase →
+**0**. Round 3 returned on the sentence's other half too: re-derived over the
+recipes this section publishes, **"none does" is false twice** — the withdrawn
+no-`-r` `grep` publishes **exit 2** as the then-value it is, and **`research-gate.sh`
+at the foot of this section publishes its own, exit 0**. The live ones name outputs
+instead: `git log … | grep -cE '^(24b9601|…)'` → **7**, `grep -rn '…' docs/` with its
+rows quoted in `docs/11`, and the escaped-alternation bullet carrying **0 hits** as
+its then-output — so the three codes are stated in prose here, not deferred to the
+recipes. The correction is applied to the body **and** recorded here — §8a-4
+row 5's lesson, that *a correction recorded
 and not applied to the body is a correction that changes nothing*.
 
 **Nothing measured moved, and nothing was re-probed.** This remains a 0-request
