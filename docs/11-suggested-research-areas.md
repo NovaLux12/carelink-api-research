@@ -190,6 +190,64 @@ party's record of a third party's fetch, and this repository has not
 independently checked one).
 
 
+### AA. Does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`?
+
+**What is known, all OBSERVED and all bounded.** The `GET
+/connect/carepartner/<base>/discover/android/3.6` **base-path** axis now has a
+three-host verdict for **all 16** base paths — **8 split, 8 uniform, 0
+ambiguous** — after the 2026-10-17 sweep of 51 requests
+([findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]). Its two
+interesting results are that `-trials` serves **one byte-identical 10 053 B
+document under seven base paths** (`v2`–`v6`, `v8`, `v9`; `cmp`-identical 7 of 7,
+`cmp`-body echoing `"config":"android,3.6"` and nothing else), and that `-trials`
+is **not** a blanket catch-all on this path (`v1`, `v7`, `v14`–`v16` and the
+`v99` absent control all answer the corpus 42 B no-route digest, same host, same
+run). That pass **deliberately held the app-version at `3.6`**, so the other axis
+is untouched.
+
+**The `android/<app-version>` axis has only ever been swept on `.eu`, and only at
+two base paths.** `04-deep-surface.hurl:14,:21` pins `v13/discover/android/3.5`
+→ `200` with `UseSSOConfiguration == Auth0SSOConfiguration` and `baseUrlCumulus`
+ending `/connect/carepartner/v11`, and `v13/discover/android/3.9` → `200` with
+**no** SSO selector — so on `.eu` at `v13` the app version demonstrably **selects
+content**. **Neither `.com` nor `-trials` has ever had this axis swept at any
+base path**, and the one cross-deployment hint points the wrong way for a
+blanket reading: on `-trials`, a *fabricated* app-version tail
+(`android/absent-probe-413306`) answered `200` with a 10 069 B body whose
+16-byte excess over the `android/3.6` cell is exactly the echoed path segment
+([findings-log/2026-10-14-pool-s8-v6split/FINDINGS.md]) — **one tail, one source,
+INFERRED to a template**. So the axis may *gate* on `.eu` and merely *echo* on
+`-trials`, and nothing on disk distinguishes those.
+
+**What is missing, and why it matters.** Whether the app-version segment is a
+content gate or an echo is the difference between "the trials deployment serves a
+real document" and "the trials deployment serves one template". Every
+`-trials`-side statement in [`docs/03`](../docs/03-discovery-and-versions.md)
+§8a rests on that distinction, and right now it is resting on **one** fabricated
+tail.
+
+**Blocker:** a request budget, not a token or an artefact. **≤20 requests** — 2
+hosts (`.com`, `-trials`) × 2 base paths (`v13`, the `-trials`-routed `v6`) ×
+{`3.5`, `3.6`, `3.9`, one fabricated `android/<distinct-length>` tail} = 16 cells,
+plus 2 controls per host (`v99` absent, `v11` served) = 4. GET only, ≥2.5 s
+same-host, controls first per host.
+
+**Closes when:** all 16 cells carry a verdict under
+[`docs/09`](../docs/09-methodology-and-oracles.md) Oracle A, and the app-version
+axis is stated as **gating** or **not gating** on each of the two hosts.
+**A negative — the axis gates nothing on `.com` or `-trials` — counts and is the
+likely answer.** Also carry back: whether the trials `1aab9bb1e721…` digest is
+stable enough to pin in `regression/hurl/`, which the 2026-10-17 pass
+deliberately did **not** do (it would add 51 requests to every weekly drift sweep
+against the ~80-request budget in `AGENTS.md` §11).
+
+**Assumptions (INFERRED):** that the trials `200` at a fabricated app-version tail
+reflects templating rather than a route that ignores the segment — measured on
+**one** tail by one pass; the assumption is precisely what this area tests. That
+the app-version segment is the only axis varying — `.eu`'s own pinned cells show
+the segment is read, so "ignored" is not available as a prior.
+
+
 > **Area V is CLOSED** (2026-10-13, claim #42) — see the Closed table at the foot of
 > this page and
 [findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md]. **Recorded negative, with a
@@ -2945,9 +3003,11 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **1 open plus 26 closed**
-stand today; the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 26 closed**
+stand today (`AA`, `AC`); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
+**`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
+the `android/<app-version>` axis on the two hosts that have never had it swept.
 
 - The area-counting patterns are widened to `^### [A-Z]{1,2}\.` wherever they live —
   [`scripts/research-checks.py`](../scripts/research-checks.py),
