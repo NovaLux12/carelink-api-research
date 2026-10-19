@@ -190,6 +190,79 @@ party's record of a third party's fetch, and this repository has not
 independently checked one).
 
 
+### AD. Can the committed `cluster.idx` locate converge — and what does the `minimed.eu` family interval actually contain?
+
+**What is known, all OBSERVED, and it is one run.** The S-L1 instrument is
+committed at `findings-log/2026-10-18-sl1-cluster-servedness/servedness.py` and
+answers **served/unserved** for any named crawl in one ranged read. It has
+classified correctly on every crawl it was pointed at: `CC-MAIN-2022-27` and
+`CC-MAIN-2024-42` both **SERVED**, the absent id `CC-MAIN-9999-99` **`404
+NoSuchKey`**, `CC-MAIN-2014-23` **SERVED** at **153 902 243 B**, and its CDX
+`404` now sits behind a **`200`** control on that same crawl
+([findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md §5–§6]). Its
+**locate** half — the banded bisection for the family interval
+`[eu,minimed)`, `eu,minimeda)` — has **never once returned a verdict on live
+data**: both controls came back **`UNCONVERGED`** at a 3-page budget, and the
+control gate correctly withheld every family claim as a result. The only
+evidence the locate machinery works at all is `selftest`, on a synthetic
+keyspace, at **0 requests**.
+
+**What is missing, and it is specific.** Nothing has ever read a `cluster.idx`
+block key for `minimed.eu`. Area M named this as `offsetB` and recorded it as
+**prepared and not sent** — the cap arrived first, after a verifier round
+corrected the stronger reading that it was mechanically blocked
+(`findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md:498-521`). So the
+question *"does this crawl's index carry the `minimed.eu` family **at all**"* is
+untouched, and it is **not** answerable from the CDX API: a `404` there cannot
+separate *the crawler never requested a `minimed.eu` URL* from *it requested one
+and the origin answered `404`* — which is exactly the ambiguity AC is chasing on
+the other side of the window.
+
+**Closes when** the locate returns a real verdict — `FAMILY_PRESENT` or
+`FAMILY_ABSENT` — for **both** controls, at a budget that is declared and
+measured rather than guessed, and then for `CC-MAIN-2014-23`. **A negative
+counts and is the likely answer**: if `CC-MAIN-2014-23`'s index carries no
+`minimed.eu` block key, that is a statement about the crawl's keyspace rather
+than about one URL, and it is stronger than any CDX `404`. **`UNCONVERGED`
+does not close this area** — it is what it already returned.
+
+**Budget, and the blocker on it, both named.** The **fix is a seed, and the seed
+is free**: the `cluster.idx` head read this instrument already performs returns
+`Content-Range` (the file's exact total length) **and** 8 KiB of the file's first
+keys. The 2026-10-19 run had both and **used neither** to seed the bisection,
+which opened at a fixed `f0 = 0.85` of file size and landed deep in
+`org,…`/`pl,…`. So the first step is **zero-request**: derive the initial
+fraction and the page schedule from the head read already in hand, plus the
+observed key distribution, and re-`selftest` it against a synthetic keyspace
+large enough that a single page cannot span it. Only then does a live run need
+the network: **budget it at ≥ 10 pages per crawl** — the observed window after
+3 pages of 4 MiB was still **18.9%** of the file — and bill it with the same
+`spacing.py` accounting. **Blocker: none** — a read of a published index, not a
+vendor surface. **What does not block it is the cap**: the 2026-10-19 pass spent
+6 of 15 rows on two control locates that could not converge at 3 pages each,
+which was its own page-schedule choice rather than a constraint
+(same log, §9).
+
+**And the zero-request half, which can start today.** Every crawl this
+repository already publishes a **classified negative** for — area M's six, area
+L's 84 in-window cells, S-L2's 44 out-of-window cells — has a served/unserved
+verdict obtainable in **one ranged read each**, and `classify` derives the whole
+table from a committed ledger without touching the network. Applying it to those
+published negatives is **zero-request once the instrument exists**, and it is the
+cheap half of this area: it would tell us, for every negative this repository
+publishes, whether the crawl's index was served at all — the pairing S-L1's
+close condition asked for and this pass could supply for only the one crawl it
+named.
+
+**Assumptions (INFERRED):** that `cluster.idx` blocks are keyed by the full
+first SURT key rather than by registrable domain (area M's standing assumption,
+still labelled INFERRED and never promoted to OBSERVED); that the keyspace's
+first keys are informative about where `eu,` sorts (untested — it is the thing
+this area would test); and that a served `cluster.idx` implies the crawl's CDX
+API is reachable (observed on one crawl, `CC-MAIN-2014-23`, and **not**
+established in either direction for the rest).
+
+
 ### AA. Does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`?
 
 **What is known, all OBSERVED and all bounded.** The `GET
@@ -2508,21 +2581,75 @@ read"**, and the hole in the broader claim stays open and stated.
 
 #### Successors to area L (dated, in place — this page cannot mint a letter)
 
-**S-L1 — the `cluster.idx`-level "is this crawl served at all" check remains
-unbuilt, and this pass gives it a second failure to work on.** The instrument that
-would turn "this crawl failed" into a statement about the crawl rather than about
-the query: for a named crawl, establish from `cluster.idx` or `collinfo.json` that
-its index is served at all, **before** any `minimed.eu` query is sent and before a
-`404` is allowed to mean anything.
-**Blocker:** none — a read of a published index, not a vendor surface.
-**Closes when** every crawl a pass names in a negative carries a served/unserved
-verdict from `cluster.idx` *as well as* from the CDX API, and a named crawl that
-cannot be read is recorded as unservable rather than left as a hole.
-`CC-MAIN-2014-23` is the named target: **four control rows, two control hosts, no
-`200`** (OBSERVED, this pass seqs 16–18, 40).
-**Assumptions (INFERRED):** that `cluster.idx` availability and CDX-API
-availability are independent signals, and that a served index with an empty result
-is distinguishable from an unserved one. Neither is demonstrated.
+**S-L1 — CLOSED 2026-10-19 (claim #152). The instrument exists, and the target's
+`404` is now a served-and-empty answer rather than an unreadable cell.** The
+instrument is `findings-log/2026-10-18-sl1-cluster-servedness/servedness.py`,
+committed under its log directory with three subcommands (`pass`, `classify`,
+`selftest`) and usable on any named crawl. **The verdict on `CC-MAIN-2014-23`,
+OBSERVED on two hosts and in this order:** the crawl is in `collinfo.json`
+(**128** published crawls; its window **2014-07-09 → 2014-08-02**, fields
+asserted `str`-typed before use); its `cluster.idx` is **SERVED**, `206` with
+`Content-Range: bytes 0-8191/153 902 243`; the CDX API answers **`200`** with
+**1 785 B** of `google.com` records on that same crawl; and the `minimed.eu`
+query then answers **`404`** + `{"message": "No Captures found for: minimed.eu"}`
+— the documented absence shape. **The cell retires on the SERVED side: this is
+"the index is served and the family is not in it", not "the crawl was
+unservable"**, and the two are not interchangeable — `AGENTS.md` §7 records that
+`index.commoncrawl.org` TLS-drops from some hosts, so an unreachable host is a
+statement about *this box*, never about a crawl. **15 requests of a 15 cap**,
+GET only, `data.commoncrawl.org` (11) and `index.commoncrawl.org` (4) only,
+**0 to any Medtronic host**, measured `t_sent` floor **3.537 s** over 11
+checkable gaps (**0 under 3.5 s, 0 under `AGENTS.md` §8's 2 s floor**), **0
+retries spent** against `E[N]` 1.00 for this run
+[source: findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md §6].
+
+**The locate half did not converge, and that is the recorded negative.** The
+`eu,minimed)`-family locate inside `cluster.idx` returned **`UNCONVERGED`** for
+both controls at a 3-page budget, so **the control gate did not pass and the
+instrument published no family-presence or family-absence verdict for any
+crawl** — including the target, whose locate was never run. The bisection
+narrowed `CC-MAIN-2022-27` to a **28 991 795 B** window (**18.9% of its
+153 702 643 B** file, ≈ 7 further 4 MiB pages) without bracketing the interval;
+its `f0 = 0.85` prior landed deep in `org,…`/`pl,…`, which is the wrong place
+for a keyspace that is **not uniform over TLDs** (INFERRED, from the three
+observed pages). **`UNCONVERGED` is not a negative and was not read as one**
+(same log, §5d, §8).
+
+**What S-L1's close condition asked, item by item.** *"served/unserved from
+`cluster.idx` for every crawl named"* — **met**: one ranged read per crawl
+answers `206` or `404`, and it classified correctly on both controls
+(`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both SERVED) against the absent-id
+oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`), which is what makes a `206`
+readable as a statement about a crawl. *"every crawl a pass names in a negative
+carries that verdict alongside its CDX verdict"* — **met for the target**, the
+only crawl this pass names a negative for. *"a named crawl that cannot be read
+is recorded unservable rather than left as a hole"* — **the branch did not
+trigger**: every crawl named was served.
+
+⚠ **Correction to this block's own text, on the record.** It named
+`CC-MAIN-2024-22` as the readable-absence control. **That crawl's own cited
+ledger contradicts it**: its S-L2 row 45 is a **`200`** for `minimed.eu`
+carrying **13 records**, not a `404`. `CC-MAIN-2024-22` is a second
+`carelink.minimed.eu` member, i.e. a **positive-adjacent** crawl. The
+documented `404 No Captures found` is **`CC-MAIN-2024-42`**
+(`findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md:349`, behind its
+row-25 `200`). The 2026-10-19 pass used `CC-MAIN-2024-42`; claim #152's
+descriptor was wrong and is corrected here rather than left standing in a
+citation someone will re-read.
+
+**Two buckets, and the instrument refuses to merge them.** `classify` prints
+**connection-level failures** (`000`, 5xx, TLS drop, timeout, non-documented 4xx
+— a statement about this host, this moment) **separately from served answers**
+(`206` on the bulk path; `200`/`301`/`302`/`404` on the CDX API, where `404` is
+the documented absence shape) — asserted in code and by `selftest`, which runs
+both predicates over every status this API has been recorded producing. A crawl
+whose every row failed at connection level is recorded **UNREAD-FROM-THIS-HOST**,
+which **does not discharge** any standing indeterminate cell. This pass: **15
+attempts, 15 served, 0 connection-level failures**
+(same log, §4).
+
+**AD** — the locate, with a seed derived from the head read (0 requests, once
+the instrument exists).
 
 **S-L2 — the window census is COMPLETE; what remains is the window itself.**
 **0 of the 84 in-window crawls are unread** after the 2026-10-15 continuation, so
@@ -3003,8 +3130,10 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 26 closed**
-stand today (`AA`, `AC`); the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 26 closed**
+stand today (`AA`, `AC`, `AD` — `AD` minted 2026-10-19 by lane sl1, the
+`cluster.idx` locate successor; counted from the `^### [A-Z]{1,2}.` headings, not
+inherited); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
 the `android/<app-version>` axis on the two hosts that have never had it swept.
@@ -3083,6 +3212,7 @@ being superseded — never silently. Letters are not reused.
 | F — what the timeline and dialog-lite gateways actually are | 2026-10-14 | **Closed NEGATIVE on the letter's own condition — no caller named, because none exists in the corpus, and no third-party client can reach either service by GET.** The caller half is a **structural** negative, not an absence of evidence: both portal builds were re-fetched on their content-hashed asset names and **reproduce their pinned anchors in full** (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…` 3 410 666 B), and in **both** bodies `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both `personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and **all five 10-character gateway ids** are **0** — while **`personal.` is 4 hits and not one is a key of the 69-name patient document** (`hcp/patients` 42, `hcp/configuration/public/` 15). **Neither build reads the patient configuration document at all**, so the pointer is unreachable from that code and no server-side proxy can exist there to follow it; that also settles the letter's "look for a proxy in the portal bundle" reading. **The `BLOCK 7` cells that had never run ran and are negative: 11 of 11 `patient-timeline` cells answer `403` `MissingAuthenticationTokenException`, 42 B, one digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which reproduces this repo's published `f249b63cb2fc` IN FULL — with the certainly-absent control byte-identical to every plausible path on all three deployments, so under Oracle A there is **no matching GET route**. Zero 404s in 17 requests, so that clause is observed on this family directly rather than by analogy from `clcloud.*`. `dialog-lite` 500s on all 4 cells with one body digest (`660f19c0…`, 36 B, **new** — the 2026-10-10 pass recorded the size and no digest) and the certainly-absent control is byte-identical to the published root on **both** regions, so **the 500 cannot discriminate the path**: it is the catch-all's signature. Zero of 15 gateway responses carry `Access-Control-*` and the header set is still the same six keys, so "neither is browser-callable" is **re-observed, not re-derived**. **Most reusable number:** `timeline` scores **196** (66+126+4, 74 signatures) against `patient-timeline`'s **0**, and all 196 are GSAP / Pusher internals, Medtronic's own snapshot-timelines **report** service, two leaked-password words, or one analytics label — `docs/09` §5's false-positive class quantified on the exact token this area hunts; a right-context census pattern returns **189** and that figure is a defect of the pattern, not a count. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the letter proposed is **1 in each build** (2 across both) and falls in the **middle** of `cum2me`, inside a leaked-password list; `baseUrl` is **2 in each build** (4 across both), every one an embedded Pusher SDK. **17 of a 40 cap**, GET only, 7 hosts, ≥2.5 s same-host, **controls first on every host**, no POST, no token exchange, no authentication. Spacing floor **2.239 s** on the `t_sent` series (1 of 10 gaps under 2.5 s, **0** under the ≥2 s floor) with **one negative duration** (seq 9, −552 ms — the known corrupt-`t0` class, **no cause asserted**); the kernel body-mtime oracle reads **2.866 s with 0 sub-2.5 s gaps**, so no gap was actually short, and that oracle is **not re-derivable from a clean clone**. ⚠ **NOT closed, and this row does not claim it:** the **three readings of the 403s** (no routes / other verbs only / the live stage is not `prod`) need an authentication attempt, excluded by `AGENTS.md` §8/§11 — four more cells went into that dead end and did not move it, and `docs/10` §1 carries the row unchanged. Also unchanged: *why* `dialog-lite` raises, and whether the raw `…timeline.config.host` value is publishable — **a disclosure judgement for a maintainer holding the value, not pre-committed here**. **Scope limit:** three builds exist and only the **patient** build has ever named the timeline at all (there every hit is an Angular component selector; area V, cited not reproduced, since `carelink.minimed.eu` is outside the claim's host set), so the negative's scope is *no web caller in any of the three builds this repo has read* (**INFERRED**, a corpus claim, not a claim about every client). **Pinned:** the EU `keys | length` = 69 assertion, **zero extra vendor requests**, completing the third copy. **Not pinned:** the gateway cells — the `execute-api.*` hosts are in no suite and adding them would widen the drift sweep's vendor budget from a research pass. Successors: the **portal lazy-chunk corpus** (224 chunks, never swept for these tokens) and the new pin's stated limit (**count ≠ set**) | [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md] | #123 |
 | R — reconcile the `deviceFamily` correction against the client consensus | 2026-10-14 | **Negative, on the area's second close condition: the value's casing stays UNOBSERVED, and `docs/05` now says so with the reason.** **0 requests of a 0 cap** — no vendor host was touched and no request of any kind was made, because a zero-request pass cannot have an oracle and this one did not manufacture one. Three findings, and the second is the one that mattered: (1) **The reconciled candidate set is 21 strings under a counting rule stated before the number** (three admitted sources hold 27 between them; the difference of **6** is duplicate **occurrences** across **5** distinct shared tokens — `SIMPLERA` is in all three sources — and the sum is printed beside the union so it cannot be mistaken for it). Every member is *extracted from a committed artefact at a named `file:line`*, so the denominator is re-derivable from a clean clone and an anchor that stops resolving exits non-zero. ⚠ **Unpinned, stated rather than left to be discovered:** the suite guards only the **map axis** — `regression/hurl/05-public-config.check.sh` pins `family count is 16`, which this pass independently re-derived — while **nothing pins the union 21, the sum 27, or the `S-CLIENT-DTO` exclusion**. A pin was considered and declined: a new `check` site moves the static count and every site that states it, and `docs/09` §4 records that widening a gate pattern in the same PR the gate passed is a maintainer decision. The gap is the re-derivation script, not a pin. (2) **One of the three candidate vocabularies the area inherited fails the provenance bar the pass sets for itself** — the third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, inside a section headed at **`:349`** — *"Round 3 — the full `RecentData` payload schema (from xDrip's message classes)"* — which names **no `file:line` and no named commit**, so `CGM` and `CC` are **not admitted** and the union is **21, not 23**; the repair is one cite, since the 2026-10-11 pass read xDrip at `366c97a8`. (3) **The three vocabularies are not one vocabulary with disagreements** — the 16 map tokens are a *published identifier axis*, the client's 5 enum + `NGP` a *prefix-matched routing classification*, and the third-party four a *product-role DTO enum*; measured overlaps are `{SIMPLERA}`, **none**, and `{GUARDIAN}` respectively, so under the client's five `startsWith` tests `CGM`/`CC` match nothing and under the third-party four `BLE`/`SIMPLERA` match nothing (INFERRED, assumptions stated). **The audit re-counted every surviving `deviceFamily` claim against `AGENTS.md` §2.1 and one was deleted outright**: `docs/05`'s "appears as a call-site field name in the lazy-chunk corpus — independent corroboration of the field name" rested on a source that records that token as **0** across the 224 chunks in its own measure table, attributes its real evidence to a different artefact with no `file:line` and no digest, and whose 224 chunk bodies are **not committed** (independent count **0** — `AGENTS.md` §1 deletes the claim, §2.1 deletes the word). Two more re-labelled: `docs/05`'s "the vendor's bundles do not contain" is **false** (the patient lazy chunk carries `medicalDeviceFamily` at byte 83,893), and `docs/10` row 37's `(GUARDIAN, MINIMED, PARADIGM)` loses **`MINIMED`/`PARADIGM`** — ⚠ **corrected 2026-10-15: the count published as their evidence was false.** The row claimed they had one uncited log line plus the row quoting it; `git grep -w` at base `7d915b8` shows **three** files carrying each token as a claimed value and a **fourth** carrying `PARADIGM` as an era label — and moves from OBSERVED to **SOURCE-OBSERVED**, since no client read here is a live response. `GUARDIAN` survives, sourceable twice. **What would change the verdict:** one authenticated `GET /patient/monitor/data`, key-names-only, value verbatim, matched against four axes (client comparison set, model code, display name, 16 map tokens); **a value matching none of the four is itself the finding**. Two successors filed under the area: read-side echo casing, and whether the `_X` suffixes mean anything | [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] | #124 |
 | K — The chunk corpus, for real this time | 2026-10-16 | **Negative on nothing, positive on completion.** Control-flow mining complete: both clinic (225) and patient (211) lazy-chunk corpora swept clean of discovery-key tokens (`baseUrlPde`, `/connect/pde`, `discover/android`, `clcloud`, `api/carepartner`, `system.gc.gz.transition.flags` leaves all 0); `system.logbook.entry.validation.config` recovered in lazy chunk `9481.6977c1a7bd7461f8` (module 79481), structure recorded as `types`/`sensorLocations.options`/`freeText`/`doseUnits.options`/`questions` with values token-gated; cross-client differential declined as not meaningful (5 clinic vs 144 patient unresolved call-site shapes, compared across constant-table vs inlined-routing builds). 0 of a 0 cap — closing on existing committed evidence from issues #56, #78, #103, #121. Successor: the 15 `hcp/configuration/public/*` keys, filed as a docs/10 §1 open question (no new letter can be minted — A–Z all in use). | [findings-log/2026-10-16-k-chunk-corpus/FINDINGS.md] | #140 |
+| **S-L1** — the `cluster.idx`-level "is this crawl served at all" instrument, and the verdict on `CC-MAIN-2014-23` | 2026-10-19 | **Closed on its close condition, and the target retired on the SERVED side.** The instrument is committed (`servedness.py`, `pass`/`classify`/`selftest`) and answers served/unserved for any named crawl in **one ranged read**, classified correctly on both controls (`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both **SERVED**) against the absent-id oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`). **`CC-MAIN-2014-23` is SERVED** — `206`, `Content-Range: bytes 0-8191/153 902 243` — and its `minimed.eu` `404` now sits behind a **`200`** control **on that same crawl** (**1 785 B** of `google.com` records), so the standing **indeterminate cell retires as served-but-empty, NOT as "unservable"**; `AGENTS.md` §7 records `index.commoncrawl.org` TLS-dropping from some hosts, so a connection-level failure is a statement about *this box* and discharges nothing. **15 of a 15 cap**, GET only, `data.commoncrawl.org` (11) + `index.commoncrawl.org` (4), **0 to any Medtronic host**, `t_sent` floor **3.537 s** (0 gaps under 3.5 s), **0 retries** at `E[N]` 1.00. **The locate half is the recorded negative: `UNCONVERGED` on both controls** at a 3-page budget, so the control gate withheld every family verdict and the target's locate never ran — `UNCONVERGED` is not a negative. ⚠ **Corrects claim #152's own descriptor**: the readable-absence control is **`CC-MAIN-2024-42`** (area M row 25 `200` / row 45 `404`), **not** `CC-MAIN-2024-22`, whose S-L2 row 45 is a **`200`** with 13 records — a positive-adjacent crawl. Successor: **AD**, the locate with a seed derived from the head read (**0 requests** once the instrument exists). | [findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md] | #152 |
 
 
 ---

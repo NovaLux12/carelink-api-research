@@ -1,0 +1,45 @@
+spacing.txt — S-L1 cluster servedness, 2026-10-19 (pass #152)
+
+Accounting method: every row in the committed ledger is one request. A
+retry is a request and is counted. Nothing is inferred from wall clock
+outside the ledger.
+
+ROWS (attempts, what the cap counts): 15
+  of which carry a t_sent (measurable spacing): 13
+  without a t_sent (spacing uncheckable, disclosed): [1, 2]
+  methods present: ['GET']
+  hosts present:   ['data.commoncrawl.org', 'index.commoncrawl.org']
+  hosts outside the two permitted: NONE
+  requests to any Medtronic host: 0 
+
+PER-HOST SPACING, from t_sent only
+  data.commoncrawl.org     10 timed sends,  9 gaps
+      floor 3.537 s   gaps under 3.5 s: 0   under AGENTS.md s8 2.0 s: 0
+  index.commoncrawl.org     3 timed sends,  2 gaps
+      floor 11.866 s   gaps under 3.5 s: 0   under AGENTS.md s8 2.0 s: 0
+  OVERALL FLOOR across both hosts: 3.537 s (declared delay 3.5 s, held inside the
+  held lock(s), so it is a floor on the SEND-to-SEND gap and not on the gap
+  between a response completing and the next request being built.)
+
+SEND TIMESTAMPS, in order
+   3  2026-10-19T22:33:36.155Z  index.commoncrawl.org    collinfo         200     35226 B
+   4  2026-10-19T22:33:39.979Z  data.commoncrawl.org     absent-crawl     404       327 B
+   5  2026-10-19T22:33:43.762Z  data.commoncrawl.org     head-ctrlA       206      8192 B
+   6  2026-10-19T22:33:47.299Z  data.commoncrawl.org     head-ctrlB       206      8192 B
+   7  2026-10-19T22:33:50.976Z  data.commoncrawl.org     locate           206   4194304 B
+   8  2026-10-19T22:33:55.462Z  data.commoncrawl.org     locate           206   4194304 B
+   9  2026-10-19T22:33:59.992Z  data.commoncrawl.org     locate           206   4194304 B
+  10  2026-10-19T22:34:04.454Z  data.commoncrawl.org     locate           206   4194304 B
+  11  2026-10-19T22:34:08.251Z  data.commoncrawl.org     locate           206   4194304 B
+  12  2026-10-19T22:34:12.062Z  data.commoncrawl.org     locate           206   4194304 B
+  13  2026-10-19T22:34:15.788Z  data.commoncrawl.org     head-target      206      8192 B
+  14  2026-10-19T22:34:19.338Z  index.commoncrawl.org    cdx-ctrl-target  200      1785 B
+  15  2026-10-19T22:34:31.204Z  index.commoncrawl.org    cdx-probe-target 404        48 B
+
+WHY THE FLOOR EXCEEDS THE DECLARED 3.5 s
+  The 3.5 s sleep is INSIDE the held lock(s), and the lock is released only
+  after the response has been read. A same-host gap is therefore
+  3.5 s + the previous response's duration, so the measured floor is a floor
+  on the send-to-send spacing and sits above the declared sleep by exactly
+  the response time. The sleep-outside-the-lock form would be worse than no
+  lock at all: it converts sequential sends into simultaneous ones.
