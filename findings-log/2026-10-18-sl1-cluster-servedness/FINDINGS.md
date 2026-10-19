@@ -85,13 +85,19 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
 - **Bodies stored outside the repository** (`AGENTS.md` §7; the hygiene check
   fails any file over 1 MiB and raw archive captures are never published).
   **Largest response 4 194 304 B** — the six locate pages, seqs 7–12, which is
-  **4× the 1 MiB ceiling on its own**. The largest response whose *head* is
-  committed is **35 226 B** (`collinfo.json`, seq 3); every committed body
-  projection is bounded to 300 characters. **The 4 MiB pages are precisely why
-  the bodies stay out of the tree**, and an earlier draft of this sentence cited
-  the 35 226 B figure as "the largest response" — corrected here because the
-  ledger's own `body_bytes` column contradicts it (seqs 7–12 each carry
-  `4194304`). Headers, ledger, projections and scripts are in the tree.
+  **4× the 1 MiB ceiling on its own**, and **all six carry a committed
+  `body_head` in the ledger**, so they are committed projections too. What is
+  *not* committed is the body itself: every projection is truncated to **300
+  characters** (`body_head` length is 300 on seqs 7–12, and on every other
+  row). **The 4 MiB pages are precisely why the bodies stay out of the tree.**
+  ⚠ **Correction (verifier round 3):** this bullet previously read *"the largest
+  response whose **head** is committed is 35 226 B"* — which is false, and
+  self-refuting two lines later, since the six locate pages are exactly the
+  responses whose heads are committed. **Round 1 caught the number (35 226 B)
+  and round 3 caught the predicate that was left attached to it**; the
+  corrected statement distinguishes *the response* (4 194 304 B, not committed)
+  from *its committed projection* (300 B, committed). Headers, ledger,
+  projections and scripts are in the tree.
 
 Ledger: `results.jsonl` (15 rows, one per request). Runner: `servedness.py pass`.
 Accounting re-derivation: `spacing.py` → `spacing.txt`. Captures: `headers/`,
@@ -160,7 +166,7 @@ What each line **proves**, as opposed to describes:
 |---|---|
 | `POSITIVE` | the interval test finds an apex key and a subdomain key |
 | `NEGATIVE` | absence is proven **only** by the adjacent `< FAM_LO` / `≥ FAM_HI` pair — a page with no family key does not on its own produce an absence |
-| `CONSTRAINED` | a locate whose reads sort entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **This is the exact failure this pass then hit live** (§5) |
+| `CONSTRAINED` | a locate whose reads sort entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **This is the shape the pass hit live, though not the identical one** — see §5b, where the three reads straddled the interval without bracketing it rather than sorting wholly before it |
 | `NEAR-MISS` | `eu,minimif)` — one character different — sorts outside the interval, so a lookalike domain is not counted as the family |
 | `FETCH FAILED` | a transport failure is `FETCH_FAILED`, never an absence |
 | `TAXONOMY` | both predicates over every status this API has been recorded producing, **asserted in code** (§4) |
@@ -549,3 +555,59 @@ load-bearing rather than decorative**.
 requires the `gate` check and currently **zero** approving reviews, so the
 substitute for a human reviewer is a fresh-context verifier plus CI — weaker,
 and stated as weaker.
+
+### Round 3 — `CONTRADICTS f211e50`
+
+Two **blocking** findings, and **both are residual forms of defects an earlier
+round had already forced a rewrite of** — which is the finding about the
+process, not only about the two sentences:
+
+1. **The "largest response whose *head* is committed is 35 226 B" clause was
+   false, and self-refuting.** Round 1 caught the *number* (`35 226 B` against
+   the ledger's `4194304`) and the fix corrected the number while **leaving the
+   predicate attached to it** — and the six locate pages carry a committed
+   `body_head` each (length 300, verified over seqs 7–12), so they are exactly
+   the responses whose heads *are* committed. → **corrected** to separate *the
+   response* (4 194 304 B, not committed) from *its committed projection*
+   (300 B, committed). A half-fix that leaves the false shape in place is worse
+   than the original, because the next reader checks the number and stops.
+2. **`docs/11:2606` still said "10 of the 15 rows went to the bulk path."** The
+   ledger puts **11 of 15** on `data.commoncrawl.org` (seqs 2, 4–13); 10 of the
+   **13** instrumented. Round 2 fixed this in the log and it **never propagated
+   to the canonical page** — which then contradicted itself six lines above and
+   the source it cites four lines below. → **corrected**, and the *lesson*
+   recorded: **`docs/` is canonical and `findings-log/` is the log, so a
+   correction made only in the log is a correction nobody reads.**
+
+Three non-blocking items, also fixed:
+
+3. **"This is the exact failure this pass then hit live"** was an overreach. The
+   `CONSTRAINED` case injects reads sorting wholly *before* the interval; the
+   live failure had reads **straddling** it (62 M `com,…`, 95 M `fr,…`–`gr,…`,
+   128 M `org,…`–`pl,…`) and failing to bracket. Same *shape*, different
+   geometry — now stated as the shape, not as the identical failure.
+4. **The new closed-area row was invisible to the counting rule.** Written
+   `| **S-L1** — …`, it matched neither `^\| [A-Z]{1,2} —` (three characters, and
+   a `-` inside the id) nor the bolded variant; `| S6 — …` is uncounted for the
+   same reason. **The count was left at 26** — raising it to match the visible
+   rows would fail the check that measures it — and the discrepancy is now
+   stated on the page rather than left for the next reader to trip over
+   (`AGENTS.md` §6 item 7).
+5. **S-L1's third close condition is satisfied vacuously**, and its literal
+   wording is one this pass argues against: the block says an unreadable crawl
+   is recorded **unservable**, while §4 argues `unservable` is the wrong label
+   for exactly that case and records **`UNREAD-FROM-THIS-HOST`** instead. The
+   branch did not trigger, so the area is not closed on having satisfied it; the
+   condition needs rewording, and `docs/11` now says so.
+
+**Pattern across three rounds, stated because it is the transferable part:**
+every blocking finding was an **accounting sentence** — never the servedness
+claim, never the evidence classes, never the independence count. Each was
+*derived prose that did not survive its own source table* (`AGENTS.md` §6
+item 5), and each was caught by recomputing the ledger rather than reading the
+prose. Two were half-fixes that left the false shape behind, and one was a
+correction that never left the log. **The static gate catches none of this
+class**: `research-checks.py` validates `[source: …]` *paths* and a heading
+count, so a stale line number, a wrong arithmetic claim and an uncounted table
+row all pass it. Every one was found by a fresh-context verifier recomputing
+from `results.jsonl`.
