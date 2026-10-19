@@ -352,9 +352,14 @@ reader does not repeat the search
 section (`AGENTS.md` §2.1). This is the *path-borne* axis; §3a is the separate
 *body*-borne one, and the two are not the same thing.
 
-Swept `GET /connect/carepartner/<base>/discover/android/<tail>` on the two hosts
-that had never had this axis swept at any base path — `clcloud.minimed.com` and
-`clcloud-trials.minimed.com` — at bases `v13` and `v6`, tails
+**What was already swept, so the novelty is not overstated:** the axis had been
+swept on `.eu` (§3), and on `-trials` at **one** base path and **two** tails —
+`/v6/discover/android/{3.6,3.8}` (§8). It had **never** been swept on
+`clcloud.minimed.com` at any base, nor on either host at base `v13`.
+
+Swept `GET /connect/carepartner/<base>/discover/android/<tail>` on the two cumulus
+`.com`/`-trials` hosts — `clcloud.minimed.com` and `clcloud-trials.minimed.com` —
+at bases `v13` and `v6`, tails
 `{3.5, 3.6, 3.9, absent-probe-871}`, controls first per host, **20 of 20
 requests**, GET only, measured same-host spacing floor **3.304 s**
 [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §1].
@@ -567,7 +572,7 @@ SSO-config filename variant
 at `carelink-trials` hosts, and is **app-version-collapsed** (`android/3.8`
 byte-identical to `android/3.6` except the echoed `"config":"android,3.8"`;
 **re-measured 2026-10-17 at four tails including a fabricated one**, all
-collapsing to one canonical digest — [§3b.3](#3b3--and-at--trials-base-v6-it-selects-nothing--observed))
+collapsing to one canonical digest — [§3b.3](#3b3-but-at--trials-base-v6-it-selects-nothing--observed))
 [source: VERSION-AXIS §4;
 findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.3]. Separately,
 `v6/display/message` — the exact URL the

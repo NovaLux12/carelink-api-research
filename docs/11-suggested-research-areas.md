@@ -278,9 +278,12 @@ carry back: whether the `3.9`-class document's **host** difference (99 countries
 an EU SSO entry on `.com` against US-only 76 on `-trials`) is a country-list
 consequence or a separate axis — no prior row varies the country axis.
 
-**Non-duplicate:** no prior pass varies the tail *strictly between* two documented
-cells; AA's four tails bracket nothing, and `docs/03` §3's published cells are
-`3.5`/`3.6`/`3.9` and `3.7`/`3.8`. **Assumptions (INFERRED):** that the `3.6`-class
+**Non-duplicate:** intermediate tails **do** exist in the record — `docs/03` §3
+documents `3.7` and `3.8` as part of the `3.6` class — but **every one of them was
+measured on `.eu`**. On `.com` and `-trials` the only tails ever requested at base
+`v13` are `3.5`, `3.6`, `3.9` and AA's fabricated value, so no intermediate tail has
+been swept on either host at that base. AA's four tails bracket nothing. **Assumptions
+(INFERRED):** that the `3.6`-class
 and `3.9`-class documents on `v13` remain distinct long enough for a ladder to
 separate them — they were distinct on 2026-10-17; and that the response document is a
 function of `(host, base, tail)` with no fourth input, which AA's cross-product is

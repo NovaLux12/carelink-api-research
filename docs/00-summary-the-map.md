@@ -108,14 +108,15 @@ the echoed request string (`"config": "android,12.0"`). **The "enum is
 open-ended" note is superseded: there is no undiscovered Auth0+v13 fallback.**
 
 > **"Byte-identical" holds *within* a host, not across them — added 2026-10-17
-> (area AA).** The sentence above was measured on one host and reads as global. The
-> legacy (`3.9`-class) document is **host-specific**: at base `v13` it carries an
-> **EU** SSO entry and **99** countries on `clcloud.minimed.com` against a **US-only
-> 76** on `clcloud-trials.minimed.com`. The `3.5` and `3.6` documents are
-> byte-identical **across** both hosts, so what is host-specific is confined to the
-> legacy tier. Separately, at `-trials` base `v6` the app-version tail gates
-> **nothing** — four tails including a fabricated one collapse to one document —
-> while at `v13` it gates content. OBSERVED, 20 of 20 requests:
+> (area AA).** The sentence above is not scoped to a host, and on the two cumulus
+> `.com`/`-trials` hosts it does not hold across them. The legacy (`3.9`-class)
+> document is **host-specific**: at base `v13` it carries an **EU** SSO entry and
+> **99** countries on `clcloud.minimed.com` against a **US-only 76** on
+> `clcloud-trials.minimed.com`. The `3.5` and `3.6` documents are byte-identical
+> **across** both hosts, so what is host-specific is confined to the legacy tier.
+> Separately, at `-trials` base `v6` the app-version tail gates **nothing** — four
+> tails including a fabricated one collapse to one document — while at `v13` it gates
+> content. OBSERVED, 20 of 20 requests:
 > [`03-discovery-and-versions.md`](03-discovery-and-versions.md) §3b
 > [findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md].
 

@@ -73,9 +73,11 @@ same digest** — one envelope, not six distinct answers (§6).
 
 [`spacing.py`](./spacing.py) → [`spacing.txt`](./spacing.txt), re-run for this
 write-up. **Counting rule:** one gap per consecutive same-host pair in request
-order, so 10 bodies give 9 gaps per host. Two independent clocks are reported —
-the `t_sent` field in the ledger, and the capture file mtime — because one
-clock alone cannot catch a mis-stamped date series.
+order, so 10 bodies give 9 gaps per host. **Two clocks** are reported — the
+`t_sent` field in the ledger, and the capture file mtime — because one clock alone
+cannot catch a mis-stamped date series. They are two *measurements*, not two
+sources: both come from this one run, so under `AGENTS.md` §2.1 the count is **1**
+and neither is described as corroborating the other.
 
 | host | gaps | `t_sent` min | `t_sent` max | gaps < 2.5 s | gaps < 2.0 s |
 |---|---|---|---|---|---|
@@ -83,7 +85,7 @@ clock alone cannot catch a mis-stamped date series.
 | `clcloud-trials.minimed.com` | 9 | **3.425 s** | 9.051 s | **0** | **0** |
 
 **Measured floor: 3.304 s**, against a stated 2.5 s and a repo floor of 2 s
-(`AGENTS.md` §8). The mtime series independently gives 3.312 s / 3.442 s minima
+(`AGENTS.md` §8). The mtime series gives 3.312 s / 3.442 s minima
 with the same zero counts.
 
 Two things are reported rather than smoothed. First, the series **disagree** on
@@ -108,9 +110,10 @@ claim's literal host list was wrong for this route family.
 published on the **cumulus** hosts, not on the `carelink.*` app/API hosts. The
 bridge reads it from `baseUrlCumulus`, which
 [`docs/03` §1](../../docs/03-discovery-and-versions.md) records as
-`…clcloud-trials.minimed.com/connect/carepartner/v13`, and §2 lists the three
-hosts the discovery document is read from as `clcloud.{minimed.eu, minimed.com,
-clcloud-trials.minimed.com}`. A `carelink.*` host is a different plane: it is
+`…clcloud-trials.minimed.com/connect/carepartner/v13`, and the same section lists
+the three hosts the discovery document is read from as `clcloud.{minimed.eu,
+minimed.com, clcloud-trials.minimed.com}`. A `carelink.*` host is a different
+plane: it is
 where `baseUrlCareLink` points, not where discovery lives.
 
 **Does it answer the area as posed?** **Yes, for the question the area asks,
@@ -260,9 +263,10 @@ adds to nor overturns that. **No choice is made between the two readings.**
 - **`x-cum-signature`.** All 14 `200` cells carry a 344-char signature and every
   one differs per cell. This pass did **not** vary the axis that would settle
   whether it is a function of `(document, host)` as `docs/03` §1 now holds, and
-  **makes no claim about it.** The three distinct raw digests at `results.jsonl:3`
-  and `:13` are one document on two hosts, which is the shape `docs/03` §1
-  already records — restated, not re-derived.
+  **makes no claim about it.** Two of the `v13` documents each arrive byte-identical
+  on both hosts — `results.jsonl:3`/`:13` (`192c47c062d71c15…`, the `3.5` cell) and
+  `:4`/`:14` (`f84886265667b1b6…`, the `3.6` cell) — which is the shape `docs/03` §1
+  already records. Restated, not re-derived.
 
 ---
 
@@ -286,9 +290,11 @@ at `v13`. The prior matrix pass declined the same pin for the same reason
 
 One lane, one run, one ledger, one author. Under `AGENTS.md` §2.1 the count is
 **1** for every claim here, including the cross-host byte-identity at `3.5`/`3.6`
-— a single run reporting on two hosts is one source observed twice. No
-*independently*, *corroborated*, *confirms* or *double-sourced* appears in this
-log or in the prose derived from it.
+— a single run reporting on two hosts is one source observed twice. The words
+*independently*, *corroborated*, *confirms* and *double-sourced* carry no claim in
+this log or in the prose derived from it; where agreement between measurements is
+worth reporting it is named as coherence (*consistent with*, *does not contradict*)
+rather than multiplicity.
 
 ## 9 · Evidence table
 
