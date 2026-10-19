@@ -345,6 +345,98 @@ reader does not repeat the search
 
 ---
 
+## 3b. The `android/<app-version>` axis on `.com` and `-trials` — **gating at `v13`, collapsed at `v6`**
+
+**Added 2026-10-17 (area AA), one pass, one ledger.** Every claim below rests on
+**one** source — this repository — so no strength word is used anywhere in this
+section (`AGENTS.md` §2.1). This is the *path-borne* axis; §3a is the separate
+*body*-borne one, and the two are not the same thing.
+
+Swept `GET /connect/carepartner/<base>/discover/android/<tail>` on the two hosts
+that had never had this axis swept at any base path — `clcloud.minimed.com` and
+`clcloud-trials.minimed.com` — at bases `v13` and `v6`, tails
+`{3.5, 3.6, 3.9, absent-probe-871}`, controls first per host, **20 of 20
+requests**, GET only, measured same-host spacing floor **3.304 s**
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §1].
+
+**The area's question was posed as a choice between "content gate" and "echo".
+The cells answer neither, and the status line alone would have got it wrong.**
+
+### 3b.1 The tail is echoed, and never validated — OBSERVED
+
+All **14** `200` bodies begin `{"config":"android,<requested tail>",` and carry
+the requested tail **exactly once** in the body bytes. A syntactically
+fabricated tail, `android/absent-probe-871`, answered **`200`** — not `400`,
+not `404` — at three cells. **There is no allow-list on this segment**
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.1].
+
+### 3b.2 …and at base `v13` it also *selects* — OBSERVED
+
+Erase the echo and re-digest, and base `v13` yields **three** distinct documents
+per host. The selection is substantive, not cosmetic: `3.6` → `3.9` moves the
+advertised `baseUrlCumulus` base (`v13` → `v2`), the `baseUrlCareLink` API
+version (`v2` → `v1`), the `CP[]` length (3 → 2, the CLINICAL entry gone), the
+country count (109 → 99 on `.com`, 109 → 76 on `-trials`), and the SSO config
+file family (`oauth20_sso_carepartner_*_v6.json` → `sso_cp_us_v6.json` /
+`eu_sso_cp_eu_v6.json`)
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2].
+
+| tail | `clcloud.minimed.com` | `clcloud-trials.minimed.com` |
+|---|---|---|
+| `3.5` | advertises cumulus **v11** · carelink v2 · CP 3 · ctry 109 | **byte-identical to `.com`** |
+| `3.6` | advertises cumulus **v13** · carelink v2 · CP 3 · ctry 109 | **byte-identical to `.com`** |
+| `3.9` | advertises cumulus **v2** · carelink v1 · CP 2 · ctry 99 | advertises cumulus **v2** · carelink v1 · CP 2 · ctry **76**, no EU SSO entry |
+| `absent-probe-871` | **same document as `3.9`** | **same document as `3.9`** |
+
+The `3.5` and `3.6` documents are byte-identical **across** the two hosts; the
+`3.9`-class document is not. So `.eu`'s published three-way split (§3) holds on
+both hosts, and what is host-specific is confined to the legacy tier.
+
+### 3b.3 …but at `-trials` base `v6` it selects nothing — OBSERVED
+
+All four tails collapse to **one** canonical digest, **n=4**: the tail is echoed
+and *nothing else* about the request varies the body. This strengthens §8's
+"app-version-collapsed" from a two-tail observation to four tails including a
+fabricated one. The `3.6` cell reproduces the digest and byte count the
+2026-10-17 matrix pass recorded for trials `v6`
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.3].
+
+```mermaid
+flowchart TD
+    A["GET /connect/carepartner/<base>/discover/android/<tail>"] --> B{"does this host serve<br/>this base at all?"}
+    B -- "no: 403 MissingAuthenticationTokenException (OBSERVED, clcloud.minimed.com + v6)" --> C["no document exists,<br/>so the tail selects nothing"]
+    B -- "yes (OBSERVED)" --> D{"after erasing the echoed tail,<br/>do the bodies still differ?"}
+    D -- "yes: >=2 distinct documents (OBSERVED, v13 on both hosts)" --> E["tail GATES which document is served"]
+    D -- "no: 1 document for all 4 tails (OBSERVED, v6 on -trials)" --> F["tail is ECHOED only,<br/>not a content gate"]
+    E --> G["both, always: the requested tail is echoed into<br/>config in every 200, and a fabricated tail<br/>answers 200 - there is no allow-list"]
+```
+
+### 3b.4 The `v6` split is a **base-axis** effect, not an app-version effect
+
+`clcloud.minimed.com` answers `403` on all four `v6` cells; `-trials` answers
+`200` on all four. That is **not** an app-version effect, and the rows settle
+it: on the same host at the **same tail** `3.6`, base `v11` returns `200`. The
+segment that decides `403` vs `200` there is the **base**. Whether `v6` is
+unrouted on `.com` because of the version segment or the `v6/discover/android/*`
+route family is **not established** — no `v6/display/message` or `v6/discover`
+prefix cell was sent — and no choice is made between those readings
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §5].
+
+### 3b.5 What this does not establish — INFERRED
+
+**Whether the tail is a lookup table or a threshold is not separable from four
+tails**, three of them adjacent: a boundary anywhere in `(3.5, 3.6]` or
+`(3.6, 3.9]` fits the data exactly as well as a per-value table. **Assumption:**
+none needed for the cells above; this is a statement about what four tails can
+discriminate. Area **AE** carries the open form
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §6].
+
+**Base `v11` carries no verdict** — one tail was sent there, as a control, and
+one cell cannot separate "selects" from "does not select". Nothing is claimed
+about `v11` on the app-version axis.
+
+---
+
 ## 4. The Auth0 + cumulus-v13 cell matrix
 
 | Cell | Auth0 | cumulus | CLINICAL | Document |
@@ -473,8 +565,12 @@ v13. `supportedCountries` differs between the two; `certificates[]` does not
 SSO-config filename variant
 `https://carelink-trials.minimed.com/configs/v1/sso_cp_us_v6.json`, points every region
 at `carelink-trials` hosts, and is **app-version-collapsed** (`android/3.8`
-byte-identical to `android/3.6` except the echoed `"config":"android,3.8"`)
-[source: VERSION-AXIS §4]. Separately, `v6/display/message` — the exact URL the
+byte-identical to `android/3.6` except the echoed `"config":"android,3.8"`;
+**re-measured 2026-10-17 at four tails including a fabricated one**, all
+collapsing to one canonical digest — [§3b.3](#3b3--and-at--trials-base-v6-it-selects-nothing--observed))
+[source: VERSION-AXIS §4;
+findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.3]. Separately,
+`v6/display/message` — the exact URL the
 vendor's own country-settings config hands out as `blePereodicDataEndpoint` — returns
 **403 on GET** and **200 with CORS on OPTIONS** on all three hosts: the resource exists,
 the **GET method is not defined**, it is POST-only, matching `work/METHOD-FACTS.md`'s
@@ -541,6 +637,17 @@ whose `-trials` response is the *same 10 053 B body*, byte for byte (`cmp`,
 7 of 7).** That body echoes `"config":"android,3.6"` and **nothing else** about
 the request: no byte of it varies with the base path. The trials-only cell is a
 property of **that one document on that one deployment**, not of `v6`.
+
+> **Extended 2026-10-17 (area AA): no byte of it varies with the app-version tail
+> either.** This paragraph established the base-path axis; the tail axis was swept
+> separately and lands the same way. At `-trials` base `v6`, tails `3.5`, `3.6`,
+> `3.9` and a fabricated `absent-probe-871` all collapse to **one** canonical
+> digest after the echo is erased — an **n=4** group, versus the **n=3**-way split
+> the same tail sweep produces at base `v13` on the same host. So `-trials` `v6`
+> is collapsed on **both** axes at once, and it is the one cell in the corpus where
+> a fabricated tail is indistinguishable from three numeric ones. OBSERVED;
+> [§3b.3](03-discovery-and-versions.md#3b-the-androidapp-version-axis-on-com-and--trials--gating-at-v13-collapsed-at-v6)
+> [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.3].
 
 **And the `-trials` column is not a catch-all**, which is what makes this a
 finding rather than an artefact: on the same host, in the same run, `v1`, `v7`,

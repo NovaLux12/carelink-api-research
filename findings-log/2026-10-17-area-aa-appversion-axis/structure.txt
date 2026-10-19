@@ -1,0 +1,54 @@
+bodies read: 20
+
+## Per-cell structure
+seq host                   reqbase tail                st config                     advCumulus  carelink  CP ctry cert echo_n raw         canon
+  1 clcloud.minimed.com    v99     3.6                403 -                -           -        -    -     -      - f249b63cb2fc  -
+  2 clcloud.minimed.com    v11     3.6                200 android,3.6                v2          v1         2   99    8      1 2103b7e850c4  7ac09335c7e4
+  3 clcloud.minimed.com    v13     3.5                200 android,3.5                v11         v2         3  109    8      1 192c47c062d7  a803d42bcd09
+  4 clcloud.minimed.com    v13     3.6                200 android,3.6                v13         v2         3  109    8      1 f84886265667  7ad212402d7f
+  5 clcloud.minimed.com    v13     3.9                200 android,3.9                v2          v1         2   99    8      1 015a25288ba8  7ac09335c7e4
+  6 clcloud.minimed.com    v13     absent-probe-871   200 android,absent-probe-871   v2          v1         2   99    8      1 8786c15268d3  7ac09335c7e4
+  7 clcloud.minimed.com    v6      3.5                403 -                -           -        -    -     -      - f249b63cb2fc  -
+  8 clcloud.minimed.com    v6      3.6                403 -                -           -        -    -     -      - f249b63cb2fc  -
+  9 clcloud.minimed.com    v6      3.9                403 -                -           -        -    -     -      - f249b63cb2fc  -
+ 10 clcloud.minimed.com    v6      absent-probe-871   403 -                -           -        -    -     -      - f249b63cb2fc  -
+ 11 clcloud-trials.minimed.com v99     3.6                403 -                -           -        -    -     -      - f249b63cb2fc  -
+ 12 clcloud-trials.minimed.com v11     3.6                200 android,3.6                v13         v2         3  109    8      1 94b739dda478  def5847975c6
+ 13 clcloud-trials.minimed.com v13     3.5                200 android,3.5                v11         v2         3  109    8      1 192c47c062d7  a803d42bcd09
+ 14 clcloud-trials.minimed.com v13     3.6                200 android,3.6                v13         v2         3  109    8      1 f84886265667  7ad212402d7f
+ 15 clcloud-trials.minimed.com v13     3.9                200 android,3.9                v2          v1         2   76    8      1 66ac7fbd19a2  9962b3db79b1
+ 16 clcloud-trials.minimed.com v13     absent-probe-871   200 android,absent-probe-871   v2          v1         2   76    8      1 fa4711cc4801  9962b3db79b1
+ 17 clcloud-trials.minimed.com v6      3.5                200 android,3.5                v2          v1         2   76    3      1 9b61847639ce  3b9d84b2525c
+ 18 clcloud-trials.minimed.com v6      3.6                200 android,3.6                v2          v1         2   76    3      1 1aab9bb1e721  3b9d84b2525c
+ 19 clcloud-trials.minimed.com v6      3.9                200 android,3.9                v2          v1         2   76    3      1 a8903df2e934  3b9d84b2525c
+ 20 clcloud-trials.minimed.com v6      absent-probe-871   200 android,absent-probe-871   v2          v1         2   76    3      1 bad674413bc3  3b9d84b2525c
+
+## Q1 — is the tail echoed?
+  documents: 14
+  every one carries the requested tail in its body bytes: True
+  occurrence counts seen: [1] (1 = the echo is confined to the config field)
+  a fabricated tail answered 200 (no 400/404) at: seq 6, seq 16, seq 20
+
+## Q2 — does the tail select, or is the echo the whole story?
+  canonical = tail erased, then sha256. A group of size >=2 proves the
+  tail did not vary the rest of the body; a group of size 1 proves nothing.
+  clcloud-trials.minimed.com v11   def5847975c6  n=1  [3.6]  advCumulus=v13 carelink=v2 CP=3 ctry=109
+  clcloud-trials.minimed.com v13   a803d42bcd09  n=1  [3.5]  advCumulus=v11 carelink=v2 CP=3 ctry=109
+  clcloud-trials.minimed.com v13   7ad212402d7f  n=1  [3.6]  advCumulus=v13 carelink=v2 CP=3 ctry=109
+  clcloud-trials.minimed.com v13   9962b3db79b1  n=2  [3.9, absent-probe-871]  advCumulus=v2 carelink=v1 CP=2 ctry=76
+  clcloud-trials.minimed.com v6    3b9d84b2525c  n=4  [3.5, 3.6, 3.9, absent-probe-871]  advCumulus=v2 carelink=v1 CP=2 ctry=76
+  clcloud.minimed.com    v11   7ac09335c7e4  n=1  [3.6]  advCumulus=v2 carelink=v1 CP=2 ctry=99
+  clcloud.minimed.com    v13   a803d42bcd09  n=1  [3.5]  advCumulus=v11 carelink=v2 CP=3 ctry=109
+  clcloud.minimed.com    v13   7ad212402d7f  n=1  [3.6]  advCumulus=v13 carelink=v2 CP=3 ctry=109
+  clcloud.minimed.com    v13   7ac09335c7e4  n=2  [3.9, absent-probe-871]  advCumulus=v2 carelink=v1 CP=2 ctry=99
+
+## Per-(host, base) verdict on the tail axis
+  clcloud-trials.minimed.com base v11   tails=1 canonical_documents=1  -> NO VERDICT (one tail sent on this base; the axis was not varied)
+  clcloud-trials.minimed.com base v13   tails=4 canonical_documents=3  -> GATING (tail selects >=2 documents)
+  clcloud-trials.minimed.com base v6    tails=4 canonical_documents=1  -> NOT GATING (one document for every tail sent)
+  clcloud.minimed.com    base v11   tails=1 canonical_documents=1  -> NO VERDICT (one tail sent on this base; the axis was not varied)
+  clcloud.minimed.com    base v13   tails=4 canonical_documents=3  -> GATING (tail selects >=2 documents)
+
+## No-route envelope
+  cells: 6; distinct digests: ['f249b63cb2fc']
+  rows: 1, 7, 8, 9, 10, 11

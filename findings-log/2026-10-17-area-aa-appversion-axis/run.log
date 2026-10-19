@@ -1,0 +1,25 @@
+2026-10-17T23:45:58.489Z  === host clcloud.minimed.com — 10 requests, controls first (v99 absent, v11 served) ===
+2026-10-17T23:46:02.214Z  seq=1 host_seq=1 clcloud.minimed.com v99 android/3.6 [control-absent] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:10.879Z  seq=2 host_seq=2 clcloud.minimed.com v11 android/3.6 [control-served] GET -> 200 application/json;charset=utf-8 18105B err=<none> cum=yes sha=2103b7e850c4 gate_waits=0
+2026-10-17T23:46:14.534Z  seq=3 host_seq=3 clcloud.minimed.com v13 android/3.5 [data-v13] GET -> 200 application/json;charset=utf-8 20256B err=<none> cum=yes sha=192c47c062d7 gate_waits=0
+2026-10-17T23:46:18.387Z  seq=4 host_seq=4 clcloud.minimed.com v13 android/3.6 [data-v13] GET -> 200 application/json;charset=utf-8 20256B err=<none> cum=yes sha=f84886265667 gate_waits=0
+2026-10-17T23:46:21.838Z  seq=5 host_seq=5 clcloud.minimed.com v13 android/3.9 [data-v13] GET -> 200 application/json;charset=utf-8 18105B err=<none> cum=yes sha=015a25288ba8 gate_waits=0
+2026-10-17T23:46:25.369Z  seq=6 host_seq=6 clcloud.minimed.com v13 android/absent-probe-871 [data-v13] GET -> 200 application/json;charset=utf-8 18118B err=<none> cum=yes sha=8786c15268d3 gate_waits=0
+2026-10-17T23:46:28.876Z  seq=7 host_seq=7 clcloud.minimed.com v6 android/3.5 [data-v6] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:32.198Z  seq=8 host_seq=8 clcloud.minimed.com v6 android/3.6 [data-v6] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:35.615Z  seq=9 host_seq=9 clcloud.minimed.com v6 android/3.9 [data-v6] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:38.926Z  seq=10 host_seq=10 clcloud.minimed.com v6 android/absent-probe-871 [data-v6] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:38.929Z  === host clcloud.minimed.com done: 10 requests, controls first ===
+2026-10-17T23:46:38.932Z  === host clcloud-trials.minimed.com — 10 requests, controls first (v99 absent, v11 served) ===
+2026-10-17T23:46:42.290Z  seq=11 host_seq=1 clcloud-trials.minimed.com v99 android/3.6 [control-absent] GET -> 403 application/json 42B err=MissingAuthenticationTokenException cum=no sha=f249b63cb2fc gate_waits=0
+2026-10-17T23:46:51.330Z  seq=12 host_seq=2 clcloud-trials.minimed.com v11 android/3.6 [control-served] GET -> 200 application/json;charset=utf-8 20345B err=<none> cum=yes sha=94b739dda478 gate_waits=0
+2026-10-17T23:47:00.176Z  seq=13 host_seq=3 clcloud-trials.minimed.com v13 android/3.5 [data-v13] GET -> 200 application/json;charset=utf-8 20256B err=<none> cum=yes sha=192c47c062d7 gate_waits=0
+2026-10-17T23:47:03.717Z  seq=14 host_seq=4 clcloud-trials.minimed.com v13 android/3.6 [data-v13] GET -> 200 application/json;charset=utf-8 20256B err=<none> cum=yes sha=f84886265667 gate_waits=0
+2026-10-17T23:47:07.288Z  seq=15 host_seq=5 clcloud-trials.minimed.com v13 android/3.9 [data-v13] GET -> 200 application/json;charset=utf-8 16369B err=<none> cum=yes sha=66ac7fbd19a2 gate_waits=0
+2026-10-17T23:47:10.815Z  seq=16 host_seq=6 clcloud-trials.minimed.com v13 android/absent-probe-871 [data-v13] GET -> 200 application/json;charset=utf-8 16382B err=<none> cum=yes sha=fa4711cc4801 gate_waits=0
+2026-10-17T23:47:19.236Z  seq=17 host_seq=7 clcloud-trials.minimed.com v6 android/3.5 [data-v6] GET -> 200 application/json;charset=utf-8 10053B err=<none> cum=yes sha=9b61847639ce gate_waits=0
+2026-10-17T23:47:22.734Z  seq=18 host_seq=8 clcloud-trials.minimed.com v6 android/3.6 [data-v6] GET -> 200 application/json;charset=utf-8 10053B err=<none> cum=yes sha=1aab9bb1e721 gate_waits=0
+2026-10-17T23:47:26.176Z  seq=19 host_seq=9 clcloud-trials.minimed.com v6 android/3.9 [data-v6] GET -> 200 application/json;charset=utf-8 10053B err=<none> cum=yes sha=a8903df2e934 gate_waits=0
+2026-10-17T23:47:29.643Z  seq=20 host_seq=10 clcloud-trials.minimed.com v6 android/absent-probe-871 [data-v6] GET -> 200 application/json;charset=utf-8 10066B err=<none> cum=yes sha=bad674413bc3 gate_waits=0
+2026-10-17T23:47:29.646Z  === host clcloud-trials.minimed.com done: 10 requests, controls first ===
+2026-10-17T23:47:29.649Z  === done: 20 requests sent, cap 20 ===

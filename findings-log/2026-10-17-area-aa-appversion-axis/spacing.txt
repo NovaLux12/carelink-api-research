@@ -1,0 +1,45 @@
+Two-clock spacing check — area AA app-version axis, 2026-10-17
+Counting rule: one gap per consecutive same-host pair in request order;
+N bodies give N-1 gaps. Declared delay 2.5 s; repo floor >=2 s.
+
+## 0. Self-conviction check — impossible durations (t_done < t_sent)
+  0 of 20 rows carry a negative duration — the date series is not
+  self-refuting on this pass, so its gaps are evidence, not artefacts.
+
+## clcloud.minimed.com
+  gaps: 9   bodies: 10
+  t_sent series : min 3.304 s  max 8.992 s  under 2.5 s: 0  under 2.0 s: 0
+  mtime  series : min 3.312 s  max 8.855 s  under 2.5 s: 0  under 2.0 s: 0
+  per-gap |send - mtime| : max 5.374 s  median 0.0095 s  disagreeing >0.5 s: 2
+  span check: mtime span 36.906 s  vs t_sent span 37.022 s  vs t_done span 36.906 s
+  per-row (microsecond mtime series, so a fresh clone can re-read it):
+     1->2  send 3.480839  mtime 8.854694  |d| 5.373855
+     2->3  send 8.992147  mtime 3.653971  |d| 5.338176
+     3->4  send 3.850330  mtime 3.850970  |d| 0.000640
+     4->5  send 3.462443  mtime 3.452973  |d| 0.009470
+     5->6  send 3.518496  mtime 3.531972  |d| 0.013477
+     6->7  send 3.678494  mtime 3.510738  |d| 0.167756
+     7->8  send 3.317253  mtime 3.321804  |d| 0.004550
+     8->9  send 3.417459  mtime 3.416173  |d| 0.001286
+     9->10 send 3.304148  mtime 3.312229  |d| 0.008081
+
+## clcloud-trials.minimed.com
+  gaps: 9   bodies: 10
+  t_sent series : min 3.425 s  max 9.051 s  under 2.5 s: 0  under 2.0 s: 0
+  mtime  series : min 3.442 s  max 9.037 s  under 2.5 s: 0  under 2.0 s: 0
+  per-gap |send - mtime| : max 5.612 s  median 0.2032 s  disagreeing >0.5 s: 4
+  span check: mtime span 47.352 s  vs t_sent span 47.365 s  vs t_done span 47.351 s
+  per-row (microsecond mtime series, so a fresh clone can re-read it):
+    11->12 send 3.425041  mtime 9.036929  |d| 5.611888
+    12->13 send 9.051171  mtime 8.847930  |d| 0.203241
+    13->14 send 8.860876  mtime 3.541972  |d| 5.318904
+    14->15 send 3.578169  mtime 3.568972  |d| 0.009197
+    15->16 send 3.578114  mtime 3.525972  |d| 0.052142
+    16->17 send 3.516961  mtime 8.417775  |d| 4.900814
+    17->18 send 8.369554  mtime 3.503238  |d| 4.866316
+    18->19 send 3.504250  mtime 3.441595  |d| 0.062655
+    19->20 send 3.480711  mtime 3.467155  |d| 0.013555
+
+## measured floor
+  t_sent series, same-host, both hosts: 3.304 s (clcloud.minimed.com)
+  mtime series  is reported per host above and is the counter the page trusts.
