@@ -446,9 +446,9 @@ non-uniform SURT keyspace** (INFERRED, from the three observed pages' first/last
 keys).
 
 **The successor this mints is the fix, and it is zero-request once the
-instrument exists**: the prior and the page schedule come from the two
-`cluster.idx` head reads this pass already spent (seqs 5, 6 and 13 — **three**,
-one per named crawl), and the budget model comes
+instrument exists**: the prior and the page schedule come from the **three**
+`cluster.idx` head reads this pass already spent (seqs 5, 6 and 13, one per named
+crawl), and the budget model comes
 from `spacing.txt` and the S-L2 `budget.py` — none of which needs a network.
 
 ---
@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Four fresh-context verifier rounds, none shown how the claim was built, each
+Six fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -589,10 +589,11 @@ Three non-blocking items, also fixed:
    `servedness.py:389-394`, are: **128 550 094** (`org,…`–`pl,…`) wholly
    **after**, **62 177 895** (`com,…`) wholly **before**, **95 363 994**
    (`fr,…`–`gr,…`) wholly **after** — **no read straddled**, and one read did
-   sort wholly before, which is the case `CONSTRAINED` covers. So round 1's
-   "the exact failure" was too strong, round 3's replacement claim of reads
-   "straddling" was **false in both halves**, and the correct statement is the
-   weaker one: the live failure is the *shape* `CONSTRAINED` guards, and its
+   sort wholly before and two wholly **after**, so **no read matched
+   `CONSTRAINED`'s case** (every one of its injected reads sorts before). So
+   round 1's "the exact failure" was too strong and round 3's replacement claim
+   of reads "straddling" was **false in both halves**; the live failure is
+   adjacent to `CONSTRAINED`'s case rather than identical to it, and its
    residual window `[66 372 199, 95 363 994]` reproduces exactly from those two
    window assignments.
 4. **The new closed-area row was invisible to the counting rule.** Written
@@ -665,9 +666,9 @@ been de-bolded, so the entry no longer described the file it was about;
 `config.yml`'s comment lost its indent in the round-1 fix; and `docs/11:2609`'s
 `[source: … §6]` should name **§1**, where the accounting half actually lives.
 
-**What four rounds establish, stated as the finding rather than the tally.**
-Every blocking finding was an **accounting or bookkeeping sentence**. Never the
-servedness claim, never an evidence class, never the independence count, never
+**What the first four rounds established, stated as the finding rather than the
+tally.** Every blocking finding was an **accounting or bookkeeping sentence**.
+Never the servedness claim, never an evidence class, never the independence count, never
 the request total — all four of which survived four independent recomputations
 and one live reproduction of the `minimed.eu` `404` (round 2 — round 1 could
 not reach it and recorded it as unverified). The defects cluster in
@@ -735,3 +736,68 @@ of this kind of prose rather than of any one author or pass. **The corrective
 that has actually worked is always the same: recompute the sentence from the
 ledger, then read `docs/` and the PR body to confirm the correction propagated.**
 Nothing else in the loop caught these.
+
+### Round 6 — `CONTRADICTS 5739b6b`
+
+Three blocking findings, **all three instances of mechanisms this section had
+already named, and two of them residuals of the fix for them.** That is now six
+rounds' worth of evidence that the mechanisms are real properties of this prose,
+so the corrective has to be mechanical rather than another careful pass.
+
+1. **§10's opener still said "Four fresh-context verifier rounds"** above a
+   section recording rounds 1–5, while the PR body said "Five" and §10's own
+   closing sentence said "Five rounds produced 12". **Round 5 fixed this same
+   opener — for the count that was correct *then*** — and it went stale the
+   moment round 5 was appended. A hand-maintained round count in a section that
+   grows a round per verification is **structurally** stale by one on every run.
+2. **"the two `cluster.idx` head reads … (seqs 5, 6 and 13 — **three**)"** — the
+   false word was left standing inside the sentence whose parenthetical
+   contradicted it. Round 5 listed this and recorded it as "→ corrected"; the
+   number was corrected and the word was not deleted (`AGENTS.md` §1).
+3. **The round-3 history entry still carried** *"which is the case
+   `CONSTRAINED` covers"*, two lines from the round-4 entry that had already
+   been corrected to say no read matched it, and four lines from §3a's
+   "**The live run did NOT hit this case**". Three passages in one file, two
+   corrected, one not. **The phrase was deleted from §3a in round 5 and this was
+   never checked** — the correction was made at the site the verifier named and
+   not swept for its other occurrences.
+
+No wire requests this round (0 of its 10), which the verdict states explicitly:
+formed entirely from the committed tree by re-running `classify`, `selftest` and
+`spacing.py` against the ledger, plus `budget.py` and `research-checks.py`.
+
+#### The mechanical corrective, because six rounds have now failed to catch these by reading
+
+`selfcheck.py` (committed beside this file) recomputes, from this file and the
+ledger, the quantities that six rounds of prose got wrong:
+
+- **the verifier-round count** — counted from the `### Round N —` headings and
+  asserted against every count this file and the PR body state;
+- **every `file:line` citation** — resolved against the file at the **same
+  commit** (the trap that produced two dead cites), and its content checked;
+- **the request accounting** — row count, host split, served vs
+  connection-level-failure, and the `body_bytes` maximum, against `FINDINGS.md`;
+- **the prose numbers** — the `E[N]` span against `budget.py`'s actual output,
+  and the locate arithmetic against the committed `locate-*.json`.
+
+Run it and it exits 0. **That is the point: the next pass does not have to be as
+careful as this one was, because the checks that kept failing are now code.**
+
+**Two defects in the corrective itself, recorded because a check that cannot
+fail is the shape this repository has been wrong before, and both were found by
+using it rather than by reading it:**
+
+1. **`REPO` walked three levels up** instead of two, pointing it at the *parent*
+   of the repository. Every path lookup missed: the `E[N]` check skipped itself
+   **without saying so**, and a citation resolved against the wrong file while
+   reporting `ok`. It was caught because a `--verbose` line printed content that
+   did not match the citation — the check's own output, not prose, gave it away.
+   **A check that reports `ok` while having checked nothing is worse than no
+   check**, and it is `AGENTS.md` §6 item 2 in the verifying direction.
+2. **The first citation check conflated live citations with historical
+   quotations**, and failed on the retraction history itself — it flagged
+   *"the largest response whose head is committed"*, a phrase that is **required**
+   to appear inside the Round 1 and Round 3 entries precisely because it was
+   corrected. Citations inside a `### Round N` entry are now counted as
+   **quotations** and exempt; only **live** citations must resolve. The run
+   reports both numbers: **6 live, 7 quoted**.
