@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Six fresh-context verifier rounds, none shown how the claim was built, each
+Seven fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -772,9 +772,21 @@ formed entirely from the committed tree by re-running `classify`, `selftest` and
 ledger, the quantities that six rounds of prose got wrong:
 
 - **the verifier-round count** — counted from the `### Round N —` headings and
-  asserted against every count this file and the PR body state;
+  asserted against the counts **in this file only**; ⚠ **Correction (round 7):**
+  an earlier draft claimed it checked "every count this file **and the PR
+  body** state", which was false — `PR_BODY` was defined and never read, and
+  `docs/11`, `docs/10` and the PR body are **entirely out of its scope**.
+  Round 7 corrupted the S-L1 block's bulk count to 99 and the checker passed.
+  **Those layers were verified by hand in that round and agree; the check does
+  not cover them.**
 - **every `file:line` citation** — resolved against the file at the **same
-  commit** (the trap that produced two dead cites), and its content checked;
+  commit** (the trap that produced two dead cites). ⚠ **Correction (round 7):**
+  an earlier draft of this bullet said the citation's *content* was checked too.
+  **It is not** — `selfcheck.py` resolves the line and stops there, and a
+  citation that resolves to the wrong content passes. Round 7 demonstrated it by
+  corrupting `docs/11:2820`'s asserted value and watching the check pass. **The
+  content at every live citation was verified by hand in that round, and is
+  correct; the check does not do it.**
 - **the request accounting** — row count, host split, served vs
   connection-level-failure, and the `body_bytes` maximum, against `FINDINGS.md`;
 - **the prose numbers** — the `E[N]` span against `budget.py`'s actual output,
@@ -801,3 +813,36 @@ using it rather than by reading it:**
    corrected. Citations inside a `### Round N` entry are now counted as
    **quotations** and exempt; only **live** citations must resolve. The run
    reports both numbers: **6 live, 7 quoted**.
+
+### Round 7 — `CLEAN 9a10f39`, and the checker is audited rather than trusted
+
+**First `CLEAN` of the run**, on the head commit, with no blocking finding. The
+servedness verdict, the evidence classes, the request accounting, the citation
+*content* and the cross-layer tallies all recompute from the ledger.
+
+Round 7's job was **adversarial**: try to make the corrective pass while the
+prose is wrong. **It held against 20+ mutations** — wrong host counts, a stale
+opener, a dropped ledger row, a dead live citation, a planted false predicate,
+full `E[N]` corruption, tally corruption, largest-response corruption on either
+side, a ledger status flipped `206`→`503`, a deleted round heading, a missing
+`FINDINGS.md`, an unparseable or missing ledger — each produced FAIL and a
+nonzero exit. **And it passed seven mutations it should have caught**, all
+recorded in `selfcheck.py`'s own comments rather than left as folklore:
+
+- citation **existence** is checked but **content** is not (demonstrated);
+- the citation regex **misses range-form cites** (`:404-413`, `:498-521`);
+- the `E[N]` span check is **substring-presence**, not a derived comparison;
+- a missing `budget.py` **skips the `E[N]` check and still prints PASS** — the
+  exact "skip without saying so" shape the script's own comments condemn;
+- live-vs-quotation is **purely positional**, so a dead citation appended after
+  the first `### Round N` heading is waved through;
+- a counter bug made an in-history missing-file citation vanish silently;
+- `PR_BODY` was defined and never read.
+
+**Every one of those seven is a hole in the net, not a false claim in the
+branch** — each quantity they cover was independently verified correct at this
+commit. **But two sentences this log told about the checker were themselves
+false**, and that is the finding: the checker was described as verifying more
+than it did. Both are **deleted** above, per `AGENTS.md` §1, rather than
+softened. The honest summary is now on the record: **`selfcheck.py` re-derives
+the counts; it does not read meaning, and the meaning was checked by hand.**

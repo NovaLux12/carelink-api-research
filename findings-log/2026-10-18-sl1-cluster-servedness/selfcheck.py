@@ -16,7 +16,10 @@ All three are invisible to `scripts/research-checks.py`, which validates
 quantities that kept being got wrong, so the next pass does not have to be as
 careful as the last one was.
 
-ZERO REQUESTS. It reads the committed tree and nothing else.
+ZERO REQUESTS. It reads the working tree, falling back to the committed tree
+for any file missing from the worktree; the committed read is a fallback, not
+the default. (An earlier draft of this line said "reads the committed tree and
+nothing else", which overstated it -- round 7.)
 
     python3 selfcheck.py            # exits 0 if every check agrees
     python3 selfcheck.py --verbose  # also prints each check's derived value
@@ -123,11 +126,6 @@ def main():
         fail("host split %s != {data: 11, index: 4}" % hosts)
     else:
         ok("host split %s" % hosts)
-    # the prose must state both halves
-    for want in ("**11 rows**", "**4\n  rows**"):
-        pass
-    if "(`data.commoncrawl.org` (11" not in f.replace("\n  ", "("):
-        pass
     m = re.search(r"`data\.commoncrawl\.org` \((\d+)\s*\n?\s*rows\)", f)
     if not m or int(m.group(1)) != hosts.get("data.commoncrawl.org"):
         fail("FINDINGS.md does not state the bulk row count as %d"
@@ -222,9 +220,10 @@ def main():
             committed = git_show(resolved)
             src = committed if committed is not None else None
         if src is None:
-            (fail if not in_history else quoted) and (
+            if in_history:
+                quoted += 1
+            else:
                 fail("citation names a file that does not exist: %s:%s" % (path, line))
-                if not in_history else None)
             continue
         lines = src.splitlines()
         if int(line) > len(lines):
