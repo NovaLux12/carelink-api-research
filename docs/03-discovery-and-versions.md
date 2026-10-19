@@ -60,6 +60,42 @@ and it **differs between `.eu` and `.com` even though the documents are byte-ide
 so the signing key or binding is host/region specific. `git grep x-cum-signature` finds
 nothing in `src/` or `test/` [source: SECURITY-FINDINGS S4; CLAIM-AUDIT-2026-10-09.md].
 
+> **⚠ The signature is not per-document, and the within-host control that settles it
+> was missing until 2026-10-17.** `VERSION-AXIS §1` infers from 6 documents on 6 hosts
+> that this is "a per-document integrity signature". One byte-identical document served
+> at **three** hosts carries **three** distinct signature values, so *document* alone does
+> not determine it. The converse is now settled too: on `-trials`, the same document
+> requested under **two different base paths** (`/v10/discover/android/3.6` and `/v11/…`)
+> carries **one** signature, which rules out *per-request*. A function of
+> **(document, host)** is consistent with **all 14** signed cells in that pass.
+>
+> **Counting rule, so "14" is re-derivable rather than typed:** a *signed cell* is a
+> response whose captured headers carry an `x-cum-signature` value. Of the 51 cells,
+> **32** are the no-route `403` envelope, **3** are the `v12` `401` envelope
+> (36 B, one digest `d551247201fc…`) and **2** are the `v10` `204` empties —
+> **none of those three groups carries a signature** — leaving **14**, at `seq` **2,
+> 14, 19, 31, 36, 38, 39, 40, 41, 42, 44, 45, 46, 48**. All **14** are fresh origin
+> responses (`x-cache: Miss from cloudfront`, none an edge replay), which is what makes
+> the `/v11/`–`/v10/` pair a genuine origin result rather than a cache hit. The step
+> from those two controls to "it is exactly `(document, host)`" is INFERRED, on the
+> assumption that no third variable moves with it.
+>
+> ⚠ **Corrected 2026-10-17 (verifier round 1): this figure read `17`.** The conclusion
+> was checked and stands; only the population was wrong, and it is reconstructible from
+> the ledger rather than mysterious: grouping the 51 cells by body digest gives **seven**
+> groups — 32 no-route `403`, 7 trials-legacy `200`, 3 `v11` `200`, 3 `401`, 3 `v13` `200`,
+> 2 empty `204`, 1 `.com` `v11` `200` — and **`17 = 51 − 32 − 2`**, i.e. every cell that
+> was neither a no-route `403` nor an empty `204`. **INFERRED, not OBSERVED:** that the
+> error was counting the **three `401` cells as signed** — they carry no
+> `x-cum-signature` at all. No committed artefact witnesses how the `17` was produced
+> (`matrix.py` builds the verdict grid, not a signed-cell tally; `cells.md` records
+> signature *presence* only), so this is a claim about a past computation.
+> **Assumption:** the original `17` was tallied over a digest- or status-class grouping
+> rather than over headers read per cell. Dropping the three `401` cells leaves the four
+> signed groups: 7 + 3 + 3 + 1 = **14**. The `17` is **withdrawn**.
+> [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §Correction (2026-10-17)]
+> [findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5].
+
 `certificates[]` is always exactly **8 entries** and **identical between the v13 and v11
 documents**, so it is **not a tenant discriminator** — only a cert-rotation tripwire
 [source: work/METHOD-FACTS.md; VERSION-AXIS §4].
@@ -455,6 +491,90 @@ the **GET method is not defined**, it is POST-only, matching `work/METHOD-FACTS.
 > outright instead of implied by the word.
 > [source: findings-log/2026-10-14-pool-s-independence-audit/FINDINGS.md §3
 > row 9].
+
+### 8a. ⚠ The `-trials`-only cell is **not** `v6`-specific — seven base paths return one identical document
+
+The paragraph above is **true of `v6`** and still is: `/v6/discover/android/3.6`
+is `200` on `clcloud-trials.minimed.com` and no-route on both patient hosts. What
+it does not survive is the implicature that **`v6` is what makes the cell
+trials-only**. Swept across all three hosts — `GET /connect/carepartner/<ver>/discover/android/3.6`,
+16 versions × 3 hosts, controls first per host — **8 of the 16 base paths split**
+(OBSERVED, [source: findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]).
+
+**Counting rule, carried here so "8 of 16" is re-derivable from this page and not
+only from the log.** Classes are **no route** = `403`
+`MissingAuthenticationTokenException` at the corpus 42 B digest · **401** =
+`401 UnauthorizedException` · **200** = a served document · **204** = served,
+empty body. A **split** is a base path whose three cells fall into **two or more
+different** classes, counting **`204` as its own class** and not merging it into
+`200` — the grouping `docs/09` Oracle A uses is coarser than this axis needs (see
+the `v10` bullet below). All 48 cells carry a class: **0 ambiguous**, and status
+alone is never consulted — each verdict is status + `x-amzn-errortype` +
+content-type + body digest (`AGENTS.md` §7, §8).
+
+All **16** base paths, one row each, so the tally can be counted off the page:
+
+| base path | `.eu` | `.com` | `-trials` | verdict |
+|---|---|---|---|---|
+| `v1` | no route | no route | no route | uniform |
+| `v2` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v3` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v4` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v5` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| **`v6`** | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v7` | no route | no route | no route | uniform |
+| `v8` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v9` | no route | no route | `200` 10 053 B `1aab9bb1e721…` | **split** |
+| `v10` | **`204`, empty body** | **`204`, empty body** | **`200` 20 345 B `94b739dda478…`** | **split** |
+| `v11` | `200` 20 345 B | `200` 18 105 B (§7) | `200` 20 345 B | uniform **status**, **two** different documents — `.eu` and `-trials` are byte-identical (§7) |
+| `v12` | `401` | `401` | `401` | uniform |
+| `v13` | `200` 20 256 B `f8488626…` | same bytes | same bytes | uniform, byte-identical |
+| `v14` | no route | no route | no route | uniform |
+| `v15` | no route | no route | no route | uniform |
+| `v16` | no route | no route | no route | uniform |
+
+**8 split** (`v2`, `v3`, `v4`, `v5`, `v6`, `v8`, `v9`, `v10`) · **8 uniform**
+(`v1`, `v7`, `v11`, `v12`, `v13`, `v14`, `v15`, `v16`).
+
+**So `v6` is one of seven base paths — `v2`, `v3`, `v4`, `v5`, `v6`, `v8`, `v9` —
+whose `-trials` response is the *same 10 053 B body*, byte for byte (`cmp`,
+7 of 7).** That body echoes `"config":"android,3.6"` and **nothing else** about
+the request: no byte of it varies with the base path. The trials-only cell is a
+property of **that one document on that one deployment**, not of `v6`.
+
+**And the `-trials` column is not a catch-all**, which is what makes this a
+finding rather than an artefact: on the same host, in the same run, `v1`, `v7`,
+`v14`–`v16` **and the `v99` absent control** all answer `403
+MissingAuthenticationTokenException` at the corpus 42 B digest. The trials
+gateway **does** key on the base-path segment. *Whether each matched base path
+has its own route registration, or one rule covers seven, is not established* —
+that needs the `OPTIONS` axis, which this pass did not run
+([findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §5]).
+
+**Two smaller new facts, both OBSERVED in that pass.**
+
+- **`v10` is a second split, and a status split the matrix could not see** (it had
+  probed `v10` on `.eu` only): `.eu` and `.com` answer `204` with an **empty
+  body** and no `x-cum-signature`; `-trials` answers `200` with the **20 345 B
+  `v11` document**, at the same digest and the same signature as its own `/v11`
+  cell. **`docs/09` Oracle A tabulates `200` and `204` in one row** (*"no
+  errortype (200/204) → public"*), so the two answers are one class to that
+  oracle; the split here is a **refinement** of it, not a contradiction — it
+  shows the grouping loses a real distinction on this base path.
+- **`v13` is byte-identical on all three hosts** (`f8488626…`, 20 256 B). **This is
+  a re-derivation, not a new claim** — `docs/03` §1 already publishes "all three
+  hosts return the same document" and area Y's audit refuted an earlier
+  "`.eu` only" premise off the back of area X's 2026-10-12 three-host capture
+  ([findings-log/2026-10-12-area-y-three-host-audit/FINDINGS.md]). This pass
+  reproduces the same digest on the same three cells for a **third** time; it is
+  listed only so the grid above is complete, and it adds nothing.
+
+**What is not claimed.** The *why* — what makes `-trials` serve a legacy
+document at these base paths — is **not closable from outside** and is not
+claimed. `VERSION-AXIS §4`'s filename reading (`sso_cp_us_v6.json`) stands as
+recorded, and this pass neither supports nor contradicts it: the body it
+measured under seven base paths carries that same filename, which is a fact
+about **one document** and not a mechanism.
 
 ## 9. PDE, `csr`, bare cumulus — refined, with a caveat
 
