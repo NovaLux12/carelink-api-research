@@ -412,7 +412,7 @@ fabricated one. The `3.6` cell reproduces the digest and byte count the
 ```mermaid
 flowchart TD
     A["GET /connect/carepartner/&lt;base&gt;/discover/android/&lt;tail&gt;"] --> B{"does this host serve<br/>this base at all?"}
-    B -- "no: 403 MissingAuthenticationTokenException (OBSERVED, clcloud.minimed.com + v6)" --> C["no document is SERVED here (OBSERVED 403);<br/>so the tail selects nothing. Whether the base<br/>is unrouted is NOT established - see 3b.4"]
+    B -- "no: 403 MissingAuthenticationTokenException (OBSERVED, clcloud.minimed.com + v6)" --> C["no document is SERVED here (Oracle A: no matching route,<br/>so the tail selects nothing). Whether the 403 is the version<br/>segment or the route family is NOT established - see 3b.4"]
     B -- "yes (OBSERVED)" --> D{"after erasing the echoed tail,<br/>do the bodies still differ?"}
     D -- "yes: >=2 distinct documents (OBSERVED, v13 on both hosts)" --> E["tail GATES which document is served"]
     D -- "no: 1 document for all 4 tails (OBSERVED, v6 on -trials)" --> F["tail is ECHOED only,<br/>not a content gate"]

@@ -111,8 +111,8 @@ published on the **cumulus** hosts, not on the `carelink.*` app/API hosts. The
 bridge reads it from `baseUrlCumulus`, which
 [`docs/03` §1](../../docs/03-discovery-and-versions.md) records as
 `…clcloud-trials.minimed.com/connect/carepartner/v13`, and the same section lists
-the three hosts the discovery document is read from as
-`clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}`. A `carelink.*`
+the three hosts the discovery document is read from as `clcloud.minimed.eu`,
+`clcloud.minimed.com` and `clcloud-trials.minimed.com`. A `carelink.*`
 host is a different plane: it is
 where `baseUrlCareLink` points, not where discovery lives.
 
@@ -282,15 +282,16 @@ directed. The candidate is the trials `v6` block — a **four-cell canonical gro
 (tail-erased digest `3b9d84b2525c…`, n=4) across four different tails**. State the
 right identifier: the four bodies have four *different* raw digests
 (`9b61847639ce…` / `1aab9bb1e721…` / `a8903df2e934…` / `bad674413bc37…`, byte counts
-10053/10053/10053/10066); only after the echoed tail is erased do they collapse to
-one. `1aab9bb1e721…` is the **`3.6` cell's raw digest alone** and is the value the
-matrix pass recorded. It is the cleanest negative in the corpus and the most
-tempting thing to freeze.
+10053/10053/10053/10066; `results.jsonl:17-20`, `structure.txt` §Q2); only after the
+echoed tail is erased do they collapse to one. `1aab9bb1e721…` is the **`3.6`
+cell's raw digest alone** and is the value the matrix pass recorded. It is the
+cleanest negative in the corpus and the most tempting thing to freeze.
 
 It is not worth the budget. `AGENTS.md` §11 gives the weekly drift sweep a budget
-of **~80 requests per sweep**; pinning the `v6` block costs **4 requests per sweep** on
-every push forever, and the same sweep would still be needed to notice the one
-change that would actually matter — the *departure* of the `3.6`-class document
+of **~80 requests per sweep**. A pin in `05-public-config` runs on two schedules —
+**4 requests on every PR gate**, which is the one that repeats — and the same sweep
+would still be needed to notice the one change that would actually matter: the
+*departure* of the `3.6`-class document
 at `v13`. The prior matrix pass declined the same pin for the same reason
 (`findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:235`). **Measure.**
 
