@@ -2600,7 +2600,11 @@ statement about *this box*, never about a crawl. **15 requests of a 15 cap**,
 GET only, `data.commoncrawl.org` (11) and `index.commoncrawl.org` (4) only,
 **0 to any Medtronic host**, measured `t_sent` floor **3.537 s** over 11
 checkable gaps (**0 under 3.5 s, 0 under `AGENTS.md` §8's 2 s floor**), **0
-retries spent** against `E[N]` 1.00 for this run
+retries spent**, `E[N]` **1.00** for this run — against the **1.25–1.65 span across
+the five populations `budget.py` prints** for this API (1.649227 / 1.515625 /
+1.421005 / 1.373269 / 1.254848), not a single figure; and **not** a second
+population for that model, since 10 of the 15 rows went to the **bulk** path,
+which never failed
 [source: findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md §6].
 
 **The locate half did not converge, and that is the recorded negative.** The

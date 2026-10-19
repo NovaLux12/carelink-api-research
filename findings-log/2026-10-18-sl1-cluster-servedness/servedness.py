@@ -629,8 +629,14 @@ def do_pass():
                  % (gate, CTRL_A, ca, CTRL_B, cb))
     print("control gate: %s  (%s=%s, %s=%s)" % (gate, CTRL_A, ca, CTRL_B, cb))
     if gate != "PASSED":
-        print("GATE NOT PASSED - the target is not read this run. A verdict "
-              "reached with unclassified controls is not a finding.")
+        # Said precisely, because the earlier wording was false in every run
+        # that reached it: servedness is a separate question from the locate
+        # and is still read below. What the gate withholds is the LOCATE.
+        print("GATE NOT PASSED - no locate verdict may be published for any "
+              "crawl, and the target's locate is not attempted below. The "
+              "target's SERVEDNESS is a separate read and still runs: it does "
+              "not depend on the locate, and controls' servedness is what "
+              "licenses reading a 206 as a statement about a crawl.")
 
     # --- 7. the target's own servedness (the close condition's first half)
     rt = fetch.get_retry(DATA_HOST, cluster_path(TARGET), "head-target", "head-target",

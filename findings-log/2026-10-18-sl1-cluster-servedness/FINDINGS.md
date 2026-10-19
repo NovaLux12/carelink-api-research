@@ -26,8 +26,10 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
 ## 1 · Accounting
 
 - **Requests: 15 of a 15 cap.** `wc -l results.jsonl` = **15**;
-  `run.log.capped` reads `DONE — 15 of a 15 cap.` The cap was reached, and
-  the queue was cut where it landed rather than extended.
+  `run.log.capped` reads `DONE - 15 of a 15 cap (lock wait 0.0s, absent-crawl
+  oracle 404, control gate NOT PASSED).` — quoted verbatim, hyphen and all
+  (an earlier draft rendered it with an em dash; corrected). The cap was
+  reached, and the queue was cut where it landed rather than extended.
 - **Hosts: `data.commoncrawl.org` (11 rows) and `index.commoncrawl.org` (4
   rows). Nothing else.** Every row's `host` is one of those two strings;
   `spacing.py` asserts it and reports `hosts outside the two permitted: NONE`.
@@ -49,10 +51,23 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   ones. `spacing.txt` is the re-derivation; `spacing.py` is what produced it.
 - **Attempts: 15 total = 15 served + 0 connection-level failure.** No request
   failed at connection level, so no retry was spent and `E[N]` came in at
-  **1.00 attempts per logical read**, against the 1.5–1.65 that
-  `findings-log/2026-10-17-sl2-outwindow-census/budget.py` puts `E[N]` at for
-  this API. **That is one observation on one run of two hosts, not a revision
-  of that budget model**, and no other pass's accounting is touched.
+  **1.00 attempts per logical read**. `budget.py` in the S-L2 census prints
+  **five** populations for this API — **1.649227** (S-L2), **1.515625**
+  (P-WHOLE), **1.421005** (FIRST-READ), **1.373269** (all), **1.254848**
+  (S-L2-OUT) — so the honest comparison is against a **1.25–1.65 span across
+  five populations, not a single figure**, and this run's 1.00 sits below all
+  five. ⚠ **Correction (verifier round 1):** this sentence previously read
+  *"against the 1.5–1.65 that `budget.py` puts `E[N]` at"* — that picked the
+  **two** populations at or above 1.5 and dropped the three below it, including
+  **1.254848**, which is the figure from the very directory it cites. The
+  direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
+  no published claim of another pass is disturbed, but the range was wrong and
+  `docs/11:2807` publishes **1.4210** as a peer value
+  (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
+  **What this is not:** a revision of that budget model, and not a second
+  population for it. One run of two hosts on a different mix (10 of 15 requests
+  to the **bulk** path, which never failed) is not a measurement of the CDX
+  API's failure rate, and no other pass's accounting is touched.
 - **Rows 1 and 2 are pre-instrument reachability probes, disclosed rather than
   hidden.** Before the pass, a bare `curl` was run against each host once to
   answer one question — `AGENTS.md` §7 records that `index.commoncrawl.org`
@@ -67,8 +82,14 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   (rows 3–15).
 - **Bodies stored outside the repository** (`AGENTS.md` §7; the hygiene check
   fails any file over 1 MiB and raw archive captures are never published).
-  Largest response **35 226 B** (`collinfo.json`). Headers, ledger, projections
-  and scripts are in the tree.
+  **Largest response 4 194 304 B** — the six locate pages, seqs 7–12, which is
+  **4× the 1 MiB ceiling on its own**. The largest response whose *head* is
+  committed is **35 226 B** (`collinfo.json`, seq 3); every committed body
+  projection is bounded to 300 characters. **The 4 MiB pages are precisely why
+  the bodies stay out of the tree**, and an earlier draft of this sentence cited
+  the 35 226 B figure as "the largest response" — corrected here because the
+  ledger's own `body_bytes` column contradicts it (seqs 7–12 each carry
+  `4194304`). Headers, ledger, projections and scripts are in the tree.
 
 Ledger: `results.jsonl` (15 rows, one per request). Runner: `servedness.py pass`.
 Accounting re-derivation: `spacing.py` → `spacing.txt`. Captures: `headers/`,
@@ -330,7 +351,7 @@ carried no absence weight and the cell was indeterminate.
 
 | # | read | row | result | class |
 |---|---|---|---|---|
-| 1 | is it published at all | 3 | `collinfo.json` **`200`**, 35 226 B, **128** crawls; `CC-MAIN-2014-23` = **`2014-07-09T23:29:26` → `2014-08-02T10:28:44`**. Fields asserted `str`-typed before use (`AGENTS.md` §6 item 3) | **OBSERVED** |
+| 1 | is it published at all | 3 | `collinfo.json` **`200`**, 35 226 B, **128** crawls; `CC-MAIN-2014-23` = **`2014-07-09T23:29:26` → `2014-08-02T10:28:44`**. Fields asserted `str`-typed before use (`AGENTS.md` §6 item 3). Row 3's committed `body_head` carries only the head of the array; the typed dates are in the projection at **`derived-collinfo-ids.txt:121`**, and the crawl count from the same file's 128 lines | **OBSERVED** |
 | 2 | **is its index served** | 13 | **`206`**, `Content-Range: bytes 0-8191/153 902 243`, `x-cache: Hit from cloudfront`, `server: AmazonS3` → **SERVED, index readable, 153 902 243 B** | **OBSERVED** |
 | 3 | does the API answer for this crawl | 14 | per-crawl control `google.com` **`200`**, 1 785 B, `text/x-ndjson`, first record `com,google)/` timestamp `20140710001322` | **OBSERVED** |
 | 4 | its `minimed.eu` answer | 15 | **`404`**, 48 B, `{"message": "No Captures found for: minimed.eu"}` — the **documented absence shape** | **OBSERVED** |
