@@ -35,6 +35,58 @@ Usage:
 LEDGER is optional and defaults to this lane's own results.jsonl. It is a POSITIONAL
 argument because docs/10 tells the next pass to run this over area M's ledger -- a
 claim that was false when the argument was not implemented and the path hardcoded.
+
+## Correction (2026-10-17) — an absent `t_sent` is skipped, not a crash
+
+Fixed here at source, after the correction issue `correction: PR #135 S-L4 -- eight
+blocking findings after three rounds` (#139) recorded the handoff as broken. Run
+exactly the way docs/10 section 1's successor directs ("the same one-command test
+over every other committed CC ledger"), this tool died on a member of area L's own
+population. The ledger path below is **repo-root-relative**, so the command is run
+from the repo root, not from this file's own directory:
+
+    $ python3 findings-log/2026-10-14-lane-s6-public-index/account.py \
+          findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl
+      File ".../account.py", line 109, in spacing
+        a, b = parse(sel[i]["t_sent"]), parse(sel[i + 1]["t_sent"])
+      TypeError: strptime() argument 1 must be str, not None
+
+`2026-10-13-area-l-ipro-hcp` carries a JSON **null** `t_sent` on 4 of its 44 rows
+(seqs 1-4). **KNOWN LIMIT of the kernel oracle, measured not assumed.** A row whose `host_tag`
+names a body file that is simply ABSENT still joins the series, so a gap can be
+measured across it. **The no-`host_tag` fix does not cover that, and the printed
+sentence has been narrowed to say so.** Measured over all 50 committed ledgers at
+this head: the missing-body branch is taken on **25 of them**, and **not one of
+those 25 prints a kernel gap figure** -- each reports the oracle UNAVAILABLE,
+because a gap needs **two or more** resolved bodies and none of those 25 has them.
+One ledger DOES have a partial body set --
+`2026-10-17-sl2-outwindow-census` resolves exactly **1** of its 45 distinct
+`host_tag`s -- and with a single body there is no pair, so the oracle still reports
+UNAVAILABLE. The case is reproducible synthetically with three rows whose middle
+`host_tag` names an absent body and `S6_SCRATCH` pointing at a directory holding
+**the other two** bodies.
+
+`parse()` caught `ValueError`, so a MALFORMED STRING was already
+treated as "this row cannot enter the series" -- and a null was not, because
+`strptime(None)` raises `TypeError`. The caller already skipped a pair when either
+side parsed to `None`; only the parse itself could not return `None`. So the fix
+is at the parse, and it is not a loosening of the spacing oracle: **the floor is
+still a minimum over real gaps, no gap is measured across a row that has no
+timestamp, and the number of skipped pairs is now printed** rather than absorbed
+silently (AGENTS.md section 2: a figure over a subset must say so).
+
+Inert for this lane's own figures, and checked rather than asserted: this ledger
+has 151 rows, **0** null and **0** absent `t_sent`, so every gap, every sub-2.5 s
+count and every inverted-row count below prints exactly as it did before the fix.
+`python3 account.py` on this lane's own results.jsonl is byte-identical in its
+default report, and under `--json` it adds two lines, both reading 0.
+
+Also added, for the same handoff reason: **the counting rule for "successful 200
+answers" is now printed beside the number.** It was `http_status == "200"` exactly,
+unstated -- and some committed CC ledgers write the opaque form `"200 (curl)"`,
+which this rule does NOT count. The count is deliberately left as it was (changing
+it would move a figure this lane has published); the rule and the number of
+opaque-200 rows are now beside it, and the detector that resolves them is named.
 """
 
 from __future__ import annotations
@@ -62,8 +114,38 @@ BODIES = os.path.join(SCRATCH, "bodies")
 # the earlier probe.sh, rows above it by this one.
 PRIOR_SEQ = 76
 
+# Keys every oracle below reads WITHOUT a default, so a row lacking one of them
+# crashes the run rather than yielding a wrong figure. Derived from the code, not
+# from memory: every `r["key"]` read in this file that is not a `.get(...)`.
+#     grep -vE '^#' account.py | grep -oE 'r\["[a-z_]+"\]' | sort -u
+# `t_sent` and `host_tag` are deliberately ABSENT from this list and are handled
+# by a counted skip inside `spacing()` -- a ledger where *some* rows are short is
+# readable, and that is the case this tool must survive.
+REQUIRED = ("seq", "host", "http_status", "method")
+# `seq` is compared and sorted numerically (`r["seq"] > PRIOR_SEQ`), so a ledger
+# that writes it as a JSON string is a different schema, not a formatting
+# difference -- comparing across the two is AGENTS.md section 6 item 3, the
+# lookup-that-resolved-to-something-else defect. Assert the type before use.
+REQUIRED_INT = ("seq",)
+# Keys used as STRINGS. Present is not enough: a null or a number passes a
+# key-presence test and then raises TypeError inside a `"x" in value` or a
+# string comparison, which is the same crash one level later.
+REQUIRED_STR = ("host", "http_status", "method")
+# `body_bytes` is only read on rows the whole-KiB filter has already required to
+# carry one, so it is not in REQUIRED; but it is divided modulo, so a non-numeric
+# value there is a type fault rather than a missing key.
+REQUIRED_NUM_WHERE_PRESENT = ("body_bytes",)
 
-def parse(ts: str):
+
+def parse(ts):
+    """A ledger timestamp, or None. None for a MALFORMED string and for an
+    ABSENT or null one alike -- `t_sent` is a JSON null on 4 rows of
+    `2026-10-13-area-l-ipro-hcp`, and strptime(None) raises TypeError, which is
+    not a ValueError and so was never caught. See the Correction in the
+    docstring. Every caller already treats None as "this row cannot enter the
+    series", so the row is skipped rather than guessed at."""
+    if not isinstance(ts, str):
+        return None
     try:
         return datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
@@ -100,20 +182,39 @@ def spacing(rows, host_filter=None):
     rows live entirely in the earlier attempt, so quoting only the whole-ledger
     figure would understate this pass, and quoting only this pass would hide
     defects a reader must see.
+
+    A row with no usable `t_sent` leaves the series entirely. Its two adjacent
+    PAIRS are dropped rather than joined across it, because a gap measured from
+    a row that carries no timestamp is a guess; the count of dropped pairs is
+    returned and printed, so a floor computed over a subset says so.
     """
     sel = [r for r in rows if (host_filter is None or r["host"] == host_filter)]
     sel.sort(key=lambda r: r["seq"])
 
     harness = []
+    skipped = 0
     for i in range(len(sel) - 1):
-        a, b = parse(sel[i]["t_sent"]), parse(sel[i + 1]["t_sent"])
+        a, b = parse(sel[i].get("t_sent")), parse(sel[i + 1].get("t_sent"))
         if a and b:
             harness.append((( b - a).total_seconds(), sel[i]["seq"], sel[i + 1]["seq"]))
+        else:
+            skipped += 1
 
     kernel = []
     prev = None
+    kernel_skipped = 0
     for r in sel:
-        p = os.path.join(BODIES, f"{r['host_tag']}.b")
+        tag = r.get("host_tag")
+        if not isinstance(tag, str):
+            # A committed ledger that records no host_tag cannot name a body file.
+            # The row BREAKS the series: `prev = None`, so no gap is measured
+            # across it -- the same rule the harness oracle applies two blocks
+            # above, and for the same reason. A gap joined across a row with no
+            # body would be a guess. Counted, never absorbed.
+            kernel_skipped += 1
+            prev = None
+            continue
+        p = os.path.join(BODIES, f"{tag}.b")
         if not os.path.exists(p):
             continue
         m = os.stat(p).st_mtime
@@ -121,7 +222,7 @@ def spacing(rows, host_filter=None):
             kernel.append((m - prev[0], prev[1], r["seq"]))
         prev = (m, r["seq"])
 
-    return harness, kernel
+    return harness, kernel, skipped, kernel_skipped
 
 
 def whole_kib_detector(rows):
@@ -134,6 +235,75 @@ def whole_kib_detector(rows):
     ok = [r for r in rows if r.get("http_status") == "200" and r.get("body_bytes")]
     whole = [r for r in ok if r["body_bytes"] % 1024 == 0]
     return ok, whole
+
+
+def schema_guard(rows):
+    """Fail closed on a ledger whose SCHEMA this tool cannot read.
+
+    A committed CC ledger is not obliged to carry the keys this lane's own does.
+    `docs/10` section 1 tells a successor to run this tool over every other
+    committed ledger, and some of them use a different schema -- so the tool has
+    to say so rather than print zeros that read as a clean negative. This is the
+    same fail-closed shape as the `is a directory` and `no such ledger` guards
+    above: exit 2, the reason named, nothing printed as if it were a finding.
+
+    REQUIRED is deliberately the small set every oracle here reads without a
+    default: `seq` orders the series, `host` groups them, `http_status` is what
+    the 200-counting rule is stated over. Keys a single row may legitimately lack
+    -- `t_sent`, `host_tag` -- are NOT in this set: those are per-row absences,
+    handled by a counted skip inside `spacing()`, because a ledger where *some*
+    rows are short is readable and one where *every* row is short is a different
+    artefact.
+    """
+    if not rows:
+        return 0  # a 0-row ledger is a pass that sent nothing; handled downstream
+    # Counted per KEY, not unioned: a key present on one row and absent on the rest
+    # is a PARTIAL ledger, and every oracle below indexes these keys directly, so
+    # one such row crashes the run exactly as a wholly-absent key would. Fail
+    # closed on any absence, and print the counts so the reader can see which key
+    # and how many rows.
+    def not_an_int(r, k):
+        return k in r and (not isinstance(r[k], int) or isinstance(r[k], bool))
+
+    absent = {k: sum(1 for r in rows if k not in r) for k in REQUIRED}
+    wrong_type = {k: sum(1 for r in rows if not_an_int(r, k)) for k in REQUIRED_INT}
+    for k in REQUIRED_STR:
+        wrong_type[k] = sum(1 for r in rows if k in r and not isinstance(r[k], str))
+    for k in REQUIRED_NUM_WHERE_PRESENT:
+        wrong_type[k] = sum(
+            1 for r in rows
+            if k in r and r[k] is not None
+            and (not isinstance(r[k], int) or isinstance(r[k], bool)))
+    problems = []
+    if any(absent.values()):
+        problems.append("keys absent")
+    if any(wrong_type.values()):
+        problems.append("keys of the wrong type")
+    if not problems:
+        return 0
+    seen = set()
+    for r in rows:
+        seen.update(r.keys())
+    print(f"account.py: {LEDGER} uses a schema this tool cannot read.", file=sys.stderr)
+    print(f"  {len(rows)} rows; {', '.join(problems)}:", file=sys.stderr)
+    for k, n in sorted(absent.items()):
+        if n:
+            print(f"    {k}: absent from {n} of {len(rows)} rows", file=sys.stderr)
+    for k, n in sorted(wrong_type.items()):
+        if n:
+            note = ""
+            if k in REQUIRED_INT:
+                note = " (compared and sorted numerically)"
+            elif k in REQUIRED_STR:
+                note = " (used as a string)"
+            elif k in REQUIRED_NUM_WHERE_PRESENT:
+                note = " (divided modulo, so it must be a number)"
+            print(f"    {k}: wrong type on {n} of {len(rows)} rows{note}",
+                  file=sys.stderr)
+    print(f"  keys the rows do carry: {', '.join(sorted(seen))}", file=sys.stderr)
+    print("  Nothing was measured and nothing is reported: an unreadable ledger is a"
+          " gap in this record, not a negative result.", file=sys.stderr)
+    return 2
 
 
 def main() -> int:
@@ -156,14 +326,29 @@ def main() -> int:
         # whole-ledger figures are the only ones that mean anything for it.
         PRIOR_SEQ = 0
     rows = load()
+    rc = schema_guard(rows)
+    if rc:
+        return rc
     total = len(rows)
     hosts = sorted({r["host"] for r in rows})
 
     ok200, whole = whole_kib_detector(rows)
+    # The counting rule for ok200, counted rather than described: a row whose
+    # http_status is the STRING "200" exactly. An opaque form such as
+    # "200 (curl)" -- which `2026-10-14-pool-s7-l7crawl` writes on every row --
+    # is NOT a match under this rule. Printed beside the number because the
+    # number means nothing without it (AGENTS.md section 6 item 7), and the
+    # rule that does resolve those rows is named rather than left for the
+    # reader to find. The COUNT is deliberately unchanged: this lane's own
+    # ledger has no opaque 200, so moving it would only invent a difference.
+    opaque_200 = [r for r in rows
+                  if isinstance(r.get("http_status"), str)
+                  and r["http_status"].startswith("200")
+                  and r["http_status"] != "200"]
 
-    h_gaps, k_gaps = spacing(rows)
+    h_gaps, k_gaps, h_skip, k_skip = spacing(rows)
     this_pass = [r for r in rows if r["seq"] > PRIOR_SEQ]
-    tp_h, tp_k = spacing(this_pass)
+    tp_h, tp_k, tp_skip, tp_kskip = spacing(this_pass)
     h_min = min((g[0] for g in h_gaps), default=None)
     k_min = min((g[0] for g in k_gaps), default=None)
 
@@ -173,10 +358,12 @@ def main() -> int:
     under = [g for g in h_gaps if g[0] < 2.5]
 
     # t_done before t_sent is impossible under the documented lock ordering
-    # (sleep, date -> t_sent, curl, date -> t_done).
-    inverted = [(r["seq"], r["host_tag"], r["t_sent"], r["t_done"]) for r in rows
-                if parse(r["t_sent"]) and parse(r["t_done"])
-                and parse(r["t_done"]) < parse(r["t_sent"])]
+    # (sleep, date -> t_sent, curl, date -> t_done). `.get` because a row may
+    # carry neither key: an absent timestamp cannot be inverted.
+    inverted = [(r["seq"], r.get("host_tag"), r.get("t_sent"), r.get("t_done"))
+                for r in rows
+                if parse(r.get("t_sent")) and parse(r.get("t_done"))
+                and parse(r.get("t_done")) < parse(r.get("t_sent"))]
 
     bad = [r for r in rows if r.get("curl_exit") not in (0, None)]
     methods = sorted({r["method"] for r in rows})
@@ -216,6 +403,10 @@ def main() -> int:
         "rows_from_prior_pass": sum(1 for r in rows if r["seq"] <= PRIOR_SEQ),
         "rows_from_this_pass": sum(1 for r in rows if r["seq"] > PRIOR_SEQ),
         "spacing_harness_min_s": round(h_min, 3) if h_min is not None else None,
+        "harness_pairs_skipped_no_usable_t_sent": h_skip,
+        "this_pass_pairs_skipped_no_usable_t_sent": tp_skip,
+        "kernel_rows_skipped_no_host_tag": k_skip,
+        "this_pass_kernel_rows_skipped_no_host_tag": tp_kskip,
         "kernel_bodies_available": bool(k_gaps),
         "spacing_kernel_body_mtime_min_s": round(k_min, 3) if k_min is not None else None,
         "this_pass_rows": len(this_pass),
@@ -223,8 +414,8 @@ def main() -> int:
         "this_pass_kernel_min_s": round(min((g[0] for g in tp_k), default=0) or 0, 3) if tp_k else None,
         "this_pass_gaps_below_2.5s": len([g for g in tp_h if g[0] < 2.5]),
         "this_pass_rows_with_t_done_before_t_sent": len(
-            [r for r in this_pass if parse(r["t_done"]) and parse(r["t_sent"])
-             and parse(r["t_done"]) < parse(r["t_sent"])]),
+            [r for r in this_pass if parse(r.get("t_done")) and parse(r.get("t_sent"))
+             and parse(r.get("t_done")) < parse(r.get("t_sent"))]),
         "harness_gaps_below_2.5s": len(under),
         "harness_gaps_below_2.5s_detail": [
             {"from_seq": a, "to_seq": b, "gap_s": round(g, 3)} for g, a, b in under],
@@ -233,7 +424,12 @@ def main() -> int:
             {"seq": s, "tag": t} for s, t, _, _ in inverted],
         "rows_with_nonzero_curl_exit": len(bad),
         "ledger_rows_parseable": total,
-        # the headline claim, counted
+        # the headline claim, counted -- and its rule, so the count is not a
+        # typed number wearing a script's name (AGENTS.md section 6 item 7)
+        "successful_200_counting_rule":
+            "http_status == '200' EXACTLY; an opaque form such as '200 (curl)' "
+            "is NOT counted by this tool",
+        "rows_with_opaque_200_status": len(opaque_200),
         "successful_200_answers": len(ok200),
         "whole_kib_truncation_candidates": len(whole),
         "whole_kib_truncation_candidate_seqs": [r["seq"] for r in whole],
@@ -267,10 +463,51 @@ def main() -> int:
         print(f"  FOREIGN LEDGER ({os.path.basename(os.path.dirname(LEDGER))}) -- this is NOT")
         print("  the lane's own results.jsonl, so the sequence-boundary split and the")
         print("  prior-pass comparison below do not apply to it.")
+    # A 0-row ledger is a real record, not a missing file: a pass that sent no
+    # request commits an empty results.jsonl (2026-10-15-area-l4-ledger-reader
+    # does exactly that). Indexing rows[-1] on it raised IndexError, so the one
+    # ledger a reader is most likely to try -- the newest pass's -- was the one
+    # that crashed. Says so in words rather than printing a silent None.
+    if not rows:
+        print(f"  WHOLE LEDGER: 0 rows -- this ledger records a pass that sent nothing.")
+        print("    Nothing to space, count or detect. That is a complete record, not a")
+        print("    missing file, and every figure below is 0 rather than unknown.")
+        print()
+        print("  --- WHOLE-KiB TRUNCATION DETECTOR (the headline claim, counted) ---")
+        print("  successful 200 answers                 0")
+        print(f"    counting rule                         {out['successful_200_counting_rule']}")
+        print("    rows whose status is an opaque 200    0")
+        print("    whole-KiB truncation candidates        0   seqs []")
+        print()
+        print("  This is a CORRELATION over the rows observed on this ledger, not a proven")
+        print("  mechanism. With no rows there is nothing to correlate, and no cause is")
+        print("  asserted.")
+        return 0
     print(f"  WHOLE LEDGER ({total} rows, seq 1-{rows[-1]['seq']})"
           + ("" if foreign else " -- includes the earlier attempt"))
     print(f"    min gap, harness t_sent            {out['spacing_harness_min_s']} s")
     print(f"    harness gaps under 2.5 s           {len(under)}")
+    print(f"    pairs skipped, no usable t_sent    {h_skip}")
+    if k_skip:
+        print(f"    rows skipped, no host_tag          {k_skip}")
+        print("      A row with no host_tag cannot name a body file, so the kernel oracle")
+        print("      BREAKS the series at it rather than joining across it: no kernel gap")
+        print("      above is measured from or over a row that carries NO HOST_TAG. The")
+        print("      harness figure is unaffected -- it reads t_sent, not host_tag.")
+        print("      NOT covered by that sentence: a row whose host_tag names a body file")
+        print("      that is absent still joins the series (see the KNOWN LIMIT in the")
+        print("      docstring). No committed ledger reaches it -- measured, not assumed.")
+        if k_skip == len(rows):
+            print("      Every row of this ledger lacks host_tag, which is a property of")
+            print("      the ledger's schema, not of the bodies.")
+        else:
+            print(f"      {len(rows) - k_skip} of {len(rows)} rows DO carry one, so this is a")
+            print("      partial ledger and the kernel oracle is broken into segments.")
+    if h_skip:
+        print("      A row with no t_sent leaves the series; the two pairs touching it are")
+        print("      dropped rather than joined across it, so no gap above is measured from")
+        print("      a row that carries no timestamp -- the floor is over the pairs that")
+        print("      remain, and says so rather than reading as the whole ledger.")
     if out["kernel_bodies_available"]:
         print(f"  min gap, kernel body mtime oracle  {out['spacing_kernel_body_mtime_min_s']} s")
     else:
@@ -310,6 +547,13 @@ def main() -> int:
     print()
     print("  --- WHOLE-KiB TRUNCATION DETECTOR (the headline claim, counted) ---")
     print(f"  successful 200 answers                 {len(ok200)}")
+    print(f"    counting rule                         http_status == '200' EXACTLY")
+    print(f"    rows whose status is an opaque 200    {len(opaque_200)}"
+          f"{'   (e.g. \"200 (curl)\") -- NOT counted above' if opaque_200 else ''}")
+    if opaque_200:
+        print("      A ledger that writes the opaque form will read LOW here. The rule that")
+        print("      resolves those rows, and the gap between the two rules, are stated in")
+        print("      findings-log/2026-10-15-area-l4-ledger-reader/kib-detector.py (RULE 2).")
     print(f"  whole-KiB truncation candidates        {len(whole)}"
           f"   seqs {[r['seq'] for r in whole]}")
     for d in out["whole_kib_candidate_detail"]:

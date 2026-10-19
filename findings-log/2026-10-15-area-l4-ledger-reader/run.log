@@ -22,6 +22,129 @@
 #      `read-area-l.py`, which is not executable — the column then named commands
 #      that would have exited 127.
 #
+## Correction (2026-10-17) — one recorded count moved, and only because a heading was added
+
+Correction issue #139's eight findings were re-derived at head by a later, separate
+pass. One recorded count moved: `sh dup-test.sh` goes **71 -> 72**, because the
+exempt-section listing prints one line per Correction heading and the log now carries
+one more of them. Same cause as section 8a-7's 70 -> 71, and no figure moved. Every
+other line count in the table below is unchanged and was RE-measured, not carried:
+each invocation was re-run with `2>&1 | grep -c ''` immediately before this commit,
+because a transcript is printed, never transcribed (verifier round 4's lesson). The
+Correction heading is what the repo's own append-only check
+(scripts/research-checks.py) requires before it will accept an edit to any file
+under findings-log/, and it is why dup-test.sh's CORR_RE now also recognises
+`## Correction (YYYY-MM-DD)` — see that file's own Correction note.
+
+## Correction (2026-10-17) — second run of this date: `sh dup-test.sh` 72 → 73
+
+A fresh-context verifier found two prose defects in PR #147 (both fixed, both
+recorded in `FINDINGS.md`'s second `## Correction (2026-10-17)` section). This
+table moves once more, for the same single cause as 70 → 71 → 72: the
+exempt-section listing prints one line per Correction heading, and the log now
+carries one more of them. **73 lines, measured, not carried** — re-run with
+`2>&1 | grep -c ''` immediately before the commit that adds this revision. Every
+other count above is unchanged at 27 / 37 / 9 / 264 / 52 / 33 / 53, each
+re-measured in the same pass. No figure moved; nothing was re-probed; 0 requests.
+
+The two corrections are worth one line here too, because both are the same failure
+this pass keeps paying for: **a statement that does not survive being run.** One
+said *four* rounds beside seven commits; one published a `grep` recipe with no `-r`
+that returned `Is a directory`, exit 2, and no rows. A third and fourth, found while
+fixing the first two, were an escaped alternation that matched nothing and a recipe
+with no file argument that read stdin. **A recipe that returns nothing is not
+evidence of a negative** — the discriminator is the exit code, measured on this host
+with grep (GNU grep 3.12): **1** for a pattern that ran and matched nothing, **2** for
+a usage error (the no-`-r` directory form is one — `Is a directory` exits **2**),
+**0** for a match; the separation is 1 against 2. ⚠ This copy first read "0 for
+"ran and matched nothing", 2 for a usage error" — the same inversion round 2 fixed
+in FINDINGS.md's second Correction section, and which this file's copy of the
+sentence survived; both copies state the measured values now.
+
+## Correction (2026-10-17) — third run of this date: `sh dup-test.sh` 73 -> 74
+
+The `origin/main` sync (`015689e`) merged with no conflict, and the re-derivation it
+obliges found five defects of this lane's own text, all recorded in `FINDINGS.md`'s
+third `## Correction (2026-10-17)` section: a reproduction citing a brace expansion
+whose two paths both MISSING, two sites stating **seven** commits beside an
+unfiltered `git log` that prints **12** lines, a `grep -n` pointer recipe left live in
+`FINDINGS.md` after the `docs/11` copy was fixed — **positions, and one crawl of the
+two** — the replacement recipe published without saying one of its rows is the
+sentence quoting it, and this pass's own first attempt at that third row, which
+described the `FINDINGS.md` recipe as the *directory* no-`-r` form and so attributed
+to it a defect that belongs to `docs/11`'s copy.
+
+This table moves once more for the same single cause as 70 -> 71 -> 72 -> 73: the
+exempt-section listing prints one line per Correction heading, and the log now carries
+one more of them. **74 lines, measured, not carried** — every row below re-run in the
+same pass with `2>&1 | grep -c ''` from this pass's own worktree, exit code recorded
+beside it:
+
+    population 0/27   schemas 0/37   manifest 0/9   census 0/264
+    self-test  0/52   dup-test 0/74   locate   0/33 kib-detector 0/53
+
+**Only the dup-test row moved. The other seven are unchanged** at 27 / 37 / 9 / 264 /
+52 / 33 / 53, re-measured rather than carried. No figure moved; nothing was
+re-probed; **0 requests** — this remains a correction pass against the committed
+corpus.
+
+## Correction (2026-10-17) — fourth run of this date: `sh dup-test.sh` 74 -> 82, by a DIFFERENT cause
+
+A fresh-context verifier returned CONTRADICTS on PR #147 with six defects; all six
+were in text or in a check this pass wrote, and all six are recorded in `FINDINGS.md`'s
+fourth `## Correction (2026-10-17)` section. Fixing them moved **this** table once
+more, and **not for the cause the three moves above share**:
+
+    74 -> 82  =  one more Correction heading (+1)
+              +  the WITHDRAWN-position block the widened bound now prints (+7)
+
+The widened bound is the verifier's second finding. `dup-test.sh` derived its
+edited-file list with `grep -v '^findings-log/'`, justified by a comment reading "this
+PR's entire diff outside its own log directory is
+`docs/11-suggested-research-areas.md`". **This PR also edits
+`findings-log/2026-10-14-lane-s6-public-index/account.py`**, so that bound excused the
+one other edited file the PR has and could not see a pointer into the script the PR
+edits. The list is now derived from `SELF_DIR` — this pass's own log directory and
+nothing else — and the subject test also matches a basename, because the prose writes
+`account.py` and not the full path. With the bound correct, **two stale positions come
+into scope**: `account.py:109` in live §7b and in live §8c, invalidated by this PR
+editing `account.py`. They sit in sections that predate the append-only rule and may
+not be edited, so they are listed in `WITHDRAWN`, matched **exact-string** so a new
+position into the same file is still a hit, and **printed by the check** so the
+residual is never mistaken for coverage.
+
+**Every row below was re-run in the same pass**, from this pass's own worktree and
+from inside this directory, with `2>&1 | grep -c ''` and the exit code recorded
+separately:
+
+    population 0/27   schemas 0/37   manifest 0/9   census 0/264
+    self-test  0/52   dup-test 0/83   locate   0/33 kib-detector 0/53
+
+**Only the dup-test row moved.** The other seven are unchanged at 27 / 37 / 9 / 264 /
+52 / 33 / 53 — and unchanged is measured, not carried: this pass re-ran all eight.
+**dup-test.sh now gives the same 83 lines and the same exit 0 whether invoked from the
+repo root or from this directory**; an intermediate revision did not, because
+`SELF_DIR` was derived from `dirname "$0"`, which is `.` under the second invocation
+and filtered nothing. **0 requests; nothing re-probed; no vendor host touched.**
+
+## Correction (2026-10-19) — fifth run: `sh dup-test.sh` 82 -> 83, the 2026-10-19 Correction heading
+
+The verifier's round-3 verdict on `fa8554c` was CONTRADICTS with six defects and
+**confirmed every census figure by independent re-derivation** -- `32 / 18 / 0` over
+the 50 committed ledgers at head and `24 / 26` at `91a2226`. **No figure moved in
+this run and none was restated**; see `FINDINGS.md`'s Correction dated 2026-10-19 for
+what was withdrawn and why.
+
+`dup-test.sh` moves **82 -> 83** for the ordinary reason: **one more Correction
+heading**, `## Correction (2026-10-19)`. **All eight rows were re-run**, from this
+pass's own worktree, with `2>&1 | grep -c ''` and the exit code recorded separately:
+
+    population 0/27   schemas 0/37   manifest 0/9   census 0/264
+    self-test  0/52   dup-test 0/83   locate   0/33 kib-detector 0/53
+
+**Only the dup-test row moved.** **0 requests; nothing re-probed; no vendor host
+touched.**
+
 # A transcript is PRINTED, never transcribed (the lesson of verifier round 4), so
 # this file is regenerated by re-running every invocation below, `2>&1` piped
 # through `grep -c ''`, immediately before the commit that adds the revision.
@@ -29,9 +152,14 @@
 # hand-changed number whose stated cause (the `escape sequence` warnings going
 # away) was wrong: the real cause was a phantom heading the round-5 edit left in
 # `FINDINGS.md`. Round 6 took it to **70** (66 from the round-5 tree, plus the four
-# lines round 6 added to its own scope note); round 7 takes it to **71**, because
+# lines round 6 added to its own scope note); round 7 took it to **71**, because
 # the exempt-section listing prints one line per Correction heading and section
-# 8a-7 is one more. See `FINDINGS.md` sections 8a-6 and 8a-7.
+# 8a-7 is one more; the four `## Correction (2026-10-17)` sections above take it
+# to **72**, **73**, **74**; then **82** — a DIFFERENT cause, the
+# withdrawn-position block the widened bound prints (+7, not a heading); then
+# **83**, the 2026-10-19 Correction heading (+1). **The count is no longer a
+# function of headings alone.** See `FINDINGS.md` sections 8a-6, 8a-7 and its five
+# dated Correction sections.
 #
 # invocation                          exit  output lines  what it did
 # ----------------------------------  ----  ------------  ----------------------------------------
@@ -40,7 +168,7 @@ python3 read-area-l.py schemas          0            37  K1 key-sets 10, K2 memb
 python3 read-area-l.py manifest         0             9  wrote manifest.tsv, precedence order
 python3 read-area-l.py census           0           264  8 ledgers -> census + the member-limit block, vs census-84.txt
 python3 read-area-l.py self-test        0            52  33 controls, decomposition below
-sh dup-test.sh                          0            71  non-duplicate table (printed) + the position check, fatal, fail-closed
+sh dup-test.sh                          0            83  non-duplicate table (printed) + the position check, fatal, fail-closed
 sh locate.sh                            0            33  every landmark, resolved by content, bound to a commit
 python3 kib-detector.py                 0            53  RULES 1-3: the whole-KiB detector, RULE 2, the 3 limit cells
 

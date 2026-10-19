@@ -2803,8 +2803,24 @@ stand.** Re-derived vs committed: RECORD **72** vs **65**, ABSENCE **11** vs
 carrying a member **12** vs **10** in-window (**13** vs **11** counting the one
 out-of-window crawl `census-84.txt:168` itself lists). 72+11+1+0 = 84, so the
 re-derived tally leaves none unassigned. **The repo already contradicted itself
-without any new evidence:** lines 1736 and 1738 above list both crawls' members
-as `(prior)`. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
+without any new evidence:** this page's own family table lists both crawls' members
+in its two `(prior)` rows — `CC-MAIN-2014-10` / `/ipro/hcp/login.jsf`, and
+`CC-MAIN-2020-24` / `index.jsp`, `login.jsf`, `main/home.jsf` — findable with
+`grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
+content and deliberately with no line number, because this page moves as other
+passes land. One of that recipe's rows is this very sentence, which quotes it, so
+**no count is printed beside it** — a figure here would be a then-value that moves
+every time this page is edited.** ⚠ **Two corrections to this sentence, both recorded because each
+replaced one broken citation with another — the failure `AGENTS.md` §6 item 6
+names, and the one this pass's own §8a-6 row 4 was written to stop.** It once read
+**"lines 1736 and 1738 above"**, stale on the commit it shipped in (those lines are
+two successor bullets); the rows are now named above instead. And the replacement
+recipe first read **`grep -n '…' docs/` without `-r`**, which GNU grep rejects —
+`grep: docs/: Is a directory`, exit 2, no rows — so the fix for a stale pointer
+published a pointer that **did not execute**. **The `-r` is load-bearing; the
+recipe is quoted with it, and it is re-run verbatim before this page ships.** A
+citation that cannot be executed is worse than a wrong line number, because the
+wrong number at least fails visibly. **⚠ Every member figure in this sentence — 39 vs 35, 12 vs 10, 13
 vs 11, and each crawl's own count — is a LOWER BOUND, not an exact total.** The
 evidence is two sentences below and it governs every number printed here; it is
 stated here rather than only there because a limit separated from its figure by
@@ -2871,7 +2887,15 @@ under a disclosure decision, or every ledger row carries the distinction — a
 in the ledger is sufficient for the second route; nothing in the tree says a later
 pass would populate it.
 
-**S-L4c — one reader for the other 36 committed ledgers.** **Blocker, weakened
+**S-L4c — one reader for the other committed ledgers.** ⚠ **The heading's "**36**"
+is withdrawn (2026-10-19): no counting rule was stated with it and none reproduces
+it. The population it means is now named by a command — `git ls-files
+'findings-log/*/results.jsonl'` → **50** committed ledgers, of which **8** are
+area L's own and appear in this pass's `manifest.tsv`, so the "other" population is
+**42**. **That changes what this open successor asks for, and it is recorded here
+rather than applied silently: the figure it was scoped against was wrong, and the
+scope is now the 42.** Nothing else in the row changes — the blocker, the
+`cors-method` half-ledger note, the closer and the zero-request budget all stand. **Blocker, weakened
 from "none":** the population contains at least one ledger that is **not
 machine-readable** — `2026-10-13-cors-method/results.jsonl` is **16 of its 24 rows
 malformed JSON**, on `main` too (commit `8b7b7e9`) — so a reader that must span
@@ -2914,10 +2938,11 @@ third instance on the same page.**
 `docs/10` §1's own successor tells the next pass to run that tool over **"every other
 committed CC ledger"**. Run exactly that way, it **crashes on a member of this very
 population**: `2026-10-13-area-l-ipro-hcp` seqs 1–4 carry a **null `t_sent`**, and
-`account.py:109` calls `strptime(None)` → `TypeError`. This pass did not fix it —
-another lane owns that file — and **that is why this successor exists**: recording
-the crash as observed is not enough while the row naming the tool still points the
-next pass straight at it. **Blocker: none — the closer is a maintainer decision, and
+`account.py`'s `spacing()` called `strptime(None)` → `TypeError`. This pass did not
+fix it — another lane owns that file — and **that is why this successor exists**:
+recording the crash as observed is not enough while the row naming the tool still
+points the next pass straight at it. **Blocker: none — the closer is a maintainer
+decision, and
 the earlier wording here ("the fix belongs to the lane that owns `account.py`") named
 neither an owner nor a route, so it described the crash without stopping anything.**
 `account.py` is a committed analysis script, not a live surface; the next pass that
@@ -2928,7 +2953,80 @@ reworded to name the ledgers it can read, which costs nothing and is the smaller
 change. **Zero requests either way.** **Assumptions (INFERRED):** that the null is
 a malformed row rather than a deliberately blank field — 4 of that ledger's 44 rows,
 all at seqs 1–4, and nothing in the tree says which. **Not fixed here.**
+⚠ **Three clauses of the entry above are superseded — *"This pass did not fix it —
+another lane owns that file"*, the `account.py:109` line number (which this change
+invalidated, since `account.py` is a file this correction edits; the call is named by
+function instead), and *"**Not fixed here**"* — and this successor is CLOSED
+2026-10-17: the
+first branch of its own closer was taken, not the cheaper reword.** `account.py` now
+tolerates an absent `t_sent`: `parse()` returns `None` for a non-string rather than
+letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching
+a row that carries no timestamp **and prints how many it skipped**, and the
+inverted-row test reads both keys with `.get()`. **All eight area-L ledgers open
+under `python3 findings-log/2026-10-14-lane-s6-public-index/account.py <ledger>`,
+run from the repo root** — the ledger path is root-relative, so the bare
+`python3 account.py <ledger>` form resolves against the script's own directory and
+exits 2. A second crash fell out of the same verification — a 0-row ledger raised
+`IndexError`; it now says in words that such a ledger records a pass that sent
+nothing. ⚠ **Two claims this paragraph carried are withdrawn.** **"The newest
+committed CC ledger in the repository"** is deleted rather than reworded
+(`AGENTS.md` §1): it is false at this head, and it had no committed ordering behind
+it — `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as
+the 0-row ledger, so "newest" named nothing. And **"all eight"** is the area-L
+population, a proper subset of what `docs/10` §1's successor actually asks for
+(*"every other committed CC ledger"*): run over the population
+`git ls-files 'findings-log/*/results.jsonl'` names — **50** committed ledgers —
+this tool reads **32** and fails closed with a named reason on **18**, **not one
+traceback**. Before this pass, over those same 50, **24** read and **26** died with
+an unhandled `KeyError` or `TypeError`. **A ledger this tool cannot read is a gap in
+the record, not a negative result**, and it now says so and exits 2 rather than
+raising.
+
+⚑ **Correction (2026-10-19). The two sentences this replaces — "the population is
+named by a command rather than a glob on purpose: a glob in this tree expands to
+paths that do not exist" — are withdrawn.** What was measured: the withdrawn figure
+**65** is the count of `findings-log/` **top-level entries — passes, not ledger
+paths** (`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), where
+there are **50** committed ledgers. The **15** difference is exactly the
+tracked entries that hold no `results.jsonl` — **14 directories and one tracked
+file**, `findings-log/cumulus-v2-spike.md`, which is a `.md` file, not a pass
+directory; e.g. `findings-log/2026-10-11-third-party-client-sources/` is a tracked
+directory that carries no ledger. **A glob and `git ls-files` name the same 50 files
+here, so the counting rule is published as a command to make the population explicit
+rather than to correct a glob that was not wrong.** **The census figures did not move because the
+enumeration changed — they moved because `account.py` was fixed.** The counting rule
+is unchanged and is the command: `git ls-files 'findings-log/*/results.jsonl'` → **50**. **Skipping the rows was the right
+fix, not a loosening:** the spacing oracle needs only the rows that carry a
+timestamp, and a gap measured *across* a row with none would be a guess. **The
+INFERRED assumption above is untouched** — a null may still be a malformed row; the
+tool no longer has to assume either way to answer. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17) — correction issue #139's eight findings, re-derived at this head]
 [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
+
+⚠ **The other seven of #139's eight findings were already fixed when PR #135
+merged** (`aa401b7`, 2026-10-15), by that pass's own **seven** further commits, self-labelled rounds **3–9** — **counted by the filtered command**, `git log --oneline aa401b7^1..aa401b7 | grep -cE '^(24b9601|227a95c|bfc8f55|741cca1|228519f|d88a879|f83137d)'` → **7**, because the **unfiltered** `git log` this sentence first cited prints **12** lines beside a stated seven — a stale
+pointer withdrawn, a policy made fatal, an unstated counting rule shipped in
+`kib-detector.py`, a reader sentence corrected to the predicate it means, and a
+rounding rule that now produces its own figure. **Re-derived at this head rather
+than taken from the issue's wording**, with one live instance of the pointer class
+found on this page and fixed above. **None of the measurements moved**, and none was
+restated. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17)]
+
+⚑ **What this correction pass closed, and why it mints no successor.**
+**S-L4e is CLOSED above** — the only one of the five S-L4 rows this pass could close,
+and it closed by taking its own first branch (fix the tool) rather than the cheaper
+one (reword the successor). **No successor area is minted, and the reason is on this
+page rather than only in the log: S-L4a, S-L4b and S-L4c are already open rows on
+this page and remain claimable, so minting them again would fail
+`CONTRIBUTING-research.md` step 7's *Non-duplicate* bar — a new row for work this page
+already schedules is a duplicate row, not a successor.** A fourth candidate was
+considered and failed the same bar: re-running #139's eight findings as a probe
+area. It is **Derived** (the dispositions above give the commands), and it could be
+made **Bounded** and **Labelled**, but it is **not Non-duplicate** — it is this
+pass's own correction, already executed, and it would ask a next pass to re-probe a
+corpus with no host contact to gain. **Bounded** is the bar that also stops a
+candidate with no cap: a correction pass that minted a probe successor would have to
+name a request budget, and none is derivable from anything on this page. **S-L4d** is
+unchanged by this pass and remains open. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17) — third pass of this date]
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the
