@@ -99,17 +99,18 @@ evidence that the word was there.
 cell implying an in-place edit be reworded. Searched, and there is no such cell:
 
 ```
-grep -rn "corrected to" docs/*.md findings-log/2026-10-17-hcp-config-deployments/*.md
+grep -rn "corrected to" docs/*.md
   -> docs/09:301, docs/11:1899   (both pre-existing, neither mine)
-git diff origin/main -- docs/ findings-log/ | grep '^+' | grep -iE "corrected to|now reads"
-  -> 1 hit, inside repair-status.py's docstring, describing a JSON field that script owns
+git diff origin/main -- docs/ | grep '^+' | grep -iE "corrected to|now reads|rewritten in place"
+  -> 0 hits
 ```
 
 The only correction table this pass wrote is §0's **"the row said | the source says"**, whose
 left column already quotes the superseded wording rather than claiming an edit. **No change was
 made because there was nothing to change** — recorded as a checked fact, not an unexamined one.
 
-**Nothing was re-litigated.** All twelve confirmed claims are untouched; the sweep did not
+**Nothing was re-litigated.** The evidence table above is the population — **17 claim rows,
+each with its class stated in the table** — and none was re-opened; the sweep did not
 re-run and **zero research requests were issued this round**, so every sweep figure is
 byte-identical across three verification rounds: floor **2.276 s / 57 gaps**, portability
 **15 of 15**, bodies **9 identical / 6 differing**, clinic-vs-support **15 of 15**,
@@ -172,7 +173,7 @@ GATE PASS — safe to open a PR.
 
 ## Downstream consumer impact
 
-- [x] No pinned consumer value affected — `carelink-bridge` pins the discovery pin, `BLE_API_VERSIONS`, the family vocabulary and the error taxonomy. None of the four moved. The suite the bridge runs before a release (`npm run drift:check`) is `05-public-config`, which reports **85 passed, 0 failed**.
+- [x] No pinned consumer value affected — **measured against the consumer, not inferred from this repo's docs.** `gh api "search/code?q=…+repo:NovaLux12/carelink-bridge"` returns **0 hits for all four queries**: `hcp/configuration`, `pow.crm.settings`, `cua.crm.settings`, `BLE_API_VERSIONS`. `carelink-bridge` pins the discovery pin, `BLE_API_VERSIONS`, the family vocabulary and the error taxonomy, and **none of the four moved** — this diff touches nothing under `regression/`, `docs/03`, or any discovery/version pin. The suite the bridge runs before a release (`npm run drift:check`) is `05-public-config`, which reports **85 passed, 0 failed**. No consumer issue is needed, so no `downstream-bridge` issue is opened.
 - [ ] A pinned value moved — none did.
 
 ---
@@ -204,13 +205,14 @@ that the route normalises a doubled slash rather than 404ing.
 
 **`docs/07:112-124` re-checked at head** — the citation in `docs/10`'s row 51 still
 resolves. Line 112 is still *"With the header, **13 of the 15 bundle-declared `public/*`
-keys return JSON**…"* and 124 is still the `pow.nutrino.cc.{broker,metadata}` row. **This
+keys return JSON**…"*, and the `pow.nutrino.cc.{broker,metadata}` row is at 123 (124 is a
+blank line — the range end, not a content row). **This
 PR's own edit to `docs/07` has two hunks, at `@@ -118` and `@@ -151`. The first rewrites
 line **121** — inside the cited range — but **1-for-1**, adding and removing no line, so it
 shifts nothing; the second is the +69-line block at `:151`, well below it. Line 121's *content*
-did change (it now carries "Superseded in its reading 2026-10-17"), but 112 and 124, the two
-lines row 51's cite names, are untouched and still say what it cites them for. One stale
-internal reference *was* found and fixed:
+did change (it now carries "Superseded in its reading 2026-10-17"), but **112 and 123 — the
+content lines row 51's range covers — are untouched** and still say what it cites them for.
+One stale internal reference *was* found and fixed:
 the rename `AA` → `AB` had left the new area's own body saying "So **AA** is not 'do they
 exist'" twice.
 
