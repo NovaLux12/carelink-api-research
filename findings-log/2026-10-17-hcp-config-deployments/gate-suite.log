@@ -1,0 +1,88 @@
+--- 05-public-config ---
+  ok   EU bulk config has the same 69 top-level keys
+  ok   CC880 family exists
+  ok   CC880 contains MMT-8062 (Flex)
+  ok   CC880 contains MMT-8085 (Flex)
+  ok   CC880 is named 'MiniMed™ Flex'
+  ok   BLE780 is named '780G'
+  ok   family count is 16
+  ok   family GM present
+  ok   family BLE700 present
+  ok   family BLE720 present
+  ok   family BLE740 present
+  ok   family BLE770 present
+  ok   family BLE780 present
+  ok   family GST present
+  ok   family SIMPLERA present
+  ok   family SIMPLERACC present
+  ok   family SIMPLERACCOLID present
+  ok   family NMX7 present
+  ok   family CC840 present
+  ok   family CC880 present
+  ok   family NMX8 present
+  ok   family INSTINCT present
+  ok   family EAGLE present
+  ok   SIMPLERA still padded (trap)
+  ok   report list length is 214
+  ok   report list contains MMT-8200
+  ok   report list duplicates MMT-9015
+  ok   report list keeps padded MMT-5100J
+  ok   logbook has SENSOR_INSERTION
+  ok   logbook has INFUSION_SET_CHANGE
+  ok   logbook has HBA1C
+  ok   logbook entry count is 12
+  ok   csr control codes contain 'tup'
+  ok   csr control codes have NO N24
+  ok   nutrition x-api-key is a placeholder
+  ok   nutrition x-api-key starts with %#
+  ok   shadow pow.crm.settings still unauthenticated
+  ok   sibling cms-config.json still gated (412)
+  ok   sibling pow.udi.number still gated (412)
+  ok   lhpro.max (KNOWN BUG: 2^32-1 minus 2,000,000)
+  ok   lghpro.max (KNOWN BUG: same value)
+  ok   vex.max (correct, control)
+  ok   gstpro.max (correct, int64 max)
+  ok   reporting countries drifted 17 -> 29 (drift guard)
+  ok   inpen countries moved in lockstep
+  ok   eu reporting list excludes US (invariant)
+  ok   family map identical on carelink.minimed.com (8ce419a22fd3)
+  ok   family map identical on carelink-trials.minimed.com (8ce419a22fd3)
+  ok   config key count (was 69)
+  ok   csrDisplayMessageUrl names csr/v2
+  ok   csr periodic endpoints name csr/v2
+  ok   the two csr keys agree
+  ok   no baseUrlCsr-shaped key exists
+  ok   no baseUrlPde-shaped key exists
+  ok   useCumulusUrls is true
+  ok   csr plane dispatch table present
+  ok   sendPeriodicToCumulus is true
+  ok   sendDiagnosticLogsToCumulus is true
+  ok   csr retina transfer_settings path
+  ok   personal retina has no transfer_settings
+  ok   csv export enable is an object
+  ok   csv export enable is per-plane
+  ok   csv export personal rawData is false
+  ok   captcha is a nested object, not a dotted key
+  ok   the dotted key captcha.key does NOT exist at top level
+  ok   captcha subkeys are the documented four
+  ok   captcha.testKey is present and empty
+  ok   BE bgUnits (KNOWN DISAGREEMENT: MG_DL)
+  ok   BE glucoseUnitsDefault (KNOWN DISAGREEMENT: MMOL_L)
+  ok   BE carries no stateCodes key (absent, not null)
+  ok   BE has exactly 34 keys
+  ok   carelinkhp.minimed.eu serves build main.fb5f8cb7eb60c4d5.js
+  ok   carelink-support.medtronic.eu serves build main.759cddab23085086.js
+  ok   .com bulk config has the same 69 top-level keys
+  ok   .com per-key form answers 200 with a one-member envelope
+  ok   .com per-key logbook entry types unwrap to 12
+  ok   -trials bulk config has the same 69 top-level keys
+  ok   -trials per-key form answers 200 with a one-member envelope
+  ok   -trials per-key logbook entry types unwrap to 12
+  ok   timeline config members are exactly featureEnabled,host (EU)
+  ok   no top-level personal.patient.timeline.host key (EU)
+  ok   timeline config members are exactly featureEnabled,host (.com)
+  ok   no top-level personal.patient.timeline.host key (.com)
+  ok   timeline config members are exactly featureEnabled,host (-trials)
+  ok   no top-level personal.patient.timeline.host key (-trials)
+
+  85 passed, 0 failed
