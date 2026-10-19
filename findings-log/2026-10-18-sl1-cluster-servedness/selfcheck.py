@@ -173,6 +173,12 @@ def main():
             ok("the false predicate appears only as a quoted, corrected defect")
 
     # ---- 3. THE E[N] SPAN, against budget.py's actual output.
+    #   H3 THE E[N] SPAN IS SUBSTRING-PRESENCE, not a derived lo/hi vs stated-span
+    #      comparison. Corrupting the span sentence passes while the substrings
+    #      survive elsewhere. Correct at head; verified against budget.py by hand.
+    #   H4 A MISSING budget.py, OR OUTPUT WITH NO PARSEABLE VALUES, SKIPS THIS
+    #      CHECK AND STILL PRINTS PASS. That is the "skip without saying so" shape
+    #      this script's own comments condemn. Fixed below to fail loudly.
     bp = os.path.join(REPO, "findings-log", "2026-10-17-sl2-outwindow-census",
                       "budget.py")
     if os.path.exists(bp):
@@ -182,6 +188,9 @@ def main():
                                      out, re.M)) |
                       set(re.findall(r"E\[N\] = 1 \+ p \+ p\^2\s+([0-9]\.[0-9]{6})",
                                      out)))
+        if not vals:
+            fail("budget.py produced no parseable E[N] values - the E[N] check "
+                 "could not run, and PASS would otherwise be reported")
         if vals:
             lo, hi = vals[0], vals[-1]
             if "1.25" not in f or "1.65" not in f:
@@ -203,6 +212,10 @@ def main():
                  "docs/10": "docs/10-open-questions.md",
                  "docs/09": "docs/09-methodology-and-oracles.md",
                  "docs/00": "docs/00-summary-the-map.md"}
+    #   H5 LIVE-VS-QUOTATION IS PURELY POSITIONAL: any citation after the first
+    #      `### Round N` heading is exempt, so a genuinely dead LIVE citation
+    #      appended after the history is waved through as a quotation. No such
+    #      citation exists at head.
     history_start = [m.start() for m in re.finditer(r"^### Round \d+ ", f, re.M)]
     live = quoted = 0
     for path, line in re.findall(r"`((?:docs|findings-log|scripts|\.github)/[A-Za-z0-9._/-]+"
@@ -239,8 +252,22 @@ def main():
                 live += 1
                 if VERBOSE:
                     print("       %s:%s -> %s" % (path, line, lines[int(line) - 1][:70]))
-    ok("%d live citations resolved, %d historical quotations (dead or superseded by design)"
-       % (live, quoted))
+    #   H6 THE H-1..H-5 CLASS OF HOLE REMAINS: this script proves a line EXISTS,
+    #      not that it SAYS what the claim says. Read the meaning by hand.
+    #   H7 ONLY FINDINGS.md IS IN SCOPE for the counts above. docs/11, docs/10 and
+    #      the PR body are NOT read (PR_BODY is defined and never used - round 7).
+    #      The counts the prose states for those layers were verified by hand.
+    ok("%d live citations resolved, %d historical quotations "
+       "(dead or superseded by design)" % (live, quoted))
+    # H4-class fix for the counts themselves: the run reports them, so assert
+    # that FINDINGS.md states THIS run's numbers rather than a remembered pair.
+    stated = re.search(r"reports both numbers: \*\*(\d+) live, (\d+) quoted", f)
+    if stated:
+        if (int(stated.group(1)), int(stated.group(2))) != (live, quoted):
+            fail("FINDINGS.md states %s live/%s quoted; this run measured "
+                 "%d/%d" % (stated.group(1), stated.group(2), live, quoted))
+        else:
+            ok("FINDINGS.md states this run's citation counts (%d/%d)" % (live, quoted))
 
     # ---- 5. THE LOCATE ARITHMETIC, against the committed locate file.
     lp = os.path.join(HERE, "locate-CC-MAIN-2022-27.json")

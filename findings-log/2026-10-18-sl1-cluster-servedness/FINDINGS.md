@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Seven fresh-context verifier rounds, none shown how the claim was built, each
+Eight fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -777,8 +777,9 @@ ledger, the quantities that six rounds of prose got wrong:
   body** state", which was false — `PR_BODY` was defined and never read, and
   `docs/11`, `docs/10` and the PR body are **entirely out of its scope**.
   Round 7 corrupted the S-L1 block's bulk count to 99 and the checker passed.
-  **Those layers were verified by hand in that round and agree; the check does
-  not cover them.**
+  **Those layers were verified by hand in that round. They are not covered by
+  the check, so their agreement is not maintained by it** — it is re-verified
+  whenever one of those files is edited.
 - **every `file:line` citation** — resolved against the file at the **same
   commit** (the trap that produced two dead cites). ⚠ **Correction (round 7):**
   an earlier draft of this bullet said the citation's *content* was checked too.
@@ -812,7 +813,7 @@ using it rather than by reading it:**
    to appear inside the Round 1 and Round 3 entries precisely because it was
    corrected. Citations inside a `### Round N` entry are now counted as
    **quotations** and exempt; only **live** citations must resolve. The run
-   reports both numbers: **6 live, 7 quoted**.
+   reports both numbers: **7 live, 7 quoted**.
 
 ### Round 7 — `CLEAN 9a10f39`, and the checker is audited rather than trusted
 
@@ -846,3 +847,46 @@ false**, and that is the finding: the checker was described as verifying more
 than it did. Both are **deleted** above, per `AGENTS.md` §1, rather than
 softened. The honest summary is now on the record: **`selfcheck.py` re-derives
 the counts; it does not read meaning, and the meaning was checked by hand.**
+
+### Round 8 — `CONTRADICTS f2085d9` (scoped, since `9a10f39`)
+
+Four blocking findings, **every one of them a bookkeeping sentence, and three of
+them committed by the very commit that was deleting other bookkeeping
+falsehoods.** That is the seventh round to find the same class, and the second
+consecutive round in which the fix for one falsehood added another.
+
+1. **"all recorded in `selfcheck.py`'s own comments rather than left as
+   folklore"** was false: **none of the seven holes was in the script.** → the
+   seven are now recorded as comments `H1`–`H7` at the code each weakens, so the
+   claim is true rather than deleted. The knowledge was worth keeping; the
+   false claim about where it lived was not.
+2. **"The run reports both numbers: 6 live, 7 quoted"** was stale — the run
+   reports **7 live, 7 quoted**, because this commit's own added citation took
+   the live count up. Mechanism 1, in the commit correcting mechanism 1. → the
+   numbers are corrected, and **`selfcheck.py` now asserts them**: it compares
+   what `FINDINGS.md` states against what it measured, so a stale pair fails the
+   run instead of being printed. **It caught this within one commit of being
+   added** — the same way it caught the round-count skew two commits earlier.
+3. **The PR body still read "Six … rounds" above a six-row table** after round 7
+   was appended here. Mechanism 3 — fixed to Seven, with the round-7 row and the
+   extended tally.
+4. **"Those layers were verified by hand in that round and agree"** was false at
+   head for the PR-body layer, because of (3). → reworded to say what is true:
+   the check does not cover those layers, **so their agreement is not maintained
+   by it** and is re-verified whenever one of them is edited.
+
+Two non-blocking: the round-7 entry's "recompute from the ledger" is loose where
+content and tallies were verified by hand and do not live in the ledger; and the
+round-7 **commit message** repeats the false "recorded in selfcheck.py's own
+comments", which is immutable history and is noted here so it is not later cited
+as evidence the comments exist.
+
+**What eight rounds have established about the branch, stated once.** The
+substantive finding — **`CC-MAIN-2014-23` is served at 153 902 243 B, and its
+`minimed.eu` `404` is a served-but-empty answer behind a `200` control on that
+same crawl** — has survived every round unchanged, reproduced over the wire by
+three of them. **All 15 blocking findings were bookkeeping**, and the last four
+were bookkeeping *about the bookkeeping*. The recurring mechanisms were
+therefore not fixed by care: they were fixed by `selfcheck.py`, which now
+derives what prose was merely asserting — and its first two days of use caught
+two staleness bugs that six rounds of reading had not.
