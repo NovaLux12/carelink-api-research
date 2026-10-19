@@ -2940,13 +2940,12 @@ paths that do not exist" — are withdrawn.** What was measured: the withdrawn f
 **65** is the count of `findings-log/` **top-level entries — passes, not ledger
 paths** (`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), where
 there are **50** committed ledgers. The **15** difference is exactly the tracked
-pass directories that hold no `results.jsonl` — e.g.
-`findings-log/2026-10-11-third-party-client-sources/`, which **is** tracked
-(`FINDINGS.md` appears in `git ls-files`) and carries no ledger. A bare
-`for f in findings-log/*/results.jsonl` counted **65** entries in this session's
-own shell while `sh -c` over the identical path counted **50**: **the two shells
-disagreed**, which is the honest reason the population is now named by a command
-rather than by either form. **The census figures did not move because the
+tracked entries that hold no `results.jsonl` — **14 directories and one tracked
+file**, `findings-log/cumulus-v2-spike.md`, which is a `.md` file, not a pass
+directory; e.g. `findings-log/2026-10-11-third-party-client-sources/` is a tracked
+directory that carries no ledger. **A glob and `git ls-files` name the same 50 files
+here, so the counting rule is published as a command to make the population explicit
+rather than to correct a glob that was not wrong.** **The census figures did not move because the
 enumeration changed — they moved because `account.py` was fixed.** The counting rule
 is unchanged and is the command: `git ls-files 'findings-log/*/results.jsonl'` → **50**. **Skipping the rows was the right
 fix, not a loosening:** the spacing oracle needs only the rows that carry a

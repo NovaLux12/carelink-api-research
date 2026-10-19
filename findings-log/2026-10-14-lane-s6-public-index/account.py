@@ -58,10 +58,13 @@ measured across it. **The no-`host_tag` fix does not cover that, and the printed
 sentence has been narrowed to say so.** Measured over all 50 committed ledgers at
 this head: the missing-body branch is taken on **25 of them**, and **not one of
 those 25 prints a kernel gap figure** -- each reports the oracle UNAVAILABLE,
-because either bodies resolve for a ledger or none do, and a *partial* body set is
-what the join-across needs and no committed ledger produces one. The case is
-reproducible synthetically with `S6_SCRATCH` pointing at a directory holding one of
-the two bodies.
+because a gap needs **two or more** resolved bodies and none of those 25 has them.
+One ledger DOES have a partial body set --
+`2026-10-17-sl2-outwindow-census` resolves exactly **1** of its 45 distinct
+`host_tag`s -- and with a single body there is no pair, so the oracle still reports
+UNAVAILABLE. The case is reproducible synthetically with three rows whose middle
+`host_tag` names an absent body and `S6_SCRATCH` pointing at a directory holding
+**the other two** bodies.
 
 `parse()` caught `ValueError`, so a MALFORMED STRING was already
 treated as "this row cannot enter the series" -- and a null was not, because

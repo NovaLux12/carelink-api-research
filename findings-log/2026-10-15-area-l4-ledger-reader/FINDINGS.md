@@ -1421,14 +1421,18 @@ expands to paths that do not exist, which is how the first version of this secti
 got its figures wrong." ⚠ **That explanation is withdrawn.** The `65` it refers to is
 the count of `findings-log/` **top-level entries — passes, not ledger paths**
 (`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), and there are **50**
-committed ledgers; the **15** difference is exactly the tracked pass directories that
-hold no `results.jsonl`, `findings-log/2026-10-11-third-party-client-sources/` among
-them — that directory **is** tracked and carries no ledger. **And the shell
-behaviour is not settled by assertion in either direction:** in this session a bare
-`for f in findings-log/*/results.jsonl` iterated **65** entries in one shell and
-**50** under `sh -c` over the identical path, and `python3 -c "glob.glob"` gives
-**50**. **The two shells disagreed**, which is the real reason the population is named
-by a command now. **The census figures moved because `account.py` was fixed, not
+committed ledgers; the **15** difference is exactly the tracked entries that hold no
+`results.jsonl` — **14 directories and one tracked file**,
+`findings-log/cumulus-v2-spike.md`, which is a `.md` file and not a pass directory;
+`findings-log/2026-10-11-third-party-client-sources/` is a tracked directory among
+them that carries no ledger. **A glob and `git ls-files` name the same 50 files
+here** (`bash -c`, `sh -c`/dash, `python3 -c "glob.glob"` and `find` all give 50), so
+the counting rule is published as a command to make the population explicit, not to
+correct a glob that was never wrong. ⚠ **This section first claimed the two shells
+"disagreed" over the identical path, on the strength of one measurement that a later
+verifier could not reproduce in `bash -c`, `sh -c`, `glob.glob`, `find` or under
+`nullglob`/`globstar` — all of which give 50.** A claim that only one run supports is
+not published; it is deleted (`AGENTS.md` §1). **The census figures moved because `account.py` was fixed, not
 because the enumeration changed** — the earlier section told the reader the opposite,
 and that is the defect. `docs/11` carries the same correction, which is editable.
 
@@ -1440,9 +1444,13 @@ the sentence and completing the fix, the branch was instrumented and run over al
 
 - the missing-body branch **is** taken — on **25 of the 50**;
 - **not one of those 25 prints a kernel gap figure.** Each reports the oracle
-  **UNAVAILABLE**, because either bodies resolve for a ledger or none do, and a
-  *partial* body set — the precondition for a gap joined across a bodyless row — is
-  what no committed ledger produces.
+  **UNAVAILABLE**, because a gap needs **two or more** resolved bodies and none of
+  those 25 has them. ⚠ **The reason this section first gave — "either bodies resolve
+  for a ledger or none do, and no committed ledger produces a partial body set" — is
+  false and is withdrawn:** `2026-10-17-sl2-outwindow-census` DOES produce a partial
+  set, resolving exactly **1** of its **45** distinct `host_tag`s. The conclusion
+  survives on the corrected reason: with one body there is no pair, so the oracle
+  reports UNAVAILABLE and no gap is printed.
 
 So **no committed ledger yields a wrong kernel number**, and the defect is the printed
 sentence, not the figure. **The sentence is narrowed** to the no-`host_tag` guarantee

@@ -122,7 +122,7 @@ separately:
 
 **Only the dup-test row moved.** The other seven are unchanged at 27 / 37 / 9 / 264 /
 52 / 33 / 53 — and unchanged is measured, not carried: this pass re-ran all eight.
-**dup-test.sh now gives the same 82 lines and the same exit 0 whether invoked from the
+**dup-test.sh now gives the same 83 lines and the same exit 0 whether invoked from the
 repo root or from this directory**; an intermediate revision did not, because
 `SELF_DIR` was derived from `dirname "$0"`, which is `.` under the second invocation
 and filtered nothing. **0 requests; nothing re-probed; no vendor host touched.**
