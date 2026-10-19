@@ -649,7 +649,7 @@ exists in this pass.** Run against the whole diff:
 ```bash
 grep -rn "corrected to" docs/*.md findings-log/2026-10-17-hcp-config-deployments/*.md
 # -> docs/09:301 (a pre-existing line about a 2026-10-13 merge, not mine)
-#    docs/11:1796 (a pre-existing "Assumptions (INFERRED)" line, not mine)
+#    docs/11:1899 (a pre-existing "Assumptions (INFERRED)" line, not mine)
 git diff origin/main -- docs/ findings-log/ | grep '^+' | grep -iE "corrected to|now reads|rewritten in place"
 # -> one hit, and it is in repair-status.py's docstring describing a JSON field that script owns
 ```
@@ -880,10 +880,13 @@ page: this round changed §3, three paragraphs after the sentence said it had no
 of the same sentence scoped itself to "every evidence class **from** §1–§12 and §A–§G"; §I
 dropped the "from" and made the sections themselves the object of the claim. (b) "The wrong
 path now survives in **exactly two places in this repository**" was wrong by a factor of five.
-`git grep -n area-p-static-schema-recovery` returns **10**: **3 in this pass** (§H's and §I's
-quotations of the defect, which are the evidence, and `results.jsonl` seq 4, a recorded row
-whose generator is fixed instead) and **7 outside it** — two in `docs/11`, one in
-`2026-10-13-area-p-static-schema/FINDINGS.md`, and four in 2026-10-14 passes. **All 7 are
+`git grep -n area-p-static-schema-recovery` returns **11**: **4 in this pass** (§H's quotation
+of the defect, §I's item 2, **this paragraph's own counting sentence**, and `results.jsonl`
+seq 4, a recorded row whose generator is fixed instead) and **7 outside it** — two in
+`docs/11`, one in `2026-10-13-area-p-static-schema/FINDINGS.md`, and four in 2026-10-14
+passes. **The first figure this paragraph gave was 10 with 3 in-pass, and it omitted the
+sentence doing the counting** — which is the defect class it is correcting, committed inside
+the correction. **All 7 outside are
 legitimate**: the file exists, every one of them cites it for something it does contain (the
 only line-anchored one, `:45`, resolves), and none is a line this PR adds — `git diff
 origin/main -- docs/11` touches neither of its two hits. The sentence asserted a count from a
@@ -909,9 +912,10 @@ correction disclosed** rather than made silently — §6.1's rule is to name the
 
 **2 · A count asserted from a grep that had not finished running.** §I: "The wrong path now
 survives in **exactly two places in this repository**", one sentence after claiming the path had
-been "grepped repo-wide rather than assumed gone". The grep returns **10**. Broken down:
-**3 in this pass** (§H's and §I's quotations of the defect, which are the evidence, plus
-`results.jsonl` seq 4, a recorded row whose generator is fixed instead) and **7 outside it** —
+been "grepped repo-wide rather than assumed gone". The grep returns **11**. Broken down:
+**4 in this pass** (§H's and §I's quotations of the defect, **§I's own corrected count
+sentence**, and `results.jsonl` seq 4, a recorded row whose generator is fixed instead) and
+**7 outside it** —
 two in `docs/11`, one in `2026-10-13-area-p-static-schema/FINDINGS.md`, four in 2026-10-14
 passes. **All 7 are legitimate**: the file exists; the only line-anchored cite among them
 (`:45`, in the independence audit) resolves and is cited for what it contains; and no line this
@@ -933,7 +937,7 @@ one, **nineteen lines above the line it did fix**.
 wrote it; area A's own correction replaced it, and `docs/01:70` now reads "**does** serve the
 clinic bundle — byte-identical to `carelinkhp.minimed.eu`. **Corrected 2026-10-12**". Today
 `:69` is the `carelink-support.medtronic.com` row. **The substantive claim is true and this pass
-re-confirmed it independently** — seq 3 records 200 / `application/javascript` /
+re-measured it** — seq 3 records 200 / `application/javascript` /
 `2a7fa8e7af519c2b…` reproducing — but the pointer is not, and this is the generator. Fixed,
 with the wording changed to say what is actually true: area A refuted the claim `docs/01`
 carried **at the time**, and `docs/01:70` records the correction. `results.jsonl` seq 3's
@@ -957,3 +961,83 @@ sentence** — and the corollary this pass had to learn twice, which is that a s
 evidence class. §1–§12 and §A–§J differ from §H's state only in the citation corrections and
 the disclosures each section names. **0 requests in this round**: all four were repaired from
 the committed ledger, the committed scripts and `docs/01`/`docs/07` as they stand.
+
+### §K — round 7: the fifth instance was inside the sentence correcting the fourth
+
+Round 6's verifier returned **CONTRADICTS** on `c03a4ad`. **Repairs 3 and 4 were confirmed
+real** — it opened `docs/07` and `docs/01` and checked that `:222-230` and `:70` hold what they
+are cited for, and it re-derived that `:158` and `:69` were correct on `origin/main` and are
+stale now. **No measurement was disputed in round 6 or round 7**, and the PR's substantive
+claims have not moved since round 1.
+
+**1 · The §I repair reproduced the defect it was repairing.** §I's replacement sentence ended
+"the sections §1–§12 and **§A–§H** are as §H left them". **Round 5 edited §H** — the two ⚠
+disclosure blocks §I itself quotes — so §A–§H is not as §H left them. `git diff b03f458..014c562`
+names the four hunks: §3 at `:247`, **§H at `:775` and `:786`**, §I appended at `:809`. The
+sentence now names all four, and separates body text from correction sections rather than
+asserting a blanket.
+
+**2 · The corrected count omitted the sentence doing the counting.** §I said the wrong path
+"survives in **exactly two places**"; §J corrected it to **10**, of which **3 in-pass**. The
+grep returns **11**, of which **4 in-pass** — because §I's own corrected count sentence names
+the path, and was not counted. **The defect class's fifth instance, committed inside the
+sentence written to correct its fourth.** Both §I and §J now read 11 / 4, and §I says plainly
+that its first figure was wrong and why.
+
+**3 · A citation-validity sentence rested on a false premise about the diff.** `PR.md` argued
+`docs/07:112-124` "still resolves" because this PR's `docs/07` edit "begins at line 154, well
+below the range". **The edit's first hunk is `@@ -118` and rewrites line 121 — inside the
+cited range.** The conclusion survives: that hunk is 1-for-1, adds and removes nothing, so it
+cannot shift the range; the +69-line block starts at `:151`. **The stated basis was wrong in a
+sentence whose entire subject is whether a citation resolves**, and "begins at line 154" was a
+statement about the second hunk presented as one about the edit. Rewritten to name both hunks
+and to argue from line-count invariance, which is the property that actually matters.
+
+**4 · §C's quoted grep output went stale on this PR's own merge.** §C records the output of
+`grep -rn "corrected to" docs/*.md …` as `docs/09:301` and `docs/11:1796`. That line number was
+correct through `4ae617e` and moved at **`0f0a932` — this PR's merge of `origin/main`**. It is
+now `docs/11:1899`; §C and the `PR.md` line that repeats it are both corrected. §C's second
+grep, quoted as "one hit", now returns more, because rounds 5–7 added prose containing the
+searched phrases. **Neither change affects §C's conclusion** — that no *correction table* in
+`docs/` implies an in-place edit, which was the claim the search was run to support.
+
+**5 · An unflagged §2.1 strength word.** §J item 4 said this pass "re-confirmed it
+**independently**". Its two sources are this pass's `results.jsonl` seq 3 and area A's
+`results.jsonl` seq 19 — **two files in one repository, one author**, which §2.1 counts as
+**one source**. The word is not permitted. Changed to "re-measured it", which is what happened
+and needs no independence. `§B` exists as the precedent for flagging this rather than editing
+it silently; this instance was not flagged, so it is recorded here.
+
+**The tally, because it is the useful part.** Six rounds, five rounds of defects, and **every
+defect is one shape**: a claim about what a file says, made without opening the file. A replace
+assumed to have hit a second file; a repair reported that was half-made; a count asserted from
+a grep not finished running; a stale citation nineteen lines above another that had just been
+repaired; a repair that reproduced the defect it repaired; and a count corrected by a sentence
+that did not count itself. **Not one of them is a measurement error** — not one of the fifteen
+portability cells, the body digests, the header populations, the spacing floor, the route
+tables, the corpus-control assertions or the merge-count resolution has moved since round 1,
+and each was independently re-derived and confirmed in rounds 1 and 2.
+
+`AGENTS.md` §6.2 publishes the positive form — *a grep that hits is not a grep that proves*.
+The negative form, which this pass had to learn five times, is sharper: **a file I did not open
+is a file I did not check, and a count I did not run to completion is not a count.** §1's rule
+already covers both — *if you cannot point at the line it came from, delete the sentence* — and
+the sentence about a repair needs the same discipline as the sentence about a measurement.
+
+**What did not change.** Every measurement, every request count, every cap revision and every
+evidence class. **0 requests in this round** — all five were repaired from the committed
+ledger, the committed scripts and `docs/01`/`docs/07` as they stand. Re-derived after this
+round's edits, not assumed: every `docs/NN:NN` citation in the diff → **0 out of range**;
+`research-checks.py` → exit 0; `measure_assertions.py` → `217 431`.
+
+⚠ **And the occurrence count, which is the sentence that cannot be written here.** When §I and
+§J corrected it, the figure stood at **11**, 4 of them in-pass. **Writing §K added more** —
+this section names the path in order to report the count, so **any in-pass tally is raised by
+the sentence reporting it**, and a figure printed in this file goes stale the moment this file
+is edited. That is not a defect to repair; it is a property of counting a string inside the
+text that names it. **The honest form is the breakdown, not a total:** within this pass the path
+occurs in `FINDINGS.md` at §H, at §I twice (its quotation of the defect and its corrected
+count), at §J, and at §K, plus `results.jsonl` seq 4; outside it, at two lines in `docs/11`,
+one in `2026-10-13-area-p-static-schema/FINDINGS.md`, and four in 2026-10-14 passes. Every one
+is legitimate, for the reasons §I gives. **Run the grep; do not trust a number printed in the
+sentence that counts.**
