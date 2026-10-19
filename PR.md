@@ -220,15 +220,26 @@ closed"**, `config.yml` `about: 1 open areas` — all four agree, and
 2. `.github/ISSUE_TEMPLATE/config.yml` lines 9–16 — the 4-line explanatory comment and
    `about: 0 open areas;` → `about: 1 open areas;`.
 
-**This is no longer a forecast — #148 has merged (`98766df`).** `main` now carries `### AA.`
-and says "1 open plus 26 closed"; this branch carries `### AB.` and says the same. **The merged
-tree needs `2 open plus 26 closed` in all three places** — heading count, the live count
-sentence, and `config.yml` — and `check_prose_counts` will fail on a merged tree still reading
-`1`, which is that check working.
+**This is no longer a forecast — #148 has merged (`98766df`), and #150 after it.** `main`
+carried `### AA.` and `### AC.`; this branch carries `### AB.`. **Neither side's number was
+inherited — both were measured away.** On the merged tree the page measures
+**3 open (`AA`, `AB`, `AC`) + 26 Closed-table rows**, and `check_prose_counts` /
+`check_numbers` pass on that figure.
 
-**This pass does not resolve it.** A conflict in `docs/` is parked and reported for the merge
-queue, and a lane writing `2` into its own branch would be claiming a tree that does not exist.
-Reported in the log's appended `## Correction (2026-10-17) §E` with the exact three numbers.
+**Resolution, recorded rather than performed silently.** `origin/main` merged at
+`015689e`; both predicted surfaces conflicted and nothing else did.
+
+| Surface | This branch said | `origin/main` said | Merged text keeps |
+|---|---|---|---|
+| `docs/11:3006` (live count sentence) | "**1 open plus 26 closed** stand today (minted 2026-10-17 by lane l2: **AB**, the direct `/hcp/configuration/*` endpoints)" | "**2 open plus 26 closed** stand today (`AA`, `AC`)" | **3 open plus 26 closed**, open ids `(AA, AB, AC)` — both sides' id lists kept, both sides' prose dropped as undercounts |
+| `.github/ISSUE_TEMPLATE/config.yml:11-16` (comment + `about:`) | `# 1 … AB minted 2026-10-17 by lane l2 (1 open + 26 closed)` / `about: 1 open areas; every A–Z area is closed` | `# 2 … A–Z all closed (2 open — AA, AC — + 26 closed)` / `about: 2 open areas (AA, AC) — …` | `# 3 … (3 open — AA, AB, AC — + 26 closed)` / `about: 3 open areas (AA, AB, AC) — …` |
+
+Both sides agreed on **26 closed**, and the merged tree measures 26, so nothing was lost on
+that half. Both sides were wrong on **open**, each by one, and in opposite directions — which
+is why neither figure was inherited. The count is arithmetic over the page, not an editorial
+choice: `python3 scripts/research-checks.py` reads `^### [A-Z]{1,2}\. ` headings (3: `AA`,
+`AB`, `AC`) and `^\| [A-Z]{1,2} — ` rows after `## Closed areas` (26; `S6` is outside the
+pattern by design and is given separately).
 
 **CI could not run on this commit, and §E is why.** No `research-gate` check has been reported
 for this branch since `b8beadc`; the other three lanes ran normally throughout, so it is not an
@@ -238,7 +249,10 @@ ref**, and a merge ref cannot be computed for a conflicting PR — so the workfl
 dispatched. **Local gate at this exact tree: `GATE PASS`, exit 0, `CAP_STATE=ok`, suite
 `85 passed, 0 failed`, leak scan 10/10, all citations resolve.** Same script CI runs; **not a
 substitute for the CI check**, which must run against the merged tree §E has to unblock.
-Recorded in `## Correction (2026-10-17) §F`.
+Recorded in `## Correction (2026-10-17) §F`. **Superseded:** the conflict above is now
+resolved on this branch, so a merge ref exists and `pull_request` dispatches — the `gate` check
+runs against the merged tree for the first time on this branch. The historical record above is
+kept as written.
 
 </details>
 

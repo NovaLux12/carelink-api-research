@@ -702,3 +702,37 @@ all citation paths resolve, `CHECKS PASS`. That is the same script CI runs, and 
 strongest signal available while the PR cannot be made mergeable. **It is not a substitute for
 the CI check and is not offered as one** — the check exists to run against the merged tree, and
 §E has to be cleared before that tree exists.
+
+### §G — the conflict is resolved, and neither side's number survived
+
+§E forecast that the merged tree would read **2 open plus 26 closed**. It does not. `origin/main`
+moved again after `98766df` and merged **#150** (`015689e`), minting `### AC.` — so the merged
+page measures **3 open plus 26 closed**, and both §E's figure and this branch's own `1` were
+undercounts.
+
+`origin/main` merged at `a44622f`. The conflict was confined to the two surfaces this pass
+predicted, and to nothing else:
+
+| Surface | this branch | `origin/main` | merged text |
+|---|---|---|---|
+| `docs/11:3006` | "**1 open plus 26 closed** stand today (minted 2026-10-17 by lane l2: **AB**, the direct `/hcp/configuration/*` endpoints)" | "**2 open plus 26 closed** stand today (`AA`, `AC`)" | **3 open plus 26 closed**, ids `(AA, AB, AC)` |
+| `.github/ISSUE_TEMPLATE/config.yml` | `# 1 … (1 open + 26 closed)` / `about: 1 open areas; every A–Z area is closed` | `# 2 … (2 open — AA, AC — + 26 closed)` / `about: 2 open areas (AA, AC) — …` | `# 3 … (3 open — AA, AB, AC — + 26 closed)` / `about: 3 open areas (AA, AB, AC) — …` |
+
+**Both sides agreed on 26 closed and the merged tree measures 26**, so that half lost nothing.
+Both sides were wrong on open, each by one, in opposite directions — this branch omitted `AA`
+and `AC`, `main` omitted `AB` — so **neither figure was inherited**. The merged number is
+arithmetic over the merged page, taken with the same patterns `scripts/research-checks.py`
+uses: `^###\s+[A-Z]{1,2}\.\s` headings → `AA`, `AB`, `AC` (3); `^\| [A-Z]{1,2} —` rows after
+`## Closed areas` → 26 (`S6` is outside the pattern by design, as §9 of the amendment states).
+
+**§E and §F are superseded on one point each, and both are kept as written.** §E said this pass
+would not resolve the conflict and would not pre-write the merged number into its own branch;
+that was correct while the merged tree did not exist, and the merged tree now does, so the
+resolution is here. §F said no `research-gate` check can be dispatched for a conflicting PR;
+the conflict is cleared, so `pull_request` fires against a computable merge ref and the `gate`
+check runs on this branch for the first time.
+
+**Requests for this round: 0.** The probing is §1–§12, already committed and already counted
+there; nothing in this correction touches a host. `python3 scripts/research-checks.py` exits 0
+on the merged tree, and `python3 scripts/measure_assertions.py` still prints `217 431`
+(`README.md:414`, `:480` and `docs/09:286` unchanged).
