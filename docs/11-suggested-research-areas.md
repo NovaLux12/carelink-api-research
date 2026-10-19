@@ -2839,7 +2839,15 @@ under a disclosure decision, or every ledger row carries the distinction — a
 in the ledger is sufficient for the second route; nothing in the tree says a later
 pass would populate it.
 
-**S-L4c — one reader for the other 36 committed ledgers.** **Blocker, weakened
+**S-L4c — one reader for the other committed ledgers.** ⚠ **The heading's "**36**"
+is withdrawn (2026-10-19): no counting rule was stated with it and none reproduces
+it. The population it means is now named by a command — `git ls-files
+'findings-log/*/results.jsonl'` → **50** committed ledgers, of which **8** are
+area L's own and appear in this pass's `manifest.tsv`, so the "other" population is
+**42**. **That changes what this open successor asks for, and it is recorded here
+rather than applied silently: the figure it was scoped against was wrong, and the
+scope is now the 42.** Nothing else in the row changes — the blocker, the
+`cors-method` half-ledger note, the closer and the zero-request budget all stand. **Blocker, weakened
 from "none":** the population contains at least one ledger that is **not
 machine-readable** — `2026-10-13-cors-method/results.jsonl` is **16 of its 24 rows
 malformed JSON**, on `main` too (commit `8b7b7e9`) — so a reader that must span
@@ -2924,8 +2932,23 @@ this tool reads **32** and fails closed with a named reason on **18**, **not one
 traceback**. Before this pass, over those same 50, **24** read and **26** died with
 an unhandled `KeyError` or `TypeError`. **A ledger this tool cannot read is a gap in
 the record, not a negative result**, and it now says so and exits 2 rather than
-raising. The population is named by a command rather than a glob on purpose: a glob
-in this tree expands to paths that do not exist. **Skipping the rows was the right
+raising.
+
+⚑ **Correction (2026-10-19). The two sentences this replaces — "the population is
+named by a command rather than a glob on purpose: a glob in this tree expands to
+paths that do not exist" — are withdrawn.** What was measured: the withdrawn figure
+**65** is the count of `findings-log/` **top-level entries — passes, not ledger
+paths** (`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), where
+there are **50** committed ledgers. The **15** difference is exactly the tracked
+pass directories that hold no `results.jsonl` — e.g.
+`findings-log/2026-10-11-third-party-client-sources/`, which **is** tracked
+(`FINDINGS.md` appears in `git ls-files`) and carries no ledger. A bare
+`for f in findings-log/*/results.jsonl` counted **65** entries in this session's
+own shell while `sh -c` over the identical path counted **50**: **the two shells
+disagreed**, which is the honest reason the population is now named by a command
+rather than by either form. **The census figures did not move because the
+enumeration changed — they moved because `account.py` was fixed.** The counting rule
+is unchanged and is the command: `git ls-files 'findings-log/*/results.jsonl'` → **50**. **Skipping the rows was the right
 fix, not a loosening:** the spacing oracle needs only the rows that carry a
 timestamp, and a gap measured *across* a row with none would be a guess. **The
 INFERRED assumption above is untouched** — a null may still be a malformed row; the

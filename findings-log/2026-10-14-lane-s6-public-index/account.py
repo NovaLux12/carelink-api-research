@@ -52,7 +52,18 @@ from the repo root, not from this file's own directory:
       TypeError: strptime() argument 1 must be str, not None
 
 `2026-10-13-area-l-ipro-hcp` carries a JSON **null** `t_sent` on 4 of its 44 rows
-(seqs 1-4). `parse()` caught `ValueError`, so a MALFORMED STRING was already
+(seqs 1-4). **KNOWN LIMIT of the kernel oracle, measured not assumed.** A row whose `host_tag`
+names a body file that is simply ABSENT still joins the series, so a gap can be
+measured across it. **The no-`host_tag` fix does not cover that, and the printed
+sentence has been narrowed to say so.** Measured over all 50 committed ledgers at
+this head: the missing-body branch is taken on **25 of them**, and **not one of
+those 25 prints a kernel gap figure** -- each reports the oracle UNAVAILABLE,
+because either bodies resolve for a ledger or none do, and a *partial* body set is
+what the join-across needs and no committed ledger produces one. The case is
+reproducible synthetically with `S6_SCRATCH` pointing at a directory holding one of
+the two bodies.
+
+`parse()` caught `ValueError`, so a MALFORMED STRING was already
 treated as "this row cannot enter the series" -- and a null was not, because
 `strptime(None)` raises `TypeError`. The caller already skipped a pair when either
 side parsed to `None`; only the parse itself could not return `None`. So the fix
@@ -103,7 +114,7 @@ PRIOR_SEQ = 76
 # Keys every oracle below reads WITHOUT a default, so a row lacking one of them
 # crashes the run rather than yielding a wrong figure. Derived from the code, not
 # from memory: every `r["key"]` read in this file that is not a `.get(...)`.
-#     grep -oE 'r\["[a-z_]+"\]' account.py | sort -u
+#     grep -vE '^#' account.py | grep -oE 'r\["[a-z_]+"\]' | sort -u
 # `t_sent` and `host_tag` are deliberately ABSENT from this list and are handled
 # by a counted skip inside `spacing()` -- a ledger where *some* rows are short is
 # readable, and that is the case this tool must survive.
@@ -478,8 +489,11 @@ def main() -> int:
         print(f"    rows skipped, no host_tag          {k_skip}")
         print("      A row with no host_tag cannot name a body file, so the kernel oracle")
         print("      BREAKS the series at it rather than joining across it: no kernel gap")
-        print("      above is measured from or over a row that carries no body. The")
+        print("      above is measured from or over a row that carries NO HOST_TAG. The")
         print("      harness figure is unaffected -- it reads t_sent, not host_tag.")
+        print("      NOT covered by that sentence: a row whose host_tag names a body file")
+        print("      that is absent still joins the series (see the KNOWN LIMIT in the")
+        print("      docstring). No committed ledger reaches it -- measured, not assumed.")
         if k_skip == len(rows):
             print("      Every row of this ledger lacks host_tag, which is a property of")
             print("      the ledger's schema, not of the bodies.")

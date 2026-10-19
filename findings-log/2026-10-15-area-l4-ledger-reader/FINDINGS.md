@@ -1407,6 +1407,78 @@ both new skip counters read **0** there. **What moved is the set of ledgers the 
 can read at all** — and that set is published above by count rather than by
 assertion.
 
+## Correction (2026-10-19) — verifier round 3 on PR #147: an explanation withdrawn, a guarantee narrowed, and two corpora-wide answers
+
+A fresh-context verifier returned **CONTRADICTS** on `fa8554c` with six defects, **0
+network requests**, and independently **re-derived and confirmed every census figure**
+— `32 / 18 / 0` over 50 at head, `24 / 26` at `91a2226`, and the whole failure
+taxonomy. **No figure is restated here and none moved.** Four of the six are prose or
+a printed sentence; two were settled by measurement before anything was changed.
+
+**The withdrawn explanation (defect 1).** This file's fourth Correction section says
+the population is named by a command "rather than by a glob — a glob in this tree
+expands to paths that do not exist, which is how the first version of this section
+got its figures wrong." ⚠ **That explanation is withdrawn.** The `65` it refers to is
+the count of `findings-log/` **top-level entries — passes, not ledger paths**
+(`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), and there are **50**
+committed ledgers; the **15** difference is exactly the tracked pass directories that
+hold no `results.jsonl`, `findings-log/2026-10-11-third-party-client-sources/` among
+them — that directory **is** tracked and carries no ledger. **And the shell
+behaviour is not settled by assertion in either direction:** in this session a bare
+`for f in findings-log/*/results.jsonl` iterated **65** entries in one shell and
+**50** under `sh -c` over the identical path, and `python3 -c "glob.glob"` gives
+**50**. **The two shells disagreed**, which is the real reason the population is named
+by a command now. **The census figures moved because `account.py` was fixed, not
+because the enumeration changed** — the earlier section told the reader the opposite,
+and that is the defect. `docs/11` carries the same correction, which is editable.
+
+**The narrowed guarantee (defect 2), decided by measurement, not by preference.**
+`account.py` printed *"no kernel gap above is measured from or over a row that
+carries no body"*, which is broader than the code. Before choosing between narrowing
+the sentence and completing the fix, the branch was instrumented and run over all
+**50** committed ledgers. The result decides it:
+
+- the missing-body branch **is** taken — on **25 of the 50**;
+- **not one of those 25 prints a kernel gap figure.** Each reports the oracle
+  **UNAVAILABLE**, because either bodies resolve for a ledger or none do, and a
+  *partial* body set — the precondition for a gap joined across a bodyless row — is
+  what no committed ledger produces.
+
+So **no committed ledger yields a wrong kernel number**, and the defect is the printed
+sentence, not the figure. **The sentence is narrowed** to the no-`host_tag` guarantee
+the code actually holds, and the residual is recorded as a **KNOWN LIMIT** in the
+module docstring with a synthetic reproduction: three rows whose middle `host_tag`
+names an absent body, `S6_SCRATCH` holding only the other two, prints **30.0 s** —
+a gap joined across the bodyless row. **The code comment above the `host_tag` branch
+was already correctly scoped and is unchanged.** Narrowing rather than completing is
+recorded here as a deliberate choice with its cost: the inertness property
+(byte-identical default report, `--json` adding **two** lines) is preserved by this
+route, and completing the fix would have forfeited it and required re-establishing it.
+
+**The misattributed parenthetical (defect 4).** The refusal breakdown above reads
+"**14** with no `http_status` (**one of those also writes it with the wrong type**)".
+⚠ **Withdrawn as false read literally:** the wrong-type ledger is
+`2026-10-14-area-f-dedicated-routes-succession`, which carries `http_status` on
+**every** row (`wrong type on 14 of 14`) — it is not among the 14 that lack the key.
+It is a **separate 18th refusal**, and the breakdown's arithmetic is unchanged: the
+six reasons sum to more than 18 because **a ledger short several keys is counted once
+per key**, which is why the counts are published as *ledgers naming each reason,
+overlapping*, not as a partition.
+
+**The derivation recipe matched its own comment (defect 6).** The comment above
+`REQUIRED` printed `grep -oE 'r\["[a-z_]+\]' account.py | sort -u`, which matched
+the comment line itself and emitted `r["key"]` — not a read. It now filters comments
+first, and the recipe returns exactly `body_bytes`, `host`, `http_status`, `method`,
+`seq`.
+
+**`docs/11`'s S-L4c row (defect 3) is rescoped, and saying so is the point.** Its
+heading read "**36** committed ledgers" with no counting rule; no rule reproduces 36.
+The counting rule is now stated and published — `git ls-files
+'findings-log/*/results.jsonl'` → **50**, of which **8** are area L's own in this
+pass's `manifest.tsv`, so the "other" population is **42**. **An open area's scope
+has been changed by a correction, and that is recorded on the row itself rather than
+applied quietly.**
+
 ## 9. Artefacts
 
 | file | what |
