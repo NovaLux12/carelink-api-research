@@ -2939,7 +2939,7 @@ named by a command rather than a glob on purpose: a glob in this tree expands to
 paths that do not exist" — are withdrawn.** What was measured: the withdrawn figure
 **65** is the count of `findings-log/` **top-level entries — passes, not ledger
 paths** (`git ls-tree <sha> --name-only findings-log/ | wc -l` → **65**), where
-there are **50** committed ledgers. The **15** difference is exactly the tracked
+there are **50** committed ledgers. The **15** difference is exactly the
 tracked entries that hold no `results.jsonl` — **14 directories and one tracked
 file**, `findings-log/cumulus-v2-spike.md`, which is a `.md` file, not a pass
 directory; e.g. `findings-log/2026-10-11-third-party-client-sources/` is a tracked
