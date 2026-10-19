@@ -356,7 +356,9 @@ section (`AGENTS.md` §2.1). This is the *path-borne* axis; §3a is the separate
 been swept on `.eu` at base `v13` (§3) and on `-trials` at base `v6` with two tails
 (§8); the 2026-10-17 matrix pass swept **all 16 base paths on all three hosts at
 tail `3.6`**, which varies the base axis and not this one. What is new here is
-varying the tail at `v13` on `.com` and `-trials`.
+**two** things: varying the tail at `v13` on `.com` and `-trials` (**never done at
+`v13` on either host**), and taking `-trials` `v6` from two tails to four, one of
+them fabricated (§3b.3).
 
 Swept `GET /connect/carepartner/<base>/discover/android/<tail>` on the two cumulus
 `.com`/`-trials` hosts — `clcloud.minimed.com` and `clcloud-trials.minimed.com` —
@@ -414,14 +416,15 @@ flowchart TD
     B -- "yes (OBSERVED)" --> D{"after erasing the echoed tail,<br/>do the bodies still differ?"}
     D -- "yes: >=2 distinct documents (OBSERVED, v13 on both hosts)" --> E["tail GATES which document is served"]
     D -- "no: 1 document for all 4 tails (OBSERVED, v6 on -trials)" --> F["tail is ECHOED only,<br/>not a content gate"]
-    E --> G["both, always: the requested tail is echoed into<br/>config in every 200, and a fabricated tail<br/>answers 200 - there is no allow-list"]
+    E --> G["and on this branch the tail is echoed too:<br/>every 200 carries it in config, and a<br/>fabricated tail answers 200 - no allow-list"]
 ```
 
 ### 3b.4 The `v6` split is a **base-axis** effect, not an app-version effect
 
 `clcloud.minimed.com` answers `403` on all four `v6` cells; `-trials` answers
-`200` on all four. That is **not** an app-version effect, and the rows settle
-it: on the same host at the **same tail** `3.6`, base `v11` returns `200`. The
+`200` on all four. That is **not** an app-version effect — **INFERRED; the
+refutations it rests on are OBSERVED** — and the rows support it: on the same host
+at the **same tail** `3.6`, base `v11` returns `200`. The
 segment that decides `403` vs `200` there is the **base**. Whether `v6` is
 unrouted on `.com` because of the version segment or the `v6/discover/android/*`
 route family is **not established** — no `v6/display/message` or `v6/discover`
@@ -652,7 +655,7 @@ property of **that one document on that one deployment**, not of `v6`.
 > the same tail sweep produces at base `v13` on the same host. So `-trials` `v6`
 > is collapsed on **both** axes at once, and it is the one cell in the corpus where
 > a fabricated tail is indistinguishable from three numeric ones. OBSERVED;
-> [§3b.3](03-discovery-and-versions.md#3b-the-androidapp-version-axis-on-com-and--trials--gating-at-v13-collapsed-at-v6)
+> [§3b.3](03-discovery-and-versions.md#3b3-but-at--trials-base-v6-it-selects-nothing--observed)
 > [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.3].
 
 **And the `-trials` column is not a catch-all**, which is what makes this a

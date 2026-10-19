@@ -21,8 +21,8 @@ is disclosed in full
 
 Ledger: [`results.jsonl`](./results.jsonl) — **20 rows**, one per request, `seq`
 1…20 with no gaps and no duplicates. Harness: [`probe.sh`](./probe.sh), whose
-`CAP=20` (`:74`) and `DELAY=2.5` (`:75`) were asserted before every send
-(`:109-110`).
+`CAP=20` (`:74`) and `DELAY=2.5` (`:75`) were asserted before every send — the cap
+is re-checked at `:109-110` and the delay applied at `:153`, inside the lock.
 
 | # | host | base | app-version | role | status | B | `body_sha256` |
 |---|---|---|---|---|---|---|---|
@@ -111,9 +111,9 @@ published on the **cumulus** hosts, not on the `carelink.*` app/API hosts. The
 bridge reads it from `baseUrlCumulus`, which
 [`docs/03` §1](../../docs/03-discovery-and-versions.md) records as
 `…clcloud-trials.minimed.com/connect/carepartner/v13`, and the same section lists
-the three hosts the discovery document is read from as `clcloud.{minimed.eu,
-minimed.com, clcloud-trials.minimed.com}`. A `carelink.*` host is a different
-plane: it is
+the three hosts the discovery document is read from as
+`clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}`. A `carelink.*`
+host is a different plane: it is
 where `baseUrlCareLink` points, not where discovery lives.
 
 **Does it answer the area as posed?** **Yes, for the question the area asks,
@@ -218,20 +218,25 @@ there is no document for the tail to select (§5).
 
 ---
 
-## 5 · The `v6` host split is a base-axis effect, not an app-version effect
+## 5 · The `v6` host split **reads as** a base-axis effect, not an app-version effect
+
+**The reading is INFERRED; the refutations it rests on are OBSERVED.** The class
+is carried into `docs/03` §3b.4 and `docs/11` wherever the claim is asserted, so
+no page states it as fact.
 
 `clcloud.minimed.com` answers `403 MissingAuthenticationTokenException` on **all
 four** `v6` cells (`results.jsonl:7-10`) at the corpus no-route digest
 `f249b63cb2fc…`; `clcloud-trials.minimed.com` answers `200` on all four
 (`:17-20`). The area flagged this as possibly a route-family difference rather
-than an app-version effect, and **the rows do settle that much**:
+than an app-version effect, and **the rows rule that one reading out** (the
+refutation is OBSERVED, the reading it supports is INFERRED):
 
-**The `403` cannot be an app-version effect.** The served control on the *same
+**The `403` is not explained by the tail.** The served control on the *same
 host*, at the *same tail* `3.6`, returned `200` (`results.jsonl:2`,
-`base v11`). The discriminator between `403` and `200` on `clcloud.minimed.com`
-is therefore the **base segment**, not the tail — all four tails behave
+`base v11`) — that cell is OBSERVED. Reading the discriminator as the
+**base segment** rather than the tail — all four tails behave
 identically under `v6`, and the one cell that varies only the base flips the
-answer. That is what makes it a base-axis fact.
+answer. That is what makes it a base-axis fact (**INFERRED**).
 
 **What the rows cannot separate.** Whether `v6` is unrouted on `.com` because of
 the *version segment* or because of the `v6/discover/android/*` *route family*
@@ -247,10 +252,10 @@ adds to nor overturns that. **No choice is made between the two readings.**
 ## 6 · What the rows do not establish
 
 - **Lookup table or threshold rule.** Only four tails were sent — `3.5`, `3.6`,
-  `3.9`, one fabricated — and they are adjacent. A boundary anywhere in `(3.5,
-  3.6]` or `(3.6, 3.9]` is exactly as consistent with the data as a per-value
-  table. **Cannot be separated.** This is the load-bearing unknown and it is
-  what successor **AE** is for.
+  `3.9`, one fabricated — and they are adjacent. A boundary anywhere in
+  `(3.5, 3.6]` or `(3.6, 3.9]` is exactly as consistent with the data as a
+  per-value table. **Cannot be separated.** This is the load-bearing unknown and
+  it is what successor **AE** is for.
 - **Why the fabricated tail lands on the `3.9`-class document.** Consistent with
   "unrecognised tails fall back to the legacy/default document"; equally
   consistent with "any tail outside the current-generation pattern falls
@@ -309,8 +314,8 @@ rather than multiplicity.
 | 7 | A fabricated tail answers `200` — no allow-list | OBSERVED | `results.jsonl:6`, `:16`, `:20` |
 | 8 | At `v13` the tail selects 3 documents per host | OBSERVED | `structure.txt` §Q2 |
 | 9 | At trials `v6` the tail selects nothing (n=4) | OBSERVED | `structure.txt` §Q2; `results.jsonl:17-20` |
-| 10 | The `v6` `403` on `.com` is a base-axis effect | OBSERVED | `results.jsonl:2` vs `:7-10` |
+| 10 | The `v6` `403` on `.com` is a base-axis effect | INFERRED | the refutations are OBSERVED (`results.jsonl:2` vs `:7-10`); the reading that the base segment is the discriminator is one step further — house precedent `findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:287` |
 | 11 | trials `v6` digest is a re-derivation of the matrix pass | OBSERVED | `findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:113`, `:143` |
 | 12 | Lookup-vs-threshold is not separable from four tails | INFERRED | §6; assumption stated there |
 | 13 | Base `v11` and `.com`-`v6` carry no verdict | INFERRED | `structure.txt`; one cell / no cell |
-| 14 | Every claim above rests on 1 source | OBSERVED | `AGENTS.md` §2.1 |
+| 14 | Every claim above rests on 1 source | INFERRED | an audit conclusion about source identity, not something seen in a response — same species as rows 4 and 5 |
