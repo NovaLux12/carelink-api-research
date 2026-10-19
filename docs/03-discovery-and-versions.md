@@ -31,7 +31,8 @@ Citations are `[source: findings-log/<file> §n]`; `PROBE-FINDINGS` =
 ## 1. The discovery document
 
 ```
-GET https://clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}/connect/carepartner/v13/discover/android/3.6
+GET https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6
+    … the same path on clcloud.minimed.com and clcloud-trials.minimed.com
 → 200 application/json, 20256 B, unauthenticated, no x-api-key required
 ```
 
@@ -133,6 +134,15 @@ all returned 200, all legacy: no `Auth0SSOConfiguration`, `baseUrlCumulus` at
 normalising, every legacy cell from 3.11 to 12.0 is **byte-identical** except the echoed
 request string `"config": "android,3.11"` vs `"config": "android,12.0"`
 [source: PROBE-FINDINGS §7].
+
+> ⚠ **That "byte-identical" holds *within* a host, not across them — added 2026-10-17
+> (area AA).** The ten cells above were swept on `.eu`. The `3.9`-class legacy document
+> is **host-specific**: at base `v13` it carries an **EU** SSO entry and **99** countries
+> on `clcloud.minimed.com` against a **US-only 76** on `clcloud-trials.minimed.com`. The
+> `3.5` and `3.6` documents *are* byte-identical across both hosts, so what is
+> host-specific is confined to the legacy tier. Full treatment and captures:
+> [§3b.2](03-discovery-and-versions.md#3b2-and-at-base-v13-it-also-selects--observed)
+> [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2].
 
 **⚠ Superseded, stated as such rather than dropped:** the earlier note "the enum is
 open-ended (10.0 still 200)" is **superseded**. There is no undiscovered Auth0+v13
@@ -383,11 +393,13 @@ not `404` — at three cells. **There is no allow-list on this segment**
 Erase the echo and re-digest, and base `v13` yields **three** distinct documents
 per host. The selection is substantive, not cosmetic: `3.6` → `3.9` moves the
 advertised `baseUrlCumulus` base (`v13` → `v2`), the `baseUrlCareLink` API
-version (`v2` → `v1`), the `CP[]` length (3 → 2, the CLINICAL entry gone), the
-country count (109 → 99 on `.com`, 109 → 76 on `-trials`), and the SSO config
-file family (`oauth20_sso_carepartner_*_v6.json` → `sso_cp_us_v6.json` /
-`eu_sso_cp_eu_v6.json`)
-[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2].
+version (`v2` → `v1`), the `CP[]` length (3 → 2 — regions `US, EU, CLINICAL` on the
+3.5/3.6 class, `US, EU` on the 3.9 class), the country count (109 → 99 on `.com`,
+109 → 76 on `-trials`), and the SSO config file family: the 3.5/3.6 class carries
+`oauth20_sso_carepartner_*_v6.json`, while the 3.9 class carries `sso_cp_us_v6.json`
+alone on `-trials` and `sso_cp_us_v6.json` **plus** `eu_sso_cp_eu_v6.json` on `.com`
+[source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2;
+`headers/04-*.b` vs `headers/05-*.b` for the regions].
 
 | tail | `clcloud.minimed.com` | `clcloud-trials.minimed.com` |
 |---|---|---|

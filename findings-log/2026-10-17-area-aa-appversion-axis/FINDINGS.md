@@ -116,6 +116,16 @@ the three hosts the discovery document is read from as `clcloud.minimed.eu`,
 host is a different plane: it is
 where `baseUrlCareLink` points, not where discovery lives.
 
+> **Correction (2026-10-19).** `docs/03` §1 carried this host list as the brace
+> shorthand `clcloud.{minimed.eu, minimed.com, clcloud-trials.minimed.com}`, and an
+> earlier commit of this PR explained the fix as "the middle element expands to a bare
+> `minimed.com`". **That explanation was wrong**: brace expansion gives
+> `clcloud.minimed.eu` and `clcloud.minimed.com` correctly — it is the **third** element
+> that breaks, expanding to `clcloud.clcloud-trials.minimed.com`. The shorthand has been
+> spelled out at `docs/03` §1; the list itself is correct either way, which is why §2's
+> claim was never in doubt. Recorded here rather than in the commit message, which
+> cannot be rewritten without force-pushing.
+
 **Does it answer the area as posed?** **Yes, for the question the area asks,
 and no for the literal wording.** The area's question is whether the app-version
 axis gates anything on `.com` and `-trials` — and `.com`/`-trials` are the
@@ -183,10 +193,13 @@ host, and the tail selects between them:
 
 The selection is substantive, not cosmetic. Going `3.6` → `3.9` changes the
 advertised `baseUrlCumulus` base (`v13` → `v2`), the `baseUrlCareLink` API
-version (`v2` → `v1`), the `CP[]` length (3 → 2, i.e. the CLINICAL entry
-disappears), the country count (109 → 99 / 76), and the SSO config file family
-(`oauth20_sso_carepartner_*_v6.json` → `sso_cp_us_v6.json` /
-`eu_sso_cp_eu_v6.json`). **This is a gate.**
+version (`v2` → `v1`), the `CP[]` length (3 → 2; the regions are
+`US, EU, CLINICAL` on the 3.5/3.6 class and `US, EU` on the 3.9 class, verified
+against `headers/04-*.b` and `headers/05-*.b`), the country count (109 on the
+3.5/3.6 class, 99 on `.com` and 76 on `-trials` for 3.9), and the SSO config
+file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against
+`sso_cp_us_v6.json` alone on `-trials` and `sso_cp_us_v6.json` **plus**
+`eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. **This is a gate.**
 
 The `3.5` and `3.6` documents are **byte-identical across the two hosts** —
 the same canonical digests, and the same raw digests at `results.jsonl:3`/`:13`
@@ -287,11 +300,13 @@ echoed tail is erased do they collapse to one. `1aab9bb1e721…` is the **`3.6`
 cell's raw digest alone** and is the value the matrix pass recorded. It is the
 cleanest negative in the corpus and the most tempting thing to freeze.
 
-It is not worth the budget. `AGENTS.md` §11 gives the weekly drift sweep a budget
-of **~80 requests per sweep**. A pin in `05-public-config` runs on two schedules —
-**4 requests on every PR gate**, which is the one that repeats — and the same sweep
-would still be needed to notice the one change that would actually matter: the
-*departure* of the `3.6`-class document
+It is not worth the budget. **Counting rule:** a pin in `05-public-config` is executed
+by `scripts/research-gate.sh`, which CI runs on **every PR**, and again by the weekly
+drift sweep — so a 4-cell pin costs **4 requests per PR gate *and* 4 per sweep**, and
+the gate is the schedule that repeats on every push. Against the ~80-request sweep
+budget in `AGENTS.md` §11 that is affordable; the reason to decline is different —
+the same sweep would still be needed to notice the one change that would actually
+matter: the *departure* of the `3.6`-class document
 at `v13`. The prior matrix pass declined the same pin for the same reason
 (`findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:235`). **Measure.**
 
