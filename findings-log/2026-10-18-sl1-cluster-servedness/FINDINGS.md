@@ -166,7 +166,7 @@ What each line **proves**, as opposed to describes:
 |---|---|
 | `POSITIVE` | the interval test finds an apex key and a subdomain key |
 | `NEGATIVE` | absence is proven **only** by the adjacent `< FAM_LO` / `≥ FAM_HI` pair — a page with no family key does not on its own produce an absence |
-| `CONSTRAINED` | a locate whose reads sort entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **This is the shape the pass hit live, and one of the three live reads did sort wholly before the interval** — see §5b |
+| `CONSTRAINED` | a locate whose every read sorts entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **The live run did NOT hit this case**: of its three reads, one sorted wholly before and **two sorted wholly after** the interval, so it is adjacent to §5b's failure rather than identical to it |
 | `NEAR-MISS` | `eu,minimif)` — one character different — sorts outside the interval, so a lookalike domain is not counted as the family |
 | `FETCH FAILED` | a transport failure is `FETCH_FAILED`, never an absence |
 | `TAXONOMY` | both predicates over every status this API has been recorded producing, **asserted in code** (§4) |
@@ -447,7 +447,8 @@ keys).
 
 **The successor this mints is the fix, and it is zero-request once the
 instrument exists**: the prior and the page schedule come from the two
-`cluster.idx` head reads this pass already spent, and the budget model comes
+`cluster.idx` head reads this pass already spent (seqs 5, 6 and 13 — **three**,
+one per named crawl), and the budget model comes
 from `spacing.txt` and the S-L2 `budget.py` — none of which needs a network.
 
 ---
@@ -475,7 +476,7 @@ Stated because the pass's budget is part of its honesty.
 
 Four fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
-from `results.jsonl` rather than reading the prose**. Both verdicts are
+from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
 record, and a corrected number with no visible retraction is a number nobody
 can check.
@@ -632,16 +633,18 @@ learned about itself:
    not: **128 550 094** (`org,…`–`pl,…`) is wholly **after** (`first_k ≥ FAM_HI`),
    **62 177 895** (`com,…`) is wholly **before** (`last_k < FAM_LO`), **95 363 994**
    (`fr,…`–`gr,…`) is wholly **after**. **No read straddled** — the
-   `else: # the page straddles` branch never fired — and **one read did sort
-   wholly before**, which is precisely the case `CONSTRAINED` covers. The
+   `else: # the page straddles` branch never fired — and while **one read did sort
+   wholly before**, two sorted wholly **after**, so **no read matched
+   `CONSTRAINED`'s case** (every one of its injected reads sorts before). The
    committed `window` `[66 372 199, 95 363 994]` reproduces exactly from those
    two window assignments, which independently confirms the classification.
    **So round 1's "the exact failure this pass then hit live" was too strong,
    and round 3's replacement was wrong** — and it was introduced by the commit
    that itself warns that *"a half-fix that leaves the false shape behind is
    worse than the original."* **That warning was written in the same commit that
-   committed the second half-fix of that shape.** The correct statement is the
-   weaker one now in §3a.
+   committed the second half-fix of that shape** — and round 5 found a third
+   instance: this entry, written to correct it, had itself re-attached the same
+   false identification. §3a now states the relation without claiming identity.
 2. **`docs/11:2811` went dead** — the head commit's own `+1` and `+8` hunks
    shifted the target to **`docs/11:2820`**, so the cite now lands on a table
    header. `AGENTS.md` §6 item 6, and **the same defect round 2 caught once**.
@@ -666,7 +669,8 @@ been de-bolded, so the entry no longer described the file it was about;
 Every blocking finding was an **accounting or bookkeeping sentence**. Never the
 servedness claim, never an evidence class, never the independence count, never
 the request total — all four of which survived four independent recomputations
-and two live reproductions of the `minimed.eu` `404`. The defects cluster in
+and one live reproduction of the `minimed.eu` `404` (round 2 — round 1 could
+not reach it and recorded it as unverified). The defects cluster in
 exactly three mechanisms, and each is now a rule for the next pass:
 
 1. **Derived arithmetic not recomputed from its own ledger.** (`E[N]` range,
@@ -679,3 +683,55 @@ exactly three mechanisms, and each is now a rule for the next pass:
 
 All three are invisible to `research-checks.py`, and all three were caught only
 by a fresh-context verifier recomputing from `results.jsonl`.
+
+### Round 5 — `CONTRADICTS 6f6f6e6`
+
+Four blocking findings, **and the pattern is now the finding**: each was one of
+the three mechanisms, and **two were committed by the very commits that had just
+named their mechanism**. That is worth more than the individual sentences.
+
+1. **§3a's `CONSTRAINED` row still identified the live failure with the
+   selftest case.** Round 4 had removed the false *"straddling"* geometry but
+   kept the identification, weakening *"the exact failure"* to *"the shape"* —
+   **a hedge, which `AGENTS.md` §1 forbids** ("do not soften it, do not hedge
+   it, delete it"). It is also false: `CONSTRAINED` injects reads that are
+   **all** wholly before, while the live run had **one** before and **two**
+   after. → **the identification is deleted**; §3a now states that the live run
+   did *not* hit that case and is adjacent to §5b's failure rather than
+   identical to it. The same false identification was repeated in the round-4
+   history entry, which had been written to correct it — **round 5's third
+   instance of the same half-fix in three rounds.**
+2. **The PR body's `## Verification` opened "Three fresh-context verifier
+   rounds"** above a four-row table, in the same round-4 commit that fixed
+   exactly this in `FINDINGS.md:476`. **Mechanism 3 again, in the artefact a
+   reviewer reads first**, and it falsifies that commit's own "All corrected".
+3. **`FINDINGS.md:478` still read "Both verdicts are recorded here"** two lines
+   below "Four fresh-context verifier rounds" — round 4 quoted the phrase in
+   full and changed only its first half. **The residual of a quoted-and-partially
+   fixed sentence**; now "Every round's verdict is recorded here".
+4. **"two live reproductions of the `minimed.eu` `404`"** — the record supports
+   **one**. Round 1 byte-verified the substantive claim but explicitly could not
+   reach the `404` and recorded it as **unverified** (§10, round 1); round 2
+   reproduced it; rounds 3 and 4 did no wire work. **A derived count not
+   recomputed from its own record — mechanism 1, in the commit that declares
+   mechanism 1 eliminated.** → corrected to **one**, naming round 2.
+
+One non-blocking: "**the two** `cluster.idx` head reads this pass already spent"
+— the ledger carries **three** 8 KiB head reads, seqs 5, 6 and 13, one per named
+crawl. → corrected, and `docs/11` and the PR body, which say "the head read"
+(indefinite singular), are left as they are because they are right.
+
+**The closing observation, and it is the honest one for this pass.** Five rounds
+produced **12** blocking findings — round 1: 3 · round 2: **0** · round 3: 2 ·
+round 4: 3 · round 5: 4 — **every one an accounting or bookkeeping
+sentence**. ⚠ An earlier draft of this sentence said *"nine"*, which is a
+derived count not recomputed from its own record: mechanism 1, committed in the
+commit written about mechanism 1. The per-round breakdown is inline so the total
+is checkable rather than re-derivable only by counting. The servedness claim, the evidence classes, the independence count
+and the request total survived every round unchanged. The three mechanisms are
+now each demonstrated **twice at least, and each at least once inside the fix
+for itself** — which is the strongest evidence available that they are properties
+of this kind of prose rather than of any one author or pass. **The corrective
+that has actually worked is always the same: recompute the sentence from the
+ledger, then read `docs/` and the PR body to confirm the correction propagated.**
+Nothing else in the loop caught these.
