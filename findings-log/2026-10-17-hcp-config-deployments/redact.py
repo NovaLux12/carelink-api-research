@@ -25,17 +25,43 @@ that so a re-deriver is not confused by the mismatch.
 import hashlib
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.abspath(os.path.join(HERE, "..", "..", "..", "..", ".."))
+# Resolved with git, not by counting parent directories: this pass was written
+# in .loop/worktrees/<name>/, where a five-level walk happens to land on the
+# main checkout, and that accidental success would have broken the script the
+# moment the branch was merged into a normal checkout (five levels up from
+# <repo>/findings-log/<pass>/ is not the repo). `git rev-parse --show-toplevel`
+# is the convention in scripts/research-loop.sh and six other files here.
+_top = subprocess.run(["git", "rev-parse", "--show-toplevel"],
+                      capture_output=True, text=True).stdout.strip()
+# Loud and early, and specifically NOT a bare os.path.exists check: from the
+# merged checkout the old five-level walk resolved several levels ABOVE the
+# repository — to a directory that exists — so an existence test would pass and
+# the script would then die at open(PATTERNS) with a traceback pointing at the
+# scrub-patterns file rather than at the path resolution three lines above it.
+# (The concrete wrong root is not written here on purpose: it is a machine-
+# specific path, which this script's own patterns scrub — it redacted this
+# comment the first time it ran.)
+if not _top or not os.path.isfile(os.path.join(_top, "scripts", "scrub-patterns.txt")):
+    sys.exit("STOP: could not locate the repository root from "
+             f"{HERE}. Searched via `git rev-parse --show-toplevel`, which returned "
+             f"{_top!r}; expected scripts/scrub-patterns.txt beneath it. Running this "
+             "outside a git worktree is not supported — run it from the checkout.")
+REPO = _top
 PATTERNS = os.path.join(REPO, "scripts", "scrub-patterns.txt")
 TOKEN = "<VENDOR-API-KEY-REDACTED>"   # the repo's own token, SECURITY-FINDINGS §S3
 
 # Scanned extensions only. Binary-ish and >1MiB files are not text and are
 # excluded by research-checks.py's hygiene rule anyway.
 SUFFIXES = (".b", ".h", ".md", ".json", ".jsonl", ".sh", ".py", ".txt", ".log")
-SKIP = {"results.jsonl", "plan.json", "REDACTIONS.md"}
+# `redact.py` skips itself: this script was rewritten mid-pass, and the one
+# machine-specific path its own comment carried made the next run match the
+# comment and rewrite this file and REDACTIONS.md. A tool that edits its own
+# source is not a redaction tool.
+SKIP = {"results.jsonl", "plan.json", "REDACTIONS.md", "redact.py"}
 
 pats = []
 for line in open(PATTERNS, encoding="utf-8"):

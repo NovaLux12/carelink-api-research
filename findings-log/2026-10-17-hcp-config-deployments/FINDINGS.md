@@ -620,8 +620,11 @@ possible and this pass took two more, which round 3 records as the process failu
 
 ### §B — a §2.1 strength word at `AGENTS.md` §2.1's independent count of 1. **Flagged, not edited.**
 
-Round 3's reviewer is right that one sentence in the superseded block above uses
-*independently* as an instrument adverb. `AGENTS.md` §2.1 lists it among the words permitted
+Round 3's reviewer is right that one sentence uses *independently* as an instrument adverb.
+**Where it stood at the time — and §J corrects this location.** At `3b8247e` the sentence was
+in the **live cap accounting section**, at line 65, not in the superseded block above: §A's
+verbatim blockquotes never contained it. The round-5 repair has since removed it from line 65
+altogether; the quotation below is the only place the word now survives. `AGENTS.md` §2.1 lists it among the words permitted
 **only at an independent count of ≥ 2**, and this claim's count is **1** — one harness, one
 pass, one author. The offending sentence is quoted here so the flag is attached to its text:
 
@@ -647,11 +650,17 @@ Round 3 asked that any correction-table cell implying an in-place edit be reword
 exists in this pass.** Run against the whole diff:
 
 ```bash
-grep -rn "corrected to" docs/*.md findings-log/2026-10-17-hcp-config-deployments/*.md
+grep -rn "corrected to" docs/*.md
 # -> docs/09:301 (a pre-existing line about a 2026-10-13 merge, not mine)
 #    docs/11:1899 (a pre-existing "Assumptions (INFERRED)" line, not mine)
-git diff origin/main -- docs/ findings-log/ | grep '^+' | grep -iE "corrected to|now reads|rewritten in place"
-# -> one hit, and it is in repair-status.py's docstring describing a JSON field that script owns
+git diff origin/main -- docs/ | grep '^+' | grep -iE "corrected to|now reads|rewritten in place"
+# -> 0 hits
+#
+# Both searches are scoped to docs/ on purpose. Run over this pass's own files,
+# the first grep matches §C's heading, its own command line and §K's quotation of
+# it — so it could never be quoted cleanly, and a tally that counts the sentence
+# reporting it is the class §J named. Scoped to docs/, which is what the claim
+# is about, both answers are stable.
 ```
 
 The only correction table this pass wrote is §0's **"the row said | the source says"**, whose
@@ -798,9 +807,18 @@ warns about: the gate resolves `[source: path]`, not the line inside the path, s
 stayed green over a citation that pointed at the wrong text.
 
 ⚠ **This item was misreported as fixed and was not.** The first repair pass corrected
-`plan.py`'s `asset_src`/`digest_src`, which had carried the wrong path into the generated
-`plan.md`/`plan.json` corpus-control table, and then wrote in this section that `FINDINGS.md`
-was fixed too. **It was not**: §3's live attribution above still named the area-p file, and
+`plan.py`'s `asset_src`/`digest_src` source fields, and then wrote in this section that
+`FINDINGS.md` was fixed too.
+
+⚠ **And this item itself carried a false causal claim, which two later sections inherited.**
+It said those `plan.py` fields "carried the same wrong path into the generated `plan.md` /
+`plan.json` corpus-control table". **They did not, and never did**: `git show <c>:…/plan.md |
+grep -c 'static-schema-recovery'` is **0** at `b8beadc`, `3b8247e`, `4ae617e` and `0f0a932`,
+and the same grep on `plan.json` is 0. The wrong path lived in `plan.py`'s **source** and in
+the `die()` message that interpolates `digest_src` — **it was never written into either
+generated file.** The correct statement of what was fixed: `FINDINGS.md` §3 and `plan.py`'s
+source fields; `probe.sh:169` also hardcoded it; `results.jsonl` seq 4 retains it by design;
+`plan.md`/`plan.json` were grepped and carry no instance. **It was not**: §3's live attribution above still named the area-p file, and
 `probe.sh` — the generator of the ledger's own `role` strings — still hardcoded it. A silent
 no-match replace had been read as a successful one. `FINDINGS.md` §3 and `probe.sh:169` are
 fixed in round 5; `results.jsonl` seq 4's `role` string still carries the old path, and it is
@@ -872,9 +890,10 @@ path.
 **What did not change.** Every measurement, every request count, every cap revision and every
 evidence class. **0 requests in this round.** In **body text**, §3's citation is the only line
 this round touched, and it is disclosed in item 2 above. **In the correction sections, §H was
-also edited this round** — the two ⚠ disclosure blocks item 2 quotes and corrects.
-`git diff b03f458..014c562` names all four hunks: §3 at `:247`, §H at `:775` and `:786`, and
-§I appended at `:809`.
+also edited this round, in two places**: the ⚠ disclosure block item 2 quotes and corrects, and
+the blockquote line-reference correction item 1 is about. `git diff b03f458..014c562` names all
+four hunks: §3's citation (hunk `@@ -247`, changed line **250**), §H at `@@ -775` and
+`@@ -786`, and §I appended at `@@ -809`.
 
 ⚠ **Two claims in the paragraph above were wrong when first written, and both are corrected
 here rather than left to be found.** (a) "**§1–§12, §A–§G … did not change**" was false on the
@@ -1024,7 +1043,9 @@ repaired; a repair that reproduced the defect it repaired; and a count corrected
 that did not count itself. **Not one of them is a measurement error** — not one of the fifteen
 portability cells, the body digests, the header populations, the spacing floor, the route
 tables, the corpus-control assertions or the merge-count resolution has moved since round 1,
-and each was independently re-derived and confirmed in rounds 1 and 2.
+and each was re-derived from this directory's own artefacts — by one verifier, working from
+this repository's committed ledger and headers, which is one source under `AGENTS.md` §2.1
+and is not described here as corroboration.
 
 `AGENTS.md` §6.2 publishes the positive form — *a grep that hits is not a grep that proves*.
 The negative form, which this pass had to learn five times, is sharper: **a file I did not open
@@ -1085,13 +1106,18 @@ gone. What replaces the first is the property that actually matters and is actua
 121 changed but **1-for-1**, so it shifts nothing, and **112 and 124 — the two lines row 51's
 cite names — are untouched** and still say what it cites them for.
 
-**What this is, stated once.** Rounds 2 through 8 found seven defects and **not one is a
+**What this is, stated once.** **This file's own numbered items are the count, and no
+aggregate is stated here** — §H 5, §I 2, §J 4, §K 5, §L 3 for the five rounds they record,
+plus round 8's own ten findings (F1–F10), which are recorded in `PR.md` and not here. **A
+figure that spans rounds would drift the moment the next round added to it**, which is what
+this paragraph previously did. **Not one defect is a
 measurement error**: the 15×3 portability grid, every body digest, the header populations, the
 2.276 s floor, both route tables, the corpus-control assertions and the merge-count resolution
-have not moved since round 1, when they were independently re-derived. Every defect is
-documentary, and the last three are documentary in a sharper sense than the earlier ones —
-**they are sentences about repairs**, which are the easiest kind of claim to write and the
-easiest to write wrongly, because writing one feels like doing the thing. `AGENTS.md` §6.2's
+have not moved since round 1, when a verifier re-derived them from this directory's committed
+artefacts — one source under `AGENTS.md` §2.1, so not "independently". Every defect is
+documentary, and **rounds 7 and 8 were documentary in a sharper sense** — they were sentences
+about repairs, which are the easiest kind of claim to write and the easiest to write wrongly,
+because writing one feels like doing the thing. `AGENTS.md` §6.2's
 published form is *a grep that hits is not a grep that proves*. The form this pass kept
 relearning is: **an edit asserted is not an edit made, and a fix described is not a fix
 performed.** Both are cured by the same thing — open the file and look.
@@ -1101,3 +1127,75 @@ path returns **11**, of which **4** are in this pass and **7** outside it — me
 last edit above, and this section names the path nowhere, so the figure cannot have moved since.
 Every `docs/NN:NN` citation in the diff → **0 out of range**. `research-checks.py` → exit 0.
 `measure_assertions.py` → `217 431`. **0 requests.**
+
+### §M — round 9: ten findings from round 8, all fixed, and one was a merge-breaker
+
+Round 8's verifier returned nine findings (**F1–F9**) and a tenth (**F10**) was added after.
+**No measurement was disputed in any round since round 1.** Each is fixed at the site named,
+and each fix is stated here with what was checked — because for six rounds the defect class
+has been a claim about a file made without opening it, and this section is the receipt.
+
+**F7 is the one that mattered and it is fixed in `redact.py`.** Its `REPO` was
+`abspath(join(HERE,"..","..","..","..",".."))` — a **depth-relative** walk, written while the
+file lived in `.loop/worktrees/<name>/`, where five levels up happens to reach the main
+checkout. From the merged checkout the same walk lands **above** the repository, in a directory
+that exists but is not the repo, so `scripts/scrub-patterns.txt` is not under it and the
+top-level `open(PATTERNS)` raised. **Fixed at the anchoring, not the arithmetic** — adjusting
+the `..` count would re-break the worktree, and both locations are the same depth below their
+own root. `REPO` is now `git rev-parse --show-toplevel`, the idiom in `scripts/research-loop.sh`
+and six other files in this tree, and resolution **fails loudly and early** with a message
+naming what it searched for — because a bare existence check would have passed against the
+non-repo directory and deferred the failure to a traceback pointing at the wrong file.
+
+Demonstrated from **both** locations, not claimed: in the worktree it resolves to the worktree
+root with `scrub-patterns.txt` present; a clone of the branch to `/tmp/mergetest` — a
+merged-style checkout at `<repo>/findings-log/<pass>/` — resolves to `/tmp/mergetest` with the
+file present. `redact.py` then re-runs clean (`no matches — nothing to redact`), so the fix is
+idempotent. It also scrubbed its own comment once, redacting a machine-specific path it had
+written; the comment no longer contains that path and says why. **That self-match also made
+the next run rewrite `REDACTIONS.md`, dropping its four real rows** — caught by `git status`
+before the commit, reverted, and `redact.py` now skips itself for the same reason it skips
+the ledger: a tool that edits its own source is not a redaction tool.
+
+**F10 was a false claim about what a script did, and it had propagated.** §H item 4 said
+`plan.py`'s `asset_src`/`digest_src` "carried the same wrong path into the generated `plan.md`
+/ `plan.json` corpus-control table". **They never did.** Checked by history rather than by
+reading the current tree: `git show <commit>:…/plan.md | grep -c 'static-schema-recovery'` is
+**0** at `b8beadc`, `3b8247e`, `4ae617e` and `0f0a932`, and 0 for `plan.json`. The wrong path
+lived in `plan.py`'s **source** and in the `die()` message that interpolates `digest_src`; it
+was never written into either generated file. §H now carries the corrected statement — fixed in
+`FINDINGS.md` §3 and in `plan.py`'s source fields; `probe.sh:169` also hardcoded it;
+`results.jsonl` seq 4 retains it by design; `plan.md`/`plan.json` were grepped and carry no
+instance. **§I item 2 and §L were checked for the same inheritance and do not carry it.**
+
+**The rest, each at its site.** **F1** — §I claimed §H holds "the two ⚠ disclosure blocks";
+it holds **one** (`grep -c '⚠'` over §H returns 1). The sentence now names both round-5 edits
+precisely: the ⚠ block, and the blockquote line-reference correction. **F6**, in the same
+sentence: §I cited `:247` for the line round 5 changed, and `:247` is blank — the hunk header
+is `@@ -247` and the changed line is **250**, now stated as both. **F2** — `PR.md` asserted
+`docs/07:124` is the `pow.nutrino.cc.{broker,metadata}` row; **124 is a blank line** and that
+row is **:123**. This text dates to `b8beadc` and round 8 re-asserted it while rewriting its own
+paragraph; both clauses now name 112 and 123 as the content lines. **F3** — §L's "independently
+re-derived" and §J's identical phrase are removed; both now say a verifier re-derived the
+figures **from this directory's committed artefacts — one source under `AGENTS.md` §2.1**. The
+only surviving uses of the word in these sections are quotations of it and the negation
+"so not *independently*". **F4** — §L's "Rounds 2 through 8 found seven defects" is replaced by
+the file's own enumeration (§H 5, §I 2, §J 4, §K 5, §L 3) plus this round's ten, and states no
+aggregate across rounds, because **an aggregate is stale the moment the next round is added**.
+**F5** — §C's and `PR.md`'s reproductions of two greps are rescoped to `docs/`, which is what
+the claim is about, and their **real** outputs substituted: the first now returns
+`docs/09:301` and `docs/11:1899`; the second returns **0**. The scoping is stated in §C, with
+the reason: run over this pass's own files the first grep matches §C's own heading, its command
+line and §K's quotation of it, so it could never be quoted cleanly. **F8** — §B said the
+offending word stood "in the superseded block above"; it stood in the **live cap section at
+line 65**, and §A's blockquotes never contained it. §B now says where it stood at `3b8247e`,
+and that the round-5 repair has since removed it, leaving §B's own quotation as the only
+survival. **F9** — `PR.md`'s "all twelve confirmed claims" named a figure with no counting rule
+and no matching population; it now points at the evidence table itself and its measured
+**17 claim rows**.
+
+**What did not change.** Every measurement, every request count, every cap revision and every
+evidence class. **0 requests in this round** — all ten were repaired from the committed
+ledger, the committed scripts and `docs/01`/`docs/07` as they stand, and F7's check used a
+local clone rather than a vendor request. Re-derived after these edits: `research-checks.py`
+exit 0, `measure_assertions.py` `217 431`.
