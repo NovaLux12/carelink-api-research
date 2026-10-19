@@ -214,7 +214,10 @@ independently checked one).
 >   cells. The segment is **never validated**.
 > - **At `v13` the tail selects substantively**: `3.6` → `3.9` moves the advertised
 >   `baseUrlCumulus` base (`v13`→`v2`), `baseUrlCareLink` (`v2`→`v1`), `CP[]` length
->   (3→2), country count (109→99 / 76) and the SSO config file family. The `3.5` and
+>   (3→2), country count (109→99 on `.com`, 109→76 on `-trials`) and the SSO config
+>   file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against
+>   `sso_cp_us_v6.json` on `-trials` and both `sso_cp_us_v6.json` +
+>   `eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. The `3.5` and
 >   `3.6` documents are byte-identical **across** both hosts; the `3.9`-class document
 >   is **not** — which corrects `docs/00`'s "every cell from 3.9 upward is
 >   byte-identical" to *within a host*.
@@ -236,9 +239,10 @@ independently checked one).
 >   `connect/carepartner/` prefixes dead on both methods" probed the *prefix parents*
 >   (`…/carepartner/`, `…/carepartner/v13`, `…/carepartner/v13/discover`). These cells
 >   are a routed leaf four segments below. **Distinct claims, no contradiction.**
-> - **No pin added**, as the area directed: the trials `v6` block would cost 4 requests
->   per weekly drift sweep against the ~80-request budget in `AGENTS.md` §11, and would
->   not catch the change that matters. **Measure.**
+> - **No pin added**, as the area directed: a 4-cell pin in `05-public-config` costs 4
+>   requests on **every PR gate** *and* 4 per weekly sweep — affordable against the
+>   ~80-request sweep budget in `AGENTS.md` §11, and declined for a different reason: it
+>   would not catch the change that matters. **Measure**; counting rule in the log §7.
 > - **One source.** One lane, one ledger, one author — no strength word is used for
 >   any of the above, including the cross-host byte-identity (`AGENTS.md` §2.1).
 >

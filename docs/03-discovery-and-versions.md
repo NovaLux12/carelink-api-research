@@ -136,11 +136,11 @@ request string `"config": "android,3.11"` vs `"config": "android,12.0"`
 [source: PROBE-FINDINGS §7].
 
 > ⚠ **That "byte-identical" holds *within* a host, not across them — added 2026-10-17
-> (area AA).** The ten cells above were swept on `.eu`. The `3.9`-class legacy document
-> is **host-specific**: at base `v13` it carries an **EU** SSO entry and **99** countries
-> on `clcloud.minimed.com` against a **US-only 76** on `clcloud-trials.minimed.com`. The
-> `3.5` and `3.6` documents *are* byte-identical across both hosts, so what is
-> host-specific is confined to the legacy tier. Full treatment and captures:
+> (area AA).** The `3.9`-class legacy document is **host-specific**: at base `v13` it
+> carries an **EU** SSO entry and **99** countries on `clcloud.minimed.com` against a
+> **US-only 76** on `clcloud-trials.minimed.com`. The `3.5` and `3.6` documents *are*
+> byte-identical across both hosts, so what is host-specific is confined to the legacy
+> tier. Full treatment and captures:
 > [§3b.2](03-discovery-and-versions.md#3b2-and-at-base-v13-it-also-selects--observed)
 > [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2].
 
@@ -399,7 +399,8 @@ version (`v2` → `v1`), the `CP[]` length (3 → 2 — regions `US, EU, CLINICA
 `oauth20_sso_carepartner_*_v6.json`, while the 3.9 class carries `sso_cp_us_v6.json`
 alone on `-trials` and `sso_cp_us_v6.json` **plus** `eu_sso_cp_eu_v6.json` on `.com`
 [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2;
-`headers/04-*.b` vs `headers/05-*.b` for the regions].
+`headers/04-*.b` and `headers/05-*.b` (`.com`), `headers/14-*.b` and `headers/15-*.b`
+(`-trials`) for the regions].
 
 | tail | `clcloud.minimed.com` | `clcloud-trials.minimed.com` |
 |---|---|---|
