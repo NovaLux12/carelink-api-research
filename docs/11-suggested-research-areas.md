@@ -2760,7 +2760,8 @@ in its two `(prior)` rows — `CC-MAIN-2014-10` / `/ipro/hcp/login.jsf`, and
 `CC-MAIN-2020-24` / `index.jsp`, `login.jsf`, `main/home.jsf` — findable with
 `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
 content and deliberately with no line number, because this page moves as other
-passes land.** ⚠ **Two corrections to this sentence, both recorded because each
+passes land. That recipe returns three lines — the two table rows, plus this very
+sentence, which quotes it — so no count is printed beside it.** ⚠ **Two corrections to this sentence, both recorded because each
 replaced one broken citation with another — the failure `AGENTS.md` §6 item 6
 names, and the one this pass's own §8a-6 row 4 was written to stop.** It once read
 **"lines 1736 and 1738 above"**, stale on the commit it shipped in (those lines are
@@ -2916,13 +2917,30 @@ tool no longer has to assume either way to answer. [source: findings-log/2026-10
 [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §1, §2b, §6, §7, §7a, §7b, §8a and the correction sections that follow it, §8b, §8c]
 
 ⚠ **The other seven of #139's eight findings were already fixed when PR #135
-merged** (`aa401b7`, 2026-10-15), by that pass's own **seven** further commits, self-labelled rounds **3–9** (`git log --oneline aa401b7^1..aa401b7`) — a stale
+merged** (`aa401b7`, 2026-10-15), by that pass's own **seven** further commits, self-labelled rounds **3–9** — **counted by the filtered command**, `git log --oneline aa401b7^1..aa401b7 | grep -cE '^(24b9601|227a95c|bfc8f55|741cca1|228519f|d88a879|f83137d)'` → **7**, because the **unfiltered** `git log` this sentence first cited prints **12** lines beside a stated seven — a stale
 pointer withdrawn, a policy made fatal, an unstated counting rule shipped in
 `kib-detector.py`, a reader sentence corrected to the predicate it means, and a
 rounding rule that now produces its own figure. **Re-derived at this head rather
 than taken from the issue's wording**, with one live instance of the pointer class
 found on this page and fixed above. **None of the measurements moved**, and none was
 restated. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17)]
+
+⚑ **What this correction pass closed, and why it mints no successor.**
+**S-L4e is CLOSED above** — the only one of the five S-L4 rows this pass could close,
+and it closed by taking its own first branch (fix the tool) rather than the cheaper
+one (reword the successor). **No successor area is minted, and the reason is on this
+page rather than only in the log: S-L4a, S-L4b and S-L4c are already open rows on
+this page and remain claimable, so minting them again would fail
+`CONTRIBUTING-research.md` step 7's *Non-duplicate* bar — a new row for work this page
+already schedules is a duplicate row, not a successor.** A fourth candidate was
+considered and failed the same bar: re-running #139's eight findings as a probe
+area. It is **Derived** (the dispositions above give the commands), and it could be
+made **Bounded** and **Labelled**, but it is **not Non-duplicate** — it is this
+pass's own correction, already executed, and it would ask a next pass to re-probe a
+corpus with no host contact to gain. **Bounded** is the bar that also stops a
+candidate with no cap: a correction pass that minted a probe successor would have to
+name a request budget, and none is derivable from anything on this page. **S-L4d** is
+unchanged by this pass and remains open. [source: findings-log/2026-10-15-area-l4-ledger-reader/FINDINGS.md §Correction (2026-10-17) — third pass of this date]
 
 **S-L3 — the census denominator needs a check, because this pass shipped a wrong
 one and only a re-derivation caught it.** A one-command verifier for the

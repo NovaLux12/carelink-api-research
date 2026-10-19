@@ -1044,7 +1044,16 @@ three rounds; claim holds, pointers and prose do not` (#139) filed **2026-10-15
 head, self-labelled rounds 3 through 9** — `24b9601` (round 3), `227a95c` (4),
 `bfc8f55` (5), `741cca1` (6), `228519f` (7), `d88a879` (8), `f83137d` (9) — before
 that merge. **The count is stated by the command, not by hand:**
-`git log --oneline aa401b7^1..aa401b7` lists them, and **rounds 3, 4, 6 and 7** are the
+`git log --oneline aa401b7^1..aa401b7 | grep -cE '^(24b9601|227a95c|bfc8f55|741cca1|228519f|d88a879|f83137d)'`
+→ **7**, re-measured at this head. ⚠ **The unfiltered `git log --oneline
+aa401b7^1..aa401b7` first stood here and prints 12 lines** — the merge itself, a
+`Merge remote-tracking branch` commit, this pass's round 1–2 pair, its opening
+finding commit, and the seven above — so a reader who ran it counted 12 beside a
+stated seven. That is **#139's finding-3 defect class committed in the one
+paragraph whose job is to get the history right**, and it is the same defect the
+Correction below fixed in the *correction* row while leaving it live in this body.
+The recipe is now the filtered one, whose output is the number printed beside it.
+And **rounds 3, 4, 6 and 7** are the
 commits that added a `## 8a-*` correction section — **round 5 added none**, and round 6
 added both `§8a-5` and `§8a-6` — measured one commit at a time with
 `git show <sha> -- …/FINDINGS.md | grep '^+## 8a'` (rounds 8–9 added none either, which
@@ -1072,8 +1081,19 @@ the history right.** See the Correction section below.
 it was describing was not touched, and it read *"lines 1736 and 1738 above list both
 crawls' members as `(prior)`"* — a position into the file its own PR edits, **wrong
 at this head**: those lines are two successor bullets, and the two rows are found by
-content with `grep -n 'CC-MAIN-2020-24.*(prior)' docs/11-suggested-research-areas.md`.
-Fixed in place in the S-L4 block, with the withdrawn numbers left visible. **This is
+content with `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`,
+run **from the repo root**. ⚠ **The recipe this paragraph first carried did not
+execute and could not have found both rows**: it was `grep -n` with **no `-r`** over
+a **directory** (GNU grep: `docs/: Is a directory`, **exit 2**, zero rows), and its
+pattern named only `CC-MAIN-2020-24`, so even had it recursed it would have matched
+**one** of the two rows and not the `CC-MAIN-2014-10` one. The replaced form returns
+**three** lines — the two table rows plus **the sentence in `docs/11` that quotes the
+recipe** — which is why **no count is printed beside it** (the same lesson as the
+Correction section below). **`\|` is load-bearing there and is not the escaped
+alternation the Correction below warns about:** this is plain `grep`, a BRE, where
+`\|` *is* alternation; the defect there was `\|` inside `grep -E`, an ERE, where it is
+a literal pipe. Both forms were re-run at this head. Fixed in place in the S-L4
+block, with the withdrawn numbers left visible. **This is
 the class finding 1 named, surviving its own fix on the other side of the file.**
 
 **The counting rule for §7b's `193`, stated here because §7b cannot be edited
@@ -1089,7 +1109,7 @@ is why the rule sits next to the number in `docs/11` and in `kib-detector.py` RU
 **The crash, before and after — the reproduction for row 7, and the whole of it.**
 
 ```
-$ python3 findings-log/2026-0{9,8}-14-lane-s6-public-index/account.py \
+$ python3 findings-log/2026-10-14-lane-s6-public-index/account.py \
       findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl          # BEFORE
   File ".../account.py", line 109, in spacing
     a, b = parse(sel[i]["t_sent"]), parse(sel[i + 1]["t_sent"])
@@ -1100,6 +1120,17 @@ $ … the same command                                                       # A
     min gap, harness t_sent            4.102 s
   exit 0
 ```
+
+⚠ **The `BEFORE` path above first read `findings-log/2026-0{9,8}-14-lane-s6-public-index/account.py`,
+and neither expansion exists** — the lane's directory is `2026-10-14`, not `09-14`
+or `08-14`, so the brace expanded to two paths and both were **MISSING**:
+`python3: can't open file '…/findings-log/2026-09-14-lane-s6-public-index/account.py':
+[Errno 2] No such file or directory`, exit 2. A reproduction a reader cannot run is
+**`AGENTS.md` §6 item 6** — the same class as #139's finding 6, committed inside the
+correction of #139, and the correction that had already been demanded of this file's
+own earlier sections. **The path is now the one that resolves, and it was re-run at
+this head**: the AFTER half above reproduces exactly (skipped **4**, min gap
+**4.102 s**, exit 0), and all eight ledgers of `manifest.tsv` exit 0.
 
 **All eight area-L ledgers now open, which is the whole of what `docs/10` §1's
 successor asks for** (`for f in …; do python3 account.py "$f"; done`, exit 0 on
@@ -1204,6 +1235,50 @@ and not applied to the body is a correction that changes nothing*.
 correction pass; `research-gate.sh` re-run under the run's lock, exit 0. The verifier
 found no credential, hostname or live-session material, and no value pinned in
 `regression/hurl/` is touched by this PR.
+
+## Correction (2026-10-17) — third pass of this date: four defects of this lane's own, found on the `origin/main` sync
+
+Merging `origin/main` (`015689e`) into the branch before verification produced **no
+conflict** — `docs/10` and `docs/11` both auto-merged, and `measure_assertions.py`
+still reads **217 431** with no pin added. The re-derivation that the sync obliges
+found **four defects in text this lane wrote**, none of them raised by a verifier and
+all four in the same two classes #139 named. Each is fixed in place above with the
+withdrawn form left visible, and each carries the command.
+
+| # | defect | class | re-derived by |
+|---|---|---|---|
+| 1 | the `BEFORE` half of the crash reproduction cited `findings-log/2026-0{9,8}-14-lane-s6-public-index/account.py` — **neither brace expansion exists**; the lane's directory is `2026-10-14` | §6 item 6 (a citation that resolves to nothing) | `[ -f findings-log/2026-09-14-lane-s6-public-index/account.py ]` → **MISSING**, same for `08-14`, while `2026-10-14` → **EXISTS** |
+| 2 | **two** sites stated **seven** commits beside the **unfiltered** `git log --oneline aa401b7^1..aa401b7`, which prints **12** lines — this file's body, and the same claim in `docs/11` | §6 item 7 / #139's finding 3 — a count the command's own output falsifies | `git log --oneline aa401b7^1..aa401b7 \| grep -cE '^(24b9601\|227a95c\|bfc8f55\|741cca1\|228519f\|d88a879\|f83137d)'` → **7**; `… \| wc -l` → **12** |
+| 3 | the `docs/11` pointer recipe recorded in the first Correction section was `grep -n` with **no `-r`** over a **directory**, naming only `CC-MAIN-2020-24` — so it neither ran nor could have matched both rows | the same no-`-r` defect the second Correction section fixed in `docs/11`, left live in this file | the withdrawn form → `grep: docs/: Is a directory`, **exit 2**, **0 rows**; the replacement `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/` → **3 rows** |
+| 4 | the replacement recipe is published **without** saying that one of its three rows is the sentence quoting it — the exact omission the second Correction section made as its own lesson | §6 item 2 in spirit: a hit that does not mean what a reader assumes | the recipe re-run at this head, three rows, the third being `docs/11`'s own quotation |
+
+**Defect 2 is the one worth naming.** The second Correction section caught a count
+that matched neither measurement and fixed it **in its own row** — leaving the same
+unfiltered command live in this file's *body*, four hundred lines up, where it
+contradicted the same count. The lesson it drew ("a correction recorded and not
+applied to the body is a correction that changes nothing") was right and was applied
+one level too shallow: **the fix reached the row that quoted the error and not the
+sentence that made it.** That is now both changed.
+
+**Defect 3's `\|` is correct here and is not the defect the second section names.**
+Plain `grep` is a BRE, where `\|` is alternation; the escaped-alternation bug was `\|`
+inside `grep -E`, an ERE, where it is a literal pipe. Both spellings were re-run at
+this head rather than reasoned about.
+
+**Nothing measured moved.** `read-area-l.py self-test` → **33 checks, PASS**;
+`census` → **2** rows AT their own limit and **7** carrying a limit without reaching
+it; `kib-detector.py` → **0 / 183 / 193** under the three rules and the same three
+census cells (**81/9/72/2/7**, **74/6/68/1/5**, **72/5/67/1/4**); `locate.sh` → every
+landmark resolved; `sh dup-test.sh` → PASS with **0** positions outside the Correction
+sections, and its output line count **unchanged at 73** because this pass added no
+Correction heading to the log until this one — which moves it to **74**, recorded in
+`run.log` under its own dated note, as the two earlier moves were.
+
+**Still a 0-request correction pass, and still nothing re-probed.** The four fixes
+above are offline: every one was made by running a command against the committed tree
+and reading its exit code. No vendor host was touched, nothing in
+`regression/hurl/` moved, and `scripts/measure_assertions.py` reads **217 431** with
+no pin added by this PR.
 
 ## 9. Artefacts
 
