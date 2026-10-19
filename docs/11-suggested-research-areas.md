@@ -2606,7 +2606,7 @@ the five populations `budget.py` prints** for this API (1.649227 / 1.515625 /
 population for that model, since **11 of the 15** rows went to the **bulk**
 path — 10 of the 13 instrumented, plus the disclosed pre-instrument probe — and
 none of them failed
-[source: findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md §6].
+[source: findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md §1, §6].
 
 **The locate half did not converge, and that is the recorded negative.** The
 `eu,minimed)`-family locate inside `cluster.idx` returned **`UNCONVERGED`** for

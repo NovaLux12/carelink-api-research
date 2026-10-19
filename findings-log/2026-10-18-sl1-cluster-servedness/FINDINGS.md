@@ -62,7 +62,7 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **1.254848**, which is the figure from the very directory it cites. The
   direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
   no published claim of another pass is disturbed, but the range was wrong and
-  `docs/11:2811` publishes **1.4210** as a peer value
+  `docs/11:2820` publishes **1.4210** as a peer value
   (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
   **What this is not:** a revision of that budget model, and not a second
   population for it. One run of two hosts on a different mix (10 of the 13
@@ -88,8 +88,8 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **4× the 1 MiB ceiling on its own**, and **all six carry a committed
   `body_head` in the ledger**, so they are committed projections too. What is
   *not* committed is the body itself: every projection is truncated to **300
-  characters** (`body_head` length is 300 on seqs 7–12, and on every other
-  row). **The 4 MiB pages are precisely why the bodies stay out of the tree.**
+  characters** (`body_head` length is 300 on seqs 3–14; seq 15 is 48 because its
+  whole body is 48 B, and rows 1–2 carry no projection at all). **The 4 MiB pages are precisely why the bodies stay out of the tree.**
   ⚠ **Correction (verifier round 3):** this bullet previously read *"the largest
   response whose **head** is committed is 35 226 B"* — which is false, and
   self-refuting two lines later, since the six locate pages are exactly the
@@ -166,7 +166,7 @@ What each line **proves**, as opposed to describes:
 |---|---|
 | `POSITIVE` | the interval test finds an apex key and a subdomain key |
 | `NEGATIVE` | absence is proven **only** by the adjacent `< FAM_LO` / `≥ FAM_HI` pair — a page with no family key does not on its own produce an absence |
-| `CONSTRAINED` | a locate whose reads sort entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **This is the shape the pass hit live, though not the identical one** — see §5b, where the three reads straddled the interval without bracketing it rather than sorting wholly before it |
+| `CONSTRAINED` | a locate whose reads sort entirely before the interval and exhausts its budget returns `UNCONVERGED`, not `FAMILY_ABSENT`. **This is the shape the pass hit live, and one of the three live reads did sort wholly before the interval** — see §5b |
 | `NEAR-MISS` | `eu,minimif)` — one character different — sorts outside the interval, so a lookalike domain is not counted as the family |
 | `FETCH FAILED` | a transport failure is `FETCH_FAILED`, never an absence |
 | `TAXONOMY` | both predicates over every status this API has been recorded producing, **asserted in code** (§4) |
@@ -473,7 +473,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Two fresh-context verifiers, neither shown how the claim was built, each
+Four fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Both verdicts are
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -581,15 +581,24 @@ process, not only about the two sentences:
 
 Three non-blocking items, also fixed:
 
-3. **"This is the exact failure this pass then hit live"** was an overreach. The
-   `CONSTRAINED` case injects reads sorting wholly *before* the interval; the
-   live failure had reads **straddling** it (62 M `com,…`, 95 M `fr,…`–`gr,…`,
-   128 M `org,…`–`pl,…`) and failing to bracket. Same *shape*, different
-   geometry — now stated as the shape, not as the identical failure.
+3. **"This is the exact failure this pass then hit live"** was an overreach, and
+   the round-4 correction below shows how it went wrong twice. The
+   `CONSTRAINED` case injects reads sorting wholly *before* the interval. The
+   three live reads, replayed against the branch predicates at
+   `servedness.py:389-394`, are: **128 550 094** (`org,…`–`pl,…`) wholly
+   **after**, **62 177 895** (`com,…`) wholly **before**, **95 363 994**
+   (`fr,…`–`gr,…`) wholly **after** — **no read straddled**, and one read did
+   sort wholly before, which is the case `CONSTRAINED` covers. So round 1's
+   "the exact failure" was too strong, round 3's replacement claim of reads
+   "straddling" was **false in both halves**, and the correct statement is the
+   weaker one: the live failure is the *shape* `CONSTRAINED` guards, and its
+   residual window `[66 372 199, 95 363 994]` reproduces exactly from those two
+   window assignments.
 4. **The new closed-area row was invisible to the counting rule.** Written
-   `| **S-L1** — …`, it matched neither `^\| [A-Z]{1,2} —` (three characters, and
-   a `-` inside the id) nor the bolded variant; `| S6 — …` is uncounted for the
-   same reason. **The count was left at 26** — raising it to match the visible
+   `| **S-L1** — …`, it did not match `^\| [A-Z]{1,2} —` (three characters, and
+   a `-` inside the id) and the `**` bolding compounds it; `| S6 — …` is
+   uncounted for the same reason. **The bolding is now dropped**, so the row is
+   at least the shape the rule expects apart from the id itself. **The count was left at 26** — raising it to match the visible
    rows would fail the check that measures it — and the discrepancy is now
    stated on the page rather than left for the next reader to trip over
    (`AGENTS.md` §6 item 7).
@@ -611,3 +620,62 @@ class**: `research-checks.py` validates `[source: …]` *paths* and a heading
 count, so a stale line number, a wrong arithmetic claim and an uncounted table
 row all pass it. Every one was found by a fresh-context verifier recomputing
 from `results.jsonl`.
+
+### Round 4 — `CONTRADICTS b55d87b`
+
+Three **blocking** findings, and the first is the sharpest thing this pass has
+learned about itself:
+
+1. **Round 3's correction of round 1's overreach was itself false, in both
+   halves.** It claimed the three live reads *"straddled"* the interval.
+   Replayed against the branch predicates at `servedness.py:389-394`, they do
+   not: **128 550 094** (`org,…`–`pl,…`) is wholly **after** (`first_k ≥ FAM_HI`),
+   **62 177 895** (`com,…`) is wholly **before** (`last_k < FAM_LO`), **95 363 994**
+   (`fr,…`–`gr,…`) is wholly **after**. **No read straddled** — the
+   `else: # the page straddles` branch never fired — and **one read did sort
+   wholly before**, which is precisely the case `CONSTRAINED` covers. The
+   committed `window` `[66 372 199, 95 363 994]` reproduces exactly from those
+   two window assignments, which independently confirms the classification.
+   **So round 1's "the exact failure this pass then hit live" was too strong,
+   and round 3's replacement was wrong** — and it was introduced by the commit
+   that itself warns that *"a half-fix that leaves the false shape behind is
+   worse than the original."* **That warning was written in the same commit that
+   committed the second half-fix of that shape.** The correct statement is the
+   weaker one now in §3a.
+2. **`docs/11:2811` went dead** — the head commit's own `+1` and `+8` hunks
+   shifted the target to **`docs/11:2820`**, so the cite now lands on a table
+   header. `AGENTS.md` §6 item 6, and **the same defect round 2 caught once**.
+   **The generalisable form, and it is not about carelessness: a `file:line`
+   citation into a file the same commit is editing is self-invalidating.** Any
+   such citation is stale the moment the commit lands, and no automated check
+   catches it — `research-checks.py` validates `[source: …]` *paths* only.
+3. **§10 opened "Two fresh-context verifiers … Both verdicts"** while recording
+   three rounds — a stale count left by the commit that added the third
+   (`AGENTS.md` §6 item 5). Now four.
+
+Four non-blocking items, also fixed: `body_head` is 300 on seqs **3–14** and
+**48** on seq 15 (its whole body), with none on rows 1–2 — the earlier "on every
+other row" was false though the ceiling held; the entry claiming the row matched
+"neither `^\| [A-Z]{1,2} —` nor **the bolded variant**" invented a second pattern
+that does not exist in `scripts/research-checks.py:231`, and the row has since
+been de-bolded, so the entry no longer described the file it was about;
+`config.yml`'s comment lost its indent in the round-1 fix; and `docs/11:2609`'s
+`[source: … §6]` should name **§1**, where the accounting half actually lives.
+
+**What four rounds establish, stated as the finding rather than the tally.**
+Every blocking finding was an **accounting or bookkeeping sentence**. Never the
+servedness claim, never an evidence class, never the independence count, never
+the request total — all four of which survived four independent recomputations
+and two live reproductions of the `minimed.eu` `404`. The defects cluster in
+exactly three mechanisms, and each is now a rule for the next pass:
+
+1. **Derived arithmetic not recomputed from its own ledger.** (`E[N]` range,
+   largest response, host split.)
+2. **Half-fixes that change the number and leave the false shape.** (Round 1's
+   number corrected, its predicate retained; round 3's geometry invented.)
+3. **A correction that stops at the layer it was made in.** (Round 2 fixed the
+   bulk-path count in the log and not in `docs/11`; round 3 corrected a
+   citation and shifted it in the same commit.)
+
+All three are invisible to `research-checks.py`, and all three were caught only
+by a fresh-context verifier recomputing from `results.jsonl`.
