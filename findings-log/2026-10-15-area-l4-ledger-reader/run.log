@@ -64,12 +64,15 @@ sentence survived; both copies state the measured values now.
 ## Correction (2026-10-17) — third run of this date: `sh dup-test.sh` 73 -> 74
 
 The `origin/main` sync (`015689e`) merged with no conflict, and the re-derivation it
-obliges found four defects of this lane's own text, all recorded in `FINDINGS.md`'s
+obliges found five defects of this lane's own text, all recorded in `FINDINGS.md`'s
 third `## Correction (2026-10-17)` section: a reproduction citing a brace expansion
 whose two paths both MISSING, two sites stating **seven** commits beside an
-unfiltered `git log` that prints **12** lines, a `grep` recipe with no `-r` left live
-in `FINDINGS.md` after the `docs/11` copy was fixed, and the replacement recipe
-published without saying one of its rows is the sentence quoting it.
+unfiltered `git log` that prints **12** lines, a `grep -n` pointer recipe left live in
+`FINDINGS.md` after the `docs/11` copy was fixed — **positions, and one crawl of the
+two** — the replacement recipe published without saying one of its rows is the
+sentence quoting it, and this pass's own first attempt at that third row, which
+described the `FINDINGS.md` recipe as the *directory* no-`-r` form and so attributed
+to it a defect that belongs to `docs/11`'s copy.
 
 This table moves once more for the same single cause as 70 -> 71 -> 72 -> 73: the
 exempt-section listing prints one line per Correction heading, and the log now carries

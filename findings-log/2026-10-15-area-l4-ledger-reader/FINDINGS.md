@@ -1082,11 +1082,20 @@ it was describing was not touched, and it read *"lines 1736 and 1738 above list 
 crawls' members as `(prior)`"* — a position into the file its own PR edits, **wrong
 at this head**: those lines are two successor bullets, and the two rows are found by
 content with `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`,
-run **from the repo root**. ⚠ **The recipe this paragraph first carried did not
-execute and could not have found both rows**: it was `grep -n` with **no `-r`** over
-a **directory** (GNU grep: `docs/: Is a directory`, **exit 2**, zero rows), and its
-pattern named only `CC-MAIN-2020-24`, so even had it recursed it would have matched
-**one** of the two rows and not the `CC-MAIN-2014-10` one. The replaced form returns
+run **from the repo root**. ⚠ **The recipe this paragraph first carried was
+`grep -n 'CC-MAIN-2020-24.*(prior)' docs/11-suggested-research-areas.md`, and it was
+wrong in two ways that a re-run measures.** **It printed positions** — `grep -n`, so
+`file:line` — in the one paragraph whose subject is the withdrawal of positions, which
+is finding 1's class re-entered through its own correction. And **it named one crawl of
+the two**, so it could not find both rows: measured at the commit that shipped it
+(`0d6df8e`) it returned **2** lines, of which **one was a table row and one was the
+sentence in `docs/11` that quotes a recipe containing the same pattern**; the
+`CC-MAIN-2014-10` row is **not among them**, and `grep -c 'CC-MAIN-2014-10.*(prior)'
+docs/11-suggested-research-areas.md` is what finds it. **This withdrawn form was never
+a directory form and never exited 2** — the no-`-r`-over-a-directory recipe with
+`Is a directory` and **exit 2** is the one `docs/11` carried and the one the Correction
+section below withdraws; two different recipes, two different defects, and this
+paragraph had them merged. The replaced form returns
 **three** lines — the two table rows plus **the sentence in `docs/11` that quotes the
 recipe** — which is why **no count is printed beside it** (the same lesson as the
 Correction section below). **`\|` is load-bearing there and is not the escaped
@@ -1249,8 +1258,9 @@ withdrawn form left visible, and each carries the command.
 |---|---|---|---|
 | 1 | the `BEFORE` half of the crash reproduction cited `findings-log/2026-0{9,8}-14-lane-s6-public-index/account.py` — **neither brace expansion exists**; the lane's directory is `2026-10-14` | §6 item 6 (a citation that resolves to nothing) | `[ -f findings-log/2026-09-14-lane-s6-public-index/account.py ]` → **MISSING**, same for `08-14`, while `2026-10-14` → **EXISTS** |
 | 2 | **two** sites stated **seven** commits beside the **unfiltered** `git log --oneline aa401b7^1..aa401b7`, which prints **12** lines — this file's body, and the same claim in `docs/11` | §6 item 7 / #139's finding 3 — a count the command's own output falsifies | `git log --oneline aa401b7^1..aa401b7 \| grep -cE '^(24b9601\|227a95c\|bfc8f55\|741cca1\|228519f\|d88a879\|f83137d)'` → **7**; `… \| wc -l` → **12** |
-| 3 | the `docs/11` pointer recipe recorded in the first Correction section was `grep -n` with **no `-r`** over a **directory**, naming only `CC-MAIN-2020-24` — so it neither ran nor could have matched both rows | the same no-`-r` defect the second Correction section fixed in `docs/11`, left live in this file | the withdrawn form → `grep: docs/: Is a directory`, **exit 2**, **0 rows**; the replacement `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/` → **3 rows** |
+| 3 | the `docs/11` pointer recipe recorded in the first Correction section was `grep -n 'CC-MAIN-2020-24.*(prior)' docs/11-suggested-research-areas.md` — **positions**, in the paragraph whose subject is withdrawing them, and **one crawl of the two**, so the `CC-MAIN-2014-10` row is unreachable by it | finding 1's class, re-entered through its own correction | re-run at the commit that shipped it (`0d6df8e`): **2** lines, one table row and one quotation; the replacement `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/` → **3 rows**, both table rows present |
 | 4 | the replacement recipe is published **without** saying that one of its three rows is the sentence quoting it — the exact omission the second Correction section made as its own lesson | §6 item 2 in spirit: a hit that does not mean what a reader assumes | the recipe re-run at this head, three rows, the third being `docs/11`'s own quotation |
+| 5 | **the first draft of this pass's own row 3 was wrong, and wrongly in the direction this pass exists to catch**: it described the withdrawn recipe as `grep -n` over a **directory**, `Is a directory`, **exit 2**, **zero rows** — which is the defect `docs/11`'s copy had, not this file's. The two recipes had been merged | §6 item 6 again, one level up: a citation to a defect that belongs to a different sentence | the withdrawn string recovered verbatim from `git show 0d6df8e:findings-log/…/FINDINGS.md` — a **file** argument, `-n` not `-r`, one crawl named — and re-run against the tree at that commit: **exit 0, 2 lines** |
 
 **Defect 2 is the one worth naming.** The second Correction section caught a count
 that matched neither measurement and fixed it **in its own row** — leaving the same
