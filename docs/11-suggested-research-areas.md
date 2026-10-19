@@ -2918,12 +2918,14 @@ committed CC ledger in the repository"** is deleted rather than reworded
 it — `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as
 the 0-row ledger, so "newest" named nothing. And **"all eight"** is the area-L
 population, a proper subset of what `docs/10` §1's successor actually asks for
-(*"every other committed CC ledger"*): run over **every committed
-`findings-log/*/results.jsonl`**, this tool reads **26** and fails closed with a
-named reason on **39** — **15** are not ledger files, **1** has an unparseable line,
-and **23** carry a schema it cannot read. **A ledger this tool cannot read is a gap
-in the record, not a negative result**, and it now says so and exits 2 rather than
-raising `KeyError`. **Skipping the rows was the right
+(*"every other committed CC ledger"*): run over the population
+`git ls-files 'findings-log/*/results.jsonl'` names — **50** committed ledgers —
+this tool reads **32** and fails closed with a named reason on **18**, **not one
+traceback**. Before this pass, over those same 50, **24** read and **26** died with
+an unhandled `KeyError` or `TypeError`. **A ledger this tool cannot read is a gap in
+the record, not a negative result**, and it now says so and exits 2 rather than
+raising. The population is named by a command rather than a glob on purpose: a glob
+in this tree expands to paths that do not exist. **Skipping the rows was the right
 fix, not a loosening:** the spacing oracle needs only the rows that carry a
 timestamp, and a gap measured *across* a row with none would be a guess. **The
 INFERRED assumption above is untouched** — a null may still be a malformed row; the

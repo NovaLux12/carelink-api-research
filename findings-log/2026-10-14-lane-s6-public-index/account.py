@@ -64,8 +64,8 @@ silently (AGENTS.md section 2: a figure over a subset must say so).
 Inert for this lane's own figures, and checked rather than asserted: this ledger
 has 151 rows, **0** null and **0** absent `t_sent`, so every gap, every sub-2.5 s
 count and every inverted-row count below prints exactly as it did before the fix.
-`python3 account.py` on this lane's own results.jsonl is byte-identical except for
-the three added lines.
+`python3 account.py` on this lane's own results.jsonl is byte-identical in its
+default report, and under `--json` it adds two lines, both reading 0.
 
 Also added, for the same handoff reason: **the counting rule for "successful 200
 answers" is now printed beside the number.** It was `http_status == "200"` exactly,
@@ -100,17 +100,27 @@ BODIES = os.path.join(SCRATCH, "bodies")
 # the earlier probe.sh, rows above it by this one.
 PRIOR_SEQ = 76
 
-# The keys every oracle below reads WITHOUT a default, so a row lacking one of
-# them crashes the run rather than yielding a wrong figure. `schema_guard()`
-# fails closed when any row lacks one, and names which and how many. Keys a
-# single row may legitimately lack -- `t_sent`, `host_tag` -- are deliberately
-# NOT here: those are handled by a counted skip inside `spacing()`.
-REQUIRED = ("seq", "host", "http_status", "t_done")
+# Keys every oracle below reads WITHOUT a default, so a row lacking one of them
+# crashes the run rather than yielding a wrong figure. Derived from the code, not
+# from memory: every `r["key"]` read in this file that is not a `.get(...)`.
+#     grep -oE 'r\["[a-z_]+"\]' account.py | sort -u
+# `t_sent` and `host_tag` are deliberately ABSENT from this list and are handled
+# by a counted skip inside `spacing()` -- a ledger where *some* rows are short is
+# readable, and that is the case this tool must survive.
+REQUIRED = ("seq", "host", "http_status", "method")
 # `seq` is compared and sorted numerically (`r["seq"] > PRIOR_SEQ`), so a ledger
 # that writes it as a JSON string is a different schema, not a formatting
 # difference -- comparing across the two is AGENTS.md section 6 item 3, the
 # lookup-that-resolved-to-something-else defect. Assert the type before use.
 REQUIRED_INT = ("seq",)
+# Keys used as STRINGS. Present is not enough: a null or a number passes a
+# key-presence test and then raises TypeError inside a `"x" in value` or a
+# string comparison, which is the same crash one level later.
+REQUIRED_STR = ("host", "http_status", "method")
+# `body_bytes` is only read on rows the whole-KiB filter has already required to
+# carry one, so it is not in REQUIRED; but it is divided modulo, so a non-numeric
+# value there is a type fault rather than a missing key.
+REQUIRED_NUM_WHERE_PRESENT = ("body_bytes",)
 
 
 def parse(ts):
@@ -183,9 +193,12 @@ def spacing(rows, host_filter=None):
         tag = r.get("host_tag")
         if not isinstance(tag, str):
             # A committed ledger that records no host_tag cannot name a body file.
-            # Skipped and counted, never guessed at -- same rule as the harness
-            # oracle above. See the Correction in the module docstring.
+            # The row BREAKS the series: `prev = None`, so no gap is measured
+            # across it -- the same rule the harness oracle applies two blocks
+            # above, and for the same reason. A gap joined across a row with no
+            # body would be a guess. Counted, never absorbed.
             kernel_skipped += 1
+            prev = None
             continue
         p = os.path.join(BODIES, f"{tag}.b")
         if not os.path.exists(p):
@@ -240,6 +253,13 @@ def schema_guard(rows):
 
     absent = {k: sum(1 for r in rows if k not in r) for k in REQUIRED}
     wrong_type = {k: sum(1 for r in rows if not_an_int(r, k)) for k in REQUIRED_INT}
+    for k in REQUIRED_STR:
+        wrong_type[k] = sum(1 for r in rows if k in r and not isinstance(r[k], str))
+    for k in REQUIRED_NUM_WHERE_PRESENT:
+        wrong_type[k] = sum(
+            1 for r in rows
+            if k in r and r[k] is not None
+            and (not isinstance(r[k], int) or isinstance(r[k], bool)))
     problems = []
     if any(absent.values()):
         problems.append("keys absent")
@@ -257,8 +277,15 @@ def schema_guard(rows):
             print(f"    {k}: absent from {n} of {len(rows)} rows", file=sys.stderr)
     for k, n in sorted(wrong_type.items()):
         if n:
-            print(f"    {k}: not an int on {n} of {len(rows)} rows"
-                  f" (this tool compares and sorts it numerically)", file=sys.stderr)
+            note = ""
+            if k in REQUIRED_INT:
+                note = " (compared and sorted numerically)"
+            elif k in REQUIRED_STR:
+                note = " (used as a string)"
+            elif k in REQUIRED_NUM_WHERE_PRESENT:
+                note = " (divided modulo, so it must be a number)"
+            print(f"    {k}: wrong type on {n} of {len(rows)} rows{note}",
+                  file=sys.stderr)
     print(f"  keys the rows do carry: {', '.join(sorted(seen))}", file=sys.stderr)
     print("  Nothing was measured and nothing is reported: an unreadable ledger is a"
           " gap in this record, not a negative result.", file=sys.stderr)
@@ -373,8 +400,8 @@ def main() -> int:
         "this_pass_kernel_min_s": round(min((g[0] for g in tp_k), default=0) or 0, 3) if tp_k else None,
         "this_pass_gaps_below_2.5s": len([g for g in tp_h if g[0] < 2.5]),
         "this_pass_rows_with_t_done_before_t_sent": len(
-            [r for r in this_pass if parse(r["t_done"]) and parse(r["t_sent"])
-             and parse(r["t_done"]) < parse(r["t_sent"])]),
+            [r for r in this_pass if parse(r.get("t_done")) and parse(r.get("t_sent"))
+             and parse(r.get("t_done")) < parse(r.get("t_sent"))]),
         "harness_gaps_below_2.5s": len(under),
         "harness_gaps_below_2.5s_detail": [
             {"from_seq": a, "to_seq": b, "gap_s": round(g, 3)} for g, a, b in under],
@@ -450,10 +477,15 @@ def main() -> int:
     if k_skip:
         print(f"    rows skipped, no host_tag          {k_skip}")
         print("      A row with no host_tag cannot name a body file, so the kernel oracle")
-        print("      skips it rather than guessing a path; the harness figure above is")
-        print("      unaffected and says nothing about these rows.")
-        print("      This ledger records no host_tag on any row, which is a property of")
-        print("      the ledger's schema, not of the bodies.")
+        print("      BREAKS the series at it rather than joining across it: no kernel gap")
+        print("      above is measured from or over a row that carries no body. The")
+        print("      harness figure is unaffected -- it reads t_sent, not host_tag.")
+        if k_skip == len(rows):
+            print("      Every row of this ledger lacks host_tag, which is a property of")
+            print("      the ledger's schema, not of the bodies.")
+        else:
+            print(f"      {len(rows) - k_skip} of {len(rows)} rows DO carry one, so this is a")
+            print("      partial ledger and the kernel oracle is broken into segments.")
     if h_skip:
         print("      A row with no t_sent leaves the series; the two pairs touching it are")
         print("      dropped rather than joined across it, so no gap above is measured from")

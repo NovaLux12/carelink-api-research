@@ -1073,7 +1073,7 @@ the history right.** See the Correction section below.
 | 4 | "67 of 69 member-source rows carry no `limit=`" mixes two cells | **already fixed** — RULE 3 is stated and shipped in `kib-detector.py`, which prints three cells: **A** every row **81 / 9 carry / 72 none / 2 AT limit**, **B** one per crawl **74 / 6 / 68 / 1**, **C** in-window **72 / 5 / 67 / 1**. `69` is no cell's row count and `67` is cell C's "carrying none" — the withdrawn clause mixed a numerator from one cell with a denominator from another (§8a-3 row 4) | `python3 kib-detector.py` |
 | 5 | the reader prints "every other member-source row carries no `limit=`, so no limit truncated it" — a predicate it does not mean | **already fixed** — `python3 read-area-l.py census` now prints **four** numbers (`carrying a limit=` / `carrying no limit=` / **`AT their own limit`** / `carried a limit WITHOUT reaching it`) and says *"ONLY \"AT their own limit\" means a limit could have truncated the tail"*, with the count that bears on the figures given as *2 of 81* (§8a-3 row 5) | `python3 read-area-l.py census` |
 | 6 | `10.3%` published beside a rule that does not produce it ("truncated") | **already fixed** — §1 now states *"one decimal place, **ROUNDED half-up**, and the exact quotient is printed beside it: **39 ÷ 380 = 0.10263 → 10.3%**"*, and carries the retraction of the `10.2%` that truncation would give (§8a-3 row 6) | `sed -n '82,92p' FINDINGS.md` |
-| 7 | `account.py` is handed on broken and the successor that names it would run it | **FIXED HERE — the one finding still open at this head, and it is now closed by the branch this pass named.** `account.py` tolerates an absent `t_sent`: `parse()` returns `None` for a non-string instead of letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching a row that carries no timestamp and **prints how many it skipped**, and `inverted` uses `.get()`. The crash reproduced before the fix and does not after — see the reproduction below. **Also fixed, and found while verifying:** a **second** crash on the same handoff — a 0-row ledger raised `IndexError` at `rows[-1]['seq']`. It now prints that the ledger records a pass that sent nothing. ⚠ **This cell first read "**so the newest committed CC ledger in the repo was one this tool could not open**", and the superlative is deleted rather than reworded (`AGENTS.md` §1: a statement you cannot point at a line for does not get softened, it gets cut).** It is false at this head — the branch has since merged `origin/main`, which carries `2026-10-17-sl2-outwindow-census` and `2026-10-17-discover-3host-matrix`, and `account.py` reads both at exit 0 — and it was not traceable when written either: `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as this pass's own 0-row ledger, so "newest" had no committed ordering behind it. **What survives is what was measured:** a 0-row ledger raised `IndexError`, and it now says in words that it records a pass that sent nothing | `python3 account.py findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl` |
+| 7 | `account.py` is handed on broken and the successor that names it would run it | **FIXED HERE — the one finding still open at this head, and it is now closed by the branch this pass named.** `account.py` tolerates an absent `t_sent`: `parse()` returns `None` for a non-string instead of letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching a row that carries no timestamp and **prints how many it skipped**, and `inverted` uses `.get()`. The crash reproduced before the fix and does not after — see the reproduction below. **Also fixed, and found while verifying:** a **second** crash on the same handoff — a 0-row ledger raised `IndexError` at `rows[-1]['seq']`. It now prints that the ledger records a pass that sent nothing. ⚠ **This cell first read "**so the newest committed CC ledger in the repo was one this tool could not open**", and the superlative is deleted rather than reworded (`AGENTS.md` §1: a statement you cannot point at a line for does not get softened, it gets cut).** It is false at this head — the branch has since merged `origin/main`, which carries `2026-10-17-sl2-outwindow-census` (which `account.py` reads at exit 0) and `2026-10-17-discover-3host-matrix` (which it does **not**: that is the `host_tag` ledger named below, and at this head it is refused by the schema guard with `http_status: absent from 51 of 51 rows`, exit 2) — and the clause was not traceable when written either: `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as this pass's own 0-row ledger, so "newest" had no committed ordering behind it. **What survives is what was measured:** a 0-row ledger raised `IndexError`, and it now says in words that it records a pass that sent nothing | `python3 findings-log/2026-10-14-lane-s6-public-index/account.py findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl`, **from the repo root** |
 | 8 | the `193` byte table cites `(§8b)`, which computes nothing, and the counting rule for "successful `200`" is unstated | **already fixed, and the finding's second half re-derives as WRONG at this head.** `kib-detector.py` **is** a committed artefact that performs the byte arithmetic: RULE 1 at its `body_bytes % 1024` test, RULE 2 as `status_of(row) == 200`, and it prints all three obvious rules (**0** / **183** / **193**). §8b exists, RULE 2 states the rule beside the number, and `docs/11`'s own floor table states it again. **What §7b still does not carry is the rule beside its own `193`** — it cites §8b instead — and this section is where that gap is recorded, because §7b is append-only (§8a-3 row 8) | `python3 kib-detector.py` (run in this directory); `cd findings-log/2026-10-15-area-l4-ledger-reader && grep -n '1024\|kib\|193' *.py *.sh` — **the `cd` is part of the recipe, because a bare `*.py *.sh` expands against whatever directory the reader is standing in** |
 
 **One live instance of finding 1's class survived all of that, in `docs/11`.**
@@ -1159,8 +1159,16 @@ that does not is `AGENTS.md` §6 item 7.
 
 **Inert for the tool's own lane, and checked rather than asserted.** That ledger has
 **151** rows, **0** null and **0** absent `t_sent`. `python3 account.py` on it is
-byte-identical before and after except for three added lines, and both new counters
-read **0** — no gap, no sub-floor count, no inverted row and no detector figure moved.
+byte-identical in its default report (`diff` of the two reports: **no output at
+all**), and under `--json` it differs by **two added lines**, both new counters
+reading **0** — no gap, no sub-floor count, no inverted row and no detector figure
+moved. ⚠ **The figure "three added lines" first stood here and was re-derived as
+wrong:** it is the `0499f07`→`f91173f` delta for the earlier fix, and at this head
+the plain report adds **nothing** and the JSON adds **two**. Measured with both
+revisions at the same path — the pre-fix file extracted with
+`git show 91a2226:…/account.py` beside the current one — because running either from a
+scratch copy makes the tool report the ledger as FOREIGN and adds lines that have
+nothing to do with the change.
 
 **One disclosure added while fixing it, because the next reader will hit it.** This
 tool's rule for *"successful 200 answers"* is `http_status == "200"` **exactly**, and
@@ -1307,7 +1315,8 @@ network request, and the note that the verdict was therefore formed without
 independent requests. **It also confirmed the substance**: every published figure it
 re-derived matched, the eight `manifest.tsv` ledgers opened, the `BEFORE` crash
 reproduced at `line 109`, the `AFTER` figures reproduced exactly, the own-ledger diff
-was three added lines and nothing else, and the §7 leak scan was zero. **All six
+was byte-identical in the default report and two added lines under `--json`, and
+the §7 leak scan was zero. **All six
 defects are in text or in a check this PR wrote.** Two of them turned out to be
 deeper than reported, and fixing them honestly produced a new finding this PR now
 publishes.
@@ -1315,7 +1324,7 @@ publishes.
 | # | as filed | corrected to | why |
 |---|---|---|---|
 | 1 | `FINDINGS.md:1070` published `grep -nE 'docs/(10\|11)[^ ]*:[0-9]+' …` and a correction section claimed **both** recipes "carry no escape" | the recipe is de-escaped, and the false claim is withdrawn | the escape is in an **ERE**, where `\|` is a *literal* pipe: the form returned **0 rows, exit 1** — indistinguishable from the clean negative it was not. The de-escaped form returns rows and the invariant it asserts is true; `sh dup-test.sh` enforces that invariant fatally, and the printed count beside it remains suppressed for the self-referential reason row 1 already gives |
-| 2 | the PR edits `account.py`, so `account.py:109` — published twice, in **live** §7b and §8c — no longer holds the `strptime` call | **withdrawn by this note**, named in full, and now *printed by the check* | the two occurrences sit in sections that predate the append-only rule and may not be edited, so a dated Correction is the only vehicle the repo offers. The withdrawal is `account.py:109` → **the call is named by function (`spacing`)**; the file's own docstring quotes the traceback at its original line, which is a historical record, not a pointer |
+| 2 | the PR edits `account.py`, so `account.py:109` — published twice, in two live sections — `### The recorded table — and why this file does NOT carry one` and `### 8c. The successors` — no longer holds the `strptime` call | **withdrawn by this note**, named in full, and now *printed by the check* | the two occurrences sit in sections that predate the append-only rule and may not be edited, so a dated Correction is the only vehicle the repo offers. The withdrawal is `account.py:109` → **the call is named by function (`spacing`)**; the file's own docstring quotes the traceback at its original line, which is a historical record, not a pointer |
 | 3 | *"so the newest committed CC ledger in the repo was one this tool could not open"* | the clause is **deleted, not reworded** | `AGENTS.md` §1. It is false at this head — `origin/main` has since brought two `2026-10-17-*` ledgers — and it was untraceable when written: `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as this pass's own ledger, so "newest" had no committed ordering behind it. What survives is the measured part: a 0-row ledger raised `IndexError` and now says in words that it records a pass that sent nothing |
 | 4 | the third Correction section's heading and opening read **"four defects"** while its own table carried five rows | **five**, in the heading and the paragraph | `AGENTS.md` §6 item 5 — prose disagreeing with the table printed beside it, the same defect row 2 of that table records one section up |
 | 5 | both files said **"no count is printed beside this recipe"** and then printed the count | the counts are **gone** from `docs/11` and from the paragraph above | the figure was the recipe's own output including the sentence quoting it — the self-referential count that correction section two exists to name. The recipes now state what they *do* (both table rows are reachable) and print no number |
@@ -1326,36 +1335,52 @@ reason this section is longer than a table.** `docs/10` §1's successor tells th
 pass to run `account.py` over *"every other committed CC ledger"*. This PR's claim was
 narrower — the eight ledgers in `manifest.tsv` — and the narrower claim was true. But
 the broader instruction is the one a reader will follow, so it was run, over **every
-`findings-log/*/results.jsonl` path in the tree**:
+committed ledger**, and the population is named by a command rather than by a glob —
+a glob in this tree expands to paths that do not exist, which is how the first
+version of this section got its figures wrong:
 
 ```
-$ for f in findings-log/*/results.jsonl; do python3 …/account.py "$f"; done   # 65 paths
+$ git ls-files 'findings-log/*/results.jsonl' | wc -l                       # 50
+$ for f in $(git ls-files 'findings-log/*/results.jsonl'); do
+      python3 …/account.py "$f"; done | sort | uniq -c                       # 32 0 / 18 2
 ```
 
-**Before this pass: 26 read to exit 0 and 39 either crashed with a traceback or
-exited 2 — 11 of them with an unhandled `KeyError` or `TypeError`.** The first is
+**Before this pass** — `account.py` at `91a2226`, run over those same 50 — **24 read
+to exit 0 and 26 died with an unhandled exception**, every one of the 26 a
+`KeyError` or `TypeError`: `host_tag` × **10**, `t_done` × **7**, `seq` × **2**,
+`host` × **3**, `seq`-as-string × **3**, and one string-format fault. The first is
 `KeyError: 'host_tag'` at `account.py:168`, on **all 51 rows** of
 `2026-10-17-discover-3host-matrix`, which records no `host_tag` on any row. **That is
 the `t_sent` defect exactly, one key over**, and it was fixed the same way — the
 kernel oracle reads `r.get("host_tag")`, skips a row that carries none, and **prints
 how many it skipped** rather than absorbing the loss.
 
-**The rest were not fixed key by key, because key by key is the wrong shape.** Four
-distinct schemas are in this corpus and more will arrive; a `.get()` added per crash
-teaches the tool nothing about the next one. So a **load-time schema guard** was added
-instead, in the fail-closed shape the file's existing `is a directory` and `no such
-ledger` guards already use: it checks the keys every oracle reads **without a default**
-— `seq`, `host`, `http_status`, `t_done` — asserts `seq` is an `int` (it is compared
-and sorted numerically, so a ledger that writes it as a JSON string is a different
-schema, not a formatting difference: `AGENTS.md` §6 item 3), and **on any absence or
-wrong type prints the offending key, the number of rows, the keys the rows do carry,
-and the sentence that it has measured nothing — then exits 2.**
+**The rest were not fixed key by key, because key by key is the wrong shape.** ⚠ **This
+paragraph first opened "Four distinct schemas are in this corpus" — a count with no
+counting rule, in the file whose §2b exists to suppress exactly that count**, and the
+paragraph below now enumerates seven refusal reasons instead. The count is deleted,
+not replaced: §2b says a schema count is meaningful only with the rule that produced
+it, and there is no such rule here. A `.get()` added per crash teaches the tool
+nothing about the next one, so a **load-time schema guard** was added instead, in the
+fail-closed shape the file's existing `is a directory` and `no such ledger` guards
+already use. **Its key set is derived from the code, not from memory** —
+`grep -oE 'r\["[a-z_]+"\]' account.py | sort -u` — and it checks three things: the key
+is **present** (`seq`, `host`, `http_status`, `method`); `seq` is an **`int`** (it is
+compared and sorted numerically, so a ledger that writes it as a JSON string is a
+different schema, not a formatting difference: `AGENTS.md` §6 item 3); the keys used
+**as strings** really are strings (a null `host` passes a presence test and then
+raises `TypeError` inside `"x" in value`); and `body_bytes`, where it is present, is a
+**number** (it is divided modulo). **On any fault it prints the offending key, the
+number of rows, the keys the rows do carry, and the sentence that it has measured
+nothing — then exits 2.** `t_sent` and `host_tag` are deliberately **not** in the set:
+a ledger where only *some* rows are short is readable, and that is the case this tool
+has to survive.
 
-**After: 26 read to exit 0, 39 fail closed with a named reason, and not one
-traceback.** Of the 39: **15** are not ledger files at all, **1** has an unparseable
-line, and **23** are schema the tool cannot read — **14** without `http_status` (three
-of those also without `seq`, three also without `host`), **11** without `t_done`, and
-**3** writing `seq` as a string. **A ledger this tool cannot read is a gap in the
+**After: 32 read to exit 0, 18 fail closed with a named reason, and not one
+traceback.** The 18 refusals, by the reason the guard printed: **14** with no
+`http_status` (one of those also writes it with the wrong type), **4** whose
+`body_bytes` is not a number, **3** writing `seq` as a string, **3** with no `seq`,
+**3** with no `host`, **2** with no `method`. **A ledger this tool cannot read is a gap in the
 record, not a negative result**, and the guard exists so a next pass gets that
 sentence instead of a stack trace.
 
@@ -1375,12 +1400,11 @@ a *new* position into the same file is still a hit. The check **still exits 0**,
 the residual on screen: it reports PASS only because the two stale positions are
 named in `WITHDRAWN`, and a reader can see exactly which two and where.
 
-**The load-time guard also means this pass's own "byte-identical except for three
-added lines" claim needs its boundary restated.** That diff was measured against
-`origin/main` over **this lane's own ledger**, and the lane's ledger is unaffected by
+**The load-time guard also means this pass's own inertness claim needs its boundary
+restated.** It was measured over **this lane's own ledger**, which is unaffected by
 every change above: its rows carry `host_tag`, `t_sent` and the four guarded keys, so
-the two new skip counters read **0** there. **What moved is the set of ledgers the
-tool can read at all** — and that set is published above by count rather than by
+both new skip counters read **0** there. **What moved is the set of ledgers the tool
+can read at all** — and that set is published above by count rather than by
 assertion.
 
 ## 9. Artefacts
