@@ -42,9 +42,11 @@ Fixed here at source, after the correction issue `correction: PR #135 S-L4 -- ei
 blocking findings after three rounds` (#139) recorded the handoff as broken. Run
 exactly the way docs/10 section 1's successor directs ("the same one-command test
 over every other committed CC ledger"), this tool died on a member of area L's own
-population:
+population. The ledger path below is **repo-root-relative**, so the command is run
+from the repo root, not from this file's own directory:
 
-    $ python3 account.py findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl
+    $ python3 findings-log/2026-10-14-lane-s6-public-index/account.py \
+          findings-log/2026-10-13-area-l-ipro-hcp/results.jsonl
       File ".../account.py", line 109, in spacing
         a, b = parse(sel[i]["t_sent"]), parse(sel[i + 1]["t_sent"])
       TypeError: strptime() argument 1 must be str, not None
@@ -97,6 +99,18 @@ BODIES = os.path.join(SCRATCH, "bodies")
 # rather than guessed from a timestamp. Rows at or below it were produced by
 # the earlier probe.sh, rows above it by this one.
 PRIOR_SEQ = 76
+
+# The keys every oracle below reads WITHOUT a default, so a row lacking one of
+# them crashes the run rather than yielding a wrong figure. `schema_guard()`
+# fails closed when any row lacks one, and names which and how many. Keys a
+# single row may legitimately lack -- `t_sent`, `host_tag` -- are deliberately
+# NOT here: those are handled by a counted skip inside `spacing()`.
+REQUIRED = ("seq", "host", "http_status", "t_done")
+# `seq` is compared and sorted numerically (`r["seq"] > PRIOR_SEQ`), so a ledger
+# that writes it as a JSON string is a different schema, not a formatting
+# difference -- comparing across the two is AGENTS.md section 6 item 3, the
+# lookup-that-resolved-to-something-else defect. Assert the type before use.
+REQUIRED_INT = ("seq",)
 
 
 def parse(ts):
@@ -164,8 +178,16 @@ def spacing(rows, host_filter=None):
 
     kernel = []
     prev = None
+    kernel_skipped = 0
     for r in sel:
-        p = os.path.join(BODIES, f"{r['host_tag']}.b")
+        tag = r.get("host_tag")
+        if not isinstance(tag, str):
+            # A committed ledger that records no host_tag cannot name a body file.
+            # Skipped and counted, never guessed at -- same rule as the harness
+            # oracle above. See the Correction in the module docstring.
+            kernel_skipped += 1
+            continue
+        p = os.path.join(BODIES, f"{tag}.b")
         if not os.path.exists(p):
             continue
         m = os.stat(p).st_mtime
@@ -173,7 +195,7 @@ def spacing(rows, host_filter=None):
             kernel.append((m - prev[0], prev[1], r["seq"]))
         prev = (m, r["seq"])
 
-    return harness, kernel, skipped
+    return harness, kernel, skipped, kernel_skipped
 
 
 def whole_kib_detector(rows):
@@ -186,6 +208,61 @@ def whole_kib_detector(rows):
     ok = [r for r in rows if r.get("http_status") == "200" and r.get("body_bytes")]
     whole = [r for r in ok if r["body_bytes"] % 1024 == 0]
     return ok, whole
+
+
+def schema_guard(rows):
+    """Fail closed on a ledger whose SCHEMA this tool cannot read.
+
+    A committed CC ledger is not obliged to carry the keys this lane's own does.
+    `docs/10` section 1 tells a successor to run this tool over every other
+    committed ledger, and some of them use a different schema -- so the tool has
+    to say so rather than print zeros that read as a clean negative. This is the
+    same fail-closed shape as the `is a directory` and `no such ledger` guards
+    above: exit 2, the reason named, nothing printed as if it were a finding.
+
+    REQUIRED is deliberately the small set every oracle here reads without a
+    default: `seq` orders the series, `host` groups them, `http_status` is what
+    the 200-counting rule is stated over. Keys a single row may legitimately lack
+    -- `t_sent`, `host_tag` -- are NOT in this set: those are per-row absences,
+    handled by a counted skip inside `spacing()`, because a ledger where *some*
+    rows are short is readable and one where *every* row is short is a different
+    artefact.
+    """
+    if not rows:
+        return 0  # a 0-row ledger is a pass that sent nothing; handled downstream
+    # Counted per KEY, not unioned: a key present on one row and absent on the rest
+    # is a PARTIAL ledger, and every oracle below indexes these keys directly, so
+    # one such row crashes the run exactly as a wholly-absent key would. Fail
+    # closed on any absence, and print the counts so the reader can see which key
+    # and how many rows.
+    def not_an_int(r, k):
+        return k in r and (not isinstance(r[k], int) or isinstance(r[k], bool))
+
+    absent = {k: sum(1 for r in rows if k not in r) for k in REQUIRED}
+    wrong_type = {k: sum(1 for r in rows if not_an_int(r, k)) for k in REQUIRED_INT}
+    problems = []
+    if any(absent.values()):
+        problems.append("keys absent")
+    if any(wrong_type.values()):
+        problems.append("keys of the wrong type")
+    if not problems:
+        return 0
+    seen = set()
+    for r in rows:
+        seen.update(r.keys())
+    print(f"account.py: {LEDGER} uses a schema this tool cannot read.", file=sys.stderr)
+    print(f"  {len(rows)} rows; {', '.join(problems)}:", file=sys.stderr)
+    for k, n in sorted(absent.items()):
+        if n:
+            print(f"    {k}: absent from {n} of {len(rows)} rows", file=sys.stderr)
+    for k, n in sorted(wrong_type.items()):
+        if n:
+            print(f"    {k}: not an int on {n} of {len(rows)} rows"
+                  f" (this tool compares and sorts it numerically)", file=sys.stderr)
+    print(f"  keys the rows do carry: {', '.join(sorted(seen))}", file=sys.stderr)
+    print("  Nothing was measured and nothing is reported: an unreadable ledger is a"
+          " gap in this record, not a negative result.", file=sys.stderr)
+    return 2
 
 
 def main() -> int:
@@ -208,6 +285,9 @@ def main() -> int:
         # whole-ledger figures are the only ones that mean anything for it.
         PRIOR_SEQ = 0
     rows = load()
+    rc = schema_guard(rows)
+    if rc:
+        return rc
     total = len(rows)
     hosts = sorted({r["host"] for r in rows})
 
@@ -225,9 +305,9 @@ def main() -> int:
                   and r["http_status"].startswith("200")
                   and r["http_status"] != "200"]
 
-    h_gaps, k_gaps, h_skip = spacing(rows)
+    h_gaps, k_gaps, h_skip, k_skip = spacing(rows)
     this_pass = [r for r in rows if r["seq"] > PRIOR_SEQ]
-    tp_h, tp_k, tp_skip = spacing(this_pass)
+    tp_h, tp_k, tp_skip, tp_kskip = spacing(this_pass)
     h_min = min((g[0] for g in h_gaps), default=None)
     k_min = min((g[0] for g in k_gaps), default=None)
 
@@ -284,6 +364,8 @@ def main() -> int:
         "spacing_harness_min_s": round(h_min, 3) if h_min is not None else None,
         "harness_pairs_skipped_no_usable_t_sent": h_skip,
         "this_pass_pairs_skipped_no_usable_t_sent": tp_skip,
+        "kernel_rows_skipped_no_host_tag": k_skip,
+        "this_pass_kernel_rows_skipped_no_host_tag": tp_kskip,
         "kernel_bodies_available": bool(k_gaps),
         "spacing_kernel_body_mtime_min_s": round(k_min, 3) if k_min is not None else None,
         "this_pass_rows": len(this_pass),
@@ -365,6 +447,13 @@ def main() -> int:
     print(f"    min gap, harness t_sent            {out['spacing_harness_min_s']} s")
     print(f"    harness gaps under 2.5 s           {len(under)}")
     print(f"    pairs skipped, no usable t_sent    {h_skip}")
+    if k_skip:
+        print(f"    rows skipped, no host_tag          {k_skip}")
+        print("      A row with no host_tag cannot name a body file, so the kernel oracle")
+        print("      skips it rather than guessing a path; the harness figure above is")
+        print("      unaffected and says nothing about these rows.")
+        print("      This ledger records no host_tag on any row, which is a property of")
+        print("      the ledger's schema, not of the bodies.")
     if h_skip:
         print("      A row with no t_sent leaves the series; the two pairs touching it are")
         print("      dropped rather than joined across it, so no gap above is measured from")

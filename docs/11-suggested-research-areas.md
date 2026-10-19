@@ -2760,8 +2760,9 @@ in its two `(prior)` rows — `CC-MAIN-2014-10` / `/ipro/hcp/login.jsf`, and
 `CC-MAIN-2020-24` / `index.jsp`, `login.jsf`, `main/home.jsf` — findable with
 `grep -rn 'CC-MAIN-2014-10.*(prior)\|CC-MAIN-2020-24.*(prior)' docs/`, **by
 content and deliberately with no line number, because this page moves as other
-passes land. That recipe returns three lines — the two table rows, plus this very
-sentence, which quotes it — so no count is printed beside it.** ⚠ **Two corrections to this sentence, both recorded because each
+passes land. One of that recipe's rows is this very sentence, which quotes it, so
+**no count is printed beside it** — a figure here would be a then-value that moves
+every time this page is edited.** ⚠ **Two corrections to this sentence, both recorded because each
 replaced one broken citation with another — the failure `AGENTS.md` §6 item 6
 names, and the one this pass's own §8a-6 row 4 was written to stop.** It once read
 **"lines 1736 and 1738 above"**, stale on the commit it shipped in (those lines are
@@ -2906,10 +2907,23 @@ tolerates an absent `t_sent`: `parse()` returns `None` for a non-string rather t
 letting `strptime(None)` raise `TypeError`, `spacing()` skips the two pairs touching
 a row that carries no timestamp **and prints how many it skipped**, and the
 inverted-row test reads both keys with `.get()`. **All eight area-L ledgers open
-under `python3 account.py <ledger>`**, and a 9th crash fell out of the same
-verification — a 0-row ledger raised `IndexError`, so the newest committed CC
-ledger in the repository was one the tool could not read; it now says in words that
-such a ledger records a pass that sent nothing. **Skipping the rows was the right
+under `python3 findings-log/2026-10-14-lane-s6-public-index/account.py <ledger>`,
+run from the repo root** — the ledger path is root-relative, so the bare
+`python3 account.py <ledger>` form resolves against the script's own directory and
+exits 2. A second crash fell out of the same verification — a 0-row ledger raised
+`IndexError`; it now says in words that such a ledger records a pass that sent
+nothing. ⚠ **Two claims this paragraph carried are withdrawn.** **"The newest
+committed CC ledger in the repository"** is deleted rather than reworded
+(`AGENTS.md` §1): it is false at this head, and it had no committed ordering behind
+it — `2026-10-15-pool-l-ipro-census-cont` is CC-bearing and carries the same date as
+the 0-row ledger, so "newest" named nothing. And **"all eight"** is the area-L
+population, a proper subset of what `docs/10` §1's successor actually asks for
+(*"every other committed CC ledger"*): run over **every committed
+`findings-log/*/results.jsonl`**, this tool reads **26** and fails closed with a
+named reason on **39** — **15** are not ledger files, **1** has an unparseable line,
+and **23** carry a schema it cannot read. **A ledger this tool cannot read is a gap
+in the record, not a negative result**, and it now says so and exits 2 rather than
+raising `KeyError`. **Skipping the rows was the right
 fix, not a loosening:** the spacing oracle needs only the rows that carry a
 timestamp, and a gap measured *across* a row with none would be a guess. **The
 INFERRED assumption above is untouched** — a null may still be a malformed row; the

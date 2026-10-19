@@ -85,6 +85,7 @@ set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 cd "$HERE/../.." || exit 1
 LOG="$HERE/FINDINGS.md"
+LOGRE="findings-log/$(basename "$HERE")/FINDINGS.md"
 ADVISORY=0
 [ "${1:-}" = "--advisory" ] && ADVISORY=1
 
@@ -108,12 +109,32 @@ D11=docs/11-suggested-research-areas.md
 # still fires for a heading that mentions correction but matches neither.
 CORR_RE='^(## 8a(-[0-9]+)?[.] Correction([^A-Za-z]|$)|## Correction [(][0-9]{4}-[0-9]{2}-[0-9]{2}[)])'
 
+# The one directory excluded from the edited-file list below: THIS pass's own log
+# directory, whose positions are exempt by the Correction-section rule above.
+# Every OTHER file is in scope, including another lane's script under
+# findings-log/ -- see the Correction dated 2026-10-17 in FINDINGS.md for why
+# the earlier `grep -v '^findings-log/'` was too broad: it excused a pointer into
+# `account.py`, which this PR edits, so the bound could not see the very
+# invalidation it exists to catch.
+SELF_DIR="findings-log/$(basename "$HERE")"
+
+# Positions this file KNOWS are stale and CANNOT remove, because they sit in
+# sections that predate its append-only rule and may not be edited. Each is named
+# in a dated Correction section below and printed by the check itself. The list
+# is exact-string, not a prefix: a NEW position into the same file is still a hit.
+#   account.py:109 -- sections 7b and 8c; this PR edits account.py, so 109 no
+#                    longer holds the strptime call. See the Correction dated
+#                    2026-10-17.
+WITHDRAWN="account.py:109"
+TMPWD=$(mktemp) || exit 2
+trap 'rm -f "$TMPWD"' EXIT INT TERM
+
 # FAIL CLOSED, AND FAIL EARLY. `git diff origin/main...HEAD` is the only source of
 # the edited-file list; with no `origin/main` (a shallow clone, a detached merge
 # checkout) it returns nothing, every path is then unmatched, and the check below
 # would report PASS on a file full of positions. So the guard runs BEFORE the
 # first grep: no list, no verdict.
-EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v '^findings-log/' || true)
+EDITED=$(git diff --name-only origin/main...HEAD 2>/dev/null | grep -v "^$SELF_DIR/" || true)
 if [ -z "$EDITED" ]; then
   echo "  ** FAIL - the edited-file list is empty: 'git diff --name-only" >&2
   echo "     origin/main...HEAD' returned nothing (is origin/main present?). With no" >&2
@@ -185,12 +206,21 @@ echo "  the exemption."
 # A position is a NUMBER THE READER IS INVITED TO LOOK UP IN A FILE.
 #
 # THE BOUND THAT MAKES IT A CHECK RATHER THAN A NUISANCE: only positions into a
-# file THIS PR ITSELF EDITS. This PR's entire diff outside its own log directory
-# is `docs/11-suggested-research-areas.md` — so a pointer into `docs/11` is
-# invalidated by this PR landing, and a pointer into `census-84.txt`,
-# `derive.py` or `account.py` is not, because this PR does not touch them. That
-# is a property of the diff, so it is derived below rather than hardcoded, and it
-# will stay true as this PR's scope changes.
+# file THIS PR ITSELF EDITS. This PR's diff outside its OWN log directory is
+# `docs/11-suggested-research-areas.md` **and
+# `findings-log/2026-10-14-lane-s6-public-index/account.py`** — so a pointer into
+# `docs/11` is invalidated by this PR landing, and so is a pointer into
+# `account.py`. A pointer into `census-84.txt` or `derive.py` is not, because this
+# PR does not touch them. That is a property of the diff, so it is derived below
+# rather than hardcoded, and it will stay true as this PR's scope changes.
+#
+# ⚠ This bound once read "This PR's entire diff outside its own log directory is
+# `docs/11-suggested-research-areas.md`", and derived the list with
+# `grep -v '^findings-log/'` -- which excused `account.py` along with this pass's
+# own log. **That silently excluded the one other edited file the PR has**, so the
+# check could not see a pointer into the very script the PR edits. It is derived
+# from `SELF_DIR` above now: this directory only. See the Correction dated
+# 2026-10-17 in FINDINGS.md.
 #
 #   A  <edited-file>:NUMBER        the colon form
 #   B  "line"/"lines" + number     incl. a range, when the subject is an edited file
@@ -211,8 +241,12 @@ echo "  the exemption."
 # a regex use that does not exist, which made gawk print "escape sequence ..."
 # warnings on stderr and made the no-write-to-stderr rule false.)
 
-HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
-  BEGIN { split(ed, A, "[|]"); for (i in A) E[A[i]] = 1 }
+HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" -v wdl="$WITHDRAWN" -v wdf="$TMPWD" '
+  BEGIN {
+    split(ed, A, "[|]")
+    for (i in A) { E[A[i]] = 1; n2 = split(A[i], B, "/"); F[B[n2]] = 1 }
+    split(wdl, W2, " "); for (i in W2) if (W2[i] != "") D[W2[i]] = 1
+  }
   # A Correction section is a SECTION: it starts at a "^## " heading and ENDS at
   # the next one. That is what makes the exemption a kind, not a position.
   /^## / { insec = ($0 ~ cre) }
@@ -232,7 +266,12 @@ HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
       } else if (tok ~ /^[A-Za-z0-9._/-]+#L[0-9]+$/) {
         pre = tok; sub(/#L[0-9]+$/, "", pre)                   # rule E (github anchor)
       }
-      if (pre != "" && (E[pre] || (length(pre) > 2 && index(ed, pre) == 1))) {
+      if (pre != "" && (E[pre] || F[pre] || (length(pre) > 2 && index(ed, pre) == 1))) {
+        # The withdrawn-position key is the position as WRITTEN: `tok` when the
+        # number is inside it (the `file:109` form), `pre ":" W[i+1]` when the
+        # writer split the colon from the number.
+        key = (tok ~ /:$/) ? pre ":" W[i+1] : tok
+        if (D[key]) { WDL[++nWD] = NR"\t"key; break }
         why = "A file:NUMBER   "; break
       }
     }
@@ -251,7 +290,19 @@ HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" '
       why = "B line NUMBER   "
     if (why != "") print NR": " why"  " line
   }
-' "$LOG")
+  END { for (i = 1; i <= nWD; i++) print WDL[i] > wdf }
+' "$LOG") || { echo "  ** FAIL - the position scan itself failed; no verdict is reported. **" >&2; exit 2; }
+if grep -q '' "$TMPWD" 2>/dev/null; then
+  echo
+  echo "  WITHDRAWN BY DATED NOTE — a stale position that sits in a section this"
+  echo "  file's append-only rule forbids editing. Named in the Correction dated"
+  echo "  2026-10-17 in FINDINGS.md, and printed here so the residual is never"
+  echo "  mistaken for coverage:"
+  # LOGRE, not $LOG: an absolute path would print this machine's home directory
+  # into the transcript, and AGENTS.md section 7 lists /home/<user> as a thing
+  # that must never appear in what this repo publishes.
+  sed "s|^|    $LOGRE:|" "$TMPWD"
+fi
 
 # Headings that LOOK like Correction sections but are not one — so the exemption
 # cannot be widened by renaming.
