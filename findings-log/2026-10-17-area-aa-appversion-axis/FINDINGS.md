@@ -195,7 +195,8 @@ The selection is substantive, not cosmetic. Going `3.6` → `3.9` changes the
 advertised `baseUrlCumulus` base (`v13` → `v2`), the `baseUrlCareLink` API
 version (`v2` → `v1`), the `CP[]` length (3 → 2; the regions are
 `US, EU, CLINICAL` on the 3.5/3.6 class and `US, EU` on the 3.9 class, verified
-against `headers/04-*.b` and `headers/05-*.b`), the country count (109 on the
+on **both** hosts against `headers/04`/`05` (`.com`) and `headers/14`/`15`
+(`-trials`)), the country count (109 on the
 3.5/3.6 class, 99 on `.com` and 76 on `-trials` for 3.9), and the SSO config
 file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against
 `sso_cp_us_v6.json` alone on `-trials` and `sso_cp_us_v6.json` **plus**
