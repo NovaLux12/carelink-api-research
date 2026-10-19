@@ -166,7 +166,7 @@ bundles)
     b03-carelink-medtronic-eu-clinic-asset "" asset
   cap_guard || exit 0
   req carelink-support.medtronic.com "/main.759cddab23085086.js" \
-    "CORPUS-CONTROL support cua build asset; asset name and digest recorded at 2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23; area A results.jsonl seq 20 recorded this host serving build B. The corpus control for the support key list" \
+    "CORPUS-CONTROL support cua build asset; asset name and digest recorded at 2026-10-13-area-g-device-tables/FINDINGS.md:70; area A results.jsonl seq 20 recorded this host serving build B. The corpus control for the support key list" \
     b04-carelink-support-medtronic-com-support-asset "" asset
   ;;
 

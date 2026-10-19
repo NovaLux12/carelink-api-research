@@ -247,7 +247,7 @@ for it, and the recorded digest asserted **before** any key list taken from it w
 
 Recorded at `findings-log/probe-2026-10-08/AUTH-TENANT-FINDINGS.md:248-249` (clinic asset
 name) and `findings-log/2026-10-14-area-k-clinic-controlflow/differential.py:142` (clinic
-digest); `findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23` (support
+digest); `findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:70` (support
 asset name and digest). **No stop condition fired.** Three clinic hosts and one support host,
 two builds, both builds live.
 
@@ -775,10 +775,17 @@ already drops the word for the same reason." It did not: the cap section's sente
 still read "hygiene check **independently** requires", at an `AGENTS.md` §2.1 independent count
 of **1**. §2.1 exposure, reported as discharged, not discharged. **Both statements cannot be
 true, so the cap section's sentence was changed** — "hygiene check — a separate mechanism that
-never saw the probe — requires" — which discharges the exposure and makes §B's claim true
-instead of leaving a correction section that flatters itself. The word remains in `§B`'s own
-verbatim blockquote at line 623, which is where the evidence of it lives; that quote is
-untouched.
+never saw the probe — requires" — which discharges the exposure instead of leaving a correction
+section that flatters itself. The word remains in `§B`'s own verbatim blockquote at
+**lines 628–629**, which is where the evidence of it lives; that quote is untouched.
+
+**`§B`'s own closing sentence is left as written, and `§I` says which of its two readings
+survives.** `§B` reads "**So the wording stands as written and this section is the
+correction.**" That sentence has two referents — the quote in `§B`, and the cap section's live
+sentence — and the repair makes them disagree: the quote indeed stands as written, and the live
+sentence no longer does. `§I` is where the disambiguation is recorded. Rewriting `§B`'s prose
+in place is the erasure `AGENTS.md` §3 exists to prevent, so `§B` stays and the reading is
+settled by appending.
 
 **4 · A citation pointing at a file that does not contain what it is cited for.**
 `FINDINGS.md` §3 attributed the support build's **asset name and digest** to
@@ -786,11 +793,19 @@ untouched.
 the **clinic** bundle (`2a7fa8e7af519c2b`); `a054555a` and `main.759cddab23085086.js` appear
 nowhere in that file. The correct source is
 `findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:70`, which carries the support asset
-name, host, byte count and digest in one table row. Fixed in `FINDINGS.md` and in `plan.py`,
-whose `asset_src`/`digest_src` fields carried the same wrong path into the generated
-`plan.md`/`plan.json` corpus-control table. This is `AGENTS.md` §6.6 in the form §6.6 warns
-about: the gate resolves `[source: path]`, not the line inside the path, so the check stayed
-green over a citation that pointed at the wrong text.
+name, host, byte count and digest in one table row. This is `AGENTS.md` §6.6 in the form §6.6
+warns about: the gate resolves `[source: path]`, not the line inside the path, so the check
+stayed green over a citation that pointed at the wrong text.
+
+⚠ **This item was misreported as fixed and was not.** The first repair pass corrected
+`plan.py`'s `asset_src`/`digest_src`, which had carried the wrong path into the generated
+`plan.md`/`plan.json` corpus-control table, and then wrote in this section that `FINDINGS.md`
+was fixed too. **It was not**: §3's live attribution above still named the area-p file, and
+`probe.sh` — the generator of the ledger's own `role` strings — still hardcoded it. A silent
+no-match replace had been read as a successful one. `FINDINGS.md` §3 and `probe.sh:169` are
+fixed in round 5; `results.jsonl` seq 4's `role` string still carries the old path, and it is
+**left as written** — a recorded row is not rewritten to a shape the process did not emit (§2
+defect 0), and `§I` carries the correction instead.
 
 **5 · Four line-range citations this PR's own `docs/07` edit moved.** `FINDINGS.md:133` cited
 `docs/07:178-193` for "the full oracle and both worked control pairs" — that range is now this
@@ -809,3 +824,52 @@ documentary and were repaired from the committed ledger, the committed headers a
 repository's own `docs/07`. The verifier's own single live GET (one cell,
 `cms-config.json` on `carelink.medtronic.com`, under a host lock) returned 200 / 2 B /
 `application/json` / `sha256 44136fa355b3…`, matching the committed cell.
+
+### §I — round 5: `§B`'s referent disambiguated, and a "fixed" claim that was not
+
+Round 4's verifier returned **CONTRADICTS** on `b03f458` against two of round 4's own five
+repairs. Both were documentary; **no measurement was touched, and none was disputed** — the
+round-4 verifier had already re-derived the 15×3 grid, every digest, the header populations
+and the 2.276 s floor and found all of them reproduce, and it confirmed repairs 1, 2 and 5
+completely.
+
+**1 · Repair 3 was half-done, and the half that was left is the half that mattered.**
+`§B` closes with "**So the wording stands as written and this section is the correction.**"
+Round 4 read that as satisfied once the cap section's live sentence dropped the word. It is
+not satisfied, because the sentence has **two referents** and the repair split them:
+
+| Referent | State after round 4 |
+|---|---|
+| the verbatim blockquote inside `§B` (lines 628–629) | **stands as written** — the word is still there, which is the evidence |
+| the cap section's live sentence (line 65) | **rewritten in place** — the word is gone |
+
+So `§B`'s sentence is now true of one referent and false of the other, and a reader cannot
+tell which it means. **The disambiguation is appended here rather than written into `§B`**,
+because `§B` is dated correction prose and `AGENTS.md` §3 makes it evidence: editing a
+correction to make it agree with a later edit is the same erasure the rule exists to prevent.
+**The settled reading:** *the wording stands as written* refers to `§B`'s own quote, which is
+untouched and remains the only place the word survives; the live cap sentence was changed in
+round 4 to discharge the §2.1 exposure, and that change stands.
+
+**2 · Repair 4 was reported as fixed and was not fixed where it was claimed.** `§H` item 4
+reads "Fixed in `FINDINGS.md` and in `plan.py`". `plan.py` was fixed. **`FINDINGS.md` was not**
+— §3's live attribution still named `2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23`,
+which is the exact defect the item describes — and neither was `probe.sh:169`, the generator
+of the ledger's own `role` strings. The cause is worth naming because it is a general hazard:
+a scripted find-and-replace was run over `plan.py`, matched, and the *same-shaped* string in
+`FINDINGS.md` was assumed fixed. **A grep that hits is not a grep that proves** (`AGENTS.md`
+§6.2), and the mirror of that — *an edit you believe you made, checked by reading the item
+that describes it rather than the file* — is the same failure wearing the other hat. Fixed in
+both files in round 5, and the wrong path is now grepped repo-wide rather than assumed gone.
+
+**`results.jsonl` seq 4 is left carrying the old path, deliberately.** Its `role` string was
+emitted by `probe.sh` at request time. Rewriting a recorded field to a shape the process did
+not emit is the repair §2 defect 0 refused, for the same reason it refused to normalise the
+ledger's two `headers` serialisations: **the ledger is what happened, not what should have
+happened.** The correction lives here; `probe.sh` is fixed so a future run emits the right
+path.
+
+**What did not change.** §1–§12, §A–§G, every measurement, every request count, every cap
+revision and every evidence class. **0 requests in this round.** The wrong path now survives in
+exactly two places in this repository: this section's and §H's quotation of the defect (which
+is the evidence), and `results.jsonl` seq 4 (a recorded row, fixed at the generator instead).
