@@ -869,7 +869,91 @@ ledger's two `headers` serialisations: **the ledger is what happened, not what s
 happened.** The correction lives here; `probe.sh` is fixed so a future run emits the right
 path.
 
-**What did not change.** §1–§12, §A–§G, every measurement, every request count, every cap
-revision and every evidence class. **0 requests in this round.** The wrong path now survives in
-exactly two places in this repository: this section's and §H's quotation of the defect (which
-is the evidence), and `results.jsonl` seq 4 (a recorded row, fixed at the generator instead).
+**What did not change.** Every measurement, every request count, every cap revision and every
+evidence class. **0 requests in this round.** Apart from §3's citation — corrected in this same
+round and disclosed in item 2 above, and the **only** body-text line this round touched — the
+sections §1–§12 and §A–§H are as §H left them.
+
+⚠ **Two claims in the paragraph above were wrong when first written, and both are corrected
+here rather than left to be found.** (a) "**§1–§12, §A–§G … did not change**" was false on the
+page: this round changed §3, three paragraphs after the sentence said it had not. §H's version
+of the same sentence scoped itself to "every evidence class **from** §1–§12 and §A–§G"; §I
+dropped the "from" and made the sections themselves the object of the claim. (b) "The wrong
+path now survives in **exactly two places in this repository**" was wrong by a factor of five.
+`git grep -n area-p-static-schema-recovery` returns **10**: **3 in this pass** (§H's and §I's
+quotations of the defect, which are the evidence, and `results.jsonl` seq 4, a recorded row
+whose generator is fixed instead) and **7 outside it** — two in `docs/11`, one in
+`2026-10-13-area-p-static-schema/FINDINGS.md`, and four in 2026-10-14 passes. **All 7 are
+legitimate**: the file exists, every one of them cites it for something it does contain (the
+only line-anchored one, `:45`, resolves), and none is a line this PR adds — `git diff
+origin/main -- docs/11` touches neither of its two hits. The sentence asserted a count from a
+grep it had not finished running; `§J` carries the fourth instance of that habit.
+
+### §J — round 6: the same defect class, a fourth time, in the correction that named it
+
+Round 5's verifier returned **CONTRADICTS** on `014c562`, with **both** of round 5's own named
+repairs **confirmed real in the files** — it opened `2026-10-13-area-g-device-tables/FINDINGS.md:70`,
+`probe.sh:169`, `plan.py:46-47` and the ledger row they rest on, and re-ran the negative about
+the old file itself. It also found round 5's `§H` line cite (623 → 628–629) correct. **No
+measurement was disputed; repairs 1, 2 and 5 of round 4 were confirmed complete.**
+
+What it found was four defects, and **two of them are in the correction section that exists to
+prevent exactly this**.
+
+**1 · A correction claimed it had changed something it had not.** §I's closing paragraph read
+"**What did not change.** §1–§12, §A–§G …". This round changed **§3**, at line 250, and §I
+says so itself in item 2 three paragraphs earlier. §H's version of the sentence scoped itself
+to "every evidence class **from** §1–§12 and §A–§G"; §I dropped the preposition and made the
+sections themselves the object of a claim they refuted. **Corrected in place in §I, with the
+correction disclosed** rather than made silently — §6.1's rule is to name the defect.
+
+**2 · A count asserted from a grep that had not finished running.** §I: "The wrong path now
+survives in **exactly two places in this repository**", one sentence after claiming the path had
+been "grepped repo-wide rather than assumed gone". The grep returns **10**. Broken down:
+**3 in this pass** (§H's and §I's quotations of the defect, which are the evidence, plus
+`results.jsonl` seq 4, a recorded row whose generator is fixed instead) and **7 outside it** —
+two in `docs/11`, one in `2026-10-13-area-p-static-schema/FINDINGS.md`, four in 2026-10-14
+passes. **All 7 are legitimate**: the file exists; the only line-anchored cite among them
+(`:45`, in the independence audit) resolves and is cited for what it contains; and no line this
+PR adds is among them — `git diff origin/main -- docs/11` touches neither of its two hits.
+**§I's sentence is corrected in place with the full breakdown**, because a count stated wrongly
+is worse than a count never stated, and the correct breakdown is the useful part.
+
+**3 · A stale `file:line` citation in a generator, missed one line above the one that was
+fixed.** `plan.py:62` carries `# docs/07:158 (one of the nine 412 siblings)` — correct on
+`origin/main`, where `:158` was inside the nine-412 list. This PR's own `docs/07` edit moved
+that list to `:222-230`; `:158` is now this PR's own new prose about the two JavaScript builds.
+The key choice is still right; only the pointer was stale. §H item 5 fixed the *same* citation
+in `plan.py:204` and `probe.sh:186` and named the hazard exactly — "fixing the prose without
+fixing the generator would have left the defect returning on the next run" — then missed this
+one, **nineteen lines above the line it did fix**.
+
+**4 · The same hazard in `probe.sh:165`.** Its corpus-control role string says area A
+"refuted `docs/01:69`'s 'does not serve that bundle'". `docs/01:69` *was* that row when area A
+wrote it; area A's own correction replaced it, and `docs/01:70` now reads "**does** serve the
+clinic bundle — byte-identical to `carelinkhp.minimed.eu`. **Corrected 2026-10-12**". Today
+`:69` is the `carelink-support.medtronic.com` row. **The substantive claim is true and this pass
+re-confirmed it independently** — seq 3 records 200 / `application/javascript` /
+`2a7fa8e7af519c2b…` reproducing — but the pointer is not, and this is the generator. Fixed,
+with the wording changed to say what is actually true: area A refuted the claim `docs/01`
+carried **at the time**, and `docs/01:70` records the correction. `results.jsonl` seq 3's
+recorded role string is **left as written**, for the reason §I gives — a recorded row is not
+rewritten to a shape the process did not emit.
+
+**The pattern, named once, because four instances of it is a process failure and not a typo.**
+Every defect in rounds 2, 4 and 6 is the same shape: **a claim about what a file says, made
+without opening the file.** Round 4 assumed a replace had hit a second file. Round 5 reported a
+fix it had made in `plan.py` as a fix it had made in `plan.py` **and** `FINDINGS.md`. §I counted
+occurrences from a grep it had not finished. `plan.py:62` sat nineteen lines above the line
+whose identical defect had just been repaired. **A grep that hits is not a grep that proves**
+(`AGENTS.md` §6.2) is the published version of this, and it is about hits; the sharper form is
+about **absence** — *a file I did not open is a file I did not check*, and a count I did not run
+to completion is not a count. Round 7 does not exist. What carries forward is the method, and
+it is the one §1 already states: **if you cannot point at the line it came from, delete the
+sentence** — and the corollary this pass had to learn twice, which is that a sentence about a
+*repair* needs the same discipline as a sentence about a *measurement*.
+
+**What did not change.** Every measurement, every request count, every cap revision and every
+evidence class. §1–§12 and §A–§J differ from §H's state only in the citation corrections and
+the disclosures each section names. **0 requests in this round**: all four were repaired from
+the committed ledger, the committed scripts and `docs/01`/`docs/07` as they stand.
