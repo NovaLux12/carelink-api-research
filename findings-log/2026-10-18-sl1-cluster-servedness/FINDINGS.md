@@ -62,11 +62,13 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **1.254848**, which is the figure from the very directory it cites. The
   direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
   no published claim of another pass is disturbed, but the range was wrong and
-  `docs/11:2807` publishes **1.4210** as a peer value
+  `docs/11:2811` publishes **1.4210** as a peer value
   (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
   **What this is not:** a revision of that budget model, and not a second
-  population for it. One run of two hosts on a different mix (10 of 15 requests
-  to the **bulk** path, which never failed) is not a measurement of the CDX
+  population for it. One run of two hosts on a different mix (10 of the 13
+  **instrumented** rows went to the **bulk** path — 11 of 15 counting the
+  disclosed pre-instrument probe of §1 — and none of them failed) is not a
+  measurement of the CDX
   API's failure rate, and no other pass's accounting is touched.
 - **Rows 1 and 2 are pre-instrument reachability probes, disclosed rather than
   hidden.** Before the pass, a bare `curl` was run against each host once to
@@ -290,8 +292,9 @@ prior is `f0 = 0.85`, which put the first read at byte ~128 M of a 153 M file
 over TLDs, so a fixed fraction is a poor first guess, and the subsequent reads
 were re-centred on the *shrunken window* rather than on the keyspace. With
 3 pages of 4 MiB against a 153 M file, the bisection is left with a 29 M window
-— **≈ 7 further 4 MiB pages**, against a cap that had 3 rows left. **The budget,
-not the method, is what stopped it** — the same shape area M recorded for its
+— **≈ 7 further 4 MiB pages**, against a per-locate page budget of **3**
+(the cap itself still had 9 rows; §9 states the same distinction). **The page
+budget, not the method, is what stopped it** — the same shape area M recorded for its
 own `offsetB`
 (`findings-log/2026-10-13-area-m-commoncrawl-cdx/FINDINGS.md:498-521`, where a
 verifier round retracted the stronger claim that the search was blocked by
@@ -320,7 +323,8 @@ contradicts that**: S-L2 row 45 is a **`200`** for `CC-MAIN-2024-22`
 `200` control. `CC-MAIN-2024-22` is a **positive-adjacent** crawl — a second
 `carelink.minimed.eu` member, not an absence. The documented `404 No Captures
 found` is `CC-MAIN-2024-42`, area M's. **This pass uses `CC-MAIN-2024-42`**
-(`servedness.py:475`), which is why the control behaved as it did. Recorded
+(`servedness.py:539`, the `TARGET, CTRL_A, CTRL_B` constant line), which is
+why the control behaved as it did. Recorded
 because a claim issue is cited material, and the correction belongs next to the
 result rather than in a lane's private notes.
 
@@ -347,7 +351,12 @@ statement about the target.
 
 `CC-MAIN-2014-23` is the named target: **four control rows across two control
 hosts, no `200`** (OBSERVED, area L seqs 16–18, 40), which is why its `404`
-carried no absence weight and the cell was indeterminate.
+carried no absence weight and the cell was indeterminate. ⚠ **That phrase is
+area L's own, and “control host” there means the control **query's** URL host
+(`google.com` / `commoncrawl.org`), not one of the two Common Crawl hosts** —
+all four rows are on `index.commoncrawl.org`. It is quoted rather than
+paraphrased because this document uses “host” in the other sense (§1), and
+the two would otherwise read as a contradiction.
 
 | # | read | row | result | class |
 |---|---|---|---|---|
@@ -355,7 +364,7 @@ carried no absence weight and the cell was indeterminate.
 | 2 | **is its index served** | 13 | **`206`**, `Content-Range: bytes 0-8191/153 902 243`, `x-cache: Hit from cloudfront`, `server: AmazonS3` → **SERVED, index readable, 153 902 243 B** | **OBSERVED** |
 | 3 | does the API answer for this crawl | 14 | per-crawl control `google.com` **`200`**, 1 785 B, `text/x-ndjson`, first record `com,google)/` timestamp `20140710001322` | **OBSERVED** |
 | 4 | its `minimed.eu` answer | 15 | **`404`**, 48 B, `{"message": "No Captures found for: minimed.eu"}` — the **documented absence shape** | **OBSERVED** |
-| 5 | family locate | — | **not run** — the cap was spent on the controls; and the controls had not classified | **not claimed** |
+| 5 | family locate | — | **not run** — the cap was spent on the controls (0 rows remained), **and** the control gate had not passed, which independently forbids publishing a locate verdict on unclassified controls | **not claimed** |
 
 ### The verdict
 
@@ -454,3 +463,89 @@ Stated because the pass's budget is part of its honesty.
   from the 8 KiB body. **Neither was used to seed the bisection.** Reading
   `bytes 0-8191` and then jumping to `f0 · total` throws away the one cheap
   observation that constrains the keyspace's shape.
+---
+
+## 10 · Verification rounds — the retraction history is the evidence
+
+Two fresh-context verifiers, neither shown how the claim was built, each
+reviewing the PR diff and the repository rules and **re-deriving the numbers
+from `results.jsonl` rather than reading the prose**. Both verdicts are
+recorded here because `AGENTS.md` §3 makes the retraction history part of the
+record, and a corrected number with no visible retraction is a number nobody
+can check.
+
+### Round 1 — `CONTRADICTS aab5f1a`
+
+Three **blocking** findings, all in the accounting, all in
+**§1 · Accounting**, and all confirmed against the sources before fixing:
+
+1. **"Largest response 35 226 B" was false** — contradicted by the ledger's own
+   `body_bytes` column, which carries **`4194304`** on seqs **7–12** (the six
+   locate pages), **4× the 1 MiB hygiene ceiling**. The sentence exists to
+   justify keeping bodies out of the tree, so it understated its own reason by
+   the factor that makes the point. → **corrected**; the 35 226 B figure is
+   re-labelled as *the largest response whose head is committed*.
+2. **"`E[N]` 1.5–1.65" picked two of five populations** that `budget.py` prints,
+   dropping **1.421005**, **1.373269** and **1.254848** — the last being the
+   figure from the very directory it cites. → **corrected** to the **1.25–1.65**
+   span across five named populations. `AGENTS.md` §6 item 5.
+3. **`config.yml`'s comment block contradicted its own `about:` line** (`# 1,
+   computed, not inherited` beside `about: 3 open areas`) — a self-contradiction
+   inside the block whose stated purpose is *"re-derive rather than trust"*.
+   → **corrected**; both now read 3.
+
+Non-blocking, also fixed: the collinfo date cite now points at
+`derived-collinfo-ids.txt:121`; the `run.log.capped` quote is verbatim with its
+hyphen; and `servedness.py`'s `GATE NOT PASSED` message claimed *"the target is
+not read this run"* while reading it three rows later.
+
+**What round 1 could not verify, and why that is not a gap in the claim:**
+ledger row 15, the `minimed.eu` `404`. Four attempts, all connection-level
+failures — per `docs/09` §4 **a failure is never an absence**, so it neither
+supports nor undermines the row. Recorded as **unverified, not contradicted**.
+
+### Round 2 — `scoped re-verify a213e86 since aab5f1a`
+
+Confirmed all three round-1 fixes **correct against the ledger rather than
+softened**, reproduced the substantive claim over the wire, and returned
+**no blocking finding**. Six non-blocking items; three were real defects and are
+fixed:
+
+- **`servedness.py:475` did not resolve** — it pointed at a comment; the
+  `TARGET, CTRL_A, CTRL_B` constants are at **`servedness.py:539`**.
+- **`docs/11:2807` did not resolve** — it was a blank line, because round 1's
+  own `+5/−1` edit to `docs/11` shifted the target by +4. **The fixing round
+  introduced the error it was correcting nearby**; now **`docs/11:2811`**.
+  `AGENTS.md` §6 item 6 — and note that the gate checks `[source: …]` *paths*,
+  not bare `file:line` prose, so **no automated check catches this class**.
+- **The reworded gate message was still unconditional** about a cap-dependent
+  fact: it announced the target's locate was not attempted while
+  `servedness.py` called `locate()` with no gate check in front of it. True on
+  this run (0 rows remained), false whenever the cap has room. → **the guard
+  was added**, so the gate is now **enforced rather than announced**; on this
+  run the result is `SKIPPED` either way, so **the committed ledger is
+  identical under both readings**.
+- Two counts reconciled in prose (the "10 vs 11" bulk-path rows, and "a cap
+  that had 3 rows left" — which was the **per-locate page budget of 3**, not cap
+  headroom of 3; the cap had **9** rows left), and one ambiguity annotated:
+  area L's *"four control rows, two control hosts"* means the control
+  **query's** URL host, not one of the two Common Crawl hosts — all four rows
+  are on `index.commoncrawl.org`.
+
+### What verification actually established
+
+Round 2 re-derived the headline claim **over the wire, independently of the
+committed ledger**: `data.commoncrawl.org` answered `206` with
+`bytes 0-99/153902243` and the same `etag`/`last-modified` as
+`headers/13-head-target.h`; `collinfo.json` returned **128** entries with the
+committed window; and — **the one row round 1 could not reach** — the
+`minimed.eu` query answered `404` `{"message": "No Captures found for:
+minimed.eu"}`, reproducing it. Two verifier rounds independently saw the CDX
+API answer `502`/`504` on ordinary queries while `data.commoncrawl.org` was
+flawless, which is **a live demonstration that the taxonomy this pass builds is
+load-bearing rather than decorative**.
+
+**No human read this PR.** `AGENTS.md` §11 records that branch protection
+requires the `gate` check and currently **zero** approving reviews, so the
+substitute for a human reviewer is a fresh-context verifier plus CI — weaker,
+and stated as weaker.

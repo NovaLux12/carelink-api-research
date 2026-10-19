@@ -631,12 +631,16 @@ def do_pass():
     if gate != "PASSED":
         # Said precisely, because the earlier wording was false in every run
         # that reached it: servedness is a separate question from the locate
-        # and is still read below. What the gate withholds is the LOCATE.
+        # and is still read below. What the gate withholds is the LOCATE, and
+        # it withholds it ENFORCED below, not merely announced - the target's
+        # locate is guarded on this flag, so the statement holds whatever the
+        # cap has room for.
         print("GATE NOT PASSED - no locate verdict may be published for any "
-              "crawl, and the target's locate is not attempted below. The "
-              "target's SERVEDNESS is a separate read and still runs: it does "
-              "not depend on the locate, and controls' servedness is what "
-              "licenses reading a 206 as a statement about a crawl.")
+              "crawl, and the target's locate is SKIPPED below by this gate "
+              "(not merely by the cap). The target's SERVEDNESS is a separate "
+              "read and still runs: it does not depend on the locate, and the "
+              # controls' servedness is what licenses reading a 206 as a "
+              "statement about a crawl.")
 
     # --- 7. the target's own servedness (the close condition's first half)
     rt = fetch.get_retry(DATA_HOST, cluster_path(TARGET), "head-target", "head-target",
@@ -653,8 +657,18 @@ def do_pass():
     fetch.get_retry(IDX_HOST, cdx_path(TARGET, "minimed.eu"),
                     "cdx-probe-target", "cdx-probe-target")
 
-    # --- 9: the target's locate, with whatever survived the cap.
-    verdicts[TARGET] = locate(TARGET, min(3, max(0, cap - fetch.rows())))
+    # --- 9: the target's locate, with whatever survived the cap. GUARDED on the
+    # control gate, not merely announced by it: an unclassified control means
+    # the machinery is unproven, so the target's locate is not spent on it.
+    # On the 2026-10-19 run this returned SKIPPED either way (the cap was also
+    # at 0), so the committed ledger is the same under both readings - but the
+    # gate now holds for whatever cap headroom a later run has.
+    if gate != "PASSED":
+        verdicts[TARGET] = "SKIPPED (control gate not passed)"
+        print("locate %-18s -> SKIPPED (control gate not passed) [%s]"
+              % (TARGET, fetch_cap_word(fetch)))
+    else:
+        verdicts[TARGET] = locate(TARGET, min(3, max(0, cap - fetch.rows())))
 
     with open(os.path.join(HERE, "run.log.capped"), "a") as fh:
         fh.write("DONE - %s (lock wait %.1fs, absent-crawl oracle %s, control gate %s).\n" % (
