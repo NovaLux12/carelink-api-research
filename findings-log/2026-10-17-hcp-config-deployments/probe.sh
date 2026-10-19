@@ -183,7 +183,7 @@ gap)
   # -------- batch 3: the one cell batch 2 spent a slot on instead of measuring -
   # `logbook.supported.entry.types` is one of the build's 15 route literals, and
   # batch 2 used it as CONTROL-4 (header-ABSENT) on all three hosts. That is the
-  # right control — docs/07:154-161 lists it among the nine siblings that return
+  # right control — docs/07:222-230 lists it among the nine siblings that return
   # 412 with no header — but it means its HEADERED verdict is unmeasured on
   # these three hosts, and a portability claim needs all 15 verdicts. Measured
   # here rather than written up as a gap, because 3 requests buy the cell and

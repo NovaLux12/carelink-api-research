@@ -4,8 +4,10 @@
 **The defect it repairs, stated first.** `curl-shim.sh` v1 captured curl's whole stdout
 into a shell variable and logged that variable as `http_status`. For the requests the
 pinned suite sends with `-o <file>` and no `-w`, stdout *is* the response body. So every
-such row carries a response body in a status column — in this ledger, **22 of the 26
-gate-suite rows**, two of which held a 5513-byte HTML document (seq 82, 83). A status
+such row carries a response body in a status column — in this ledger, **22 of the 52
+gate-suite rows**, two of which held a 5513-byte HTML document (seq 82, 83). The other 30
+carry a real numeric status: 4 of them from the two runs before the shim was rewritten,
+26 from the two after. A status
 column that can hold an HTML document will be read as a status by someone who does not
 know, and this file is that someone.
 

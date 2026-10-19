@@ -118,7 +118,7 @@
   {
    "host": "carelink.medtronic.com",
    "path": "/hcp/configuration/public/logbook.supported.entry.types",
-   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:154-161 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
+   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:222-230 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
    "header": null,
    "kind": "control",
    "note": "header-absent control, expected 412"
@@ -158,7 +158,7 @@
   {
    "host": "carelink.medtronic.eu",
    "path": "/hcp/configuration/public/logbook.supported.entry.types",
-   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:154-161 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
+   "role": "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means 'header rejected at the edge' and not 'key absent'. Deliberately NOT `pow.crm.settings`: docs/07:222-230 records that on carelink.medtronic.eu that one key alone answers 200 with no header while `logbook.supported.entry.types` is one of the nine siblings that return 412 \u2014 so it is the cell that can discriminate.",
    "header": null,
    "kind": "control",
    "note": "header-absent control, expected 412"
