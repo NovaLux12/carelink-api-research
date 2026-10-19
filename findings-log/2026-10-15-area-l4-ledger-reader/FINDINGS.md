@@ -1148,8 +1148,16 @@ run the tool over *"every other committed CC ledger"*; this pass ran it over the
 ledgers of `manifest.tsv`, which is the area-L population and a proper subset.
 ⚠ **The clause "which is the whole of what `docs/10` §1's successor asks for" is
 withdrawn** — the corpus-wide run that closes the gap is in the Correction dated
-2026-10-17 below, and it found **11 further ledgers this tool could not read at
-all**. Run over the eight: exit 0 on each (`for f in …; do python3 …/account.py "$f";
+2026-10-17 below, and it found **18 further ledgers this tool could not read at
+all**. ⚠ **This clause first read "**11** further ledgers", a figure that reproduces
+under no rule and is the unhandled-crash count from the withdrawn 65-path
+enumeration at `c39cb44`, which the census rewrite superseded without updating this
+sentence.** The counting rule is the same as the census's and is re-derived at this
+head: over the **50** committed ledgers
+(`git ls-files 'findings-log/*/results.jsonl'`), **18** are refused with a named
+reason, **all 18 of them outside the eight of `manifest.tsv`** — `comm` of the
+refused set against the manifest's eight returns **18** and the intersection is
+**empty** — so "further", i.e. beyond the eight, is **18** and not 11. Run over the eight: exit 0 on each (`for f in …; do python3 …/account.py "$f";
 done`), the 0-row ledger included. **Skipping a row without a `t_sent` is the correct
 fix, not a loosening**: the spacing oracle needs only the rows that have one, and a
 gap measured *across* a row with no timestamp would be a guess. The floor is still a
