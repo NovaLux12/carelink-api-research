@@ -162,7 +162,7 @@ bundles)
     b02-carelink-medtronic-com-clinic-asset "" asset
   cap_guard || exit 0
   req carelink.medtronic.eu "/main.fb5f8cb7eb60c4d5.js" \
-    "CORPUS-CONTROL same clinic build asset on the shadow-portal .eu host; area A results.jsonl seq 19 refuted docs/01:69's 'does not serve that bundle'" \
+    "CORPUS-CONTROL same clinic build asset on the shadow-portal .eu host; area A results.jsonl seq 19 refuted the claim docs/01 carried at the time ('does not serve that bundle'); docs/01:70 now records the correction" \
     b03-carelink-medtronic-eu-clinic-asset "" asset
   cap_guard || exit 0
   req carelink-support.medtronic.com "/main.759cddab23085086.js" \

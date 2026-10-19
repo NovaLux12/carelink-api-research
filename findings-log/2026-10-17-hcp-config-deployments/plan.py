@@ -59,7 +59,7 @@ P = "/hcp/configuration/public/"
 ABSENT = P + "zzz.this.does.not.exist.zzz"        # HCP-CONFIG-SCHEMA.md:108
 CASE_UP = P + "CSU.CONTROL.CODES.SETTINGS"         # HCP-CONFIG-SCHEMA.md:121,188
 CASE_LO = P + "cua.control.codes.settings"         # HCP-CONFIG-SCHEMA.md:125,155
-HDR_ABSENT_KEY = P + "logbook.supported.entry.types"  # docs/07:158 (one of the nine 412 siblings)
+HDR_ABSENT_KEY = P + "logbook.supported.entry.types"  # docs/07:222-230 (one of the nine 412 siblings)
 PROWEB = "X-System-ID: ProWeb"
 
 ROUTE = re.compile(rb"hcp/configuration/public/([A-Za-z0-9._?=&/()-]+)")
