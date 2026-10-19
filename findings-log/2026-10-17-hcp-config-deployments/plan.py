@@ -43,8 +43,8 @@ SUPPORT = {
     "asset": "/main.759cddab23085086.js",
     "bytes": 3410666,
     "sha256": "a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954",
-    "asset_src": "findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23",
-    "digest_src": "findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23",
+    "asset_src": "findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:70",
+    "digest_src": "findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:70",
     "tag": "b04-carelink-support-medtronic-com-support-asset",
     "build": "B / support cua",
 }
@@ -201,7 +201,7 @@ def build_plan():
             "CONTROL-4 header-absent: `logbook.supported.entry.types` with NO X-System-ID. "
             "Expected 412 (HCP-CONFIG-SCHEMA.md:151). Proves that on this host 412 means "
             "'header rejected at the edge' and not 'key absent'. Deliberately NOT "
-            "`pow.crm.settings`: docs/07:154-161 records that on carelink.medtronic.eu that one "
+            "`pow.crm.settings`: docs/07:222-230 records that on carelink.medtronic.eu that one "
             "key alone answers 200 with no header while `logbook.supported.entry.types` is one "
             "of the nine siblings that return 412 — so it is the cell that can discriminate.",
             None, "control", "header-absent control, expected 412")

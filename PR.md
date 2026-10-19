@@ -33,8 +33,8 @@ split is **not** there, in three independent ways.
 ### Verifier round 1 — both blocking findings fixed
 
 **B1 — the status repair covered only the first gate run.** Reproduced exactly:
-26 gate rows, 22 unusable statuses, 11 repaired → 11 shipped unrepaired and undisclosed
-(seq 75, 76, 79–87), two of them (`seq 82`, `83`) holding **5513-byte HTML documents** in
+26 gate rows existed at that point, 22 with unusable statuses, 11 repaired → 11 shipped
+unrepaired and undisclosed (seq 75, 76, 79–87), two of them (`seq 82`, `83`) holding **5513-byte HTML documents** in
 `http_status`. `repair-status.py` v1 was **scoped to an event instead of to a state**.
 
 ```
@@ -55,8 +55,9 @@ the suite's own status capture). The suite's stdout is byte-for-byte what it wou
 A log-write failure is now **loud on stderr**, since a silently dropped line would put a
 vendor request in the pass's traffic with no row for it.
 
-**This is demonstrated, not asserted:** gate runs 1–2 produced 4 clean rows out of 26; gate
-runs 3–4, under the new shim, produced **13 of 13 clean** — real `200`s and real `412`s.
+**This is demonstrated, not asserted:** of the 52 rows now in the ledger, gate runs 1–2
+(seq 62–87) produced 4 clean out of 26, and gate runs 3–4 (seq 88–113), under the new
+shim, produced **26 of 26 clean** — real `200`s and real `412`s.
 
 **B2 — the revised cap was not enforced by the committed `probe.sh`.** Reproduced: `CAP=85`
 at line 41 was the only assignment while the log claimed 90. **Fixed at the mechanism, not
@@ -73,7 +74,7 @@ prints `CAP_STATE=ok|over`. The run below printed `CAP_STATE=ok`.
 | 2 | Two denominators in §8.1 (19 vs 20) | **Fixed.** A counting-rule callout states the populations *before* the numbers: **19** = config responses per host (bundle fetch excluded), **20** = all rows including the bundle fetch. Mirrored into `analyse.py` so `analysis.md` cannot drift from it. |
 | 3 | Two `headers` serialisations | **Fixed as a note, not a rewrite.** `FINDINGS.md` §2 and a banner in `analysis.md` name both forms, their row ranges (seq 1–55 vs 56–61) and the root cause, and state that `analyse.py` reads the `.h` files so no finding depends on it. Left in place: normalising a recorded field to a shape the process did not emit is not a repair. |
 | 4 | Stale "11 gate-suite rows" numeral in §2 | **Fixed** — now "All 39" at that point, and "All 52" in the final accounting. |
-| 5 | `redact.py` docstring arithmetic (9+3=12) vs its count of 11 | **Fixed, and the file was misnamed.** The arithmetic is in `repair-status.py`'s docstring, not `redact.py`'s. It now reads **22 of the 26**, which is what the script actually did. |
+| 5 | `redact.py` docstring arithmetic (9+3=12) vs its count of 11 | **Fixed, and the file was misnamed.** The arithmetic is in `repair-status.py`'s docstring, not `redact.py`'s. It now reads **22 of the 52**, which is what the script actually did over the full ledger. |
 
 ### Round 2 — `### AB.` arithmetic did not close, and a §2.1 strength word
 
@@ -116,8 +117,8 @@ byte-identical across three verification rounds: floor **2.276 s / 57 gaps**, po
 
 ## Requests used
 
-- [x] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted. **This pass issued no POST and no OPTIONS at all.** The 26 requests the pinned suite issued are the suite's own, under `AGENTS.md` §11, and are recorded in the ledger with `kind: gate-suite`.
-- [x] Slept ≥2s between requests to the same host — `sleep 2.5` **inside** the shared per-host `flock`. **Measured `t_sent` floor 2.276 s over 57 same-host gaps, 1 sub-floor reading, no cause asserted.** The 26 gate-suite rows are excluded from that figure: their `t_sent` is a shim's pre-exec stamp, not a stamp taken inside a lock.
+- [x] GET only, except OPTIONS with an empty body to find POST-only routes, and the two pinned POSTs in `04-deep-surface.hurl` (public client_ids, asserted as 403 failures) — no other POST, no token exchange, no authentication attempted. **This pass issued no POST and no OPTIONS at all.** The 52 requests the pinned suite issued across four runs are the suite's own, under `AGENTS.md` §11, and are recorded in the ledger with `kind: gate-suite`.
+- [x] Slept ≥2s between requests to the same host — `sleep 2.5` **inside** the shared per-host `flock`. **Measured `t_sent` floor 2.276 s over 57 same-host gaps, 1 sub-floor reading, no cause asserted.** The 52 gate-suite rows are excluded from that figure: their `t_sent` is a shim's pre-exec stamp, not a stamp taken inside a lock.
 - [x] Stated cap respected: **113 of a 113 cap**, and the accounting is now separable.
   - **The sweep is 61 requests against the 85 the claim planned under — 24 never spent.**
   - **The other 52 are the repository's own gate**: `research-gate.sh` runs
@@ -204,8 +205,8 @@ that the route normalises a doubled slash rather than 404ing.
 **`docs/07:112-124` re-checked at head** — the citation in `docs/10`'s row 51 still
 resolves. Line 112 is still *"With the header, **13 of the 15 bundle-declared `public/*`
 keys return JSON**…"* and 124 is still the `pow.nutrino.cc.{broker,metadata}` row. **This
-PR's own +71-line edit to `docs/07` begins at line 166**, well below the range, so the
-correction did not move the lines it cites. `docs/07:149` and `docs/07:247-262`, the other two
+PR's own edit to `docs/07` (+70/-1, net +69) begins at line 154**, well below the range,
+so the correction did not move the lines it cites. `docs/07:149` and `docs/07:247-262`, the other two
 ranges row 51 cites, also still resolve. One stale internal reference *was* found and fixed:
 the rename `AA` → `AB` had left the new area's own body saying "So **AA** is not 'do they
 exist'" twice.

@@ -62,8 +62,9 @@ research cap of 113 measures the 61-row sweep plus the 52 gate rows absorbed bef
 distinction was drawn; it does not measure run 5. Every one of the 126 is declared here and
 recorded in a file in this directory. **Nothing is unaccounted and nothing was dropped to
 make a number fit.** Every row for all four runs is in `results.jsonl` with
-`"kind": "gate-suite"`, and `scripts/research-checks.py`'s hygiene check independently
-requires `wc -l results.jsonl` (113) ≤ the number stated here (113) ≤ the cap (113).
+`"kind": "gate-suite"`, and `scripts/research-checks.py`'s hygiene check — a separate
+mechanism that never saw the probe — requires `wc -l results.jsonl` (113) ≤ the number
+stated here (113) ≤ the cap (113).
 
 ### The three revisions, each with the count that forced it
 
@@ -129,7 +130,7 @@ against source before any request went out:
 | the row said | the source says |
 |---|---|
 | "**never issued these 15 config reads**" | `findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md` **§10 is titled "Do not re-run"** and states "All 15 bundle-declared `public/*` keys and all 6 direct `hcp/configuration/*` endpoints have been resolved to an existence verdict" |
-| "`docs/07` publishes the oracle and one worked control pair but **no per-key verdict**" | `docs/07:112-124` publishes the per-key count and the notable-bodies table; `docs/07:178-193` publishes the full oracle and both worked control pairs |
+| "`docs/07` publishes the oracle and one worked control pair but **no per-key verdict**" | `docs/07:112-124` publishes the per-key count and the notable-bodies table; `docs/07:247-262` publishes the full oracle and both worked control pairs |
 
 The corrected row was committed alone, as `5508de9`, **before** the first request, with the
 superseded wording preserved verbatim inside the cell (`AGENTS.md` §5). What survived the
@@ -184,7 +185,7 @@ Three defects are on the record rather than smoothed over:
    never persisted. The four requests are **counted**. Re-issuing them would have doubled
    the cost for no evidentiary gain: the assets are content-addressed, so a second fetch
    proves nothing the first did not.
-2. **22 of the 26 absorbed gate-suite rows carried a response BODY in the `http_status`
+2. **22 of the 52 absorbed gate-suite rows carried a response BODY in the `http_status`
    field — and the first disclosure of this said "9 of the 13", covering only the first gate
    run.** `curl-shim.sh` logged curl's whole stdout as the status; for the requests the suite
    sends with `-o <file>` and no `-w`, stdout *is* the body. Two of the affected rows,
@@ -199,12 +200,16 @@ Three defects are on the record rather than smoothed over:
    every `kind: gate-suite` row on every run, reports clean / marked / repaired, replaces a
    contaminated value with an explicit marker naming the reason, keeps the original string's
    length in `http_status_original_length`, and corrects the row's `ledger_note` to name the
-   status field. **No status code was invented.** The four clean rows are the two
-   `carelink.medtronic.eu/hcp/configuration/public/{cms-config.json,pow.udi.number}` pairs
-   from runs 1 and 2, which yielded a real `412` because those requests are sent with
-   `-w`. They agree with `docs/07:154-161`, but they are **this repository stated twice**,
-   not independent confirmation (`AGENTS.md` §2.1), and are not used as evidence for any
-   claim here.
+   status field. **No status code was invented.** Of the 52 rows, **30 carry a real
+   numeric status and 22 carry the marker** — `repair-status.py results.jsonl` prints that
+   split, and it is the authority. The 30 split **4 from runs 1–2** (seq 64, 65, 77, 78 — the
+   two `carelink.medtronic.eu/hcp/configuration/public/{cms-config.json,pow.udi.number}`
+   pairs, which yielded a real `412` because those requests are sent with `-w`) and **26 from
+   runs 3–4**, every one of them clean under the rewritten shim. The runs 1–2 four agree
+   with `docs/07:222-230`, but they are **this repository stated twice**, not independent
+   confirmation (`AGENTS.md` §2.1), and are not used as evidence for any claim here. The
+   runs 3–4 26 are gate-suite traffic, excluded from every figure in this file for the same
+   reason the other 26 are (their `t_sent` is a pre-exec shim stamp, §2).
 
    **The shim was rewritten so this cannot recur.** It now asks curl for the status on its
    own channel — appending `--write-out '%{stderr}%{http_code}'` **only when the caller
@@ -328,7 +333,7 @@ a 404 as "not on this platform" will be right here — for the wrong reason.
 
 **Every control passed on every host.** Two details worth keeping:
 
-- The header-absent control is **deliberately not** `pow.crm.settings`. `docs/07:154-161`
+- The header-absent control is **deliberately not** `pow.crm.settings`. `docs/07:222-230`
   records that on `carelink.medtronic.eu` that one key alone answers **200 with no header**
   while nine siblings return 412. `logbook.supported.entry.types` is one of those nine, so it
   is the cell that can discriminate — and it returned **412 on all three hosts**, which is
@@ -550,7 +555,7 @@ for the 61 sweep rows are under `headers/`; the 52 gate-suite rows have no commi
 
 | Claim | Class | Source |
 |---|---|---|
-| The `docs/10` §1 row was wrong on both halves, corrected before any request | SOURCE-OBSERVED | commit `5508de9`; `findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md` §10; `docs/07:112-124`, `:178-193` |
+| The `docs/10` §1 row was wrong on both halves, corrected before any request | SOURCE-OBSERVED | commit `5508de9`; `findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md` §10; `docs/07:112-124`, `:247-262` |
 | All four bundle digests reproduce their recorded values | OBSERVED | `results.jsonl` seq 1–4; `plan.md` §Corpus control |
 | Both builds carry an identical `hcp/configuration` route table — 15 `public/*` + 6 direct | OBSERVED (shipped code) | `plan.md` §The two route tables; extraction in `plan.py` |
 | The extraction reads the same population `HCP-CONFIG-SCHEMA.md` §10 records (15 and 6) | OBSERVED | `plan.md` self-check line |
@@ -736,3 +741,71 @@ check runs on this branch for the first time.
 there; nothing in this correction touches a host. `python3 scripts/research-checks.py` exits 0
 on the merged tree, and `python3 scripts/measure_assertions.py` still prints `217 431`
 (`README.md:414`, `:480` and `docs/09:286` unchanged).
+
+### §H — round 4: five documentary defects, all fixed, none of them a measurement
+
+A fresh-context verifier reviewed the merged tree at `0f0a932` and returned **CONTRADICTS** on
+five points. **It refuted no research measurement**: it re-derived the 15×3 portability grid,
+every body digest, the header populations, the 2.276 s floor, both route tables and the
+§G count resolution from this directory's own artefacts, and every one reproduced. It also
+confirmed the §7 scrub is clean over all 6 514 added lines and that the append-only rule holds
+against the merge base. What it found were five defects of the same shape as `AGENTS.md` §6
+items 1, 5 and 6 — **bookkeeping and citations that had gone stale against this PR's own
+edits** — and one of them (`§B`'s closing claim) was a correction section misdescribing the
+text it corrects.
+
+**1 · A stale denominator inside the narrative whose purpose is to correct a stale denominator.**
+`FINDINGS.md` §2 defect 2 read "**22 of the 26** absorbed gate-suite rows" and "**The four
+clean rows** are the two … pairs from runs 1 and 2". The ledger carries **52** gate-suite rows,
+and `repair-status.py results.jsonl` — the script this very section cites as total and
+idempotent — prints **30 already clean, 22 already marked**. Both figures were the round-2
+numbers, correct for runs 1–2 alone, left standing in prose that a re-deriver reads as current.
+**Corrected to 22 of 52, with the 30 named**: 4 from runs 1–2 (seq 64, 65, 77, 78) and 26 from
+runs 3–4, every one clean under the rewritten shim. The same stale `26` stood in
+`repair-status.py`'s docstring and in three places in `PR.md`; all four now carry 52, and
+`PR.md`'s run-3–4 claim, which read "13 of 13 clean" against a ledger holding **26 of 26**,
+now reads 26.
+
+**2 · `PR.md` contradicted itself three lines apart.** "The **26** requests the pinned suite
+issued" and "The **26** gate-suite rows are excluded from that figure", against "The other
+**52** are the repository's own gate … 61 + 52 = 113" at line 123. Both `26`s now read 52.
+
+**3 · `§B` reported a fix that had not been made.** `§B` ends "The rewritten cap section above
+already drops the word for the same reason." It did not: the cap section's sentence at line 65
+still read "hygiene check **independently** requires", at an `AGENTS.md` §2.1 independent count
+of **1**. §2.1 exposure, reported as discharged, not discharged. **Both statements cannot be
+true, so the cap section's sentence was changed** — "hygiene check — a separate mechanism that
+never saw the probe — requires" — which discharges the exposure and makes §B's claim true
+instead of leaving a correction section that flatters itself. The word remains in `§B`'s own
+verbatim blockquote at line 623, which is where the evidence of it lives; that quote is
+untouched.
+
+**4 · A citation pointing at a file that does not contain what it is cited for.**
+`FINDINGS.md` §3 attributed the support build's **asset name and digest** to
+`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md:23`. That line names only
+the **clinic** bundle (`2a7fa8e7af519c2b`); `a054555a` and `main.759cddab23085086.js` appear
+nowhere in that file. The correct source is
+`findings-log/2026-10-13-area-g-device-tables/FINDINGS.md:70`, which carries the support asset
+name, host, byte count and digest in one table row. Fixed in `FINDINGS.md` and in `plan.py`,
+whose `asset_src`/`digest_src` fields carried the same wrong path into the generated
+`plan.md`/`plan.json` corpus-control table. This is `AGENTS.md` §6.6 in the form §6.6 warns
+about: the gate resolves `[source: path]`, not the line inside the path, so the check stayed
+green over a citation that pointed at the wrong text.
+
+**5 · Four line-range citations this PR's own `docs/07` edit moved.** `FINDINGS.md:133` cited
+`docs/07:178-193` for "the full oracle and both worked control pairs" — that range is now this
+PR's own new prose; the oracle is at **`docs/07:247-262`** (heading `:247`, table `:249-256`,
+both control pairs `:258-262`). `FINDINGS.md` cited `docs/07:154-161` for "nine siblings return
+412" in two places; that paragraph is now **`docs/07:222-230`**. The evidence table's
+`docs/07` cite and `PR.md`'s `docs/07:247-262` were checked at the same time and are correct.
+The **generator** was fixed at the same time — `plan.py:204` and `probe.sh:186` both emitted
+`docs/07:154-161`, so `plan.md` and `plan.json` carried it twice each and would have
+regenerated it. Fixing the prose without fixing the generator would have left the defect
+returning on the next run; that is §6.5's mechanism.
+
+**What did not change.** Every measurement, every request count, every cap revision and every
+evidence class from §1–§12 and §A–§G. **0 requests in this round** — all five defects are
+documentary and were repaired from the committed ledger, the committed headers and the
+repository's own `docs/07`. The verifier's own single live GET (one cell,
+`cms-config.json` on `carelink.medtronic.com`, under a host lock) returned 200 / 2 B /
+`application/json` / `sha256 44136fa355b3…`, matching the committed cell.
