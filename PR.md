@@ -206,11 +206,11 @@ that the route normalises a doubled slash rather than 404ing.
 resolves. Line 112 is still *"With the header, **13 of the 15 bundle-declared `public/*`
 keys return JSON**…"* and 124 is still the `pow.nutrino.cc.{broker,metadata}` row. **This
 PR's own edit to `docs/07` has two hunks, at `@@ -118` and `@@ -151`. The first rewrites
-line **121**, inside the cited range, but **1-for-1 and without adding or removing a line**,
-so it cannot shift `112-124`; the second is the +69-line block at `:151`, well below it. That
-is the check: the range's contents are unchanged and its line numbers are unchanged, which is
-what "still resolves" requires. `docs/07:149` and `docs/07:247-262`, the other two
-ranges row 51 cites, also still resolve. One stale internal reference *was* found and fixed:
+line **121** — inside the cited range — but **1-for-1**, adding and removing no line, so it
+shifts nothing; the second is the +69-line block at `:151`, well below it. Line 121's *content*
+did change (it now carries "Superseded in its reading 2026-10-17"), but 112 and 124, the two
+lines row 51's cite names, are untouched and still say what it cites them for. One stale
+internal reference *was* found and fixed:
 the rename `AA` → `AB` had left the new area's own body saying "So **AA** is not 'do they
 exist'" twice.
 

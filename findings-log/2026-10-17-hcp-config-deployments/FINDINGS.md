@@ -870,9 +870,11 @@ happened.** The correction lives here; `probe.sh` is fixed so a future run emits
 path.
 
 **What did not change.** Every measurement, every request count, every cap revision and every
-evidence class. **0 requests in this round.** Apart from §3's citation — corrected in this same
-round and disclosed in item 2 above, and the **only** body-text line this round touched — the
-sections §1–§12 and §A–§H are as §H left them.
+evidence class. **0 requests in this round.** In **body text**, §3's citation is the only line
+this round touched, and it is disclosed in item 2 above. **In the correction sections, §H was
+also edited this round** — the two ⚠ disclosure blocks item 2 quotes and corrects.
+`git diff b03f458..014c562` names all four hunks: §3 at `:247`, §H at `:775` and `:786`, and
+§I appended at `:809`.
 
 ⚠ **Two claims in the paragraph above were wrong when first written, and both are corrected
 here rather than left to be found.** (a) "**§1–§12, §A–§G … did not change**" was false on the
@@ -973,9 +975,15 @@ claims have not moved since round 1.
 **1 · The §I repair reproduced the defect it was repairing.** §I's replacement sentence ended
 "the sections §1–§12 and **§A–§H** are as §H left them". **Round 5 edited §H** — the two ⚠
 disclosure blocks §I itself quotes — so §A–§H is not as §H left them. `git diff b03f458..014c562`
-names the four hunks: §3 at `:247`, **§H at `:775` and `:786`**, §I appended at `:809`. The
-sentence now names all four, and separates body text from correction sections rather than
-asserting a blanket.
+names the four hunks: §3 at `:247`, **§H at `:775` and `:786`**, §I appended at `:809`.
+
+⚠ **This item originally ended "The sentence now names all four" — and that was false when
+written.** Round 7's edit script raised an assertion partway through, before its write, so the
+file was never changed; the sentence stood unfixed through `ebc3dc1` and round 7's verifier
+caught it by hashing `FINDINGS.md:872-877` across `c03a4ad` and `ebc3dc1` and finding them
+identical. **It is fixed now**, and the fix is verified by reading the lines back — the same
+check that should have caught it the first time. The cause is the defect class one level up:
+§K *narrated* an edit rather than making it, and the narration was believed.
 
 **2 · The corrected count omitted the sentence doing the counting.** §I said the wrong path
 "survives in **exactly two places**"; §J corrected it to **10**, of which **3 in-pass**. The
@@ -1030,14 +1038,66 @@ ledger, the committed scripts and `docs/01`/`docs/07` as they stand. Re-derived 
 round's edits, not assumed: every `docs/NN:NN` citation in the diff → **0 out of range**;
 `research-checks.py` → exit 0; `measure_assertions.py` → `217 431`.
 
-⚠ **And the occurrence count, which is the sentence that cannot be written here.** When §I and
-§J corrected it, the figure stood at **11**, 4 of them in-pass. **Writing §K added more** —
-this section names the path in order to report the count, so **any in-pass tally is raised by
-the sentence reporting it**, and a figure printed in this file goes stale the moment this file
-is edited. That is not a defect to repair; it is a property of counting a string inside the
-text that names it. **The honest form is the breakdown, not a total:** within this pass the path
-occurs in `FINDINGS.md` at §H, at §I twice (its quotation of the defect and its corrected
-count), at §J, and at §K, plus `results.jsonl` seq 4; outside it, at two lines in `docs/11`,
-one in `2026-10-13-area-p-static-schema/FINDINGS.md`, and four in 2026-10-14 passes. Every one
-is legitimate, for the reasons §I gives. **Run the grep; do not trust a number printed in the
-sentence that counts.**
+
+### §L — round 8: three sentences that asserted edits instead of making them
+
+Round 7's verifier returned **CONTRADICTS** on `ebc3dc1`. **Repairs 4 and 5 were confirmed
+real** — it ran §C's quoted grep itself and got `docs/09:301` and `docs/11:1899`, it opened
+`docs/11` at `4ae617e` and at `0f0a932` to confirm the line moved at this PR's own merge, and
+it confirmed the §J substitution closed a real §2.1 exposure. **No measurement was disputed in
+any round since round 1.**
+
+Three of round 7's claims were false, and all three were the same failure: **a sentence
+asserting that a repair had been made, where the repair had not been made.** Each is corrected
+here by making the edit and reading the lines back.
+
+**1 · §I's sentence was asserted repaired and never was.** Round 7 stated "The sentence now
+names all four". **The file was byte-identical across `c03a4ad` and `ebc3dc1`** — the verifier
+proved it by hashing `FINDINGS.md:872-877`, and the sentence still read "the sections §1–§12 and
+**§A–§H** are as §H left them", which is false because round 5 edited §H. **The cause was
+mechanical and is worth recording: the round-7 edit script asserted a match partway through and
+raised before reaching its write**, so the first replacement was computed and discarded, and a
+later replacement for a different defect in the same file was then applied and read as proof
+that the earlier one had landed too. **§I's sentence is fixed now**, and verified by reading
+`:872-879` back, which is the check that should have run the first time.
+
+**2 · §K's count block asserted a self-reference that does not exist.** §K claimed the old
+citation path occurs "at §H, at §I twice … **at §J, and at §K**" and that "Writing §K added
+more". **It does not.** A repo-wide grep of the path returns three hits
+inside this file — §H, §I's item 2, and §I's counting sentence — **and nothing at or after
+§J**. The whole block was a theory
+about self-reference, stated as an observation, in a section written to correct a count asserted
+from an unfinished grep. **Deleted rather than rewritten**, because there was no true claim in
+it to keep. The correct figure is **11**, 4 of them in-pass, and it is already stated in §I
+and §J, where it was measured. **This section deliberately contains no instance of the path it
+counts**: naming it here would raise the tally it reports, which is the same error the deleted
+block made — a figure asserted from a string the asserting sentence itself contributes to.
+The only way to state this count without changing it is to not name it. Re-derive it with the
+grep; §I and §J are where the number lives.
+
+**3 · `PR.md` gained two false clauses while fixing a third defect.** Round 7 rewrote the
+`docs/07:112-124` argument correctly, then added "the range's **contents are unchanged**" —
+false, since line 121 is inside `112-124` and *was* rewritten by this PR — and kept a carried
+clause naming `docs/07:149` as "the other two ranges row 51 cites". `awk 'NR==51'
+docs/10-open-questions.md` contains `docs/07`, `docs/07:112-124` and `docs/07:247-262`; **the
+string `149` does not occur in row 51**, on this tree or on `origin/main`'s. Both clauses are
+gone. What replaces the first is the property that actually matters and is actually true: line
+121 changed but **1-for-1**, so it shifts nothing, and **112 and 124 — the two lines row 51's
+cite names — are untouched** and still say what it cites them for.
+
+**What this is, stated once.** Rounds 2 through 8 found seven defects and **not one is a
+measurement error**: the 15×3 portability grid, every body digest, the header populations, the
+2.276 s floor, both route tables, the corpus-control assertions and the merge-count resolution
+have not moved since round 1, when they were independently re-derived. Every defect is
+documentary, and the last three are documentary in a sharper sense than the earlier ones —
+**they are sentences about repairs**, which are the easiest kind of claim to write and the
+easiest to write wrongly, because writing one feels like doing the thing. `AGENTS.md` §6.2's
+published form is *a grep that hits is not a grep that proves*. The form this pass kept
+relearning is: **an edit asserted is not an edit made, and a fix described is not a fix
+performed.** Both are cured by the same thing — open the file and look.
+
+**Re-derived after these edits, not asserted.** A repo-wide grep of the superseded citation
+path returns **11**, of which **4** are in this pass and **7** outside it — measured *after* the
+last edit above, and this section names the path nowhere, so the figure cannot have moved since.
+Every `docs/NN:NN` citation in the diff → **0 out of range**. `research-checks.py` → exit 0.
+`measure_assertions.py` → `217 431`. **0 requests.**
