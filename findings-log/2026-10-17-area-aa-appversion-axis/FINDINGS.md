@@ -303,8 +303,8 @@ rather than multiplicity.
 | 1 | 20 requests sent, 20 ledger rows, cap not revised | OBSERVED | `results.jsonl:1-20`; `probe.sh:74` |
 | 2 | Same-host spacing floor 3.304 s, 0 gaps under 2.5 s | OBSERVED | `spacing.txt` §measured floor |
 | 3 | Both hosts: `v99` control `403` at `f249b63cb2fc…`, `v11` control `200` | OBSERVED | `results.jsonl:1`, `:11`, `:2`, `:12` |
-| 4 | Claim #151's host list was wrong; discovery is published on `clcloud.*` | OBSERVED | `docs/03` §1, §2 |
-| 5 | Area C's bare-prefix row is a distinct claim, not a contradiction | OBSERVED | `findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md:30-31`, `:72-77` |
+| 4 | Claim #151's host list was wrong for this route family | INFERRED | judgement; the supporting publication is `docs/03` §1 |
+| 5 | Area C's bare-prefix row is a distinct claim, not a contradiction | INFERRED | judgement; the supporting cells are `findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md:30-31`, `:72-77` |
 | 6 | All 14 `200` bodies echo the requested tail exactly once | OBSERVED | `structure.txt` §Q1 |
 | 7 | A fabricated tail answers `200` — no allow-list | OBSERVED | `results.jsonl:6`, `:16`, `:20` |
 | 8 | At `v13` the tail selects 3 documents per host | OBSERVED | `structure.txt` §Q2 |

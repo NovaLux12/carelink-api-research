@@ -352,10 +352,11 @@ reader does not repeat the search
 section (`AGENTS.md` §2.1). This is the *path-borne* axis; §3a is the separate
 *body*-borne one, and the two are not the same thing.
 
-**What was already swept, so the novelty is not overstated:** the axis had been
-swept on `.eu` (§3), and on `-trials` at **one** base path and **two** tails —
-`/v6/discover/android/{3.6,3.8}` (§8). It had **never** been swept on
-`clcloud.minimed.com` at any base, nor on either host at base `v13`.
+**What was already swept, so the novelty is not overstated:** the tail axis had
+been swept on `.eu` at base `v13` (§3) and on `-trials` at base `v6` with two tails
+(§8); the 2026-10-17 matrix pass swept **all 16 base paths on all three hosts at
+tail `3.6`**, which varies the base axis and not this one. What is new here is
+varying the tail at `v13` on `.com` and `-trials`.
 
 Swept `GET /connect/carepartner/<base>/discover/android/<tail>` on the two cumulus
 `.com`/`-trials` hosts — `clcloud.minimed.com` and `clcloud-trials.minimed.com` —
