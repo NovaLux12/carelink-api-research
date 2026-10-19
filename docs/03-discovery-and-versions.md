@@ -411,15 +411,15 @@ fabricated one. The `3.6` cell reproduces the digest and byte count the
 
 ```mermaid
 flowchart TD
-    A["GET /connect/carepartner/<base>/discover/android/<tail>"] --> B{"does this host serve<br/>this base at all?"}
-    B -- "no: 403 MissingAuthenticationTokenException (OBSERVED, clcloud.minimed.com + v6)" --> C["no document exists,<br/>so the tail selects nothing"]
+    A["GET /connect/carepartner/&lt;base&gt;/discover/android/&lt;tail&gt;"] --> B{"does this host serve<br/>this base at all?"}
+    B -- "no: 403 MissingAuthenticationTokenException (OBSERVED, clcloud.minimed.com + v6)" --> C["no document is SERVED here (OBSERVED 403);<br/>so the tail selects nothing. Whether the base<br/>is unrouted is NOT established - see 3b.4"]
     B -- "yes (OBSERVED)" --> D{"after erasing the echoed tail,<br/>do the bodies still differ?"}
     D -- "yes: >=2 distinct documents (OBSERVED, v13 on both hosts)" --> E["tail GATES which document is served"]
     D -- "no: 1 document for all 4 tails (OBSERVED, v6 on -trials)" --> F["tail is ECHOED only,<br/>not a content gate"]
     E --> G["and on this branch the tail is echoed too:<br/>every 200 carries it in config, and a<br/>fabricated tail answers 200 - no allow-list"]
 ```
 
-### 3b.4 The `v6` split is a **base-axis** effect, not an app-version effect
+### 3b.4 The `v6` split **reads as** a **base-axis** effect, not an app-version effect
 
 `clcloud.minimed.com` answers `403` on all four `v6` cells; `-trials` answers
 `200` on all four. That is **not** an app-version effect — **INFERRED; the

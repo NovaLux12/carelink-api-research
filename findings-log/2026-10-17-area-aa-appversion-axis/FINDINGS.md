@@ -279,11 +279,16 @@ adds to nor overturns that. **No choice is made between the two readings.**
 
 **No assertion is added to `regression/hurl/` by this pass**, as the area
 directed. The candidate is the trials `v6` block — a **four-cell canonical group
-where one digest (`1aab9bb1e721…`, 10053 B) serves four different tails**, the
-cleanest negative in the corpus and the most tempting thing to freeze.
+(tail-erased digest `3b9d84b2525c…`, n=4) across four different tails**. State the
+right identifier: the four bodies have four *different* raw digests
+(`9b61847639ce…` / `1aab9bb1e721…` / `a8903df2e934…` / `bad674413bc37…`, byte counts
+10053/10053/10053/10066); only after the echoed tail is erased do they collapse to
+one. `1aab9bb1e721…` is the **`3.6` cell's raw digest alone** and is the value the
+matrix pass recorded. It is the cleanest negative in the corpus and the most
+tempting thing to freeze.
 
-It is not worth the budget. `AGENTS.md` §11 gives the weekly drift sweep **~80
-requests per push**; pinning the `v6` block costs **4 requests per sweep** on
+It is not worth the budget. `AGENTS.md` §11 gives the weekly drift sweep a budget
+of **~80 requests per sweep**; pinning the `v6` block costs **4 requests per sweep** on
 every push forever, and the same sweep would still be needed to notice the one
 change that would actually matter — the *departure* of the `3.6`-class document
 at `v13`. The prior matrix pass declined the same pin for the same reason
@@ -314,7 +319,7 @@ rather than multiplicity.
 | 7 | A fabricated tail answers `200` — no allow-list | OBSERVED | `results.jsonl:6`, `:16`, `:20` |
 | 8 | At `v13` the tail selects 3 documents per host | OBSERVED | `structure.txt` §Q2 |
 | 9 | At trials `v6` the tail selects nothing (n=4) | OBSERVED | `structure.txt` §Q2; `results.jsonl:17-20` |
-| 10 | The `v6` `403` on `.com` is a base-axis effect | INFERRED | the refutations are OBSERVED (`results.jsonl:2` vs `:7-10`); the reading that the base segment is the discriminator is one step further — house precedent `findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:287` |
+| 10 | The `v6` `403` on `.com` is a base-axis effect | INFERRED | the refutations are OBSERVED (`results.jsonl:2` vs `:7-10`); the reading that the base segment is the discriminator is one step further |
 | 11 | trials `v6` digest is a re-derivation of the matrix pass | OBSERVED | `findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md:113`, `:143` |
 | 12 | Lookup-vs-threshold is not separable from four tails | INFERRED | §6; assumption stated there |
 | 13 | Base `v11` and `.com`-`v6` carry no verdict | INFERRED | `structure.txt`; one cell / no cell |
