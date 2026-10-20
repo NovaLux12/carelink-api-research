@@ -1,0 +1,33 @@
+{
+ "budget": 3,
+ "note": "budget 3 pages, 9 of a 15 cap",
+ "pages_used": 3,
+ "reads": [
+  {
+   "bytes": 4194304,
+   "first_key": "org,rust-lang,doc)/stable/core/simd/type.i64x2.html 20241005155150",
+   "last_key": "pro,35photo)/photo_11041091 20241010085048",
+   "lines": 34467,
+   "range": 101088653
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "com,sa,nti)/hdmi-extender-lc-eu.html 20241005072343",
+   "last_key": "com,susanneorum)/ 20241014233619",
+   "lines": 35261,
+   "range": 48447174
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "fr,saucats)/co-marquage-administratif?audience=pro&xml=f33340 20241009062458",
+   "last_key": "il,org,karev)/pages/message.aspx?itemid=4 20241004160738",
+   "lines": 30796,
+   "range": 74767913
+  }
+ ],
+ "state": "UNCONVERGED",
+ "window": [
+  52641478,
+  74767913
+ ]
+}
