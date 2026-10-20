@@ -296,6 +296,40 @@ function of `(host, base, tail)` with no fourth input, which AA's cross-product 
 consistent with but did not test.
 
 
+### AF. Can the findings-log census be made self-deriving, so no lane restates it by hand?
+
+**What is known, labelled and cited.** The committed-ledger census is stated by hand in
+**at least three** places — the S-L4c block, the ledger-census row, and a comment in
+`findings-log/2026-10-14-lane-s6-public-index/account.py` — and its population is
+**derived from the tree**, so **every merge that adds a `findings-log/…/results.jsonl`
+moves it**. OBSERVED: area AA's ledger moved the population 50 → 51 at `ad376d8` and
+would make it 52 when #154 lands, falsifying all five derived figures one merge after
+they were written (see the **S-L4c correction of 2026-10-20**, further up this page).
+
+**What is missing, and why it matters.** Nothing catches this. `scripts/research-checks.py`
+checks the assertion count, the open-area count, the prose counts and the log-cite
+resolvability — it does **not** derive the ledger census, so a then-value survives CI
+until a human notices. The failure mode is silent by construction: the sentence reads
+correctly at the head it was written on and is wrong at the next.
+
+**Blocker:** nothing external. **0 requests.** A static check in `scripts/research-checks.py`
+that derives `git ls-files 'findings-log/*/results.jsonl' | wc -l` and fails on any docs
+sentence stating a bare ledger population with no commit anchor beside it — the same
+shape as the existing "N open plus M closed" check, which already fails on drift.
+
+**Closes when:** no bare population figure survives without a commit it is true at, **or**
+the census is reported only as command output and the hand-stated figures are deleted.
+**A negative counts** — if the check cannot distinguish a genuinely anchored figure from
+a live one, that is itself the finding and the answer.
+
+**Non-duplicate:** no existing check derives this census. **Assumptions (INFERRED):** that
+the three hand-stated sites are all this PR can see, and that no fourth exists in a
+findings-log comment the census prose does not name; a `grep` for the counting command
+settles it. **Labelled:** the *falsehood* is OBSERVED; the *remedy* is INFERRED until a
+check exists.
+
+
+
 > **Area V is CLOSED** (2026-10-13, claim #42) — see the Closed table at the foot of
 > this page and
 [findings-log/2026-10-13-area-v-pde-clients/FINDINGS.md]. **Recorded negative, with a
@@ -2904,6 +2938,36 @@ pre-existing and outside this claim. Otherwise zero requests; apply the same
 count-then-read method to every `results.jsonl`.
 **Closes when** every committed ledger resolves under the same query-derived cell
 rule, or each non-resolving ledger is named with its schema and its reason.
+
+> ⚑ **Correction (2026-10-20) — the census figures above are anchored, not live.**
+> The `50` and `42` in this block were measured at **`5f37668`**, and they are correct
+> *there*. They are **not** correct at any head that adds a ledger, because
+> `findings-log/2026-10-17-area-aa-appversion-axis/results.jsonl` — committed by area
+> AA, PR #155 — makes the population **51** at **`ad376d8`**. Rather than bump the
+> numbers (which would be false again the moment PR #154 merges, adding
+> `findings-log/2026-10-18-sl1-cluster-servedness/results.jsonl`), both readings are
+> published with the commit each belongs to:
+>
+> | reading | at `5f37668` (measured) | at `ad376d8` (after AA's merge) |
+> |---|---|---|
+> | committed ledgers | 50 | 51 |
+> | excluding the 8 area-L ledgers | 42 | 43 |
+> | refused by the reader | 18 | 19 |
+> | `findings-log/` top-level entries | 65 | 66 |
+>
+> **Counting rule**, unchanged and re-derivable at whatever head you hold:
+> `git ls-files 'findings-log/*/results.jsonl'` — population = one such file; an item
+> = one such file; a pass = exit 0; fail-closed = non-zero with a named reason.
+> **The 19th refusal is area AA's own ledger, refused by design**: its schema carries
+> no `http_status`, so it is a *known member* of the population, not an unexplained
+> gap. **Two figures survive by coincidence and are not evidence the census is
+> stable**: `66 − 51 = 15` still holds, and "not one traceback" still holds across all
+> 51 (every exit ∈ {0, 2}).
+>
+> **The durable property, which is why this is anchored rather than restated:**
+> **every merge that adds a `findings-log` ledger moves this census**, so any
+> unanchored figure about it is false by construction one merge later. Carried to
+> successor **AF** below.
 **A negative counts.** **Assumptions (INFERRED):** that the other passes' schemas
 are independent of area L's — different passes, different days, and nothing in the
 tree asserts the schema set is closed. **Measured here and worth carrying into
@@ -2981,6 +3045,17 @@ traceback**. Before this pass, over those same 50, **24** read and **26** died w
 an unhandled `KeyError` or `TypeError`. **A ledger this tool cannot read is a gap in
 the record, not a negative result**, and it now says so and exits 2 rather than
 raising.
+
+> ⚑ **Correction (2026-10-20) — same census, anchored.** The `50`, the `18 refused`
+> and the `65` in this row were measured at **`5f37668`** and are correct there. Area
+> AA's ledger (PR #155) makes them **51 / 19 / 66** at **`ad376d8`**, and PR #154 adds a
+> 52nd. Both readings and the counting rule are published at the
+> **S-L4c correction above**; they
+> are not restated here, because a second copy is a second thing to falsify. The
+> `32 read` figure is **unaffected** — the AA ledger is one of the refusals, not one of
+> the reads. **Do not bump these numbers in place**: a per-head figure here is false by
+> construction one merge later. (S-L4c is a bolded paragraph opener, not a heading, so
+> this cross-reference is plain text on purpose — there is no anchor to link to.)
 
 ⚑ **Correction (2026-10-19). The two sentences this replaces — "the population is
 named by a command rather than a glob on purpose: a glob in this tree expands to
@@ -3149,15 +3224,16 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 27 closed**
-stand today (`AC`, `AE`); the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 27 closed**
+stand today (`AC`, `AE`, `AF`); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
 the `android/<app-version>` axis on the two cumulus `.com`/`-trials` hosts — which
 had **not** been swept on that axis at base `v13` (⚠ corrected on closing AA, which
 this PR did: `.com` had never had the tail varied at any base, and `-trials` only at
 `v6` with two tails — see `docs/03` §3b's "What was already swept").
-**`AE` was the second** (minted 2026-10-19 by the PR that closed AA, under
+**`AF` was the third** (minted 2026-10-20, by the PR that closed AA, on the `origin/main`
+sync — the census anchor below). **`AE` was the second** (minted 2026-10-19 by that same PR, under
 [claim #151](https://github.com/NovaLux12/carelink-api-research/issues/151) — the
 same claim issue AA was closed under), and is the question AA's cells could not
 answer — whether that tail is a lookup table or a threshold.
