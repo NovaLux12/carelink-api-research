@@ -12,7 +12,7 @@ one.** The index answers `206` with a **153 902 243 B** `cluster.idx`; a
 per-crawl `200` control on the same crawl answers **1 785 B** of
 `google.com` records; and only then does the `minimed.eu` query answer the
 **documented** absence shape, `404` + `{"message": "No Captures found for:
-minimed.eu"}`. **Three answers, **in order**, on the two permitted hosts, and the cell is no
+minimed.eu"}`. **Three answers, in order, on the two permitted hosts, and the cell is no
 longer indeterminate.**
 
 **And the instrument's own negative, which is the part worth keeping: the
@@ -1112,23 +1112,28 @@ like every count here, **hand-maintained**: it is applied by a REST call and
 there is no generator for it, so it is not staleness-proof either.
 
 **Rounds after the twelve headed ones, recorded here so the opener's promise
-holds.** Each returned blocking findings, each was fixed in place without a new
-heading, and none changed a substantive claim:
+holds.** Targets and counts are taken from the commit messages that fixed each
+verdict, not from memory. Eleven of these sixteen returned blocking findings;
+one returned none.
 
 | round | verdict on | blocking | what it found |
 |---|---|---|---|
-| 13 | `e35935b` | 3 | a cumulative total that failed its own arithmetic (**fourth** occurrence of that class), the same figure self-contradicting in the PR body, and a claim that digit form brought the totals under the checker when bold markers make them **invisible** to it |
-| 14 | `fdd7157` | 2 | the PR body's twelve-round total stated 29 where its own breakdown summed to **32**, and a scoping pointer citing a **§11 that does not exist** |
-| 15 | `9837ce6` | 2 | both named sentences left unfixed at the sites blocked on — a patch that corrected *different twins* — and its commit message claiming deletions that did not happen |
-| 16 | `88df396` | **0** | `scoped re-verify`, no blocking and no non-blocking finding; every item on its checklist recomputed from the ledger |
-| 17 | `88df396` | 3 | this full-scope review: **"three hosts"** where the ledger has two (present since `aab5f1a`, self-contradicted by §1), this opener promising a completeness the record did not have, and the same bare-fragment clause — the pattern of a fix landing beside the sentence it was meant to remove |
+| 13 | `88df396` | 2 | a total that failed its own arithmetic, the same figure self-contradicting in the PR body, and a claim that digit form brought the totals under the checker when bold markers make them **invisible** to it |
+| 14 | `88df396` | 3 | **"three hosts"** where the ledger has two (present since `aab5f1a`), the §10 opener promising a completeness the record lacked, and the same bare-fragment clause |
+| 15 | `88df396` | **0** | `scoped re-verify`: no blocking and no non-blocking finding; every checklist item recomputed from the ledger |
+| 16 | `e45cce9` | 4 | the rounds table above misattributing two verdicts and miscounting the total; the same "each returned blocking findings" opener contradicted by its own row 15; and `AD`'s "zero-request" claim contradicting its own per-crawl cost |
 
-**Sixteen rounds, 32 + 3 + 2 + 2 + 0 + 3 = 42 blocking findings, and every one of
-them bookkeeping.** The substantive claim has never been contested in any of
-them. Three classes recur and are now named: a **cumulative total in prose**, a
-**`file:line` citation into a file the same commit edits**, and — the newest, and
-the one this table exists to expose — **a fix that lands beside the sentence it
-was meant to remove**, which is why a patch can be "correct" and still leave the
-blocked text standing. The remedy for that last one is boring and it is the only
-thing that worked: **grep the blocked sentence itself, after the commit, every
-time.**
+⚠ **An earlier draft of this table was wrong and is corrected above.** It
+assigned round 13 to `e35935b` and round 14 to `fdd7157`, which double-counted
+one round's findings and omitted another's entirely — a claim misstating what
+past commits did, which is the one thing §10 exists to get right. The counts and
+targets above are read off the fix commits' own messages.
+
+**Sixteen rounds, 41 blocking findings (32 across the twelve headed rounds + 2 +
+3 + 0 + 4), and every one of them bookkeeping.** The substantive claim has never
+been contested in any of them. Three classes recur and are now named: a
+**cumulative total in prose**, a **`file:line` citation into a file the same
+commit edits**, and **a fix that lands beside the sentence it was meant to
+remove** — which is how a patch can be "correct" and still leave the blocked text
+standing. The remedy for that last one is boring and it is the only thing that
+worked: **grep the blocked sentence itself, after the commit, every time.**

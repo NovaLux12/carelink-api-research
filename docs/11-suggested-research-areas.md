@@ -197,16 +197,19 @@ vendor surface. **What does not block it is the cap**: the 2026-10-19 pass spent
 which was its own page-schedule choice rather than a constraint
 (same log, §9).
 
-**And the zero-request half, which can start today.** Every crawl this
-repository already publishes a **classified cell** for — area M's six, area
-L's 84 in-window cells, S-L2's 44 out-of-window cells — has a served/unserved
-verdict obtainable in **one ranged read each**, and `classify` derives the whole
-table from a committed ledger without touching the network. Applying it to those
-published negatives is **zero-request once the instrument exists**, and it is the
-cheap half of this area: it would tell us, for every negative this repository
-publishes, whether the crawl's index was served at all — the pairing S-L1's
-close condition asked for and this pass could supply for only the one crawl it
-named.
+**And the cheap half, which can start today — with its cost stated.** Every
+crawl this repository already publishes a **classified cell** for — area M's six,
+area L's 84 in-window cells, S-L2's 44 out-of-window cells — needs a served or
+unserved verdict from `cluster.idx`, and **that is one ranged read per crawl**: at
+~134 distinct crawls it is a budgeted pass of order 130–170 requests at ≥3.5 s
+per host, **not a zero-request exercise**. What *is* zero-request, and is the
+right place to start, is `classify`: it derives the whole verdict table from a
+committed ledger without touching the network, so the servedness of every crawl
+this pass already read is re-derivable at no cost today, and the pairing S-L1's
+close condition asked for can be brought to bear on this repository's published
+negatives the moment their `cluster.idx` rows exist. **No committed ledger in
+this repository carries a `cluster.idx` row for those crawls**, which is why the
+2026-10-19 pass could supply the pairing only for the one crawl it named.
 
 **Assumptions (INFERRED):** that `cluster.idx` blocks are keyed by the full
 first SURT key rather than by registrable domain (area M's standing assumption,
