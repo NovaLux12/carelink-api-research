@@ -200,9 +200,12 @@ which was its own page-schedule choice rather than a constraint
 **And the cheap half, which can start today — with its cost stated.** Every
 crawl this repository already publishes a **classified cell** for — area M's six,
 area L's 84 in-window cells, S-L2's 44 out-of-window cells — needs a served or
-unserved verdict from `cluster.idx`, and **that is one ranged read per crawl**: at
-~134 distinct crawls it is a budgeted pass of order 130–170 requests at ≥3.5 s
-per host, **not a zero-request exercise**. What *is* zero-request, and is the
+unserved verdict from `cluster.idx`, and **that is one ranged read per crawl**.
+Those populations overlap: area M's six sit inside area L's and S-L2's, so the
+union is **128 distinct crawls** (area L 84 + S-L2 44, overlap 0), and the pairing
+is a budgeted pass of **≥128 requests** at ≥3.5 s per host — **not a zero-request
+exercise**. 128 is the zero-failure floor, not a prediction: E[N] on this API has
+run above 1, so budget to the model in `budget.py` rather than to the floor. What *is* zero-request, and is the
 right place to start, is `classify`: it derives the whole verdict table from a
 committed ledger without touching the network, so the servedness of every crawl
 this pass already read is re-derivable at no cost today, and the pairing S-L1's

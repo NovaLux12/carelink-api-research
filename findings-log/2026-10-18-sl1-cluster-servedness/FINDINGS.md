@@ -550,7 +550,7 @@ committed ledger**: `data.commoncrawl.org` answered `206` with
 `headers/13-head-target.h`; `collinfo.json` returned **128** entries with the
 committed window; and — **the one row round 1 could not reach** — the
 `minimed.eu` query answered `404` `{"message": "No Captures found for:
-minimed.eu"}`, reproducing it. Two verifier rounds independently saw the CDX
+minimed.eu"}`, reproducing it. A verifier round saw the CDX
 API answer `502`/`504` on ordinary queries while `data.commoncrawl.org` was
 flawless, which is **a live demonstration that the taxonomy this pass builds is
 load-bearing rather than decorative**.
@@ -1000,7 +1000,7 @@ Four blocking findings, **all in the new prose of the commit that closed the
 previous round**, and two of them of the exact class that commit had just fixed:
 
 1. **"+149 lines" failed its own arithmetic.** The row moved `docs/11:2820` →
-   `docs/11:2914`, which is **+91**. The +149 is **main's** shift of the same
+   `docs/11:2911`, which is **+91**. The +149 is **main's** shift of the same
    row (2762 → 2911) — a different measurement, never named as such. → corrected,
    with both figures stated so the reader can see which is which. **The commit
    that fixed round 10's "a total that fails its own arithmetic" introduced a
@@ -1117,16 +1117,15 @@ verification rounds has been wrong within one round of being written — a subto
 presented as a whole-run total, a round's findings attributed to the wrong commit,
 a table rebuilt with the same double-count and a new target. The cause is
 structural rather than carelessness: **writing a count invalidates it, because the
-fix for the wrong count is itself another round.** Eight consecutive rounds
-blocked on exactly this and each fix produced the next instance, including in the
+fix for the wrong count is itself another round.** Rounds blocked on exactly this repeatedly, and each fix produced the next instance, including in the
 commit that fixed the previous one.
 
-**So the counts are not published, and nothing above claims a total.** What the
+**So no single cumulative total is published here.** What the
 record does carry is the twelve headed entries below, which are the evidence that
 matters: each names the commit it reviewed, its verdict and what it found. Rounds
-after those are recorded **in their own fix commits**, where each is stated
-against the commit it actually reviewed — which is the only place the mapping was
-ever reliable, and the only place a reader can check it.
+after those are recorded in the commits that fixed them. The mapping from a fix
+commit to the verdict it answers is therefore checkable there, and is not
+restated here.
 
 ⚠ **What is true, and needs no count:** across the whole run **every blocking
 finding was a bookkeeping sentence** — an accounting figure, a citation, a scope
