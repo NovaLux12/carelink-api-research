@@ -151,9 +151,16 @@ EDRE=$(printf '%s\n' "$EDITED" | paste -sd'|' -)
 # bare `FINDINGS.md:N` in docs/10 §1 or docs/11 became a "position into a file this
 # PR edits" — 10 spurious hits, none of them a claim. A bare basename abbreviation is
 # only honoured when exactly ONE tracked file bears that basename; that is the rule
-# now, so `docs/11` stays allowed (unique) and `FINDINGS.md` does not. Full paths
-# still match exactly, via E. A bare `FINDINGS.md:N` is genuinely unresolvable and a
-# real citation should write the path.
+# now, so a genuinely unique basename (e.g. `account.py`, one carrier) still fires and
+# `FINDINGS.md` (63 carriers) does not. Full paths still match exactly, via E.
+#
+# NOTE on the `docs/11:NNN` form, which this comment previously and wrongly claimed
+# "stays allowed": that token is a PATH PREFIX, not a basename, so it is matched only
+# by the `index(ed, pre) == 1` rule — i.e. only when `docs/11-suggested-research-areas.md`
+# happens to LEAD the edited list. At this head the first entry is
+# `.github/ISSUE_TEMPLATE/config.yml`, so that form fires under neither rule. That
+# order-dependence is PRE-EXISTING and unchanged by this correction; it is recorded here
+# so the allowance is not credited with more than it does.
 UNIQB=$(printf '%s\n' "$EDITED" \
   | while IFS= read -r f; do
       b=${f##*/}
