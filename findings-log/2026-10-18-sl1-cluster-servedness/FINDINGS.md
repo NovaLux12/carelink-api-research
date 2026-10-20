@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Eleven fresh-context verifier rounds, none shown how the claim was built, each
+Twelve fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -932,8 +932,8 @@ into a **reported failure that names the defect in the checker**.
 never once been contested: **`CC-MAIN-2014-23` is served at 153 902 243 B, and
 its `minimed.eu` `404` is a served-but-empty answer behind a `200` control on
 that same crawl** — the standing indeterminate retires on the served side, not
-on an inability to ask. **25** blocking findings, every one
-bookkeeping** (rounds 1–10: 3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), and round 9's
+on an inability to ask. **29** blocking findings, every one
+bookkeeping** (rounds 1–11: 3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 + 4 = **29**), and round 9's
 **first** finding was about a *merge* that no earlier round had been asked to
 look at; its other two were the stale-total and checker classes already named. **The checkable claim held; the prose around it did not, and
 neither did I.**
@@ -971,8 +971,12 @@ prose asserted. → fixed to use each match's own position; the assertion
 immediately caught the now-stale pair and forced both the prose and this entry's
 figures to the measured values.
 
-**The pattern across ten rounds, stated once and finally.** **25** blocking
-findings (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), **every one a bookkeeping sentence**. The servedness verdict, the
+**The pattern across the ten rounds recorded at this point, stated once.** **25**
+blocking findings (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), **every one a
+bookkeeping sentence**. ⚠ The figure is scoped to those ten rounds deliberately:
+a cumulative total written in prose goes stale as soon as the next entry lands,
+and rounds 9 through 12 each blocked on exactly that. **The live total is the
+one in the §11 line below, and it is the one to read.** The servedness verdict, the
 evidence classes, the independence count and the request total have never been
 contested in any round. What does not self-resolve is **a correction chain
 written in prose**, because each fix creates staleness somewhere else: a citation
@@ -994,7 +998,7 @@ previous round**, and two of them of the exact class that commit had just fixed:
    delta that failed its own arithmetic.**
 2. **The round-10 entry stated 4 live / 10 quoted** while claiming to be forced to
    measured values; measured is **4 live / 13 quoted** (17 cites total, and
-   4 + 10 does not even sum). The "10" was the *parent's* split. → corrected,
+   4 + 10 does not even sum). → corrected,
    and the false clause *"forced … this entry's figures to the measured values"*
    was the tell: it was true of the prose and not of the entry saying it.
 3. **"Twenty-two blocking findings" was the rounds-1–9 subtotal presented as the
@@ -1012,11 +1016,15 @@ previous round**, and two of them of the exact class that commit had just fixed:
 One non-blocking: the total-vs-breakdown assertion is **digit-only**, so a
 word-form total (`= **22**`) passes while a digit-form one fails. Round 10's own
 finding was a word-form total. → the headline totals are now in **digit form**,
-which is what brings them under the assertion; the residual gap is recorded as
-`H8` rather than left implied.
+`H8` records the residual gap rather than leaving it implied. ⚠ **Correction
+(round 12): an earlier draft of this sentence claimed digit form *brings the
+totals under the assertion*. That was false** — the assertion's `\b(\d+)` does not
+match `**25**`, because the bold markers intervene, so a bolded total was
+invisible to it. The totals are in digit form for readability; **they are not
+enforced by the assertion, and this file does not claim they are.**
 
-**Eleven rounds, twenty-five blocking findings, and the finding is now
-structural rather than incidental.** Every one is bookkeeping. The pattern that
+**Eleven rounds, 29 blocking findings (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 + 4
+= **29**), and the finding is now structural rather than incidental.** Every one is bookkeeping. The pattern that
 produces them is specific and it is this: **a correction written in prose creates
 staleness in a second place**, and the second place is usually a *different
 document*. Two of the four above are a figure that was right when written and
@@ -1026,3 +1034,45 @@ The servedness verdict, the evidence classes, the independence count and the
 request total have now recomputed cleanly **eleven times without a single
 challenge** — and that is the honest measure of this pass: the finding was sound,
 and the *writing around it* was the hard part.
+
+### Round 12 — `CONTRADICTS 98a1cfc`
+
+Three blocking findings, and **the third names the loop itself**, which is why
+this entry is written without a bare cumulative total of its own.
+
+1. **"Eleven rounds, twenty-five blocking findings" failed its own arithmetic**
+   again: the entry openers give 3, 0, 2, 3, 4, 3, 0, 4, 3, 3, 4, and the first
+   ten sum to **25**, so eleven sum to **29**. → corrected, with the eleven-round
+   breakdown inline. **Rounds 9, 10, 11 and 12 have now blocked on the identical
+   defect**: a subtotal presented as the whole-run total.
+2. **The PR body's inline breakdown summed to 29 while its total said 25** — the
+   same figure, self-contradicting in one sentence, in the layer round 10
+   already flagged for staleness. → both corrected.
+3. **"digit form … brings them under the assertion" was false.** The assertion's
+   `\b(\d+)` does not match `**25**`, because the bold markers intervene: a
+   bolded total is **invisible to the checker that certifies it**. → the claim is
+   **deleted, not softened** (`AGENTS.md` §1), and what is now on the record is
+   that the totals are in digit form for readability and **are not enforced** by
+   the assertion. `H8` records the same gap from the script's side.
+
+One non-blocking: `H8`'s "all headline totals are in DIGIT form" was itself
+wrong — one was word-form. Corrected with it.
+
+**The mechanism, finally stated as a rule rather than an observation.** A
+cumulative total written in prose is a **claim about the future**, because the
+next round entry invalidates it by existing. Four consecutive rounds have blocked
+on that, and **twice the fix was committed in the very commit that fixed the
+previous instance** — which means the check that keeps failing is a *human reading
+the sentence*, and adding a sentence about it does not help. What helps is
+removing the hand-maintained figure: the historical totals are now **scoped to
+the rounds they were true for**, and the live one carries its breakdown beside it
+so a reader can check it in one subtraction.
+
+**An attempt to make the checker derive the total, and why it was reverted.**
+The obvious fix is to sum the per-round counts in code. It was built, and it was
+reverted: the per-round counts live in prose whose wording varies ("Four
+blocking findings", "**no blocking finding**", "Three **blocking** findings"), so
+the parser mis-counted and produced **more** false failures than it caught. **A
+checker that fires on correct prose is worse than none**, and the honest outcome
+is that this quantity is **not machine-checked** — recorded as `H8`, claimed
+nowhere.
