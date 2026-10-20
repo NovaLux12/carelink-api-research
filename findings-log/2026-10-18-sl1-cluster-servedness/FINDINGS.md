@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Ten fresh-context verifier rounds, none shown how the claim was built, each
+Eleven fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -813,7 +813,7 @@ using it rather than by reading it:**
    to appear inside the Round 1 and Round 3 entries precisely because it was
    corrected. Citations inside a `### Round N` entry are now counted as
    **quotations** and exempt; only **live** citations must resolve. The run
-   reports both numbers: **4 live, 13 quoted**.
+   reports both numbers: **4 live, 15 quoted**.
 
 ### Round 7 — `CLEAN 9a10f39`, and the checker is audited rather than trusted
 
@@ -932,8 +932,8 @@ into a **reported failure that names the defect in the checker**.
 never once been contested: **`CC-MAIN-2014-23` is served at 153 902 243 B, and
 its `minimed.eu` `404` is a served-but-empty answer behind a `200` control on
 that same crawl** — the standing indeterminate retires on the served side, not
-on an inability to ask. **Twenty-two blocking findings, every one
-bookkeeping** (rounds 1–9: 3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 = **22**), and round 9's
+on an inability to ask. **25** blocking findings, every one
+bookkeeping** (rounds 1–10: 3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), and round 9's
 **first** finding was about a *merge* that no earlier round had been asked to
 look at; its other two were the stale-total and checker classes already named. **The checkable claim held; the prose around it did not, and
 neither did I.**
@@ -951,11 +951,13 @@ fixed the previous instance.
    round 9's *first* finding was about the merge; the other two were the
    stale-total and checker classes already named. → corrected.
 2. **`docs/11:2820` died in the second merge**, which shifted that region by
-   +149 lines; the `1.4210` row is now at **`docs/11:2911`**. This is the round-4
+   +91 lines (2820 → 2911; the figure +149 is main's own shift of the same
+   row, 2762 → 2911, not the branch-to-branch delta); the `1.4210` row is now at
+   **`docs/11:2911`**. This is the round-4
    precedent exactly: **a `file:line` citation into a file the same commit edits
    is self-invalidating**, and the second merge repeated it. `selfcheck.py`
    passed it because the line *exists* and is blank — the content-blindness is
-   disclosed as `H1`, and it is why content checks stay a human task.
+   disclosed as `H1`/`H6`, and it is why content checks stay a human task.
 3. **The PR body was two rounds stale** — no rows for rounds 8 or 9, still
    *"Seven … 15 blocking findings"*. → both rows added and the total corrected.
 
@@ -964,13 +966,13 @@ classified repeated citations by `f.index()`, which returns the *first*
 occurrence's position** — so every repeat of a cited string was classified by
 where its first mention fell, and two historical quotations plus one historical
 `servedness.py:539` were counted as **live**. Under the script's own documented
-rule the true split is **4 live / 10 quoted**, not the 7/7 it printed and the
+rule the true split is **4 live / 15 quoted**, not the 7/7 it printed and the
 prose asserted. → fixed to use each match's own position; the assertion
 immediately caught the now-stale pair and forced both the prose and this entry's
 figures to the measured values.
 
-**The pattern across ten rounds, stated once and finally.** Twenty-two blocking
-findings, **every one a bookkeeping sentence**. The servedness verdict, the
+**The pattern across ten rounds, stated once and finally.** **25** blocking
+findings (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), **every one a bookkeeping sentence**. The servedness verdict, the
 evidence classes, the independence count and the request total have never been
 contested in any round. What does not self-resolve is **a correction chain
 written in prose**, because each fix creates staleness somewhere else: a citation
@@ -978,3 +980,49 @@ dies in the file it points into, a count goes stale where it is duplicated, and
 a total disagrees with its own breakdown. Two of those three are now caught by
 `selfcheck.py` in milliseconds; **the third — whether a citation says what the
 claim says — is not, and is not claimed to be.**
+
+### Round 11 — `CONTRADICTS 60cfb6d`
+
+Four blocking findings, **all in the new prose of the commit that closed the
+previous round**, and two of them of the exact class that commit had just fixed:
+
+1. **"+149 lines" failed its own arithmetic.** The row moved `docs/11:2820` →
+   `docs/11:2911`, which is **+91**. The +149 is **main's** shift of the same
+   row (2762 → 2911) — a different measurement, never named as such. → corrected,
+   with both figures stated so the reader can see which is which. **The commit
+   that fixed round 10's "a total that fails its own arithmetic" introduced a
+   delta that failed its own arithmetic.**
+2. **The round-10 entry stated 4 live / 10 quoted** while claiming to be forced to
+   measured values; measured is **4 live / 13 quoted** (17 cites total, and
+   4 + 10 does not even sum). The "10" was the *parent's* split. → corrected,
+   and the false clause *"forced … this entry's figures to the measured values"*
+   was the tell: it was true of the prose and not of the entry saying it.
+3. **"Twenty-two blocking findings" was the rounds-1–9 subtotal presented as the
+   ten-round total** — round 9's and round 10's own entries are visible in the
+   same file. → **25**, with the ten-round breakdown inline. **This is round 9's
+   finding 2, verbatim, one round later.**
+4. **"`disclosed as H1`" cited a comment that does not exist.** `grep -c H1
+   selfcheck.py` = 0: only `H3`–`H7` were ever added, so the round-8 sentence
+   *"recorded as comments `H1`–`H7`"* was false from birth and this entry
+   propagated it. → **the missing `H1` and `H2` comments are now actually
+   added** (content-blindness, and range-form cites unmatched), which makes both
+   the round-8 sentence and this one true; the citation is to `H1`/`H6`, which is
+   where the disclosure lives.
+
+One non-blocking: the total-vs-breakdown assertion is **digit-only**, so a
+word-form total (`= **22**`) passes while a digit-form one fails. Round 10's own
+finding was a word-form total. → the headline totals are now in **digit form**,
+which is what brings them under the assertion; the residual gap is recorded as
+`H8` rather than left implied.
+
+**Eleven rounds, twenty-five blocking findings, and the finding is now
+structural rather than incidental.** Every one is bookkeeping. The pattern that
+produces them is specific and it is this: **a correction written in prose creates
+staleness in a second place**, and the second place is usually a *different
+document*. Two of the four above are a figure that was right when written and
+wrong by the time it was read; one is a citation that died in a file the same
+commit edited; one is a claim about where a disclosure lives that never existed.
+The servedness verdict, the evidence classes, the independence count and the
+request total have now recomputed cleanly **eleven times without a single
+challenge** — and that is the honest measure of this pass: the finding was sound,
+and the *writing around it* was the hard part.

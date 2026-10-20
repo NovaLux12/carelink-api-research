@@ -81,8 +81,12 @@ def main():
         fail("round headings are not 1..N: %s" % rounds)
     else:
         ok("%d rounds recorded (%s)" % (n_rounds, ", ".join(map(str, rounds))))
-    word = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six",
-            7: "Seven", 8: "Eight", 9: "Nine", 10: "Ten"}
+    # Derived, never hardcoded: an earlier draft listed words up to "Ten" and
+    # raised KeyError on the eleventh round - a checker defect surfaced by the
+    # very staleness it exists to catch.
+    _W = ("Zero One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve "
+          "Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen Twenty")
+    word = {i: _W.split()[i] for i in range(1, 21)}
     opener = re.search(r"^(%s) fresh-context verifier rounds" % "|".join(word.values()),
                        f, re.M)
     if not opener:
@@ -192,6 +196,11 @@ def main():
             ok("the false predicate appears only as a quoted, corrected defect")
 
     # ---- 3. THE E[N] SPAN, against budget.py's actual output.
+    #   H1 CITATION CONTENT IS NOT CHECKED. Only that the LINE EXISTS. A citation
+    #      that resolves to the wrong content passes. Round 11 restated this and
+    #      confirmed it adversarially; content is verified by hand, not here.
+    #   H2 RANGE-FORM CITES ARE NOT MATCHED. The regex matches `:NNN` only, so
+    #      `:404-413` and `:498-521` are never resolved at all.
     #   H3 THE E[N] SPAN IS SUBSTRING-PRESENCE, not a derived lo/hi vs stated-span
     #      comparison. Corrupting the span sentence passes while the substrings
     #      survive elsewhere. Correct at head; verified against budget.py by hand.
@@ -277,6 +286,12 @@ def main():
                     print("       %s:%s -> %s" % (path, line, lines[int(line) - 1][:70]))
     #   H6 THE H-1..H-5 CLASS OF HOLE REMAINS: this script proves a line EXISTS,
     #      not that it SAYS what the claim says. Read the meaning by hand.
+    #   H8 THE TOTAL-VS-BREAKDOWN ASSERTION IS DIGIT-ONLY. A word-form total
+    #      ("= **22**") is not matched by the \b(\d+) blocking findings\b rule, so
+    #      round 10's own word-form total passed while a digit-form one fails.
+    #      All headline totals in FINDINGS.md are now in DIGIT form for that
+    #      reason; this comment records why, so the digit form is not "fixed"
+    #      back to prose later.
     #   H7 ONLY FINDINGS.md IS IN SCOPE for the counts above. docs/11, docs/10 and
     #      the PR body are NOT read (PR_BODY is defined and never used - round 7).
     #      The counts the prose states for those layers were verified by hand.
