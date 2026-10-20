@@ -977,8 +977,12 @@ bookkeeping sentence**. ⚠ The figure is scoped to those ten rounds deliberatel
 a cumulative total written in prose goes stale as soon as the next entry lands,
 and rounds 9 through 12 each blocked on exactly that. **The live total across the
 12 rounds this file records is 32** (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 + 4 +
-3), and it is published per round in the PR body's Verification table — that table,
-not any single figure inside an entry, is what to read. The servedness verdict, the
+3), published per round in the PR body's Verification table, which is where a
+reader should start. ⚠ **That table is hand-maintained like everything else
+here** — it is applied by a REST call, there is no generator for it, and rounds
+8, 9 and 10 each found it stale. **It is the most complete and most legible
+presentation of the per-round counts, not a staleness-proof one**, and naming it
+as the authoritative home does not make it one. The servedness verdict, the
 evidence classes, the independence count and the request total have never been
 contested in any round. What does not self-resolve is **a correction chain
 written in prose**, because each fix creates staleness somewhere else: a citation
@@ -1087,9 +1091,13 @@ total stated 29 where its own breakdown summed to **32** (the fixer had taken
 `FINDINGS.md`'s eleven-round figure instead of summing the body's twelve numbers),
 and a scoping pointer cited a **§11 that does not exist** — `FINDINGS.md` has
 §§1–10 — so the sentence meant to tell a reader where the live total lives
-pointed nowhere. Both corrected. Also corrected `H8`, which quoted the bare
-`\b(\d+)` fragment as if it were the whole rule and so misled anyone testing it;
-the full pattern is now quoted, and the difference stated.
+pointed nowhere. Both corrected. `H8` was also touched, to remove an ambiguity rather than to fix an
+error: it described the rule as `\b(\d+)` where the code uses
+`\b(\d+) blocking findings\b`, and a reader testing only the fragment would get a
+different answer from the check. ⚠ **An earlier draft of this note claimed
+`H8` had quoted the bare fragment “misleading anyone testing it”. That was
+false: `H8` already quoted the full rule, and the bare fragment appears only in
+this file's prose. The edit stands; the defect it claimed does not.**
 
 **No `### Round 13` heading was added, and that is the point.** Every previous
 round appended a heading carrying a cumulative total, which made the *next*
