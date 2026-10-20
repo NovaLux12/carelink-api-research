@@ -144,6 +144,31 @@ if [ -z "$EDITED" ]; then
 fi
 EDRE=$(printf '%s\n' "$EDITED" | paste -sd'|' -)
 
+# ⚠ CORRECTION (2026-10-20, area AA's merge). The basename allowance below used to
+# be built from EVERY edited file, so any bare `NAME:LINE` whose basename matched an
+# edited file's counted as a position into it. `FINDINGS.md` is the basename of ~62
+# tracked files, so the moment ANY lane added a `findings-log/…/FINDINGS.md`, every
+# bare `FINDINGS.md:N` in docs/10 §1 or docs/11 became a "position into a file this
+# PR edits" — 10 spurious hits, none of them a claim. A bare basename abbreviation is
+# only honoured when exactly ONE tracked file bears that basename; that is the rule
+# now, so a genuinely unique basename (e.g. `account.py`, one carrier) still fires and
+# `FINDINGS.md` (63 carriers) does not. Full paths still match exactly, via E.
+#
+# NOTE on the `docs/11:NNN` form, which this comment previously and wrongly claimed
+# "stays allowed": that token is a PATH PREFIX, not a basename, so it is matched only
+# by the `index(ed, pre) == 1` rule — i.e. only when `docs/11-suggested-research-areas.md`
+# happens to LEAD the edited list. At this head the first entry is
+# `.github/ISSUE_TEMPLATE/config.yml`, so that form fires under neither rule. That
+# order-dependence is PRE-EXISTING and unchanged by this correction; it is recorded here
+# so the allowance is not credited with more than it does.
+UNIQB=$(printf '%s\n' "$EDITED" \
+  | while IFS= read -r f; do
+      b=${f##*/}
+      n=$(git ls-files | awk -F/ -v b="$b" '$NF==b' | wc -l | tr -d ' ')
+      [ "$n" = "1" ] && printf '%s\n' "$b"
+    done | sort -u | paste -sd'|' -)
+UNIQBRE=$(printf '%s\n' "$UNIQB" | paste -sd'|' -)
+
 echo "dup-test.sh — the non-duplicate test, run against docs/10 section 1,"
 echo "the docs/11 Closed table, and docs/11 itself."
 echo
@@ -241,10 +266,13 @@ echo "  the exemption."
 # a regex use that does not exist, which made gawk print "escape sequence ..."
 # warnings on stderr and made the no-write-to-stderr rule false.)
 
-HITS=$(awk -v ed="$EDRE" -v cre="$CORR_RE" -v wdl="$WITHDRAWN" -v wdf="$TMPWD" '
+HITS=$(awk -v ed="$EDRE" -v uqb="$UNIQBRE" -v cre="$CORR_RE" -v wdl="$WITHDRAWN" -v wdf="$TMPWD" '
   BEGIN {
     split(ed, A, "[|]")
-    for (i in A) { E[A[i]] = 1; n2 = split(A[i], B, "/"); F[B[n2]] = 1 }
+    # E — exact full paths. F — the basename abbreviation, but ONLY for basenames
+    # that exactly one tracked file carries (see the CORRECTION at UNIQB above).
+    for (i in A) E[A[i]] = 1
+    n3 = split(uqb, U, "[|]"); for (i = 1; i <= n3; i++) if (U[i] != "") F[U[i]] = 1
     split(wdl, W2, " "); for (i in W2) if (W2[i] != "") D[W2[i]] = 1
   }
   # A Correction section is a SECTION: it starts at a "^## " heading and ENDS at
