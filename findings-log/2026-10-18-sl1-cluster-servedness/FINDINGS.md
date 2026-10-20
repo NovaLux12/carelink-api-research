@@ -62,7 +62,7 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **1.254848**, which is the figure from the very directory it cites. The
   direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
   no published claim of another pass is disturbed, but the range was wrong and
-  `docs/11:2820` publishes **1.4210** as a peer value
+  `docs/11:2911` publishes **1.4210** as a peer value
   (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
   **What this is not:** a revision of that budget model, and not a second
   population for it. One run of two hosts on a different mix (10 of the 13
@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Nine fresh-context verifier rounds, none shown how the claim was built, each
+Ten fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -813,7 +813,7 @@ using it rather than by reading it:**
    to appear inside the Round 1 and Round 3 entries precisely because it was
    corrected. Citations inside a `### Round N` entry are now counted as
    **quotations** and exempt; only **live** citations must resolve. The run
-   reports both numbers: **7 live, 7 quoted**.
+   reports both numbers: **4 live, 13 quoted**.
 
 ### Round 7 — `CLEAN 9a10f39`, and the checker is audited rather than trusted
 
@@ -932,7 +932,49 @@ into a **reported failure that names the defect in the checker**.
 never once been contested: **`CC-MAIN-2014-23` is served at 153 902 243 B, and
 its `minimed.eu` `404` is a served-but-empty answer behind a `200` control on
 that same crawl** — the standing indeterminate retires on the served side, not
-on an inability to ask. **Twenty blocking findings, every one bookkeeping** — and
-the last three were bookkeeping about a *merge* that no earlier round had been
-asked to look at. **The checkable claim held; the prose around it did not, and
+on an inability to ask. **Twenty-two blocking findings, every one
+bookkeeping** (rounds 1–9: 3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 = **22**), and round 9's
+**first** finding was about a *merge* that no earlier round had been asked to
+look at; its other two were the stale-total and checker classes already named. **The checkable claim held; the prose around it did not, and
 neither did I.**
+
+### Round 10 — `CONTRADICTS 64f06b1`
+
+Three blocking findings, all bookkeeping, **all three of the exact classes this
+file has blocked on before** — and two of them introduced by the commit that
+fixed the previous instance.
+
+1. **"Twenty blocking findings" failed its own arithmetic.** The rounds 1–8
+   breakdown sums to **19** and round 9 opens *"Three blocking findings"*, so
+   19 + 3 = **22**. → restated as **22** with all nine rounds inline.
+   **"The last three were bookkeeping about a *merge*"** was also wrong: only
+   round 9's *first* finding was about the merge; the other two were the
+   stale-total and checker classes already named. → corrected.
+2. **`docs/11:2820` died in the second merge**, which shifted that region by
+   +149 lines; the `1.4210` row is now at **`docs/11:2911`**. This is the round-4
+   precedent exactly: **a `file:line` citation into a file the same commit edits
+   is self-invalidating**, and the second merge repeated it. `selfcheck.py`
+   passed it because the line *exists* and is blank — the content-blindness is
+   disclosed as `H1`, and it is why content checks stay a human task.
+3. **The PR body was two rounds stale** — no rows for rounds 8 or 9, still
+   *"Seven … 15 blocking findings"*. → both rows added and the total corrected.
+
+One non-blocking, and the fix is the interesting part: **`selfcheck.py`
+classified repeated citations by `f.index()`, which returns the *first*
+occurrence's position** — so every repeat of a cited string was classified by
+where its first mention fell, and two historical quotations plus one historical
+`servedness.py:539` were counted as **live**. Under the script's own documented
+rule the true split is **4 live / 10 quoted**, not the 7/7 it printed and the
+prose asserted. → fixed to use each match's own position; the assertion
+immediately caught the now-stale pair and forced both the prose and this entry's
+figures to the measured values.
+
+**The pattern across ten rounds, stated once and finally.** Twenty-two blocking
+findings, **every one a bookkeeping sentence**. The servedness verdict, the
+evidence classes, the independence count and the request total have never been
+contested in any round. What does not self-resolve is **a correction chain
+written in prose**, because each fix creates staleness somewhere else: a citation
+dies in the file it points into, a count goes stale where it is duplicated, and
+a total disagrees with its own breakdown. Two of those three are now caught by
+`selfcheck.py` in milliseconds; **the third — whether a citation says what the
+claim says — is not, and is not claimed to be.**

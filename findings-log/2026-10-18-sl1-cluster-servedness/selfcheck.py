@@ -237,9 +237,13 @@ def main():
     #      citation exists at head.
     history_start = [m.start() for m in re.finditer(r"^### Round \d+ ", f, re.M)]
     live = quoted = 0
-    for path, line in re.findall(r"`((?:docs|findings-log|scripts|\.github)/[A-Za-z0-9._/-]+"
-                                 r"|servedness\.py|spacing\.py|selfcheck\.py):(\d+)`", f):
-        pos = f.index("`%s:%s`" % (path, line))
+    for cite_m in re.finditer(r"`((?:docs|findings-log|scripts|\.github)/[A-Za-z0-9._/-]+"
+                              r"|servedness\.py|spacing\.py|selfcheck\.py):(\d+)`", f):
+        path, line = cite_m.group(1), cite_m.group(2)
+        # H-fixed (round 10): use THIS match's own position, not f.index(), which
+        # returns the first occurrence and so classified every repeat of a cited
+        # string by where its first mention fell.
+        pos = cite_m.start()
         in_history = any(h < pos for h in history_start)
         resolved = SHORTHAND.get(path, path)
         cand = [os.path.join(HERE, resolved), os.path.join(REPO, resolved)]
