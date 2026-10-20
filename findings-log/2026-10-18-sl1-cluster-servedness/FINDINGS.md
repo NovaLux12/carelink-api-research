@@ -474,7 +474,7 @@ Stated because the pass's budget is part of its honesty.
 
 ## 10 · Verification rounds — the retraction history is the evidence
 
-Eight fresh-context verifier rounds, none shown how the claim was built, each
+Nine fresh-context verifier rounds, none shown how the claim was built, each
 reviewing the PR diff and the repository rules and **re-deriving the numbers
 from `results.jsonl` rather than reading the prose**. Every round's verdict is
 recorded here because `AGENTS.md` §3 makes the retraction history part of the
@@ -885,8 +885,54 @@ as evidence the comments exist.
 substantive finding — **`CC-MAIN-2014-23` is served at 153 902 243 B, and its
 `minimed.eu` `404` is a served-but-empty answer behind a `200` control on that
 same crawl** — has survived every round unchanged, reproduced over the wire by
-three of them. **All 15 blocking findings were bookkeeping**, and the last four
+three of them. **All 19 blocking findings were bookkeeping** (round 1: 3 ·
+round 2: **0** · round 3: 2 · round 4: 3 · round 5: 4 · round 6: 3 · round 7: **0** ·
+round 8: 4), and the last four
 were bookkeeping *about the bookkeeping*. The recurring mechanisms were
 therefore not fixed by care: they were fixed by `selfcheck.py`, which now
 derives what prose was merely asserting — and its first two days of use caught
 two staleness bugs that six rounds of reading had not.
+
+### Round 9 — `CONTRADICTS 66ab664`
+
+Three blocking findings, and **the first is the most serious error of the run,
+in a part of the work no verifier had been pointed at.**
+
+1. **The merge resolution was wrong, and it broke the table.** On the
+   `origin/main` conflict in `docs/10`, main and this branch had each appended a
+   dated correction at the same tail position of two rows. I resolved by
+   **keeping both sides' text**, which is right *in principle* and wrong *in
+   fact*: checking each row against the merge base shows **only one side had
+   edited each row** — row 66 was edited by this branch alone, row 67 by `main`
+   alone. My union therefore prepended the **unchanged** side, producing **7
+   pipes where the table has 5**, a duplicated source cell, a duplicated clause
+   and a broken backtick. **Each row now takes its actually-edited side
+   verbatim**, verified: 5 pipes on both, no duplication, both corrections
+   intact. **The generalisable lesson, and it is the one worth carrying:** a
+   merge conflict is resolved by asking **which side changed**, never by
+   concatenating. "Keep both" is only correct when both changed, and asserting
+   that without checking is the same failure as a hedge — it reads as careful and
+   is not verified.
+2. **"All 15 blocking findings" understated the record it closes.** The per-round
+   counts are 3, 0, 2, 3, 4, 3, 0, 4 = **19**; 15 was the rounds-1–7 subtotal
+   presented as the eight-round total — **the stale-count class this log has
+   blocked on four times**, and `selfcheck.py` did not catch it because it only
+   checked the rounds-1–5 tally. → restated as **19** with the full breakdown
+   inline, and `selfcheck.py` now asserts that **every** "N blocking findings"
+   figure in the file equals the sum of the breakdown printed beside it.
+
+**Two defects in the checker itself, found while fixing the above.** The new
+assertion crashed on a tuple, and round 8 had recorded an unhandled traceback as
+"exits nonzero, so it fails — ugly but nonzero" and accepted it. **A crash is not
+a verdict**: it reports nothing about what disagreed, and a reader can mistake a
+bug in the checker for a clean run. `selfcheck.py` now converts any exception
+into a **reported failure that names the defect in the checker**.
+
+**What nine rounds establish.** The substantive finding is unchanged and has
+never once been contested: **`CC-MAIN-2014-23` is served at 153 902 243 B, and
+its `minimed.eu` `404` is a served-but-empty answer behind a `200` control on
+that same crawl** — the standing indeterminate retires on the served side, not
+on an inability to ask. **Twenty blocking findings, every one bookkeeping** — and
+the last three were bookkeeping about a *merge* that no earlier round had been
+asked to look at. **The checkable claim held; the prose around it did not, and
+neither did I.**

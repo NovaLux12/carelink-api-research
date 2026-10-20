@@ -98,6 +98,25 @@ def main():
                     r"round 4: (\d+).*?round 5: (\d+)", f, re.S)
     if tally and per:
         parts = [int(per.group(i)) for i in range(1, 6)]
+        # Every "N blocking findings" figure anywhere in the file must equal the
+        # sum of the per-round breakdown printed alongside it. Round 9 caught the
+        # rounds-1-7 subtotal being presented as the whole-run total; this is the
+        # assertion that would have caught it.
+        for m in re.finditer(r"\b(\d+) blocking findings\b", f):
+            near = f[max(0, m.start() - 300):m.end() + 300]
+            bd = [(int(a), int(b.replace("**", ""))) for a, b in
+                  re.findall(r"round (\d+):\s*\**(\d+)\**", near)]
+            if not bd:
+                continue
+            last_round = max(bd, key=lambda t: t[0])[0]
+            total = sum(v for _, v in bd)
+            if int(m.group(1)) != total:
+                fail("figure '%s blocking findings' != sum of the breakdown "
+                     "beside it (%d over rounds %d-%d)"
+                     % (m.group(1), total, min(r for r, _ in bd), last_round))
+            else:
+                ok("figure %s matches its own %d-round breakdown (%d)"
+                   % (m.group(1), last_round, total))
         if sum(parts) != int(tally.group(1)):
             fail("blocking tally %s != sum of its own per-round parts %d"
                  % (tally.group(1), sum(parts)))
@@ -297,4 +316,16 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # H6: a crash is not a verdict. Round 8 recorded that a traceback "exits
+    # nonzero, so it fails" as acceptable; it is not - an unhandled exception
+    # reports nothing about WHAT disagreed, and a reader can mistake a bug in the
+    # checker for a clean run. Any exception now becomes a reported failure.
+    try:
+        rc = main()
+    except Exception as exc:                      # noqa: BLE001 - deliberate
+        print("SELFCHECK FAIL — the checker itself raised %s: %s"
+              % (type(exc).__name__, exc))
+        print("  A checker that crashes has checked nothing; this is a defect in "
+              "the checker, not a verdict on the branch.")
+        rc = 1
+    sys.exit(rc)
