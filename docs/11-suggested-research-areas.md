@@ -198,7 +198,7 @@ which was its own page-schedule choice rather than a constraint
 (same log, §9).
 
 **And the zero-request half, which can start today.** Every crawl this
-repository already publishes a **classified negative** for — area M's six, area
+repository already publishes a **classified cell** for — area M's six, area
 L's 84 in-window cells, S-L2's 44 out-of-window cells — has a served/unserved
 verdict obtainable in **one ranged read each**, and `classify` derives the whole
 table from a committed ledger without touching the network. Applying it to those
