@@ -287,8 +287,10 @@ def main():
     #   H6 THE H-1..H-5 CLASS OF HOLE REMAINS: this script proves a line EXISTS,
     #      not that it SAYS what the claim says. Read the meaning by hand.
     #   H8 THE TOTAL-VS-BREAKDOWN ASSERTION IS DIGIT-ONLY. A word-form total
-    #      ("= **22**") is not matched by the \b(\d+) blocking findings\b rule, so
-    #      round 10's own word-form total passed while a digit-form one fails.
+    #      ("= **22**") is not matched by the rule the checker actually uses,
+    #      `\b(\d+) blocking findings\b` (the bare `\b(\d+)` fragment does match
+    #      inside `**25**`; it is the trailing `blocking findings` that fails),
+    #      so round 10's own word-form total passed while a digit-form one fails.
     #      All headline totals in FINDINGS.md are now in DIGIT form for that
     #      reason; this comment records why, so the digit form is not "fixed"
     #      back to prose later.

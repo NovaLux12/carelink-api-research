@@ -975,8 +975,10 @@ figures to the measured values.
 blocking findings (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 = **25**), **every one a
 bookkeeping sentence**. ⚠ The figure is scoped to those ten rounds deliberately:
 a cumulative total written in prose goes stale as soon as the next entry lands,
-and rounds 9 through 12 each blocked on exactly that. **The live total is the
-one in the §11 line below, and it is the one to read.** The servedness verdict, the
+and rounds 9 through 12 each blocked on exactly that. **The live total across the
+12 rounds this file records is 32** (3 + 0 + 2 + 3 + 4 + 3 + 0 + 4 + 3 + 3 + 4 +
+3), and it is published per round in the PR body's Verification table — that table,
+not any single figure inside an entry, is what to read. The servedness verdict, the
 evidence classes, the independence count and the request total have never been
 contested in any round. What does not self-resolve is **a correction chain
 written in prose**, because each fix creates staleness somewhere else: a citation
@@ -1076,3 +1078,25 @@ the parser mis-counted and produced **more** false failures than it caught. **A
 checker that fires on correct prose is worse than none**, and the honest outcome
 is that this quantity is **not machine-checked** — recorded as `H8`, claimed
 nowhere.
+
+---
+
+**Round 13 (`CONTRADICTS e35935b`) — fixed in place, deliberately without a new
+heading.** Two blocking findings, both bookkeeping: the PR body's twelve-round
+total stated 29 where its own breakdown summed to **32** (the fixer had taken
+`FINDINGS.md`'s eleven-round figure instead of summing the body's twelve numbers),
+and a scoping pointer cited a **§11 that does not exist** — `FINDINGS.md` has
+§§1–10 — so the sentence meant to tell a reader where the live total lives
+pointed nowhere. Both corrected. Also corrected `H8`, which quoted the bare
+`\b(\d+)` fragment as if it were the whole rule and so misled anyone testing it;
+the full pattern is now quoted, and the difference stated.
+
+**No `### Round 13` heading was added, and that is the point.** Every previous
+round appended a heading carrying a cumulative total, which made the *next*
+round's total stale by construction — five consecutive rounds have blocked on
+exactly that, twice inside the commit that fixed the previous instance. Fixing
+the figure in place, under this note rather than a new heading, removes the
+self-invalidation instead of restating it. **The live total across the twelve
+rounds this file records is 32**, and the authoritative per-round figures live in
+the PR body's Verification table, which is regenerated rather than hand-edited
+whenever a round lands.
