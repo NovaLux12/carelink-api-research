@@ -1092,12 +1092,11 @@ total stated 29 where its own breakdown summed to **32** (the fixer had taken
 and a scoping pointer cited a **§11 that does not exist** — `FINDINGS.md` has
 §§1–10 — so the sentence meant to tell a reader where the live total lives
 pointed nowhere. Both corrected. `H8` was also touched, to remove an ambiguity rather than to fix an
-error: it described the rule as `\b(\d+)` where the code uses
-`\b(\d+) blocking findings\b`, and a reader testing only the fragment would get a
-different answer from the check. ⚠ **An earlier draft of this note claimed
-`H8` had quoted the bare fragment “misleading anyone testing it”. That was
-false: `H8` already quoted the full rule, and the bare fragment appears only in
-this file's prose. The edit stands; the defect it claimed does not.**
+error. **`H8` already quoted the full rule `\b(\d+) blocking findings\b`; the bare
+`\b(\d+)` fragment appears only in this file's prose, not in the script.** The
+edit rewords `H8` so it states plainly which pattern the checker uses, and adds
+that the bare fragment matches where the full rule does not — a reader testing one
+and expecting the other's answer is no longer left to guess.
 
 **No `### Round 13` heading was added, and that is the point.** Every previous
 round appended a heading carrying a cumulative total, which made the *next*
@@ -1105,6 +1104,7 @@ round's total stale by construction — five consecutive rounds have blocked on
 exactly that, twice inside the commit that fixed the previous instance. Fixing
 the figure in place, under this note rather than a new heading, removes the
 self-invalidation instead of restating it. **The live total across the twelve
-rounds this file records is 32**, and the authoritative per-round figures live in
-the PR body's Verification table, which is regenerated rather than hand-edited
-whenever a round lands.
+rounds this file records is 32**. The per-round figures are published in the PR
+body's Verification table, which is the most legible place to read them — and,
+like every count here, **hand-maintained**: it is applied by a REST call and
+there is no generator for it, so it is not staleness-proof either.
