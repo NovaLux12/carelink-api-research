@@ -52,12 +52,20 @@ from the repo root, not from this file's own directory:
       TypeError: strptime() argument 1 must be str, not None
 
 `2026-10-13-area-l-ipro-hcp` carries a JSON **null** `t_sent` on 4 of its 44 rows
-(seqs 1-4). **KNOWN LIMIT of the kernel oracle, measured not assumed.** A row whose `host_tag`
-names a body file that is simply ABSENT still joins the series, so a gap can be
+(seqs 1-4). **KNOWN LIMIT of the kernel oracle, measured not assumed.** A row whose
+`host_tag` names a body file that is simply ABSENT still joins the series, so a gap can be
 measured across it. **The no-`host_tag` fix does not cover that, and the printed
-sentence has been narrowed to say so.** Measured over all 50 committed ledgers at
-this head: the missing-body branch is taken on **25 of them**, and **not one of
-those 25 prints a kernel gap figure** -- each reports the oracle UNAVAILABLE,
+sentence has been narrowed to say so.** ⚠ **Correction (2026-10-20): the population
+figure below was measured at commit `5f37668`, and it is deliberately NOT restated as a
+live count.** Area AA's ledger (PR #155) makes it 51 at `ad376d8`, and PR #154 adds a
+52nd -- "all N committed ledgers at this head" is false by construction one merge later,
+so bumping it would only relocate the defect. **Re-derive it instead**, with the same
+counting rule the census uses:
+
+    git ls-files 'findings-log/*/results.jsonl' | wc -l
+
+The missing-body branch is taken on **25 of the 50 measured at `5f37668`**, and **not
+one of those 25 prints a kernel gap figure** -- each reports the oracle UNAVAILABLE,
 because a gap needs **two or more** resolved bodies and none of those 25 has them.
 One ledger DOES have a partial body set --
 `2026-10-17-sl2-outwindow-census` resolves exactly **1** of its 45 distinct

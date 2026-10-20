@@ -144,52 +144,6 @@ here demonstrates an actual cross-origin call.
 
 ## Tier 1 — no token needed, high value
 
-### AC. After the window: what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled?
-
-The out-of-window census is **complete** — **0 of 44 unread**, every cell
-classified under the counting rule (a `404` reads as an absence only behind a `200`
-on that same crawl; a `502`/`504`/`503`/`400` is a failure and is re-issued, never
-an absence) — and it returned **165 records over 27 distinct host-relative paths
-and six hosts** in its 40 record cells. **Five of the 44 carry a `/ipro/hcp/`
-member**, the last dated **2026-06-10**, archived **`404`**
-[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F2, §F5, §F10].
-
-**What is known, and what is missing.** Every status in those cells is the
-**archived** status of a capture — the answer the origin gave when a crawler
-fetched that URL — so a `404` is consistent with retirement, a gate, and path
-rewriting, and **nothing observed separates the three**. The census also produced
-a pattern nobody has looked at: **`javascript-warning.html` appears in 29 of the
-40 record cells**, in **five** distinct shapes, four of them nested under `/app/` at
-up to `/app/assets/assets/assets/assets/javascript-warning.html`. Area L saw five
-such captures on one crawl in 2026-10 and explicitly declined to interpret them.
-
-**Closes when** the post-2022 `minimed.eu` record set is **enumerated rather than
-sampled** — every path and status across the 41 out-of-window crawls from 2022-06,
-under a stated completeness rule, with the nested-asset shapes either explained or
-recorded as unexplained. **A negative counts**, and a negative is the likely answer:
-if the nested shapes turn out to be a crawler artefact rather than a served path
-structure, that is the finding. **Budget:** derivable from
-`findings-log/2026-10-17-sl2-outwindow-census/budget.py` — **2.59 requests per
-crawl measured**, 2.51 derived, so ~106 rows for the 41 post-window crawls — and
-the crawl list must again be derived from `GET /collinfo.json`.
-
-**Blocker:** none — a read of a published index, not a vendor surface. The real
-blocker on the *interpretation* is `AGENTS.md` §7: the record bodies are outside
-the tree, so **"did `carelink.minimed.eu` serve a catch-all on those nested asset
-paths" cannot be settled from a Common Crawl ledger at all** — the 404s and 200s
-here are indistinguishable from a SPA fallback without one bounded live probe on
-the named path. **That live probe is the sharp question this area exists for**, and
-it is cheap and GET-only.
-
-**Assumptions (INFERRED):** that the 165 records enumerate what the crawler
-requested rather than what exists (the API is queried by URL, so it answers about
-requested paths only); that `carelink.minimed.eu` and `carelink.minimed.com` behave
-alike on these asset paths (untested — the census never queried `.com`); and that
-the archived status is a faithful record of the origin's answer (it is a third
-party's record of a third party's fetch, and this repository has not
-independently checked one).
-
-
 ### AD. Can the committed `cluster.idx` locate converge — and what does the `minimed.eu` family interval actually contain?
 
 **What is known, all OBSERVED, and it is one run.** The S-L1 instrument is
@@ -263,62 +217,191 @@ API is reachable (observed on one crawl, `CC-MAIN-2014-23`, and **not**
 established in either direction for the rest).
 
 
-### AA. Does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`?
 
-**What is known, all OBSERVED and all bounded.** The `GET
-/connect/carepartner/<base>/discover/android/3.6` **base-path** axis now has a
-three-host verdict for **all 16** base paths — **8 split, 8 uniform, 0
-ambiguous** — after the 2026-10-17 sweep of 51 requests
-([findings-log/2026-10-17-discover-3host-matrix/FINDINGS.md §3]). Its two
-interesting results are that `-trials` serves **one byte-identical 10 053 B
-document under seven base paths** (`v2`–`v6`, `v8`, `v9`; `cmp`-identical 7 of 7,
-`cmp`-body echoing `"config":"android,3.6"` and nothing else), and that `-trials`
-is **not** a blanket catch-all on this path (`v1`, `v7`, `v14`–`v16` and the
-`v99` absent control all answer the corpus 42 B no-route digest, same host, same
-run). That pass **deliberately held the app-version at `3.6`**, so the other axis
-is untouched.
+### AC. After the window: what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled?
 
-**The `android/<app-version>` axis has only ever been swept on `.eu`, and only at
-two base paths.** `04-deep-surface.hurl:14,:21` pins `v13/discover/android/3.5`
-→ `200` with `UseSSOConfiguration == Auth0SSOConfiguration` and `baseUrlCumulus`
-ending `/connect/carepartner/v11`, and `v13/discover/android/3.9` → `200` with
-**no** SSO selector — so on `.eu` at `v13` the app version demonstrably **selects
-content**. **Neither `.com` nor `-trials` has ever had this axis swept at any
-base path**, and the one cross-deployment hint points the wrong way for a
-blanket reading: on `-trials`, a *fabricated* app-version tail
-(`android/absent-probe-413306`) answered `200` with a 10 069 B body whose
-16-byte excess over the `android/3.6` cell is exactly the echoed path segment
-([findings-log/2026-10-14-pool-s8-v6split/FINDINGS.md]) — **one tail, one source,
-INFERRED to a template**. So the axis may *gate* on `.eu` and merely *echo* on
-`-trials`, and nothing on disk distinguishes those.
+The out-of-window census is **complete** — **0 of 44 unread**, every cell
+classified under the counting rule (a `404` reads as an absence only behind a `200`
+on that same crawl; a `502`/`504`/`503`/`400` is a failure and is re-issued, never
+an absence) — and it returned **165 records over 27 distinct host-relative paths
+and six hosts** in its 40 record cells. **Five of the 44 carry a `/ipro/hcp/`
+member**, the last dated **2026-06-10**, archived **`404`**
+[source: findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md §F2, §F5, §F10].
 
-**What is missing, and why it matters.** Whether the app-version segment is a
-content gate or an echo is the difference between "the trials deployment serves a
-real document" and "the trials deployment serves one template". Every
-`-trials`-side statement in [`docs/03`](../docs/03-discovery-and-versions.md)
-§8a rests on that distinction, and right now it is resting on **one** fabricated
-tail.
+**What is known, and what is missing.** Every status in those cells is the
+**archived** status of a capture — the answer the origin gave when a crawler
+fetched that URL — so a `404` is consistent with retirement, a gate, and path
+rewriting, and **nothing observed separates the three**. The census also produced
+a pattern nobody has looked at: **`javascript-warning.html` appears in 29 of the
+40 record cells**, in **five** distinct shapes, four of them nested under `/app/` at
+up to `/app/assets/assets/assets/assets/javascript-warning.html`. Area L saw five
+such captures on one crawl in 2026-10 and explicitly declined to interpret them.
 
-**Blocker:** a request budget, not a token or an artefact. **≤20 requests** — 2
-hosts (`.com`, `-trials`) × 2 base paths (`v13`, the `-trials`-routed `v6`) ×
-{`3.5`, `3.6`, `3.9`, one fabricated `android/<distinct-length>` tail} = 16 cells,
-plus 2 controls per host (`v99` absent, `v11` served) = 4. GET only, ≥2.5 s
-same-host, controls first per host.
+**Closes when** the post-2022 `minimed.eu` record set is **enumerated rather than
+sampled** — every path and status across the 41 out-of-window crawls from 2022-06,
+under a stated completeness rule, with the nested-asset shapes either explained or
+recorded as unexplained. **A negative counts**, and a negative is the likely answer:
+if the nested shapes turn out to be a crawler artefact rather than a served path
+structure, that is the finding. **Budget:** derivable from
+`findings-log/2026-10-17-sl2-outwindow-census/budget.py` — **2.59 requests per
+crawl measured**, 2.51 derived, so ~106 rows for the 41 post-window crawls — and
+the crawl list must again be derived from `GET /collinfo.json`.
 
-**Closes when:** all 16 cells carry a verdict under
-[`docs/09`](../docs/09-methodology-and-oracles.md) Oracle A, and the app-version
-axis is stated as **gating** or **not gating** on each of the two hosts.
-**A negative — the axis gates nothing on `.com` or `-trials` — counts and is the
-likely answer.** Also carry back: whether the trials `1aab9bb1e721…` digest is
-stable enough to pin in `regression/hurl/`, which the 2026-10-17 pass
-deliberately did **not** do (it would add 51 requests to every weekly drift sweep
-against the ~80-request budget in `AGENTS.md` §11).
+**Blocker:** none — a read of a published index, not a vendor surface. The real
+blocker on the *interpretation* is `AGENTS.md` §7: the record bodies are outside
+the tree, so **"did `carelink.minimed.eu` serve a catch-all on those nested asset
+paths" cannot be settled from a Common Crawl ledger at all** — the 404s and 200s
+here are indistinguishable from a SPA fallback without one bounded live probe on
+the named path. **That live probe is the sharp question this area exists for**, and
+it is cheap and GET-only.
 
-**Assumptions (INFERRED):** that the trials `200` at a fabricated app-version tail
-reflects templating rather than a route that ignores the segment — measured on
-**one** tail by one pass; the assumption is precisely what this area tests. That
-the app-version segment is the only axis varying — `.eu`'s own pinned cells show
-the segment is read, so "ignored" is not available as a prior.
+**Assumptions (INFERRED):** that the 165 records enumerate what the crawler
+requested rather than what exists (the API is queried by URL, so it answers about
+requested paths only); that `carelink.minimed.eu` and `carelink.minimed.com` behave
+alike on these asset paths (untested — the census never queried `.com`); and that
+the archived status is a faithful record of the origin's answer (it is a third
+party's record of a third party's fetch, and this repository has not
+independently checked one).
+
+
+> **Area AA is CLOSED** (2026-10-17, claim #151) — see the Closed table at the foot of
+> this page and
+> [findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md]. **The area's framing
+> was the wrong pair of terms, and saying so is the finding.** It asked whether the
+> app-version axis is a **content gate** or an **echo**. It is **both at once**, and the
+> status line alone would have returned "echo": a fabricated tail
+> (`android/absent-probe-871`) answers **`200`** on both hosts, so nothing is rejected
+> and nothing looks selective. The discriminator is in the bodies — erase the echoed
+> `config` value and re-digest.
+>
+> **Per `(host, base)`, OBSERVED, 20 of 20 requests, GET only, measured same-host
+> spacing floor 3.304 s:**
+>
+> | base | `.com` | `-trials` |
+> |---|---|---|
+> | `v13` | **gating** — 4 tails → **3** documents | **gating** — 4 tails → **3** documents |
+> | `v6` | **no verdict** — base unrouted (`403`, no-route digest) | **not gating** — 4 tails → **1** document (n=4) |
+> | `v11` | **no verdict** — one tail sent (a control) | **no verdict** — one tail sent (a control) |
+>
+> - **No allow-list, on either host.** All 14 `200` bodies echo the requested tail
+>   exactly once into `"config"`, and a fabricated tail was served verbatim at three
+>   cells. The segment is **never validated**.
+> - **At `v13` the tail selects substantively**: `3.6` → `3.9` moves the advertised
+>   `baseUrlCumulus` base (`v13`→`v2`), `baseUrlCareLink` (`v2`→`v1`), `CP[]` length
+>   (3→2), country count (109→99 on `.com`, 109→76 on `-trials`) and the SSO config
+>   file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against
+>   `sso_cp_us_v6.json` on `-trials` and both `sso_cp_us_v6.json` +
+>   `eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. The `3.5` and
+>   `3.6` documents are byte-identical **across** both hosts; the `3.9`-class document
+>   is **not** — which corrects `docs/00`'s "every cell from 3.9 upward is
+>   byte-identical" to *within a host*.
+> - **At `-trials` `v6` the tail gates nothing** — four tails including a fabricated
+>   one collapse to one document. Strongest single result in the pass, and it
+>   **re-derives** the digest the 2026-10-17 matrix pass recorded there.
+> - **The `v6` `403` split reads as a base-axis effect, not an app-version effect
+>   (INFERRED; the refutations are OBSERVED)**, and the rows support that much: same
+>   host, same tail `3.6`, base `v11` → `200`. Whether
+>   `v6` is unrouted on `.com` because of the version segment or the route family is
+>   **not** established and **no choice is made** between those readings.
+> - **Deviation, disclosed:** claim #151 named `carelink.minimed.com` /
+>   `carelink-trials.minimed.com`; the pass sent `clcloud.minimed.com` /
+>   `clcloud-trials.minimed.com`, because that is the host family the route is
+>   published on (`baseUrlCumulus`). **The claim's host list was wrong.** It answers
+>   the area as posed — `.com`/`-trials` are the deployment designations — and does
+>   **not** speak to the `carelink.*` hosts, which were not swept.
+> - **Premise checked, not assumed:** the prior closed row recording "the bare
+>   `connect/carepartner/` prefixes dead on both methods" probed the *prefix parents*
+>   (`…/carepartner/`, `…/carepartner/v13`, `…/carepartner/v13/discover`). These cells
+>   are a routed leaf four segments below. **Distinct claims, no contradiction.**
+> - **No pin added**, as the area directed: a 4-cell pin in `05-public-config` costs 4
+>   requests on **every PR gate** *and* 4 per weekly sweep — affordable against the
+>   ~80-request sweep budget in `AGENTS.md` §11, and declined for a different reason: it
+>   would not catch the change that matters. **Measure**; counting rule in the log §7.
+> - **One source.** One lane, one ledger, one author — no strength word is used for
+>   any of the above, including the cross-host byte-identity (`AGENTS.md` §2.1).
+>
+> **Carried forward as area AE**, which is the one question these cells could not
+> answer.
+
+### AE. Is the `android/<app-version>` tail a lookup table, or a threshold?
+
+**What is known, labelled and cited.** At base `v13` on **both** cumulus hosts the
+app-version tail **gates content** — four tails select **three** distinct documents,
+differing in advertised `baseUrlCumulus` base, `baseUrlCareLink` version, `CP[]`
+length, country count and SSO config file family (OBSERVED, 20 of 20 requests,
+`[findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §4.2]`). The tail is
+**never validated** — a fabricated tail answers `200` and lands on the `3.9`-class
+document (OBSERVED, same source `§4.1`). At `-trials` base `v6` the tail gates
+**nothing** — four tails, one document (OBSERVED, `§4.3`).
+
+**What is missing, and why it matters.** **Whether the rule is a per-value lookup or
+a threshold is not separable from AA's tails.** AA sent `3.5`, `3.6`, `3.9` and one
+fabricated value — three of them adjacent. A boundary anywhere in `(3.5, 3.6]` or
+`(3.6, 3.9]` fits those cells exactly as well as a table keyed on the string. The
+difference is not cosmetic: it decides whether a client can pick a **safe** tail
+without enumerating them. It is also the only question AA left open that more of the
+same cells could not answer.
+
+**Blocker:** a request budget, not a token. **≤20 requests** — `clcloud.minimed.com`
+first, base `v13`, tails strictly **inside** `(3.6, 3.9)`: `3.61`, `3.65`, `3.7`,
+`3.75`, `3.8`, `3.85`, `3.89` = 7 cells, plus 2 controls (`v99` absent, `v11`
+served) = **9**; the `-trials` host only if the first host brackets a boundary,
+**≤9** more. GET only, ≥2.5 s same-host, controls first per host.
+
+**Closes when:** the discriminating boundary is bracketed to a specific interval on
+at least one host, **or** the ladder turns up a **fourth** distinct document, which
+is positive evidence for a table. **A negative counts** — if no tail in `(3.6, 3.9)`
+produces a document distinct from the `3.6`-class, the boundary lies outside the
+swept range (or the rule is not a threshold at all), and that is the answer. Also
+carry back: whether the `3.9`-class document's **host** difference (99 countries and
+an EU SSO entry on `.com` against US-only 76 on `-trials`) is a country-list
+consequence or a separate axis — no prior row varies the country axis.
+
+**Non-duplicate:** intermediate tails **do** exist in the record — `docs/03` §3
+documents `3.7` and `3.8` as part of the `3.6` class — but they were measured on
+`.eu` **at base `v13`** (`3.8` also appears on `-trials`, but at base `v6` — §8).
+On `.com` and `-trials` the only tails ever requested at base `v13` are `3.5`,
+`3.6`, `3.9` and AA's fabricated value, so no intermediate tail has been swept on
+either host at that base. AA's four tails bracket nothing. **Assumptions
+(INFERRED):** that the `3.6`-class
+and `3.9`-class documents on `v13` remain distinct long enough for a ladder to
+separate them — they were distinct on 2026-10-17; and that the response document is a
+function of `(host, base, tail)` with no fourth input, which AA's cross-product is
+consistent with but did not test.
+
+
+### AF. Can the findings-log census be made self-deriving, so no lane restates it by hand?
+
+**What is known, labelled and cited.** The committed-ledger census is stated by hand in
+**at least three** places — the S-L4c block, the ledger-census row, and a comment in
+`findings-log/2026-10-14-lane-s6-public-index/account.py` — and its population is
+**derived from the tree**, so **every merge that adds a `findings-log/…/results.jsonl`
+moves it**. OBSERVED: area AA's ledger moved the population 50 → 51 at `ad376d8` and
+would make it 52 when #154 lands, falsifying all five derived figures one merge after
+they were written (see the **S-L4c correction of 2026-10-20**, further up this page).
+
+**What is missing, and why it matters.** Nothing catches this. `scripts/research-checks.py`
+checks the assertion count, the open-area count, the prose counts and the log-cite
+resolvability — it does **not** derive the ledger census, so a then-value survives CI
+until a human notices. The failure mode is silent by construction: the sentence reads
+correctly at the head it was written on and is wrong at the next.
+
+**Blocker:** nothing external. **0 requests.** A static check in `scripts/research-checks.py`
+that derives `git ls-files 'findings-log/*/results.jsonl' | wc -l` and fails on any docs
+sentence stating a bare ledger population with no commit anchor beside it — the same
+shape as the existing "N open plus M closed" check, which already fails on drift.
+
+**Closes when:** no bare population figure survives without a commit it is true at, **or**
+the census is reported only as command output and the hand-stated figures are deleted.
+**A negative counts** — if the check cannot distinguish a genuinely anchored figure from
+a live one, that is itself the finding and the answer.
+
+**Non-duplicate:** no existing check derives this census. **Assumptions (INFERRED):** that
+the three hand-stated sites are all this PR can see, and that no fourth exists in a
+findings-log comment the census prose does not name; a `grep` for the counting command
+settles it. **Labelled:** the *falsehood* is OBSERVED; the *remedy* is INFERRED until a
+check exists.
+
 
 
 > **Area V is CLOSED** (2026-10-13, claim #42) — see the Closed table at the foot of
@@ -2661,8 +2744,16 @@ which **does not discharge** any standing indeterminate cell. This pass: **15
 attempts, 15 served, 0 connection-level failures**
 (same log, §4).
 
-**AD** — the locate, with a seed derived from the head read (0 requests, once
-the instrument exists).
+
+**Blocker:** none — a read of a published index, not a vendor surface.
+**Closes when** every crawl a pass names in a negative carries a served/unserved
+verdict from `cluster.idx` *as well as* from the CDX API, and a named crawl that
+cannot be read is recorded as unservable rather than left as a hole.
+`CC-MAIN-2014-23` is the named target: **four control rows, two control hosts, no
+`200`** (OBSERVED, this pass seqs 16–18, 40).
+**Assumptions (INFERRED):** that `cluster.idx` availability and CDX-API
+availability are independent signals, and that a served index with an empty result
+is distinguishable from an unserved one. Neither is demonstrated.
 
 **S-L2 — the window census is COMPLETE; what remains is the window itself.**
 **0 of the 84 in-window crawls are unread** after the 2026-10-15 continuation, so
@@ -2996,6 +3087,36 @@ pre-existing and outside this claim. Otherwise zero requests; apply the same
 count-then-read method to every `results.jsonl`.
 **Closes when** every committed ledger resolves under the same query-derived cell
 rule, or each non-resolving ledger is named with its schema and its reason.
+
+> ⚑ **Correction (2026-10-20) — the census figures above are anchored, not live.**
+> The `50` and `42` in this block were measured at **`5f37668`**, and they are correct
+> *there*. They are **not** correct at any head that adds a ledger, because
+> `findings-log/2026-10-17-area-aa-appversion-axis/results.jsonl` — committed by area
+> AA, PR #155 — makes the population **51** at **`ad376d8`**. Rather than bump the
+> numbers (which would be false again the moment PR #154 merges, adding
+> `findings-log/2026-10-18-sl1-cluster-servedness/results.jsonl`), both readings are
+> published with the commit each belongs to:
+>
+> | reading | at `5f37668` (measured) | at `ad376d8` (after AA's merge) |
+> |---|---|---|
+> | committed ledgers | 50 | 51 |
+> | excluding the 8 area-L ledgers | 42 | 43 |
+> | refused by the reader | 18 | 19 |
+> | `findings-log/` top-level entries | 65 | 66 |
+>
+> **Counting rule**, unchanged and re-derivable at whatever head you hold:
+> `git ls-files 'findings-log/*/results.jsonl'` — population = one such file; an item
+> = one such file; a pass = exit 0; fail-closed = non-zero with a named reason.
+> **The 19th refusal is area AA's own ledger, refused by design**: its schema carries
+> no `http_status`, so it is a *known member* of the population, not an unexplained
+> gap. **Two figures survive by coincidence and are not evidence the census is
+> stable**: `66 − 51 = 15` still holds, and "not one traceback" still holds across all
+> 51 (every exit ∈ {0, 2}).
+>
+> **The durable property, which is why this is anchored rather than restated:**
+> **every merge that adds a `findings-log` ledger moves this census**, so any
+> unanchored figure about it is false by construction one merge later. Carried to
+> successor **AF** below.
 **A negative counts.** **Assumptions (INFERRED):** that the other passes' schemas
 are independent of area L's — different passes, different days, and nothing in the
 tree asserts the schema set is closed. **Measured here and worth carrying into
@@ -3073,6 +3194,17 @@ traceback**. Before this pass, over those same 50, **24** read and **26** died w
 an unhandled `KeyError` or `TypeError`. **A ledger this tool cannot read is a gap in
 the record, not a negative result**, and it now says so and exits 2 rather than
 raising.
+
+> ⚑ **Correction (2026-10-20) — same census, anchored.** The `50`, the `18 refused`
+> and the `65` in this row were measured at **`5f37668`** and are correct there. Area
+> AA's ledger (PR #155) makes them **51 / 19 / 66** at **`ad376d8`**, and PR #154 adds a
+> 52nd. Both readings and the counting rule are published at the
+> **S-L4c correction above**; they
+> are not restated here, because a second copy is a second thing to falsify. The
+> `32 read` figure is **unaffected** — the AA ledger is one of the refusals, not one of
+> the reads. **Do not bump these numbers in place**: a per-head figure here is false by
+> construction one merge later. (S-L4c is a bolded paragraph opener, not a heading, so
+> this cross-reference is plain text on purpose — there is no anchor to link to.)
 
 ⚑ **Correction (2026-10-19). The two sentences this replaces — "the population is
 named by a command rather than a glob on purpose: a glob in this tree expands to
@@ -3241,25 +3373,21 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 26 closed**
-stand today (`AA`, `AC`, `AD` — `AD` minted 2026-10-19 by lane sl1, the
-`cluster.idx` locate successor; counted from the `^### [A-Z]{1,2}.` headings, not
+**The maintainer decision the paragraphs above deferred has been taken.** **4 open plus 27 closed**
+stand today (`AC`, `AD`, `AE`, `AF` — `AD` minted 2026-10-19 by lane sl1 and merged
+against the `AE`/`AF` mints; counted from the `^### [A-Z]{1,2}.` headings, not
 inherited); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
-
-**A successor-prefixed closed row is not counted, and that is stated rather than
-worked around.** The closed-area count in `scripts/research-checks.py` is
-`^\| [A-Z]{1,2} —`, which matches `| K —` but **not** `| S6 —` or `| S-L1 —`:
-both carry a `-` inside the id, so the id is neither one nor two letters.
-**Those two rows are the only area rows the rule misses** (the other uncounted
-`|` lines on this page are prose fragments, not rows). **The count was left at
-26** — raising it to match the visible row count would fail the check that
-measures it. The rows are real and dated; the rule is what cannot see them.
-Fixing a published counting predicate belongs to its own PR, not to a findings
-commit (`AGENTS.md` §6 item 7 — a count generalised without a recorded counting
-rule).
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
-the `android/<app-version>` axis on the two hosts that have never had it swept.
+the `android/<app-version>` axis on the two cumulus `.com`/`-trials` hosts — which
+had **not** been swept on that axis at base `v13` (⚠ corrected on closing AA, which
+this PR did: `.com` had never had the tail varied at any base, and `-trials` only at
+`v6` with two tails — see `docs/03` §3b's "What was already swept").
+**`AF` was the third** (minted 2026-10-20, by the PR that closed AA, on the `origin/main`
+sync — the census anchor below). **`AE` was the second** (minted 2026-10-19 by that same PR, under
+[claim #151](https://github.com/NovaLux12/carelink-api-research/issues/151) — the
+same claim issue AA was closed under), and is the question AA's cells could not
+answer — whether that tail is a lookup table or a threshold.
 
 - The area-counting patterns are widened to `^### [A-Z]{1,2}\.` wherever they live —
   [`scripts/research-checks.py`](../scripts/research-checks.py),
@@ -3335,6 +3463,7 @@ being superseded — never silently. Letters are not reused.
 | F — what the timeline and dialog-lite gateways actually are | 2026-10-14 | **Closed NEGATIVE on the letter's own condition — no caller named, because none exists in the corpus, and no third-party client can reach either service by GET.** The caller half is a **structural** negative, not an absence of evidence: both portal builds were re-fetched on their content-hashed asset names and **reproduce their pinned anchors in full** (`2a7fa8e7af519c2b…` 3 397 615 B; `a054555a0f22176e…` 3 410 666 B), and in **both** bodies `patient-timeline`, `dialog-lite`, `app-patient-timeline`, `patientTimeline`, both `personal.patient.timeline.*` spellings, `execute-api`, `prodous`, `/patient/`, `clcloud`, `carelink.minimed` and **all five 10-character gateway ids** are **0** — while **`personal.` is 4 hits and not one is a key of the 69-name patient document** (`hcp/patients` 42, `hcp/configuration/public/` 15). **Neither build reads the patient configuration document at all**, so the pointer is unreachable from that code and no server-side proxy can exist there to follow it; that also settles the letter's "look for a proxy in the portal bundle" reading. **The `BLOCK 7` cells that had never run ran and are negative: 11 of 11 `patient-timeline` cells answer `403` `MissingAuthenticationTokenException`, 42 B, one digest `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16` — which reproduces this repo's published `f249b63cb2fc` IN FULL — with the certainly-absent control byte-identical to every plausible path on all three deployments, so under Oracle A there is **no matching GET route**. Zero 404s in 17 requests, so that clause is observed on this family directly rather than by analogy from `clcloud.*`. `dialog-lite` 500s on all 4 cells with one body digest (`660f19c0…`, 36 B, **new** — the 2026-10-10 pass recorded the size and no digest) and the certainly-absent control is byte-identical to the published root on **both** regions, so **the 500 cannot discriminate the path**: it is the catch-all's signature. Zero of 15 gateway responses carry `Access-Control-*` and the header set is still the same six keys, so "neither is browser-callable" is **re-observed, not re-derived**. **Most reusable number:** `timeline` scores **196** (66+126+4, 74 signatures) against `patient-timeline`'s **0**, and all 196 are GSAP / Pusher internals, Medtronic's own snapshot-timelines **report** service, two leaked-password words, or one analytics label — `docs/09` §5's false-positive class quantified on the exact token this area hunts; a right-context census pattern returns **189** and that figure is a defect of the pattern, not a count. Counting **per build**, as `grep-out.txt` does: the `m2m` hit the letter proposed is **1 in each build** (2 across both) and falls in the **middle** of `cum2me`, inside a leaked-password list; `baseUrl` is **2 in each build** (4 across both), every one an embedded Pusher SDK. **17 of a 40 cap**, GET only, 7 hosts, ≥2.5 s same-host, **controls first on every host**, no POST, no token exchange, no authentication. Spacing floor **2.239 s** on the `t_sent` series (1 of 10 gaps under 2.5 s, **0** under the ≥2 s floor) with **one negative duration** (seq 9, −552 ms — the known corrupt-`t0` class, **no cause asserted**); the kernel body-mtime oracle reads **2.866 s with 0 sub-2.5 s gaps**, so no gap was actually short, and that oracle is **not re-derivable from a clean clone**. ⚠ **NOT closed, and this row does not claim it:** the **three readings of the 403s** (no routes / other verbs only / the live stage is not `prod`) need an authentication attempt, excluded by `AGENTS.md` §8/§11 — four more cells went into that dead end and did not move it, and `docs/10` §1 carries the row unchanged. Also unchanged: *why* `dialog-lite` raises, and whether the raw `…timeline.config.host` value is publishable — **a disclosure judgement for a maintainer holding the value, not pre-committed here**. **Scope limit:** three builds exist and only the **patient** build has ever named the timeline at all (there every hit is an Angular component selector; area V, cited not reproduced, since `carelink.minimed.eu` is outside the claim's host set), so the negative's scope is *no web caller in any of the three builds this repo has read* (**INFERRED**, a corpus claim, not a claim about every client). **Pinned:** the EU `keys | length` = 69 assertion, **zero extra vendor requests**, completing the third copy. **Not pinned:** the gateway cells — the `execute-api.*` hosts are in no suite and adding them would widen the drift sweep's vendor budget from a research pass. Successors: the **portal lazy-chunk corpus** (224 chunks, never swept for these tokens) and the new pin's stated limit (**count ≠ set**) | [findings-log/2026-10-14-pool-f-timeline-caller/FINDINGS.md] | #123 |
 | R — reconcile the `deviceFamily` correction against the client consensus | 2026-10-14 | **Negative, on the area's second close condition: the value's casing stays UNOBSERVED, and `docs/05` now says so with the reason.** **0 requests of a 0 cap** — no vendor host was touched and no request of any kind was made, because a zero-request pass cannot have an oracle and this one did not manufacture one. Three findings, and the second is the one that mattered: (1) **The reconciled candidate set is 21 strings under a counting rule stated before the number** (three admitted sources hold 27 between them; the difference of **6** is duplicate **occurrences** across **5** distinct shared tokens — `SIMPLERA` is in all three sources — and the sum is printed beside the union so it cannot be mistaken for it). Every member is *extracted from a committed artefact at a named `file:line`*, so the denominator is re-derivable from a clean clone and an anchor that stops resolving exits non-zero. ⚠ **Unpinned, stated rather than left to be discovered:** the suite guards only the **map axis** — `regression/hurl/05-public-config.check.sh` pins `family count is 16`, which this pass independently re-derived — while **nothing pins the union 21, the sum 27, or the `S-CLIENT-DTO` exclusion**. A pin was considered and declined: a new `check` site moves the static count and every site that states it, and `docs/09` §4 records that widening a gate pattern in the same PR the gate passed is a maintainer decision. The gap is the re-derivation script, not a pin. (2) **One of the three candidate vocabularies the area inherited fails the provenance bar the pass sets for itself** — the third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, inside a section headed at **`:349`** — *"Round 3 — the full `RecentData` payload schema (from xDrip's message classes)"* — which names **no `file:line` and no named commit**, so `CGM` and `CC` are **not admitted** and the union is **21, not 23**; the repair is one cite, since the 2026-10-11 pass read xDrip at `366c97a8`. (3) **The three vocabularies are not one vocabulary with disagreements** — the 16 map tokens are a *published identifier axis*, the client's 5 enum + `NGP` a *prefix-matched routing classification*, and the third-party four a *product-role DTO enum*; measured overlaps are `{SIMPLERA}`, **none**, and `{GUARDIAN}` respectively, so under the client's five `startsWith` tests `CGM`/`CC` match nothing and under the third-party four `BLE`/`SIMPLERA` match nothing (INFERRED, assumptions stated). **The audit re-counted every surviving `deviceFamily` claim against `AGENTS.md` §2.1 and one was deleted outright**: `docs/05`'s "appears as a call-site field name in the lazy-chunk corpus — independent corroboration of the field name" rested on a source that records that token as **0** across the 224 chunks in its own measure table, attributes its real evidence to a different artefact with no `file:line` and no digest, and whose 224 chunk bodies are **not committed** (independent count **0** — `AGENTS.md` §1 deletes the claim, §2.1 deletes the word). Two more re-labelled: `docs/05`'s "the vendor's bundles do not contain" is **false** (the patient lazy chunk carries `medicalDeviceFamily` at byte 83,893), and `docs/10` row 37's `(GUARDIAN, MINIMED, PARADIGM)` loses **`MINIMED`/`PARADIGM`** — ⚠ **corrected 2026-10-15: the count published as their evidence was false.** The row claimed they had one uncited log line plus the row quoting it; `git grep -w` at base `7d915b8` shows **three** files carrying each token as a claimed value and a **fourth** carrying `PARADIGM` as an era label — and moves from OBSERVED to **SOURCE-OBSERVED**, since no client read here is a live response. `GUARDIAN` survives, sourceable twice. **What would change the verdict:** one authenticated `GET /patient/monitor/data`, key-names-only, value verbatim, matched against four axes (client comparison set, model code, display name, 16 map tokens); **a value matching none of the four is itself the finding**. Two successors filed under the area: read-side echo casing, and whether the `_X` suffixes mean anything | [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] | #124 |
 | K — The chunk corpus, for real this time | 2026-10-16 | **Negative on nothing, positive on completion.** Control-flow mining complete: both clinic (225) and patient (211) lazy-chunk corpora swept clean of discovery-key tokens (`baseUrlPde`, `/connect/pde`, `discover/android`, `clcloud`, `api/carepartner`, `system.gc.gz.transition.flags` leaves all 0); `system.logbook.entry.validation.config` recovered in lazy chunk `9481.6977c1a7bd7461f8` (module 79481), structure recorded as `types`/`sensorLocations.options`/`freeText`/`doseUnits.options`/`questions` with values token-gated; cross-client differential declined as not meaningful (5 clinic vs 144 patient unresolved call-site shapes, compared across constant-table vs inlined-routing builds). 0 of a 0 cap — closing on existing committed evidence from issues #56, #78, #103, #121. Successor: the 15 `hcp/configuration/public/*` keys, filed as a docs/10 §1 open question (no new letter can be minted — A–Z all in use). | [findings-log/2026-10-16-k-chunk-corpus/FINDINGS.md] | #140 |
+| AA — does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`? | 2026-10-17 | **Positive, on both hosts, and the area's gate-versus-echo framing is withdrawn as the wrong pair of terms.** The tail is **both** echoed and selective at once. **OBSERVED, 20 of 20 requests, GET only, measured same-host floor 3.304 s** (9 gaps/host, 0 under 2.5 s, controls first per host, `v99` absent -> 403 at `f249b63cb2fc…` and `v11` served -> 200 on both). **No allow-list anywhere**: all 14 `200` bodies echo the requested tail exactly once into `"config"`, and a fabricated tail `android/absent-probe-871` was served verbatim at 3 cells — never 400/404. **At base `v13` on both `.com` and `-trials` the tail gates**: 4 tails select **3** documents, and `3.6`->`3.9` moves advertised `baseUrlCumulus` base (`v13`->`v2`), `baseUrlCareLink` (`v2`->`v1`), `CP[]` length (3->2), country count (109->99 on `.com`, 109->76 on `-trials`) and the SSO config file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against `sso_cp_us_v6.json` on `-trials` and both `sso_cp_us_v6.json` + `eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. The `3.5`/`3.6` documents are byte-identical **across** both hosts; the `3.9`-class document is not, which corrects `docs/00`'s "every cell from 3.9 upward is byte-identical" to *within a host*. **At `-trials` base `v6` the tail gates nothing** — 4 tails including the fabricated one collapse to **one** canonical digest (n=4), re-deriving the digest the 2026-10-17 matrix pass recorded there. **The `v6` 403 split reads as a base-axis effect, not an app-version effect (INFERRED; the refutations are OBSERVED)** — same host, same tail `3.6`, base `v11` -> 200 — but whether `v6` is unrouted on `.com` because of the version segment or the route family is **not established and no choice is made**. **Deviation, disclosed:** claim #151 named `carelink.minimed.com`/`carelink-trials.minimed.com`; the pass sent `clcloud.*`, the host family the route is published on — **the claim's host list was wrong**; it answers the area as posed and does **not** speak to `carelink.*`. **Premise checked:** the closed row on "bare `connect/carepartner/` prefixes dead" probed *prefix parents*, not this routed leaf — **no contradiction**. **No pin added** — a 4-cell pin in `05-public-config` costs 4 requests on **every PR gate** *and* 4 per weekly sweep, and it would not catch the change that matters (the `3.6`-class document departing). **Measure**; counting rule in the log §7. **One source** — no strength word used (`§2.1`). Lookup-vs-threshold **not separable** from 4 tails; carried to **AE** | [findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md] | #155 |
 | S-L1 — the `cluster.idx`-level "is this crawl served at all" instrument, and the verdict on `CC-MAIN-2014-23` | 2026-10-19 | **Closed on its close condition, and the target retired on the SERVED side.** The instrument is committed (`servedness.py`, `pass`/`classify`/`selftest`) and answers served/unserved for any named crawl in **one ranged read**, classified correctly on both controls (`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both **SERVED**) against the absent-id oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`). **`CC-MAIN-2014-23` is SERVED** — `206`, `Content-Range: bytes 0-8191/153 902 243` — and its `minimed.eu` `404` now sits behind a **`200`** control **on that same crawl** (**1 785 B** of `google.com` records), so the standing **indeterminate cell retires as served-but-empty, NOT as "unservable"**; `AGENTS.md` §7 records `index.commoncrawl.org` TLS-dropping from some hosts, so a connection-level failure is a statement about *this box* and discharges nothing. **15 of a 15 cap**, GET only, `data.commoncrawl.org` (11) + `index.commoncrawl.org` (4), **0 to any Medtronic host**, `t_sent` floor **3.537 s** (0 gaps under 3.5 s), **0 retries** at `E[N]` 1.00. **The locate half is the recorded negative: `UNCONVERGED` on both controls** at a 3-page budget, so the control gate withheld every family verdict and the target's locate never ran — `UNCONVERGED` is not a negative. ⚠ **Corrects claim #152's own descriptor**: the readable-absence control is **`CC-MAIN-2024-42`** (area M row 25 `200` / row 45 `404`), **not** `CC-MAIN-2024-22`, whose S-L2 row 45 is a **`200`** with 13 records — a positive-adjacent crawl. Successor: **AD**, the locate with a seed derived from the head read (**0 requests** once the instrument exists). | [findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md] | #152 |
 
 
