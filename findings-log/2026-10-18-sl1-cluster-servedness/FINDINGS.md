@@ -62,7 +62,7 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **1.254848**, which is the figure from the very directory it cites. The
   direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
   no published claim of another pass is disturbed, but the range was wrong and
-  `docs/11:2914` publishes **1.4210** as a peer value
+  `docs/11:2917` publishes **1.4210** as a peer value
   (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
   **What this is not:** a revision of that budget model, and not a second
   population for it. One run of two hosts on a different mix (10 of the 13
@@ -1121,7 +1121,7 @@ fix for the wrong count is itself another round.** Rounds blocked on exactly thi
 commit that fixed the previous one.
 
 **So no single cumulative total is published here.** What the
-record does carry is the twelve headed entries below, which are the evidence that
+record does carry is the twelve headed entries above, which are the evidence that
 matters: each names the commit it reviewed, its verdict and what it found. Rounds
 after those are recorded in the commits that fixed them. The mapping from a fix
 commit to the verdict it answers is therefore checkable there, and is not
