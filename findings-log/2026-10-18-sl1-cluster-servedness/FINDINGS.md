@@ -62,7 +62,7 @@ for **any** crawl. `UNCONVERGED` is not a negative and is not read as one.
   **1.254848**, which is the figure from the very directory it cites. The
   direction of the error runs against this pass (1.00 vs a lowest of 1.25), so
   no published claim of another pass is disturbed, but the range was wrong and
-  `docs/11:2911` publishes **1.4210** as a peer value
+  `docs/11:2914` publishes **1.4210** as a peer value
   (`AGENTS.md` §6 item 5 — prose that does not survive its own source table).
   **What this is not:** a revision of that budget model, and not a second
   population for it. One run of two hosts on a different mix (10 of the 13
@@ -1000,7 +1000,7 @@ Four blocking findings, **all in the new prose of the commit that closed the
 previous round**, and two of them of the exact class that commit had just fixed:
 
 1. **"+149 lines" failed its own arithmetic.** The row moved `docs/11:2820` →
-   `docs/11:2911`, which is **+91**. The +149 is **main's** shift of the same
+   `docs/11:2914`, which is **+91**. The +149 is **main's** shift of the same
    row (2762 → 2911) — a different measurement, never named as such. → corrected,
    with both figures stated so the reader can see which is which. **The commit
    that fixed round 10's "a total that fails its own arithmetic" introduced a
@@ -1111,29 +1111,33 @@ body's Verification table, which is the most legible place to read them — and,
 like every count here, **hand-maintained**: it is applied by a REST call and
 there is no generator for it, so it is not staleness-proof either.
 
-**Rounds after the twelve headed ones, recorded here so the opener's promise
-holds.** Targets and counts are taken from the commit messages that fixed each
-verdict, not from memory. Eleven of these sixteen returned blocking findings;
-one returned none.
+**Rounds after the twelve headed ones.** Their targets and counts are **not
+tabulated here, and that is deliberate.** Every enumeration of this run's
+verification rounds has been wrong within one round of being written — a subtotal
+presented as a whole-run total, a round's findings attributed to the wrong commit,
+a table rebuilt with the same double-count and a new target. The cause is
+structural rather than carelessness: **writing a count invalidates it, because the
+fix for the wrong count is itself another round.** Eight consecutive rounds
+blocked on exactly this and each fix produced the next instance, including in the
+commit that fixed the previous one.
 
-| round | verdict on | blocking | what it found |
-|---|---|---|---|
-| 13 | `88df396` | 2 | a total that failed its own arithmetic, the same figure self-contradicting in the PR body, and a claim that digit form brought the totals under the checker when bold markers make them **invisible** to it |
-| 14 | `88df396` | 3 | **"three hosts"** where the ledger has two (present since `aab5f1a`), the §10 opener promising a completeness the record lacked, and the same bare-fragment clause |
-| 15 | `88df396` | **0** | `scoped re-verify`: no blocking and no non-blocking finding; every checklist item recomputed from the ledger |
-| 16 | `e45cce9` | 4 | the rounds table above misattributing two verdicts and miscounting the total; the same "each returned blocking findings" opener contradicted by its own row 15; and `AD`'s "zero-request" claim contradicting its own per-crawl cost |
+**So the counts are not published, and nothing above claims a total.** What the
+record does carry is the twelve headed entries below, which are the evidence that
+matters: each names the commit it reviewed, its verdict and what it found. Rounds
+after those are recorded **in their own fix commits**, where each is stated
+against the commit it actually reviewed — which is the only place the mapping was
+ever reliable, and the only place a reader can check it.
 
-⚠ **An earlier draft of this table was wrong and is corrected above.** It
-assigned round 13 to `e35935b` and round 14 to `fdd7157`, which double-counted
-one round's findings and omitted another's entirely — a claim misstating what
-past commits did, which is the one thing §10 exists to get right. The counts and
-targets above are read off the fix commits' own messages.
+⚠ **What is true, and needs no count:** across the whole run **every blocking
+finding was a bookkeeping sentence** — an accounting figure, a citation, a scope
+sentence, or a sentence *about* the round history. The substantive claim was never
+contested once. Three classes recur, and they are the transferable part:
 
-**Sixteen rounds, 41 blocking findings (32 across the twelve headed rounds + 2 +
-3 + 0 + 4), and every one of them bookkeeping.** The substantive claim has never
-been contested in any of them. Three classes recur and are now named: a
-**cumulative total in prose**, a **`file:line` citation into a file the same
-commit edits**, and **a fix that lands beside the sentence it was meant to
-remove** — which is how a patch can be "correct" and still leave the blocked text
-standing. The remedy for that last one is boring and it is the only thing that
-worked: **grep the blocked sentence itself, after the commit, every time.**
+1. **a cumulative total in prose**, which the next entry invalidates;
+2. **a `file:line` citation into a file the same commit edits**, which dies on
+   landing (this happened three times);
+3. **a fix that lands beside the sentence it was meant to remove**, so a patch can
+   be correct and still leave the blocked text standing.
+
+The remedy that worked, and the only one, is boring: **grep the blocked sentence
+itself, after the commit, every time.**
