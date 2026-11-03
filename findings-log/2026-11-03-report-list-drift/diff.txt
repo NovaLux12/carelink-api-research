@@ -1,0 +1,33 @@
+# set difference: 2026-10-13 capture -> 2026-11-03 live
+# recorded 214   live 236   added 23   removed 1   net +22
+
+## ADDED (in live, not in recorded) — order of appearance in the live list
++00 'MMT-5100       '
++01 'MMT-5100K'
++02 'MMT-5120       '
++03 'MMT-5100CLX'
++04 'MMT-5100CLX    '
++05 'MMT-5100CLX2'
++06 'MMT-5100CLX2   '
++07 'MMT-5100CLXAL1'
++08 'MMT-5100CLXAL14'
++09 'MMT-5100CLXAL14M'
++10 'MMT-5100CLX2AL1'
++11 'MMT-5100CLX2AL14'
++12 'MMT-5100CLXP'
++13 'MMT-5100CLXP   '
++14 'MMT-5100CLXPAL1'
++15 'MMT-5100CLXPAL14'
++16 'MMT-5100JLXAL1'
++17 'MMT-5100JLXAL14'
++18 'MMT-5100JLXAL14M'
++19 'MMT-5100JLX2AL1'
++20 'MMT-5100JLX2AL14'
++21 'MMT-5100JLXPAL1'
++22 'MMT-5100JLXPAL14'
+
+## REMOVED (in recorded, not in live)
+-   'MMT-5101'
+
+## distinct values
+recorded distinct: 212   live distinct: 234
