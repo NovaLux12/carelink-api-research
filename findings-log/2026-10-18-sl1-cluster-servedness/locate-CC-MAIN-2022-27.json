@@ -1,0 +1,33 @@
+{
+ "budget": 3,
+ "note": "budget 3 pages, 6 of a 15 cap",
+ "pages_used": 3,
+ "reads": [
+  {
+   "bytes": 4194304,
+   "first_key": "org,openspeleo)/openspeleo/googlefullmap.php?listaunirecid=|42&table=os_groups 20220627062854",
+   "last_key": "pl,ckz-debica)/27631/en5/dental-night-guard-dreams-more-frequent-urination-than-normal.html 20220704131125",
+   "lines": 32324,
+   "range": 128550094
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "com,sculpturesnogler)/de/mad-apfel-sitzend-mantel-gold-1092.html 20220701012638",
+   "last_key": "com,superlab360)/games-zu-qiu/ouqingu19 20220706075103",
+   "lines": 34934,
+   "range": 62177895
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "fr,biocooplaciotat)/recettes-biocoop-la-ciotat/poelee-de-fruits-aux-epices-petites-tuiles-craquantes-1577.html 20220704153945",
+   "last_key": "gr,kathemera)/2022/06/206548/%cf%84%ce%bc%ce%ae%ce%bc%ce%b1-%ce%b1%ce%b3%ce%b3%ce%bb%ce%b9%ce%ba%cf%8e%ce%bd-%ce%b5%ce%be-%ce%b1%cf%80%ce%bf%cf%83%cf%84%ce%ac%cf%83%ce%b5%cf%89%cf%82-%ce%b1%cf%80%cf%8c-%cf%84%ce%bf-%ce%b5%ce%ba-3 20220630154424",
+   "lines": 29555,
+   "range": 95363994
+  }
+ ],
+ "state": "UNCONVERGED",
+ "window": [
+  66372199,
+  95363994
+ ]
+}

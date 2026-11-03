@@ -8,11 +8,11 @@ contact_links:
     about: Evidence classes, the never-publish rules, and the traps.
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
-    # 2, computed, not inherited. K closed 2026-10-16; A–Z all closed
-    # (3 open — AC, AE, AF — + 27 closed). Successors now mint past Z as two-letter ids (AA, AB, …) — see
-    # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
-    # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
-    about: 3 open areas (AC, AE, AF) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+    # 4, computed, not inherited. K closed 2026-10-16; A–Z all closed
+    # (4 open + 27 closed as of 2026-10-19; `AD` minted by lane sl1 and merged against
+    # the sibling `AE`/`AF` mints, so this figure is measured, never inherited).
+    # Successors now mint past Z as two-letter ids (AA, AB, …) — see
+    about: 4 open areas (AC, AD, AE, AF) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
     about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.

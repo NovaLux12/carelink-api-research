@@ -1,0 +1,13 @@
+3	collinfo	index.commoncrawl.org	collinfo	/collinfo.json	200	35226
+4	absent-crawl	data.commoncrawl.org	absent-crawl	/cc-index/collections/CC-MAIN-9999-99/indexes/cluster.idx#0-8191[8192B]	404	327
+5	head-ctrlA	data.commoncrawl.org	head-ctrlA	/cc-index/collections/CC-MAIN-2022-27/indexes/cluster.idx#0-8191[8192B]	206	8192
+6	head-ctrlB	data.commoncrawl.org	head-ctrlB	/cc-index/collections/CC-MAIN-2024-42/indexes/cluster.idx#0-8191[8192B]	206	8192
+7	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2022-27/indexes/cluster.idx#128550094-132744397[4194304B]	206	4194304
+8	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2022-27/indexes/cluster.idx#62177895-66372198[4194304B]	206	4194304
+9	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2022-27/indexes/cluster.idx#95363994-99558297[4194304B]	206	4194304
+10	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2024-42/indexes/cluster.idx#101088653-105282956[4194304B]	206	4194304
+11	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2024-42/indexes/cluster.idx#48447174-52641477[4194304B]	206	4194304
+12	locate	data.commoncrawl.org	locate	/cc-index/collections/CC-MAIN-2024-42/indexes/cluster.idx#74767913-78962216[4194304B]	206	4194304
+13	head-target	data.commoncrawl.org	head-target	/cc-index/collections/CC-MAIN-2014-23/indexes/cluster.idx#0-8191[8192B]	206	8192
+14	cdx-ctrl-target	index.commoncrawl.org	cdx-ctrl-target	/CC-MAIN-2014-23-index?url=google.com&output=json&matchType=domain&limit=5	200	1785
+15	cdx-probe-target	index.commoncrawl.org	cdx-probe-target	/CC-MAIN-2014-23-index?url=minimed.eu&output=json&matchType=domain	404	48
