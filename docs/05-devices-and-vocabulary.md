@@ -123,7 +123,7 @@ because the six Flex model numbers are consistent across every source held.
 |---|---|---|---|
 | patient config | `personal.device.family.to.model.mapping` | 16 families | `MMT-8200`, `MMT-8201`, `MMT-8400`, `MMT-8401` — present in the HCP report config **and in both portal builds**, **absent here** |
 | clinic bundle device table (both builds — see per-build note below) | `hp-main.js` module `68462`, byte range 2999400–3007200; PUMP / SENSOR / StandaloneCGM / InsulinDelivery | **80 distinct `MMT-*`, 9 distinct `SKU-*`** | `MMT-8600`, `MMT-8601` — absent from the table *in the same file* |
-| HCP report config | `/hcp/configuration/public/pow.common.core.report.generation` → `reportFileNamingSupportedPumpModels` (214 entries) | includes MMT-8600/8601 and MMT-8200/8201/8400/8401 | **a third, partial table** — no single table is authoritative |
+| HCP report config | `/hcp/configuration/public/pow.common.core.report.generation` → `reportFileNamingSupportedPumpModels` (**236** entries as of 2026-11-03; was 214 at the 2026-10-13 classification) | includes MMT-8600/8601 and MMT-8200/8201/8400/8401 | **a third, partial table** — no single table is authoritative |
 
 > **Per-build note — 2026-10-13 (area G).** "The clinic bundle's device table"
 > above is now confirmed to be **one table in two builds, not two tables**: the
@@ -216,6 +216,34 @@ findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
 > *map* and is now wrong if read of the *config*. Guidance item 4 below is
 > read the same way: the patient **map** is missing those four codes; the
 > patient **config** is not.
+
+> ### ⚠ Correction — 2026-11-03 — the list is 236, not 214, and one code was removed
+>
+> Re-derived live (`GET /patient/v2/configuration/public` → 200, 69 top-level
+> keys, unchanged). The patient list now holds **236 entries**: **23 added**
+> and **1 removed** (`MMT-5101`), net +22. Every addition is an
+> `MMT-5100`/`MMT-5120` family variant (`CLX`, `CLX2`, `CLXP`, `JLX`, `AL1`,
+> `AL14`, `AL14M` and their padded-space forms), so the growth is one device
+> line gaining report-naming coverage rather than a broad expansion
+> [source: findings-log/2026-11-03-report-list-drift/FINDINGS.md; `diff.txt`].
+>
+> **The removal is the part a count cannot carry.** `MMT-5101` — which the
+> spelling-traps table below records as a bare alias and which appeared in the
+> 47-unmatched prefix group as `5101` — is no longer in the list. Why is
+> **NOT KNOWN** and no inference is offered.
+>
+> Padding convention is unchanged: five of the 23 additions carry trailing
+> spaces, in the same form as `MMT-5100J      `. The recorded list was 214
+> entries / 212 distinct; the live list is 236 / 234.
+>
+> **Scope limit, stated.** Only the **patient** copy of this list was
+> re-derived. `carelinkhp.minimed.eu` returned **412, 0 B** — the documented
+> precondition-failure state for that host, not a 404 fallback — and was not
+> retried. Whether the HCP copy moved with it is **OPEN**.
+>
+> The 2026-10-13 classification above remains a true record of that capture and
+> is left as written; the [regression pin](../regression/hurl/05-public-config.check.sh)
+> now carries 236.
 
 ## Spelling traps
 

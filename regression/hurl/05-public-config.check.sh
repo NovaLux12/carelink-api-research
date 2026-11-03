@@ -97,12 +97,16 @@ done
 # normalise() strips it; a naive exact-match parser would silently miss them.
 check "SIMPLERA still padded (trap)"        '.["personal.device.family.to.model.mapping"].SIMPLERA | index("MMT-5100       ") != null' 'true'
 
-# --- Report-naming list (area H, #33): 214 entries, classified 2026-10-13 ---
+# --- Report-naming list (area H, #33): 236 entries, re-derived 2026-11-03 ---
 # personal.common.core.report.generation.reportFileNamingSupportedPumpModels.
 # The list is a superset vocabulary reaching past the family map (47 wire
 # codes match no family), so its length and the two anomaly sentinels are
 # pinned: if Medtronic adds a model or dedupes, this fails loudly.
-check "report list length is 214"           '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | length' '214'
+# Was 214 at the 2026-10-13 classification; it is now 236 — 23 entries added
+# (all MMT-5100/MMT-5120 variants) and 1 removed (MMT-5101). A count-only pin
+# cannot see the removal, which is why the diff artefact is committed with it.
+# [source: findings-log/2026-11-03-report-list-drift/FINDINGS.md]
+check "report list length is 236"           '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | length' '236'
 check "report list contains MMT-8200"       '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | index("MMT-8200") != null' 'true'
 check "report list duplicates MMT-9015"     '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | map(select(. == "MMT-9015")) | length' '2'
 check "report list keeps padded MMT-5100J"  '.["personal.common.core.report.generation"].reportFileNamingSupportedPumpModels | index("MMT-5100J      ") != null' 'true'
