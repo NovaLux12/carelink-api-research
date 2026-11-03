@@ -3379,9 +3379,9 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **4 open plus 27 closed**
-stand today (`AC`, `AD`, `AE`, `AF` — `AD` minted 2026-10-19 by lane sl1 and merged
-against the `AE`/`AF` mints; counted from the `^### [A-Z]{1,2}.` headings, not
+**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 27 closed**
+stand today (`AC`, `AD`, `AE`, `AF`, `AB` — `AD` minted 2026-10-19 by lane sl1, `AB`
+minted by lane l2; counted from the `^### [A-Z]{1,2}.` headings, not
 inherited); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
