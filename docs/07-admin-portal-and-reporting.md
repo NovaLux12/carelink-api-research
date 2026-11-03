@@ -118,7 +118,7 @@ token-gated (`personal/media/config/<locale>` → 401) and one is an empty `{}`
 | `cua.control.codes.settings` | 778 B — the HCP twin of the patient `csr.control.codes.settings`. **Control** vocabulary (`dpml`, `tcc`, `tup`, `lhpro`, `lghpro`, `vex`, `ssd`, `gstpro`, `gstrc`), **no N-codes, no severity vocabulary** |
 | `logbook.supported.entry.types` | 226 B — **byte-identical, list-for-list, to the patient-side key**. The key is unprefixed, and unprefixed means "shared", not "patient" |
 | `user-identifier-settings?countryCode=…` | the only `public/*` key that takes a parameter and genuinely varies: US = bare 10-digit phone (`^\d{10}$`), EU/DE = 20-char Unicode class |
-| `pow.crm.settings` · `cua.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` and the same shape with `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire |
+| `pow.crm.settings` · `cua.crm.settings` | `{"base.uri":"https://carelink.medtronic.eu/crm","product":"pow","version":"4.5"}` and the same shape with `base.uri` = `carelink-support.medtronic.eu/crm` — the **CUA (support) vs POW (clinic) CRM split**, confirmed on the wire. **Superseded in its reading 2026-10-17:** the split is **not deployment-dependent** — `cua.crm.settings` answers on the clinic deployments too and carries `"product": "pow"` on all three hosts probed, so a `cua.` prefix does not mean "support deployment". See *Deployment portability of the 15 verdicts* below |
 | `hcp.banner.notifications` · `pow.follow.up.settings` · `pow.country.media.groups` · `pow.invite.to.personal.uri` | a disclosed **maintenance window** (`2026-08-20T16:00Z`→`16:45Z`) with `timezone:"PT"` hardcoded on an EU portal; email rate limits, a URL regex, a 3-domain allowlist; 37 + 51 country codes; a bare `https://carelink.minimed.eu` |
 | `pow.nutrino.cc.{broker,metadata}.service.config` | the `commoncore` report hosts and sub-paths — see below |
 
@@ -150,6 +150,75 @@ recorded and this table neither confirms nor refutes it. What the table adds is 
 `.com` **support** host publishes the **clinic** CRM base in `pow.crm.settings` —
 INFERRED reading: the base tracks the **deployment** (TLD) rather than the product. One
 key, three hosts, no `cua.*` reading; offered as a reading, not a finding.
+
+> ⚠ **That reading is now measured — 15 keys × 3 hosts, 2026-10-17** — and the inference
+> stands, with the reading replaced by a result and one caveat added
+> [source: findings-log/2026-10-17-hcp-config-deployments/FINDINGS.md].
+> `carelink.medtronic.com` and `carelink-support.medtronic.com` are **byte-identical on all
+> 15** route literals while serving **two different JavaScript builds**
+> (`2a7fa8e7af519c2b…` 3 397 615 B against `a054555a0f22176e…` 3 410 666 B, both digests
+> re-asserted this pass), and in **6** of the 15 the only difference anywhere is
+> `carelink.medtronic.eu` against both `.com` hosts. The axis that moves content is the
+> **TLD**; the product role does not move it. Area A's caveat, restated rather than
+> inherited: `carelink-support.medtronic.eu` was **not** swept, so its verdicts are
+> **INFERRED** from the digest pair and are excluded from every figure below.
+
+### Deployment portability of the 15 verdicts — **15 of 15**, and the POW/CUA split is not there
+
+The single-deployment reading above is now three deployments wider. Each host's build was
+re-fetched by its **content-hashed asset name** and its recorded digest asserted before any
+key list taken from it was used (OBSERVED, **4 of 4** reproduce), and each host's candidate
+list was extracted offline from **that host's own route table** — never from this page.
+**113 of a 113 cap** — the cap was revised three times (85 → 90 → 100 → 113) and every revision is stated in the log head; **every request over budget was the pinned suite the gate runs on every push**, and **no row was deleted to absorb it**, `GET` only, ≥2.5 s same-host inside a shared per-host lock, measured
+`t_sent` floor **2.276 s** over 57 gaps with 1 sub-floor reading and **no cause asserted**
+[source: findings-log/2026-10-17-hcp-config-deployments/FINDINGS.md].
+
+**The verdicts are deployment-portable: 15 of 15 keys carry the same status verdict on
+`carelink.medtronic.com`, `carelink.medtronic.eu` and `carelink-support.medtronic.com` —
+the same 15 that `HCP-CONFIG-SCHEMA.md` §10 records for `carelinkhp.minimed.eu`.** All four
+controls passed on all three hosts, which is what makes the two 404s per host trustworthy:
+the certainly-absent path returned **404 with 0 bytes and no `content-type`** on all three
+(not the `carelinkhp` 5518 B HTML trap), `CSU.CONTROL.CODES.SETTINGS` → **404** against
+`cua.control.codes.settings` → **200** re-derives the case-sensitivity half on each host, and
+`logbook.supported.entry.types` with **no header** returned **412** on all three.
+
+**The POW/CUA split is not visible on this surface — that is the answer, and it supersedes
+the reading above.** `cua.*` answers on the clinic deployments and `pow.*` answers on the
+support deployment; **both namespaces answer everywhere**, and the payloads say so
+themselves: **`cua.crm.settings` carries `"product": "pow"` on all three hosts** (OBSERVED).
+`docs/07`'s earlier sentence describing the split stands as a record of what one key on one
+host showed, and the following sentence is now settled: **`cua.crm.settings` was probed on
+all three hosts** — 200 · 105 B / 104 B / 105 B, `base.uri` the **support** CRM while
+`product` reads `pow`. A `cua.` prefix does not mean "support deployment"; a client must read
+`base.uri`, never the prefix. The split is real, but it lives in the bundle's runtime
+product selection (`JS-API-SURFACE.md` §7.15) and nowhere on this config surface.
+
+**Same verdict, different body — and the two axes are different.** **9 of 15** keys are
+byte-identical across all three hosts; the **6** that differ are `cua.crm.settings`,
+`pow.crm.settings`, `pow.invite.to.personal.uri`, `hcp.banner.notifications`,
+`pow.nutrino.cc.broker.service.config` and `pow.nutrino.cc.metadata.service.config` — in
+every one the `.eu` host is the odd one out and the two `.com` hosts match.
+
+Three deployment-level facts this pass adds, none of which `docs/07` recorded:
+
+- **`carelink-support.medtronic.com` serves no `content-security-policy`, no
+  `strict-transport-security` and no `x-content-type-options`** — **0 of 19** responses each,
+  against **19 of 19** on both clinic hosts — and advertises
+  `access-control-allow-headers: X-System-ID` where both clinic hosts advertise
+  `X-System-ID, Content-Type, authorization` (20 of 20 responses each). **Severity: low** —
+  a hardening gap, not an access control, and **no cause is asserted**. Recorded as an
+  observation; it belongs beside `docs/08`'s F2, which records the *key* replicating across
+  deployments while the *hardening* does not.
+- **A credential-shaped `x-api-key` is reachable through this surface.** `docs/08` F2 records
+  the key material inside the public bundle; it is also served **unauthenticated** by
+  `pow.nutrino.cc.{broker,metadata}.service.config` on the `.com` deployments, where
+  `carelink.medtronic.eu` serves the **placeholder** the pinned suite asserts. Value
+  **redacted** per `SECURITY.md`; `findings-log/2026-10-17-hcp-config-deployments/REDACTIONS.md`
+  records the substitution. Already known — **not a new disclosure**.
+- **`application/octet-stream` on 11 of the 13 answering keys**, on all three hosts — a far
+  wider version of the settled note below. **Whether that is per-host or a loose 2026-10-08
+  record is NOT determined**: `carelinkhp`'s config surface was not re-probed, its own §10
+  saying do not re-run it.
 
 On the **shadow** portal `carelink.medtronic.eu` (no header, unauthenticated), the same
 family was probed. `/hcp/configuration/public/pow.crm.settings` → **200, 96 B**, while
