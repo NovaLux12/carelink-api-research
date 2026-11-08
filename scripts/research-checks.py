@@ -502,8 +502,14 @@ def check_ledger_census():
              'can be checked against it (wrong cwd, or the rule broke)')
         return
 
-    claim_pat = re.compile(r'(?<![\w.])([\d,]{1,5})\s+(?:committed|tracked)\s+ledgers?\b'
-                           r'|(?<![\w.])([\d,]{1,5})\s+committed\s+`?results\.jsonl`?\s+files?')
+    # Figure-then-noun, allowing a connector between them (`=`, `is`, a dash,
+    # a colon, a semicolon) — the shapes a person actually writes. Plus
+    # noun-then-figure, which is the same claim in the other order.
+    claim_pat = re.compile(
+        r'(?<![\w.])([\d,]{1,5})\s*(?:[=\u2013\u2014:\-;]|\bis\b)?\s*'
+        r'(?:committed|tracked)\s+ledgers?\b'
+        r'|(?<![\w.])([\d,]{1,5})\s+committed\s+`?results\.jsonl`?\s+files?'
+        r'|\b(?:committed|tracked)\s+ledgers?\b\s*(?:=|is|are|:)\s*([\d,]{1,5})\b')
     anchor_pat = re.compile(r'(?<![\w`/-])([0-9a-f]{7,40})(?![\w`/-])')
     para_break = re.compile(r'^\s*$|^\s*(?:#{1,6}\s|[|>]|[-*+]\s)')
 
@@ -601,21 +607,43 @@ def check_ledger_census():
                 if l.lstrip().startswith('```'):
                     inf = not inf
                     continue
-                if not inf:
+                if not inf and not l.strip().startswith('|'):
                     out_span.append(l)
             joined = ' '.join(norm(l) for l in out_span)
-            own = norm(line)
+            # A table row is a reading, not a sentence. The joined path drops
+            # them above; the single-line unit needs the same guard, or
+            # `> | committed ledgers | 50 | 51 |` matches noun-then-figure here.
+            # A table row is a reading, not a sentence — with or without a
+            # blockquote marker in front of it.
+            own = '' if re.match(r'\s*>?\s*\|',
+                                 re.sub(r'^\s*>\s?', '', line)) else norm(line)
             if re.match(r'\s*>\s*', line):
-                # A quoted line is only a claim if it states a figure in its own
-                # body; the `>` runs inside a block are joined for wrapping too.
+                # A blockquote, including LAZY CONTINUATION lines: markdown lets
+                # a paragraph continue inside a quote without repeating `>`, so
+                #   > The census is **94**
+                #   committed ledgers.
+                # is one quoted sentence. Joining only the contiguous `>` run
+                # split it in half — the `>` line held no claim and the
+                # continuation walked back to a `>` line and stopped. The run
+                # therefore continues until a blank line or a new block marker.
                 lo2 = i
                 while lo2 > 0 and re.match(r'\s*>', lines[lo2 - 1]):
                     lo2 -= 1
                 hi2 = i
-                while hi2 + 1 < len(lines) and re.match(r'\s*>', lines[hi2 + 1]):
+                while hi2 + 1 < len(lines):
+                    nxt = lines[hi2 + 1]
+                    if not nxt.strip():
+                        break
+                    if re.match(r'\s*(?:#{1,6}\s|\||[-*+]\s|```)', nxt):
+                        break
                     hi2 += 1
-                joined = ' '.join(norm(re.sub(r'^\s*>\s?', '', l))
-                                  for l in lines[lo2:hi2 + 1])
+                body = [re.sub(r'^\s*>\s?', '', l) for l in lines[lo2:hi2 + 1]]
+                # A table row inside the quote is a reading, not a sentence:
+                # joining the quote's table let `committed ledgers | 50 | 51`
+                # read as a claim about 50. Same exclusion the top-level scan
+                # applies, applied after the `>` marker is stripped.
+                body = [l for l in body if not l.strip().startswith('|')]
+                joined = ' '.join(norm(l) for l in body)
             return [(own, i, i, lo), (joined, lo + 1, hi + 1, lo)]
 
         seen = set()   # per FILE: one paragraph is one claim, however many lines
@@ -626,7 +654,8 @@ def check_ledger_census():
                 continue  # fenced code sample, not prose
             for text, lo_no, hi_no, para_start in scan_units(i):
                 for m in claim_pat.finditer(text):
-                    value = int((m.group(1) or m.group(2)).replace(',', ''))
+                    raw = m.group(1) or m.group(2) or m.group(3)
+                    value = int(raw.replace(',', ''))
                     before = text[:m.start()]
                     after = text[m.end():]
                     if subset_before.search(before) or subset_after.match(after):
