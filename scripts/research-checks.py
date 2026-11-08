@@ -507,6 +507,17 @@ def check_ledger_census():
     anchor_pat = re.compile(r'(?<![\w`/-])([0-9a-f]{7,40})(?![\w`/-])')
     para_break = re.compile(r'^\s*$|^\s*(?:#{1,6}\s|[|>]|[-*+]\s)')
 
+    # A figure about a PART of the population is not a claim about the
+    # population. "18 committed ledgers were refused" is a subset sentence: it
+    # was never true or false as a census figure, so requiring it to match the
+    # whole-tree count forces a truthful sentence to be rewritten and reports
+    # "the population is 55" about a sentence that never claimed 55. Narrow by
+    # design — an explicit partitive immediately before the figure, or a
+    # past-tense verb immediately after it.
+    subset_before = re.compile(r'(?:\bof\s+(?:the|these|those|which|them)\b|\bout\s+of\b)'
+                               r'[^.]{0,24}$', re.I)
+    subset_after = re.compile(r'^\s+(?:were|was|had|have|has|are\s+still)\b', re.I)
+
     def norm(line):
         """Strip markdown emphasis so `**50** committed ledgers` is a figure."""
         return re.sub(r'[*`_]', '', line)
@@ -558,37 +569,103 @@ def check_ledger_census():
     for path in docs_sites + log_sites:
         strict = path in docs_sites
         lines = read(path).splitlines()
+
+        def scan_units(i):
+            """The claim text for line i, joined across a hard wrap.
+
+            A figure landing at end-of-line is the NORMAL shape in a file
+            hard-wrapped at 80 columns, not a contrived one: matching a single
+            line let `The census is **55**\\ncommitted ledgers` pass silently,
+            which is the cheapest possible bypass. So the paragraph is joined
+            before the figure is looked for.
+
+            A blockquote is scanned as a BODY rather than skipped. Quoted
+            history is evidence, but the house form for stating a NEW census
+            figure is a dated correction blockquote — the S-L4c block — so
+            skipping `>` lines excluded the one place a fresh figure is most
+            likely to be written. The distinction is enforced by the anchor
+            requirement, not by refusing to look.
+            """
+            lo = i
+            while lo > 0 and not para_break.match(lines[lo - 1]):
+                lo -= 1
+            hi = i
+            while hi + 1 < len(lines) and not para_break.match(lines[hi + 1]):
+                hi += 1
+            # Never let the joined window cross a fence: a census sentence
+            # inside a code block is an example, and joining the surrounding
+            # paragraph across the ``` boundaries made one look like prose.
+            span = lines[lo:hi + 1]
+            out_span, inf = [], False
+            for l in span:
+                if l.lstrip().startswith('```'):
+                    inf = not inf
+                    continue
+                if not inf:
+                    out_span.append(l)
+            joined = ' '.join(norm(l) for l in out_span)
+            own = norm(line)
+            if re.match(r'\s*>\s*', line):
+                # A quoted line is only a claim if it states a figure in its own
+                # body; the `>` runs inside a block are joined for wrapping too.
+                lo2 = i
+                while lo2 > 0 and re.match(r'\s*>', lines[lo2 - 1]):
+                    lo2 -= 1
+                hi2 = i
+                while hi2 + 1 < len(lines) and re.match(r'\s*>', lines[hi2 + 1]):
+                    hi2 += 1
+                joined = ' '.join(norm(re.sub(r'^\s*>\s?', '', l))
+                                  for l in lines[lo2:hi2 + 1])
+            return [(own, i, i, lo), (joined, lo + 1, hi + 1, lo)]
+
+        seen = set()   # per FILE: one paragraph is one claim, however many lines
         for i, line in enumerate(lines):
-            if re.match(r'\s*[|>]', line):
-                continue  # table row / quoted history — not a live prose claim
+            if re.match(r'\s*\|', line):
+                continue  # table row — quoted history, not a live prose claim
             if in_fence(lines, i):
                 continue  # fenced code sample, not prose
-            for m in claim_pat.finditer(norm(line)):
-                value = int((m.group(1) or m.group(2)).replace(',', ''))
-                where = f'{path}:{i + 1}'
-                readings = [(a, anchor_reading(a))
-                            for a in anchor_pat.findall(' '.join(paragraph(lines, i)))]
-                readings = [(a, n) for a, n in readings if n is not None]
-                if not readings:
-                    msg = (f'{where} states {value} committed ledgers with no resolving '
-                           f'commit anchor beside it — the population is derived from the '
-                           f'tree and is {population} at this head, so the figure is false '
-                           f'one merge later; write "measured at `<sha>`" or state it as '
-                           f'command output')
-                elif not any(n == value for _, n in readings):
-                    anchors = ', '.join(f'{a}→{n}' for a, n in readings)
-                    msg = (f'{where} states {value} committed ledgers, but its anchor(s) '
-                           f'({anchors}) did not hold that many; measured {population} at '
-                           f'this head — re-derive, do not bump the figure')
-                else:
-                    continue
-                if strict:
-                    fail(msg)
-                    violations += 1
-                else:
-                    warn(msg + ' (findings-log/ is append-only — supersede with a dated '
-                               'correction, do not rewrite in place)')
-                    stale += 1
+            for text, lo_no, hi_no, para_start in scan_units(i):
+                for m in claim_pat.finditer(text):
+                    value = int((m.group(1) or m.group(2)).replace(',', ''))
+                    before = text[:m.start()]
+                    after = text[m.end():]
+                    if subset_before.search(before) or subset_after.match(after):
+                        continue  # partitive, not a census claim
+                    where = (f'{path}:{i + 1}' if para_start == i
+                             else f'{path}:{lo_no}-{hi_no}')
+                    # One paragraph is one claim. Join-matching finds the same
+                    # figure from every line in the paragraph, so the key is the
+                    # paragraph's FIRST line for both units — otherwise a
+                    # wrapped paragraph reports once per line and the output is
+                    # 28 warnings about one sentence.
+                    key = (path, para_start, value)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    readings = [(a, anchor_reading(a))
+                                for a in anchor_pat.findall(' '.join(paragraph(lines, i)))]
+                    readings = [(a, n) for a, n in readings if n is not None]
+                    if not readings:
+                        msg = (f'{where} states {value} committed ledgers with no '
+                               f'resolving commit anchor beside it — the population is '
+                               f'derived from the tree and is {population} at this head, '
+                               f'so the figure is false one merge later; write '
+                               f'"measured at `<sha>`" or state it as command output')
+                    elif not any(n == value for _, n in readings):
+                        anchors = ', '.join(f'{a}→{n}' for a, n in readings)
+                        msg = (f'{where} states {value} committed ledgers, but its '
+                               f'anchor(s) ({anchors}) did not hold that many; measured '
+                               f'{population} at this head — re-derive, do not bump the '
+                               f'figure')
+                    else:
+                        continue
+                    if strict:
+                        fail(msg)
+                        violations += 1
+                    else:
+                        warn(msg + ' (findings-log/ is append-only — supersede with a '
+                                   'dated correction, do not rewrite in place)')
+                        stale += 1
     if not violations and not stale:
         ok(f'{population} committed ledgers at this head, derived; every prose '
            f'statement of the census is anchored to a commit that held it')
