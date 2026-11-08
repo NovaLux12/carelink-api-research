@@ -1206,3 +1206,65 @@ evidence class. **0 requests in this round** — all ten were repaired from the 
 ledger, the committed scripts and `docs/01`/`docs/07` as they stand, and F7's check used a
 local clone rather than a vendor request. Re-derived after these edits: `research-checks.py`
 exit 0, `measure_assertions.py` `217 431`.
+
+## Correction (2026-11-08) — six receipt defects in §B, §H and §M
+
+This pass is **append-only** (`AGENTS.md` §3), so every sentence named below **stands as
+written and this section is the correction** — the same handling §B already uses for its own
+§2.1 strength word. None of the six is a measurement; all six are prose about where a claim
+lives or which round made it. **0 requests**: every figure below is a `grep`, `awk` or `sed`
+over this tree.
+
+**1 · §M says the ⚠ count over §H is 1. It is 2.** §M's F1 line read that §I's "the two ⚠
+disclosure blocks" was wrong because "§H holds **one** (`grep -c '⚠'` over §H returns 1)".
+§H runs from its heading to §I's, `sed -n '754,845p' … | grep -c '⚠'` returns **2** — the
+misreported-fix block at **:809** and the false-causal-claim block at **:813**. The count is
+also range-sensitive, which is worth stating rather than hiding: a range that runs past §H's
+own end into §I (`754,930`) returns **4**, because §I quotes the mark twice at :893 and :898.
+**So the "one" was wrong twice over** — wrong for §H's own range and wrong for the wider range
+the sentence implied. What survives from F1 is only the part that was checked by reading the
+text rather than counting a glyph: §I's "two ⚠ *disclosure blocks*" is still not what §H has,
+because :813 is a correction **to** :809's block, not a second independent disclosure. The
+number to quote is **2 lines, one disclosure and one correction to it**; the sentence's
+parenthetical command is withdrawn here rather than replaced, since a bare glyph count cannot
+express that distinction.
+
+**2 · §M says round 8's F1–F10 are "recorded in `PR.md` and not here". Only F2 is in `PR.md`.**
+`grep -o 'F[0-9]\+' PR.md | sort | uniq -c` returns **`2 F2`** and nothing else — both hits are
+the same `docs/08-security-findings.md` §F2 citation, which is a different numbering scheme
+altogether. The ten findings F1–F10 are recorded **in §M itself**, item by item, which is why
+§M can name each one's site. The true statement: **round 8's ten findings are recorded in this
+section; `PR.md` carries only the `docs/08` §F2 reference, which is unrelated.**
+
+**3 · §M attributes the second "re-derived" to §J. It is in §K.** F3's receipt said "§L's
+'independently re-derived' and §J's identical phrase are removed". `awk 'NR>=916&&NR<=1062 &&
+/re-derived/'` finds the two instances at **:990** and **:1046** — both inside **§K**, which
+opens at :986 and ends where §L opens at :1063. §J (`:916`–`:985`) carries **no** instance of
+the word. The cross-reference is **§K**, twice; "§L's" in that sentence is correct, since §L
+opens at :1063 and its own phrase is separate.
+
+**4 · §B credits the removal at line 65 to "the round-5 repair". It was round 4.** §H's
+heading reads "round 4: five documentary defects", and §I states the same thing directly: "the
+live cap sentence was **changed in round 4** to discharge the §2.1 exposure". Round 5's two
+edits were §H's misreported-fix repair and §B's referent disambiguation (§I item 1), neither of
+which touched line 65. `git log -S` on the sentence is the confirming instrument; the two
+in-file statements at §H:754 and §I:869 agree without it. **§B's "round-5 repair" should read
+"round-4 repair".**
+
+**5 · §B says "§J corrects this location". The correction is §I item 1.** §I item 1 is headed
+"Repair 3 was half-done, and the half that was left is the half that mattered" and is the
+paragraph that resolves §B's two referents; §J (`:916`–) opens after it and addresses a
+different defect class. §B's pointer should read **§I item 1**. (This is F8's own defect
+surviving in F8's receipt: the fix named the right fact and the wrong section.)
+
+**6 · §H says "two later sections inherited" the false causal claim. None did.** §H's ⚠ at
+:813 asserts the `plan.md`/`plan.json` propagation claim "carried … which two later sections
+inherited". §M contradicts it nine lines of section later — "**§I item 2 and §L were checked for
+the same inheritance and do not carry it**" — and §M is the section that actually grepped both.
+The true statement is the narrower one §M already carries: the claim propagated **nowhere**;
+§I item 2 and §L were checked and are clean. The word "inherited" in :813 is a claim about two
+other sections made without opening them, which is the exact defect class §M exists to record.
+
+**What did not change.** Every measurement — the 15×3 portability grid, every body digest, the
+header populations, the 2.276 s floor, both route tables — and every request count. **0
+requests in this correction.**
