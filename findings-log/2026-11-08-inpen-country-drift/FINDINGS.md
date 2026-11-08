@@ -144,7 +144,7 @@ history is a second thing to rotate if the vendor ever changes what it serves.
 Both raw files are removed and `.gitignore`d in the shape of the precedent. What
 remains is sufficient to audit **part** of §1–§3 — and which part is stated
 precisely below rather than claimed wholesale, because "sufficient" turns out to be
-true of four rows and false of three:
+true of six rows and false of four:
 
 | Artefact | What it supports |
 |---|---|
@@ -153,13 +153,29 @@ true of four rows and false of three:
 | `results.jsonl` | the three requests, with counts, timings, and the **31 / 115** figures |
 | §7 below | the commands to re-derive everything else from a fresh GET |
 
-**Auditable from what is committed:** the count (31), the reporting count (115), the
-verbatim list, and the delta against the recorded 29 — four of §1's rows in full.
+**Auditable from what is committed — six of §1's ten claims:**
 
-**NOT auditable from what is committed:** the object-vs-array type, the
-all-values-`true` check, and the subset comparison against the reporting list. No
-committed file contains the response body, so those three require a re-fetch. §7
-gives the exact command for each.
+| §1 row | Backed by |
+|---|---|
+| 1 · 31 countries | `results.jsonl` seq 1 + `inpen-list-verbatim-2026-11-08.txt` |
+| 2 · the pinned value was 29 | `docs/00-summary-the-map.md:375`, tracked, carries the 29-list |
+| 3 · FR and PT added | `diff-vs-recorded-29.txt` |
+| 4 · nothing removed | same diff — only `>` lines |
+| 5 · the 29-list is reproducible | same diff — no `-` lines |
+| 10 · reporting is 115 | `results.jsonl` seq 1 |
+
+**NOT auditable from what is committed — four rows:**
+
+| §1 row | Why, and where the command is |
+|---|---|
+| 6 · value is an object, not an array | no committed file holds a type; §7 cmd 2 |
+| 7 · every key is `true` | no committed file holds values; §7 cmd 3 |
+| 8 · InPen is a subset of reporting (115) | no committed file holds membership; §7 cmd 4 |
+| 9 · FR and PT are already in the reporting list | membership again; §7 cmd 4 covers it, since a subset that holds puts them there |
+
+No committed file contains the response body, so those four require a re-fetch. §7
+gives one command per *shape* of question — four commands for four rows, with cmd 4
+answering rows 8 and 9 together.
 
 **What this costs:** a reader cannot re-run the §3 subset comparison from a
 committed file; they must re-fetch the config. That is the intended trade — the
@@ -208,8 +224,10 @@ ride along.
 
 ## 7. Re-deriving this pass
 
-One GET, then four commands — one per claim that is not auditable from the
-committed files. Each produces exactly one row of §1.
+One GET, then four commands — one per §1 row that is not auditable from the
+committed files, which §6 enumerates as rows 6, 7, 8 and 9. Command 4 answers rows
+8 and 9 together, because a subset that holds puts both new members in the
+reporting list.
 
 ```bash
 curl -s --compressed -A 'carelink-bridge-research/1.0' \
