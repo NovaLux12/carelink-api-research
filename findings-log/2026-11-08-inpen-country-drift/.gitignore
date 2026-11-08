@@ -2,7 +2,7 @@
 #
 # The 69-key public config is unauthenticated and carries credential-shaped
 # values: a reCAPTCHA site key (6L...buor...), an auth0ClientId, and a Mixpanel
-# token under personal.mixpanel.anthropic... Committing the body would put those
+# token under personal.mixpanel.analytics.settings. Committing the body would put those
 # in the diff, which findings-log/2026-10-12-published-pointers/FINDINGS.md
 # already ruled against: the committable form of a pass is the REDACTION, not
 # the capture.

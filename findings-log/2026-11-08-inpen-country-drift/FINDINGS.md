@@ -22,7 +22,7 @@ assertion `inpen countries moved in lockstep` in
 | The 29-list recorded on 2026-10-11 is exactly reproducible from this capture minus FR/PT | **OBSERVED** | `diff-vs-recorded-29.txt` — no `-` lines, no other `+` lines |
 | The `enabledPerCountry` value is a JSON **object** keyed by country, not an array | **OBSERVED** | measured on the live response; re-derive with the §7 command (`jq type` → object). NOT re-derivable from `results.jsonl`, which holds aggregates only |
 | Every key currently carries `true`; there is no false-valued entry | **OBSERVED** | measured on the live response; re-derive with the §7 command. NOT re-derivable from `results.jsonl` |
-| The InPen list remains a **strict subset** of `personal.common.core.reporting.enabled.countries` (115) | **OBSERVED** | set comparison in §3 |
+| The InPen list remains a **strict subset** of `personal.common.core.reporting.enabled.countries` (115) | **OBSERVED** | measured on the live response; re-derive with the §7 subset command. NOT re-derivable from `results.jsonl` |
 | Both additions (FR, PT) are already in the reporting list | **OBSERVED** | measured on the live response; re-derive with the §7 command. NOT re-derivable from `results.jsonl` |
 | The reporting list is still **115**, unchanged from its 2026-11-03 value | **OBSERVED** | seq 1; the passing `reporting countries drifted 17 -> 29` guard |
 | **Why** Medtronic added FR and PT | **NOT KNOWN** — no inference offered | — |
@@ -142,21 +142,36 @@ test the repo applies. The test is that the committable artefact is the
 history is a second thing to rotate if the vendor ever changes what it serves.
 
 Both raw files are removed and `.gitignore`d in the shape of the precedent. What
-remains is sufficient to audit every claim in §1–§3 without the vendor's site key:
+remains is sufficient to audit **part** of §1–§3 — and which part is stated
+precisely below rather than claimed wholesale, because "sufficient" turns out to be
+true of four rows and false of three:
 
 | Artefact | What it supports |
 |---|---|
 | `inpen-list-verbatim-2026-11-08.txt` | the 31 countries, verbatim and sortable |
 | `diff-vs-recorded-29.txt` | the exact delta against the 2026-10-11 record |
-| `results.jsonl` | the three requests, with counts and timings |
-| §7 below | the command to re-derive the list in one line |
+| `results.jsonl` | the three requests, with counts, timings, and the **31 / 115** figures |
+| §7 below | the commands to re-derive everything else from a fresh GET |
+
+**Auditable from what is committed:** the count (31), the reporting count (115), the
+verbatim list, and the delta against the recorded 29 — four of §1's rows in full.
+
+**NOT auditable from what is committed:** the object-vs-array type, the
+all-values-`true` check, and the subset comparison against the reporting list. No
+committed file contains the response body, so those three require a re-fetch. §7
+gives the exact command for each.
 
 **What this costs:** a reader cannot re-run the §3 subset comparison from a
 committed file; they must re-fetch the config. That is the intended trade — the
 precedent makes it explicitly, and re-fetching is one unauthenticated GET.
 
 **Nothing in §1 was retracted.** Every figure was derived from the response before
-it was removed, and each is independently re-derivable by the command in §7.
+it was removed. The count and the delta are re-derivable from the committed files;
+the type, all-`true` and subset checks are not — they need the fresh GET in §7,
+which contains a separate command for each. The distinction is stated rather than
+smoothed over, because "re-derivable from the committed evidence" and
+"re-derivable by re-fetching" are different guarantees and only the first one
+survives the vendor changing what it serves.
 
 ### ⚠ The remedy does not remove the bytes from history, and that is stated here
 
@@ -193,9 +208,36 @@ ride along.
 
 ## 7. Re-deriving this pass
 
+One GET, then four commands — one per claim that is not auditable from the
+committed files. Each produces exactly one row of §1.
+
 ```bash
 curl -s --compressed -A 'carelink-bridge-research/1.0' \
-  'https://carelink.minimed.eu/patient/v2/configuration/public' \
-| jq -r '.["personal.inpen.supported.countries"].enabledPerCountry | keys | .[]' | sort
-# -> 31 lines; diff against the 29 recorded at docs/00-summary-the-map.md:375
+  'https://carelink.minimed.eu/patient/v2/configuration/public' -o cfg.json
 ```
+
+```bash
+# 31 (and the verbatim list)
+jq -r '.["personal.inpen.supported.countries"].enabledPerCountry | keys | .[]' cfg.json | sort
+# -> 31 lines; diff against the 29 recorded at docs/00-summary-the-map.md:375
+
+# object, not array
+jq -r '.["personal.inpen.supported.countries"].enabledPerCountry | type' cfg.json
+# -> object
+
+# every key true, none false
+jq -r '.["personal.inpen.supported.countries"].enabledPerCountry
+       | [to_entries[] | select(.value != true)] | length' cfg.json
+# -> 0  (zero keys that are not true)
+
+# subset of the reporting list, and 115
+jq -r '(.["personal.inpen.supported.countries"].enabledPerCountry | keys | sort) as $i
+       | (.["personal.common.core.reporting.enabled.countries"]) as $r
+       | "\($i | length) inpen, \($r | length) reporting, missing: \([$i[] | select(. as $c | $r | index($c) | not)])"' cfg.json
+# -> 31 inpen, 115 reporting, missing: []
+```
+
+**Note the shape of the last one:** it prints the *missing* members rather than a
+boolean, so an empty list is the evidence. A `true`/`false` summary cannot
+distinguish "subset holds" from "the lookup returned null" — the failure mode
+`docs/09` records.
