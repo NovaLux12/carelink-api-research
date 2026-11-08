@@ -51,12 +51,22 @@ check that failed there would trap a lane between two rules.
 
 ## Demonstrations (all run in this worktree)
 
-- **Passes on the tree** after the one doc fix: `53 committed ledgers at `6600700`
-  — head, derived; every prose statement of the census is anchored to a commit
-  that held it`.
-- **Fails on a planted bare figure**: planting "**53** committed ledgers" with no
-  anchor in `docs/11` fails with *"states 53 committed ledgers with no resolving
-  commit anchor beside it"*. Restored afterwards with `git checkout`.
+- **Passes on the tree** after the one doc fix. The population was **53** at
+  `6600700` (the base this lane started from) and is **54** at this lane's own head,
+  because this lane's `results.jsonl` is itself one more committed ledger — which is
+  the drift this check exists to catch, arriving through the very commit that adds
+  the check. Both figures are stated with the commit they are true at, per the rule
+  the check enforces:
+  ```
+  $ git ls-tree -r --name-only 6600700 -- findings-log/ | grep -c results.jsonl
+  53
+  $ git ls-files -- 'findings-log/*/results.jsonl' | wc -l    # at this lane's head
+  54
+  ```
+- **Fails on a planted bare figure**: planting a bare population sentence with no
+  anchor in `docs/` fails with *"states N committed ledgers with no resolving
+  commit anchor beside it"* and the run exits 1. Demonstrated and restored with
+  `git checkout` — the working tree was left clean, confirmed by `git status`.
 - **Fails on a mis-anchored figure**: the anchor is checked against the tree, so
   a figure whose anchor held a different count fails as a mis-transcription.
 - Non-vacuity was verified separately: before the matcher was fixed, a naive
