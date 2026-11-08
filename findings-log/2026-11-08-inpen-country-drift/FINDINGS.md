@@ -174,8 +174,8 @@ true of six rows and false of four:
 | 9 · FR and PT are already in the reporting list | membership again; §7 cmd 4 covers it, since a subset that holds puts them there |
 
 No committed file contains the response body, so those four require a re-fetch. §7
-gives one command per *shape* of question — four commands for four rows, with cmd 4
-answering rows 8 and 9 together.
+gives three commands for them — the fourth re-emits row 1's list for cross-check
+against the committed verbatim file.
 
 **What this costs:** a reader cannot re-run the §3 subset comparison from a
 committed file; they must re-fetch the config. That is the intended trade — the
@@ -224,10 +224,12 @@ ride along.
 
 ## 7. Re-deriving this pass
 
-One GET, then four commands — one per §1 row that is not auditable from the
-committed files, which §6 enumerates as rows 6, 7, 8 and 9. Command 4 answers rows
-8 and 9 together, because a subset that holds puts both new members in the
-reporting list.
+One GET, then four commands. Three settle the questions no committed file can
+answer — the object-type, all-`true` and subset questions, which §6 enumerates as
+rows 6, 7, 8 and 9, with the subset command covering the last two because a subset
+that holds puts both new members in the reporting list. The fourth re-emits row 1's
+31-country list, so the committed list can be checked against the live one rather
+than trusted.
 
 ```bash
 curl -s --compressed -A 'carelink-bridge-research/1.0' \
