@@ -1,0 +1,16 @@
+# Raw captures from this pass — deliberately NOT committed.
+#
+# The 69-key public config is unauthenticated and carries credential-shaped
+# values: a reCAPTCHA site key (6L...buor...), an auth0ClientId, and a Mixpanel
+# token under personal.mixpanel.anthropic... Committing the body would put those
+# in the diff, which findings-log/2026-10-12-published-pointers/FINDINGS.md
+# already ruled against: the committable form of a pass is the REDACTION, not
+# the capture.
+#
+# What IS committed: the verbatim country list, the diff against the recorded 29,
+# the ledger rows, and the commands that re-derive them. Anyone can re-fetch the
+# body themselves; nobody needs the vendor's site key in git history.
+config-2026-11-08.json
+config-gzip-2026-11-08.bin
+config-*.json
+config-*.bin

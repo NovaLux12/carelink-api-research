@@ -20,10 +20,10 @@ assertion `inpen countries moved in lockstep` in
 | Exactly **two** countries are present now that were absent then: **FR** and **PT** | **OBSERVED** | `diff-vs-recorded-29.txt` |
 | **Nothing was removed** — the change is purely additive | **OBSERVED** | `diff-vs-recorded-29.txt` (only `>` lines) |
 | The 29-list recorded on 2026-10-11 is exactly reproducible from this capture minus FR/PT | **OBSERVED** | `diff-vs-recorded-29.txt` — no `-` lines, no other `+` lines |
-| The `enabledPerCountry` value is a JSON **object** keyed by country, not an array | **OBSERVED** | `config-2026-11-08.json`; `jq type` → object |
+| The `enabledPerCountry` value is a JSON **object** keyed by country, not an array | **OBSERVED** | seq 1; `jq type` → object |
 | Every key currently carries `true`; there is no false-valued entry | **OBSERVED** | seq 1; `jq 'to_entries\|map(select(.value==true))\|length'` → 31 |
 | The InPen list remains a **strict subset** of `personal.common.core.reporting.enabled.countries` (115) | **OBSERVED** | set comparison in §3 |
-| Both additions (FR, PT) are already in the reporting list | **OBSERVED** | same capture |
+| Both additions (FR, PT) are already in the reporting list | **OBSERVED** | seq 1; set comparison in §3 |
 | The reporting list is still **115**, unchanged from its 2026-11-03 value | **OBSERVED** | seq 1; the passing `reporting countries drifted 17 -> 29` guard |
 | **Why** Medtronic added FR and PT | **NOT KNOWN** — no inference offered | — |
 
@@ -69,7 +69,7 @@ reporting list move together"** — the 2026-10-10 finding was that a client whi
 cached "these countries have reporting" was silently wrong for 12 countries
 after a one-day rollout.
 
-Re-derived on this capture:
+Re-derived from the same response:
 
 | Check | Result |
 |---|---|
@@ -112,3 +112,54 @@ further expansion is **NOT KNOWABLE** from one capture and does not clear the
 minting bar (Derived · Bounded · Non-duplicate · Labelled).
 
 **Evidence path:** `findings-log/2026-11-08-inpen-country-drift/`
+
+---
+
+## 6. Withdrawal — raw captures were committed, then removed
+
+**Recorded because the repo's own precedent forbids what this pass first did, and
+the pass should carry its own correction rather than leave it in a PR thread.**
+
+The first version of this directory committed `config-2026-11-08.json` and
+`config-gzip-2026-11-08.bin` — the raw unauthenticated response. An independent
+verifier flagged the shape without calling it a leak, and checking the precedent
+showed the rule was already settled:
+
+> **⚠ Raw captures are deliberately NOT committed.** The 69-key public config is
+> unauthenticated and carries credential-shaped values: a reCAPTCHA site key, and
+> an `x-api-key` under each of the two `nutrino.cc.*` service keys. Committing
+> `docs/*.json` would put credentials in the diff.
+> — `findings-log/2026-10-12-published-pointers/FINDINGS.md`
+
+Measured against this pass's own capture, the values present were: a reCAPTCHA
+site key (`6L…buor…`), an `auth0ClientId`, and a Mixpanel `token`. **Every one is
+served unauthenticated by the vendor and none is a secret** — but that is not the
+test the repo applies. The test is that the committable artefact is the
+**redaction**, not the capture, because a second copy of a credential shape in git
+history is a second thing to rotate if the vendor ever changes what it serves.
+
+Both raw files are removed and `.gitignore`d in the shape of the precedent. What
+remains is sufficient to audit every claim in §1–§3 without the vendor's site key:
+
+| Artefact | What it supports |
+|---|---|
+| `inpen-list-verbatim-2026-11-08.txt` | the 31 countries, verbatim and sortable |
+| `diff-vs-recorded-29.txt` | the exact delta against the 2026-10-11 record |
+| `results.jsonl` | the three requests, with counts and timings |
+| §5 below | the command to re-derive the list in one line |
+
+**What this costs:** a reader cannot re-run the §3 subset comparison from a
+committed file; they must re-fetch the config. That is the intended trade — the
+precedent makes it explicitly, and re-fetching is one unauthenticated GET.
+
+**Nothing in §1 was retracted.** Every figure was derived from the response before
+it was removed, and each is independently re-derivable by the command in §5.
+
+## 7. Re-deriving this pass
+
+```bash
+curl -s --compressed -A 'carelink-bridge-research/1.0' \
+  'https://carelink.minimed.eu/patient/v2/configuration/public' \
+| jq -r '.["personal.inpen.supported.countries"].enabledPerCountry | keys | .[]' | sort
+# -> 31 lines; diff against the 29 recorded at docs/00-summary-the-map.md:375
+```
