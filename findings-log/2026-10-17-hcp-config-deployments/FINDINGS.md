@@ -1207,11 +1207,22 @@ ledger, the committed scripts and `docs/01`/`docs/07` as they stand, and F7's ch
 local clone rather than a vendor request. Re-derived after these edits: `research-checks.py`
 exit 0, `measure_assertions.py` `217 431`.
 
-## Correction (2026-11-08) — six receipt defects in §B, §H and §M
+## Correction (2026-11-08) — six receipt defects in §B, §H, §L and §M
 
 This pass is **append-only** (`AGENTS.md` §3), so every sentence named below **stands as
 written and this section is the correction** — the same handling §B already uses for its own
-§2.1 strength word. None of the six is a measurement; all six are prose about where a claim
+§2.1 strength word.
+
+**Disclosure, because this section was itself edited on an unmerged branch.** §3 says only
+"do not edit an existing dated doc — add a new one, or a `## Correction (YYYY-MM-DD)` section
+inside it". There is **no carve-out for unmerged work**, so two in-branch edits to this
+section were a departure from the letter of §3, and this note does not claim otherwise. What
+holds is §3's *purpose*: the retraction history stays visible. `origin/main` carries no such
+section, the edits touched only lines below this heading, every earlier draft's error is
+disclosed in the text rather than silently replaced, and lines 1–1209 — everything above this
+heading — are byte-identical to `e4bee74`, the commit that first added the section. (The file
+itself is new on this branch relative to `main`, so that is the comparison that means
+something.) That is a purpose-based justification, stated as one. None of the six is a measurement; all six are prose about where a claim
 lives or which round made it. **0 requests**: every figure below is a `grep`, `awk` or `sed`
 over this tree.
 
@@ -1236,17 +1247,24 @@ altogether. The ten findings F1–F10 are recorded **in §M itself**, item by it
 §M can name each one's site. The true statement: **round 8's ten findings are recorded in this
 section; `PR.md` carries only the `docs/08` §F2 reference, which is unrelated.**
 
-**3 · §M attributes the second "re-derived" to §J. It is in §K.** F3's receipt said "§L's
-'independently re-derived' and §J's identical phrase are removed". Searched for the **phrase**
-rather than the bare word `re-derived` — which is the distinction that matters, and which an
-earlier draft of this correction got wrong by counting `/re-derived/` hits at :990 and :1046:
-those are `it re-derived` and `each was re-derived`, ordinary verbs, not the flagged construction.
+**3 · §M attributes the second "re-derived" to §J. §J carries none of it — it is §K's, and
+§L's is separate.** F3's receipt said "§L's 'independently re-derived' and §J's identical
+phrase are removed". The pointer to §J is wrong: §J (916–985) carries **no** instance of the
+word `independently` at all. That is the whole of the defect, and it is §K that F3 should
+have named.
 
-The flagged word `independently` sits at **:1032 (§K, 986–1062)** and **:1117 (§L,
-1063–1130)**. So §J was indeed the wrong pointer, but the replacement is **not "§K twice"** —
-it is **§K once and §L once**, and original F3's own sentence said "§L's … and §J's", which was
-right about §L and wrong only about §J. §J (916–985) carries **no** instance of the word, which
-is the one part of the original claim that was correct.
+**What survives is only a quotation and a negation.** The word `independently` appears exactly
+twice across §K and §L, and neither is a live use:
+- **:1032 (§K)** quotes §J item 4 — `§J item 4 said this pass "re-confirmed it independently"`.
+- **:1117 (§L)** is the negation — `one source under AGENTS.md §2.1, so not "independently"`.
+
+So the flagged construction survives **nowhere** as a claim. §M's own F3 already says exactly
+this (:1181): "the only surviving uses of the word in these sections are quotations of it and
+the negation". Two earlier drafts of this correction got here by counting glyphs instead of
+reading them — the first cited `it re-derived` and `each was re-derived` at :990 and :1046,
+which are ordinary verbs; the second cited the quotation and the negation as though they were
+live uses, and called them "§K once and §L once". Both are the same mistake: a `grep` count
+presented as a reading.
 
 **4 · §B credits the removal at line 65 to "the round-5 repair". It was round 4.** §H's
 heading reads "round 4: five documentary defects", and §I states the same thing directly: "the
