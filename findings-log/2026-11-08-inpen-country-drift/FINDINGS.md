@@ -20,10 +20,10 @@ assertion `inpen countries moved in lockstep` in
 | Exactly **two** countries are present now that were absent then: **FR** and **PT** | **OBSERVED** | `diff-vs-recorded-29.txt` |
 | **Nothing was removed** — the change is purely additive | **OBSERVED** | `diff-vs-recorded-29.txt` (only `>` lines) |
 | The 29-list recorded on 2026-10-11 is exactly reproducible from this capture minus FR/PT | **OBSERVED** | `diff-vs-recorded-29.txt` — no `-` lines, no other `+` lines |
-| The `enabledPerCountry` value is a JSON **object** keyed by country, not an array | **OBSERVED** | seq 1; `jq type` → object |
-| Every key currently carries `true`; there is no false-valued entry | **OBSERVED** | seq 1; `jq 'to_entries\|map(select(.value==true))\|length'` → 31 |
+| The `enabledPerCountry` value is a JSON **object** keyed by country, not an array | **OBSERVED** | measured on the live response; re-derive with the §7 command (`jq type` → object). NOT re-derivable from `results.jsonl`, which holds aggregates only |
+| Every key currently carries `true`; there is no false-valued entry | **OBSERVED** | measured on the live response; re-derive with the §7 command. NOT re-derivable from `results.jsonl` |
 | The InPen list remains a **strict subset** of `personal.common.core.reporting.enabled.countries` (115) | **OBSERVED** | set comparison in §3 |
-| Both additions (FR, PT) are already in the reporting list | **OBSERVED** | seq 1; set comparison in §3 |
+| Both additions (FR, PT) are already in the reporting list | **OBSERVED** | measured on the live response; re-derive with the §7 command. NOT re-derivable from `results.jsonl` |
 | The reporting list is still **115**, unchanged from its 2026-11-03 value | **OBSERVED** | seq 1; the passing `reporting countries drifted 17 -> 29` guard |
 | **Why** Medtronic added FR and PT | **NOT KNOWN** — no inference offered | — |
 
@@ -131,9 +131,12 @@ showed the rule was already settled:
 > `docs/*.json` would put credentials in the diff.
 > — `findings-log/2026-10-12-published-pointers/FINDINGS.md`
 
-Measured against this pass's own capture, the values present were: a reCAPTCHA
-site key (`6L…buor…`), an `auth0ClientId`, and a Mixpanel `token`. **Every one is
-served unauthenticated by the vendor and none is a secret** — but that is not the
+Measured against this pass's own capture, the credential-shaped values present
+were: a reCAPTCHA site key (`6L…buor…`), an `auth0ClientId`, a Mixpanel `token`
+under `personal.mixpanel.analytics.settings`, and **two `x-api-key` values** under
+`nutrino.cc.{broker,metadata}.service.config` — the last two being what the
+precedent above names explicitly. **Every one is served unauthenticated by the
+vendor and none is a secret** — but that is not the
 test the repo applies. The test is that the committable artefact is the
 **redaction**, not the capture, because a second copy of a credential shape in git
 history is a second thing to rotate if the vendor ever changes what it serves.
@@ -146,14 +149,47 @@ remains is sufficient to audit every claim in §1–§3 without the vendor's sit
 | `inpen-list-verbatim-2026-11-08.txt` | the 31 countries, verbatim and sortable |
 | `diff-vs-recorded-29.txt` | the exact delta against the 2026-10-11 record |
 | `results.jsonl` | the three requests, with counts and timings |
-| §5 below | the command to re-derive the list in one line |
+| §7 below | the command to re-derive the list in one line |
 
 **What this costs:** a reader cannot re-run the §3 subset comparison from a
 committed file; they must re-fetch the config. That is the intended trade — the
 precedent makes it explicitly, and re-fetching is one unauthenticated GET.
 
 **Nothing in §1 was retracted.** Every figure was derived from the response before
-it was removed, and each is independently re-derivable by the command in §5.
+it was removed, and each is independently re-derivable by the command in §7.
+
+### ⚠ The remedy does not remove the bytes from history, and that is stated here
+
+Removing the files from the tree does **not** remove them from the branch's
+history: `20fa875` is an ancestor of this branch's head, so the capture blob is
+still reachable and **would land in `main` if this PR is merged with a merge
+commit**. §6's own rationale — that a second copy in history is a second thing to
+rotate — is therefore only satisfied by removing it from history, not from the tip.
+
+**What actually removes it, in preference order:**
+
+1. **Squash-merge this PR.** The squashed commit carries the final tree only; no
+   intermediate blob reaches `main`. This is the cheap correct answer and is what
+   this pass recommends.
+2. **Rewrite the branch** (`git rebase -i` / `filter-repo`) before merge, if a
+   merge commit is wanted for another reason. Not done here: `AGENTS.md` forbids
+   force-pushing to a pushed branch without exception, and a force-push of a
+   public branch is a worse process breach than the one this section records.
+
+**So the state is: the capture is out of the tree, out of the merge result under a
+squash, and still in this branch's history until the branch is deleted.** The
+branch should be deleted on merge, which the repo does for every lane.
+
+**A related gate defect found while checking this, and it is not this pass's to
+fix:** `scripts/research-gate.sh` scans only `*.md *.yml *.yaml *.sh *.hurl`, so a
+`.json` capture is never scanned at all; and the reCAPTCHA pattern in
+`scripts/scrub-patterns.txt` is line-anchored (`^6L…$`), so it matches a bare key
+line but **not** the key embedded in a JSON value. Measured on the live capture:
+anchored 0 hits, unanchored 1. The gate reporting "leak scan clean" on this PR was
+therefore true of the patterns it ran and vacuous for the file it most needed to
+check. Filed as a separate correction rather than silently widened here — widening
+a scrub pattern in a drift-repair PR is the kind of quiet change that should not
+ride along.
 
 ## 7. Re-deriving this pass
 
