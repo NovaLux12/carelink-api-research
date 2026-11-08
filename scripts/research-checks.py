@@ -57,6 +57,11 @@ What it enforces:
   7. LOG CITES — cites inside findings-log/ must resolve, or carry a reasoned
      `allow-unresolved-cites` exemption. Findings-log files were previously
      read only as valid targets, never scanned as sources.
+  8. LEDGER CENSUS — the committed-ledger population is derived from the tree
+     (`git ls-files 'findings-log/*/results.jsonl'`), so no prose may state it
+     without a commit anchor that RESOLVES and whose tree held that number.
+     The bare figure is false one merge later; nothing derived it before, so
+     area AA's ledger silently invalidated three hand-stated sites at once.
 
 Deliberately NOT enforced: whether a claim is true. That is the human's, or a
 second pass'. (scripts/research-gate.sh header.)
@@ -447,6 +452,151 @@ def check_prompt_parity():
     ok('prompt wiring agrees (AGENTS cites + loop report contract)')
 
 
+def check_ledger_census():
+    """No prose may state the committed-ledger census without a commit it is true at.
+
+    The census population is DERIVED FROM THE TREE — one item is one
+    `findings-log/*/results.jsonl` — so it moves on every merge that adds a
+    ledger (area AA's ledger moved it 50 → 51; PR #154 moved it again). A figure
+    written by hand is therefore true at the head it was written on and false at
+    the next, silently, because nothing derived it: the S-L4c block and the
+    ledger-census row both restated `50` beside figures derived from it.
+
+    This check derives the population with the census's own counting rule,
+    `git ls-files 'findings-log/*/results.jsonl'`, and then, for every prose
+    statement of the form "N committed ledgers", requires a commit anchor in the
+    same paragraph that actually RESOLVES and whose tree really did contain N
+    such files. Three failure shapes: no anchor (the bare figure — false one
+    merge later by construction); an anchor that does not resolve; an anchor
+    whose tree held a different number (a mis-transcribed reading, the
+    S-L4c "36" class). The anchor is verified against the tree rather than
+    trusted, which is what makes the figure self-deriving instead of merely
+    footnoted.
+
+    Scope: docs/ and README.md FAIL. findings-log/ only WARNS — that tree is
+    append-only (AGENTS.md §3), so a stale figure in a comment there cannot be
+    rewritten in place; it is superseded by a dated correction, and this check
+    must not trap a lane between two rules. Quoted history (blockquotes, table
+    rows) is excluded: a correction quoting a past count is evidence, not a
+    claim. Zero vendor requests — `git ls-files`/`git ls-tree` only.
+    """
+    print('--- ledger census ---')
+    def population_at(rev=None):
+        if rev is None:
+            out = subprocess.run(['git', 'ls-files', '--',
+                                  'findings-log/*/results.jsonl'],
+                                 capture_output=True, text=True, timeout=60)
+        else:
+            out = subprocess.run(['git', 'ls-tree', '-r', '--name-only', rev, '--',
+                                  'findings-log/'],
+                                 capture_output=True, text=True, timeout=60)
+        if out.returncode != 0:
+            return None
+        return len([l for l in out.stdout.splitlines()
+                    if re.fullmatch(r'findings-log/[^/]+/results\.jsonl', l.strip())])
+
+    population = population_at()
+    if not population:
+        fail('ledger census: the counting rule `git ls-files '
+             "'findings-log/*/results.jsonl'` named no files — no prose figure "
+             'can be checked against it (wrong cwd, or the rule broke)')
+        return
+
+    claim_pat = re.compile(r'(?<![\w.])([\d,]{1,5})\s+(?:committed|tracked)\s+ledgers?\b'
+                           r'|(?<![\w.])([\d,]{1,5})\s+committed\s+`?results\.jsonl`?\s+files?')
+    anchor_pat = re.compile(r'(?<![\w`/-])([0-9a-f]{7,40})(?![\w`/-])')
+    para_break = re.compile(r'^\s*$|^\s*(?:#{1,6}\s|[|>]|[-*+]\s)')
+
+    def norm(line):
+        """Strip markdown emphasis so `**50** committed ledgers` is a figure."""
+        return re.sub(r'[*`_]', '', line)
+
+    def in_fence(lines, i):
+        """Is line i inside a fenced code block? A code sample is not a claim."""
+        fence = False
+        for line in lines[:i]:
+            if line.lstrip().startswith('```'):
+                fence = not fence
+        return fence
+
+    def paragraph(lines, i):
+        """The enclosing paragraph, plus a correction blockquote directly below.
+
+        The house form is to state the figure in the sentence and anchor it in
+        the dated correction immediately under it (the S-L4c block does
+        exactly this), so the anchor window has to include that block.
+        """
+        lo = i
+        while lo > 0 and not para_break.match(lines[lo - 1]):
+            lo -= 1
+        hi = i
+        while hi + 1 < len(lines) and not para_break.match(lines[hi + 1]):
+            hi += 1
+        win = lines[lo:hi + 1]
+        j = hi + 1
+        while j < len(lines) and (not lines[j].strip()
+                                  or re.match(r'\s*>', lines[j])):
+            win.append(lines[j])
+            j += 1
+        return [norm(l) for l in win]
+
+    resolved_cache = {}
+
+    def anchor_reading(sha):
+        """The ledger population at `sha`, or None if the anchor is not a commit."""
+        if sha not in resolved_cache:
+            chk = subprocess.run(['git', 'cat-file', '-e', sha + '^{commit}'],
+                                 capture_output=True, text=True, timeout=30)
+            resolved_cache[sha] = population_at(sha) if chk.returncode == 0 else None
+        return resolved_cache[sha]
+
+    docs_sites = [p for p in ['README.md'] + sorted(glob.glob('docs/*.md'))
+                  if os.path.exists(p)]
+    log_sites = [p for p in sorted(glob.glob('findings-log/**/*.md', recursive=True))
+                 if os.path.isfile(p) and os.path.getsize(p) <= 1_048_576]
+    violations = stale = 0
+    for path in docs_sites + log_sites:
+        strict = path in docs_sites
+        lines = read(path).splitlines()
+        for i, line in enumerate(lines):
+            if re.match(r'\s*[|>]', line):
+                continue  # table row / quoted history — not a live prose claim
+            if in_fence(lines, i):
+                continue  # fenced code sample, not prose
+            for m in claim_pat.finditer(norm(line)):
+                value = int((m.group(1) or m.group(2)).replace(',', ''))
+                where = f'{path}:{i + 1}'
+                readings = [(a, anchor_reading(a))
+                            for a in anchor_pat.findall(' '.join(paragraph(lines, i)))]
+                readings = [(a, n) for a, n in readings if n is not None]
+                if not readings:
+                    msg = (f'{where} states {value} committed ledgers with no resolving '
+                           f'commit anchor beside it — the population is derived from the '
+                           f'tree and is {population} at this head, so the figure is false '
+                           f'one merge later; write "measured at `<sha>`" or state it as '
+                           f'command output')
+                elif not any(n == value for _, n in readings):
+                    anchors = ', '.join(f'{a}→{n}' for a, n in readings)
+                    msg = (f'{where} states {value} committed ledgers, but its anchor(s) '
+                           f'({anchors}) did not hold that many; measured {population} at '
+                           f'this head — re-derive, do not bump the figure')
+                else:
+                    continue
+                if strict:
+                    fail(msg)
+                    violations += 1
+                else:
+                    warn(msg + ' (findings-log/ is append-only — supersede with a dated '
+                               'correction, do not rewrite in place)')
+                    stale += 1
+    if not violations and not stale:
+        ok(f'{population} committed ledgers at this head, derived; every prose '
+           f'statement of the census is anchored to a commit that held it')
+    elif not violations:
+        ok(f'{population} committed ledgers at this head, derived; findings-log/ has '
+           f'{stale} anchored-or-superseded statement(s) (warning-only, append-only tree)')
+
+
 def check_append_only():
     """findings-log/ is append-only: additions free, deletions forbidden,
     modifications require a Correction section. AGENTS.md §3 allows appending
@@ -500,12 +650,13 @@ def main():
     check_priorities_sync()
     check_prompt_parity()
     check_append_only()
+    check_ledger_census()
 
     print()
     if FAILED:
         print('CHECKS FAIL — see above. The counting rule is in this file\'s header.')
         return 1
-    print('CHECKS PASS — numbers, prose counts, log cites, log hygiene, priorities, prompts, and append-only all agree.')
+    print('CHECKS PASS — numbers, prose counts, log cites, log hygiene, priorities, prompts, the ledger census and append-only all agree.')
     return 0
 
 
