@@ -1229,7 +1229,7 @@ number to quote is **2 lines, one disclosure and one correction to it**; the sen
 parenthetical command is withdrawn here rather than replaced, since a bare glyph count cannot
 express that distinction.
 
-**2 · §M says round 8's F1–F10 are "recorded in `PR.md` and not here". Only F2 is in `PR.md`.**
+**2 · §L says round 8's F1–F10 are "recorded in `PR.md` and not here". Only F2 is in `PR.md`.** The sentence is at **:1111 — inside §L (1063–1130)**, not §M; an earlier draft of this correction attributed it to §M and was wrong to. The defect itself stands.
 `grep -o 'F[0-9]\+' PR.md | sort | uniq -c` returns **`2 F2`** and nothing else — both hits are
 the same `docs/08-security-findings.md` §F2 citation, which is a different numbering scheme
 altogether. The ten findings F1–F10 are recorded **in §M itself**, item by item, which is why
@@ -1237,11 +1237,16 @@ altogether. The ten findings F1–F10 are recorded **in §M itself**, item by it
 section; `PR.md` carries only the `docs/08` §F2 reference, which is unrelated.**
 
 **3 · §M attributes the second "re-derived" to §J. It is in §K.** F3's receipt said "§L's
-'independently re-derived' and §J's identical phrase are removed". `awk 'NR>=916&&NR<=1062 &&
-/re-derived/'` finds the two instances at **:990** and **:1046** — both inside **§K**, which
-opens at :986 and ends where §L opens at :1063. §J (`:916`–`:985`) carries **no** instance of
-the word. The cross-reference is **§K**, twice; "§L's" in that sentence is correct, since §L
-opens at :1063 and its own phrase is separate.
+'independently re-derived' and §J's identical phrase are removed". Searched for the **phrase**
+rather than the bare word `re-derived` — which is the distinction that matters, and which an
+earlier draft of this correction got wrong by counting `/re-derived/` hits at :990 and :1046:
+those are `it re-derived` and `each was re-derived`, ordinary verbs, not the flagged construction.
+
+The flagged word `independently` sits at **:1032 (§K, 986–1062)** and **:1117 (§L,
+1063–1130)**. So §J was indeed the wrong pointer, but the replacement is **not "§K twice"** —
+it is **§K once and §L once**, and original F3's own sentence said "§L's … and §J's", which was
+right about §L and wrong only about §J. §J (916–985) carries **no** instance of the word, which
+is the one part of the original claim that was correct.
 
 **4 · §B credits the removal at line 65 to "the round-5 repair". It was round 4.** §H's
 heading reads "round 4: five documentary defects", and §I states the same thing directly: "the
@@ -1259,7 +1264,7 @@ surviving in F8's receipt: the fix named the right fact and the wrong section.)
 
 **6 · §H says "two later sections inherited" the false causal claim. None did.** §H's ⚠ at
 :813 asserts the `plan.md`/`plan.json` propagation claim "carried … which two later sections
-inherited". §M contradicts it nine lines of section later — "**§I item 2 and §L were checked for
+inherited". §M contradicts it **356 lines later** (:813 → :1169) — "**§I item 2 and §L were checked for
 the same inheritance and do not carry it**" — and §M is the section that actually grepped both.
 The true statement is the narrower one §M already carries: the claim propagated **nowhere**;
 §I item 2 and §L were checked and are clean. The word "inherited" in :813 is a claim about two
