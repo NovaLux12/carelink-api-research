@@ -1222,9 +1222,10 @@ section, the edits touched only lines below this heading, every earlier draft's 
 disclosed in the text rather than silently replaced, and lines 1–1209 — everything above this
 heading — are byte-identical to `e4bee74`, the commit that first added the section. (The file
 itself is new on this branch relative to `main`, so that is the comparison that means
-something.) That is a purpose-based justification, stated as one. None of the six is a measurement; all six are prose about where a claim
-lives or which round made it. **0 requests**: every figure below is a `grep`, `awk` or `sed`
-over this tree.
+something.) That is a purpose-based justification, stated as one.
+
+None of the six is a measurement; all six are prose about where a claim lives or which round
+made it. **0 requests**: every figure below is a `grep`, `awk` or `sed` over this tree.
 
 **1 · §M says the ⚠ count over §H is 1. It is 2.** §M's F1 line read that §I's "the two ⚠
 disclosure blocks" was wrong because "§H holds **one** (`grep -c '⚠'` over §H returns 1)".
