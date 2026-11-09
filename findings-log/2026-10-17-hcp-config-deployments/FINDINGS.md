@@ -1220,9 +1220,10 @@ section were a departure from the letter of §3, and this note does not claim ot
 holds is §3's *purpose*: the retraction history stays visible. `origin/main` carries no such
 section, the edits touched only lines below this heading, every earlier draft's error is
 disclosed in the text rather than silently replaced, and lines 1–1209 — everything above this
-heading — are byte-identical to `e4bee74`, the commit that first added the section. (The file
-itself is new on this branch relative to `main`, so that is the comparison that means
-something.) That is a purpose-based justification, stated as one.
+heading — are byte-identical to `96ca3d6`, the commit that first added this section. (`e4bee74`
+carries them too, but it is a merge commit — `96ca3d6` and `7526105` are its parents — so
+naming it as the adding commit would be wrong. The file itself is new on this branch relative
+to `main`, so that is the comparison that means something.) That is a purpose-based justification, stated as one.
 
 None of the six is a measurement; all six are prose about where a claim lives or which round
 made it. **0 requests**: every figure below is a `grep`, `awk` or `sed` over this tree.
