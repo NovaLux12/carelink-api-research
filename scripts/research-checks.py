@@ -57,6 +57,11 @@ What it enforces:
   7. LOG CITES — cites inside findings-log/ must resolve, or carry a reasoned
      `allow-unresolved-cites` exemption. Findings-log files were previously
      read only as valid targets, never scanned as sources.
+  8. LEDGER CENSUS — the committed-ledger population is derived from the tree
+     (`git ls-files 'findings-log/*/results.jsonl'`), so no prose may state it
+     without a commit anchor that RESOLVES and whose tree held that number.
+     The bare figure is false one merge later; nothing derived it before, so
+     area AA's ledger silently invalidated three hand-stated sites at once.
 
 Deliberately NOT enforced: whether a claim is true. That is the human's, or a
 second pass'. (scripts/research-gate.sh header.)
@@ -447,6 +452,257 @@ def check_prompt_parity():
     ok('prompt wiring agrees (AGENTS cites + loop report contract)')
 
 
+def check_ledger_census():
+    """No prose may state the committed-ledger census without a commit it is true at.
+
+    The census population is DERIVED FROM THE TREE — one item is one
+    `findings-log/*/results.jsonl` — so it moves on every merge that adds a
+    ledger (area AA's ledger moved it 50 → 51; PR #154 moved it again). A figure
+    written by hand is therefore true at the head it was written on and false at
+    the next, silently, because nothing derived it: the S-L4c block and the
+    ledger-census row both restated `50` beside figures derived from it.
+
+    This check derives the population with the census's own counting rule,
+    `git ls-files 'findings-log/*/results.jsonl'`, and then, for every prose
+    statement of the form "N committed ledgers", requires a commit anchor in the
+    same paragraph that actually RESOLVES and whose tree really did contain N
+    such files. Three failure shapes: no anchor (the bare figure — false one
+    merge later by construction); an anchor that does not resolve; an anchor
+    whose tree held a different number (a mis-transcribed reading, the
+    S-L4c "36" class). The anchor is verified against the tree rather than
+    trusted, which is what makes the figure self-deriving instead of merely
+    footnoted.
+
+    Scope: docs/ and README.md FAIL. findings-log/ only WARNS — that tree is
+    append-only (AGENTS.md §3), so a stale figure in a comment there cannot be
+    rewritten in place; it is superseded by a dated correction, and this check
+    must not trap a lane between two rules. Quoted history (blockquotes, table
+    rows) is excluded: a correction quoting a past count is evidence, not a
+    claim. Zero vendor requests — `git ls-files`/`git ls-tree` only.
+    """
+    print('--- ledger census ---')
+    def population_at(rev=None):
+        if rev is None:
+            out = subprocess.run(['git', 'ls-files', '--',
+                                  'findings-log/*/results.jsonl'],
+                                 capture_output=True, text=True, timeout=60)
+        else:
+            out = subprocess.run(['git', 'ls-tree', '-r', '--name-only', rev, '--',
+                                  'findings-log/'],
+                                 capture_output=True, text=True, timeout=60)
+        if out.returncode != 0:
+            return None
+        return len([l for l in out.stdout.splitlines()
+                    if re.fullmatch(r'findings-log/[^/]+/results\.jsonl', l.strip())])
+
+    population = population_at()
+    if not population:
+        fail('ledger census: the counting rule `git ls-files '
+             "'findings-log/*/results.jsonl'` named no files — no prose figure "
+             'can be checked against it (wrong cwd, or the rule broke)')
+        return
+
+    # Figure-then-noun, allowing a connector between them (`=`, `is`, a dash,
+    # a colon, a semicolon) — the shapes a person actually writes. Plus
+    # noun-then-figure, which is the same claim in the other order.
+    claim_pat = re.compile(
+        r'(?<![\w.])([\d,]{1,5})\s*(?:[=\u2013\u2014:\-;]|\bis\b)?\s*'
+        r'(?:committed|tracked)\s+ledgers?\b'
+        r'|(?<![\w.])([\d,]{1,5})\s+committed\s+`?results\.jsonl`?\s+files?'
+        r'|\b(?:committed|tracked)\s+ledgers?\b\s*(?:=|is|are|:)\s*([\d,]{1,5})\b')
+    anchor_pat = re.compile(r'(?<![\w`/-])([0-9a-f]{7,40})(?![\w`/-])')
+    para_break = re.compile(r'^\s*$|^\s*(?:#{1,6}\s|[|>]|[-*+]\s)')
+
+    # A figure about a PART of the population is not a claim about the
+    # population. "18 committed ledgers were refused" is a subset sentence: it
+    # was never true or false as a census figure, so requiring it to match the
+    # whole-tree count forces a truthful sentence to be rewritten and reports
+    # "the population is 55" about a sentence that never claimed 55. Narrow by
+    # design — an explicit partitive immediately before the figure, or a
+    # past-tense verb immediately after it.
+    subset_before = re.compile(r'(?:\bof\s+(?:the|these|those|which|them)\b|\bout\s+of\b)'
+                               r'[^.]{0,24}$', re.I)
+    subset_after = re.compile(r'^\s+(?:were|was|had|have|has|are\s+still)\b', re.I)
+
+    def norm(line):
+        """Strip markdown emphasis so `**50** committed ledgers` is a figure."""
+        return re.sub(r'[*`_]', '', line)
+
+    def in_fence(lines, i):
+        """Is line i inside a fenced code block? A code sample is not a claim."""
+        fence = False
+        for line in lines[:i]:
+            if line.lstrip().startswith('```'):
+                fence = not fence
+        return fence
+
+    def paragraph(lines, i):
+        """The enclosing paragraph, plus a correction blockquote directly below.
+
+        The house form is to state the figure in the sentence and anchor it in
+        the dated correction immediately under it (the S-L4c block does
+        exactly this), so the anchor window has to include that block.
+        """
+        lo = i
+        while lo > 0 and not para_break.match(lines[lo - 1]):
+            lo -= 1
+        hi = i
+        while hi + 1 < len(lines) and not para_break.match(lines[hi + 1]):
+            hi += 1
+        win = lines[lo:hi + 1]
+        j = hi + 1
+        while j < len(lines) and (not lines[j].strip()
+                                  or re.match(r'\s*>', lines[j])):
+            win.append(lines[j])
+            j += 1
+        return [norm(l) for l in win]
+
+    resolved_cache = {}
+
+    def anchor_reading(sha):
+        """The ledger population at `sha`, or None if the anchor is not a commit."""
+        if sha not in resolved_cache:
+            chk = subprocess.run(['git', 'cat-file', '-e', sha + '^{commit}'],
+                                 capture_output=True, text=True, timeout=30)
+            resolved_cache[sha] = population_at(sha) if chk.returncode == 0 else None
+        return resolved_cache[sha]
+
+    docs_sites = [p for p in ['README.md'] + sorted(glob.glob('docs/*.md'))
+                  if os.path.exists(p)]
+    log_sites = [p for p in sorted(glob.glob('findings-log/**/*.md', recursive=True))
+                 if os.path.isfile(p) and os.path.getsize(p) <= 1_048_576]
+    violations = stale = 0
+    for path in docs_sites + log_sites:
+        strict = path in docs_sites
+        lines = read(path).splitlines()
+
+        def scan_units(i):
+            """The claim text for line i, joined across a hard wrap.
+
+            A figure landing at end-of-line is the NORMAL shape in a file
+            hard-wrapped at 80 columns, not a contrived one: matching a single
+            line let `The census is **55**\\ncommitted ledgers` pass silently,
+            which is the cheapest possible bypass. So the paragraph is joined
+            before the figure is looked for.
+
+            A blockquote is scanned as a BODY rather than skipped. Quoted
+            history is evidence, but the house form for stating a NEW census
+            figure is a dated correction blockquote — the S-L4c block — so
+            skipping `>` lines excluded the one place a fresh figure is most
+            likely to be written. The distinction is enforced by the anchor
+            requirement, not by refusing to look.
+            """
+            lo = i
+            while lo > 0 and not para_break.match(lines[lo - 1]):
+                lo -= 1
+            hi = i
+            while hi + 1 < len(lines) and not para_break.match(lines[hi + 1]):
+                hi += 1
+            # Never let the joined window cross a fence: a census sentence
+            # inside a code block is an example, and joining the surrounding
+            # paragraph across the ``` boundaries made one look like prose.
+            span = lines[lo:hi + 1]
+            out_span, inf = [], False
+            for l in span:
+                if l.lstrip().startswith('```'):
+                    inf = not inf
+                    continue
+                if not inf and not l.strip().startswith('|'):
+                    out_span.append(l)
+            joined = ' '.join(norm(l) for l in out_span)
+            # A table row is a reading, not a sentence. The joined path drops
+            # them above; the single-line unit needs the same guard, or
+            # `> | committed ledgers | 50 | 51 |` matches noun-then-figure here.
+            # A table row is a reading, not a sentence — with or without a
+            # blockquote marker in front of it.
+            own = '' if re.match(r'\s*>?\s*\|',
+                                 re.sub(r'^\s*>\s?', '', line)) else norm(line)
+            if re.match(r'\s*>\s*', line):
+                # A blockquote, including LAZY CONTINUATION lines: markdown lets
+                # a paragraph continue inside a quote without repeating `>`, so
+                #   > The census is **94**
+                #   committed ledgers.
+                # is one quoted sentence. Joining only the contiguous `>` run
+                # split it in half — the `>` line held no claim and the
+                # continuation walked back to a `>` line and stopped. The run
+                # therefore continues until a blank line or a new block marker.
+                lo2 = i
+                while lo2 > 0 and re.match(r'\s*>', lines[lo2 - 1]):
+                    lo2 -= 1
+                hi2 = i
+                while hi2 + 1 < len(lines):
+                    nxt = lines[hi2 + 1]
+                    if not nxt.strip():
+                        break
+                    if re.match(r'\s*(?:#{1,6}\s|\||[-*+]\s|```)', nxt):
+                        break
+                    hi2 += 1
+                body = [re.sub(r'^\s*>\s?', '', l) for l in lines[lo2:hi2 + 1]]
+                # A table row inside the quote is a reading, not a sentence:
+                # joining the quote's table let `committed ledgers | 50 | 51`
+                # read as a claim about 50. Same exclusion the top-level scan
+                # applies, applied after the `>` marker is stripped.
+                body = [l for l in body if not l.strip().startswith('|')]
+                joined = ' '.join(norm(l) for l in body)
+            return [(own, i, i, lo), (joined, lo + 1, hi + 1, lo)]
+
+        seen = set()   # per FILE: one paragraph is one claim, however many lines
+        for i, line in enumerate(lines):
+            if re.match(r'\s*\|', line):
+                continue  # table row — quoted history, not a live prose claim
+            if in_fence(lines, i):
+                continue  # fenced code sample, not prose
+            for text, lo_no, hi_no, para_start in scan_units(i):
+                for m in claim_pat.finditer(text):
+                    raw = m.group(1) or m.group(2) or m.group(3)
+                    value = int(raw.replace(',', ''))
+                    before = text[:m.start()]
+                    after = text[m.end():]
+                    if subset_before.search(before) or subset_after.match(after):
+                        continue  # partitive, not a census claim
+                    where = (f'{path}:{i + 1}' if para_start == i
+                             else f'{path}:{lo_no}-{hi_no}')
+                    # One paragraph is one claim. Join-matching finds the same
+                    # figure from every line in the paragraph, so the key is the
+                    # paragraph's FIRST line for both units — otherwise a
+                    # wrapped paragraph reports once per line and the output is
+                    # 28 warnings about one sentence.
+                    key = (path, para_start, value)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    readings = [(a, anchor_reading(a))
+                                for a in anchor_pat.findall(' '.join(paragraph(lines, i)))]
+                    readings = [(a, n) for a, n in readings if n is not None]
+                    if not readings:
+                        msg = (f'{where} states {value} committed ledgers with no '
+                               f'resolving commit anchor beside it — the population is '
+                               f'derived from the tree and is {population} at this head, '
+                               f'so the figure is false one merge later; write '
+                               f'"measured at `<sha>`" or state it as command output')
+                    elif not any(n == value for _, n in readings):
+                        anchors = ', '.join(f'{a}→{n}' for a, n in readings)
+                        msg = (f'{where} states {value} committed ledgers, but its '
+                               f'anchor(s) ({anchors}) did not hold that many; measured '
+                               f'{population} at this head — re-derive, do not bump the '
+                               f'figure')
+                    else:
+                        continue
+                    if strict:
+                        fail(msg)
+                        violations += 1
+                    else:
+                        warn(msg + ' (findings-log/ is append-only — supersede with a '
+                                   'dated correction, do not rewrite in place)')
+                        stale += 1
+    if not violations and not stale:
+        ok(f'{population} committed ledgers at this head, derived; every prose '
+           f'statement of the census is anchored to a commit that held it')
+    elif not violations:
+        ok(f'{population} committed ledgers at this head, derived; findings-log/ has '
+           f'{stale} anchored-or-superseded statement(s) (warning-only, append-only tree)')
+
+
 def check_append_only():
     """findings-log/ is append-only: additions free, deletions forbidden,
     modifications require a Correction section. AGENTS.md §3 allows appending
@@ -500,12 +756,13 @@ def main():
     check_priorities_sync()
     check_prompt_parity()
     check_append_only()
+    check_ledger_census()
 
     print()
     if FAILED:
         print('CHECKS FAIL — see above. The counting rule is in this file\'s header.')
         return 1
-    print('CHECKS PASS — numbers, prose counts, log cites, log hygiene, priorities, prompts, and append-only all agree.')
+    print('CHECKS PASS — numbers, prose counts, log cites, log hygiene, priorities, prompts, the ledger census and append-only all agree.')
     return 0
 
 
