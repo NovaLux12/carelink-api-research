@@ -83,6 +83,17 @@ from measure_assertions import measure  # noqa: E402
 
 FAILED = False
 
+# A closed-area row in docs/11's Closed table. Hardened from the original
+# `^\| [A-Z]{1,2} —` (exactly one space after the pipe): a verifier planted
+# `|  ZQ — …` with two spaces above the heading and the guard passed green,
+# because the predicate never matched it in the first place. The row was
+# invisible to the count as well, so it would have been invisible to every
+# reader of the page too. `\s+` on both sides accepts any spacing a human
+# would read as a table row while still refusing prose that merely starts
+# with a pipe.
+CLOSED_ROW = r'^\|\s+[A-Z]{1,2}\s+—'
+CLOSED_ROW_ID = r'^\|\s+([A-Z]{1,2})\s+—'
+
 
 def fail(msg):
     global FAILED
@@ -258,11 +269,11 @@ def check_prose_counts():
     # in the wrong place. Anchoring alone would not catch it either, since the
     # orphan is simply outside the tail. So: count closed-shaped rows in the whole
     # file and require that count to equal the in-table count.
-    in_table = len(re.findall(r'^\| [A-Z]{1,2} —', text[m.start():], re.M))
-    whole_file = len(re.findall(r'^\| [A-Z]{1,2} —', text, re.M))
+    in_table = len(re.findall(CLOSED_ROW, text[m.start():], re.M))
+    whole_file = len(re.findall(CLOSED_ROW, text, re.M))
     if whole_file != in_table:
-        orphan_ids = sorted(set(re.findall(r'^\| ([A-Z]{1,2}) —', text, re.M))
-                            - set(re.findall(r'^\| ([A-Z]{1,2}) —', text[m.start():], re.M)))
+        orphan_ids = sorted(set(re.findall(CLOSED_ROW_ID, text, re.M))
+                            - set(re.findall(CLOSED_ROW_ID, text[m.start():], re.M)))
         fail(f'docs/11: {whole_file - in_table} closed-area row(s) sit OUTSIDE the '
              f'Closed table ({orphan_ids}) — a closed row above the `## Closed areas` '
              f'heading is counted by no reader and reads as unstarted work; move it '

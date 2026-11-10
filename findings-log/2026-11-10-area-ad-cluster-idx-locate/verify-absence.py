@@ -2,6 +2,16 @@
 """verify-absence.py — re-derive every ABSENT verdict from the committed block
 bodies alone. Zero requests, zero network.
 
+## Correction (2026-11-10)
+
+The no-bodies path used to exit **2** while printing "nothing to verify". That
+reads as a pass: the bodies live in `.loop/` and are never committed, so a clean
+checkout hits this path by DEFAULT, and a caller testing `exit == 1` — or a human
+reading "nothing to verify" as "nothing wrong" — would take a silent no-op for a
+successful verification. It now exits **3** with a `NOT VERIFIED` prefix so the
+three states stay distinguishable: 0 = verified, 1 = a verdict failed, 3 = could
+not run so nothing was verified. No verdict, figure or key in this file changed.
+
 The defect this file exists for. The S-L1 `servedness.py` locate publishes
 FAMILY_ABSENT when two ADJACENT `cluster.idx` keys straddle the interval. That
 inference is invalid: `cluster.idx` carries one line per CDX *block*, keyed by
@@ -46,8 +56,17 @@ def rec_key(line):
 def main():
     bodies = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("L_BODIES")
     if not bodies or not os.path.isdir(bodies):
-        print("no bodies dir (bodies live in .loop/, never committed) - nothing to verify")
-        return 2
+        # Exit 3, not 2, and say NOT VERIFIED. The bodies live in .loop/ and are
+        # never committed, so this is the DEFAULT state for anyone running this
+        # from a clean checkout. "nothing to verify" reads as "nothing wrong" to a
+        # human, and a caller testing `exit == 1` would take a silent no-op for a
+        # successful verification. Three states must stay distinguishable:
+        #   0 = verified (family present/absent as expected)
+        #   1 = a verdict failed
+        #   3 = could not run, so nothing was verified
+        print("NOT VERIFIED: no bodies dir (bodies live in .loop/, never committed) - "
+              "this run verified NOTHING; exit 3 means could-not-run, not pass")
+        return 3
     conf = json.load(open(os.path.join(HERE, "confirm.json")))
 
     # block-read bodies are identified by their seq in the committed ledger: a
