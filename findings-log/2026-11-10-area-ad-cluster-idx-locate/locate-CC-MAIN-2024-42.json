@@ -1,0 +1,44 @@
+{
+ "budget": 10,
+ "evidence": [
+  "eu,minilotto)/archiv?jahr=2005 20241009195020",
+  "eu,miningsee)/tag/ireland 20241006105858"
+ ],
+ "note": "budget 10 pages, 9 of a 50 cap",
+ "page": [
+  69080802,
+  73275106
+ ],
+ "pages_used": 4,
+ "reads": [
+  {
+   "bytes": 4194304,
+   "first_key": "cz,justice,rejc)/;jsessionid=3bmp13qkpfbflrpx-azhxgh-gpue1-zmwkuryzfx.rejcextapl01?0 20241006230421",
+   "last_key": "de,rewe)/rezepte/sojaschnetzel-gemuesepfanne 20241012102732",
+   "lines": 34409,
+   "range": 61607336
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "net,metalstorm)/users/krokmortem/profile 20241009111151",
+   "last_key": "nz,co,mikeriversdale,blog)/2013/04 20241011232044",
+   "lines": 36484,
+   "range": 91501200
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "gr,naftotopos)/forum/search.php?&search_id=unanswered 20241015055959",
+   "last_key": "io,github,yujunmao1)/champ/solutions/p_combinatorics_13_gpt4t_13soln.html 20241015230224",
+   "lines": 32830,
+   "range": 76554268
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "edu,sfcollege,news)/2012/01/30/cied-incubating-company-seeks-volunteers-for-spring-service-trip 20241009065402",
+   "last_key": "fr,carolinejan)/portfolio-item/logo-elevage-chevaux-2 20241004151112",
+   "lines": 30691,
+   "range": 69080802
+  }
+ ],
+ "state": "FAMILY_ABSENT"
+}

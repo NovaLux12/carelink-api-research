@@ -1,0 +1,33 @@
+{
+ "block_first_key": "eu,mini-parfemy)/wp-content/uploads/2021/12/img_3566.jpeg 20220628223311",
+ "cdx_file": "cdx-00187.gz",
+ "crawl": "CC-MAIN-2022-27",
+ "first_record_key": "eu,mini-parfemy)/wp-content/uploads/2021/12/img_3566.jpeg",
+ "gz_bytes": 202350,
+ "http_status": "206",
+ "last_record_key": "eu,minimumwaste)/profile/donaldcittadini13413661/my-files",
+ "length": 202350,
+ "minimed_keys": [
+  "eu,minimed,carelink)/app/assets/assets/assets/assets/javascript-warning.html",
+  "eu,minimed,carelink)/app/assets/assets/assets/javascript-warning.html",
+  "eu,minimed,carelink)/app/assets/assets/javascript-warning.html",
+  "eu,minimed,carelink)/app/assets/javascript-warning.html",
+  "eu,minimed,carelink)/assets/javascript-warning.html",
+  "eu,minimed,carelink)/ipro/hcp/index.jsp",
+  "eu,minimed,carelink)/patient/entry.jsp?bhcp=1\"\"%20target=\"\"_blank",
+  "eu,minimed,carelink)/patient/privacypolicy.jsp",
+  "eu,minimed,carelink)/robots.txt"
+ ],
+ "minimed_records": 9,
+ "minimed_statuses": [
+  "crawl-data/CC-MAIN-2022-27/segments/1656104244535.68/crawldiagnostics/CC-MAIN-20220703134535-20220703164535-00598.warc.gz",
+  "crawl-data/CC-MAIN-2022-27/segments/1656104244535.68/robotstxt/CC-MAIN-20220703134535-20220703164535-00478.warc.gz",
+  "eng",
+  "eng,fin,lav"
+ ],
+ "note": "21 of a 50 cap",
+ "offset": 354897930,
+ "plaintext_bytes": 1364544,
+ "records_in_block": 3000,
+ "state": "READ"
+}
