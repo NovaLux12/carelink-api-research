@@ -1,0 +1,63 @@
+{
+ "CC-MAIN-2014-23": {
+  "basis": "block read in full, no family record inside it",
+  "bisection_pages": 5,
+  "bisection_state": "FAMILY_ABSENT",
+  "block_cdx_file": "cdx-00236.gz",
+  "block_gz_bytes": 196232,
+  "block_key": "eu,mimoa)/projects/spain/barcelona/cccb 20140729023301",
+  "block_offset": 186985750,
+  "family_keys": [],
+  "family_records": 0,
+  "puncturing_pair": [
+   "eu,mimoa)/projects/spain/barcelona/cccb 20140729023301",
+   "eu,minus273)/gulshan 20140723234727"
+  ],
+  "records_in_block": 3000,
+  "state": "FAMILY_ABSENT"
+ },
+ "CC-MAIN-2022-27": {
+  "basis": "block-confirmed records",
+  "bisection_pages": 5,
+  "bisection_state": "FAMILY_ABSENT",
+  "block_cdx_file": "cdx-00187.gz",
+  "block_gz_bytes": 202350,
+  "block_key": "eu,mini-parfemy)/wp-content/uploads/2021/12/img_3566.jpeg 20220628223311",
+  "block_offset": 354897930,
+  "family_keys": [
+   "eu,minimed,carelink)/app/assets/assets/assets/assets/javascript-warning.html",
+   "eu,minimed,carelink)/app/assets/assets/assets/javascript-warning.html",
+   "eu,minimed,carelink)/app/assets/assets/javascript-warning.html",
+   "eu,minimed,carelink)/app/assets/javascript-warning.html",
+   "eu,minimed,carelink)/assets/javascript-warning.html",
+   "eu,minimed,carelink)/ipro/hcp/index.jsp",
+   "eu,minimed,carelink)/patient/entry.jsp?bhcp=1\"\"%20target=\"\"_blank",
+   "eu,minimed,carelink)/patient/privacypolicy.jsp",
+   "eu,minimed,carelink)/robots.txt"
+  ],
+  "family_records": 9,
+  "puncturing_pair": [
+   "eu,mini-parfemy)/wp-content/uploads/2021/12/img_3566.jpeg 20220628223311",
+   "eu,minimumwaste)/profile/donaldcittadini13413661/profile 20220701010643"
+  ],
+  "records_in_block": 3000,
+  "state": "FAMILY_PRESENT"
+ },
+ "CC-MAIN-2024-42": {
+  "basis": "block read in full, no family record inside it",
+  "bisection_pages": 4,
+  "bisection_state": "FAMILY_ABSENT",
+  "block_cdx_file": "cdx-00180.gz",
+  "block_gz_bytes": 219913,
+  "block_key": "eu,minilotto)/archiv?jahr=2005 20241009195020",
+  "block_offset": 157271108,
+  "family_keys": [],
+  "family_records": 0,
+  "puncturing_pair": [
+   "eu,minilotto)/archiv?jahr=2005 20241009195020",
+   "eu,miningsee)/tag/ireland 20241006105858"
+  ],
+  "records_in_block": 3000,
+  "state": "FAMILY_ABSENT"
+ }
+}

@@ -1,0 +1,37 @@
+control gate (KEY-ONLY, run 1) -- NOT PASSED
+  CC-MAIN-2022-27 -> FAMILY_ABSENT (expected FAMILY_PRESENT)
+  CC-MAIN-2024-42 -> FAMILY_ABSENT (expected FAMILY_ABSENT)
+
+The key-only gate failed on CTRL_A. It was NOT a transport or budget failure: the
+bisection converged on both controls, and it converged to the WRONG answer on one.
+That is the defect, and the block read below is the observation that proves it.
+
+control gate (BLOCK-CONFIRMED, run 2) -- PASSED
+  the same bisection state machine, but an absence is published only after the one
+  cluster.idx block that must contain the family has been read and counted.
+
+  CC-MAIN-2022-27 -> FAMILY_PRESENT  [expected FAMILY_PRESENT]  block cdx-00187.gz, 3000 records, 9 family
+       eu,minimed,carelink)/app/assets/assets/assets/assets/javascript-warning.html
+       eu,minimed,carelink)/app/assets/assets/assets/javascript-warning.html
+       eu,minimed,carelink)/app/assets/assets/javascript-warning.html
+       eu,minimed,carelink)/app/assets/javascript-warning.html
+       eu,minimed,carelink)/assets/javascript-warning.html
+       eu,minimed,carelink)/ipro/hcp/index.jsp
+       bisection state was FAMILY_ABSENT in 5 pages; pair (eu,mini-parfemy)/wp-content/uploads/2021/12/ | eu,minimumwaste)/profile/donaldcittadini1341)
+
+  CC-MAIN-2024-42 -> FAMILY_ABSENT  [expected FAMILY_ABSENT]  block cdx-00180.gz, 3000 records, 0 family
+       bisection state was FAMILY_ABSENT in 4 pages; pair (eu,minilotto)/archiv?jahr=2005 2024100919502 | eu,miningsee)/tag/ireland 20241006105858)
+
+  CC-MAIN-2014-23 -> FAMILY_ABSENT  [target]  block cdx-00236.gz, 3000 records, 0 family
+       bisection state was FAMILY_ABSENT in 5 pages; pair (eu,mimoa)/projects/spain/barcelona/cccb 2014 | eu,minus273)/gulshan 20140723234727)
+
+THE DEFECT, stated once:
+  CTRL_A's key-only verdict was FAMILY_ABSENT and it was FALSE. The puncturing
+  pair (eu,mini-parfemy) , eu,minimumwaste)) has no cluster.idx key inside the
+  family interval, but cluster.idx is keyed per BLOCK: the first key of a block
+  bounds its whole byte range. A pair straddling the interval therefore says the
+  interval lies INSIDE that block - which is where a present family lives.
+  Reading the block keyed eu,mini-parfemy) returned 3000 records including 9
+  eu,minimed,carelink) rows. The absence half of the S-L1 instrument is unsound;
+  its presence half (a key hit inside the interval) is unaffected.
+
