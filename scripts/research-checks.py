@@ -532,11 +532,11 @@ def check_ledger_census():
     sentence and the blockquote-scanning code landed together in a37f4df, so no
     revision ever had a docstring saying this while the code skipped `>` lines.
     The clause "a correction quoting a past count is evidence, not a claim" also
-    appears verbatim in `check_prose_counts`, where it is TRUE — that check really
-    does skip `>` lines — and it was never true here. A reader who greps the
-    phrase will find an accurate site and this one, which is why the wording is
-    replaced rather than merely deleted.) Zero vendor requests — `git ls-files`/
-    `git ls-tree` only.
+    appears verbatim in `check_prose_counts` and in docs/09's oracle table, where
+    it is TRUE — that check really does skip `>` lines — and it was never true
+    here. A reader who greps the phrase will find two accurate sites and this one,
+    which is why the wording is replaced rather than merely deleted.) Zero vendor
+    requests — `git ls-files`/`git ls-tree` only.
     """
     print('--- ledger census ---')
     def population_at(rev=None):
