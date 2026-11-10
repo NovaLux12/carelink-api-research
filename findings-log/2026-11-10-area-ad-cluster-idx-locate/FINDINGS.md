@@ -409,9 +409,14 @@ table that visibly does not sum, or a sentence that misdescribes its own ledger,
 a reader than the small break with strict append-only. But that means this log has been
 **edited in place as well as corrected**, which is not the pure append-only form AGENTS.md §3
 asks for. The first revision of this paragraph claimed "recorded here rather than rewritten in
-place", which was false of the very commit that wrote it. The audit trail survives because each
-item below quotes the old text and names the merge SHA, so a reader can see exactly what
-changed — but the trade is disclosed here rather than described as something it was not.
+place", which was false of the very commit that wrote it. What the audit trail actually holds,
+stated per item rather than as a blanket reassurance — an earlier revision of this sentence
+claimed all four "quote the old text and name the merge SHA", and that was wrong twice over:
+**items 1, 3 and 4 quote the superseded wording verbatim; item 2 describes the old state
+without quoting it; and no item names a merge SHA** (the hex strings in item 3 are `sha256`
+body digests, not commits). The superseded revision is `ec3c1a9` (PR #169), and
+`git show ec3c1a9:findings-log/2026-11-10-area-ad-cluster-idx-locate/FINDINGS.md` is the
+authority for what the text said before this section existed.
 
 1. **§4's straddle parenthetical cites the wrong byte index for one of its two rows.**
    It says `a < FAM_LO (0x2D '-' < 0x6D 'm' at index 8)`. The first differing byte is at
