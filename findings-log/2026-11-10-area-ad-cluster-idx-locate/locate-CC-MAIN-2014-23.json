@@ -1,0 +1,51 @@
+{
+ "budget": 10,
+ "evidence": [
+  "eu,mimoa)/projects/spain/barcelona/cccb 20140729023301",
+  "eu,minus273)/gulshan 20140723234727"
+ ],
+ "note": "seeded f0, budget 10, 23 of a 50 cap",
+ "page": [
+  121830098,
+  126024402
+ ],
+ "pages_used": 5,
+ "reads": [
+  {
+   "bytes": 4194304,
+   "first_key": "com,photobucket,s23)/user/kemmerer123/media/ts2e/sigies/1-1.jpg.html 20140724082606",
+   "last_key": "com,realgm,basketball)/nba/preseason/team/miami_heat/15/rosters 20140724022328",
+   "lines": 33226,
+   "range": 78770781
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "com,yayahan)/portfolio/costumes/domino-x-force 20140723220953",
+   "last_key": "edu,illinois)/calendar/detail/417?cal=20130926&calmin=201309&eventid=29250964&skinid=2576 20140731212557",
+   "lines": 32442,
+   "range": 116336512
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "org,americanpregnancy)/forums/private.php?do=newpm&u=181241 20140801042625",
+   "last_key": "org,heartland)/policy-documents/research-commentary-national-%e2%80%98common-core%e2%80%99-curriculum-standards?quicktabs_1=0 20140723160509",
+   "lines": 33411,
+   "range": 135119377
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "gov,epa)/region9/waste/p2/business.html 20140726052629",
+   "last_key": "net,alldiscountbooks)/_you-lost-me-discussion-guide_t_.html 20140723090249",
+   "lines": 33303,
+   "range": 125727944
+  },
+  {
+   "bytes": 4194304,
+   "first_key": "edu,sage)/newsevents/events?audience=240361&date=2013-05-01&event_id=279606&start_date=2013-02-13 20140728203612",
+   "last_key": "gov,hud,portal)/hudportal/hud?src=/hud/recovery/hud/program_offices/comm_planning/environment/hud/topics/hud/states/delaware 20140722181256",
+   "lines": 32229,
+   "range": 121830098
+  }
+ ],
+ "state": "FAMILY_ABSENT"
+}

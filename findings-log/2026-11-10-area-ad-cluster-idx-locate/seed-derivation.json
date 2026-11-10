@@ -1,0 +1,34 @@
+{
+ "crawls": {
+  "CC-MAIN-2014-23": {
+   "bracket": null,
+   "derivation": "mean of the two control seeds (0.52613, 0.52477); the two brackets agree to within 0.00136 of the file, so the mean is the estimator with no target-side evidence",
+   "f0": 0.52545,
+   "total": null
+  },
+  "CC-MAIN-2022-27": {
+   "bracket": [
+    66372199,
+    95363994
+   ],
+   "f0": 0.52613,
+   "page_pct_of_file": 2.73,
+   "total": 153702643
+  },
+  "CC-MAIN-2024-42": {
+   "bracket": [
+    52641478,
+    74767913
+   ],
+   "f0": 0.52477,
+   "page_pct_of_file": 3.46,
+   "total": 121395065
+  }
+ },
+ "family": [
+  "eu,minimed)",
+  "eu,minimeda"
+ ],
+ "method": "midpoint of the de,/es,/eu, bracket observed in the committed 2026-10-18 pages; zero requests",
+ "source_dir": "findings-log/2026-10-18-sl1-cluster-servedness (relative to the repo root)"
+}
