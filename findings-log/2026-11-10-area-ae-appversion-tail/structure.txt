@@ -1,0 +1,44 @@
+ledger rows: 18
+
+## Per-cell
+seq host                       base tail   role             st  bytes  echo class          structure
+  1 clcloud.minimed.com        v99  3.6    control-absent  403     42     0 -              -
+  2 clcloud.minimed.com        v11  3.6    control-served  200  18105     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+  3 clcloud.minimed.com        v13  3.61   data-ladder     200  18106     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+  4 clcloud.minimed.com        v13  3.65   data-ladder     200  18106     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+  5 clcloud.minimed.com        v13  3.7    data-ladder     200  20256     0 7ad212402d7f   advCumulus=v13 carelink=v2 CP=3 ctry=109 sso=oauth20_sso_carepartner_eu_v6.json,oauth20_sso_carepartner_us_v6.json
+  6 clcloud.minimed.com        v13  3.75   data-ladder     200  18106     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+  7 clcloud.minimed.com        v13  3.8    data-ladder     200  20256     0 7ad212402d7f   advCumulus=v13 carelink=v2 CP=3 ctry=109 sso=oauth20_sso_carepartner_eu_v6.json,oauth20_sso_carepartner_us_v6.json
+  8 clcloud.minimed.com        v13  3.85   data-ladder     200  18106     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+  9 clcloud.minimed.com        v13  3.89   data-ladder     200  18106     0 7ac09335c7e4   advCumulus=v2 carelink=v1 CP=2 ctry=99 sso=eu_sso_cp_eu_v6.json,sso_cp_us_v6.json
+ 10 clcloud-trials.minimed.com v99  3.6    control-absent  403     42     0 -              -
+ 11 clcloud-trials.minimed.com v11  3.6    control-served  200  20345     0 def5847975c6   advCumulus=v13 carelink=v2 CP=3 ctry=109 sso=oauth20_sso_carepartner_us_v6.json
+ 12 clcloud-trials.minimed.com v13  3.61   data-ladder     200  16370     0 9962b3db79b1   advCumulus=v2 carelink=v1 CP=2 ctry=76 sso=sso_cp_us_v6.json
+ 13 clcloud-trials.minimed.com v13  3.65   data-ladder     200  16370     0 9962b3db79b1   advCumulus=v2 carelink=v1 CP=2 ctry=76 sso=sso_cp_us_v6.json
+ 14 clcloud-trials.minimed.com v13  3.7    data-ladder     200  20256     0 7ad212402d7f   advCumulus=v13 carelink=v2 CP=3 ctry=109 sso=oauth20_sso_carepartner_eu_v6.json,oauth20_sso_carepartner_us_v6.json
+ 15 clcloud-trials.minimed.com v13  3.75   data-ladder     200  16370     0 9962b3db79b1   advCumulus=v2 carelink=v1 CP=2 ctry=76 sso=sso_cp_us_v6.json
+ 16 clcloud-trials.minimed.com v13  3.8    data-ladder     200  20256     0 7ad212402d7f   advCumulus=v13 carelink=v2 CP=3 ctry=109 sso=oauth20_sso_carepartner_eu_v6.json,oauth20_sso_carepartner_us_v6.json
+ 17 clcloud-trials.minimed.com v13  3.85   data-ladder     200  16370     0 9962b3db79b1   advCumulus=v2 carelink=v1 CP=2 ctry=76 sso=sso_cp_us_v6.json
+ 18 clcloud-trials.minimed.com v13  3.89   data-ladder     200  16370     0 9962b3db79b1   advCumulus=v2 carelink=v1 CP=2 ctry=76 sso=sso_cp_us_v6.json
+
+## Classes, per (host, base)
+  clcloud-trials.minimed.com base v11: 1 cells, 1 distinct class(es)
+    def5847975c6  n=1  tails=[3.6]
+    -> ONE CLASS (tail selects nothing in the swept range)
+  clcloud-trials.minimed.com base v13: 7 cells, 2 distinct class(es)
+    9962b3db79b1  n=5  tails=[3.61, 3.65, 3.75, 3.85, 3.89]
+    7ad212402d7f  n=2  tails=[3.7, 3.8]
+    -> NOT A SINGLE THRESHOLD (classes: 2, contiguous=False) -> table
+  clcloud.minimed.com base v11: 1 cells, 1 distinct class(es)
+    7ac09335c7e4  n=1  tails=[3.6]
+    -> ONE CLASS (tail selects nothing in the swept range)
+  clcloud.minimed.com base v13: 7 cells, 2 distinct class(es)
+    7ac09335c7e4  n=5  tails=[3.61, 3.65, 3.75, 3.85, 3.89]
+    7ad212402d7f  n=2  tails=[3.7, 3.8]
+    -> NOT A SINGLE THRESHOLD (classes: 2, contiguous=False) -> table
+
+## Controls
+  seq 1 clcloud.minimed.com v99/3.6 control-absent: 403 application/json 42B MissingAuthenticationTokenException
+  seq 2 clcloud.minimed.com v11/3.6 control-served: 200 application/json;charset=utf-8 18105B 
+  seq 10 clcloud-trials.minimed.com v99/3.6 control-absent: 403 application/json 42B MissingAuthenticationTokenException
+  seq 11 clcloud-trials.minimed.com v11/3.6 control-served: 200 application/json;charset=utf-8 20345B 

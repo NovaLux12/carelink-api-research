@@ -1,0 +1,7 @@
+rows: 18; self-conviction (t_done < t_sent): 0 []
+
+host                          gaps       min       max  <2.5s  <2.0s
+clcloud-trials.minimed.com       8     3.427     9.604      0      0
+clcloud.minimed.com              8     3.499     3.918      0      0
+
+MEASURED FLOOR (all hosts, same-host gaps only): 3.427 s over 16 gaps; under 2.5 s: 0
