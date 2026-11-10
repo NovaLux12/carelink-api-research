@@ -527,11 +527,11 @@ def check_ledger_census():
     figure is most likely to be written — the distinction is enforced by the
     anchor requirement, not by refusing to look. Table ROWS are excluded, with
     or without a blockquote marker in front: a row is a reading, not a sentence,
-    so `| committed ledgers | 50 | 51 |` is not a claim about 50. (The old line
-    this replaced, "Quoted history (blockquotes, table rows) is excluded", was
-    wrong on arrival rather than stale: `git log -S` shows both it and the
-    blockquote-scanning code landed together in a37f4df, so no revision ever had
-    a docstring saying that while the code skipped `>` lines. It was never true
+    so `| committed ledgers | 50 | 51 |` is not a claim about 50. (The line this
+    replaced said blockquotes were excluded. It was wrong on arrival rather than
+    stale: that line and the blockquote-scanning code below both landed in
+    a37f4df, the commit that created this check, so no revision ever had a
+    docstring saying it while the code skipped `>` lines. It was never true
     here.) Zero vendor requests — `git ls-files`, `git ls-tree` and
     `git cat-file -e` only, no network.
     """
