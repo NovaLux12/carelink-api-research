@@ -3816,8 +3816,10 @@ already recorded rather than on an unmeasured deployment.
 Dated, with the verdict and the evidence. An area leaves this table only by
 being superseded — never silently. Letters are not reused.
 
-> **On the row count.** The gate counts rows matching `^| [A-Z]{1,2} —`, which is the
-> rule behind every "N open plus M closed" sentence on this page. Two rows here — `S6`
+> **On the row count.** The gate counts rows matching `CLOSED_ROW` in
+> `scripts/research-checks.py` — an area id of one or two capitals, then an em dash,
+> tolerating any whitespace between them. That is the rule behind every
+> "N open plus M closed" sentence on this page. Two rows here — `S6`
 > and `S-L1` — are closed sub-areas whose ids predate the one-or-two-letter convention;
 > they match neither that pattern nor any `### ` heading, so they are in the table but in
 > no count. Both are closed. The sentences count areas, not rows.
