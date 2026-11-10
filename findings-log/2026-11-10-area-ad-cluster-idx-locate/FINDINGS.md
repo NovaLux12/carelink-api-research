@@ -403,11 +403,12 @@ derivation and the three verdicts all re-checked true. What follows are errors i
 *about* that evidence, plus one tool hazard.
 
 **How this section relates to the text above it — stated plainly, because an earlier revision
-of this very section got it wrong.** All four defects are recorded here *and* fixed in place:
-the itemisation table, the run-split sentence, the byte index, and the exit code. Leaving a
-table that visibly does not sum, or a sentence that misdescribes its own ledger, is worse for
-a reader than the small break with strict append-only. But that means this log has been
-**edited in place as well as corrected**, which is not the pure append-only form AGENTS.md §3
+of this very section got it wrong.** All four defects are recorded here; three were fixed in
+place in *this* file — the itemisation table, the run-split sentence, the byte index — and the
+fourth, the exit code, was fixed in `verify-absence.py`, a different file. Leaving a table that
+visibly does not sum, or a sentence that misdescribes its own ledger, is worse for a reader
+than the small break with strict append-only. But that means **this file has been edited in
+place as well as corrected**, which is not the pure append-only form AGENTS.md §3
 asks for. The first revision of this paragraph claimed "recorded here rather than rewritten in
 place", which was false of the very commit that wrote it. What the audit trail actually holds,
 stated per item rather than as a blanket reassurance — an earlier revision of this sentence
