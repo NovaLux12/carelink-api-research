@@ -3822,7 +3822,13 @@ being superseded — never silently. Letters are not reused.
 > "N open plus M closed" sentence on this page. Two rows here — `S6`
 > and `S-L1` — are closed sub-areas whose ids predate the one-or-two-letter convention;
 > they match neither that pattern nor any `### ` heading, so they are in the table but in
-> no count. Both are closed. The sentences count areas, not rows.
+> no count. Both are closed.
+>
+> The two figures in those sentences are measured by different units, which is worth
+> knowing before comparing them: the **open** figure counts `### ` area headings, while
+> the **closed** figure is a row count over `CLOSED_ROW`. So `S6` and `S-L1` are absent
+> from the closed figure only because their ids do not match the row pattern — not
+> because they are not areas.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
