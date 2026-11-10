@@ -446,16 +446,79 @@ prefix cell was sent — and no choice is made between those readings
 
 ### 3b.5 What this does not establish — INFERRED
 
+> **Superseded 2026-11-10 by §3b.6, and kept as written.** This paragraph was true of
+> AA's four tails and is not true of AE's eleven: *"Whether the tail is a lookup table
+> or a threshold is not separable from four tails, three of them adjacent: a boundary
+> anywhere in `(3.5, 3.6]` or `(3.6, 3.9]` fits the data exactly as well as a per-value
+> table."* **The premise that failed is the "not separable" half, not the arithmetic** —
+> a ladder *inside* the interval does separate them, and §3b.6 records how.
+
 **Whether the tail is a lookup table or a threshold is not separable from four
 tails**, three of them adjacent: a boundary anywhere in `(3.5, 3.6]` or
 `(3.6, 3.9]` fits the data exactly as well as a per-value table. **Assumption:**
 none needed for the cells above; this is a statement about what four tails can
-discriminate. Area **AE** carries the open form
+discriminate. Area **AE** carried the open form
 [source: findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §6].
 
 **Base `v11` carries no verdict** — one tail was sent there, as a control, and
 one cell cannot separate "selects" from "does not select". Nothing is claimed
 about `v11` on the app-version axis.
+
+### 3b.6 The rule is a **table keyed on the string**, not a threshold — added 2026-11-10 (area AE)
+
+**Area AE closed the table-versus-threshold question that §3b.5 had left open, and
+the answer changes what this section implies.** One pass, one ledger, one source
+(`AGENTS.md` §2.1) — no strength word is used
+[source: findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md §3].
+
+Seven tails **strictly inside** `(3.6, 3.9)` at base `v13` were sent on **both**
+cumulus hosts, 18 of a 20 cap, GET only, controls first per host. The
+tail-erased digest gives **one** class sequence, identical on `.com` and
+`-trials`:
+
+| tail | class | document |
+|---|---|---|
+| `3.61` | **L** | cumulus `v2` · carelink v1 · CP 2 · ctry 99 (`.com`) / 76 (`-trials`) |
+| `3.65` | **L** | ″ |
+| `3.7` | **C** | cumulus **`v13`** · carelink **v2** · CP **3** · ctry **109** |
+| `3.75` | **L** | ″ |
+| `3.8` | **C** | ″ |
+| `3.85` | **L** | ″ |
+| `3.89` | **L** | ″ |
+
+**The sequence `L L C L C L L` is the whole finding.** A threshold is a monotone
+step function of the numeric value; a step function that leaves the legacy branch
+at `3.65 → 3.7` has no way back to it at `3.75`. This sequence returns twice, so
+**no threshold over the numeric value can produce these cells** (INFERRED; the
+sequence it refutes is OBSERVED). The rule must be keyed on the **string** — a
+table. Among the strings tested the current-generation entries are
+**`{3.6, 3.7, 3.8}`**
+[source: findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md §2.2, §3].
+
+**What this retires, stated as a retraction of a reading rather than of a cell.**
+§3's `.eu` table — `3.6, 3.7, 3.8 → v13`; `3.9`–`12.0` → legacy — was right, and
+§3b.2's "three documents selected by the tail" left the rule's shape open in a way
+that admitted a reading of the axis as a **generation step** (current up to some
+version, legacy above it). That reading is an artefact of sampling only the two
+ends of the interval: AA sent `3.5`, `3.6`, `3.9` and this pass sent the seven
+interior cells, and the interior is **not** a step. The `.eu` cells themselves are
+**untouched** — this pass sent no `.eu` request and makes no claim about that
+host.
+
+**The practical consequence for the pin.** `android/3.6` is a **table entry**, not
+a point above a threshold. It cannot be made stale by a boundary moving
+underneath it, which is a different (and weaker) failure mode than §3's ADR-0002
+discussion assumes. What it *can* lose is its **entry** — the table dropping `3.6`
+or the `3.6`-class document departing — which is the change worth watching and the
+reason AE added no pin (log §6).
+
+**Still not established:** the table's membership across **string forms** —
+`3.60`, `3.700`, `3.6.0` are unobserved on this path, and `3.6.0`/`3.7.0`/`3.8.0`
+are forms clients actually ship on the body axis (§3a) — and its completeness
+**above `3.9`**. Both are carried as the successor addendum under `docs/11` area
+AE. Truncation of the tail to one decimal is **excluded** by the cells
+(`3.75`/`3.85` → legacy while `3.7`/`3.8` → current), so if any normalisation
+exists it is finer than that.
 
 ---
 

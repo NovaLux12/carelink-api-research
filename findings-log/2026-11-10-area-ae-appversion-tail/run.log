@@ -1,0 +1,40 @@
+2026-11-10T00:21:54.940Z  === host clcloud.minimed.com — controls first (v99 absent, v11 served), then 7 tails in (3.6,3.9) ===
+2026-11-10T00:21:55.585Z  seq=1 gate busy (rc=3) — wait 1/60 inside the host lock, then re-check
+2026-11-10T00:22:06.246Z  seq=1 gate busy (rc=3) — wait 2/60 inside the host lock, then re-check
+2026-11-10T00:22:19.905Z  seq=1 host_seq=1 clcloud.minimed.com v99 android/3.6 [control-absent] GET -> 403 application/json 42B err=MissingAuthenticationTokenException sha=f249b63cb2fc erased= gate_waits=2
+2026-11-10T00:22:23.731Z  seq=2 host_seq=2 clcloud.minimed.com v11 android/3.6 [control-served] GET -> 200 application/json;charset=utf-8 18105B err=<none> sha=2103b7e850c4 erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:23.743Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:27.476Z  seq=3 host_seq=3 clcloud.minimed.com v13 android/3.61 [data-ladder] GET -> 200 application/json;charset=utf-8 18106B err=<none> sha=2eb6d4102e5b erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:27.482Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:31.841Z  seq=4 host_seq=4 clcloud.minimed.com v13 android/3.65 [data-ladder] GET -> 200 application/json;charset=utf-8 18106B err=<none> sha=cf321df805b3 erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:31.874Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:34.658Z  seq=5 host_seq=5 clcloud.minimed.com v13 android/3.7 [data-ladder] GET -> 200 application/json;charset=utf-8 20256B err=<none> sha=de96fb4dd27a erased=7ad212402d7f gate_waits=0
+2026-11-10T00:22:34.661Z     structure: {"adv_cumulus": "v13", "carelink": "v2", "n_cert": 8, "n_cp": 3, "n_ctry": 109, "sso": ["oauth20_sso_carepartner_eu_v6.json", "oauth20_sso_carepartner_us_v6.json"]}
+2026-11-10T00:22:38.139Z  seq=6 host_seq=6 clcloud.minimed.com v13 android/3.75 [data-ladder] GET -> 200 application/json;charset=utf-8 18106B err=<none> sha=709b2fba43d1 erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:38.148Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:41.765Z  seq=7 host_seq=7 clcloud.minimed.com v13 android/3.8 [data-ladder] GET -> 200 application/json;charset=utf-8 20256B err=<none> sha=9d0458d0185b erased=7ad212402d7f gate_waits=0
+2026-11-10T00:22:41.768Z     structure: {"adv_cumulus": "v13", "carelink": "v2", "n_cert": 8, "n_cp": 3, "n_ctry": 109, "sso": ["oauth20_sso_carepartner_eu_v6.json", "oauth20_sso_carepartner_us_v6.json"]}
+2026-11-10T00:22:45.254Z  seq=8 host_seq=8 clcloud.minimed.com v13 android/3.85 [data-ladder] GET -> 200 application/json;charset=utf-8 18106B err=<none> sha=4abbc6529c67 erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:45.258Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:48.841Z  seq=9 host_seq=9 clcloud.minimed.com v13 android/3.89 [data-ladder] GET -> 200 application/json;charset=utf-8 18106B err=<none> sha=3bcec8f07cdd erased=7ac09335c7e4 gate_waits=0
+2026-11-10T00:22:48.844Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 99, "sso": ["eu_sso_cp_eu_v6.json", "sso_cp_us_v6.json"]}
+2026-11-10T00:22:48.848Z  === host clcloud.minimed.com done: 9 requests this run; ledger now 9 of cap 20 ===
+2026-11-10T00:24:19.386Z  === host clcloud-trials.minimed.com — controls first (v99 absent, v11 served), then 7 tails in (3.6,3.9) ===
+2026-11-10T00:24:23.255Z  seq=10 host_seq=1 clcloud-trials.minimed.com v99 android/3.6 [control-absent] GET -> 403 application/json 42B err=MissingAuthenticationTokenException sha=f249b63cb2fc erased= gate_waits=0
+2026-11-10T00:24:32.766Z  seq=11 host_seq=2 clcloud-trials.minimed.com v11 android/3.6 [control-served] GET -> 200 application/json;charset=utf-8 20345B err=<none> sha=94b739dda478 erased=def5847975c6 gate_waits=0
+2026-11-10T00:24:32.779Z     structure: {"adv_cumulus": "v13", "carelink": "v2", "n_cert": 8, "n_cp": 3, "n_ctry": 109, "sso": ["oauth20_sso_carepartner_us_v6.json"]}
+2026-11-10T00:24:41.998Z  seq=12 host_seq=3 clcloud-trials.minimed.com v13 android/3.61 [data-ladder] GET -> 200 application/json;charset=utf-8 16370B err=<none> sha=bf769926555e erased=9962b3db79b1 gate_waits=0
+2026-11-10T00:24:42.148Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 76, "sso": ["sso_cp_us_v6.json"]}
+2026-11-10T00:24:45.828Z  seq=13 host_seq=4 clcloud-trials.minimed.com v13 android/3.65 [data-ladder] GET -> 200 application/json;charset=utf-8 16370B err=<none> sha=62804ec08c0b erased=9962b3db79b1 gate_waits=0
+2026-11-10T00:24:45.843Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 76, "sso": ["sso_cp_us_v6.json"]}
+2026-11-10T00:24:49.626Z  seq=14 host_seq=5 clcloud-trials.minimed.com v13 android/3.7 [data-ladder] GET -> 200 application/json;charset=utf-8 20256B err=<none> sha=de96fb4dd27a erased=7ad212402d7f gate_waits=0
+2026-11-10T00:24:49.638Z     structure: {"adv_cumulus": "v13", "carelink": "v2", "n_cert": 8, "n_cp": 3, "n_ctry": 109, "sso": ["oauth20_sso_carepartner_eu_v6.json", "oauth20_sso_carepartner_us_v6.json"]}
+2026-11-10T00:24:53.959Z  seq=15 host_seq=6 clcloud-trials.minimed.com v13 android/3.75 [data-ladder] GET -> 200 application/json;charset=utf-8 16370B err=<none> sha=9ad089f575e4 erased=9962b3db79b1 gate_waits=0
+2026-11-10T00:24:53.991Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 76, "sso": ["sso_cp_us_v6.json"]}
+2026-11-10T00:24:56.875Z  seq=16 host_seq=7 clcloud-trials.minimed.com v13 android/3.8 [data-ladder] GET -> 200 application/json;charset=utf-8 20256B err=<none> sha=9d0458d0185b erased=7ad212402d7f gate_waits=0
+2026-11-10T00:24:56.878Z     structure: {"adv_cumulus": "v13", "carelink": "v2", "n_cert": 8, "n_cp": 3, "n_ctry": 109, "sso": ["oauth20_sso_carepartner_eu_v6.json", "oauth20_sso_carepartner_us_v6.json"]}
+2026-11-10T00:25:00.260Z  seq=17 host_seq=8 clcloud-trials.minimed.com v13 android/3.85 [data-ladder] GET -> 200 application/json;charset=utf-8 16370B err=<none> sha=60977b7e4cfb erased=9962b3db79b1 gate_waits=0
+2026-11-10T00:25:00.263Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 76, "sso": ["sso_cp_us_v6.json"]}
+2026-11-10T00:25:04.409Z  seq=18 host_seq=9 clcloud-trials.minimed.com v13 android/3.89 [data-ladder] GET -> 200 application/json;charset=utf-8 16370B err=<none> sha=4fff97e20a5e erased=9962b3db79b1 gate_waits=0
+2026-11-10T00:25:04.518Z     structure: {"adv_cumulus": "v2", "carelink": "v1", "n_cert": 8, "n_cp": 2, "n_ctry": 76, "sso": ["sso_cp_us_v6.json"]}
+2026-11-10T00:25:04.691Z  === host clcloud-trials.minimed.com done: 9 requests this run; ledger now 18 of cap 20 ===
