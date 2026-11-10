@@ -1,0 +1,36 @@
+spacing.txt — the same-host delay series for
+  findings-log/2026-11-10-area-ac-catchall-probe/results.jsonl
+  host: carelink.minimed.eu (ONE host in scope, so host_seq is the series)
+  declared delay: >= 2.5 s, slept INSIDE flock; repository floor: >= 2.0 s
+  rows in the ledger: 14
+  distinct hosts in the ledger: carelink.minimed.eu
+
+CLOCK A — t_sent (the harness clock; re-derivable from this file alone)
+n     host_seq  t_sent                     gap       verdict  
+1     1         2026-11-10T00:32:04.150Z   -         -        
+2     2         2026-11-10T00:32:06.755Z       2.605 ok       
+3     3         2026-11-10T00:32:09.338Z       2.583 ok       
+4     4         2026-11-10T00:32:11.946Z       2.608 ok       
+5     5         2026-11-10T00:32:14.539Z       2.593 ok       
+6     6         2026-11-10T00:32:17.120Z       2.581 ok       
+7     7         2026-11-10T00:32:19.719Z       2.599 ok       
+8     8         2026-11-10T00:32:22.327Z       2.608 ok       
+9     9         2026-11-10T00:32:24.915Z       2.588 ok       
+10    10        2026-11-10T00:32:27.514Z       2.599 ok       
+11    11        2026-11-10T00:33:40.576Z      73.062 ok       
+12    12        2026-11-10T00:33:43.155Z       2.579 ok       
+13    13        2026-11-10T00:33:45.735Z       2.580 ok       
+14    14        2026-11-10T00:34:11.813Z      26.078 ok       
+
+  gaps 13   min 2.579 s   max 73.062 s   mean 9.820 s
+  under the declared 2.5 s: 0
+  under the repository 2.0 s floor: 0
+  negative durations (impossible; a corrupt-t0 signature): 0
+  FLOOR ON THIS CLOCK: 2.579 s
+
+REQUEST DURATIONS (t_done - t_sent): min 0.004 s   max 0.012 s   mean 0.006 s
+  negative: 0
+
+REQUEST ACCOUNTING
+  rows: 14   failures: 0   retries: 0
+  distinct statuses: 200, 404

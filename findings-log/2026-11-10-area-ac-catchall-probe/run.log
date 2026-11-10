@@ -1,0 +1,15 @@
+seq	role	path	http	content_type	bytes	sha256_16	t_sent	t_done
+1	control-fabricated-apex	/zz-ac-absent-20261110-probe.html	404	text/html; charset=iso-8859-1	196	80c3fe2ae1062abf	2026-11-10T00:32:04.150Z	2026-11-10T00:32:04.155Z
+2	control-live-document	/robots.txt	404	text/html; charset=iso-8859-1	196	80c3fe2ae1062abf	2026-11-10T00:32:06.755Z	2026-11-10T00:32:06.760Z
+3	shape-apex	/assets/javascript-warning.html	200	text/html; charset=UTF-8	1180	11321752d74eea41	2026-11-10T00:32:09.338Z	2026-11-10T00:32:09.343Z
+4	shape-depth1	/app/assets/javascript-warning.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:11.946Z	2026-11-10T00:32:11.958Z
+5	shape-depth2	/app/assets/assets/javascript-warning.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:14.539Z	2026-11-10T00:32:14.544Z
+6	shape-depth3	/app/assets/assets/assets/javascript-warning.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:17.120Z	2026-11-10T00:32:17.125Z
+7	shape-depth4	/app/assets/assets/assets/assets/javascript-warning.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:19.719Z	2026-11-10T00:32:19.724Z
+8	shape-depth4-dup	/app/assets/assets/assets/assets/javascript-warning.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:22.327Z	2026-11-10T00:32:22.332Z
+9	fabricated-nested	/app/assets/zz-ac-absent-20261110-probe.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:24.915Z	2026-11-10T00:32:24.920Z
+10	fabricated-deepest	/app/assets/assets/assets/assets/zz-ac-absent-20261110-probe.html	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:32:27.514Z	2026-11-10T00:32:27.526Z
+11	fabricated-under-assets	/assets/zz-ac-absent-20261110-probe.html	404	text/html; charset=iso-8859-1	196	80c3fe2ae1062abf	2026-11-10T00:33:40.576Z	2026-11-10T00:33:40.580Z
+12	ipro-hcp-live	/ipro/hcp/	404	text/html; charset=iso-8859-1	196	80c3fe2ae1062abf	2026-11-10T00:33:43.155Z	2026-11-10T00:33:43.160Z
+13	ipro-hcp-live-doc	/ipro/hcp/index.html	404	text/html; charset=iso-8859-1	196	80c3fe2ae1062abf	2026-11-10T00:33:45.735Z	2026-11-10T00:33:45.740Z
+14	app-shell-root	/app/	200	text/html; charset=UTF-8	1833	8dfb96a70999bdb4	2026-11-10T00:34:11.813Z	2026-11-10T00:34:11.818Z
