@@ -487,11 +487,19 @@ tail-erased digest gives **one** class sequence, identical on `.com` and
 | `3.89` | **L** | ″ |
 
 **The sequence `L L C L C L L` is the whole finding.** A threshold is a monotone
-step function of the numeric value; a step function that leaves the legacy branch
+step function of the numeric value; such a function that leaves the legacy branch
 at `3.65 → 3.7` has no way back to it at `3.75`. This sequence returns twice, so
-**no threshold over the numeric value can produce these cells** (INFERRED; the
-sequence it refutes is OBSERVED). The rule must be keyed on the **string** — a
-table. Among the strings tested the current-generation entries are
+**no monotone threshold over the numeric value can produce these cells** (INFERRED;
+the sequence it refutes is OBSERVED). ⚠ **The bound matters and an earlier draft of
+this paragraph overstated it:** a *union of disjoint intervals* (current iff the
+value is in `[3.7,3.71) ∪ [3.8,3.81)`) is a step function of the numeric value, is
+not monotone, and fits all seven cells — so the refuted class is **monotone /
+single-boundary** thresholds, not every numeric rule. Truncation to one decimal is
+excluded directly by `3.75`/`3.85`. What survives is a table keyed on the string
+**or** a non-monotone interval set, and the cells do not separate those two. The
+practical consequence stands: a client cannot choose a safe tail by comparing
+versions, because no version ordering can express a rule that returns the legacy
+branch twice. Among the strings tested the current-generation entries are
 **`{3.6, 3.7, 3.8}`**
 [source: findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md §2.2, §3].
 

@@ -27,9 +27,9 @@ failures, no retries, no deviation. **Same-host spacing floor measured at
 
 Ledger: [`results.jsonl`](./results.jsonl) — **18 rows**, one per request, `seq`
 1…18 with no gaps and no duplicates. Harness: [`probe.sh`](./probe.sh), whose
-`CAP=20` is a single assignment at `:56` and is asserted against the **ledger
+`CAP=20` is a single assignment at `:47` and is asserted against the **ledger
 length**, not a process-local counter, so a second invocation cannot silently
-exceed the pass budget. `DELAY=2.5` is `:57`, applied at `:150` — inside the
+exceed the pass budget. `DELAY=2.5` is `:48`, applied at `:120` — inside the
 per-host `flock`, after the gate check.
 
 Two invocations, one per host (`probe.sh host1`, `probe.sh host2`), each
@@ -182,10 +182,23 @@ the legacy class is not (`.com` 99 countries, `-trials` 76) — exactly what AA
 **INFERRED — and this is the whole argument:** a threshold rule is a **monotone**
 step function of the numeric value. Once such a function leaves the legacy
 branch at `3.65 → 3.7`, it cannot return to the legacy branch at `3.75` — a
-step function has no way back down. The observed sequence does return, twice.
-Therefore **no single-boundary and no multi-boundary threshold over the numeric
-value can produce these cells**; the rule must be keyed on the **string**. That
-is a table.
+monotone step function has no way back down. The observed sequence does return,
+twice. Therefore **no monotone threshold over the numeric value can produce these
+cells**; the rule must be keyed on the **string**.
+
+⚠ **The bound, stated precisely because a verifier caught the wider claim being
+false.** An earlier draft of this section and of `docs/03` §3b.6 said *"no
+threshold over the numeric value"*, full stop. That is not what the cells exclude:
+a **union of disjoint intervals** — current iff the value falls in
+`[3.7,3.71) ∪ [3.8,3.81)` — is a step function of the numeric value, is not
+monotone, and fits all seven cells exactly. So the refuted class is
+**monotone / single-boundary** thresholds (and, separately, truncation to one
+decimal, which `3.75`/`3.85` exclude directly). What survives is a table keyed on
+the string **or** a non-monotone interval set; the cells do not separate those two,
+and no claim is made between them. The practical consequence is unchanged — a
+client cannot pick a safe tail by comparing versions, because any rule that
+returns the legacy branch twice is not an ordering a version comparison can
+express.
 
 **Assumptions this inference rests on**, stated so they can be attacked:
 that the response document is a function of `(host, base, tail)` with no fourth
@@ -310,7 +323,7 @@ multiplicity.
 
 | # | Claim | Class | Source |
 |---|---|---|---|
-| 1 | 18 requests sent, 18 ledger rows, cap 20 not revised, 2 unspent | OBSERVED | `results.jsonl:1-18`; `probe.sh:56` |
+| 1 | 18 requests sent, 18 ledger rows, cap 20 not revised, 2 unspent | OBSERVED | `results.jsonl:1-18`; `probe.sh:47` (the `CAP=20` assignment) |
 | 2 | Same-host spacing floor 3.427 s over 16 gaps, 0 under 2.5 s | OBSERVED | `spacing.txt` |
 | 3 | `v99` control `403` at `f249b63cb2fc…` on both hosts | OBSERVED | `results.jsonl:1`, `:10` |
 | 4 | `v11` control `200` on both hosts | OBSERVED | `results.jsonl:2`, `:11` |
