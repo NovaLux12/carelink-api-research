@@ -60,13 +60,15 @@ the absence it was asking about, and it is not a verdict that `minimed.eu` is ab
 | retries (E[N] > 1 on this API) | 14 | **6** (all `504`, all on `index.commoncrawl.org`) |
 | **subtotal, the pass** | **49** | **25** |
 | block confirmation reads (§4 — the repair, unplanned) | — | **6** |
+| re-issued `head` read `CC-MAIN-2014-23` (`seq 23`, duplicate of `seq 14` — first block parse failed) | — | **1** |
 | **total** | **50** | **32** |
 
 The block reads were **not** in the pre-registered plan and are declared as a deviation:
 they exist because the control gate failed and the failure needed a cause rather than a
-shrug. Six rows (three crawls × two runs, the first run of each crawl aborted after its
-single block read — see §9) is what the diagnosis cost. 32 of 50 is inside the cap with 18
-unspent; nothing was extended to make a result appear.
+shrug. The split is **run 1 = `seq` 21–22** (two block reads) and **run 2 = `seq` 29–32**
+(four block reads, `cdx-00236.gz` twice), plus one re-issued `head` read at `seq 23`. Seven
+unplanned rows in total, costing 7 of the 18 unspent requests, is what the diagnosis cost.
+32 of 50 is inside the cap with 18 unspent; nothing was extended to make a result appear.
 
 ### Spacing, measured
 
@@ -202,7 +204,7 @@ The bisection's evidence for that `FAMILY_ABSENT` was the adjacent pair
 ```
 a = eu,mini-parfemy)/wp-content/uploads/2021/12/img_3566.jpeg 20220628223311
 b = eu,minimumwaste)/profile/donaldcittadini13413661/profile  20220701010643
-a < FAM_LO   (0x2D '-' < 0x6D 'm' at index 8)
+a < FAM_LO   (0x2D '-' < 0x6D 'm' at index 7)
 b >= FAM_HI  (0x75 'u' > 0x65 'e' at index 8)
 ```
 
@@ -390,3 +392,53 @@ three blocks showed such a case.
 **Closes `docs/11` area AD** — as a **negative about the instrument's absence proof**, with
 the target's `FAMILY_ABSENT` published on a sound basis rather than the unsound one, and with
 the presence half, the seed fix and the convergence result kept as positives.
+
+---
+
+## Correction (2026-11-10)
+
+Four defects found by a fresh-context verifier after this log merged. The findings and the
+block-level evidence are unaffected — the containment arithmetic, the 9 records, the seed
+derivation and the three verdicts all re-checked true. What follows are errors in the prose
+*about* that evidence, plus one tool hazard. Recorded here rather than rewritten in place,
+per AGENTS.md §3.
+
+1. **§4's straddle parenthetical cites the wrong byte index for one of its two rows.**
+   It says `a < FAM_LO (0x2D '-' < 0x6D 'm' at index 8)`. The first differing byte is at
+   **index 7**, not 8: `a[:8]` is `eu,mini-` and `FAM_LO[:8]` is `eu,minim`, so the
+   comparison turns at the `-`/`m` pair in position 7. Index 8 compares `p` against `e`.
+   The **relation is true** (`a < FAM_LO` holds, verified by direct string comparison) and
+   the second row's index 8 is correct (`u` vs `e` in `eu,minimu` against `eu,minime`) —
+   only the stated position of the first is wrong. A wrong index in a correct argument is
+   still a defect: a reader checking it would find the claim false and distrust the rest.
+
+2. **§1's itemisation sums to 31, but the ledger holds 32 rows.** The table's own numbers
+   are 1+1+2+9+1+5+6 = 25 for the pass, plus 6 block reads = **31**. The unlisted row is
+   `seq 23`, a re-issued 8 KiB `head` read of `CC-MAIN-2014-23`'s `cluster.idx` — a
+   duplicate of `seq 14`, issued when the first block parse failed. The headline
+   **"32 of a 50 cap" is correct** (`wc -l results.jsonl` = 32, and `spacing.py` re-derives
+   it); the itemisation merely fails to carry that one re-request. Note this is the second
+   time this repository has had a stated count disagree with its own ledger, so the rule
+   stands: derive the count from the ledger, never from the itemisation.
+
+3. **§1's run-split sentence is wrong about the shape of the split.** It says "three crawls
+   × two runs, the first run of each crawl aborted after its single block read", implying
+   3+3. The actual split is **run 1 = seq 21–22** (two reads: `cdx-00187.gz`,
+   `cdx-00180.gz`) and **run 2 = seq 29–32** (four reads: `cdx-00236.gz`, `cdx-00187.gz`,
+   `cdx-00180.gz`, `cdx-00236.gz`). §9.2's "two of them cost a request each" likewise
+   under-counts against the three aborted block invocations visible in the ledger. The
+   conclusion the sentence supports — that the block reads were an unplanned repair costing
+   6 requests — is correct; only the description of how they were distributed is not.
+
+4. **`verify-absence.py` exits 2 when it finds nothing to verify, which reads as a pass.**
+   Invoked with no argument it prints `no bodies dir … nothing to verify` and exits **2**.
+   A caller testing `if exit != 0` is fine, but a caller testing `if exit == 1` — or a human
+   reading "nothing to verify" as "nothing wrong" — would take a silent no-op for a
+   successful verification. The bodies live in `.loop/` and are never committed, so this
+   is the *default* state for anyone running it from a clean checkout. Changed to exit **3**
+   with the message prefixed `NOT VERIFIED`, so the three states are distinguishable:
+   0 = verified present/absent as expected, 1 = a verdict failed, 3 = could not run.
+
+None of these change a finding, a verdict or a published claim. They are the kind of defect
+that survives a green gate because the gate checks that numbers agree with the page, not
+that the page agrees with the ledger it cites.
