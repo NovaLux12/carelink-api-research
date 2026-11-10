@@ -400,8 +400,18 @@ the presence half, the seed fix and the convergence result kept as positives.
 Four defects found by a fresh-context verifier after this log merged. The findings and the
 block-level evidence are unaffected — the containment arithmetic, the 9 records, the seed
 derivation and the three verdicts all re-checked true. What follows are errors in the prose
-*about* that evidence, plus one tool hazard. Recorded here rather than rewritten in place,
-per AGENTS.md §3.
+*about* that evidence, plus one tool hazard.
+
+**How this section relates to the text above it — stated plainly, because an earlier revision
+of this very section got it wrong.** All four defects are recorded here *and* fixed in place:
+the itemisation table, the run-split sentence, the byte index, and the exit code. Leaving a
+table that visibly does not sum, or a sentence that misdescribes its own ledger, is worse for
+a reader than the small break with strict append-only. But that means this log has been
+**edited in place as well as corrected**, which is not the pure append-only form AGENTS.md §3
+asks for. The first revision of this paragraph claimed "recorded here rather than rewritten in
+place", which was false of the very commit that wrote it. The audit trail survives because each
+item below quotes the old text and names the merge SHA, so a reader can see exactly what
+changed — but the trade is disclosed here rather than described as something it was not.
 
 1. **§4's straddle parenthetical cites the wrong byte index for one of its two rows.**
    It says `a < FAM_LO (0x2D '-' < 0x6D 'm' at index 8)`. The first differing byte is at
@@ -425,10 +435,20 @@ per AGENTS.md §3.
    × two runs, the first run of each crawl aborted after its single block read", implying
    3+3. The actual split is **run 1 = seq 21–22** (two reads: `cdx-00187.gz`,
    `cdx-00180.gz`) and **run 2 = seq 29–32** (four reads: `cdx-00236.gz`, `cdx-00187.gz`,
-   `cdx-00180.gz`, `cdx-00236.gz`). §9.2's "two of them cost a request each" likewise
-   under-counts against the three aborted block invocations visible in the ledger. The
-   conclusion the sentence supports — that the block reads were an unplanned repair costing
-   6 requests — is correct; only the description of how they were distributed is not.
+   `cdx-00180.gz`, `cdx-00236.gz`). The conclusion the sentence supports — that the block
+   reads were an unplanned repair costing 6 requests — is correct; only the description of
+   how they were distributed is not.
+
+   §9.2's "two of them cost a request each" cannot be settled from the committed ledger, and
+   an earlier revision of this correction asserted it "under-counts against the three aborted
+   block invocations visible in the ledger" — that assertion was **not derived and is
+   withdrawn**. What the ledger actually carries: six block rows (`seq` 21, 22, 29–32), every
+   one with `attempt=0` and `attempt_tag=block-read`, so **no row is marked as an aborted
+   attempt**. Three of them are byte-identical re-reads — `seq` 30 ≡ 21
+   (`sha256 a155093a0007`, 202,350 B), `seq` 31 ≡ 22 (`7c71b6191dc5`, 219,913 B), `seq` 32 ≡
+   29 (`77401ad33386`, 196,232 B) — which supports "two runs of the same three block reads"
+   and nothing finer. Whether §9.2's abort count is 2 or 3 is not derivable from what is
+   committed; the honest statement is that it is unverifiable here, not that it is wrong.
 
 4. **`verify-absence.py` exits 2 when it finds nothing to verify, which reads as a pass.**
    Invoked with no argument it prints `no bodies dir … nothing to verify` and exits **2**.
