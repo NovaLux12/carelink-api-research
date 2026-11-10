@@ -1,0 +1,10 @@
+DERIVE b01-baseline-clinic-asset: status=asserted bytes=3397615 sha256=2a7fa8e7af519c2b… recorded=2a7fa8e7af519c2b… reproduces=True public_literals=15 direct_literals=6
+DERIVE b02-com-clinic-asset: status=asserted bytes=3397615 sha256=2a7fa8e7af519c2b… recorded=2a7fa8e7af519c2b… reproduces=True public_literals=15 direct_literals=6
+DERIVE b03-eu-clinic-asset: status=asserted bytes=3397615 sha256=2a7fa8e7af519c2b… recorded=2a7fa8e7af519c2b… reproduces=True public_literals=15 direct_literals=6
+DERIVE b04-support-asset: status=asserted bytes=3410666 sha256=a054555a0f22176e… recorded=a054555a0f22176e… reproduces=True public_literals=15 direct_literals=6
+DERIVE b01-baseline-clinic-asset direct set: access/config appContext application productContext user whitelisted
+DERIVE b02-com-clinic-asset direct set: access/config appContext application productContext user whitelisted
+DERIVE b03-eu-clinic-asset direct set: access/config appContext application productContext user whitelisted
+DERIVE b04-support-asset direct set: access/config appContext application productContext user whitelisted
+DERIVE shared=6 clinic_only=[] support_only=[]
+DERIVE VERDICT: PROCEED — 4 of 4 digests reproduce, both builds name the same 6

@@ -3272,6 +3272,7 @@ boundary year, and the count in prose names the rule it was measured under.
 number it checks.
 
 [source: findings-log/2026-10-14-pool-l-ipro-hcp-census/FINDINGS.md]
+| AB — are the six direct `/hcp/configuration/*` verdicts deployment-portable, or only on `carelinkhp`? | 2026-11-10 | **Negative, and that is the answer: the six verdicts are deployment-portable, 18 of 18 cells.** `access/config`, `appContext`, `whitelisted` → **401** with one 48 B `InvalidToken`/`AUTH` body on all three swept hosts (one digest, 9 of 9); `application`, `productContext`, `user` → **405**, 0 B, `Allow: POST, OPTIONS`. 12 of 12 controls first per host; 4 of 4 build digests re-asserted (corpus control **per host**, not per build); both builds name the same 6 direct literals (derived offline, sweep aborts if not). **New:** the 9 empty-body `OPTIONS` cells all answer **200** with `allow: POST, OPTIONS` and a 13 B body carrying the same list, and **`access-control-allow-methods` is absent on 43 of 43** — so on this family the method signal is `Allow`, not `ACAM`. **6 of 6, but one INFERRED assumption left unmeasured, and said so:** the header gate on the **direct** subtree was never tested header-less (every direct cell carried `X-System-ID`), so `412` there is unmeasured, not answered; the second (405 reflects the route) is settled in the expected direction. **43 of a 43 cap**, GET + empty-body OPTIONS only, measured same-host floor **2.595 s** by kernel body-mtime (39 gaps, 0 under 2.5 s; the `t_sent` series reads 2.108 s with 4 sub-2.5 s gaps and 3 impossible negative durations, the known corrupt-`t0` class, no cause asserted) | [findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] | #162 |
 
 ---
 
@@ -3381,10 +3382,13 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 27 closed**
-stand today (`AC`, `AD`, `AE`, `AF`, `AB` — `AD` minted 2026-10-19 by lane sl1, `AB`
-minted by lane l2; counted from the `^### [A-Z]{1,2}.` headings, not
-inherited); the next bounded successor that clears the step 7 quality bar is minted as a
+**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 28 closed**
+stand today (`AC`, `AD`, `AE`, `AF`, `AG` — `AD` minted 2026-10-19 by lane sl1, `AG`
+minted 2026-11-10 by the pass that closed `AB`; counted from the `^### [A-Z]{1,2}.` headings, not
+inherited). The open figure did **not** fall when `AB` closed, because the same pass
+minted `AG` as its successor — a closure that mints an area nets zero open, and the
+Closed table grows by one. Both figures are derived, never inherited; re-run
+`python3 scripts/research-checks.py`. the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
 the `android/<app-version>` axis on the two cumulus `.com`/`-trials` hosts — which
@@ -3443,7 +3447,7 @@ and [`CONTRIBUTING-research.md`](../CONTRIBUTING-research.md) step 7 is the rule
 per-key sweep (0 requests), so the "0 mismatches" line becomes re-hashable.
 **Assumptions (INFERRED):** none beyond the quoted addendum claims.
 
-### AB. The six direct `/hcp/configuration/*` endpoints — portable, or only on `carelinkhp`?
+### AB (closed 2026-11-10) The six direct `/hcp/configuration/*` endpoints — portable, or only on `carelinkhp`?
 
 **What:** the 6 route literals that sit **directly** under `hcp/configuration/` in both
 portal builds' route tables, read on the same three deployments lane l2 just swept for the
@@ -3503,6 +3507,85 @@ the `412` behaviour was measured only under `public/`, and the header gate may n
 direct subtree at all); and that `405` on the recorded host reflects the route rather than a
 method filter that differs per deployment. **Controls first per host** settles the first: a
 header-absent cell on a direct route is a control here, not a candidate.
+
+#### Closing note (2026-11-10) — CLOSED, and the verdict is a negative
+
+**Closed by** `findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md`, claim
+[#162](https://github.com/NovaLux12/carelink-api-research/issues/162). **43 of a 43
+cap**, `GET` only plus 9 empty-body `OPTIONS`, ≥2.5 s per host inside the shared lock,
+**three hosts swept** (`carelink.medtronic.com`, `carelink.medtronic.eu`,
+`carelink-support.medtronic.com`) with `carelinkhp.minimed.eu` kept as the recorded
+baseline and touched only by the corpus control — which is why the candidate count is
+`6 x 3 = 18` and not 24.
+
+**The six verdicts are deployment-portable, 18 of 18 cells** (OBSERVED): `access/config`,
+`appContext`, `whitelisted` answer **401** with one 48-byte
+`{"error":{"type":"InvalidToken","group":"AUTH"}}` body on all three hosts (one digest,
+9 of 9 cells); `application`, `productContext`, `user` answer **405** with 0 bytes and
+`Allow: POST, OPTIONS` on all three. **12 of 12 controls reproduced first per host**, so
+the oracle is live on each host. Two things this section did not record and the pass adds:
+the **9 `OPTIONS` cells all answer 200 with `allow: POST, OPTIONS`** and a 13-byte body
+carrying the same list, with **no `access-control-allow-methods` anywhere on this family**
+(43 of 43) — so on this surface the method signal is `Allow`, not `ACAM`; and the 401
+body digest is the same envelope the repo already records on `carelink.minimed.{eu,com}`
+and `-trials` (one source, `AGENTS.md` §2.1).
+
+**Settled and not settled, stated separately.** The second INFERRED assumption above —
+that `405` reflects the route rather than a per-deployment method filter — is **settled in
+the direction the pass expected**: the three deployments advertise the identical
+`Allow`, so what is observed is agreement (the reading that the filter is the route's is
+INFERRED from that agreement plus one `server` header across all 43 responses). The first
+— that the edge rejects a **header-less** request to the direct subtree the way it does
+under `public/` — **was not tested**: every direct cell was sent with the header, and
+spending 3 of the 43 on a header-less direct cell would have cost 3 of the 18 candidate
+cells the portability claim needs. It is **unmeasured, not answered**, and the honest
+statement is only that the direct subtree behaves as `public/` does *when the header is
+present*.
+
+**No `docs/07` change.** `docs/07` describes the `public/*` family and the shadow portal's
+`/hcp/configuration/{application,user,countries/getAllCountries}` 405s; every sentence it
+carries about the direct six is a `carelinkhp` or `.eu` single-deployment reading that
+this pass **confirms** and does not move. Recorded in the log's verdict section rather
+than edited into a page whose subject is a different subtree.
+
+### AG. Does `Allow` agree with `access-control-allow-methods` on the same route — and does area N's warning generalise?
+
+**What is known.** On the four portal deployments, the three POST-only direct routes
+answer `GET` **405** with `allow: POST, OPTIONS` (9 of 9 cells) and empty-body `OPTIONS`
+**200** with a 13-byte body that is the same method list (9 of 9 cells), while
+`access-control-allow-methods` is **absent on all 43 responses**
+[source: findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] (OBSERVED). On the
+cumulus/gateway families the reverse holds: `OPTIONS` 200s carry the CORS set, and area N
+established that `access-control-allow-methods` there is **not** a register of a route's
+methods — `carepartner/v13/display/message` advertises `OPTIONS` and is GET-capable on all
+three hosts (`docs/09` §2). Area Z then found `ACAM` is a per-route constant whose
+*order* differs from the literal `OPTIONS` on two routes. So two families now disagree
+about whether the preflight's method list can be believed, and **nobody has compared
+`Allow` against `ACAM` on a single route**.
+
+**What is missing.** Whether the disagreement is a property of the **header** or of the
+**family**. If one route ever returns both, the comparison is one request cheap and
+settles whether `ACAM` is wrong everywhere or only where the gateway generates it.
+
+**Blocker:** a route that returns **both** `Allow` and `access-control-allow-methods` on
+the same response — none is recorded on any host in this repo, so the pass starts with a
+**bounded search** (the 15 `public/*` keys and the six direct routes on the four portal
+hosts are already known to carry no `ACAM`; the cumulus `display/message` and `csr/v2`
+routes carry `ACAM` and no `Allow`). Nothing here needs a token; the blocker is that the
+overlap may not exist, and a pass must say so rather than manufacture one.
+
+**Closes when:** either one response is captured carrying **both** headers on the same
+route and the two lists are compared — **a disagreement is as good a close as an
+agreement** — or a bounded sweep of the routes already known to carry one or the other
+(≤20 cells, `GET` + empty-body `OPTIONS`, controls first) shows **no route carries both**,
+in which case the negative is the answer and the claim is that the two headers are
+disjoint by design on every family measured. **A negative counts.**
+
+**Assumptions (INFERRED):** that `Allow` is emitted by the server from the route's
+registered methods rather than configured per route — reasoned from one `server` header
+across 43 responses and from `Allow` agreeing with the `OPTIONS` body on 9 of 9 cells, and
+**not** established; and that a route carrying both headers would be found among those
+already recorded rather than on an unmeasured deployment.
 
 ## Closed areas
 
