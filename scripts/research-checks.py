@@ -531,8 +531,8 @@ def check_ledger_census():
     sentence was wrong on arrival rather than stale: `git log -S` shows both the
     sentence and the blockquote-scanning code landed together in a37f4df, so no
     revision ever had a docstring saying this while the code skipped `>` lines.
-    It described the bypass as though it were still the design.) Zero vendor
-    requests — `git ls-files`/`git ls-tree` only.
+    It was never true here.) Zero vendor requests — `git ls-files`/`git ls-tree`
+    only.
     """
     print('--- ledger census ---')
     def population_at(rev=None):
