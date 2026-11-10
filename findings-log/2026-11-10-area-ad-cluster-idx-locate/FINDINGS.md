@@ -463,8 +463,11 @@ authority for what the text said before this section existed.
    the number of aborted invocations nor the number that cost a request can be checked against
    it — the honest statement is that both are unverifiable here, not that either is wrong.
    §9.2's own supporting clause, "both are in the ledger as their own rows", is in fact
-   falsified by the ledger, which marks no row as aborted; that is a defect in §9.2 recorded
-   here rather than corrected above, since §9.2 is the original log and this section is the
+   falsified by the ledger: it carries no `confirm` role at all (its ten `role` values are
+   `absent-crawl`, `block-read`, `cdx-ctrl-target`, `cdx-probe-target`, `collinfo`, `head`,
+   `head-ctrlA`, `head-ctrlB`, `head-target`, `locate`) and no row is marked aborted, so the
+   two failed invocations cannot be located in it. That is a defect in §9.2 recorded here
+   rather than corrected above, since §9.2 is the original log and this section is the
    correction to it.
 
 4. **`verify-absence.py` exits 2 when it finds nothing to verify, which reads as a pass.**
