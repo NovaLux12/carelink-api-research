@@ -521,9 +521,18 @@ def check_ledger_census():
     Scope: docs/ and README.md FAIL. findings-log/ only WARNS — that tree is
     append-only (AGENTS.md §3), so a stale figure in a comment there cannot be
     rewritten in place; it is superseded by a dated correction, and this check
-    must not trap a lane between two rules. Quoted history (blockquotes, table
-    rows) is excluded: a correction quoting a past count is evidence, not a
-    claim. Zero vendor requests — `git ls-files`/`git ls-tree` only.
+    must not trap a lane between two rules. Blockquote BODIES are scanned, not
+    skipped: the house form for stating a fresh census figure is a dated
+    correction blockquote, so skipping `>` lines excluded the one place a new
+    figure is most likely to be written — the distinction is enforced by the
+    anchor requirement, not by refusing to look. Table ROWS are excluded, with
+    or without a blockquote marker in front: a row is a reading, not a sentence,
+    so `| committed ledgers | 50 | 51 |` is not a claim about 50. (That closing
+    sentence was wrong on arrival rather than stale: `git log -S` shows both the
+    sentence and the blockquote-scanning code landed together in a37f4df, so no
+    revision ever had a docstring saying this while the code skipped `>` lines.
+    It described the bypass as though it were still the design.) Zero vendor
+    requests — `git ls-files`/`git ls-tree` only.
     """
     print('--- ledger census ---')
     def population_at(rev=None):
