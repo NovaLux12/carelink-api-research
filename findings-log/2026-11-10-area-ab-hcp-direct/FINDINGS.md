@@ -189,13 +189,17 @@ reproducing lane l2's hardening observation on a second route family.
   `Apache/2.4.62 (Red Hat Enterprise Linux) OpenSSL/3.5.5` on all 43 responses) rather
   than configured per route. The observation is the agreement; the mechanism is not
   established.
-- **No `Access-Control-Allow-*` preflight header appears on this family at all**:
-  `access-control-allow-origin` and `access-control-allow-methods` are **absent on 43 of
-  43** responses, including all 9 OPTIONS 200s. Only `access-control-allow-headers`
-  appears, on the 401s. **This is the opposite of the cumulus family**, where an
-  `OPTIONS` 200 carries the CORS set and `docs/09` §2 warns that `ACAM` is not a method
-  register. Here there is no `ACAM` to misread: the signal is `Allow`, in the body and
-  the header. That does not make `Allow` a method register in general — it makes it one
+- **`access-control-allow-origin` and `access-control-allow-methods` are absent on 43 of
+  43** responses, including all 9 OPTIONS 200s. **`access-control-allow-headers` is present
+  on 43 of 43** — on the 9 OPTIONS 200s it carries `X-System-ID`, `Content-Type` and
+  `authorization`; on the other 34 it carries the `X-System-ID` family. ⚠ **An earlier draft
+  of this bullet said "only `access-control-allow-headers` appears, on the 401s", which its
+  own ledger refutes** (43 of 43, including the OPTIONS 200s); corrected before merge from a
+  verifier finding, and recorded here rather than silently rewritten because the wrong version
+  was used to draw the contrast with the cumulus family. **This is the opposite of the cumulus
+  family**, where an `OPTIONS` 200 carries the full CORS set and `docs/09` §2 warns that `ACAM`
+  is not a method register. Here there is no `ACAM` to misread: the signal is `Allow`, in the
+  body and the header. That does not make `Allow` a method register in general — it makes it one
   **on this family, for these three routes**, which is all this pass claims.
 - **Read narrowly, per `docs/09` §2:** these cells do **not** establish that `POST` is
   the only writer method, and no `POST` was sent. They establish what the deployment
