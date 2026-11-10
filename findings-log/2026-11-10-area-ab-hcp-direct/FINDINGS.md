@@ -191,16 +191,23 @@ reproducing lane l2's hardening observation on a second route family.
   established.
 - **`access-control-allow-origin` and `access-control-allow-methods` are absent on 43 of
   43** responses, including all 9 OPTIONS 200s. **`access-control-allow-headers` is present
-  on 43 of 43** — on the 9 OPTIONS 200s it carries `X-System-ID`, `Content-Type` and
-  `authorization`; on the other 34 it carries the `X-System-ID` family. ⚠ **An earlier draft
-  of this bullet said "only `access-control-allow-headers` appears, on the 401s", which its
-  own ledger refutes** (43 of 43, including the OPTIONS 200s); corrected before merge from a
-  verifier finding, and recorded here rather than silently rewritten because the wrong version
-  was used to draw the contrast with the cumulus family. **This is the opposite of the cumulus
-  family**, where an `OPTIONS` 200 carries the full CORS set and `docs/09` §2 warns that `ACAM`
-  is not a method register. Here there is no `ACAM` to misread: the signal is `Allow`, in the
-  body and the header. That does not make `Allow` a method register in general — it makes it one
-  **on this family, for these three routes**, which is all this pass claims.
+  on 43 of 43**, and its value splits **per host, not per method**: `carelink.medtronic.com`
+  and `carelink.medtronic.eu` (and the `carelinkhp.minimed.eu` corpus-control row) carry
+  `X-System-ID, Content-Type, authorization` on **all 29** of their rows; the support host
+  `carelink-support.medtronic.com` carries the short `X-System-ID` on **all 14** of its rows —
+  on every status and both methods alike. ⚠ **This bullet has now been wrong twice, and both
+  errors are recorded rather than smoothed over.** The first draft said "No
+  `Access-Control-Allow-*` preflight header appears on this family at all … Only
+  `access-control-allow-headers` appears, on the 401s" — refuted by its own ledger (43 of 43,
+  all statuses). The first *fix* then attributed the split to the OPTIONS 200s versus the rest,
+  which the ledger also refutes: it is a **host** split, and a verifier caught the second error
+  after the first was "fixed". The lesson is worth more than the sentence: **a correction
+  written from a summary of the data inherits the summary's shape, so re-derive the
+  breakdown from the ledger, not from the previous paragraph.** **This is the opposite of the
+  cumulus family**, where an `OPTIONS` 200 carries the full CORS set and `docs/09` §2 warns
+  that `ACAM` is not a method register. Here there is no `ACAM` to misread: the signal is
+  `Allow`, in the body and the header. That does not make `Allow` a method register in general
+  — it makes it one **on this family, for these three routes**, which is all this pass claims.
 - **Read narrowly, per `docs/09` §2:** these cells do **not** establish that `POST` is
   the only writer method, and no `POST` was sent. They establish what the deployment
   *advertises*, which is what AGENTS.md §8 asks an `OPTIONS` probe to do and what
