@@ -1,0 +1,11 @@
+#role	path	outname
+control-fabricated-apex	/zz-ac-absent-20261110-probe.html	c1-fab-apex
+control-live-document	/robots.txt	c2-robots
+shape-apex	/assets/javascript-warning.html	s1-apex
+shape-depth1	/app/assets/javascript-warning.html	s2-d1
+shape-depth2	/app/assets/assets/javascript-warning.html	s3-d2
+shape-depth3	/app/assets/assets/assets/javascript-warning.html	s4-d3
+shape-depth4	/app/assets/assets/assets/assets/javascript-warning.html	s5-d4
+shape-depth4-dup	/app/assets/assets/assets/assets/javascript-warning.html	s6-d4dup
+fabricated-nested	/app/assets/zz-ac-absent-20261110-probe.html	c3-fab-d1
+fabricated-deepest	/app/assets/assets/assets/assets/zz-ac-absent-20261110-probe.html	c4-fab-d4

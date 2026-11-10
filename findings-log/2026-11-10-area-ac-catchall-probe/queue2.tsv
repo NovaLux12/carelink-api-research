@@ -1,0 +1,4 @@
+#role	path	outname
+fabricated-under-assets	/assets/zz-ac-absent-20261110-probe.html	c5-fab-assets
+ipro-hcp-live	/ipro/hcp/	i1-ipro-slash
+ipro-hcp-live-doc	/ipro/hcp/index.html	i2-ipro-index
