@@ -2,6 +2,16 @@
 """verify-absence.py — re-derive every ABSENT verdict from the committed block
 bodies alone. Zero requests, zero network.
 
+## Correction (2026-11-10)
+
+The no-bodies path used to exit **2** while printing "nothing to verify". That
+reads as a pass: the bodies live in `.loop/` and are never committed, so a clean
+checkout hits this path by DEFAULT, and a caller testing `exit == 1` — or a human
+reading "nothing to verify" as "nothing wrong" — would take a silent no-op for a
+successful verification. It now exits **3** with a `NOT VERIFIED` prefix so the
+three states stay distinguishable: 0 = verified, 1 = a verdict failed, 3 = could
+not run so nothing was verified. No verdict, figure or key in this file changed.
+
 The defect this file exists for. The S-L1 `servedness.py` locate publishes
 FAMILY_ABSENT when two ADJACENT `cluster.idx` keys straddle the interval. That
 inference is invalid: `cluster.idx` carries one line per CDX *block*, keyed by
