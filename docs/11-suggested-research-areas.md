@@ -3816,6 +3816,12 @@ already recorded rather than on an unmeasured deployment.
 Dated, with the verdict and the evidence. An area leaves this table only by
 being superseded — never silently. Letters are not reused.
 
+> **On the row count.** The gate counts rows matching `^| [A-Z]{1,2} —`, which is the
+> rule behind every "N open plus M closed" sentence on this page. Two rows here — `S6`
+> and `S-L1` — are closed sub-areas whose ids predate the one-or-two-letter convention;
+> they match neither that pattern nor any `### ` heading, so they are in the table but in
+> no count. Both are closed. The sentences count areas, not rows.
+
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
 | AB — are the six direct `/hcp/configuration/*` verdicts deployment-portable, or only on `carelinkhp`? | 2026-11-10 | **Negative, and that is the answer: the six verdicts are deployment-portable, 18 of 18 cells.** `access/config`, `appContext`, `whitelisted` → **401** with one 48 B `InvalidToken`/`AUTH` body on all three swept hosts (one digest, 9 of 9); `application`, `productContext`, `user` → **405**, 0 B, `Allow: POST, OPTIONS`. 12 of 12 controls first per host; 4 of 4 build digests re-asserted (corpus control **per host**, not per build); both builds name the same 6 direct literals (derived offline, sweep aborts if not). **New:** the 9 empty-body `OPTIONS` cells all answer **200** with `allow: POST, OPTIONS` and a 13 B body carrying the same list, and **`access-control-allow-methods` is absent on 43 of 43** — so on this family the method signal is `Allow`, not `ACAM`. **6 of 6, but one INFERRED assumption left unmeasured, and said so:** the header gate on the **direct** subtree was never tested header-less (every direct cell carried `X-System-ID`), so `412` there is unmeasured, not answered; the second (405 reflects the route) is settled in the expected direction. **43 of a 43 cap**, GET + empty-body OPTIONS only, measured same-host floor **2.595 s** by kernel body-mtime (39 gaps, 0 under 2.5 s; the `t_sent` series reads 2.108 s with 4 sub-2.5 s gaps and 3 impossible negative durations, the known corrupt-`t0` class, no cause asserted) | [findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] | #162 |
