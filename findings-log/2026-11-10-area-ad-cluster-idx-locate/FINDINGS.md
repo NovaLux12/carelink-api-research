@@ -412,14 +412,17 @@ asks for. The first revision of this paragraph claimed "recorded here rather tha
 place", which was false of the very commit that wrote it. What the audit trail actually holds,
 stated per item rather than as a blanket reassurance — an earlier revision of this sentence
 claimed all four "quote the old text and name the merge SHA", and that was wrong twice over:
-**items 1, 3 and 4 quote the superseded wording verbatim; item 2 describes the old state
-without quoting it; and no item names a merge SHA** (the hex strings in item 3 are `sha256`
-body digests, not commits). The superseded revision is `ec3c1a9` (PR #169), and
+**items 1, 3 and 4 quote the superseded wording** (item 1 word-for-word with a whitespace run
+collapsed, items 3 and 4 verbatim), **item 2 describes the old state without quoting it, and no
+item names a merge SHA** (the hex strings in item 3 are `sha256` body digests, not commits). The
+superseded revision is `ec3c1a9` (PR #169), and
 `git show ec3c1a9:findings-log/2026-11-10-area-ad-cluster-idx-locate/FINDINGS.md` is the
 authority for what the text said before this section existed.
 
 1. **§4's straddle parenthetical cites the wrong byte index for one of its two rows.**
-   It says `a < FAM_LO (0x2D '-' < 0x6D 'm' at index 8)`. The first differing byte is at
+   The superseded line 205 read `a < FAM_LO   (0x2D '-' < 0x6D 'm' at index 8)` — quoted
+   here word for word, though with its three-space run collapsed to one, so this is a
+   word-level rather than byte-level quotation. The first differing byte is at
    **index 7**, not 8: `a[:8]` is `eu,mini-` and `FAM_LO[:8]` is `eu,minim`, so the
    comparison turns at the `-`/`m` pair in position 7. Index 8 compares `p` against `e`.
    The **relation is true** (`a < FAM_LO` holds, verified by direct string comparison) and
@@ -452,8 +455,15 @@ authority for what the text said before this section existed.
    attempt**. Three of them are byte-identical re-reads — `seq` 30 ≡ 21
    (`sha256 a155093a0007`, 202,350 B), `seq` 31 ≡ 22 (`7c71b6191dc5`, 219,913 B), `seq` 32 ≡
    29 (`77401ad33386`, 196,232 B) — which supports "two runs of the same three block reads"
-   and nothing finer. Whether §9.2's abort count is 2 or 3 is not derivable from what is
-   committed; the honest statement is that it is unverifiable here, not that it is wrong.
+   and nothing finer. Two distinct quantities in §9.2 are **not** derivable from what is
+   committed, and they must not be conflated: §9.2 states that **three** invocations aborted,
+   of which **two** cost a request each. The ledger records no abort marker at all, so neither
+   the number of aborted invocations nor the number that cost a request can be checked against
+   it — the honest statement is that both are unverifiable here, not that either is wrong.
+   §9.2's own supporting clause, "both are in the ledger as their own rows", is in fact
+   falsified by the ledger, which marks no row as aborted; that is a defect in §9.2 recorded
+   here rather than corrected above, since §9.2 is the original log and this section is the
+   correction to it.
 
 4. **`verify-absence.py` exits 2 when it finds nothing to verify, which reads as a pass.**
    Invoked with no argument it prints `no bodies dir … nothing to verify` and exits **2**.
