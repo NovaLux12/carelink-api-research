@@ -224,7 +224,7 @@ established in either direction for the rest).
 
 
 
-### AC. After the window: what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled?
+### AC (closed 2026-11-10) After the window: what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled?
 
 The out-of-window census is **complete** — **0 of 44 unread**, every cell
 classified under the counting rule (a `404` reads as an absence only behind a `200`
@@ -268,6 +268,29 @@ alike on these asset paths (untested — the census never queried `.com`); and t
 the archived status is a faithful record of the origin's answer (it is a third
 party's record of a third party's fetch, and this repository has not
 independently checked one).
+
+> **Area AC is CLOSED** (2026-11-10, claim #168) — see the Closed table at the foot of
+> this page and
+> [findings-log/2026-11-10-area-ac-catchall-probe/FINDINGS.md].
+> **The enumeration half was already complete and was not re-run**: the 2026-10-17 pass
+> reached **0 of 44 unread** with every cell classified and the nested shapes recorded as
+> unexplained under F10a, which is exactly what the close-condition permits
+> ([findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md] §F10a). **Only the one live
+> question above was probed — 14 of a 20 GET-only cap, floor 2.579 s, 0 failures** — and the
+> answer splits in two: `carelink.minimed.eu` runs **no whole-host catch-all** (a fabricated
+> apex path answers a real `404`, byte-identical to `/ipro/hcp/`'s live `404`), but **every
+> path under `/app/` returns one identical 1 833-byte SPA shell whether it exists or not** —
+> two invented names at two depths produced the same digest a real path gets. So the
+> catch-all is **prefix-scoped, not host-wide**, and the strong "unanswerable at all" reading
+> above **does not hold as written**: it holds for `/app/…` URLs and **not** for
+> `/ipro/hcp/`, which is outside `/app/` and therefore still readable. **The nesting pattern
+> F10a recorded is explained in one direction** — the `/app/` shell answers at every depth by
+> construction — while which came first, the crawler's URLs or the vendor's rewrite, stays
+> unestablished. **A measurement limitation, not a disclosure**: nothing here shows the
+> vendor hiding anything. Successor (needs its own claim): which **prefixes** each host in
+> the family serves a shell at — `carelinkhp.minimed.eu` catches **everything** per
+> `AGENTS.md` §7, a different mechanism under the same word.
+
 
 
 > **Area AA is CLOSED** (2026-10-17, claim #151) — see the Closed table at the foot of
@@ -376,9 +399,68 @@ function of `(host, base, tail)` with no fourth input, which AA's cross-product 
 consistent with but did not test.
 
 
-### AF. Can the findings-log census be made self-deriving, so no lane restates it by hand?
+### AF (closed 2026-11-10) Can the findings-log census be made self-deriving, so no lane restates it by hand?
 
-**What is known, labelled and cited.** The committed-ledger census is stated by hand in
+> **CLOSED 2026-11-10 — the check exists and runs on every gate.**
+> [findings-log/2026-11-08-area-af-census-self-deriving/FINDINGS.md]
+> `scripts/research-checks.py:455 check_ledger_census()` derives the population
+> (`git ls-files 'findings-log/*/results.jsonl'`), matches every live prose claim
+> of the form "N committed ledgers" in `README.md` and `docs/*.md`, and requires a
+> commit anchor in the same paragraph that **resolves and whose tree really held
+> that number** (`git ls-tree`) — so a mis-transcribed reading fails too. `docs/`
+> and `README.md` fail; `findings-log/` warns only, because that tree is
+> append-only under `AGENTS.md` §3 and a check that failed there would trap a lane
+> between two rules. The gate prints its derived population on every run beside the
+> verdict line.
+>
+> **The area's own close condition is met twice over:** no bare population figure
+> survives in `docs/` without a commit it is true at, *and* the census is now
+> reported as derived command output beside the figures rather than instead of
+> them. The `account.py` comment the area named is superseded by the log, which is
+> the correction form §3 allows — it is not editable in place.
+>
+> **This row was written 2026-11-10, two days after the remedy shipped.** The check
+> merged in `a37f4df` (#159) and AF was never moved into the Closed table, so the
+> page went on advertising an area the repository already held. That is the
+> stale-claim failure the page's own step 4 warns about, arriving on the page
+> itself: a merged finding with no closure reads exactly like unstarted work.
+>
+> **Adversarial history, kept because it is the useful half.** The check passed
+> every test it was given and was still fooled by two shapes nobody examined — a
+> hard-wrapped figure (`docs/11` is wrapped at ~80 cols, so a figure landing at
+> end-of-line is the *normal* shape) and a blockquote, which the first version
+> skipped as "quoted history" while the house form for a new census figure **is** a
+> dated correction blockquote. A third round found that the blockquote fix opened a
+> markdown lazy-continuation bypass. All closed. **The shape matrix is recorded in
+> the commit message of `a37f4df`, not in the code** — `git log --format=%B a37f4df`
+> carries both rounds' verdicts verbatim ("Verified against a 12-shape matrix …" and
+> "Verified 12/12 on the shapes that matter …"), and the docstring records the three
+> *failure* shapes instead. **A check authored by the mind that wrote the prose it
+> polices shares that mind's blind spots** — which is the argument for the
+> fresh-context verifier applied to tooling, not just to claims.
+>
+> **One gap that was open is now closed, and the difference matters.** The commit
+> message of `a37f4df` records a residual: a markdown table row inside a blockquote,
+> with no connector, still reporting through the joined path. That was true when
+> written; the round-3 filter (`body = [l for l in body if not
+> l.strip().startswith('|')]`, applied after the `>` marker is stripped) closes it.
+> **Verified by planting, not by reading** (2026-11-10): two blockquoted table-row
+> shapes appended to `docs/11` leave the check silent at exit 0, while a control
+> plant — a bare sentence stating a population figure with no anchor — fails at
+> exit 1. So the earlier "known gap" is **retired**, not carried. The plants are
+> described rather than quoted: reproducing a census-shaped figure here would make
+> this very paragraph a claim, which the check then flags — as it did on the first
+> draft of this sentence, which is the check working.
+>
+> **A related inconsistency is recorded here and deliberately not fixed:** the
+> docstring still says quoted history including table rows is *excluded*, which the
+> implementation contradicts — blockquote bodies are now **scanned**, with only
+> their table rows dropped. That is a stale sentence in `scripts/`, and this PR is a
+> bookkeeping change to `docs/`; editing the check here would be the scope creep a
+> verifier is right to reject. It is named so the next person need not re-derive it.
+
+**What was known, labelled and cited, at the time the area was open.** The
+committed-ledger census is stated by hand in
 **at least three** places — the S-L4c block, the ledger-census row, and a comment in
 `findings-log/2026-10-14-lane-s6-public-index/account.py` — and its population is
 **derived from the tree**, so **every merge that adds a `findings-log/…/results.jsonl`
@@ -3382,14 +3464,17 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 28 closed**
-stand today (`AC`, `AD`, `AE`, `AF`, `AG` — `AD` minted 2026-10-19 by lane sl1, `AG`
-minted 2026-11-10 by the pass that closed `AB`; counted from the `^### [A-Z]{1,2}.` headings, not
-inherited). The open figure did **not** fall when `AB` closed, because the same pass
-minted `AG` as its successor — a closure that mints an area nets zero open, and the
-Closed table grows by one. Both figures are derived, never inherited; re-run
+**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 30 closed**
+stand today (`AD`, `AE`, `AG` — `AD` minted 2026-10-19 by lane sl1, `AG`
+minted 2026-11-10 by the pass that closed `AB`, `AC` closed 2026-11-10 by claim #168,
+`AF` closed 2026-11-10; counted from the `^### [A-Z]{1,2}.` headings with
+`python3 scripts/research-checks.py`, not inherited). The open figure did **not** fall when `AB`
+closed, because the same pass minted `AG` as its successor — a closure that mints an area nets
+zero open, and the Closed table grows by one. Both figures are derived, never inherited; re-run
 `python3 scripts/research-checks.py`. the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
+**`AF` closed 2026-11-10** — its check shipped in `a37f4df` (#159) and the area was never moved
+into the Closed table, so the page advertised work the repository already held for two days.
 **`AA` was the first such mint** (2026-10-17, [issue #145](https://github.com/NovaLux12/carelink-api-research/issues/145)):
 the `android/<app-version>` axis on the two cumulus `.com`/`-trials` hosts — which
 had **not** been swept on that axis at base `v13` (⚠ corrected on closing AA, which
@@ -3594,6 +3679,7 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| AC — after the window, what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled? | 2026-11-10 | **The census half was already complete and was NOT re-run; the one open question was a live probe, and its answer splits the host in two.** Enumeration close-condition had been met on 2026-10-17 — **0 of 44 unread**, every cell classified, **165 records / 27 paths / six hosts**, **5 of the 44** carrying a `/ipro/hcp/` member (last dated 2026-06-10, archived `404`), nested shapes recorded as unexplained under F10a — so this pass sent **0 requests to Common Crawl** and **read 0 crawls**. What a ledger could not settle was the catch-all, and **14 of a 20 GET-only cap** (0 failures, 0 retries, floor **2.579 s** between 14 requests, 0 of 13 gaps under the declared 2.5 s) settles it: **no whole-host catch-all** — a fabricated apex path (verified 0 `git grep` hits) answers a real **`404`**, 196 B, digest `80c3fe2ae1062abf`, **byte-identical** to the live `/ipro/hcp/` and `/ipro/hcp/index.html` `404`s and to `/assets/zz-ac-absent-…html` — **but every path under `/app/` returns one identical 1 833-byte SPA shell whether it exists or not**: two invented names at depths 1 and 4 produced digest `8dfb96a70999bdb4`, the same bytes `/app/` itself and all four recorded `/app/assets/…` nesting depths return. **Two handlers, selected by path prefix and visible in `Content-Type`** (`iso-8859-1` Apache 404 vs `UTF-8` shell). So the catch-all is **prefix-scoped, not host-wide**, and **the strong "unanswerable at all" reading does not hold as written** — it holds for `/app/…` URLs and **not** for `/ipro/hcp/`, which is outside `/app/` and stays readable; `/ipro/hcp/` is **not served today** and the archived `404`s still do not date the change. **F10a's nesting pattern is explained in one direction** (the `/app/` shell answers at every depth by construction); which came first stays unestablished. **A measurement limitation, not a disclosure — nothing shows the vendor hiding anything, and this is not a security finding.** ⚠ **The `/robots.txt` control refuted its own premise**: it is **`404` on this host**, byte-identical to the fabricated path, and **no crawl record in this repository has ever shown a `200` at `/robots.txt` on `carelink.minimed.eu`** — the `200` belongs to `carelink-stage3.minimed.eu`. Successor (needs its own claim): which **prefixes** each host in the family serves a shell at — `carelinkhp.minimed.eu` catches **everything** per `AGENTS.md` §7, a different mechanism under the same word | [findings-log/2026-11-10-area-ac-catchall-probe/FINDINGS.md] + [findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md] | #168 |
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |
 | N — do the two new POST-only routes exist on the other two cumulus hosts | 2026-10-12 | **Positive, and no region split.** Both `connect/csr/v2/display/message` and bare `connect/v2/display/message` are live and POST-only on `clcloud.minimed.com` and `clcloud-trials.minimed.com` as well as `.eu` — every cell byte-identical including CORS header ordering, controls first on each host. 16 of a 16 cap, GET+OPTIONS only. The pass also produced a **methodology correction**: `access-control-allow-methods` is not a register of a route's methods (`v13/display/message` advertises `OPTIONS` and is GET-capable on all three hosts) | [findings-log/2026-10-12-csr-cross-host/FINDINGS.md] | #8 |
 | U — are the `csr/v1`, `csr/v3` and PDE cells dead on `.com`/`-trials` too, or only on `.eu`? | 2026-10-12 | **Negative, 3 hosts wide.** All six cells dead on **both** methods on both remaining hosts — 24 of 24 cells `403 MissingAuthenticationTokenException`, controls first on each host, 32 of a 32 cap. All 28 no-route bodies byte-identical (42 B, `sha256:f249b63cb2fc`), and that digest matches the `.eu` capture, so the router's no-route response is one artefact shared by three hosts. `docs/00`'s "Not re-probed on `.com`/`-trials`" caveat is **discharged**; nothing flipped to live | [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md] | #11 |
@@ -3622,6 +3708,7 @@ being superseded — never silently. Letters are not reused.
 | R — reconcile the `deviceFamily` correction against the client consensus | 2026-10-14 | **Negative, on the area's second close condition: the value's casing stays UNOBSERVED, and `docs/05` now says so with the reason.** **0 requests of a 0 cap** — no vendor host was touched and no request of any kind was made, because a zero-request pass cannot have an oracle and this one did not manufacture one. Three findings, and the second is the one that mattered: (1) **The reconciled candidate set is 21 strings under a counting rule stated before the number** (three admitted sources hold 27 between them; the difference of **6** is duplicate **occurrences** across **5** distinct shared tokens — `SIMPLERA` is in all three sources — and the sum is printed beside the union so it cannot be mistaken for it). Every member is *extracted from a committed artefact at a named `file:line`*, so the denominator is re-derivable from a clean clone and an anchor that stops resolving exits non-zero. ⚠ **Unpinned, stated rather than left to be discovered:** the suite guards only the **map axis** — `regression/hurl/05-public-config.check.sh` pins `family count is 16`, which this pass independently re-derived — while **nothing pins the union 21, the sum 27, or the `S-CLIENT-DTO` exclusion**. A pin was considered and declined: a new `check` site moves the static count and every site that states it, and `docs/09` §4 records that widening a gate pattern in the same PR the gate passed is a maintainer decision. The gap is the re-derivation script, not a pin. (2) **One of the three candidate vocabularies the area inherited fails the provenance bar the pass sets for itself** — the third-party set `GUARDIAN`/`NGP`/`CGM`/`CC` is recorded at `findings-log/probe-2026-10-08/APP-EMULATION-RESEARCH.md:384-385`, inside a section headed at **`:349`** — *"Round 3 — the full `RecentData` payload schema (from xDrip's message classes)"* — which names **no `file:line` and no named commit**, so `CGM` and `CC` are **not admitted** and the union is **21, not 23**; the repair is one cite, since the 2026-10-11 pass read xDrip at `366c97a8`. (3) **The three vocabularies are not one vocabulary with disagreements** — the 16 map tokens are a *published identifier axis*, the client's 5 enum + `NGP` a *prefix-matched routing classification*, and the third-party four a *product-role DTO enum*; measured overlaps are `{SIMPLERA}`, **none**, and `{GUARDIAN}` respectively, so under the client's five `startsWith` tests `CGM`/`CC` match nothing and under the third-party four `BLE`/`SIMPLERA` match nothing (INFERRED, assumptions stated). **The audit re-counted every surviving `deviceFamily` claim against `AGENTS.md` §2.1 and one was deleted outright**: `docs/05`'s "appears as a call-site field name in the lazy-chunk corpus — independent corroboration of the field name" rested on a source that records that token as **0** across the 224 chunks in its own measure table, attributes its real evidence to a different artefact with no `file:line` and no digest, and whose 224 chunk bodies are **not committed** (independent count **0** — `AGENTS.md` §1 deletes the claim, §2.1 deletes the word). Two more re-labelled: `docs/05`'s "the vendor's bundles do not contain" is **false** (the patient lazy chunk carries `medicalDeviceFamily` at byte 83,893), and `docs/10` row 37's `(GUARDIAN, MINIMED, PARADIGM)` loses **`MINIMED`/`PARADIGM`** — ⚠ **corrected 2026-10-15: the count published as their evidence was false.** The row claimed they had one uncited log line plus the row quoting it; `git grep -w` at base `7d915b8` shows **three** files carrying each token as a claimed value and a **fourth** carrying `PARADIGM` as an era label — and moves from OBSERVED to **SOURCE-OBSERVED**, since no client read here is a live response. `GUARDIAN` survives, sourceable twice. **What would change the verdict:** one authenticated `GET /patient/monitor/data`, key-names-only, value verbatim, matched against four axes (client comparison set, model code, display name, 16 map tokens); **a value matching none of the four is itself the finding**. Two successors filed under the area: read-side echo casing, and whether the `_X` suffixes mean anything | [findings-log/2026-10-14-pool-r-devicefamily-casing/FINDINGS.md] | #124 |
 | K — The chunk corpus, for real this time | 2026-10-16 | **Negative on nothing, positive on completion.** Control-flow mining complete: both clinic (225) and patient (211) lazy-chunk corpora swept clean of discovery-key tokens (`baseUrlPde`, `/connect/pde`, `discover/android`, `clcloud`, `api/carepartner`, `system.gc.gz.transition.flags` leaves all 0); `system.logbook.entry.validation.config` recovered in lazy chunk `9481.6977c1a7bd7461f8` (module 79481), structure recorded as `types`/`sensorLocations.options`/`freeText`/`doseUnits.options`/`questions` with values token-gated; cross-client differential declined as not meaningful (5 clinic vs 144 patient unresolved call-site shapes, compared across constant-table vs inlined-routing builds). 0 of a 0 cap — closing on existing committed evidence from issues #56, #78, #103, #121. Successor: the 15 `hcp/configuration/public/*` keys, filed as a docs/10 §1 open question (no new letter can be minted — A–Z all in use). | [findings-log/2026-10-16-k-chunk-corpus/FINDINGS.md] | #140 |
 | AA — does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`? | 2026-10-17 | **Positive, on both hosts, and the area's gate-versus-echo framing is withdrawn as the wrong pair of terms.** The tail is **both** echoed and selective at once. **OBSERVED, 20 of 20 requests, GET only, measured same-host floor 3.304 s** (9 gaps/host, 0 under 2.5 s, controls first per host, `v99` absent -> 403 at `f249b63cb2fc…` and `v11` served -> 200 on both). **No allow-list anywhere**: all 14 `200` bodies echo the requested tail exactly once into `"config"`, and a fabricated tail `android/absent-probe-871` was served verbatim at 3 cells — never 400/404. **At base `v13` on both `.com` and `-trials` the tail gates**: 4 tails select **3** documents, and `3.6`->`3.9` moves advertised `baseUrlCumulus` base (`v13`->`v2`), `baseUrlCareLink` (`v2`->`v1`), `CP[]` length (3->2), country count (109->99 on `.com`, 109->76 on `-trials`) and the SSO config file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against `sso_cp_us_v6.json` on `-trials` and both `sso_cp_us_v6.json` + `eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. The `3.5`/`3.6` documents are byte-identical **across** both hosts; the `3.9`-class document is not, which corrects `docs/00`'s "every cell from 3.9 upward is byte-identical" to *within a host*. **At `-trials` base `v6` the tail gates nothing** — 4 tails including the fabricated one collapse to **one** canonical digest (n=4), re-deriving the digest the 2026-10-17 matrix pass recorded there. **The `v6` 403 split reads as a base-axis effect, not an app-version effect (INFERRED; the refutations are OBSERVED)** — same host, same tail `3.6`, base `v11` -> 200 — but whether `v6` is unrouted on `.com` because of the version segment or the route family is **not established and no choice is made**. **Deviation, disclosed:** claim #151 named `carelink.minimed.com`/`carelink-trials.minimed.com`; the pass sent `clcloud.*`, the host family the route is published on — **the claim's host list was wrong**; it answers the area as posed and does **not** speak to `carelink.*`. **Premise checked:** the closed row on "bare `connect/carepartner/` prefixes dead" probed *prefix parents*, not this routed leaf — **no contradiction**. **No pin added** — a 4-cell pin in `05-public-config` costs 4 requests on **every PR gate** *and* 4 per weekly sweep, and it would not catch the change that matters (the `3.6`-class document departing). **Measure**; counting rule in the log §7. **One source** — no strength word used (`§2.1`). Lookup-vs-threshold **not separable** from 4 tails; carried to **AE** | [findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md] | #155 |
+| AF — can the findings-log census be made self-deriving, so no lane restates it by hand? | 2026-11-10 | **Positive — the check exists, runs on every gate, and verifies anchors against the tree rather than trusting them.** `scripts/research-checks.py:455 check_ledger_census()` derives the population with the census's own counting rule (`git ls-files 'findings-log/*/results.jsonl'`) and, for every live prose statement of the form "N committed ledgers" in `README.md` and `docs/*.md`, requires a commit anchor **in the same paragraph** that resolves *and whose tree really held that number* (`git ls-tree`) — so the three failure shapes are all caught: no anchor (the bare figure, false one merge later by construction), an anchor that does not resolve, and an anchor whose tree held a different count (the mis-transcribed-reading class). **`docs/` and `README.md` FAIL; `findings-log/` WARNS only**, because that tree is append-only under `AGENTS.md` §3 and a check that failed there would trap a lane between two rules. **The area's close condition is met twice over:** no bare population figure survives in `docs/` without a commit it is true at, *and* the census is reported as derived command output beside the figures. **Adversarial history is the reusable half:** the first check passed every test it was given and was still fooled by two shapes nobody examined — a hard-wrapped figure (`docs/11` is wrapped at ~80 cols, so end-of-line is the *normal* shape) and a blockquote, which v1 skipped as "quoted history" while the house form for a new census figure **is** a dated correction blockquote; the blockquote fix then opened a markdown lazy-continuation bypass. All closed — **the shape matrix lives in `a37f4df`'s commit message** (`git log --format=%B a37f4df`: "Verified against a 12-shape matrix …" and "Verified 12/12 on the shapes that matter …"), while the docstring records the three *failure* shapes instead; this row's first draft cited the docstring and a fresh-context verifier correctly caught the mismatch. **A check authored by the mind that wrote the prose it polices shares that mind's blind spots** — the argument for the fresh-context verifier applied to tooling. **One gap that was open is now closed:** `a37f4df`'s commit message records a residual (a table row inside a blockquote still over-reporting); the round-3 filter closes it, **verified by planting** on 2026-11-10 — two blockquoted table-row shapes leave the check silent while the bare-figure control fails at exit 1. The docstring's "blockquotes … are excluded" sentence is stale against the implementation; it is named here and deliberately not edited, because this is a `docs/` bookkeeping PR and touching the check would be scope creep. **0 of a 0 cap, 0 requests**, static over the working tree. **Row written 2026-11-10, two days after the remedy shipped in `a37f4df` (#159) with no Closed-table row** — the stale-claim failure arriving on the page itself | [findings-log/2026-11-08-area-af-census-self-deriving/FINDINGS.md] | #159, closed #160 |
 | S-L1 — the `cluster.idx`-level "is this crawl served at all" instrument, and the verdict on `CC-MAIN-2014-23` | 2026-10-19 | **Closed on its close condition, and the target retired on the SERVED side.** The instrument is committed (`servedness.py`, `pass`/`classify`/`selftest`) and answers served/unserved for any named crawl in **one ranged read**, classified correctly on both controls (`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both **SERVED**) against the absent-id oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`). **`CC-MAIN-2014-23` is SERVED** — `206`, `Content-Range: bytes 0-8191/153 902 243` — and its `minimed.eu` `404` now sits behind a **`200`** control **on that same crawl** (**1 785 B** of `google.com` records), so the standing **indeterminate cell retires as served-but-empty, NOT as "unservable"**; `AGENTS.md` §7 records `index.commoncrawl.org` TLS-dropping from some hosts, so a connection-level failure is a statement about *this box* and discharges nothing. **15 of a 15 cap**, GET only, `data.commoncrawl.org` (11) + `index.commoncrawl.org` (4), **0 to any Medtronic host**, `t_sent` floor **3.537 s** (0 gaps under 3.5 s), **0 retries** at `E[N]` 1.00. **The locate half is the recorded negative: `UNCONVERGED` on both controls** at a 3-page budget, so the control gate withheld every family verdict and the target's locate never ran — `UNCONVERGED` is not a negative. ⚠ **Corrects claim #152's own descriptor**: the readable-absence control is **`CC-MAIN-2024-42`** (area M row 25 `200` / row 45 `404`), **not** `CC-MAIN-2024-22`, whose S-L2 row 45 is a **`200`** with 13 records — a positive-adjacent crawl. Successor: **AD**, the locate with a seed derived from the head read (**0 requests** once the instrument exists). | [findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md] | #152 |
 
 
