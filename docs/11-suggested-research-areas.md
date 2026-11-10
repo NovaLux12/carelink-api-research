@@ -352,7 +352,32 @@ independently checked one).
 > **Carried forward as area AE**, which is the one question these cells could not
 > answer.
 
-### AE. Is the `android/<app-version>` tail a lookup table, or a threshold?
+### AE (closed 2026-11-10) — is the `android/<app-version>` tail a lookup table, or a threshold?
+
+> **Area AE is CLOSED** (2026-11-10, claim #161) — see the Closed table at the foot
+> of this page and
+> [findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md]. **It is a table
+> keyed on the string, not a threshold**, and the discriminator is the **order** of
+> the documents along the ladder, not the status line and not the document count.
+>
+> **OBSERVED, 18 of a 20 cap, GET only, measured same-host spacing floor 3.427 s
+> (16 gaps, 0 under 2.5 s), controls first per host** — `v99` absent → `403` at the
+> no-route digest `f249b63cb2fc…` and `v11` served → `200` on both hosts. Seven
+> tails strictly inside `(3.6, 3.9)` at base `v13` on both hosts produce the class
+> sequence **`L L C L C L L`** (`3.61, 3.65, 3.7, 3.75, 3.8, 3.85, 3.89`), where
+> **C** is the `v13`/carelink-v2/CP-3/109-country document and **L** the
+> `v2`/v1/CP-2 one. **INFERRED and load-bearing:** a threshold is a monotone step
+> function, and a step function that leaves the legacy branch at `3.65 → 3.7`
+> cannot return to it at `3.75`; this sequence returns twice. So the rule is keyed
+> on the string. The current-generation entries among the strings tested are
+> **`{3.6, 3.7, 3.8}`** — the row `docs/03` §3 has carried for `.eu` all along.
+>
+> **A negative that is stated as one:** the ladder found **two** classes, both
+> already known, and **no fourth document**. The verdict rests on ordering alone.
+> **Neither the table's membership across string forms** (`3.60`, `3.700`,
+> `3.6.0` are unobserved on this path) **nor its completeness above `3.9`** is
+> measured — carried to the AE successor below. **One source**; no strength word used
+> (`AGENTS.md` §2.1). No pin added, for the reason in the log §6.
 
 **What is known, labelled and cited.** At base `v13` on **both** cumulus hosts the
 app-version tail **gates content** — four tails select **three** distinct documents,
@@ -397,6 +422,71 @@ and `3.9`-class documents on `v13` remain distinct long enough for a ladder to
 separate them — they were distinct on 2026-10-17; and that the response document is a
 function of `(host, base, tail)` with no fourth input, which AA's cross-product is
 consistent with but did not test.
+
+#### Successor to area AE — the table's membership across string forms, and whether it is closed above `3.9`
+
+> **Minted 2026-11-10 by the PR that closed AE** (claim #161), as a `####` addendum
+> rather than a `###` heading: the page's live count sentence must read **4 open plus
+> 28 closed** after AE closes, and a new `###` area would make it 5 again. The
+> precedence for the placement is the page's own successor-to-F block.
+
+**What is known, labelled and cited.** On both cumulus hosts at base `v13`, the
+app-version tail selects between two documents by **string identity**, not by a
+numeric boundary: the ladder `3.61, 3.65, 3.7, 3.75, 3.8, 3.85, 3.89` returns the
+class sequence `L L C L C L L`, which no monotone step function can produce
+(OBSERVED for the sequence; INFERRED for the consequence,
+`[findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md §3]`). Among the
+strings tested the current-generation entries are `{3.6, 3.7, 3.8}`.
+
+**What is missing, and why it matters.** Two gaps, and they matter differently.
+**(a) Membership across string forms.** Only `X.Y` and `X.YY` strings were sent.
+Whether `3.60`, `3.70`, `3.700`, `3.6.0` or `3.8.0` are table entries is
+**unmeasured on this path** — and those are not hypothetical forms: `docs/03` §3a
+records `3.6.0`, `3.7.0` and `3.8.0` as values clients actually ship on the body
+axis. If the lookup normalises, a client pinning `3.6.0` may be in the legacy
+class without anyone noticing; if it does not normalise, the pin `android/3.6` is
+one string among several and the safe-pin claim in `docs/03` §3 needs that caveat
+stated. **(b) Completeness above `3.9`.** No tail above `3.9` has ever been sent
+on this path. If the table simply has no entries there, every tail above `3.9`
+falls through to legacy — which is what `3.9` and AA's fabricated tail both do
+(the fall-through reading is INFERRED, not observed). Whether a **future**
+current-generation entry appears above `3.9` is the drift question the pin cannot
+see.
+
+**Blocker:** a request budget, not a token. **≤22 requests**, itemised so the
+arithmetic closes: host 1 (`clcloud.minimed.com`) base `v13`, controls first
+(`v99` absent, `v11` served) = 2, then the **string-form** cells `3.6.0`, `3.7.0`,
+`3.8.0`, `3.60`, `3.70`, `3.80` = 6, so **8 on host 1**; host 2 the same 8 only if
+host 1 shows a form behaving differently from its `X.Y` counterpart, **≤8** more
+= **16**; part (b) rides the same pass — `3.91`, `3.99`, `4.0`, `10.0` = **4**, so
+**20**, plus 2 slack for a re-issue at `E[N]` above 1, giving **22**. ⚠ **An
+earlier draft of this Blocker said "≤14" while itemising 8 + 8 + 4 = 20**, which
+does not close; corrected before merge from a verifier finding. Part (b) is
+cheaper and answers only "is anything above `3.9` current", not "is the table
+complete". GET only, ≥2.5 s same-host, controls first per host, bodies transient
+and reduced to status/bytes/`sha256`/tail-erased digest as this pass did.
+
+**Closes when:** every probed string form maps to the class its `X.Y` counterpart
+maps to (**the table does not normalise** — a clean negative, and the answer is
+that the pin's string is load-bearing), **or** at least one form maps to a
+different class (**the table normalises**, and the normalisation rule is named to
+the extent the cells support it). Part (b) closes when a tail above `3.9` either
+produces a document distinct from the legacy class, or the swept range above `3.9`
+all lands on legacy. **A negative counts in both halves.**
+
+**Assumptions (INFERRED):** that the response document remains a function of
+`(host, base, tail)` with no fourth input — AE's cross-host agreement is
+consistent with this and does not test it; that the deployment state is stable
+across the pass, which AE's two-host agreement makes likely but a single
+mid-ladder change would break; and that a string form reaching a different class
+is a statement about **lookup keys**, not about a second gate elsewhere in the
+request path — no cell here varies anything but the tail.
+
+**Non-duplicate:** AE varied the tail only within `(3.6, 3.9)` on the `X.Y` /
+`X.YY` forms, and area Q's string-form work (`3.6.0`, `3.7.0`, `3.8.0`) is on the
+**body** axis, a different field on a different route. No prior row sends an
+`X.Y.Z` or `X.Y0` string on `discover/android/<tail>` on either `.com` or
+`-trials`.
 
 
 ### AF (closed 2026-11-10) Can the findings-log census be made self-deriving, so no lane restates it by hand?
@@ -3463,9 +3553,10 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 29 closed**
-stand today (`AD`, `AE`, `AB` — `AD` minted 2026-10-19 by lane sl1, `AB`
-minted by lane l2, `AC` closed 2026-11-10 by claim #168, `AF` closed 2026-11-10;
+**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 30 closed**
+stand today (`AD`, `AB` — `AD` minted 2026-10-19 by lane sl1, `AB`
+minted by lane l2, `AC` closed 2026-11-10 by claim #168, `AE` closed 2026-11-10 by claim #161,
+`AF` closed 2026-11-10;
 counted from the `^### [A-Z]{1,2}.` headings with `python3 scripts/research-checks.py`, not
 inherited); the next bounded successor that clears the step 7 quality bar is minted as a
 **two-letter area** (`AA`, `AB`, …) instead of being parked as an addendum or a `docs/10` §1 row.
@@ -3627,6 +3718,7 @@ being superseded — never silently. Letters are not reused.
 | AA — does the `android/<app-version>` axis gate anything on `.com` and `-trials`, or only on `.eu`? | 2026-10-17 | **Positive, on both hosts, and the area's gate-versus-echo framing is withdrawn as the wrong pair of terms.** The tail is **both** echoed and selective at once. **OBSERVED, 20 of 20 requests, GET only, measured same-host floor 3.304 s** (9 gaps/host, 0 under 2.5 s, controls first per host, `v99` absent -> 403 at `f249b63cb2fc…` and `v11` served -> 200 on both). **No allow-list anywhere**: all 14 `200` bodies echo the requested tail exactly once into `"config"`, and a fabricated tail `android/absent-probe-871` was served verbatim at 3 cells — never 400/404. **At base `v13` on both `.com` and `-trials` the tail gates**: 4 tails select **3** documents, and `3.6`->`3.9` moves advertised `baseUrlCumulus` base (`v13`->`v2`), `baseUrlCareLink` (`v2`->`v1`), `CP[]` length (3->2), country count (109->99 on `.com`, 109->76 on `-trials`) and the SSO config file family: `oauth20_sso_carepartner_*_v6.json` on the 3.5/3.6 class, against `sso_cp_us_v6.json` on `-trials` and both `sso_cp_us_v6.json` + `eu_sso_cp_eu_v6.json` on `.com` for the 3.9 class. The `3.5`/`3.6` documents are byte-identical **across** both hosts; the `3.9`-class document is not, which corrects `docs/00`'s "every cell from 3.9 upward is byte-identical" to *within a host*. **At `-trials` base `v6` the tail gates nothing** — 4 tails including the fabricated one collapse to **one** canonical digest (n=4), re-deriving the digest the 2026-10-17 matrix pass recorded there. **The `v6` 403 split reads as a base-axis effect, not an app-version effect (INFERRED; the refutations are OBSERVED)** — same host, same tail `3.6`, base `v11` -> 200 — but whether `v6` is unrouted on `.com` because of the version segment or the route family is **not established and no choice is made**. **Deviation, disclosed:** claim #151 named `carelink.minimed.com`/`carelink-trials.minimed.com`; the pass sent `clcloud.*`, the host family the route is published on — **the claim's host list was wrong**; it answers the area as posed and does **not** speak to `carelink.*`. **Premise checked:** the closed row on "bare `connect/carepartner/` prefixes dead" probed *prefix parents*, not this routed leaf — **no contradiction**. **No pin added** — a 4-cell pin in `05-public-config` costs 4 requests on **every PR gate** *and* 4 per weekly sweep, and it would not catch the change that matters (the `3.6`-class document departing). **Measure**; counting rule in the log §7. **One source** — no strength word used (`§2.1`). Lookup-vs-threshold **not separable** from 4 tails; carried to **AE** | [findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md] | #155 |
 | AF — can the findings-log census be made self-deriving, so no lane restates it by hand? | 2026-11-10 | **Positive — the check exists, runs on every gate, and verifies anchors against the tree rather than trusting them.** `scripts/research-checks.py:455 check_ledger_census()` derives the population with the census's own counting rule (`git ls-files 'findings-log/*/results.jsonl'`) and, for every live prose statement of the form "N committed ledgers" in `README.md` and `docs/*.md`, requires a commit anchor **in the same paragraph** that resolves *and whose tree really held that number* (`git ls-tree`) — so the three failure shapes are all caught: no anchor (the bare figure, false one merge later by construction), an anchor that does not resolve, and an anchor whose tree held a different count (the mis-transcribed-reading class). **`docs/` and `README.md` FAIL; `findings-log/` WARNS only**, because that tree is append-only under `AGENTS.md` §3 and a check that failed there would trap a lane between two rules. **The area's close condition is met twice over:** no bare population figure survives in `docs/` without a commit it is true at, *and* the census is reported as derived command output beside the figures. **Adversarial history is the reusable half:** the first check passed every test it was given and was still fooled by two shapes nobody examined — a hard-wrapped figure (`docs/11` is wrapped at ~80 cols, so end-of-line is the *normal* shape) and a blockquote, which v1 skipped as "quoted history" while the house form for a new census figure **is** a dated correction blockquote; the blockquote fix then opened a markdown lazy-continuation bypass. All closed — **the shape matrix lives in `a37f4df`'s commit message** (`git log --format=%B a37f4df`: "Verified against a 12-shape matrix …" and "Verified 12/12 on the shapes that matter …"), while the docstring records the three *failure* shapes instead; this row's first draft cited the docstring and a fresh-context verifier correctly caught the mismatch. **A check authored by the mind that wrote the prose it polices shares that mind's blind spots** — the argument for the fresh-context verifier applied to tooling. **One gap that was open is now closed:** `a37f4df`'s commit message records a residual (a table row inside a blockquote still over-reporting); the round-3 filter closes it, **verified by planting** on 2026-11-10 — two blockquoted table-row shapes leave the check silent while the bare-figure control fails at exit 1. The docstring's "blockquotes … are excluded" sentence is stale against the implementation; it is named here and deliberately not edited, because this is a `docs/` bookkeeping PR and touching the check would be scope creep. **0 of a 0 cap, 0 requests**, static over the working tree. **Row written 2026-11-10, two days after the remedy shipped in `a37f4df` (#159) with no Closed-table row** — the stale-claim failure arriving on the page itself | [findings-log/2026-11-08-area-af-census-self-deriving/FINDINGS.md] | #159, closed #160 |
 | S-L1 — the `cluster.idx`-level "is this crawl served at all" instrument, and the verdict on `CC-MAIN-2014-23` | 2026-10-19 | **Closed on its close condition, and the target retired on the SERVED side.** The instrument is committed (`servedness.py`, `pass`/`classify`/`selftest`) and answers served/unserved for any named crawl in **one ranged read**, classified correctly on both controls (`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both **SERVED**) against the absent-id oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`). **`CC-MAIN-2014-23` is SERVED** — `206`, `Content-Range: bytes 0-8191/153 902 243` — and its `minimed.eu` `404` now sits behind a **`200`** control **on that same crawl** (**1 785 B** of `google.com` records), so the standing **indeterminate cell retires as served-but-empty, NOT as "unservable"**; `AGENTS.md` §7 records `index.commoncrawl.org` TLS-dropping from some hosts, so a connection-level failure is a statement about *this box* and discharges nothing. **15 of a 15 cap**, GET only, `data.commoncrawl.org` (11) + `index.commoncrawl.org` (4), **0 to any Medtronic host**, `t_sent` floor **3.537 s** (0 gaps under 3.5 s), **0 retries** at `E[N]` 1.00. **The locate half is the recorded negative: `UNCONVERGED` on both controls** at a 3-page budget, so the control gate withheld every family verdict and the target's locate never ran — `UNCONVERGED` is not a negative. ⚠ **Corrects claim #152's own descriptor**: the readable-absence control is **`CC-MAIN-2024-42`** (area M row 25 `200` / row 45 `404`), **not** `CC-MAIN-2024-22`, whose S-L2 row 45 is a **`200`** with 13 records — a positive-adjacent crawl. Successor: **AD**, the locate with a seed derived from the head read (**0 requests** once the instrument exists). | [findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md] | #152 |
+| AE — is the `android/<app-version>` tail a lookup table, or a threshold? | 2026-11-10 | **Closed POSITIVE: it is a table keyed on the string, not a threshold — and the discriminator is the ORDER of the documents along the ladder, not the status line and not the document count.** **OBSERVED, 18 of a 20 cap** (2 unspent, GET only, no failures, no retries), controls **first** on each host — `v99` absent -> `403` at the corpus no-route digest `f249b63cb2fc…` on both, `v11` served -> `200` on both — measured same-host floor **3.427 s** over **16** gaps, **0** under 2.5 s. Seven tails strictly inside `(3.6,3.9)` at base `v13` on **both** hosts produce one class sequence, identical on `.com` and `-trials`: `3.61`->L, `3.65`->L, `3.7`->**C**, `3.75`->L, `3.8`->**C**, `3.85`->L, `3.89`->L, where **C** is the `v13`/carelink-v2/CP-3/109-country document (20256 B) and **L** the `v2`/v1/CP-2 one (99 countries on `.com`, 76 on `-trials`). **A threshold is a monotone step function, and a monotone step function that leaves the legacy branch at `3.65`->`3.7` cannot return to it at `3.75` — this sequence returns twice, so no MONOTONE threshold over the numeric value can produce these cells (INFERRED; the sequence it refutes is OBSERVED).** ⚠ **Bound corrected before merge, from a verifier finding:** a *union of disjoint intervals* (`[3.7,3.71) ∪ [3.8,3.81)`) is a step function of the numeric value, is not monotone, and fits all seven cells — so the refuted class is **monotone / single-boundary** thresholds, not every numeric rule; what survives is a string-keyed table **or** a non-monotone interval set, and these cells do not separate them. The current-generation entries among the strings tested are **`{3.6,3.7,3.8}`** — the row `docs/03` §3 carried for `.eu` all along, which retires the generation-step reading AA's two-endpoint sample made possible. **The echo trap held and was defeated:** all 16 `200` bodies echo the requested tail exactly once (`echo_n=1`) and the status is a constant `200` across the whole ladder, so **nothing here is readable from a status code** — the discriminator is the tail-erased digest, computed at send time on the transient body, and no raw body is committed. `3.7` and `3.8` each re-derive AA's `3.6` digest `7ad212402d7f`; the other five re-derive AA's `3.9` digests `7ac09335c7e4` / `9962b3db79b1` (OBSERVED; a **re-derivation — one source**, `§2.1`, no strength word). **A negative stated as one: the ladder found TWO classes, both already known, and NO fourth document** — the verdict rests on ordering alone, and a reader should hold exactly that. **Not measured:** membership across string forms (`3.60`, `3.700`, `3.6.0` — unobserved on this path) and completeness above `3.9`; carried to the AE successor addendum. Truncation to one decimal **is excluded** by the cells themselves (`3.75`/`3.85` -> legacy while `3.7`/`3.8` -> current). **No pin added** — the tempting `3.75`/`3.8` pair would cost 2 requests on every PR gate *and* per weekly sweep while firing on the wrong change; the change that matters is the `3.6`-class entry departing. `docs/03` §3b.5 carries the synthesis | [findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md] | #161 |
 
 
 ---
