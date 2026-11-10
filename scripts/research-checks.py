@@ -232,9 +232,43 @@ def check_prose_counts():
     print('--- prose counts ---')
     text = read('docs/11-suggested-research-areas.md')
     areas = len(re.findall(r'^###\s+[A-Z]{1,2}\.\s', text, re.M))
-    closed_section = text.split('## Closed areas', 1)
-    closed = len(re.findall(r'^\| [A-Z]{1,2} —', closed_section[1], re.M)) \
-        if len(closed_section) > 1 else 0
+    # The heading must be matched ANCHORED at line start, not by a bare string
+    # split. `text.split('## Closed areas', 1)` also matches the same literal
+    # inside a markdown table cell (docs/11 quotes the counting command in the
+    # S-L2 duplicate-test table), so the split landed hundreds of lines early and
+    # the count swept in every closed-looking row after that point — including a
+    # row that had escaped the table entirely. That produced a FALSE GREEN on a
+    # page whose Closed table was one row short and whose orphan row sat in
+    # another area's prose. An anchored search cannot be fooled by a quoted
+    # command; if the heading is missing it returns None and the check fails
+    # closed rather than counting the whole file.
+    m = re.search(r'^## Closed areas[ \t]*$', text, re.M)
+    if m is None:
+        fail('docs/11: no `## Closed areas` heading found at line start — the '
+             'closed-area count cannot be derived, so the prose count is '
+             'unverifiable (an unanchored split would silently count the whole '
+             'file and pass)')
+        return
+    # A closed-area row must live INSIDE the table, not merely somewhere after
+    # the heading. The failure this catches is real and was shipped: an `| AB —`
+    # row was inserted into another area's prose, hundreds of lines ABOVE the
+    # `## Closed areas` heading, while the Closed table itself was one row short.
+    # The unanchored split counted it anyway (because the literal also appears in
+    # a quoted command earlier in the page) and the page passed green with a row
+    # in the wrong place. Anchoring alone would not catch it either, since the
+    # orphan is simply outside the tail. So: count closed-shaped rows in the whole
+    # file and require that count to equal the in-table count.
+    in_table = len(re.findall(r'^\| [A-Z]{1,2} —', text[m.start():], re.M))
+    whole_file = len(re.findall(r'^\| [A-Z]{1,2} —', text, re.M))
+    if whole_file != in_table:
+        orphan_ids = sorted(set(re.findall(r'^\| ([A-Z]{1,2}) —', text, re.M))
+                            - set(re.findall(r'^\| ([A-Z]{1,2}) —', text[m.start():], re.M)))
+        fail(f'docs/11: {whole_file - in_table} closed-area row(s) sit OUTSIDE the '
+             f'Closed table ({orphan_ids}) — a closed row above the `## Closed areas` '
+             f'heading is counted by no reader and reads as unstarted work; move it '
+             f'into the table')
+        return
+    closed = in_table
     cfg = None
     for line in read('.github/ISSUE_TEMPLATE/config.yml').splitlines():
         m = re.search(r'about: (\d+) (?:open )?areas', line)
