@@ -527,10 +527,12 @@ def check_ledger_census():
     figure is most likely to be written — the distinction is enforced by the
     anchor requirement, not by refusing to look. Table ROWS are excluded, with
     or without a blockquote marker in front: a row is a reading, not a sentence,
-    so `| committed ledgers | 50 | 51 |` is not a claim about 50. (An earlier
-    revision of this docstring said "quoted history inside blockquotes is
-    excluded", which described the pre-fix behaviour and was the very bypass
-    that got closed.) Zero vendor requests — `git ls-files`/`git ls-tree` only.
+    so `| committed ledgers | 50 | 51 |` is not a claim about 50. (That closing
+    sentence was wrong on arrival rather than stale: `git log -S` shows both the
+    sentence and the blockquote-scanning code landed together in a37f4df, so no
+    revision ever had a docstring saying this while the code skipped `>` lines.
+    It described the bypass as though it were still the design.) Zero vendor
+    requests — `git ls-files`/`git ls-tree` only.
     """
     print('--- ledger census ---')
     def population_at(rev=None):
