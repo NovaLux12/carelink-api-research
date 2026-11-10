@@ -403,23 +403,28 @@ derivation and the three verdicts all re-checked true. What follows are errors i
 *about* that evidence, plus one tool hazard.
 
 **How this section relates to the text above it — stated plainly, because an earlier revision
-of this very section got it wrong.** All four defects are recorded here *and* fixed in place:
-the itemisation table, the run-split sentence, the byte index, and the exit code. Leaving a
-table that visibly does not sum, or a sentence that misdescribes its own ledger, is worse for
-a reader than the small break with strict append-only. But that means this log has been
-**edited in place as well as corrected**, which is not the pure append-only form AGENTS.md §3
+of this very section got it wrong.** All four defects are recorded here; three were fixed in
+place in *this* file — the itemisation table, the run-split sentence, the byte index — and the
+fourth, the exit code, was fixed in `verify-absence.py`, a different file. Leaving a table that
+visibly does not sum, or a sentence that misdescribes its own ledger, is worse for a reader
+than the small break with strict append-only. But that means **this file has been edited in
+place as well as corrected**, which is not the pure append-only form AGENTS.md §3
 asks for. The first revision of this paragraph claimed "recorded here rather than rewritten in
 place", which was false of the very commit that wrote it. What the audit trail actually holds,
 stated per item rather than as a blanket reassurance — an earlier revision of this sentence
 claimed all four "quote the old text and name the merge SHA", and that was wrong twice over:
-**items 1, 3 and 4 quote the superseded wording verbatim; item 2 describes the old state
-without quoting it; and no item names a merge SHA** (the hex strings in item 3 are `sha256`
-body digests, not commits). The superseded revision is `ec3c1a9` (PR #169), and
+**items 1, 3 and 4 quote the superseded wording** (item 1 byte-exact; item 3 verbatim apart
+from a line-wrap join; item 4 verbatim apart from a marked `…` elision), **item 2 describes the
+old state without quoting it, and no item names a merge SHA** (the hex strings in item 3 are
+`sha256` body digests, not commits). The
+superseded revision is `ec3c1a9` (PR #169), and
 `git show ec3c1a9:findings-log/2026-11-10-area-ad-cluster-idx-locate/FINDINGS.md` is the
 authority for what the text said before this section existed.
 
 1. **§4's straddle parenthetical cites the wrong byte index for one of its two rows.**
-   It says `a < FAM_LO (0x2D '-' < 0x6D 'm' at index 8)`. The first differing byte is at
+   The superseded line 205 read `a < FAM_LO   (0x2D '-' < 0x6D 'm' at index 8)` — reproduced
+   here byte for byte, three-space run and all, so the quotation is exact. The first
+   differing byte is at
    **index 7**, not 8: `a[:8]` is `eu,mini-` and `FAM_LO[:8]` is `eu,minim`, so the
    comparison turns at the `-`/`m` pair in position 7. Index 8 compares `p` against `e`.
    The **relation is true** (`a < FAM_LO` holds, verified by direct string comparison) and
@@ -452,8 +457,18 @@ authority for what the text said before this section existed.
    attempt**. Three of them are byte-identical re-reads — `seq` 30 ≡ 21
    (`sha256 a155093a0007`, 202,350 B), `seq` 31 ≡ 22 (`7c71b6191dc5`, 219,913 B), `seq` 32 ≡
    29 (`77401ad33386`, 196,232 B) — which supports "two runs of the same three block reads"
-   and nothing finer. Whether §9.2's abort count is 2 or 3 is not derivable from what is
-   committed; the honest statement is that it is unverifiable here, not that it is wrong.
+   and nothing finer. Two distinct quantities in §9.2 are **not** derivable from what is
+   committed, and they must not be conflated: §9.2 states that **three** invocations aborted,
+   of which **two** cost a request each. The ledger records no abort marker at all, so neither
+   the number of aborted invocations nor the number that cost a request can be checked against
+   it — the honest statement is that both are unverifiable here, not that either is wrong.
+   §9.2's own supporting clause, "both are in the ledger as their own rows", is in fact
+   falsified by the ledger: it carries no `confirm` role at all (its ten `role` values are
+   `absent-crawl`, `block-read`, `cdx-ctrl-target`, `cdx-probe-target`, `collinfo`, `head`,
+   `head-ctrlA`, `head-ctrlB`, `head-target`, `locate`) and no row is marked aborted, so the
+   two failed invocations cannot be located in it. That is a defect in §9.2 recorded here
+   rather than corrected above, since §9.2 is the original log and this section is the
+   correction to it.
 
 4. **`verify-absence.py` exits 2 when it finds nothing to verify, which reads as a pass.**
    Invoked with no argument it prints `no bodies dir … nothing to verify` and exits **2**.
