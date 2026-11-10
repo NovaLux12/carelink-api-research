@@ -532,8 +532,12 @@ def check_ledger_census():
     stale: that line and the blockquote-scanning code below both landed in
     a37f4df, the commit that created this check, so no revision ever had a
     docstring saying it while the code skipped `>` lines. It was never true
-    here.) Zero vendor requests — `git ls-files`, `git ls-tree` and
-    `git cat-file -e` only, no network.
+    here. This is asserted from the commits themselves, not via `git log -S`:
+    the old line wraps across two source lines, so the unwrapped pattern never
+    matches it literally, and -S reports only the commits that later quoted or
+    removed it — a trap worth knowing before citing -S for this phrase.) Zero
+    vendor requests — `git ls-files`, `git ls-tree` and `git cat-file -e` only,
+    no network.
     """
     print('--- ledger census ---')
     def population_at(rev=None):
