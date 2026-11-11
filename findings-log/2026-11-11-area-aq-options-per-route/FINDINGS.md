@@ -219,14 +219,14 @@ floor and both clocks. Exits 0 only when every one holds. It issues no requests.
 This lane was chartered as **area AQ** and built its directory under that name. Reading
 `origin/main` at build time showed **`AQ` in use twice**:
 
-| holder | where | first minted |
-|---|---|---|
-| **this pass** | open heading `### AQ. Do areas C and N's…` | `5a24fd1`, 2026-11-11 01:23:30 UTC |
-| the `hcp/patients/` subtree pass | closed row `| AY — is the \`hcp/patients/\` subtree route-live…` | `cae2127`, 2026-11-11 01:38:32 UTC |
+| holder | claim | merged | where |
+|---|---|---|---|
+| the `hcp/patients/` subtree pass | **#199**, 01:05:47 | **PR #203, 01:38:33** | closed row `| AQ —` |
+| **this pass** | #209 | **not merged** | open heading `### AQ.` as built |
 
-**This pass was the FIRST to register the letter on the page, by 15 minutes**, so it keeps `AQ`
-and the `hcp/patients/` row is re-lettered **`AY`**. Area AR's and AS's cross-references to
-"area **AQ**" were written about the `hcp/patients/` pass and now mean **`AY`**.
+**The `hcp/patients/` pass claimed the letter first and merged it**, so under merge order it keeps
+`AQ` and this area is recorded as **`AY`**. Area AR's and AS's cross-references to "area **AQ**"
+were written about the `hcp/patients/` pass, which is what they still mean.
 
 `docs/11` now has **no letter used twice** (`^### [A-Z]{1,2}.` headings and `| XX —` rows,
 compared as sets), and the count sentence reads **9 open plus 43 closed** as printed by

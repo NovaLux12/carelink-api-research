@@ -3617,13 +3617,13 @@ claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` c
 **Amendment (2026-11-11, from area AY's close).** The count moved to **9 open plus 43 closed**, and
 one thing about it is disclosed rather than smoothed over.
 
-**`AQ` was minted twice on `main`.** The `hcp/patients/` area took the letter at 01:18 UTC
-(PR #203, closed as the `| AQ —` row); the `OPTIONS`-per-route area took the same letter five
-minutes later (PR #201). Neither PR saw the other — which is exactly the collision the
-"Letter allocation" note above warns about, caught this time by the closing pass. The **later**
-mint, the `OPTIONS` one, was renamed **`AY`**, so the table carries one `AQ` row and one `AY` row
-and no letter appears twice. The `hcp/patients/` area keeps `AQ`, which is what areas AR and AS
-mean by it.
+**`AQ` was minted twice.** The `hcp/patients/` area **claimed it first (issue #199, 01:05:47)**
+and **merged it (PR #203, 01:38:33)**, closing as the `| AQ —` row; the `OPTIONS`-per-route area
+took the same letter as a heading at 01:23:30 and has **not merged**. Neither PR saw the other —
+exactly the collision the "Letter allocation" note above warns about, caught this time by the
+closing pass. Under merge order the `hcp/patients/` area keeps `AQ` and the `OPTIONS` one is
+**`AY`**, so the table carries one `AQ` row and one `AY` row and no letter appears twice. Areas AR
+and AS mean the `hcp/patients/` pass when they say "area `AQ`".
 
 **Why open did not fall.** Closing `AY` removed one `###` heading and minting `AZ` added one, so
 **9 open** is unchanged while **closed** rose by one to **43**. A closing pass that mints a
