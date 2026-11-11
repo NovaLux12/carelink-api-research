@@ -3602,7 +3602,7 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **10 open plus 49 closed**
+**The maintainer decision the paragraphs above deferred has been taken.** **10 open plus 50 closed**
 stand today (`AL` open — the `/hcp/configuration/` 405 across every host that mounts it;
 `AM` minted 2026-11-10 by the PR that closed `AK`, `AK` closed 2026-11-10 by claim #183,
 `AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
@@ -3614,7 +3614,7 @@ claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` c
 `^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 
-**Amendment (2026-11-11, from area AY's close).** The count moved to **10 open plus 49 closed**, and
+**Amendment (2026-11-11, from area AY's close).** The count moved to **10 open plus 50 closed**, and
 one thing about it is disclosed rather than smoothed over.
 
 **`AQ` was minted twice.** The `hcp/patients/` area **claimed it first (issue #199, 01:05:47)**
@@ -3841,39 +3841,6 @@ does on this subtree. That is established for `/hcp/configuration/` (area AB: 9 
 answered `200` with a 13-byte body) and **not** established for `hcp/patients/`, whose `405`
 cells carry `Allow` but were never preflighted.
 
-### AU. Were the 211 patient lazy chunks ever swept for the `INSTINCT` range tail — and does the `model-mapping` route exist in any chunk the eager bundle does not reach?
-
-**What is known (OBSERVED).** Area AM closed the names question on the **eager** patient bundle
-plus four key-addressable documents: `SKU-78963/78964/78965/78968-01` all carry `name: "Instinct
-Sensor"` from `/patient/configuration/system/model-mapping/{US,GB,DE}`, and `7896\d` is **0 hits**
-in the 3 417 255 B eager bundle [source:
-findings-log/2026-11-11-area-am-instinct-name-hunt/FINDINGS.md]. The **211 lazy chunks were never
-swept for `7896x`** — area K swept them for the *discovery* token set only, and its committed
-`grep-out.txt` carries 38 tokens, none of them a SKU or a model number [source:
-findings-log/2026-10-13-area-k-patient-chunks/FINDINGS.md §5].
-
-**What is missing.** Whether a lazy chunk carries a second, richer naming path — a
-`productName`/`marketingName` field, a `INSTINCT`-specific table, or a call to a `model-mapping`
-variant the eager bundle never names. The eager bundle's only name-rendering path is
-`mapDeviceModelName(deviceModel, deviceModelMapping)` reading `features.dataCalendar`; a chunk
-could carry another.
-
-**Blocker:** **request budget, not method.** 211 chunk GETs against a 16-request cap is 13× over;
-the chunk list, the emitted-name defect (`2076`→`common`, so the id form 404s while the emitted
-name 200s) and a working sweep harness are all committed and reusable. A pass must budget ≥ 225
-requests and re-derive the list from the runtime's `f.u` before sending — not trust
-`chunks-swept.txt` by name.
-
-**Closes when:** the 211 bodies are fetched from `carelink.minimed.eu` on their **emitted** names,
-each asserted `application/javascript` with a distinct digest (0 fallbacks), and every `7896[0-9]`,
-`SKU-`, `productName`, `marketingName` and `Instinct` occurrence is recorded with byte offset and
-enclosing context. **A negative counts** — "no chunk names a SKU" is a complete answer and it
-closes the corpus half of the naming question for good.
-
-**Assumptions (INFERRED):** that a lazy chunk *could* hold a name the eager bundle does not,
-reasoned from area K's one positive (`6746.c6795ff7e9ff468d.js` reads a config key the eager
-bundle only names) and **not** established for naming specifically; and that the 211-entry list is
-still complete, which the `f.u`-re-derivation requirement exists to falsify.
 
 ---
 
@@ -4175,6 +4142,46 @@ form on the patient side) is evidence about the *patient* plane, not the clinic 
 
 ---
 
+### BJ. Is the chunk-local `mapDeviceModelName` reachable from a router entry — and does its `shortName` fallback render a label the eager path drops?
+
+**What is known (OBSERVED).** Area AU swept all 211 patient lazy chunks on `carelink.minimed.eu`
+on their emitted names and found **two implementations of one function**. The eager bundle's
+version takes the mapping as a parameter and returns `features.dataCalendar` or `null`; lazy
+chunk `7187.87daa49216a1a9ef.js` (117 821 B, `a0017511…`) re-implements it at offset 80 246
+with **arity 1**, reading `this.deviceModelConfig` (bound at offset 83 184 to
+`this.userService.deviceModelMapping`), and its fallback chain is
+`features.dataCalendar` → **`shortName`** → the raw model code. `shortName` is **1 hit in all
+211 bodies**, inside that function [source:
+findings-log/2026-11-11-area-au-lazy-chunk-sweep/FINDINGS.md §5]. The corpus carries **no**
+`7896[0-9]` SKU tail (`sku_like = 0` of 211) and **no** `model-mapping` literal — so the
+naming question is closed on this corpus and this is what is left of it.
+
+**What is missing.** Whether the chunk copy is reachable at all, and if so whether that route is
+one the eager copy cannot serve. The eager copy is called at byte 581 419 from the `CommonCore`
+graph path; the chunk copy is called at 74 109 / 77 084 / 80 015 inside one report-graph
+component that is **not** in the eager bundle. So the two are in different code regions, and
+nothing yet ties the chunk's component to a router entry.
+
+**Blocker:** **nobody has run the pass, and it needs no requests.** Chunk `7187` and the eager
+bundle are both already on disk with committed digests, and area S4 proved this corpus supports
+control-flow recovery at 0 requests. What stops it is not access — it is that AU was scoped to a
+census and stopped at one, and the follow-up is a different method (selector → module id →
+`loadComponent`/`loadChildren` edge in the eager router).
+
+**Closes when:** a static pass (a) names the router path, or the absence of one, that reaches
+chunk `7187`'s component, quoting the `loadChildren`/`loadComponent` edge and its byte offset in
+the eager bundle, **and** (b) states whether that path is gated on `csrEnabled` or on the
+`deviceModelMapping` resolver `Gd`. **A negative counts** — "chunk 7187's component has no
+router edge in the eager bundle" is a complete answer and it closes the two-label question.
+
+**Assumptions (INFERRED):** that the chunk copy is a *separate* implementation rather than the
+same function moved by a build step. The reasoning is that both appear in the same shipped tree
+with different arity, different property-test spelling and different fallbacks, and a minifier
+does not change arity; the assumption this rests on is that no build step in this tree rewrites
+one call site into the other, which AU did not test.
+
+---
+
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
@@ -4196,6 +4203,7 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| AU — were the 211 patient lazy chunks ever swept for the `INSTINCT` range tail, and does a `model-mapping` route exist in any chunk the eager bundle does not reach? | 2026-11-11 | **Negative on both halves, positive on one thing the question did not name.** No `7896` SKU-tail occurrence appears in the **211 lazy chunks fetched from `carelink.minimed.eu`** on their **emitted** names: `7896[0-9]` is 6 hits, all 6 inside one zxcvbn password dictionary in `8141.650c358996e4c19a.js`, and `sku_like` (not a pure digit run) is **0 of 211**; bare `7896` is 15, all in the same list. `SKU-` **0**, `marketingName` **0**, `Instinct` case-sensitive **0** (the 4 insensitive hits are `instinct/instincts/instinctive/instinctively` in the same word list), `model-mapping` **0**, `configuration/system` **0**. The one `deviceModelMapping` in the corpus (chunk `7187`, offset 83 219) is a **property read** off `userService`, not a route — the eager bundle is the only body in this corpus that names `patient/configuration/system/model-mapping/${V}` (byte 3 374 413, reproduced as control 3). **The positive:** chunk `7187.87daa49216a1a9ef.js` **re-implements** `mapDeviceModelName` at offset 80 246 with **arity 1**, a different property test, and a fallback chain `features.dataCalendar` → **`shortName`** → raw code, where the eager copy (byte 581 725, arity 2) returns `null` — and `shortName` is 1 hit in all 211 bodies, inside that function. **OBSERVED, 214 of a 225 cap**, GET only, one host, controls first with **asserted digests** (control 1 `common.206e355a4a593fbd.js` 200/21 157 B/`de1f782d…`; control 2 runtime 200/8 268 B/`0dfea208…`; control 3 eager 200/3 417 255 B/`0fb4fbd4…` **and** `Instinct`=2 non-zero with `7896[0-9]`=0 in the same body, so the matcher is proven able to return both answers), run **aborts** on any disagreement; 214 of 214 = `200`, all `application/javascript`, **211 distinct digests, 0 fallbacks**. The list was **re-derived from `f.u` in the fetched runtime** (211 entries, asserted), and the offline diff measures the committed list's one defect: `common.*` vs `2076.*`, **same hash, one name** — the rest of area K's corpus is unchanged, **213 of 213 digests identical**. **Spacing 2.641 s floor, 213 gaps, 0 under 2.5 s by kernel body-mtime**; the `t_sent` series is **disqualified not smoothed** — it reads 30 gaps under 2.5 s and 26 rows with `t_done` < `t_sent`, and `clock-proof.sh` reproduces a **0.804 s backward `date` jump in 5 of 200 trials with zero network**, so those negatives are a harness artefact (no cause asserted). Bare `7896` is a **coordinate fragment** in the eager bundle (8 SVG path hits, `C151.607628,35.1487896`) — the digit-anchored form is the SKU test, and both are counted so the difference cannot be swallowed. Successor: **BJ** (is the chunk-local copy reachable from a router entry) — static, 0 requests | [findings-log/2026-11-11-area-au-lazy-chunk-sweep/FINDINGS.md] | #217 |
 | AV — has the portal device table (module `68462`) grown past `78960` since the 2026-10-13 build, and what does it name the four tail codes? | 2026-11-11 | **Negative on growth, and the negative is the finding: all five pinned build digests reproduce EXACTLY, so the table is still the 2026-10-13 artefact and still stops at `78960`.** `carelinkhp.minimed.eu`, `carelink.medtronic.{com,eu}` serve build A at **3 397 615 B `2a7fa8e7af519c2b…`** and `carelink-support.medtronic.{eu,com}` serve build B at **3 410 666 B `a054555a0f22176e…`**, each asserted against its pinned value **before** anything in the body was read (`probe.sh` exits 4 on `MOVED`); the entry-document control (**5518 B `0f2c5f62…`**) reproduced area G seq 2 in full first. So **the config drift of 2026-11-03 did NOT carry the JS bundle with it** — one moved, the other did not. Module `68462` is **9 172 B at byte 2 999 302 (A) / 2 801 145 (B)**, four sections `PUMP`/`SENSOR`/`StandaloneCGM`/`InsulinDelivery`, **97 named pairs** — identical to area G. Its `INSTINCT` rows are **unchanged: 6 codes → `Instinct™ Sensor`, 3 → `Instinct™ Go`** (`78954`/`78956`/`78958` are the Go three), plus `MMT-5420` → Sensor, identical in both builds and all five bodies. **All four tail codes are absent from all five bodies in all three code forms** — 0 quoted-pair, 0 `SKU-` string, 0 bare `NNNNN-01` hits — and `78961/78962/78966/78967` are absent too, a **fourth** vendor artefact skipping them. ⚠ **A false-hit class caught in-run:** `78963` and `78965` *do* substring-hit every body (11 and 2), all inside **module `14520`'s zxcvbn password dictionary** at identical byte offsets — the first `extract.sh` counted them as codes; the committed census separates the three forms and carries the raw count in its own labelled column. **Does it now agree with `model-mapping`? No, on two independent axes:** coverage (the table omits 4 codes the document carries) and vocabulary (the document gives all 13 codes `name: "Instinct Sensor"` — PUBLISHED, area AM — while the table splits 9 of them 6/3 across two product names). **Zero-request side-finding that explains the shape:** module `1287` resolves a code by whole key **then by its first 8 characters**, in `SENSOR` then `StandaloneCGM`, **never `PUMP`** (byte 55 700, quoted verbatim) — so `MMT-5100JC1` → `Synergy Sensor` via prefix, `MMT-1884XCU` → null despite being a table key, and the four tail codes would need `SENSOR` rows to become nameable (*null* today). **6 of a 14 cap**, GET only, no POST/OPTIONS/token/cookie/auth/wordlist, control first and gating; same-host spacing floor **4.820 s** from `t_sent` (1 gap, 0 under 2.5 s), mtime clock **proven live** (6/6 distinct, ascending, all after `t_sent`, floor 4.975 s). **Not claimed:** that the table stops at `78960` in any later build — a digest change ends it, and the digest assertion is the check — or a product identity for `Instinct™ Go` | [findings-log/2026-11-11-area-av-portal-device-table/FINDINGS.md] | #223 |
 | AO — is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at? | 2026-11-11 | **Closed POSITIVE on the key question, and the answer splits in two.** The five tails the area was minted for, on both hosts, ten cells, one observation each: `android/3.5`, `android/3.7`, `android/3.8` **carry** `Auth0SSOConfiguration` on **all three** of their `CP[]` entries on `clcloud.minimed.com` and `clcloud.minimed.eu`; `android/3.9` and `android/3.10` **carry it on neither of their two entries** on either host — so the key is present on `3.5`/`3.7`/`3.8` and absent on `3.9`/`3.10` **in the five tails this pass measured, on two hosts, ten cells in total**. **The second result narrows the original code finding and is a different population from key absence:** the selector is `cpEntry.UseSSOConfiguration ?? 'Auth0SSOConfiguration'`, so the right operand is reachable only where the selector is **absent** while the Auth0 key is **present** — and in all **67 `CP[]` entries** area AO (31) and area AH (36) measured between them, at base `v13` on three hosts, the two keys appear **together or not at all**: **0 entries** carry one without the other, and every present `UseSSOConfiguration` holds the literal `Auth0SSOConfiguration` (OBSERVED). **INFERRED:** the `??` right operand is therefore dead on every cell measured so far. **Controls reproduced first, both passed:** positive `3.6` → `200`, key present **3 of 3** entries; certainly-absent `zz-ao-absent-3141` → `200`, key present **0 of 2** (a `200`, consistent with AA's echo-not-validation result, so it is read as a key-membership control and not a refusal control). **Kept apart as the close condition demands:** the guard's **runtime inertness is NOT established** — key presence is necessary and not sufficient, and whether a client on such a cell raises a *named* `NoAuth0SSOConfigurationError` or fails unnamed later at the data call is a property of `selectAuth0ConfigUrl()`'s caller in `carelink-bridge`, which this repo does not run and no `GET` can observe. `docs/03`'s "every version 3.4 → 5.0" stays refuted and is neither restored nor widened; what is added is that the key **is** on the pin's three near neighbours, so a bump to `3.5`/`3.7`/`3.8` would not be stopped by key absence while a bump to `3.9`/`3.10` would land on a keyless entry (OBSERVED for presence; consequence INFERRED). **12 of a 12 cap**, 0 unspent, GET only, `sleep 2.5` inside the per-host `flock`, **0 failures, 0 retries**; spacing floor **2.844 s** (`.com`, 6 gaps) / **2.577 s** (`.eu`, 4 gaps) on the ledger clock, **0 of 10 gaps under 2.5 s**, totals checked against `sum(rows_per_host − 1)`; kernel body-mtime oracle **live** (12 distinct mtimes) and reads **2.842 s** / **2.576 s**, 0 sub-2.5 s. Bodies byte-identical across the two hosts for all five tails once the echoed tail is erased, so ten cells are five documents seen twice. **No pin added** — 5 requests per PR gate and per weekly sweep to guard a boolean, and `docs/09` §4 makes widening a gate a maintainer decision. Successor: **BE**, whether the co-presence is a `v13` property or holds across the base axis | [findings-log/2026-11-11-area-ao-adr-pin-guard/FINDINGS.md] | lane lao, no claim issue |
 | DP — what pump data is on the wire that the bridge discards? | 2026-11-11 | **Positive: the pump-data parser is entirely in one lazy chunk, and both schema gaps the repo called "blocked on a real 780G account" are recoverable at zero requests.** 21 of 24 pump-data tokens are **0 in the eager patient bundle** and present in lazy chunk `6746` — `therapyAlgorithmState` 5/0, `autoModeShieldState` 3/0, `plgmLgsState` 2/0, `lastAlarm` 29/0, `activeInsulin` 3/0, `reservoirRemainingUnits` 2/0, `medicalDeviceBatteryLevelPercent` 4/0, `sensorState` 15/0. **`therapyAlgorithmState` carries two disjoint vocabularies, 7 tokens:** `autoModeShieldState` in `{AUTO_BASAL, SAFE_BASAL, FEATURE_OFF}` (3), `plgmLgsState` in `{FEATURE_OFF, REFRACTORY_PERIOD, MONITORING, SUSPEND_FIRED_PLGM, SUSPEND_FIRED_LGS}` (5) — the second is the Low-Glucose-Suspend state, and its `SUSPEND_FIRED_*` members mean delivery has stopped. **The alarm-code normalisation table is published, at chunk-byte 84476: 73 source codes collapse to 19 name keys** (`002` absorbs 39, `024` 7, `037` 6, `062` 4, `007`/`011` 2 each, 13 singletons), with `00-1` and `121` suppressed outright at byte 87622. **This refutes `docs/10`'s standing "not published on any unauthenticated surface" negative** — that row probed 28 route *names*; the vocabulary is published as *data* in the client, keyed on the code's value, which is why searching for `alarmCode` found 0. The same correction applies to area P, which read the portal bundles where `therapyAlgorithmState` is genuinely 0. NOTE: **nothing is observed on the wire** — both field sets are read from the client's own parser, so the class is OBSERVED-of-source, not OBSERVED-of-response; and the 211-chunk corpus was **not** swept for pump fields, so the zeros are scoped to the eager bundle. 2 of a 2 cap; eager-bundle digest reproduces the pinned `0fb4fbd4…` exactly. Successor **BD** [findings-log/2026-11-11-area-dp-pump-data-plane/FINDINGS.md] | #224 |
