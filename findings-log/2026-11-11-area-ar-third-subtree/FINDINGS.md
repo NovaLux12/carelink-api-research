@@ -258,10 +258,13 @@ so the figures stay auditable without it, and `probe.sh` does not need it (it re
 `<repo>/.loop/ar-scratch`) for clock B; with the scratch dir gone it reports clock B **not live**
 and claims one clock, which is the correct degradation rather than a silent failure.
 
-## 9. Successor — **AY**
+## 9. Successor — **BC**
 
-Minted as **AY** in `docs/11` at this head (`origin/main` was at `73d2df0`; `AY` was free there and
-still free at commit time). Two halves, because the ledger's own answer splits:
+Minted as **BC** in `docs/11` at this head. It was first written as `AY` — that letter was free at
+`origin/main` when this lane started (`73d2df0`) and free at its first commit, but four sibling
+lanes in the same round each minted `AY` independently, so it was renamed by merge order. The
+`AY` on the page now belongs to a different area. Two halves, because the ledger's own answer
+splits:
 
 - **(a) the mechanism** — is the `configuration` exception a mounted handler whose own method
   filter answers before route resolution, or a rewrite that special-cases that one prefix? Area AN
