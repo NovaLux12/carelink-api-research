@@ -27,6 +27,14 @@ this route exists and the build does not name it" is exactly the kind of
 disagreement this pass is supposed to surface — but it is counted separately so
 it can never be mistaken for a derived route.
 
+RE-RUN LIMIT — stated once, here. This script CANNOT be re-run from a clean clone. It
+needs the eager bundle as argv[1], and that bundle is fetched into `.loop/aq-assets/main.js`,
+which `.gitignore` excludes (`.loop/`), so it is not in the repository. `derive.txt` records
+the bundle's byte count and sha256 (`2a7fa8e7…`), so the figures below stay auditable without
+it, and `probe.sh` re-fetches the bundle as its first request if a re-run is wanted. Nothing
+else this script reads is uncommitted: the chunk corpus is
+`findings-log/2026-10-14-area-k-clinic-controlflow/route-delta.json`.
+
 Usage:  derive.py <eager-bundle> <chunk-route-json> <claimed-set> <out-txt> <out-set>
 Exit:   0 = derivation completed (agreement or not; see the verdict line)
         2 = no `hcp/patients` literal in the eager bundle at all
