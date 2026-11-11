@@ -3825,7 +3825,7 @@ axis has assumed and none has tested.
 
 ---
 
-### AY. Is the `/hcp/configuration/` 405 exception a *mount*, and does `hcp/patients/` answer an absent child at **depth 2** the way it does at depth 1?
+### BC. Is the `/hcp/configuration/` 405 exception a *mount*, and does `hcp/patients/` answer an absent child at **depth 2** the way it does at depth 1?
 
 **What is known (OBSERVED).** Area AR measured an absent child under three sibling subtrees the
 shipped clinic build names — `/hcp/user/`, `/hcp/clinics/`, `/hcp/reports/` — and every one
