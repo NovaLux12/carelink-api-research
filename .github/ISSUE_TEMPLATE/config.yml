@@ -13,7 +13,7 @@ contact_links:
     # python3 scripts/research-checks.py counts ^### [A-Z]{1,2}. headings and checks
     # that the `about:` line below agrees with the page. No figure is repeated here on
     # purpose: a count written into a comment is a count that drifts.
-    about: 9 open areas (AO, AT, AU, AV, AW, AZ, BA, BB, BC) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+    about: 10 open areas (AO, AT, AU, AV, AW, AZ, BA, BB, BC, BD) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
     about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.
