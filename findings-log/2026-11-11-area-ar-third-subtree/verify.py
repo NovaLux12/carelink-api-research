@@ -150,8 +150,12 @@ print(f"  under 2.0 s: {len(under20)}  {[round(x,3) for x in under20]}")
 print(f"  impossible negative DURATIONS (t_done < t_sent): {neg if neg else 'none'}")
 
 print("\n== 6. clock B — kernel body mtimes, with a liveness proof ==")
-scratch = os.environ.get("AR_SCRATCH",
-                         "/home/jack/projects/carelink-api-research/.loop/ar-scratch")
+# Repo-relative by default: an absolute path here would put a machine path into a
+# committed file, which AGENTS.md §7 forbids. Resolved against the findings dir's
+# grandparent, so the script runs from a clean clone with the scratch in .loop/.
+_here = os.path.dirname(os.path.abspath(__file__))
+_repo = os.path.abspath(os.path.join(_here, "..", "..", ".."))
+scratch = os.environ.get("AR_SCRATCH", os.path.join(_repo, ".loop", "ar-scratch"))
 bodies = []
 for r in rows:
     p = os.path.join(scratch, r["tag"] + ".b")
