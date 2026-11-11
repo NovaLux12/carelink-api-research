@@ -8,13 +8,13 @@ contact_links:
     about: Evidence classes, the never-publish rules, and the traps.
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
-    # 5 open + 38 closed, computed, not inherited. K closed 2026-10-16; A–Z all closed
+    # 5 open + 39 closed, computed, not inherited. K closed 2026-10-16; A–Z all closed
     # (`AP` closed by claim #197 and `AQ` minted by the same pass — measured, never
     # inherited; re-run python3 scripts/research-checks.py rather than trusting this line).
     # Successors now mint past Z as two-letter ids (AA, AB, …) — see
     # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
     # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
-    about: 5 open areas (AL, AM, AN, AO, AQ) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+    about: 5 open areas (AM, AN, AO, AQ, AR) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
     # (2 open + 33 closed as of 2026-11-10; `AD` minted by lane sl1 and closed by claim #164,
     # `AB` closed by this PR, `AG` minted by the pass that closed `AB`, `AC` closed by
     # claim #168, `AE` closed by claim #161, `AF` closed 2026-11-10, `AH` closed by

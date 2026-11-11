@@ -3602,7 +3602,7 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 38 closed**
+**The maintainer decision the paragraphs above deferred has been taken.** **5 open plus 39 closed**
 stand today (`AL` open — the `/hcp/configuration/` 405 across every host that mounts it;
 `AM` minted 2026-11-10 by the PR that closed `AK`, `AK` closed 2026-11-10 by claim #183,
 `AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
@@ -3825,44 +3825,40 @@ axis has assumed and none has tested.
 
 ---
 
-### AL. Is the `/hcp/configuration/` 405 a handler-level constant on **every** host that mounts it?
+### AR. Does the `/hcp/configuration/` 405 constant extend to a **third** subtree under `/hcp/`?
 
-**What is known.** On `carelink.medtronic.com` and `carelink.medtronic.eu`, a path that
-certainly does not exist — `zz-ag-absent-8713`, verified 0 `git grep` hits repo-wide —
-returns **405 with `Allow: POST, OPTIONS`**, byte-identical to the real POST-only route
-`/hcp/configuration/application`, while `/hcp/zz-ag-absent-8713` returns a genuine
-**404** and `/zz-ag-absent-8713` returns the **5518 B SPA fallback**
-[source: findings-log/2026-11-10-area-ag-allow-vs-acam/FINDINGS.md §2] (OBSERVED). So the
-405 is scoped to the `/hcp/configuration/` subtree on those two hosts, and `Allow` there
-is a **subtree constant**, not a register of a route's methods — refuting area AG's own
-INFERRED assumption (OBSERVED boundary, INFERRED cause).
+**What is known.** On all four clinic hosts, an absent path under `/hcp/configuration/` answers
+**405 + `Allow: POST, OPTIONS`** — 4 of 4, identical status, byte count, `Allow` value and
+`Server` string — while an absent path one level up, under `/hcp/`, answers a genuine **404**
+with **no `Content-Type` header at all**
+[source: findings-log/2026-11-11-area-al-405-all-hosts/FINDINGS.md] (OBSERVED; the
+handler-vs-configuration reading is INFERRED). So `405 + Allow` there carries **no information
+about a route's existence**, and area AG's refutation of its own assumption is a property of
+the handler rather than of two deployments.
 
-**What is missing.** The boundary was measured on **two** hosts. `carelink-support.medtronic.com`
-returned 405 + `Allow` on both the real route and the absent path, but its root and `/hcp/`
-boundary cells were not run (cap), and **`carelinkhp.minimed.eu` — the baseline deployment
-that `AGENTS.md` §10 says not to re-run for existence — was never tested at all.** If the
-405 is a property of the handler, every host that mounts it should reproduce it for an
-absent child path; if it is a property of one deployment's configuration, it should not.
+**What is missing.** The constant has been measured on **one** subtree. `hcp/patients/` is
+being tested in this run (area **AQ**), which will say whether the constant reaches a second
+subtree — but two points do not establish a pattern, and the *value* of `Allow` has never been
+compared across subtrees. If `hcp/patients/` answers `Allow: GET, POST, OPTIONS` where
+`hcp/configuration/` answers `Allow: POST, OPTIONS`, then the constant is **per-subtree**, and
+`Allow` would be telling you something after all — just not about the individual route.
 
-**Blocker:** none for the probe — this is four absent-path cells per host on hosts already
-in the corpus. The blocker is **scope discipline**: `carelinkhp.minimed.eu` is the recorded
-baseline and §10 is titled "Do not re-run", so a pass must state that it is testing the
-*handler's* behaviour with a path that cannot exist, **not** re-deriving any known verdict,
-and must not re-probe any settled path.
+**Blocker:** a third subtree whose route literals are **recorded in shipped code** rather than
+guessed. `/hcp/configuration/` and `hcp/patients/` are both derived from the portal bundles;
+a third must be derived the same way. If AQ finds none, this area is blocked on a bundle
+re-read, not on a request budget.
 
-**Closes when:** for each of the four portal hosts, `/hcp/configuration/zz-<fresh>-absent`
-is requested once and its status + `Allow` recorded beside a same-host `/hcp/zz-<fresh>-absent`
-404 control and a root-level 5518 B control. **A negative counts**: if `carelinkhp` answers
-404 for the absent child path while `carelink.medtronic.*` answer 405, the constant is
-per-deployment and AG's boundary is a local fact rather than a family property — and that
-is the more interesting result.
+**Closes when:** a third `/hcp/<subtree>/<absent>` cell is requested on at least two hosts,
+beside the same-host `/hcp/<absent>` 404 control and the `/hcp/configuration/<absent>` 405
+reference, and its status + full `Allow` value are recorded. **A negative counts**: if the
+third subtree answers 404 instead of 405, the constant is scoped to `/hcp/configuration/` after
+all and AL's four-host invariance is a coincidence of one subtree — which would be the more
+surprising and more useful result.
 
-**Assumptions (INFERRED):** that the 405 is produced by a handler mounted at
-`/hcp/configuration/` which answers before route resolution — consistent with the observed
-boundary and with the byte-identical response, but the mechanism was never observed, only
-the boundary; and that a fresh absent name will not accidentally collide with a real route,
-which is why the name must be checked with `git grep` and the pass must use a new token
-rather than reusing `zz-ag-absent-8713`.
+**Assumptions (INFERRED):** that a subtree boundary is a property of how Apache mounts a
+handler, so a third mounted subtree should reproduce the shape; and that an absent path is the
+right probe for it, which holds only where the subtree is genuinely handled rather than
+rewritten.
 
 ### AN. Does the 5518 B fallback stop at `/hcp/` because of a mount, or because `/hcp/` holds a handler of its own?
 
@@ -4025,6 +4021,7 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| AL — is the `/hcp/configuration/` 405 a handler-level constant on **every** host that mounts it? | 2026-11-11 | **Positive, on all four hosts, and it cost ZERO requests — the answer was already committed.** `carelink.medtronic.com`, `carelink.medtronic.eu`, `carelink-support.medtronic.com` and **`carelinkhp.minimed.eu`** each answer `/hcp/configuration/<absent>` with **405, 0 B, `Allow: POST, OPTIONS`** and `Server: Apache/2.4.62` — identical on all four — while `/hcp/<absent>` answers a genuine **404, 0 B, no `Content-Type`** on all four [source: findings-log/2026-11-10-area-ak-portal-spa-fallback/results.jsonl seq 3/4, 8/9, 13/14, 18/19]. So the constant is a property of the **handler**, not of any one deployment's configuration (OBSERVED for the invariance; INFERRED for the handler reading). **Area AK had already measured the one cell AL was minted to buy** — `carelinkhp`'s `/hcp/configuration/` absent path, seq 19 — for a different question, so AL closes without a request and `carelinkhp` is never re-probed (§10 respected). **What it settles:** `405 + Allow` under `/hcp/configuration/` carries no information about a route's existence — it is emitted for a path that cannot exist, so any pass reading it as "route present, wrong method" is reading a subtree constant. Area AB's six-route verdicts are unaffected: the header is not false, it is merely not discriminating. **What it does not settle:** whether the constant extends to sibling subtrees (successor **AR**, with `hcp/patients/` tested as **AQ** this run), or any mechanism (area **AN**). **0 of a 0 cap**, no request, no spacing question, no failures — the second area in two runs to close at zero requests by reading a committed ledger instead of re-deriving it | [findings-log/2026-11-11-area-al-405-all-hosts/FINDINGS.md] | #194 |
 | AI — what do `SKU-78961-01` … `SKU-78968-01` map to, and are they in the patient document at all? | 2026-11-10 | **Positive on presence, negative on naming, and the range notation in `docs/05` was the defect.** The patient family map's `INSTINCT` row holds **13** `SKU-NNNNN-01` codes, not the 9 the portal builds carry — so of the **76** integers in `78893…78968`, **13** are codes and **63** are skipped, and the row is an **enumeration, not a span**. The **tail splits 4/4**: `78963`, `78964`, `78965`, `78968` are **present** in **both** patient documents; `78961`, `78962`, `78966`, `78967` are **absent** from both. **What they map to is the family `INSTINCT` and no product name** — neither patient document names *any* `SKU-` string, and the portal device table that draws the `Instinct™ Sensor` / `Instinct™ Go` split **stops at `78960`**, so no source held here extends it and none is invented. **This reverses area G's direction:** G read the 9 portal SKUs against a wider recorded range and implied the patient side was smaller; it is **larger**, and the four in the difference are exactly the tail codes — the portal table is the incomplete side again, the same shape as `MMT-8600`/`MMT-8601`. **Method stated because the method is the choice:** two key-addressable documents fetched **whole** per host (`personal.device.family.to.model.mapping`, `personal.common.core.report.generation`) and scanned locally at **zero** further requests — a per-SKU GET would need an `…<key>.<SKU>` sub-key grammar recorded **nowhere** in this repo, i.e. wordlist fuzzing, and 8 probes on one host could not produce a two-table set difference across three deployments. **12 of a 16 cap**, 4 unspent, GET only, no POST/token/cookie/auth/wordlist; 6 of 6 controls passed **first on every host** (absent `zzz.not.a.real.key.zzz` → **404, 0 B, `text/vnd.a`**; live `logbook.supported.entry.types` → **200, 281 B, `7f0a5bb4…`**, reproducing area E seq 2/78 in full); **no deployment split** — one digest per document across all three hosts, the family map reproducing area E seq 40/116 in full (`ae70bde0…`, 3470 B) and its row **byte-identical** to the 2026-10-13 committed row. Measured **same-host spacing floor 2.591 s** by the kernel body-mtime oracle (9 gaps, **0 under 2.5 s**); ⚠ the `t_sent`/`t_done` series reads 1.899 s with one negative duration (seq 6 `t_queued` before seq 5 `t_done`) — the known corrupt-`t0` class `docs/09` §4 records, **no cause asserted**. ⚠ **A body-size drift found and not explained:** the report document reads **9470 B `ef92e9f3…`**, not area E's **10937 B `2f918b71…`**, on all three hosts — while its 236-entry list is **set- and order-identical** to the 2026-11-03 committed capture and its five top-level keys are unchanged, so a serialisation change and a content change are **not separable** from the bytes kept. Side-finding at zero requests: **`MMT-5420`** (the portal's `"Instinct™ Sensor"`) is in **no** family row but **is** in the report list at index 102, so the naming table is not derived from the family map in either direction. **Not claimed:** a name for the four present tail codes (a guess), or that absence from these two documents is absence from every Medtronic surface | [findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md] | #181 |
 | AG — does `Allow` agree with `access-control-allow-methods` on the same route, and does area N's warning generalise? | 2026-11-10 | **Negative on the title question — no response ever carries both — and a control refuted its own premise, which is the finding.** **0 of 28 live cells and 0 of 2,730 committed ledger rows** carry `Allow` and `ACAM` together. The two headers come from **different server stacks**: portal hosts run `Apache/2.4.62` and emit `Allow` (27 rows) with `ACAM` **0 of 1,700**; cumulus hosts run API Gateway and emit `ACAM` (56 rows) with `Allow` **0 of 248**. They are disjoint by design on both families measured. **The certainly-absent control was not absent:** `/hcp/configuration/zz-ag-absent-8713` (0 `git grep` hits repo-wide) returned **405 + `Allow: POST, OPTIONS`, byte-identical to the real POST-only route `/hcp/configuration/application`** — so `Allow` on this family does **not** discriminate "route exists, wrong method" from "route does not exist", and **area AG's own INFERRED assumption (that `Allow` comes from a route's registered methods) is refuted, not merely unestablished.** A recorded cap revision (24 → 28) bought the boundary: `/zz-ag-absent-8713` → **200, 5518 B** (the SPA fallback, on hosts where `AGENTS.md` §7 does not document it — successor **AK**), `/hcp/zz-ag-absent-8713` → **404**, `/hcp/configuration/zz-ag-absent-8713` → **405 + Allow**. So the 405 is scoped to the `/hcp/configuration/` **subtree** and `Allow` there is a **subtree constant**. **Area N's warning generalises in both directions:** neither header is a method register where it appears. Controls: portal known-live → 412 on 3 of 3 (the recorded `X-System-ID` gate); cumulus known-live → 401, 36 B, digest `d551247201fc8fc2` on 3 of 3; cumulus absent → 403, 42 B, digest `f249b63cb2fcb66b…`, reproducing the repo's published no-route digest in full on 3 of 3. **28 of a 28 cap**, GET + empty-body OPTIONS only, 6 hosts, no POST/token/auth/wordlist; `t_sent` spacing **22 gaps, min 1.894 s, median 2.941 s, 2 under 2.5 s, 1 under the 2.0 s floor, 0 negative gaps** (⚠ **3 negative response durations** — seq 4 −0.749 s, 7 −0.664 s, 11 −0.189 s; the earlier "0 negative" conflated gaps with durations, corrected 2026-11-10) — the sub-floor reading disclosed, **no cause asserted** (the known corrupt-`t0` class, `docs/09` §4), with no kernel-mtime oracle available because the bodies sat in a gitignored scratch dir. **Not established:** that no server anywhere emits both (two families measured); that the 405 constant holds on `carelink-support.medtronic.com` (cells not run, cap) or `carelinkhp` (never tested — successor **AL**); or any mechanism for the 405, only its boundary. Not a disclosure: every cell is an unauthenticated GET or empty-body OPTIONS on a public host | [findings-log/2026-11-10-area-ag-allow-vs-acam/FINDINGS.md] | #179 |
 
