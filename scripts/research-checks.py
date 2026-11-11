@@ -302,6 +302,30 @@ def check_prose_counts():
         else:
             ok(f'docs/11:{i} prose count {n} + {c} agrees with the page')
 
+    # Every area id must be UNIQUE across headings and closed rows. Letters are
+    # never reused, and a duplicate makes every cross-reference on the page
+    # ambiguous — "area AQ" then names two different questions, and a reader (or
+    # a lane) cannot tell which. This shipped once: an open `### AQ.` heading and
+    # a closed `| AQ —` row described two unrelated areas for a full round, and
+    # every count check stayed green because the totals were correct.
+    open_ids = re.findall(r'^###\s+([A-Z]{1,2})\.\s', text, re.M)
+    closed_tail = text[m.start():]
+    closed_ids = re.findall(CLOSED_ROW_ID, closed_tail, re.M)
+    counts = {}
+    for ident in open_ids + closed_ids:
+        counts[ident] = counts.get(ident, 0) + 1
+    dups = {k: v for k, v in counts.items() if v > 1}
+    if dups:
+        detail = ', '.join(f'{k} ×{v}' for k, v in sorted(dups.items()))
+        where = {k: ('open' if k in open_ids else '') +
+                    ('+closed' if k in closed_ids else '') for k in dups}
+        fail(f'docs/11: area id(s) used more than once — {detail} '
+             f'({", ".join(f"{k}:{v}" for k, v in sorted(where.items()))}). '
+             f'Letters are never reused; a duplicate makes every cross-reference '
+             f'ambiguous. Re-letter the later mint and update config.yml')
+    else:
+        ok(f'docs/11: {len(counts)} area ids, all unique across headings and closed rows')
+
 
 def check_findings_log_cites():
     """Cites inside findings-log/ must resolve — or say why they cannot.
