@@ -3602,7 +3602,7 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **9 open plus 46 closed**
+**The maintainer decision the paragraphs above deferred has been taken.** **9 open plus 47 closed**
 stand today (`AL` open — the `/hcp/configuration/` 405 across every host that mounts it;
 `AM` minted 2026-11-10 by the PR that closed `AK`, `AK` closed 2026-11-10 by claim #183,
 `AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
@@ -3614,7 +3614,7 @@ claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` c
 `^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 
-**Amendment (2026-11-11, from area AY's close).** The count moved to **9 open plus 46 closed**, and
+**Amendment (2026-11-11, from area AY's close).** The count moved to **9 open plus 47 closed**, and
 one thing about it is disclosed rather than smoothed over.
 
 **`AQ` was minted twice.** The `hcp/patients/` area **claimed it first (issue #199, 01:05:47)**
@@ -3624,6 +3624,16 @@ exactly the collision the "Letter allocation" note above warns about, caught thi
 closing pass. Under merge order the `hcp/patients/` area keeps `AQ` and the `OPTIONS` one is
 **`AY`**, so the table carries one `AQ` row and one `AY` row and no letter appears twice. Areas AR
 and AS mean the `hcp/patients/` pass when they say "area `AQ`".
+
+
+**Amendment (2026-11-11, from area AO's close).** The count moved to **9 open plus 47 closed**.
+Area `AO` closed into the table and minted `BD` as its successor, so the **open** figure is
+unchanged by construction while the **closed** row count rose by one — the half a reader can
+check against the table. Both figures above are quoted from
+`python3 scripts/research-checks.py` at this head, not computed here. ⚠ The figure in the
+`AY` amendment immediately above is **updated in place**, as that amendment's own last bullet
+requires of every minting pass — it is the page's live count sentence, not a record of what the
+count was when `AY` closed.
 
 **Why open did not fall.** Closing `AY` removed one `###` heading and minting `AZ` added one, so
 **9 open** is unchanged while **closed** rose by one to **43**. A closing pass that mints a
@@ -3800,7 +3810,7 @@ carries about the direct six is a `carelinkhp` or `.eu` single-deployment readin
 this pass **confirms** and does not move. Recorded in the log's verdict section rather
 than edited into a page whose subject is a different subtree.
 
-### AO. Is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at — and which cells are those?
+### AO (closed 2026-11-11) Is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at — and which cells are those?
 
 **What is known.** `docs/03` §3 carried a code finding that
 `selectAuth0ConfigUrl()`'s `const key = cpEntry.UseSSOConfiguration ?? 'Auth0SSOConfiguration'`
@@ -3843,7 +3853,92 @@ on none, which is consistent with a per-entry field but does not prove the granu
 (3) that a cell's key set is stable on the timescale of one pass, which every pass on this
 axis has assumed and none has tested.
 
+#### Closing note (2026-11-11) — CLOSED, and the answer splits in two
+
+**Closed by** `findings-log/2026-11-11-area-ao-adr-pin-guard/FINDINGS.md`. **12 of a 12 cap**
+(0 unspent), `GET` only, `sleep 2.5` inside the per-host `flock`, controls first.
+
+**The five tails this area was minted for, answered on both hosts** (OBSERVED, ten cells,
+one observation each): `android/3.5`, `android/3.7` and `android/3.8` **carry** a
+`Auth0SSOConfiguration` key on all three of their `CP[]` entries on `clcloud.minimed.com` and
+`clcloud.minimed.eu`; `android/3.9` and `android/3.10` **do not carry it** on either host, on
+either of their two entries. So the key is present on `3.5`/`3.7`/`3.8` and absent on
+`3.9`/`3.10` — in the five tails this pass measured, on two hosts, ten cells in total.
+
+**Controls, reproduced before any question cell:** positive `3.6` → `200`, key present 3 of 3
+entries; certainly-absent `zz-ao-absent-3141` → `200`, key present 0 of 2. The absent control
+returned `200` rather than a `403`, which is consistent with AA's finding that the tail is
+echoed and not validated; it is read as a key-membership control, not a refusal control.
+
+**A second result, and it is the one that narrows the original code finding.** The selector is
+`cpEntry.UseSSOConfiguration ?? 'Auth0SSOConfiguration'`, so the right operand is reachable
+only where `UseSSOConfiguration` is **absent** while the Auth0 key is **present**. In all
+**67 `CP[]` entries** this pass (31) and area AH (36) measured between them, at base `v13` on
+three hosts, the two keys appear together or not at all — **0 entries** carry one without the
+other, and where both are present `UseSSOConfiguration` holds the literal string
+`Auth0SSOConfiguration` (OBSERVED). **INFERRED:** the `??` right operand is therefore dead on
+every cell measured so far, which is a *different* population from "the key is absent" and is
+not what `docs/03`'s paragraph described.
+
+**What this does NOT establish, in one sentence as the close condition requires:** the guard's
+**runtime** inertness is **not** established by this pass, because (a) key presence is a
+necessary and not a sufficient condition for the failure mode, and (b) the behaviour on such a
+cell — a named `NoAuth0SSOConfigurationError` or an unnamed failure later at the data call — is
+a property of `selectAuth0ConfigUrl()`'s caller in `carelink-bridge`, which this repository
+does not run and no `GET` can observe.
+
+**Effect on `docs/03` §3.** The claim that the key exists on every version 3.4 → 5.0 stays
+refuted; this pass neither restores nor widens it. What it adds is that the key **is** present
+on the three near neighbours of the pin, so a pin bump to `3.5`, `3.7` or `3.8` would not be
+stopped by key absence, while a bump to `3.9` or `3.10` would land on an entry with no such key
+(OBSERVED for presence; the consequence is INFERRED).
+
+**Assumption (2) above was partly tested and holds for `3.6`:** the key is present on all three
+of its entries and on none of the keyless documents' entries, which is consistent with — and
+does not prove — a per-entry field. **Assumption (3)** is untouched: every cell here is one
+observation. **No pin added** — a five-cell pin costs 5 requests on every PR gate and per
+weekly sweep to guard a boolean, and `docs/09` §4 makes widening a gate a maintainer decision.
+
+**Successor minted: `BD`** — the co-presence invariant was measured at base `v13` only.
+
 ---
+
+### BD. Is the `Auth0SSOConfiguration` / `UseSSOConfiguration` co-presence a **v13** property, or does it hold across the base axis too?
+
+**What is known (OBSERVED).** At base `v13`, across `clcloud.minimed.com`,
+`clcloud.minimed.eu` and `clcloud-trials.minimed.com`, **67 `CP[]` entries** — 31 from area AO,
+36 from area AH — show the two keys strictly together: `3.5`, `3.6`, `3.7` and `3.8` carry both
+on every entry, while `3.4`, `3.9`, `3.10`, `4.0`, `4.1`, `4.2`, `5.0` and three fabricated tails
+carry neither. **0 entries** carry one without the other, and every present
+`UseSSOConfiguration` holds the literal `Auth0SSOConfiguration`
+[source: findings-log/2026-11-11-area-ao-adr-pin-guard/FINDINGS.md §4]. So the `??` right
+operand is unreachable in that population (INFERRED, from the operator's semantics).
+
+**What is missing.** Every one of those 67 entries is at base **`v13`**. The base axis is not
+independent of the tail axis in this repo's records: at `-trials` base `v6` the tail gates
+nothing and four tails collapse to one document, and `v11`/`v2` are recorded bases that serve
+different documents entirely [source:
+findings-log/2026-10-17-area-aa-appversion-axis/FINDINGS.md §3b]. **A document served at
+another base could carry the Auth0 key without the `UseSSOConfiguration` selector** — which is
+the one state that would make the `??` fallback live — and nothing measured so far rules that
+out.
+
+**Blocker:** none on the request side — **≤10 requests**, GET only, no token, no cookie, no
+auth, no wordlist: at least 3 bases × 2 tails × 2 hosts, plus **two controls on the host swept
+first** (a `v13` cell whose key set is already recorded, and a fabricated tail).
+
+**Closes when:** co-presence is classified at three or more bases on two hosts, with the `v13`
+control reproduced first, and the finding states — keeping the two halves apart — whether the
+invariant is a base-independent property of the document family or an artefact of `v13`. **A
+negative counts:** "the keys co-vary at every base measured" closes it as firmly as finding a
+lone key. ⚠ **The client half stays blocked exactly as in `AO`**: whether a lone key makes the
+guard inert *at runtime* needs a `carelink-bridge` run, not a `GET`.
+
+**Assumptions (INFERRED):** that a base serving a different document is a place a different
+`CP[]` schema could appear, which the `v2`/`v11`/`v13` split makes plausible but does not
+establish; and that a 3-base sample can distinguish "invariant" from "coincidence at `v13`",
+which it cannot in general — a positive at one other base is evidence of non-invariance, while
+a negative at every base probed is bounded by the bases probed.
 
 
 ### AZ. Is the per-route `OPTIONS` resolution **stable**, and which mechanism produces the preflight?
@@ -4233,6 +4328,7 @@ being superseded — never silently. Letters are not reused.
 | S-L1 — the `cluster.idx`-level "is this crawl served at all" instrument, and the verdict on `CC-MAIN-2014-23` | 2026-10-19 | **Closed on its close condition, and the target retired on the SERVED side.** The instrument is committed (`servedness.py`, `pass`/`classify`/`selftest`) and answers served/unserved for any named crawl in **one ranged read**, classified correctly on both controls (`CC-MAIN-2022-27` and `CC-MAIN-2024-42` both **SERVED**) against the absent-id oracle (`CC-MAIN-9999-99` → `404 NoSuchKey`). **`CC-MAIN-2014-23` is SERVED** — `206`, `Content-Range: bytes 0-8191/153 902 243` — and its `minimed.eu` `404` now sits behind a **`200`** control **on that same crawl** (**1 785 B** of `google.com` records), so the standing **indeterminate cell retires as served-but-empty, NOT as "unservable"**; `AGENTS.md` §7 records `index.commoncrawl.org` TLS-dropping from some hosts, so a connection-level failure is a statement about *this box* and discharges nothing. **15 of a 15 cap**, GET only, `data.commoncrawl.org` (11) + `index.commoncrawl.org` (4), **0 to any Medtronic host**, `t_sent` floor **3.537 s** (0 gaps under 3.5 s), **0 retries** at `E[N]` 1.00. **The locate half is the recorded negative: `UNCONVERGED` on both controls** at a 3-page budget, so the control gate withheld every family verdict and the target's locate never ran — `UNCONVERGED` is not a negative. ⚠ **Corrects claim #152's own descriptor**: the readable-absence control is **`CC-MAIN-2024-42`** (area M row 25 `200` / row 45 `404`), **not** `CC-MAIN-2024-22`, whose S-L2 row 45 is a **`200`** with 13 records — a positive-adjacent crawl. Successor: **AD**, the locate with a seed derived from the head read (**0 requests** once the instrument exists). | [findings-log/2026-10-18-sl1-cluster-servedness/FINDINGS.md] | #152 |
 | AE — is the `android/<app-version>` tail a lookup table, or a threshold? | 2026-11-10 | **Closed POSITIVE: it is a table keyed on the string, not a threshold — and the discriminator is the ORDER of the documents along the ladder, not the status line and not the document count.** **OBSERVED, 18 of a 20 cap** (2 unspent, GET only, no failures, no retries), controls **first** on each host — `v99` absent -> `403` at the corpus no-route digest `f249b63cb2fc…` on both, `v11` served -> `200` on both — measured same-host floor **3.427 s** over **16** gaps, **0** under 2.5 s. Seven tails strictly inside `(3.6,3.9)` at base `v13` on **both** hosts produce one class sequence, identical on `.com` and `-trials`: `3.61`->L, `3.65`->L, `3.7`->**C**, `3.75`->L, `3.8`->**C**, `3.85`->L, `3.89`->L, where **C** is the `v13`/carelink-v2/CP-3/109-country document (20256 B) and **L** the `v2`/v1/CP-2 one (99 countries on `.com`, 76 on `-trials`). **A threshold is a monotone step function, and a monotone step function that leaves the legacy branch at `3.65`->`3.7` cannot return to it at `3.75` — this sequence returns twice, so no MONOTONE threshold over the numeric value can produce these cells (INFERRED; the sequence it refutes is OBSERVED).** ⚠ **Bound corrected before merge, from a verifier finding:** a *union of disjoint intervals* (`[3.7,3.71) ∪ [3.8,3.81)`) is a step function of the numeric value, is not monotone, and fits all seven cells — so the refuted class is **monotone / single-boundary** thresholds, not every numeric rule; what survives is a string-keyed table **or** a non-monotone interval set, and these cells do not separate them. The current-generation entries among the strings tested are **`{3.6,3.7,3.8}`** — the row `docs/03` §3 carried for `.eu` all along, which retires the generation-step reading AA's two-endpoint sample made possible. **The echo trap held and was defeated:** all 16 `200` bodies echo the requested tail exactly once (`echo_n=1`) and the status is a constant `200` across the whole ladder, so **nothing here is readable from a status code** — the discriminator is the tail-erased digest, computed at send time on the transient body, and no raw body is committed. `3.7` and `3.8` each re-derive AA's `3.6` digest `7ad212402d7f`; the other five re-derive AA's `3.9` digests `7ac09335c7e4` / `9962b3db79b1` (OBSERVED; a **re-derivation — one source**, `§2.1`, no strength word). **A negative stated as one: the ladder found TWO classes, both already known, and NO fourth document** — the verdict rests on ordering alone, and a reader should hold exactly that. **Not measured:** membership across string forms (`3.60`, `3.700`, `3.6.0` — unobserved on this path) and completeness above `3.9`; carried to the AE successor addendum. Truncation to one decimal **is excluded** by the cells themselves (`3.75`/`3.85` -> legacy while `3.7`/`3.8` -> current). **No pin added** — the tempting `3.75`/`3.8` pair would cost 2 requests on every PR gate *and* per weekly sweep while firing on the wrong change; the change that matters is the `3.6`-class entry departing. `docs/03` §3b.5 carries the synthesis | [findings-log/2026-11-10-area-ae-appversion-tail/FINDINGS.md] | #161 |
 | AH — do the `android/4.x` discovery cells still serve cumulus v2, and is the Instinct track still reachable? | 2026-11-10 | **Closed: the OBSERVATION holds and the READING does not — and the control, not the candidates, is what decides it.** **The fallback finding comes first because it inverts the question.** The certainly-absent control `android/zz-absent-8713` and a tail above every string this axis has ever served (`99.99`, against a recorded maximum of `12.0`) both answered **`200`** and returned **the same document as all four 4.x cells** — after the echoed tail is replaced with a fixed marker, all six bodies are `cmp`-identical per host (18 104 B on `.com`, 16 368 B on `-trials`, **zero byte delta**). So **`baseUrlCumulus` `/connect/carepartner/v2` is the DEFAULT document, not a version selection**, and *"the 4.x cells return cumulus v2"* carries no more information than *"4.x is not in the table"*. **Only two tails were keyed: `3.4` → cumulus `v11`, `CP[]` 3 with **CLINICAL**, `baseUrlPde` `v2`, 109 countries; `3.6` → cumulus `v13`, `CP[]` 3 with CLINICAL, `baseUrlPde` `v3`, 109 countries** — both byte-identical across the two hosts, and `3.6` re-derives area AE's `7ad212402d7f…` exactly (the same one source). The fallback document is host-specific: 99 countries with an EU SSO entry on `.com`, 76 with a US-only entry on `-trials`. **The spike's Instinct INFERENCE is WITHDRAWN, by this pass, dated 2026-11-10** — `findings-log/cumulus-v2-spike.md:16` argued *"the cumulus-v2 shape may be the transport the Instinct-era Cumulus API rides on"* from the 4.x cells' v2 selection, and that step takes a property **every string** has as evidence about **one string**. The spike file is superseded, **not edited** (append-only). The hypothesis is **not refuted**: it now rests on the xDrip #4318 report alone, which is where it should have been recorded. The same reasoning supersedes the 2026-08-05 note that `4.1` "confirms 4.x is a distinct legacy product track" — **4.x is indistinguishable from a tail the server does not know.** **Two `docs/03` claims refuted and corrected in place:** `docs/03:164`'s *"`Auth0SSOConfiguration` key now exists on every version 3.4 → 5.0"* — measured **present on `3.6` only**, absent on `3.4`/`4.0`/`4.1`/`4.2`/`5.0` and on both fabricated tails, by CP-entry key membership rather than substring; and `docs/03:156`'s grouping of `3.4` with the v2 cells, which its own source (`PROBE-FINDINGS:63`, "3.3, 3.4 → v11, 3 regions") always contradicted. Consequence for the ADR 0002 guard: the `??` fallback has nothing to fall back to on those five cells, so the described failure mode cannot run there — the guard's inertness is **unscoped, not known**, and the five unmeasured tails (`3.5`, `3.7`, `3.8`, `3.9`, `3.10`) are carried to **AM**. **16 of a 20 cap**, GET only, `sleep 2.5` inside the per-host `flock`, **≥ 2.5 s between requests to the same host**, controls first per host, **0 failures, 0 retries**; 4 held back and unspent. The cap was never revised: 12 for the sweep + 2 for the `docs/03:164` lower bound + 2 for the fallback confirmation, both addenda recorded in `probe.sh` **before** sending. Measured same-host floor **2.962 s** (`.com`) / **2.986 s** (`-trials`) by kernel body-mtime, **0 gaps under 2.5 s on either host**; the ledger clock reads 2.399 s with **two negative durations** (seq 4, 5 — the known corrupt-`t0` class, **no cause asserted**). **No pin added** — a 4-cell pin costs 4 requests on every PR gate *and* per weekly sweep to guard a value that no client reads, since the fallback document is not a version selection. **One source** — no strength word used (`AGENTS.md` §2.1) | [findings-log/2026-11-10-area-ah-discovery-4x/FINDINGS.md] | #180 |
+| AO — is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at? | 2026-11-11 | **Closed POSITIVE on the key question, and the answer splits in two.** The five tails the area was minted for, on both hosts, ten cells, one observation each: `android/3.5`, `android/3.7`, `android/3.8` **carry** `Auth0SSOConfiguration` on **all three** of their `CP[]` entries on `clcloud.minimed.com` and `clcloud.minimed.eu`; `android/3.9` and `android/3.10` **carry it on neither of their two entries** on either host — so the key is present on `3.5`/`3.7`/`3.8` and absent on `3.9`/`3.10` **in the five tails this pass measured, on two hosts, ten cells in total**. **The second result narrows the original code finding and is a different population from key absence:** the selector is `cpEntry.UseSSOConfiguration ?? 'Auth0SSOConfiguration'`, so the right operand is reachable only where the selector is **absent** while the Auth0 key is **present** — and in all **67 `CP[]` entries** area AO (31) and area AH (36) measured between them, at base `v13` on three hosts, the two keys appear **together or not at all**: **0 entries** carry one without the other, and every present `UseSSOConfiguration` holds the literal `Auth0SSOConfiguration` (OBSERVED). **INFERRED:** the `??` right operand is therefore dead on every cell measured so far. **Controls reproduced first, both passed:** positive `3.6` → `200`, key present **3 of 3** entries; certainly-absent `zz-ao-absent-3141` → `200`, key present **0 of 2** (a `200`, consistent with AA's echo-not-validation result, so it is read as a key-membership control and not a refusal control). **Kept apart as the close condition demands:** the guard's **runtime inertness is NOT established** — key presence is necessary and not sufficient, and whether a client on such a cell raises a *named* `NoAuth0SSOConfigurationError` or fails unnamed later at the data call is a property of `selectAuth0ConfigUrl()`'s caller in `carelink-bridge`, which this repo does not run and no `GET` can observe. `docs/03`'s "every version 3.4 → 5.0" stays refuted and is neither restored nor widened; what is added is that the key **is** on the pin's three near neighbours, so a bump to `3.5`/`3.7`/`3.8` would not be stopped by key absence while a bump to `3.9`/`3.10` would land on a keyless entry (OBSERVED for presence; consequence INFERRED). **12 of a 12 cap**, 0 unspent, GET only, `sleep 2.5` inside the per-host `flock`, **0 failures, 0 retries**; spacing floor **2.844 s** (`.com`, 6 gaps) / **2.577 s** (`.eu`, 4 gaps) on the ledger clock, **0 of 10 gaps under 2.5 s**, totals checked against `sum(rows_per_host − 1)`; kernel body-mtime oracle **live** (12 distinct mtimes) and reads **2.842 s** / **2.576 s**, 0 sub-2.5 s. Bodies byte-identical across the two hosts for all five tails once the echoed tail is erased, so ten cells are five documents seen twice. **No pin added** — 5 requests per PR gate and per weekly sweep to guard a boolean, and `docs/09` §4 makes widening a gate a maintainer decision. Successor: **BD**, whether the co-presence is a `v13` property or holds across the base axis | [findings-log/2026-11-11-area-ao-adr-pin-guard/FINDINGS.md] | lane lao, no claim issue |
 
 
 ---
