@@ -1,0 +1,138 @@
+{
+  "hcp/patients/addPatient": {
+    "alias": "Ds",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/archivePatient": {
+    "alias": "ht",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/care-partner/search": {
+    "alias": "Sn",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/checkPhoneNumber": {
+    "alias": null,
+    "methods": [],
+    "note": "literal not assigned to a variable in this bundle"
+  },
+  "hcp/patients/clearPatientsFlags": {
+    "alias": "Xs",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/flagPatient": {
+    "alias": "ps",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getAllClinicArchivedPatients": {
+    "alias": "Qa",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getAllClinicUnarchivedPatients": {
+    "alias": "Da",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getInviteToPersonalSubjectPlaceholder": {
+    "alias": "Jt",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getInviteToPersonalTemplate": {
+    "alias": "Bt",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getPatient": {
+    "alias": "Hr",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/getPatientsMealProfilesAndDailyHabits": {
+    "alias": "Qn",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/linkPatient": {
+    "alias": "yr",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/otc-linking/allowed": {
+    "alias": "cr",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/otc-linking/code/email/send": {
+    "alias": "fi",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/otc-linking/code/sms/send": {
+    "alias": "Yn",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/sendInviteToPersonal": {
+    "alias": "ws",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/unFlagPatient": {
+    "alias": "ua",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/unarchivePatient": {
+    "alias": "so",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/unlinkPatient": {
+    "alias": "ma",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/updatePatient": {
+    "alias": "ra",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients/updatePatientsMealProfilesAndDailyHabits": {
+    "alias": "jn",
+    "module_len": 9391,
+    "methods": [],
+    "call_sites": 0
+  },
+  "hcp/patients": {
+    "alias": null,
+    "methods": [],
+    "note": "literal not assigned to a variable in this bundle"
+  }
+}

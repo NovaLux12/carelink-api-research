@@ -84,6 +84,36 @@ SIMPLERACC  SIMPLERACCOLID  NMX7  CC840  CC880  NMX8  INSTINCT  EAGLE
 > `"Instinct™ Sensor"` — is in **no** family row and **is** in the report list (index 102), so the
 > naming table is not derived from the family map in either direction
 > [source: findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md].
+>
+> **⚠ Corrected 2026-11-11 (area AM) — the sentence above that says "no source held here extends
+> it" was true of the corpora area AI had, and is false against the vendor's live surface. All four
+> tail codes carry a name, and it is `Instinct Sensor`.**
+>
+> The name lives behind a key-addressable route this repository had only ever *inventoried as a call
+> site*, never sent. The patient bundle carries it at byte **3374392**:
+>
+> ```js
+> getDeviceModelMapping(V){return this.http.get(`patient/configuration/system/model-mapping/${V}`)}
+> ```
+>
+> — called at byte 2165828 with the country store's code. **OBSERVED, 16 of a 16 cap, GET only**:
+> `…/model-mapping/US` → 200, 39 157 B `f0efac1d…` on `.com` **and** `.eu`; `…/GB` and `…/DE` →
+> 200, 40 105 B `7f73c467…`. In every one, `SKU-78963-01`, `SKU-78964-01`, `SKU-78965-01` and
+> `SKU-78968-01` — **and** their bare `7896x-01` forms — carry `"name": "Instinct Sensor"`,
+> `"family": "INSTINCT"`
+> [source: findings-log/2026-11-11-area-am-instinct-name-hunt/FINDINGS.md; `tail-names.tsv`;
+> `coverage-13.tsv`].
+>
+> **What that does and does not restore.** It gives the four a **display name**, not the
+> `Instinct™ Sensor` / `Instinct™ Go` split: in this document **`name` is constant
+> (`Instinct Sensor`) for all 13 family-map codes in both markets**, and the two products are
+> separated only in `features.patientListPremium` / `patientDashboard` — `Instinct` in the US copy,
+> `Instinct Go` in the EU copy, `Instinct Go` being **0 occurrences in the US body**. `MMT-5420`
+> keeps `Instinct™ Sensor` (with the trademark) in both. So the portal table's split is **not
+> reproduced** here, and **which physical SKU is `Instinct™ Go` remains unrecovered** — this page
+> states a name, and does not claim a product identity. `78961`, `78962`, `78966` and `78967` are
+> absent from this document too, which is now a **third** vendor source skipping them.
+> [source: findings-log/2026-11-11-area-am-instinct-name-hunt/FINDINGS.md].
 
 A second key of the same document corroborates the marketing name:
 

@@ -1,0 +1,88 @@
+== rows: 36  cap: 36  over cap: False ==
+== curl_exit != 0: [] ==
+== servers: ['Apache/2.4.62 (Red Hat Enterprise Linux) OpenSSL/3.5.5'] ==
+== acam values: ['(none)'] ==
+== acao values: ['(none)'] ==
+
+== CONTROLS (8) ==
+  seq  2 carelinkhp.minimed.eu            /hcp/configuration/public/pow.crm.settings     200  96B sha=a977733a53ee0d5f
+  seq  3 carelinkhp.minimed.eu            /hcp/zz-aq-absent-9157                         404   0B sha=-
+  seq  5 carelink.medtronic.com           /hcp/configuration/public/pow.crm.settings     200  97B sha=370e3bba0d28c540
+  seq  6 carelink.medtronic.com           /hcp/zz-aq-absent-9157                         404   0B sha=-
+  seq  8 carelink.medtronic.eu            /hcp/configuration/public/pow.crm.settings     200  96B sha=a977733a53ee0d5f
+  seq  9 carelink.medtronic.eu            /hcp/zz-aq-absent-9157                         404   0B sha=-
+  seq 11 carelink-support.medtronic.com   /hcp/configuration/public/pow.crm.settings     200  97B sha=370e3bba0d28c540
+  seq 12 carelink-support.medtronic.com   /hcp/zz-aq-absent-9157                         404   0B sha=-
+
+== BOUNDARY — absent child under hcp/patients/ (4) ==
+  seq  4 carelinkhp.minimed.eu            404 0B ct=(none) allow=(none)
+  seq  7 carelink.medtronic.com           404 0B ct=(none) allow=(none)
+  seq 10 carelink.medtronic.eu            404 0B ct=(none) allow=(none)
+  seq 13 carelink-support.medtronic.com   404 0B ct=(none) allow=(none)
+
+== CANDIDATES (23) ==
+  seq 14 /hcp/patients/addPatient                                 405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 15 /hcp/patients/archivePatient                             405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 16 /hcp/patients/care-partner/search                        412   0B ct=(none)                   allow=(none)
+  seq 17 /hcp/patients/checkPhoneNumber                           405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 18 /hcp/patients/clearPatientsFlags                         405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 19 /hcp/patients/flagPatient                                405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 20 /hcp/patients/getAllClinicArchivedPatients               405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 21 /hcp/patients/getAllClinicUnarchivedPatients             405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 22 /hcp/patients/getInviteToPersonalSubjectPlaceholder      404   0B ct=(none)                   allow=(none)
+  seq 23 /hcp/patients/getInviteToPersonalTemplate                404   0B ct=(none)                   allow=(none)
+  seq 24 /hcp/patients/getPatient                                 405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 25 /hcp/patients/getPatientsMealProfilesAndDailyHabits      405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 26 /hcp/patients/linkPatient                                405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 27 /hcp/patients/otc-linking/allowed                        412   0B ct=(none)                   allow=(none)
+  seq 28 /hcp/patients/otc-linking/code/email/send                405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 29 /hcp/patients/otc-linking/code/sms/send                  405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 30 /hcp/patients/sendInviteToPersonal                       404   0B ct=(none)                   allow=(none)
+  seq 31 /hcp/patients/unFlagPatient                              405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 32 /hcp/patients/unarchivePatient                           405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 33 /hcp/patients/unlinkPatient                              405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 34 /hcp/patients/updatePatient                              405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 35 /hcp/patients/updatePatientsMealProfilesAndDailyHabits   405   0B ct=(none)                   allow=POST, OPTIONS
+  seq 36 /hcp/patients                                            404   0B ct=(none)                   allow=(none)
+  status histogram: {'405': 17, '412': 2, '404': 4}
+
+== 405-constant test ==
+  absent child statuses: ['404'], all zero-byte: True
+  candidate 405 count: 17
+  candidate 404 count: 4
+  VERDICT: 405 is PER-ROUTE here — the absent child 404s, so a 405 on a candidate is evidence of a registered handler
+
+== depth check: 18 single-segment candidates ==
+  statuses at depth 1: {'405': 15, '404': 3}
+
+== the claim's 12 names, each against this pass's cell ==
+  hcp/patients                                             404
+  hcp/patients/archivePatient                              405  allow=POST, OPTIONS
+  hcp/patients/checkPhoneNumber                            405  allow=POST, OPTIONS
+  hcp/patients/getInviteToPersonalTemplate                 404
+  hcp/patients/getPatient                                  405  allow=POST, OPTIONS
+  hcp/patients/getPatientsMealProfilesAndDailyHabits       405  allow=POST, OPTIONS
+  hcp/patients/linkPatient                                 405  allow=POST, OPTIONS
+  hcp/patients/otc-linking/allowed                         412
+  hcp/patients/otc-linking/code/sms/send                   405  allow=POST, OPTIONS
+  hcp/patients/sendInviteToPersonal                        404
+  hcp/patients/unlinkPatient                               405  allow=POST, OPTIONS
+  hcp/patients/updatePatient                               405  allow=POST, OPTIONS
+
+== spacing, clock A (t_sent, re-derivable) ==
+  gaps 31  min 1.841  median 2.632  max 76.001
+  under 2.5 s: [(1.841, 8, 9), (2.229, 29, 30)]
+  under 2.0 s: [(1.841, 8, 9)]
+  impossible negative DURATIONS: [(1, 'carelinkhp.minimed.eu', -0.508), (8, 'carelink.medtronic.eu', -0.695), (29, 'carelinkhp.minimed.eu', -0.307)]
+
+== spacing, clock B (kernel body mtimes, NOT re-derivable from a clone) ==
+  bodies stat-able: 36 of 36
+  gaps 31  min 2.594  median 2.630  max 76.628
+  under 2.5 s: []
+  FLOOR ON THIS CLOCK: 2.594 s
+
+== derive.txt cross-check ==
+  eager probeable: 21   chunk-only: 1   needs-id: 15   claim-only: 1
+  candidates.txt rows: 23  (= eager 21 + chunk 1 + claim-only 1)
+  arithmetic closes: True
+  1 + 8 + 4 + 23 = 36   (cap is 36)
