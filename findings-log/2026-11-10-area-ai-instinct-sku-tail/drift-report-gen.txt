@@ -1,0 +1,14 @@
+# The report.dict body is not the 2026-10-13 size
+
+Area E recorded `personal.common.core.report.generation` at 10937 B, sha256 `2f918b71cb2889d2…` on `.com` (seq 29) and `-trials` (seq 105).
+This pass reads **9470 B**, sha256 `ef92e9f39a1709b4…` on all three hosts — a different body, recorded as a fact, no cause asserted.
+
+`reportFileNamingSupportedPumpModels` holds **236** entries here. The 2026-11-03 drift pass measured 236 and committed the list verbatim; the 2026-10-13 area H pass measured 214.
+
+Top-level keys of the document, with the type and length of each:
+
+- `deviceModelShouldBeInclude` — bool: True
+- `dualReportEnabled` — bool: True
+- `reportFileNamingSupportedPumpModels` — list, 236
+- `reportGenerationRules` — list, 9
+- `separateDevices` — list, 29
