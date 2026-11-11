@@ -1,0 +1,39 @@
+=== ledger clock (t_sent series), per host ===
+-- clcloud.minimed.com  n=7
+   seq= 1 tail=3.6             t_sent_gap=None send_duration=0.449
+   seq= 2 tail=zz-absent-8713  t_sent_gap=3.0 send_duration=0.431
+   seq= 3 tail=4.0             t_sent_gap=2.97 send_duration=0.423
+   seq= 4 tail=4.1             t_sent_gap=3.723 send_duration=-0.32
+   seq= 5 tail=4.2             t_sent_gap=2.867 send_duration=-0.145
+   seq= 6 tail=5.0             t_sent_gap=2.399 send_duration=0.45
+   seq=13 tail=3.4             t_sent_gap=93.266 send_duration=0.503
+   min gap=2.399  under2.5=1  under2.0=0  negative_durations=2
+-- clcloud-trials.minimed.com  n=7
+   seq= 7 tail=3.6             t_sent_gap=None send_duration=6.02
+   seq= 8 tail=zz-absent-8713  t_sent_gap=8.554 send_duration=0.58
+   seq= 9 tail=4.0             t_sent_gap=3.12 send_duration=0.457
+   seq=10 tail=4.1             t_sent_gap=2.995 send_duration=0.448
+   seq=11 tail=4.2             t_sent_gap=2.985 send_duration=0.474
+   seq=12 tail=5.0             t_sent_gap=3.012 send_duration=0.451
+   seq=14 tail=3.4             t_sent_gap=70.439 send_duration=0.742
+   min gap=2.985  under2.5=0  under2.0=0  negative_durations=0
+
+=== kernel body-mtime oracle (independent of the ledger clock) ===
+-- clcloud.minimed.com
+   seq= 1 c1-clcloud-minimed-com-live-3.6.b            mtime_gap=None
+   seq= 2 c2-clcloud-minimed-com-absent.b              mtime_gap=2.985
+   seq= 3 k-clcloud-minimed-com-4-0.b                  mtime_gap=2.962
+   seq= 4 k-clcloud-minimed-com-4-1.b                  mtime_gap=2.979
+   seq= 5 k-clcloud-minimed-com-4-2.b                  mtime_gap=3.042
+   seq= 6 k-clcloud-minimed-com-5-0.b                  mtime_gap=2.995
+   seq= 7 a-clcloud-minimed-com-3-4.b                  mtime_gap=93.315
+   kernel floor=2.962  under2.5=0  gaps=6
+-- clcloud-trials.minimed.com
+   seq= 8 c1-clcloud-trials-minimed-com-live-3.6.b     mtime_gap=None
+   seq= 9 c2-clcloud-trials-minimed-com-absent.b       mtime_gap=3.114
+   seq=10 k-clcloud-trials-minimed-com-4-0.b           mtime_gap=2.996
+   seq=11 k-clcloud-trials-minimed-com-4-1.b           mtime_gap=2.986
+   seq=12 k-clcloud-trials-minimed-com-4-2.b           mtime_gap=3.012
+   seq=13 k-clcloud-trials-minimed-com-5-0.b           mtime_gap=2.989
+   seq=14 a-clcloud-trials-minimed-com-3-4.b           mtime_gap=70.58
+   kernel floor=2.986  under2.5=0  gaps=6

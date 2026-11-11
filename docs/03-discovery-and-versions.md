@@ -153,7 +153,20 @@ fallback; 3.6/3.7/3.8 remain the only cells on the track the bridge uses
 |---|---|---|---|---|
 | 3.6, 3.7, 3.8 | yes | **v13** | yes | auth0 doc — what the bridge uses |
 | 3.5 | yes | **v11** | yes | auth0 doc, wrong cumulus |
-| 3.9 – 12.0 (and ≤ 3.4) | no | v2 | no | legacy doc |
+| 3.9 – 12.0, 4.0 – 5.0, and `≤ 3.3` | no | v2 | no | **the fallback doc** |
+| 3.4 | no | **v11** | yes | legacy doc, v11 |
+
+> ⚠ **Corrected 2026-11-10 (area AH), two rows and a re-reading.** (a) The `≤ 3.4` group
+> was wrong: **`android/3.4` is not a v2 cell** — it answers cumulus **v11**, `CP[]`
+> length **3** with a **CLINICAL** region, `baseUrlPde` **v2**, 109 countries (OBSERVED,
+> both hosts, `findings-log/probe-2026-10-08/PROBE-FINDINGS.md:63` agreed with the
+> measurement all along, so this row contradicted its own source). (b) The `4.0–5.0`
+> tail was listed as a distinct track and is not one: **v2 is the DEFAULT document, and
+> a tail the server does not key on resolves to it whether or not it is a version.** A
+> certainly-absent tail and `99.99` return the *same* document, byte-identical after the
+> echo is erased — so "4.x → v2" carries no information about 4.x beyond "4.x is not
+> keyed". Only **`3.4`** and **`3.6`** were keyed among the eight tails
+> [source: findings-log/2026-11-10-area-ah-discovery-4x/FINDINGS.md §0, §2].
 
 `android/3.5` is a **near miss**: it selects the Auth0 config but points at cumulus
 **v11**, so it is still not a usable fallback. The pin stays `android/3.6`
@@ -169,6 +182,24 @@ later at the data call, with no named error. The runtime guard the ADR relies on
 currently inert; the pin is protected only by the ADR text and the discovery test.
 Suggested fix, **not applied** (a repo change): gate on `baseUrlCumulus` containing `/v13`
 too [source: PROBE-FINDINGS §3].
+
+> ⚠ **CORRECTED 2026-11-10 (area AH) — the universal form of the paragraph above is false.**
+> It reads *"`Auth0SSOConfiguration` key now exists on every version 3.4 → 5.0"*. Measured:
+> the key is **present on `3.6`** and **absent on `3.4`, `4.0`, `4.1`, `4.2` and `5.0`** —
+> five of the six distinct tails this pass read, on both `.com` and `-trials`. Those five
+> `CP[]` entries carry exactly `{SSOConfiguration, baseUrlAem, baseUrlCareLink,
+> baseUrlCumulus, baseUrlPde, region}` and nothing more. The earlier table row's
+> "`UseSSOConfiguration` absent" on the 4.x cells was right; the "the key exists anyway"
+> step is what does not reproduce. **So on those five cells the `??` fallback has nothing to
+> fall back to, and the failure mode described above — resolve the Auth0 URL, die at the
+> data call with no named error — cannot run there.**
+>
+> What survives is narrower and is **not** withdrawn: the guard may still be inert on
+> `3.5`, `3.7`, `3.8`, `3.9` or `3.10`, **none of which this pass measured and none of which
+> is claimed here.** Whether it is inert *where the bridge could actually be pointed* is
+> carried to **area AM**. The paragraph above is kept rather than rewritten: the retraction
+> history is the evidence [source:
+> findings-log/2026-11-10-area-ah-discovery-4x/FINDINGS.md §3].
 
 ## 3a. A second version axis — the request body
 
