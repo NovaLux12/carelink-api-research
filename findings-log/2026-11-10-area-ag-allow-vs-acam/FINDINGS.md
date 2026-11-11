@@ -93,7 +93,7 @@ So the answer to AG's title question is: **the two headers never appear together
 
 **One recorded cap revision:** 24 → 28. Reason: the absent control returned `405 + Allow`, so the primary cell could not be interpreted without knowing how far the 405 reaches; four cells (two paths × two portal hosts) established the boundary.
 
-Measured same-host spacing, `t_sent` series: **22 gaps, minimum 1.894 s, median 2.959 s, 2 gaps under 2.5 s, 1 under the 2.0 s floor, 0 negative durations.**
+Measured same-host spacing, `t_sent` series: **22 gaps, minimum 1.894 s, median 2.941 s (interpolated; the middle element is 2.959 s), 2 gaps under 2.5 s, 1 under the 2.0 s floor, 0 negative gaps — and 3 negative response durations.**
 
 ⚠ **The 1.894 s gap is disclosed as below the `>= 2 s` floor.** The declared delay is 2.5 s and it is taken *inside* the per-host `flock`, so this is the known corrupt-`t0` class this repo has recorded in four prior passes (`docs/09` §4) — **no cause is asserted**. Unlike prior passes there is no kernel-mtime oracle here to cross-check it: the bodies were written to a gitignored scratch dir that is deleted after the run.
 
@@ -117,3 +117,31 @@ Measured same-host spacing, `t_sent` series: **22 gaps, minimum 1.894 s, median 
 | `boundary.sh` | the 4-cell boundary batch, the recorded cap revision |
 | `results.jsonl` | 28 rows, one per request, with `allow`/`acam`/`acao`/`acah` per row |
 | `run.log` | per-request line, timestamps, cap-stop guard |
+
+## Correction (2026-11-10) — two figures, both found by a fresh-context verifier
+
+**1 · "0 negative durations" was false, and it is the run's own defect class.** The
+sentence published `0 negative durations` beside the gap series. The gap series does
+have 0 negatives — but **three rows have a negative response duration**
+(`t_done < t_sent`):
+
+| seq | host | `t_done − t_sent` |
+|---|---|---|
+| 4 | `carelink.medtronic.com` | **−0.749 s** |
+| 7 | `carelink.medtronic.eu` | **−0.664 s** |
+| 11 | `carelink-support.medtronic.com` | **−0.189 s** |
+
+Three negative *durations* are not the same quantity as zero negative *gaps*, and the
+sentence used one word for both — the "two quantities under one number" shape this run
+catalogues, committed in the paragraph that catalogues it. The corrected sentence names
+both quantities separately. The claim that matters is unchanged: **no gap is negative**,
+and the sub-floor reading stands as disclosed with **no cause asserted**.
+
+**2 · The median was the middle element, not the median.** `2.959 s` is `gaps[n//2]`;
+the interpolated median of the same 22 gaps is **2.941 s**. The difference is 0.018 s and
+changes no conclusion, but a figure labelled "median" should be the median. Both are now
+stated so a reader can reproduce either.
+
+**Neither correction changes a verdict, a count or a request total.** The pass's findings
+— 0 of 28 cells carrying both headers, the refuted control, the subtree-scoped 405 — are
+untouched, and were independently confirmed from the ledger.
