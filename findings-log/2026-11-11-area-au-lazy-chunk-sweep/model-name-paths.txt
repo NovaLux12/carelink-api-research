@@ -1,0 +1,29 @@
+==============================================================================
+AREA AU — the TWO mapDeviceModelName implementations, side by side
+==============================================================================
+
+CHUNK 7187.87daa49216a1a9ef.js  off 80246  arity 1
+  mapDeviceModelName(t){var n;for(const a of Object.values(this.deviceModelConfig))if(a.hasOwnProperty(t)){const l=a[t];return(null==(n=null==l?void 0:l.features)?void 0:n.dataCalendar)||(null==l?void 0:l.shortName)||t}return t}
+
+EAGER main.6595daf83bd6d4b1.js   off 581725  arity 2
+  mapDeviceModelName(Ye,Nt){var Ht;for(const gn of Object.values(Nt))if(Object.prototype.hasOwnProperty.call(gn,Ye)){const gt=gn[Ye];return(null==(Ht=null==gt?void 0:gt.features)?void 0:Ht.dataCalendar)||null}return Ye}
+
+DIFFERENCE (OBSERVED, both strings quoted above):
+  arity     1 (chunk)                      vs 2 (eager)
+  config    this.deviceModelConfig         vs a parameter Nt
+  lookup    a.hasOwnProperty(t)            vs Object.prototype.hasOwnProperty.call(gn,Ye)
+  fallback  features.dataCalendar          vs features.dataCalendar
+            || shortName                   vs (none)
+            || t                           vs Ye
+  ---- the chunk has a shortName FALLBACK the eager implementation does not ----
+
+chunk binding @83184: 'serService=_,this.SCALE_OPTIONS=$n.G,this.VISIBLE_RANGE=Dt.y,this.latestSegment=null,this.deviceModelConfig=this.userService.deviceModelMapping,this.graphData=this.reportsService.s'
+eager binding @1949368: ')(()=>!1)))}).pipe((0,Ii.T)(({inPenEnabled:j,isBannerVisible:pe})=>pe&&j&&!pn.c.csrEnabled)),this.userService.deviceModelMapping=this.route.snapshot.data.deviceModelMapping,this.reportsError=this.repo'
+
+call sites of mapDeviceModelName
+  chunk @74109: 'mapDeviceModelName(this.latestSegment.deviceModel):void 0].m'
+  chunk @77084: 'mapDeviceModelName(n),align:"left",rotation:0,x:5,zIndex:11,'
+  chunk @80015: 'mapDeviceModelName(x),align:"left",rotation:0,x:5,y:6-(v%2=='
+  chunk @80246: 'mapDeviceModelName(t){var n;for(const a of Object.values(thi'
+  eager @581419: 'mapDeviceModelName(an.deviceModel,Nt);return wt&&(lt=wt),{...an,segmen'
+  eager @581725: 'mapDeviceModelName(Ye,Nt){var Ht;for(const gn of Object.values(Nt))if('
