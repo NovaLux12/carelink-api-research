@@ -1,0 +1,18 @@
+== clock A: t_sent (committed, re-derivable) ==
+rows 20  negative durations (t_done < t_sent): 2
+  IMPOSSIBLE seq 1 carelink.medtronic.com duration -0.557 s
+  IMPOSSIBLE seq 9 carelink.medtronic.eu duration -0.689 s
+same-host gaps 16  min 1.847 s  max 3.351 s  mean 2.658 s
+under declared 2.5 s: 2
+under repository 2.0 s floor: 2
+  shortest carelink.medtronic.eu seq 9->10 1.847 s
+  shortest carelink.medtronic.com seq 1->2 1.977 s
+  shortest carelinkhp.minimed.eu seq 17->18 2.593 s
+
+== clock B: kernel body mtimes (NOT re-derivable from a clone) ==
+bodies stat-able 20 of 20  same-host gaps 16
+min 2.595 s  max 2.844 s  mean 2.693 s
+under declared 2.5 s: 0
+under repository 2.0 s floor: 0
+under minus t_sent minus first-row latency, per gap >0.5 s: 3
+FLOOR ON THIS CLOCK: 2.595 s

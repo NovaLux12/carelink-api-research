@@ -16,7 +16,7 @@ contact_links:
     # Successors now mint past Z as two-letter ids (AA, AB, …) — see
     # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
     # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
-    about: 3 open areas (AL, AM, AO) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+    about: 4 open areas (AL, AM, AN, AO) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
     # 1, computed, not inherited. K closed 2026-10-16; A–Z all closed
     # (2 open + 34 closed as of 2026-11-10; `AD` minted by lane sl1 and closed by claim #164,
     # `AB` closed by this PR, `AG` minted by the pass that closed `AB`, `AC` closed by
