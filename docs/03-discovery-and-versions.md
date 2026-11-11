@@ -853,6 +853,22 @@ are **dead on both methods on both remaining hosts**: 24 of 24 cells
 by Area C — so the router's no-route response is one artefact shared by all three
 hosts, not three lookalikes [findings-log/2026-10-12-pde-csr-cross-host/FINDINGS.md].
 
+**Update 2026-11-10 (area AJ):** the **`carepartner/v2`** message leaf — a *different*
+path from bare `/connect/v2`, and the one the cumulus-v2 spike's table names — is
+**dead on both methods on `.com` and `.eu`**, but on **`clcloud-trials.minimed.com`
+`GET` is unrouted and `OPTIONS` answers `200`** with `ACAO: *` / `ACAM: OPTIONS`. Under
+the rule at the top of this subsection that is a route registered with a non-`GET`
+method, on one host of three. Its sibling under the same base,
+`v2/discover/android/3.6`, is `GET` `200` but `OPTIONS` `403` on that host — so the
+`200` is not a blanket property of the subtree, though **no same-subtree
+absent-path `OPTIONS` control was bought** and that gap is successor **AM**
+[findings-log/2026-11-10-area-aj-cumulus-v2-message/FINDINGS.md].
+⚠ **Also corrected: the cumulus-v2 spike records this leaf as `GET`** — the client it
+cites (`carelink_client2.py:221` → `:238`) `POST`s, and so does its own header comment
+at `:42`. **The spike's `GET` is wrong, and the live `GET` is 403 on all three hosts**,
+so a reader following that table would send the wrong method and read a no-route `403`
+as an auth failure. The spike is append-only and is corrected here, not edited there.
+
 ### 9a. ⚠ The published PDE base URL cannot answer, anywhere it is published
 
 **OBSERVED**, and this is the load-bearing consequence of the three preceding updates.

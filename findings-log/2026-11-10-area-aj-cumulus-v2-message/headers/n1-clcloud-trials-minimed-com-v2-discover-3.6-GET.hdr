@@ -1,0 +1,20 @@
+HTTP/2 200 
+content-type: application/json;charset=utf-8
+date: Tue, 10 Nov 2026 23:55:30 GMT
+content-encoding: br
+x-amzn-requestid: c761f41c-e796-4573-8981-7192bfcafef6
+x-permitted-cross-domain-policies: none
+strict-transport-security: max-age=31536000 ; includeSubDomains
+x-frame-options: sameorigin
+content-security-policy: default-src 'self'
+x-cum-signature: Vb10bioKaklFrm6csSvfo7EEpn1T9XJnoLY92WRiUjlCnvu+7Ntt+ie5sg19QpJoakjhKj7Aa6/+HZULeDFYZH1ceGpBePvVIn/4INUm5pmpT1MmfqH+b8Rjbxp1cDexb45SU4VGUzVb/K52hGvp/v40KAhL1kZqt2NS+NBwtbdWQxck27DoFpfoFb+F8O3R/6Ej1bGDGkLMU8YW/LcAzmODrA+fFuC+8BT9cRB9v+G3I9qEzhJzajnArLOV3tZdrlFGey7lRtRiIREXb9G8VTKHkH5mG3kgH4eB1BH+2yNzhSBh3aIrZArLdY/lUZ1kjv0z1FJ0x2YNpxH5t4iWXQ==
+x-amz-apigw-id: GphFgGOpoAMFs6A=
+cache-control: no-cache, no-store
+x-amzn-trace-id: Root=1-6af3aeef-54508afc6211008777eed178;Parent=27ecd3335d57ef67;Sampled=0;Lineage=1:1babbf03:0
+vary: Accept-Encoding
+x-cache: Miss from cloudfront
+via: 1.1 787c68b9b5999b5d25ce6f834aeedfb0.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR95-P2
+alt-svc: h3=":443"; ma=86400
+x-amz-cf-id: l5SuzxVfkKPdmyM6n8vKrwkKbmnwYeIBiiDSVRnM6_A1eqqupsMltw==
+
