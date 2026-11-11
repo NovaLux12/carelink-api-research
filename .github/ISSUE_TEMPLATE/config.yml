@@ -8,28 +8,12 @@ contact_links:
     about: Evidence classes, the never-publish rules, and the traps.
   - name: Pick up a research area
     url: https://github.com/NovaLux12/carelink-api-research/blob/main/docs/11-suggested-research-areas.md
-    # 9 open + 42 closed, computed, not inherited. K closed 2026-10-16; A–Z all closed
-    # (`AP` closed by claim #197 and `AQ` minted by the same pass — measured, never
-    # inherited; re-run python3 scripts/research-checks.py rather than trusting this line).
-    # Successors now mint past Z as two-letter ids (AA, AB, …) — see
-    # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
-    # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
+    # Re-derive the count; never inherit it. Successors mint past Z as two-letter ids
+    # (AA, AB, …) — see docs/11 "Why there is no area AA", Amendment 2026-10-16.
+    # python3 scripts/research-checks.py counts ^### [A-Z]{1,2}. headings and checks
+    # that the `about:` line below agrees with the page. No figure is repeated here on
+    # purpose: a count written into a comment is a count that drifts.
     about: 9 open areas (AO, AQ, AR, AS, AT, AU, AV, AW, AX) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
-    # (2 open + 33 closed as of 2026-11-10; `AD` minted by lane sl1 and closed by claim #164,
-    # `AB` closed by this PR, `AG` minted by the pass that closed `AB`, `AC` closed by
-    # claim #168, `AE` closed by claim #161, `AF` closed 2026-11-10, `AH` closed by
-    # claim #180 and `AM` minted by the same pass — measured, never inherited).
-    # Successors now mint past Z as two-letter ids (AA, AB, …) — see
-    # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
-    # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
-    # 1, computed, not inherited. K closed 2026-10-16; A–Z all closed
-    # (2 open + 34 closed as of 2026-11-10; `AD` minted by lane sl1 and closed by claim #164,
-    # `AB` closed by this PR, `AG` minted by the pass that closed `AB`, `AC` closed by
-    # claim #168, `AE` closed by claim #161, `AF` closed 2026-11-10, `AG` closed by
-    # claim #179, `AI` closed by claim #181 — measured, never inherited).
-    # Successors now mint past Z as two-letter ids (AA, AB, …) — see
-    # docs/11 "Why there is no area AA", Amendment 2026-10-16. Re-derive rather than trust:
-    # python3 scripts/research-checks.py, which counts ^### [A-Z]{1,2}. headings.
   - name: Bridge bug? File it on carelink-bridge instead
     url: https://github.com/NovaLux12/carelink-bridge/issues/new?template=bug.yml
     about: Login, upload, or crash failures in a client belong in the client repo. This repo takes observations about Medtronic's API, not client bugs.
