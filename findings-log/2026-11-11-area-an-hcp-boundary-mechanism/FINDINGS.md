@@ -26,7 +26,7 @@ the finding.** The boundary is **not a directory, a mount point, or a filesystem
 `/hcp` **without** the trailing slash answers the **`200` fallback entry document** on all four
 hosts (OBSERVED, 4 of 4, §4 cells 2/6/10/14), where a mapped directory would have produced
 Apache's `DirectorySlash` `301` to `/hcp/`, and `/hcp/` itself answers `404` with **no** `301`
-(OBSERVED, 4 of 4). So the selector compares a path **string beginning `/hcp/`** — the trailing
+(OBSERVED, 4 of 4). **INFERRED:** so the selector compares a path **string beginning `/hcp/`** — the trailing
 slash is part of the key — and the bare prefix is *outside* the handler's own surface.
 **INFERRED, and the inference is what makes (b) the better-supported of the two:** the `404` this
 family emits is **not** Apache's own file-not-found page — **0 of 31** recorded `404`s on these
@@ -192,7 +192,7 @@ one host, and the answer is: by exactly one header.**
 | `Cache-Control` | `no-cache, must-revalidate` | identical |
 | `Access-Control-Allow-Headers` | `X-System-ID, Content-Type, authorization` | identical |
 
-**So the `404` and the `405` are emitted by the same layer and differ only in the method
+**INFERRED:** so the `404` and the `405` are emitted by the same layer and differ only in the method
 advertisement.** Both carry the application's `ACAH` and its `Cache-Control`, and neither carries
 a `Content-Type`. That is **not** the shape of Apache's stock `404`, which on this build is
 `text/html; charset=iso-8859-1` with a body — the shape `carelink.minimed.eu` returns for an
@@ -421,3 +421,21 @@ Bodies are not in the tree (`AGENTS.md` §7: no raw capture). Re-run:
 python3 spacing.py
 python3 census.py ../..
 ```
+
+## Correction (2026-11-11) — two causal sentences were stated without their label
+
+A verifier found two bold sentences that assert a cause with no same-sentence `INFERRED`
+label, at §0 line 29 and §5 line 195. Both claims **are** labelled elsewhere (§0:31, §5:241,
+§8 bullet 2) and neither asserts mechanism (a) or (b), so nothing downstream moved — but the
+repository's rule is a label **in the same sentence**, not a label somewhere in the section.
+
+Both now read `**INFERRED:** so …`:
+
+- §0: "the selector compares a path string beginning `/hcp/`" — an inference from four
+  observations of behaviour to a claim about implementation, and exactly the kind of sentence
+  a later reader would quote as if it had been seen.
+- §5: "the `404` and the `405` are emitted by the same layer" — same shape, same fix.
+
+The measurements themselves are unchanged and are all OBSERVED: `/hcp` 200 on 4 of 4,
+`/hcp/` 404 on 4 of 4, no 301 anywhere, `//hcp/…` 404, `/app/hcp/…` 200 fallback, and
+0 of 31 recorded 404s carrying a `Content-Type` or body against 339/353 typed 200s.
