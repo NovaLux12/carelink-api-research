@@ -1,0 +1,74 @@
+== 1. request accounting ==
+PASS  ledger rows 18 == CAP 18
+PASS  itemisation 3 controls x 2 hosts + 3 subtrees x 2 depths x 2 hosts = 18, cap is 18
+PASS  curl_exit 0 on 18 of 18 rows
+PASS  every recorded method is GET
+
+== 2. candidate coverage ==
+PASS  carelink.medtronic.eu /hcp/user/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink.medtronic.eu /hcp/user/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink.medtronic.eu /hcp/clinics/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink.medtronic.eu /hcp/clinics/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink.medtronic.eu /hcp/reports/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink.medtronic.eu /hcp/reports/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink.medtronic.eu: 9 rows == 9
+PASS  carelink-support.medtronic.com /hcp/user/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink-support.medtronic.com /hcp/user/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink-support.medtronic.com /hcp/clinics/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink-support.medtronic.com /hcp/clinics/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink-support.medtronic.com /hcp/reports/zz-ar-absent-6293 recorded (depth 1)
+PASS  carelink-support.medtronic.com /hcp/reports/zz-ar-absent-6293/zz recorded (depth 2)
+PASS  carelink-support.medtronic.com: 9 rows == 9
+
+== 3. controls, per host ==
+PASS  carelink.medtronic.eu CONTROL-1 pow.crm.settings -> 200, 96 B (recorded 200, 96 B)
+PASS  carelink.medtronic.eu CONTROL-1 digest a977733a53ee0d5f == recorded a977733a53ee0d5f
+PASS  carelink.medtronic.eu CONTROL-2 /hcp/configuration/<absent> -> 405 + Allow: POST, OPTIONS, 0 B (got 405 + 'POST, OPTIONS', 0 B)
+PASS  carelink.medtronic.eu CONTROL-3 /hcp/<absent> -> 404, 0 B, no Content-Type (got 404, 0 B, '(none)')
+PASS  carelink-support.medtronic.com CONTROL-1 pow.crm.settings -> 200, 97 B (recorded 200, 97 B)
+PASS  carelink-support.medtronic.com CONTROL-1 digest 370e3bba0d28c540 == recorded 370e3bba0d28c540
+PASS  carelink-support.medtronic.com CONTROL-2 /hcp/configuration/<absent> -> 405 + Allow: POST, OPTIONS, 0 B (got 405 + 'POST, OPTIONS', 0 B)
+PASS  carelink-support.medtronic.com CONTROL-3 /hcp/<absent> -> 404, 0 B, no Content-Type (got 404, 0 B, '(none)')
+
+== 4. verdict matrix (read from the ledger) ==
+host                            subtree         depth 1           depth 2           Allow
+carelink.medtronic.eu           /hcp/user/      ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink.medtronic.eu           /hcp/clinics/   ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink.medtronic.eu           /hcp/reports/   ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink.medtronic.eu           /hcp/configuration/ ref              ('405', 0, 'POST, OPTIONS')
+carelink-support.medtronic.com  /hcp/user/      ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink-support.medtronic.com  /hcp/clinics/   ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink-support.medtronic.com  /hcp/reports/   ('404', 0, '(none)', '(none)')('404', 0, '(none)', '(none)')(none)
+carelink-support.medtronic.com  /hcp/configuration/ ref              ('405', 0, 'POST, OPTIONS')
+PASS  depth 1 and depth 2 agree on every (host, subtree) — no mix to report
+
+  cells: 6 x 404, 0 x 405 across 6 (host, subtree) pairs
+PASS  all 6 derived-subtree cells answer 404, 0 B, no Content-Type — the constant does NOT reach them
+PASS  every cell is 0 B
+PASS  no cell carries a Content-Type (so none is the 5518 B SPA fallback, area AK)
+
+== 5. clock A — t_sent ==
+  grouping discipline: group by host, sort by seq, then zip.
+  expected gaps sum(rows_per_host - 1) = 8 + 8 = 16
+PASS  gap count 16 == 16
+  pairs under 2.5 s: [(2.06, '11->12')]
+  gaps 16  min 2.060 s  median 2.609 s  max 3.546 s
+  under 2.5 s: 1  [2.06]
+  under 2.0 s: 0  []
+  impossible negative DURATIONS (t_done < t_sent): [(11, -0.477)]
+
+== 6. clock B — kernel body mtimes, with a liveness proof ==
+  bodies stat-able 18 of 18   DISTINCT mtimes 18 of 18
+  clock B PROVEN LIVE by 18 distinct request-time mtimes.
+  gaps 16  min 2.590 s  median 2.626 s  max 2.823 s
+  under 2.5 s: 0
+PASS  clock B gap count 16 == 16
+PASS  clock B floor 2.590 s >= 2.5 s
+
+== 7. derivation arithmetic ==
+PASS  derive.txt: bundle digest reproduces the value area AB pinned
+PASS  derive.txt: derivation returned a third subtree
+PASS  candidates.txt holds 3 subtrees (the ranked top 3)
+PASS  18 = 3 x 2 + 3 x 2 x 2 = 18
+
+VERIFY: ALL CHECKS PASSED
