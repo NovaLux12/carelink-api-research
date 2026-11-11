@@ -22,17 +22,30 @@ jobs:
           # under a top-level directory, so extracting a bare "hurl" fails —
           # extract the real path instead, and let the suite be skipped rather
           # than fail the whole gate if the download itself breaks.
-          set -euo pipefail
+          set -uo pipefail
           VER=8.0.1
           URL="https://github.com/Orange-OpenSource/hurl/releases/download/${VER}/hurl-${VER}-x86_64-unknown-linux-gnu.tar.gz"
+          # The guard must cover EXECUTION, not just download. On 2026-11-11 the
+          # pinned 8.0.1 tarball downloaded fine and installed fine, but the binary
+          # could not load libxml2.so.2 on the runner image, so `hurl --version`
+          # exited 127 — and `set -e` killed the whole job before the gate ran.
+          # Every open PR failed identically in 7s and none of them was at fault.
+          # A missing or unusable runner tool must SKIP the live suite, never fail
+          # the gate: the gate's own job is the repository's assertions, and the
+          # suite already reports its own verdict when it can run.
           if curl -fsSL -o /tmp/hurl.tar.gz "$URL"; then
-            tar -xzf /tmp/hurl.tar.gz -C /tmp
+            tar -xzf /tmp/hurl.tar.gz -C /tmp || true
             # 8.x nests the binaries under bin/; 7.x put them at the root.
             SRC="/tmp/hurl-${VER}-x86_64-unknown-linux-gnu"
             [ -d "$SRC/bin" ] && SRC="$SRC/bin"
-            install -m755 "$SRC/hurl" /usr/local/bin/hurl
-            [ -f "$SRC/hurlfmt" ] && install -m755 "$SRC/hurlfmt" /usr/local/bin/hurlfmt
-            hurl --version
+            install -m755 "$SRC/hurl" /usr/local/bin/hurl 2>/dev/null || true
+            [ -f "$SRC/hurlfmt" ] && install -m755 "$SRC/hurlfmt" /usr/local/bin/hurlfmt 2>/dev/null || true
+            if hurl --version 2>/dev/null; then
+              echo "hurl OK"
+            else
+              echo "::warning::hurl installed but cannot run on this runner (missing shared library?); the live assertion suite will be skipped"
+              rm -f /usr/local/bin/hurl /usr/local/bin/hurlfmt
+            fi
           else
             echo "::warning::hurl download failed; the live assertion suite will be skipped"
           fi
