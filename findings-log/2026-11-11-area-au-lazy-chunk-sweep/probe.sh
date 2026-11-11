@@ -37,9 +37,10 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 #
 # CORRECTED 2026-11-11 (verifier round). This was `cd "$HERE/../../../../.."`,
 # which counted five levels up from the findings dir. In the main checkout that
-# is `/home`; in a worktree it is `/home/jack`. Neither is the repo root, so the
-# lock landed OUTSIDE `.loop/` — in the repo root on this run, as an untracked
-# `host-carelink.minimed.eu.lock` — and no second worker ever took it. The
+# is the parent of the user's home; in a worktree it is a different ancestor.
+# Neither is the repo root, so the lock landed OUTSIDE `.loop/` — in the repo
+# root on this run, as an untracked `host-carelink.minimed.eu.lock` — and no
+# second worker ever took it. The
 # spacing *measurement* survived (the sleep is inside `flock` either way, and the
 # floor was re-derived from body mtimes), but the cross-worker serialisation the
 # comment claims was never in force.
@@ -242,3 +243,31 @@ echo "swept $n cells from the f.u-derived list" >> "$RUNLOG"
 
 echo "run end: $(date -u +%FT%T.%3NZ) rows=$(wc -l < "$LEDGER") cap=${CAP}" >> "$RUNLOG"
 echo "TMPBODIES=$TMPBODIES" >&2
+
+: <<'CORRECTION'
+## Correction (2026-11-11) — the lock path, and a machine path in its own fix
+
+`LOOP` was derived by counting five levels up from the findings directory. In the main
+checkout that is the parent of the user's home and in a worktree it is a different
+ancestor; neither is the repo root, so the lock landed outside `.loop/` and no second
+worker ever took it. Found because the AU verifier noticed an untracked
+`host-carelink.minimed.eu.lock` in the repo root and asked why.
+
+Corrected to ask git instead:
+
+    LOOP="$(cd "$(dirname "$(git -C "$HERE" rev-parse --git-common-dir)")" && pwd)/.loop"
+
+`--git-common-dir` resolves to the shared `.git` from any worktree, so its parent is the
+main checkout and `.loop` there is the one shared lock directory. Verified from both
+layouts.
+
+**The first attempt at this correction was itself rejected by the gate, twice, and both
+rejections were right.** It described the two wrong resolutions with literal absolute
+home paths — a machine path in a committed file, which is the rule this repo enforces
+and which this very file's own log had claimed to satisfy. And it edited an append-only
+file without this section. Both are fixed here.
+
+The spacing *measurement* is unaffected: `sleep 2.5` runs inside a `flock` either way,
+and the floor was re-derived from body mtimes (2.6408 s over 213 gaps, 0 under 2.5 s).
+What was never in force is the cross-worker serialisation the comment claimed.
+CORRECTION
