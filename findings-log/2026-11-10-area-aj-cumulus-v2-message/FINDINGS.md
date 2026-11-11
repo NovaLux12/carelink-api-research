@@ -285,3 +285,32 @@ fix that exact class of error. Corrected to 2.022 s.
 `clcloud-trials.minimed.com` only (`GET` 403 + `OPTIONS` 200 with CORS) and is dead on
 both methods on `.com` and `.eu`; all twelve-thirteen 403s carry one digest; the
 `docs/09` §2 oracle reading is supported verbatim by that page.
+
+## Correction (2026-11-11) — §6.1's missing control has been run, and the positive holds
+
+This section is appended; nothing above is edited.
+
+**§6.1 said the `OPTIONS`-on-a-certainly-absent-path control was never run inside this
+subtree on this host, and that the `-trials` positive's discriminating power was therefore
+**unproven**. It has now been run on this host, and the positive survives it
+[source: findings-log/2026-11-11-area-ap-trials-options-specificity/FINDINGS.md §3–§4].
+
+Area AP sent, on `clcloud-trials.minimed.com`, in one run with both controls gated first:
+
+| method | path | result |
+|---|---|---|
+| `OPTIONS` | `connect/carepartner/v2/zz-ap-absent-4821` | **403**, 42 B, `f249b63cb2fcb66b…` — no route |
+| `OPTIONS` | `connect/carepartner/v2/zz-ap-absent-4821/zz` | **403**, same digest |
+| `OPTIONS` | `connect/carepartner/v2/display/message` | **200**, 0 B, `ACAO: *` (this pass's seq 10, reproduced) |
+| `GET` | `connect/carepartner/v2/display/message` | **403**, same digest (this pass's seq 9, reproduced) |
+
+So the `200` at seq 10 is **path-specific within that subtree**, and the sentence in §4 —
+*"The `200` at seq 10 is **path-specific** (INFERRED from those two OBSERVED cells …)"* —
+can now be read as **OBSERVED for this subtree on this host**, with the two fabricated names
+and the `discover/android/3.6` `403` as its controls. **The verdict itself is unchanged**:
+still `GET` 403 + `OPTIONS` 200 → a route registered with a non-`GET` method; still POST
+**INFERRED and not read from a header** (§6.2, unchanged); still this host only.
+
+Two things this correction does **not** do: it does not promote the POST half, and it does
+not extend the result to `.com` or `.eu`, which area AP did not touch (that lane's scope was
+this host only, because four parallel lanes held the others).
