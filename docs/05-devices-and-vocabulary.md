@@ -114,6 +114,20 @@ SIMPLERACC  SIMPLERACCOLID  NMX7  CC840  CC880  NMX8  INSTINCT  EAGLE
 > states a name, and does not claim a product identity. `78961`, `78962`, `78966` and `78967` are
 > absent from this document too, which is now a **third** vendor source skipping them.
 > [source: findings-log/2026-11-11-area-am-instinct-name-hunt/FINDINGS.md].
+>
+> **✓ Re-observed 2026-11-11 (area AV) — the statement above now carries a date, not a correction.**
+> All five portal builds were re-fetched on their content-hashed names from their own hosts and
+> **every digest reproduced its pinned value exactly** (clinic `2a7fa8e7…` / 3 397 615 B on
+> `carelinkhp` and `carelink.medtronic.{com,eu}`; support `a054555a…` / 3 410 666 B on
+> `carelink-support.medtronic.{eu,com}`), so the table read here is **still the 2026-10-13 artefact**
+> and **still stops at `78960`**: the four tail codes have 0 hits in all five bodies in all three
+> code forms. The `Instinct™ Sensor` / `Instinct™ Go` split is unchanged (6 Sensor, 3 Go — `78954`,
+> `78956`, `78958`). **The 2026-11-03 config drift did not carry the JS bundle with it.** A
+> zero-request reading of the consumer adds the mechanism: module `1287` looks a code up whole,
+> then by its **first 8 characters**, in `SENSOR` then `StandaloneCGM` and **never `PUMP`** — which
+> is why so many suffixed `MMT-` variants are nameable at all, and why the four absent `SKU-` rows
+> are the only thing standing between the tail codes and a name
+> [source: findings-log/2026-11-11-area-av-portal-device-table/FINDINGS.md §2, §4, §6].
 
 A second key of the same document corroborates the marketing name:
 

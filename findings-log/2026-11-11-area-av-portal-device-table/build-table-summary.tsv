@@ -1,0 +1,6 @@
+tag	host	build	asset_sha256	asset_bytes	module_start_byte	module_bytes	named_pairs	sku_pairs	instinct_named_pairs
+a-hp-main	carelinkhp.minimed.eu	A(pow)	2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba	3397615	2999302	9172	97	9	10
+a-cmc-main	carelink.medtronic.com	A(pow)	2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba	3397615	2999302	9172	97	9	10
+a-cme-main	carelink.medtronic.eu	A(pow)	2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba	3397615	2999302	9172	97	9	10
+a-sup-main	carelink-support.medtronic.eu	B(cua)	a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954	3410666	2801145	9172	97	9	10
+a-supc-main	carelink-support.medtronic.com	B(cua)	a054555a0f22176ecb51d8f6439680a394e2be5e889494bec5004c93be28c954	3410666	2801145	9172	97	9	10
