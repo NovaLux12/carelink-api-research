@@ -219,14 +219,42 @@ This lane was chartered as **area AQ** and built its directory under that name. 
 
 | holder | where | first minted |
 |---|---|---|
-| the `hcp/patients/` subtree pass | closed row `| AQ — is the \`hcp/patients/\` subtree route-live…` | `a206944`, 2026-11-11 01:18 UTC (PR #200/#203) |
-| **this pass** | open heading `### AQ. Do areas C and N's…` | `5a24fd1`, 2026-11-11 01:23 UTC (PR #201) |
+| **this pass** | open heading `### AQ. Do areas C and N's…` | `5a24fd1`, 2026-11-11 01:23:30 UTC |
+| the `hcp/patients/` subtree pass | closed row `| AY — is the \`hcp/patients/\` subtree route-live…` | `cae2127`, 2026-11-11 01:38:32 UTC |
 
-**This pass is the later mint by five minutes**, so it yields: the closed table carries this area
-as **`AY`** and the `hcp/patients/` row keeps `AQ`. Area AR's and AS's cross-references to
-"area **AQ**" therefore still mean the `hcp/patients/` pass, which is what they were written for.
+**This pass was the FIRST to register the letter on the page, by 15 minutes**, so it keeps `AQ`
+and the `hcp/patients/` row is re-lettered **`AY`**. Area AR's and AS's cross-references to
+"area **AQ**" were written about the `hcp/patients/` pass and now mean **`AY`**.
 
 `docs/11` now has **no letter used twice** (`^### [A-Z]{1,2}.` headings and `| XX —` rows,
 compared as sets), and the count sentence reads **9 open plus 43 closed** as printed by
 `python3 scripts/research-checks.py` at this head — quoted, not computed. The letter `AZ` is
 minted for the successor; `AY` is retired by this close.
+
+## Correction (2026-11-11) — this lane yielded the WRONG letter, on a false citation
+
+A verifier caught this and it was right twice over.
+
+§9 said `AQ` had been used twice and that **this pass was the later mint by five minutes**, so it
+yielded and recorded itself as `AY`. Both halves of that reasoning were wrong:
+
+| event | commit | time (UTC) |
+|---|---|---|
+| this pass's `### AQ.` heading enters `main` | `5a24fd1` | **01:23:30** |
+| the `hcp/patients/` `\| AQ —` closed row enters `main` | `cae2127` | **01:38:32** |
+
+**This pass was first, by fifteen minutes.** The cited `a206944` — offered as the moment the
+`hcp/patients/` area took the letter — **contains no AQ row at all**: that commit closed area AL.
+`git show a206944:docs/11-suggested-research-areas.md | grep -cE '^(###|\|) AQ'` returns 0.
+
+The `hcp/patients/` area did *claim* the letter earlier (issue #199, 01:05:47) but had not written
+it into the registry, and a claim is not a registration — the page is the namespace.
+
+**Fixed:** this area keeps **`AQ`**; the `hcp/patients/` closed row is re-lettered **`AY`**. Area
+AR's and AS's "area AQ" cross-references now point at `AY`, and docs/11 says so at both sites.
+
+The lesson is the one the skill keeps repeating in new shapes: **"who was first" is a question
+about the artefact, not about intent.** The honest check is `git log -S` against the file that
+holds the namespace — not a claim's timestamp, and not a commit that happens to sit nearby in the
+log. A citation offered to settle an ordering argument must be opened, because a plausible SHA
+nobody read is worse than no citation: it makes a wrong conclusion look sourced.
