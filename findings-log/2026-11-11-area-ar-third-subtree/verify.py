@@ -17,6 +17,18 @@ Checks, each one able to FAIL — a check that cannot fail is not evidence
 
 Usage: verify.py <findings-dir>
 Exit:  0 = every check passed; 1 = a check failed (which one is printed)
+
+## Correction (2026-11-11) — the scratch default carried an absolute machine path
+
+`scratch` defaulted to `/home/<user>/projects/.../.loop/ar-scratch`, which is on
+`AGENTS.md` §7's scrub list. It now resolves from `__file__`, so the script still runs
+from a clean clone with the scratch in `.loop/`.
+
+This is an in-place edit to an append-only artefact, disclosed here for the same reason
+as the one in `derive.txt`: a machine path is never evidence, so removing it destroys no
+part of the audit trail, while leaving it in publishes something §7 says never to
+publish. The gate does not scan machine paths, so nothing caught it; it was found with
+`git grep -rn '/home/' -- .` while checking the end state.
 """
 import glob
 import json
