@@ -3602,12 +3602,13 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 33 closed**
-stand today (`AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
+**The maintainer decision the paragraphs above deferred has been taken.** **3 open plus 35 closed**
+stand today (`AL` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
 `AB` minted by lane l2 and closed 2026-11-10 by this PR, `AG` minted 2026-11-10 by the
 pass that closed `AB`, `AC` closed 2026-11-10 by claim #168, `AE` closed 2026-11-10 by
-claim #161, `AF` closed 2026-11-10, `AH` closed 2026-11-10 by claim #180 and its successor
-`AM` minted by the same pass; counted from the `^### [A-Z]{1,2}.` headings with
+claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` closed
+2026-11-10 by claim #181, which minted `AO` as its successor; counted from the
+`^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 The open figure did **not** fall when `AB` closed, because the same pass minted `AG` as its
 successor — a closure that mints an area nets zero open, and the Closed table grows by one.
@@ -3773,7 +3774,7 @@ carries about the direct six is a `carelinkhp` or `.eu` single-deployment readin
 this pass **confirms** and does not move. Recorded in the log's verdict section rather
 than edited into a page whose subject is a different subtree.
 
-### AM. Is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at — and which cells are those?
+### AO. Is the ADR 0002 pin guard inert on any cell the bridge could actually be pointed at — and which cells are those?
 
 **What is known.** `docs/03` §3 carried a code finding that
 `selectAuth0ConfigUrl()`'s `const key = cpEntry.UseSSOConfiguration ?? 'Auth0SSOConfiguration'`
@@ -3818,44 +3819,91 @@ axis has assumed and none has tested.
 
 ---
 
-### AG. Does `Allow` agree with `access-control-allow-methods` on the same route — and does area N's warning generalise?
+### AL. Is the `/hcp/configuration/` 405 a handler-level constant on **every** host that mounts it?
 
-**What is known.** On the four portal deployments, the three POST-only direct routes
-answer `GET` **405** with `allow: POST, OPTIONS` (9 of 9 cells) and empty-body `OPTIONS`
-**200** with a 13-byte body that is the same method list (9 of 9 cells), while
-`access-control-allow-methods` is **absent on all 43 responses**
-[source: findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] (OBSERVED). On the
-cumulus/gateway families the reverse holds: `OPTIONS` 200s carry the CORS set, and area N
-established that `access-control-allow-methods` there is **not** a register of a route's
-methods — `carepartner/v13/display/message` advertises `OPTIONS` and is GET-capable on all
-three hosts (`docs/09` §2). Area Z then found `ACAM` is a per-route constant whose
-*order* differs from the literal `OPTIONS` on two routes. So two families now disagree
-about whether the preflight's method list can be believed, and **nobody has compared
-`Allow` against `ACAM` on a single route**.
+**What is known.** On `carelink.medtronic.com` and `carelink.medtronic.eu`, a path that
+certainly does not exist — `zz-ag-absent-8713`, verified 0 `git grep` hits repo-wide —
+returns **405 with `Allow: POST, OPTIONS`**, byte-identical to the real POST-only route
+`/hcp/configuration/application`, while `/hcp/zz-ag-absent-8713` returns a genuine
+**404** and `/zz-ag-absent-8713` returns the **5518 B SPA fallback**
+[source: findings-log/2026-11-10-area-ag-allow-vs-acam/FINDINGS.md §2] (OBSERVED). So the
+405 is scoped to the `/hcp/configuration/` subtree on those two hosts, and `Allow` there
+is a **subtree constant**, not a register of a route's methods — refuting area AG's own
+INFERRED assumption (OBSERVED boundary, INFERRED cause).
 
-**What is missing.** Whether the disagreement is a property of the **header** or of the
-**family**. If one route ever returns both, the comparison is one request cheap and
-settles whether `ACAM` is wrong everywhere or only where the gateway generates it.
+**What is missing.** The boundary was measured on **two** hosts. `carelink-support.medtronic.com`
+returned 405 + `Allow` on both the real route and the absent path, but its root and `/hcp/`
+boundary cells were not run (cap), and **`carelinkhp.minimed.eu` — the baseline deployment
+that `AGENTS.md` §10 says not to re-run for existence — was never tested at all.** If the
+405 is a property of the handler, every host that mounts it should reproduce it for an
+absent child path; if it is a property of one deployment's configuration, it should not.
 
-**Blocker:** a route that returns **both** `Allow` and `access-control-allow-methods` on
-the same response — none is recorded on any host in this repo, so the pass starts with a
-**bounded search** (the 15 `public/*` keys and the six direct routes on the four portal
-hosts are already known to carry no `ACAM`; the cumulus `display/message` and `csr/v2`
-routes carry `ACAM` and no `Allow`). Nothing here needs a token; the blocker is that the
-overlap may not exist, and a pass must say so rather than manufacture one.
+**Blocker:** none for the probe — this is four absent-path cells per host on hosts already
+in the corpus. The blocker is **scope discipline**: `carelinkhp.minimed.eu` is the recorded
+baseline and §10 is titled "Do not re-run", so a pass must state that it is testing the
+*handler's* behaviour with a path that cannot exist, **not** re-deriving any known verdict,
+and must not re-probe any settled path.
 
-**Closes when:** either one response is captured carrying **both** headers on the same
-route and the two lists are compared — **a disagreement is as good a close as an
-agreement** — or a bounded sweep of the routes already known to carry one or the other
-(≤20 cells, `GET` + empty-body `OPTIONS`, controls first) shows **no route carries both**,
-in which case the negative is the answer and the claim is that the two headers are
-disjoint by design on every family measured. **A negative counts.**
+**Closes when:** for each of the four portal hosts, `/hcp/configuration/zz-<fresh>-absent`
+is requested once and its status + `Allow` recorded beside a same-host `/hcp/zz-<fresh>-absent`
+404 control and a root-level 5518 B control. **A negative counts**: if `carelinkhp` answers
+404 for the absent child path while `carelink.medtronic.*` answer 405, the constant is
+per-deployment and AG's boundary is a local fact rather than a family property — and that
+is the more interesting result.
 
-**Assumptions (INFERRED):** that `Allow` is emitted by the server from the route's
-registered methods rather than configured per route — reasoned from one `server` header
-across 43 responses and from `Allow` agreeing with the `OPTIONS` body on 9 of 9 cells, and
-**not** established; and that a route carrying both headers would be found among those
-already recorded rather than on an unmeasured deployment.
+**Assumptions (INFERRED):** that the 405 is produced by a handler mounted at
+`/hcp/configuration/` which answers before route resolution — consistent with the observed
+boundary and with the byte-identical response, but the mechanism was never observed, only
+the boundary; and that a fresh absent name will not accidentally collide with a real route,
+which is why the name must be checked with `git grep` and the pass must use a new token
+rather than reusing `zz-ag-absent-8713`.
+
+### AM. Do `SKU-78963/78964/78965/78968-01` carry a product name **anywhere** the vendor serves publicly, or is `INSTINCT` the only answer?
+
+**What is known.** The patient family map's `INSTINCT` row holds **13** `SKU-NNNNN-01`
+codes and the patient report-naming list holds the same 13; both are byte-identical across
+`carelink.minimed.com`, `.eu` and `-trials`, and neither carries a display name for **any**
+`SKU-` string — they map family → code list and name nothing. The only source in this
+repository that assigns a *product* name to an `INSTINCT` code is the portal device table
+(module `68462`), which names **10** codes — `MMT-5420` and 9 `SKU-` — and **every one of
+them is ≤ `78960`**. So four codes the patient documents list have **no name in any source
+held here**, and `docs/05` now says so rather than implying a range
+[source: findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md] (OBSERVED for the
+documents; PUBLISHED-and-cited, not measured by that pass, for the portal table).
+
+**What is missing.** Whether a name for those four exists on a vendor surface this
+repository has read only partially. Three candidate corpora, none swept for these four
+tokens: the **patient eager bundle and its 211 lazy chunks** (read for other tokens; the
+chunk corpus has never been grepped for `7896x`), the **two portal builds** (read at the
+2026-10-13 build — the table may have grown since, and the report list demonstrably did:
+214 → 236 between 2026-10-13 and 2026-11-03), and the **HCP report config**
+(`reportFileNamingSupportedPumpModels` there is 236 entries; only the patient copy has been
+diffed against the family map).
+
+**Blocker:** **no route returns a name→SKU mapping.** `docs/05`'s naming table is a string
+literal inside a JS asset, not a config key, and area AI measured that the two key-addressable
+patient documents carry no names at all — so this question **cannot** be answered by a
+per-SKU GET, and a pass must not invent a sub-key grammar to try. It is a **static-corpus**
+question: the pass reads committed/fetchable bundles, not an endpoint. Second blocker, a
+judgement one: fetching the three 3.4 MB builds to answer it costs 3 requests but re-anchors
+digests that area G and area AB already pin, so the pass must say which build it read and
+whether the digest moved.
+
+**Closes when:** either one vendor-served artefact pairs **any** of the four codes with a
+product name, and the name plus its `file:line`/byte offset is recorded — in which case
+`docs/05`'s `INSTINCT` row gains a name column it currently cannot have; **or** a bounded
+static sweep of the three named corpora (patient eager bundle + its lazy chunks, both portal
+builds, the HCP report config) finds the four codes **only** inside family/list enumerations
+and never adjacent to a name string, in which case the negative is the answer and the claim
+is that the `Instinct™ Sensor` / `Instinct™ Go` split is **unrecoverable from public
+artefacts** for the tail. **A negative counts**, and it is the more useful result: it would
+tell a third-party client that a family-level `INSTINCT` classification is the ceiling.
+
+**Assumptions (INFERRED):** that a name for a shipping SKU would appear in *some* served
+artefact if it existed — reasoned from the fact that the nine named codes do appear in one,
+and **not** established; and that the four codes belong to one of the two known `INSTINCT`
+products rather than a third that has no table anywhere, which no source here tests. **A
+tail code that carries no name and matches no product is itself a finding, not a gap.**
 
 ## Closed areas
 
@@ -3878,6 +3926,9 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| AI — what do `SKU-78961-01` … `SKU-78968-01` map to, and are they in the patient document at all? | 2026-11-10 | **Positive on presence, negative on naming, and the range notation in `docs/05` was the defect.** The patient family map's `INSTINCT` row holds **13** `SKU-NNNNN-01` codes, not the 9 the portal builds carry — so of the **76** integers in `78893…78968`, **13** are codes and **63** are skipped, and the row is an **enumeration, not a span**. The **tail splits 4/4**: `78963`, `78964`, `78965`, `78968` are **present** in **both** patient documents; `78961`, `78962`, `78966`, `78967` are **absent** from both. **What they map to is the family `INSTINCT` and no product name** — neither patient document names *any* `SKU-` string, and the portal device table that draws the `Instinct™ Sensor` / `Instinct™ Go` split **stops at `78960`**, so no source held here extends it and none is invented. **This reverses area G's direction:** G read the 9 portal SKUs against a wider recorded range and implied the patient side was smaller; it is **larger**, and the four in the difference are exactly the tail codes — the portal table is the incomplete side again, the same shape as `MMT-8600`/`MMT-8601`. **Method stated because the method is the choice:** two key-addressable documents fetched **whole** per host (`personal.device.family.to.model.mapping`, `personal.common.core.report.generation`) and scanned locally at **zero** further requests — a per-SKU GET would need an `…<key>.<SKU>` sub-key grammar recorded **nowhere** in this repo, i.e. wordlist fuzzing, and 8 probes on one host could not produce a two-table set difference across three deployments. **12 of a 16 cap**, 4 unspent, GET only, no POST/token/cookie/auth/wordlist; 6 of 6 controls passed **first on every host** (absent `zzz.not.a.real.key.zzz` → **404, 0 B, `text/vnd.a`**; live `logbook.supported.entry.types` → **200, 281 B, `7f0a5bb4…`**, reproducing area E seq 2/78 in full); **no deployment split** — one digest per document across all three hosts, the family map reproducing area E seq 40/116 in full (`ae70bde0…`, 3470 B) and its row **byte-identical** to the 2026-10-13 committed row. Measured **same-host spacing floor 2.591 s** by the kernel body-mtime oracle (9 gaps, **0 under 2.5 s**); ⚠ the `t_sent`/`t_done` series reads 1.899 s with one negative duration (seq 6 `t_queued` before seq 5 `t_done`) — the known corrupt-`t0` class `docs/09` §4 records, **no cause asserted**. ⚠ **A body-size drift found and not explained:** the report document reads **9470 B `ef92e9f3…`**, not area E's **10937 B `2f918b71…`**, on all three hosts — while its 236-entry list is **set- and order-identical** to the 2026-11-03 committed capture and its five top-level keys are unchanged, so a serialisation change and a content change are **not separable** from the bytes kept. Side-finding at zero requests: **`MMT-5420`** (the portal's `"Instinct™ Sensor"`) is in **no** family row but **is** in the report list at index 102, so the naming table is not derived from the family map in either direction. **Not claimed:** a name for the four present tail codes (a guess), or that absence from these two documents is absence from every Medtronic surface | [findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md] | #181 |
+| AG — does `Allow` agree with `access-control-allow-methods` on the same route, and does area N's warning generalise? | 2026-11-10 | **Negative on the title question — no response ever carries both — and a control refuted its own premise, which is the finding.** **0 of 28 live cells and 0 of 2,730 committed ledger rows** carry `Allow` and `ACAM` together. The two headers come from **different server stacks**: portal hosts run `Apache/2.4.62` and emit `Allow` (27 rows) with `ACAM` **0 of 1,700**; cumulus hosts run API Gateway and emit `ACAM` (56 rows) with `Allow` **0 of 248**. They are disjoint by design on both families measured. **The certainly-absent control was not absent:** `/hcp/configuration/zz-ag-absent-8713` (0 `git grep` hits repo-wide) returned **405 + `Allow: POST, OPTIONS`, byte-identical to the real POST-only route `/hcp/configuration/application`** — so `Allow` on this family does **not** discriminate "route exists, wrong method" from "route does not exist", and **area AG's own INFERRED assumption (that `Allow` comes from a route's registered methods) is refuted, not merely unestablished.** A recorded cap revision (24 → 28) bought the boundary: `/zz-ag-absent-8713` → **200, 5518 B** (the SPA fallback, on hosts where `AGENTS.md` §7 does not document it — successor **AK**), `/hcp/zz-ag-absent-8713` → **404**, `/hcp/configuration/zz-ag-absent-8713` → **405 + Allow**. So the 405 is scoped to the `/hcp/configuration/` **subtree** and `Allow` there is a **subtree constant**. **Area N's warning generalises in both directions:** neither header is a method register where it appears. Controls: portal known-live → 412 on 3 of 3 (the recorded `X-System-ID` gate); cumulus known-live → 401, 36 B, digest `d551247201fc8fc2` on 3 of 3; cumulus absent → 403, 42 B, digest `f249b63cb2fcb66b…`, reproducing the repo's published no-route digest in full on 3 of 3. **28 of a 28 cap**, GET + empty-body OPTIONS only, 6 hosts, no POST/token/auth/wordlist; `t_sent` spacing **22 gaps, min 1.894 s, median 2.959 s, 2 under 2.5 s, 1 under the 2.0 s floor, 0 negative** — the sub-floor reading disclosed, **no cause asserted** (the known corrupt-`t0` class, `docs/09` §4), with no kernel-mtime oracle available because the bodies sat in a gitignored scratch dir. **Not established:** that no server anywhere emits both (two families measured); that the 405 constant holds on `carelink-support.medtronic.com` (cells not run, cap) or `carelinkhp` (never tested — successor **AL**); or any mechanism for the 405, only its boundary. Not a disclosure: every cell is an unauthenticated GET or empty-body OPTIONS on a public host | [findings-log/2026-11-10-area-ag-allow-vs-acam/FINDINGS.md] | #179 |
+
 | AB — are the six direct `/hcp/configuration/*` verdicts deployment-portable, or only on `carelinkhp`? | 2026-11-10 | **Negative, and that is the answer: the six verdicts are deployment-portable, 18 of 18 cells.** `access/config`, `appContext`, `whitelisted` → **401** with one 48 B `InvalidToken`/`AUTH` body on all three swept hosts (one digest, 9 of 9); `application`, `productContext`, `user` → **405**, 0 B, `Allow: POST, OPTIONS`. 12 of 12 controls first per host; 4 of 4 build digests re-asserted (corpus control **per host**, not per build); both builds name the same 6 direct literals (derived offline, sweep aborts if not). **New:** the 9 empty-body `OPTIONS` cells all answer **200** with `allow: POST, OPTIONS` and a 13 B body carrying the same list, and **`access-control-allow-methods` is absent on 43 of 43** — so on this family the method signal is `Allow`, not `ACAM`. **6 of 6, but one INFERRED assumption left unmeasured, and said so:** the header gate on the **direct** subtree was never tested header-less (every direct cell carried `X-System-ID`), so `412` there is unmeasured, not answered; the second (405 reflects the route) is settled in the expected direction. **43 of a 43 cap**, GET + empty-body OPTIONS only, measured same-host floor **2.595 s** by kernel body-mtime (39 gaps, 0 under 2.5 s; the `t_sent` series reads 2.108 s with 4 sub-2.5 s gaps and 3 impossible negative durations, the known corrupt-`t0` class, no cause asserted) | [findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] | #162 |
 | AC — after the window, what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled? | 2026-11-10 | **The census half was already complete and was NOT re-run; the one open question was a live probe, and its answer splits the host in two.** Enumeration close-condition had been met on 2026-10-17 — **0 of 44 unread**, every cell classified, **165 records / 27 paths / six hosts**, **5 of the 44** carrying a `/ipro/hcp/` member (last dated 2026-06-10, archived `404`), nested shapes recorded as unexplained under F10a — so this pass sent **0 requests to Common Crawl** and **read 0 crawls**. What a ledger could not settle was the catch-all, and **14 of a 20 GET-only cap** (0 failures, 0 retries, floor **2.579 s** between 14 requests, 0 of 13 gaps under the declared 2.5 s) settles it: **no whole-host catch-all** — a fabricated apex path (verified 0 `git grep` hits) answers a real **`404`**, 196 B, digest `80c3fe2ae1062abf`, **byte-identical** to the live `/ipro/hcp/` and `/ipro/hcp/index.html` `404`s and to `/assets/zz-ac-absent-…html` — **but every path under `/app/` returns one identical 1 833-byte SPA shell whether it exists or not**: two invented names at depths 1 and 4 produced digest `8dfb96a70999bdb4`, the same bytes `/app/` itself and all four recorded `/app/assets/…` nesting depths return. **Two handlers, selected by path prefix and visible in `Content-Type`** (`iso-8859-1` Apache 404 vs `UTF-8` shell). So the catch-all is **prefix-scoped, not host-wide**, and **the strong "unanswerable at all" reading does not hold as written** — it holds for `/app/…` URLs and **not** for `/ipro/hcp/`, which is outside `/app/` and stays readable; `/ipro/hcp/` is **not served today** and the archived `404`s still do not date the change. **F10a's nesting pattern is explained in one direction** (the `/app/` shell answers at every depth by construction); which came first stays unestablished. **A measurement limitation, not a disclosure — nothing shows the vendor hiding anything, and this is not a security finding.** ⚠ **The `/robots.txt` control refuted its own premise**: it is **`404` on this host**, byte-identical to the fabricated path, and **no crawl record in this repository has ever shown a `200` at `/robots.txt` on `carelink.minimed.eu`** — the `200` belongs to `carelink-stage3.minimed.eu`. Successor (needs its own claim): which **prefixes** each host in the family serves a shell at — `carelinkhp.minimed.eu` catches **everything** per `AGENTS.md` §7, a different mechanism under the same word | [findings-log/2026-11-10-area-ac-catchall-probe/FINDINGS.md] + [findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md] | #168 |
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |

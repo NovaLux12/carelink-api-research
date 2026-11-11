@@ -1,0 +1,32 @@
+2026-11-10T23:49:24.946Z === AG sweep start, cap 24 ===
+2026-11-10T23:49:27.905Z GET carelink.medtronic.com/hcp/configuration/access/config -> 412 allow=none acam=none acao=none 0B
+2026-11-10T23:49:30.748Z GET carelink.medtronic.com/hcp/configuration/zz-ag-absent-8713 -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:33.579Z GET carelink.medtronic.com/hcp/configuration/application -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:36.261Z OPTIONS carelink.medtronic.com/hcp/configuration/application -> 200 allow=POST, OPTIONS acam=none acao=none 13B
+2026-11-10T23:49:38.919Z GET carelink.medtronic.eu/hcp/configuration/access/config -> 412 allow=none acam=none acao=none 0B
+2026-11-10T23:49:41.563Z GET carelink.medtronic.eu/hcp/configuration/zz-ag-absent-8713 -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:44.181Z GET carelink.medtronic.eu/hcp/configuration/application -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:46.796Z OPTIONS carelink.medtronic.eu/hcp/configuration/application -> 200 allow=POST, OPTIONS acam=none acao=none 13B
+2026-11-10T23:49:49.814Z GET carelink-support.medtronic.com/hcp/configuration/access/config -> 412 allow=none acam=none acao=none 0B
+2026-11-10T23:49:52.536Z GET carelink-support.medtronic.com/hcp/configuration/zz-ag-absent-8713 -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:55.384Z GET carelink-support.medtronic.com/hcp/configuration/application -> 405 allow=POST, OPTIONS acam=none acao=none 0B
+2026-11-10T23:49:58.222Z OPTIONS carelink-support.medtronic.com/hcp/configuration/application -> 200 allow=POST, OPTIONS acam=none acao=none 13B
+2026-11-10T23:50:01.194Z GET clcloud.minimed.com/connect/carepartner/v13/display/message -> 401 allow=none acam=none acao=none 36B
+2026-11-10T23:50:04.420Z GET clcloud.minimed.com/connect/csr/v2/zz-ag-absent-8713 -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:06.884Z GET clcloud.minimed.com/connect/csr/v2/display/message -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:09.718Z OPTIONS clcloud.minimed.com/connect/csr/v2/display/message -> 200 allow=none acam=OPTIONS,POST acao=* 0B
+2026-11-10T23:50:12.683Z GET clcloud-trials.minimed.com/connect/carepartner/v13/display/message -> 401 allow=none acam=none acao=none 36B
+2026-11-10T23:50:15.627Z GET clcloud-trials.minimed.com/connect/csr/v2/zz-ag-absent-8713 -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:18.655Z GET clcloud-trials.minimed.com/connect/csr/v2/display/message -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:21.604Z OPTIONS clcloud-trials.minimed.com/connect/csr/v2/display/message -> 200 allow=none acam=OPTIONS,POST acao=* 0B
+2026-11-10T23:50:24.397Z GET clcloud.minimed.eu/connect/carepartner/v13/display/message -> 401 allow=none acam=none acao=none 36B
+2026-11-10T23:50:27.169Z GET clcloud.minimed.eu/connect/csr/v2/zz-ag-absent-8713 -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:29.633Z GET clcloud.minimed.eu/connect/csr/v2/display/message -> 403 allow=none acam=none acao=none 42B
+2026-11-10T23:50:32.249Z OPTIONS clcloud.minimed.eu/connect/csr/v2/display/message -> 200 allow=none acam=OPTIONS,POST acao=* 0B
+2026-11-10T23:50:32.257Z === AG sweep end: 24 of 24 ===
+2026-11-10T23:50:58.129Z === AG batch 2 start, cap 28 (revision 24->28) ===
+2026-11-10T23:51:00.982Z GET carelink.medtronic.com/zz-ag-absent-8713 -> 200 allow=none acam=none 5518B
+2026-11-10T23:51:03.825Z GET carelink.medtronic.com/hcp/zz-ag-absent-8713 -> 404 allow=none acam=none 0B
+2026-11-10T23:51:06.484Z GET carelink.medtronic.eu/zz-ag-absent-8713 -> 200 allow=none acam=none 5518B
+2026-11-10T23:51:09.997Z GET carelink.medtronic.eu/hcp/zz-ag-absent-8713 -> 404 allow=none acam=none 0B
+2026-11-10T23:51:09.107Z === AG batch 2 end: 28 of 28 ===

@@ -55,9 +55,37 @@ SIMPLERACC  SIMPLERACCOLID  NMX7  CC840  CC880  NMX8  INSTINCT  EAGLE
 | `EAGLE` | MMT-9015, 9017, 9115, 9117 |
 | `SIMPLERACC` | MMT-8600, 8601, MMT5100, MMT-5100JC1/2/4, MMT-5101W1/2/4, MMT-5100JD4, MMT-5101P/M |
 | `SIMPLERACCOLID` | MMT-8602 |
-| `INSTINCT` | SKU-78893-01 … SKU-78968-01 (plus unprefixed duplicates) |
+| `INSTINCT` | SKU-78893/78953/78954/78955/78956/78957/78958/78959/78960/78963/78964/78965/78968-01 (plus unprefixed duplicates) |
 
-A second, independent key corroborates the marketing name:
+> **⚠ Corrected 2026-11-10 (area AI) — the `INSTINCT` row is an enumeration, not a span; the range
+> notation above overstated it.** The row holds **13** `SKU-NNNNN-01` codes, listed verbatim above
+> (30 values in total: the 13 SKU-prefixed + the same 13 bare + 4 placeholders). Of the **76**
+> integers between `78893` and `78968`, **13** are codes and **63** are skipped — `78894`–`78952`,
+> `78961`, `78962`, `78966`, `78967`. So `SKU-78893-01 … SKU-78968-01`, which this page carried,
+> reads as contiguous and is not. Measured on all three patient deployments
+> (`.com`, `.eu`, `-trials`), 12 of a 16 cap, GET only: the family map is one digest
+> (`ae70bde0…`, 3470 B) on all three, reproduces area E's recorded value in full, and its row is
+> **byte-identical** to the row area H first committed
+> [source: findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md;
+> `family-map-verbatim.txt`].
+>
+> **What the four tail codes `78963`/`78964`/`78965`/`78968` map to: the family `INSTINCT` and no
+> product name.** Neither patient document carries a display name for *any* `SKU-` string — the
+> family map maps family → code list, the report-naming list is a bare string list — so the
+> `Instinct™ Sensor` / `Instinct™ Go` split the portal device table draws **stops at `78960`** and
+> **no source held here extends it**. `78961`, `78962`, `78966` and `78967` appear in **neither**
+> patient document. **A name for the four present tail codes would be a guess** and none is offered.
+>
+> **This reverses the direction area G's row implied.** Area G read the portal builds against this
+> page and recorded the 9 portal SKUs against a *wider* recorded range, which suggests the patient
+> side is larger-or-equal — and it is **larger**: the patient row has 13, the portal table 9, and the
+> four in the difference are exactly the tail codes. The portal table is the incomplete side again,
+> the same shape as `MMT-8600`/`MMT-8601` below. Separately, `MMT-5420` — the portal's
+> `"Instinct™ Sensor"` — is in **no** family row and **is** in the report list (index 102), so the
+> naming table is not derived from the family map in either direction
+> [source: findings-log/2026-11-10-area-ai-instinct-sku-tail/FINDINGS.md].
+
+A second key of the same document corroborates the marketing name:
 
 ```json
 "system.settings.transfer.feature.config": { "device.mapping": { "BLE780": "780G", "CC880": "MiniMed™ Flex" } }
