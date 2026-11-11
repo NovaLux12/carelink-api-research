@@ -408,8 +408,32 @@ def check_log_hygiene():
         rj = os.path.join(d, 'results.jsonl')
         if os.path.exists(rj):
             rows = sum(1 for line in read(rj).splitlines() if line.strip())
+        else:
+            # Some passes keep their ledger as `requests.tsv` (one row per request)
+            # rather than JSONL. Counting only results.jsonl makes a compliant pass
+            # look like a zero-request one — which is how a two-sided check starts
+            # producing false positives, so read whichever ledger exists.
+            rt = os.path.join(d, 'requests.tsv')
+            if os.path.exists(rt):
+                rj = rt
+                rows = sum(1 for line in read(rt).splitlines()
+                           if line.strip() and not line.lstrip().startswith('#'))
         if rows > used:
-            fail(f'{name}: results.jsonl has {rows} rows, FINDINGS.md accounts for {used}')
+            fail(f'{name}: {os.path.basename(rj)} has {rows} rows, FINDINGS.md accounts for {used}')
+        elif used > rows and 'cap-counts: ledger-rows' not in t:
+            # THE OTHER DIRECTION, silent for the whole life of this check.
+            # `rows > used` catches a ledger longer than the prose. It says nothing when
+            # the prose claims MORE requests than the ledger holds — which is how a pass
+            # overstates its own work, and how two quantities get conflated under one
+            # number. Warn-only because findings-log/ is append-only (AGENTS.md §3): a
+            # fail would trap a lane between two rules it cannot satisfy, since the
+            # offending sentence cannot be rewritten. The escape hatch is for a sentence
+            # that is right and counts a different population on purpose.
+            warn(f'{name}/FINDINGS.md accounts for {used} of a {limit} cap but '
+                 f'{os.path.basename(rj)} holds {rows} row(s) — the claim is larger than the '
+                 f'ledger. If that sentence counts a different population (gate runs, retries, '
+                 f'a multi-document pass), say which and add `<!-- cap-counts: ledger-rows -->` '
+                 f'beside it with the reason; otherwise the figure overstates the pass')
     for f in glob.glob('findings-log/**/*', recursive=True):
         if os.path.splitext(f)[1] in banned:
             fail(f'{f}: raw archive capture — AGENTS.md §7 forbids committing these')
