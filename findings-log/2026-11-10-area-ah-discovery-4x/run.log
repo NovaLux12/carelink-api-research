@@ -1,0 +1,30 @@
+2026-11-10T23:56:16.638Z === host clcloud.minimed.com — controls first, then 4 tails at base v13 ===
+2026-11-10T23:56:19.634Z seq=1 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/3.6 [CONTROL-live: base v13 tail 3.6, recorded 200 + Auth0/v13 document on both hosts] status=200 exit=0
+2026-11-10T23:56:22.607Z seq=2 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/zz-absent-8713 [CONTROL-absent: fabricated tail zz-absent-8713 — no naming convention produces it] status=200 exit=0
+2026-11-10T23:56:25.568Z seq=3 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/4.0 [CANDIDATE: the claim's cell android/4.0 at base v13] status=200 exit=0
+2026-11-10T23:56:28.555Z seq=4 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/4.1 [CANDIDATE: the claim's cell android/4.1 at base v13] status=200 exit=0
+2026-11-10T23:56:31.596Z seq=5 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/4.2 [CANDIDATE: the claim's cell android/4.2 at base v13] status=200 exit=0
+2026-11-10T23:56:34.584Z seq=6 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/5.0 [CANDIDATE: the claim's cell android/5.0 at base v13] status=200 exit=0
+2026-11-10T23:56:34.589Z === host clcloud.minimed.com done; ledger 6 of cap 20 ===
+2026-11-10T23:56:36.800Z === host clcloud-trials.minimed.com — controls first, then 4 tails at base v13 ===
+2026-11-10T23:56:45.358Z seq=7 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/3.6 [CONTROL-live: base v13 tail 3.6, recorded 200 + Auth0/v13 document on both hosts] status=200 exit=0
+2026-11-10T23:56:48.473Z seq=8 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/zz-absent-8713 [CONTROL-absent: fabricated tail zz-absent-8713 — no naming convention produces it] status=200 exit=0
+2026-11-10T23:56:51.470Z seq=9 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/4.0 [CANDIDATE: the claim's cell android/4.0 at base v13] status=200 exit=0
+2026-11-10T23:56:54.455Z seq=10 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/4.1 [CANDIDATE: the claim's cell android/4.1 at base v13] status=200 exit=0
+2026-11-10T23:56:57.468Z seq=11 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/4.2 [CANDIDATE: the claim's cell android/4.2 at base v13] status=200 exit=0
+2026-11-10T23:57:00.455Z seq=12 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/5.0 [CANDIDATE: the claim's cell android/5.0 at base v13] status=200 exit=0
+2026-11-10T23:57:00.460Z === host clcloud-trials.minimed.com done; ledger 12 of cap 20 ===
+2026-11-10T23:58:04.861Z === addendum: Auth0SSOConfiguration lower bound (docs/03:164) ===
+2026-11-10T23:58:07.906Z seq=13 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/3.4 [ADDENDUM: docs/03:164 claims the Auth0SSOConfiguration KEY spans 3.4 -> 5.0; 3.4 is that claim's lower bound] status=200 exit=0
+2026-11-10T23:58:11.408Z seq=14 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/3.4 [ADDENDUM: docs/03:164 claims the Auth0SSOConfiguration KEY spans 3.4 -> 5.0; 3.4 is that claim's lower bound] status=200 exit=0
+
+=== per-host spacing, t_sent series (ledger clock) and kernel body-mtime oracle ===
+clcloud.minimed.com: n=7 t_sent gaps=[3.0, 2.97, 3.723, 2.867, 2.399, 93.266]
+clcloud.minimed.com: t_sent floor=2.399 under2.5=1 under2.0=0 negative_duration_seqs=[4, 5]
+clcloud-trials.minimed.com: n=7 t_sent gaps=[8.554, 3.12, 2.995, 2.985, 3.012, 70.439]
+clcloud-trials.minimed.com: t_sent floor=2.985 under2.5=0 under2.0=0 negative_duration_seqs=[]
+clcloud.minimed.com: kernel-mtime gaps=[2.985, 2.962, 2.979, 3.042, 2.995, 93.315] floor=2.962 under2.5=0
+clcloud-trials.minimed.com: kernel-mtime gaps=[3.114, 2.996, 2.986, 3.012, 2.989, 70.58] floor=2.986 under2.5=0
+2026-11-11T00:01:17.950Z === addendum 2: fallback confirmation at tail 99.99 ===
+2026-11-11T00:01:20.955Z seq=15 GET https://clcloud.minimed.com/connect/carepartner/v13/discover/android/99.99 [FALLBACK-CONFIRM: tail 99.99 is above every string this axis has ever served (max recorded 12.0); if it returns the same document as 4.x, v2 is the default and not a version selection] status=200 exit=0
+2026-11-11T00:01:24.608Z seq=16 GET https://clcloud-trials.minimed.com/connect/carepartner/v13/discover/android/99.99 [FALLBACK-CONFIRM: tail 99.99 is above every string this axis has ever served (max recorded 12.0); if it returns the same document as 4.x, v2 is the default and not a version selection] status=200 exit=0
