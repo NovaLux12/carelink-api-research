@@ -97,7 +97,7 @@ signature); `GET 401` → live with `GET`.
 | 17 | `.eu` | GET | `v2/discover/android/3.6` | 403 | MissingAuthToken | 42 `f249b63c…` | — | no `GET` route |
 | 18 | `.eu` | OPTIONS | `v2/discover/android/3.6` | 403 | MissingAuthToken | 42 `f249b63c…` | — | **dead** |
 
-All twelve `403`s carry **one** digest, `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`,
+All thirteen `403`s carry **one** digest, `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`,
 42 B — the absent control, the six candidate cells on `.com`/`.eu` and the two
 `-trials` no-route cells alike. **Evidence class: OBSERVED** — `results.jsonl` rows 1–18,
 `headers/*.hdr` + `headers/*.body`, `run.log`.
@@ -236,10 +236,22 @@ should not be repeated here. Recorded as a decision, not an omission.
 retries. `GET` + empty-body `OPTIONS` only, no `POST`, no token, no cookie, no auth
 header of any kind.
 
-Measured same-host spacing **2.611 s floor over 15 gaps, 0 under 2.5 s**, from the
-**kernel body-file mtimes** — the series `docs/09` §4 says to trust when the harness's
-own clock is suspect. The harness `t_sent` series reads **2.022 s with 1 gap under
-2.5 s** and **0 negative durations**, which is the known corrupt-`t0` signature
-recorded in five prior passes; no cause is asserted for it, and the mtime series is the
-authority. Both figures are given because `docs/09` §4 requires the weaker one to be
-reported beside the stronger, not replaced by it.
+⚠ **Corrected 2026-11-10 after verification: the kernel-mtime oracle is DEAD on this
+pass, and the figure originally published here (2.611 s floor, 0 under 2.5 s) was an
+artefact of it.**
+
+The `t_sent` series reads **2.022 s floor over 15 gaps, 1 gap under 2.5 s, and 1
+negative duration** (`seq 14`, `.eu`, `t_done - t_sent = -0.531 s`) — the known
+corrupt-`t0` signature recorded in five prior passes, and no cause is asserted.
+
+The mtime cross-check that earlier passes used to rescue such a series **cannot be
+applied here**, and the reason is mechanical: every committed body file carries the
+**same** mtime (`1794355484.4125…`, a 43 ms spread across all 18), because they were
+written by the same checkout/copy step rather than by curl at request time. A series
+whose spread is 43 ms cannot measure a 2.5 s spacing rule. **So this pass has one
+clock, not two, and that clock contains a negative duration and a sub-floor gap.**
+
+What is claimed: the delay was slept inside the per-host `flock` as declared. What is
+**not** claimed: a clean spacing floor. `1.894 s`-class readings on a series that also
+reports an impossible negative are exactly what `docs/09` §4 says to publish rather
+than reconcile.
