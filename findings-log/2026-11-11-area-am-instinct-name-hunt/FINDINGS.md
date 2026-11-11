@@ -81,7 +81,7 @@ authentication, no wordlist, no DNS. Three hosts, all in this lane's set:
 
 **Declared delay `sleep 2.5` inside the per-host `flock`** — one `flock 9` per request, the sleep
 and the curl both inside it. **Measured same-host spacing floor 2.609 s by the kernel body-mtime
-oracle**, 12 gaps across the three hosts, **0 under 2.5 s**
+oracle**, 13 gaps across the three hosts (4 + 6 + 3), **0 under 2.5 s**
 (`.com` 2.682/15.968/2.814/98.809 · `.eu` 2.617/16.317/2.618/96.038/2.609/2.620 ·
 `-trials` 2.833/16.665/2.843). Every gap is ≥ 2.5 s.
 
@@ -249,7 +249,7 @@ last-value-wins collapse is `AGENTS.md` §6 item 3 wearing different clothes, so
 |---|---|---|
 | 16 of a 16 cap, GET only, controls first per host, 3 hosts | OBSERVED | `results.jsonl` seq 1–16; `run.log` |
 | Absent control 404 / 0 B / `text/vnd.a` on all 3 hosts; live control 200 / 281 B / `7f0a5bb4…` on all 3 | OBSERVED | `results.jsonl` seq 1–6 |
-| Spacing floor 2.609 s by body-mtime, 12 gaps, 0 under 2.5 s | OBSERVED | kernel mtime over `.loop/am-scratch/*.b`; disclosed against the `t_sent` series (§Accounting) |
+| Spacing floor 2.609 s by body-mtime, 13 gaps, 0 under 2.5 s | OBSERVED | kernel mtime over `.loop/am-scratch/*.b`; disclosed against the `t_sent` series (§Accounting) |
 | `t_sent` reads one 1.751 s gap and two negative durations; no cause asserted | OBSERVED | `results.jsonl` seq 3, 8 |
 | Patient bundle 3 417 255 B `0fb4fbd4…` on all 3 hosts; reproduces area V seq 3/7 | OBSERVED | `results.jsonl` seq 7, 9, 11 |
 | Clinic asset name 404 / 196 B / `80c3fe2a…` on all 3 patient hosts | OBSERVED | `results.jsonl` seq 8, 10, 12 |
@@ -266,3 +266,26 @@ last-value-wins collapse is `AGENTS.md` §6 item 3 wearing different clothes, so
 | The HCP `pow.common.core.report.generation` copy holds 214 entries and no name field | **PUBLISHED (cited, read from committed bodies, zero requests)** | `findings-log/2026-10-17-hcp-config-deployments/headers/k0{24,36,48}-*report.generation.b` |
 | The two portal builds were not read; the clinic device table may or may not have grown | INFERRED limit | assumption: the portal host family is another lane's; seq 8/10/12 only test the asset name on a patient host |
 | `US` across two deployments is one artefact, so US-vs-EU is one source | INFERRED (§2.1) | identical digest `f0efac1d…` on seq 13 and 14 |
+
+## Correction (2026-11-11) — "12 gaps" was 13, and the parenthetical proved it
+
+A verifier caught this and was right. The spacing paragraph said **"12 gaps across the three
+hosts"** and then listed, in the same sentence, `.com` **4** · `.eu` **6** · `-trials` **3** =
+**13**. The evidence table carried the same wrong figure. Nothing else in the paragraph moved:
+the floor (2.609 s), the "0 under 2.5 s" reading and the disclosed `t_sent` anomalies are all
+unchanged, because a missing gap cannot lower a minimum.
+
+Recomputed from `results.jsonl`, grouping by host and sorting on `seq` (16 rows → 5/7/4 per host):
+
+```
+carelink.minimed.com        5 rows -> 4 gaps
+carelink.minimed.eu         7 rows -> 6 gaps
+carelink-trials.minimed.com 4 rows -> 3 gaps
+                                  TOTAL 13
+```
+
+The check that would have caught it is arithmetic that must hold regardless of any filter:
+**`sum(rows_per_host - 1)`**. 16 rows over 3 hosts cannot produce 12 same-host gaps, and the
+lane's own list already said 13. A count that disagrees with the evidence printed beside it is
+the cheapest kind of defect to find and the easiest to miss, because both halves look
+authoritative.
