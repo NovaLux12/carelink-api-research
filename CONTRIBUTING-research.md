@@ -55,9 +55,16 @@ These are not negotiable:
 - **≥2 seconds between requests to the same host.** Stay under your cap.
 - Candidates must be **derived from an observed naming convention**, with the
   reasoning recorded. A bounded, justified list is fine. "Try some words" is not.
-- **Discriminate on `Content-Type`, never on status code.** `carelinkhp.minimed.eu`
-  returns HTTP 200 with 5518 bytes of HTML for every path that does not exist —
-  a status-code check reads that as a hit.
+- **The 5518 B SPA fallback is prefix-scoped, and it is on four hosts, not one.**
+  `carelinkhp.minimed.eu`, `carelink.medtronic.{com,eu}` and
+  `carelink-support.medtronic.com` each return HTTP 200 + `text/html`, 5518 bytes, for
+  any path that does not exist **at the apex or under `/app/`**. **It stops at `/hcp/`**:
+  `/hcp/<absent>` is a real `404` (0 B, no `Content-Type` header) and
+  `/hcp/configuration/<absent>` is `405 + Allow: POST, OPTIONS` — on all four, including
+  `carelinkhp`. So the status code **is** an oracle under `/hcp/` and is worthless at the
+  apex and under `/app/`. **5518 B is not a fingerprint** — the clinic build serves
+  `sha256 0f2c5f62…` and the support build a different 5518 B body, `f637c8d0…`;
+  discriminate on the digest. [source: findings-log/2026-11-10-area-ak-portal-spa-fallback/FINDINGS.md §8]
 - **`carelink.minimed.eu` serves gzip unconditionally**, ignoring
   `Accept-Encoding`. Use `curl --compressed`, or every parse fails.
 - **`*.carelink.eu`, `*.carelink.com`, `*.clcloud.eu` are wildcard DNS on a
@@ -266,8 +273,14 @@ controller that runs the loop prompt until the work runs out.
   cap and the request count in the write-up.
 - Candidate paths must be derived from an observed naming convention, with the
   reasoning recorded. A bounded, justified list is fine. "Try some words" is not.
-- Discriminate on Content-Type, never on status code. carelinkhp.minimed.eu
-  returns HTTP 200 + 5518 bytes of HTML for every path that does not exist.
+- The 5518 B SPA fallback is prefix-scoped and sits on four hosts: carelinkhp.minimed.eu,
+  carelink.medtronic.{com,eu} and carelink-support.medtronic.com return HTTP 200 +
+  text/html, 5518 bytes, for any unknown path at the apex or under /app/. It stops at
+  /hcp/: /hcp/<absent> is a real 404 (0 B, no Content-Type header) and
+  /hcp/configuration/<absent> is 405 + Allow: POST, OPTIONS, on all four hosts including
+  carelinkhp. So status IS an oracle under /hcp/ and is worthless at the apex and under
+  /app/. 5518 B is not a fingerprint: the clinic build serves sha256 0f2c5f62... and the
+  support build a different 5518 B body, f637c8d0...; discriminate on the digest.
 - carelink.minimed.eu serves gzip unconditionally, ignoring Accept-Encoding. Use
   `curl --compressed`, or every parse fails on 0x8b.
 - *.carelink.eu, *.carelink.com, *.clcloud.eu are wildcard parking DNS. A random
