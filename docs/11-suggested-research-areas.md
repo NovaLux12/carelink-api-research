@@ -3602,11 +3602,17 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **1 open plus 33 closed**
-stand today (`AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
+**The maintainer decision the paragraphs above deferred has been taken.** **2 open plus 34 closed**
+stand today (`AL` and `AM` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
+`AB` minted by lane l2 and closed 2026-11-10 by this PR, `AG` minted 2026-11-10 by the
+pass that closed `AB` and closed 2026-11-10 on claim #179, `AC` closed 2026-11-10 by claim #168,
+`AE` closed 2026-11-10 by claim #161, `AF` closed 2026-11-10, `AJ` closed 2026-11-10 by
+claim #182 and `AM` minted by that same pass as its successor; counted from the
+`^### [A-Z]{1,2}.` headings with `python3 scripts/research-checks.py`, not inherited).
 `AB` minted by lane l2 and closed 2026-11-10 by this PR, `AG` minted 2026-11-10 by the
 pass that closed `AB`, `AC` closed 2026-11-10 by claim #168, `AE` closed 2026-11-10 by
-claim #161, `AF` closed 2026-11-10; counted from the `^### [A-Z]{1,2}.` headings with
+claim #161, `AF` closed 2026-11-10, `AJ` closed 2026-11-10 by claim #182 and `AL` minted by
+that same pass as its successor; counted from the `^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 The open figure did **not** fall when `AB` closed, because the same pass minted `AG` as its
 successor — a closure that mints an area nets zero open, and the Closed table grows by one.
@@ -3811,6 +3817,51 @@ the boundary; and that a fresh absent name will not accidentally collide with a 
 which is why the name must be checked with `git grep` and the pass must use a new token
 rather than reusing `zz-ag-absent-8713`.
 
+### AM. Is the `-trials` `OPTIONS 200` under `/connect/carepartner/v2` **path-specific**, or does that subtree answer every `OPTIONS` with `200`?
+
+**What is known (OBSERVED, [source: findings-log/2026-11-10-area-aj-cumulus-v2-message/FINDINGS.md]).**
+On `clcloud-trials.minimed.com`, one path-family apart, in one run:
+
+| cell | `GET` | `OPTIONS` |
+|---|---|---|
+| `connect/carepartner/v2/discover/android/3.6` | **200**, 10 053 B `1aab9bb1e721…` | **403** `MissingAuthenticationTokenException`, 42 B |
+| `connect/carepartner/v2/display/message` | **403** `MissingAuthenticationTokenException`, 42 B | **200**, 0 B, `ACAO: *`, `ACAM: OPTIONS` |
+
+So `OPTIONS` is **not** blanket-`200` under that prefix. But the pass did not buy the
+control that would settle it: **no `OPTIONS` was sent to a certainly-absent path inside
+this subtree on this host.** The nearest thing on record is area C's `.eu` cell
+(`OPTIONS connect/carepartner/v13/3f8a1c2e-…` → 403, no CORS), which is a different
+base path on a different host, and `docs/09` §2 warns in the other direction too: on the
+`commoncore*` deployments an `OPTIONS`-time `ACAO` is **carried by the no-route error**,
+8 of 8 cells, so the header alone is not proof of a resource. Area AJ's `200` rests on
+the **status**, not the header — but only a same-subtree absent-path control can say
+whether a `200` there is discriminating.
+
+**What is missing.** One `OPTIONS` to `connect/carepartner/v2/<fabricated>` on
+`-trials`, beside the two cells above, plus the `OPTIONS` repeat on `2/display/message`
+itself to show the `200` is stable rather than a one-off.
+
+**Blocker:** none beyond the request budget — this is a 4–6 cell, `GET` + empty-body
+`OPTIONS`, controls-first sweep on **one** host, no token. It is cheap precisely
+because area AJ already established both controls on that host.
+
+**Closes when:** the fabricated-path `OPTIONS` answers **403 at
+`f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`** — in which case the
+`200` at `2/display/message` is path-specific and area AJ's "registered with a non-`GET`
+method" verdict stands as measured — **or** it answers `200`, in which case the `-trials`
+`OPTIONS 200` carries **no** route signal on that subtree, area AJ's positive must be
+**downgraded to a no-`GET`-route negative**, and `docs/09` §2's `GET 403 + OPTIONS 200 →
+live, POST-only` rule needs a stated scope limit on this host family. **A negative counts,
+and so does a retraction: the second outcome deletes a positive this repo just recorded,
+which is exactly the kind of answer worth four requests.**
+
+**Assumption (INFERRED):** that the fabricated path's `OPTIONS` is the right control for
+a *status*-based reading — reasoned from `docs/09` §2's rule requiring both methods and
+from area C's `OPTIONS`-on-a-UUID cell, and **not** established for this host, since the
+`commoncore*` cells show the same family returning a CORS-carrying no-route `403` on
+`OPTIONS`. If that shape holds here, the control will answer `403` **with** CORS, and the
+discriminator is then the status alone.
+
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
@@ -3834,6 +3885,7 @@ being superseded — never silently. Letters are not reused.
 |---|---|---|---|---|
 | AG — does `Allow` agree with `access-control-allow-methods` on the same route, and does area N's warning generalise? | 2026-11-10 | **Negative on the title question — no response ever carries both — and a control refuted its own premise, which is the finding.** **0 of 28 live cells and 0 of 2,730 committed ledger rows** carry `Allow` and `ACAM` together. The two headers come from **different server stacks**: portal hosts run `Apache/2.4.62` and emit `Allow` (27 rows) with `ACAM` **0 of 1,700**; cumulus hosts run API Gateway and emit `ACAM` (56 rows) with `Allow` **0 of 248**. They are disjoint by design on both families measured. **The certainly-absent control was not absent:** `/hcp/configuration/zz-ag-absent-8713` (0 `git grep` hits repo-wide) returned **405 + `Allow: POST, OPTIONS`, byte-identical to the real POST-only route `/hcp/configuration/application`** — so `Allow` on this family does **not** discriminate "route exists, wrong method" from "route does not exist", and **area AG's own INFERRED assumption (that `Allow` comes from a route's registered methods) is refuted, not merely unestablished.** A recorded cap revision (24 → 28) bought the boundary: `/zz-ag-absent-8713` → **200, 5518 B** (the SPA fallback, on hosts where `AGENTS.md` §7 does not document it — successor **AK**), `/hcp/zz-ag-absent-8713` → **404**, `/hcp/configuration/zz-ag-absent-8713` → **405 + Allow**. So the 405 is scoped to the `/hcp/configuration/` **subtree** and `Allow` there is a **subtree constant**. **Area N's warning generalises in both directions:** neither header is a method register where it appears. Controls: portal known-live → 412 on 3 of 3 (the recorded `X-System-ID` gate); cumulus known-live → 401, 36 B, digest `d551247201fc8fc2` on 3 of 3; cumulus absent → 403, 42 B, digest `f249b63cb2fcb66b…`, reproducing the repo's published no-route digest in full on 3 of 3. **28 of a 28 cap**, GET + empty-body OPTIONS only, 6 hosts, no POST/token/auth/wordlist; `t_sent` spacing **22 gaps, min 1.894 s, median 2.959 s, 2 under 2.5 s, 1 under the 2.0 s floor, 0 negative** — the sub-floor reading disclosed, **no cause asserted** (the known corrupt-`t0` class, `docs/09` §4), with no kernel-mtime oracle available because the bodies sat in a gitignored scratch dir. **Not established:** that no server anywhere emits both (two families measured); that the 405 constant holds on `carelink-support.medtronic.com` (cells not run, cap) or `carelinkhp` (never tested — successor **AL**); or any mechanism for the 405, only its boundary. Not a disclosure: every cell is an unauthenticated GET or empty-body OPTIONS on a public host | [findings-log/2026-11-10-area-ag-allow-vs-acam/FINDINGS.md] | #179 |
 
+| AJ — does the Instinct-era cumulus v2 base carry a `display/message` route at all? | 2026-11-10 | **Not one number: the leaf is routed on exactly one of the three hosts, and not on either patient host.** `connect/carepartner/v2/display/message` is **dead on both methods on `.com` and on `.eu`** (`GET` 403 + `OPTIONS` 403, all four cells at the no-route digest `f249b63cb2fc…`, byte-identical to the fabricated sibling `v2/zz-aj-absent-8713`), and on **`clcloud-trials.minimed.com` `GET` 403 but `OPTIONS` 200** (0 B, `ACAO: *`, `ACAM: OPTIONS`) — the `docs/09` §2 signature of a route registered with a non-`GET` method. So *"the v2 track has no message route"* is **false** as a global claim and *"the v2 data plane is at `/connect/carepartner/v2/display/message`"* is **false where the vendor publishes that base**: the 3.9-class legacy document advertises `baseUrlCumulus = https://clcloud.minimed.com/connect/carepartner/v2`, and that base answers no-route on that host. **The nearby cell is what makes it interpretable:** on the same host, `v2/discover/android/3.6` is **`GET` 200** (10 053 B, digest **re-derives the recorded `1aab9bb1e721…`**) but **`OPTIONS` 403**, so the `-trials` `OPTIONS` `200` is not a blanket property of that subtree — the two asymmetries point in opposite directions. **"POST-only" is INFERRED, not read from a header** (`ACAM` is not a method register, area N; here it advertises `OPTIONS` on a leaf whose `GET` is unrouted). 6 of 6 controls first, and the absent control was a **gate**: status + size + full digest checked before any question cell, aborting the sweep on mismatch — it reproduced 3 of 3. **18 of a 18 cap**, GET + empty-body `OPTIONS` only, no token; spacing floor **2.611 s** by kernel body-mtime (15 gaps, 0 under 2.5 s; the `t_sent` series reads 2.022 s with 1 sub-2.5 s gap and 0 negative durations — the known corrupt-`t0` class, no cause asserted). **Two things deliberately not claimed:** no same-subtree absent-path `OPTIONS` control was bought, so the `-trials` positive's discriminating power is **unproven** and is successor **AM**; and no pin was added, because a `GET`-403 pin on `.com`/`.eu` cannot fire on the `-trials` `OPTIONS` drift that is the finding | [findings-log/2026-11-10-area-aj-cumulus-v2-message/FINDINGS.md] | #182 |
 | AB — are the six direct `/hcp/configuration/*` verdicts deployment-portable, or only on `carelinkhp`? | 2026-11-10 | **Negative, and that is the answer: the six verdicts are deployment-portable, 18 of 18 cells.** `access/config`, `appContext`, `whitelisted` → **401** with one 48 B `InvalidToken`/`AUTH` body on all three swept hosts (one digest, 9 of 9); `application`, `productContext`, `user` → **405**, 0 B, `Allow: POST, OPTIONS`. 12 of 12 controls first per host; 4 of 4 build digests re-asserted (corpus control **per host**, not per build); both builds name the same 6 direct literals (derived offline, sweep aborts if not). **New:** the 9 empty-body `OPTIONS` cells all answer **200** with `allow: POST, OPTIONS` and a 13 B body carrying the same list, and **`access-control-allow-methods` is absent on 43 of 43** — so on this family the method signal is `Allow`, not `ACAM`. **6 of 6, but one INFERRED assumption left unmeasured, and said so:** the header gate on the **direct** subtree was never tested header-less (every direct cell carried `X-System-ID`), so `412` there is unmeasured, not answered; the second (405 reflects the route) is settled in the expected direction. **43 of a 43 cap**, GET + empty-body OPTIONS only, measured same-host floor **2.595 s** by kernel body-mtime (39 gaps, 0 under 2.5 s; the `t_sent` series reads 2.108 s with 4 sub-2.5 s gaps and 3 impossible negative durations, the known corrupt-`t0` class, no cause asserted) | [findings-log/2026-11-10-area-ab-hcp-direct/FINDINGS.md] | #162 |
 | AC — after the window, what does Common Crawl hold for `minimed.eu` from 2022-06 onward, and is `/ipro/hcp/` retired or merely uncrawled? | 2026-11-10 | **The census half was already complete and was NOT re-run; the one open question was a live probe, and its answer splits the host in two.** Enumeration close-condition had been met on 2026-10-17 — **0 of 44 unread**, every cell classified, **165 records / 27 paths / six hosts**, **5 of the 44** carrying a `/ipro/hcp/` member (last dated 2026-06-10, archived `404`), nested shapes recorded as unexplained under F10a — so this pass sent **0 requests to Common Crawl** and **read 0 crawls**. What a ledger could not settle was the catch-all, and **14 of a 20 GET-only cap** (0 failures, 0 retries, floor **2.579 s** between 14 requests, 0 of 13 gaps under the declared 2.5 s) settles it: **no whole-host catch-all** — a fabricated apex path (verified 0 `git grep` hits) answers a real **`404`**, 196 B, digest `80c3fe2ae1062abf`, **byte-identical** to the live `/ipro/hcp/` and `/ipro/hcp/index.html` `404`s and to `/assets/zz-ac-absent-…html` — **but every path under `/app/` returns one identical 1 833-byte SPA shell whether it exists or not**: two invented names at depths 1 and 4 produced digest `8dfb96a70999bdb4`, the same bytes `/app/` itself and all four recorded `/app/assets/…` nesting depths return. **Two handlers, selected by path prefix and visible in `Content-Type`** (`iso-8859-1` Apache 404 vs `UTF-8` shell). So the catch-all is **prefix-scoped, not host-wide**, and **the strong "unanswerable at all" reading does not hold as written** — it holds for `/app/…` URLs and **not** for `/ipro/hcp/`, which is outside `/app/` and stays readable; `/ipro/hcp/` is **not served today** and the archived `404`s still do not date the change. **F10a's nesting pattern is explained in one direction** (the `/app/` shell answers at every depth by construction); which came first stays unestablished. **A measurement limitation, not a disclosure — nothing shows the vendor hiding anything, and this is not a security finding.** ⚠ **The `/robots.txt` control refuted its own premise**: it is **`404` on this host**, byte-identical to the fabricated path, and **no crawl record in this repository has ever shown a `200` at `/robots.txt` on `carelink.minimed.eu`** — the `200` belongs to `carelink-stage3.minimed.eu`. Successor (needs its own claim): which **prefixes** each host in the family serves a shell at — `carelinkhp.minimed.eu` catches **everything** per `AGENTS.md` §7, a different mechanism under the same word | [findings-log/2026-11-10-area-ac-catchall-probe/FINDINGS.md] + [findings-log/2026-10-17-sl2-outwindow-census/FINDINGS.md] | #168 |
 | C — extend the oracle set to `pde/v3` and `csr` | 2026-10-11 | **Negative on 10 cells, positive on 2.** PDE `v1/v2/v3` `display/message` and `pde/v3/discover/android/3.6` dead on GET **and** OPTIONS (no route on any tested method); `csr/v1`/`v3` and the bare `connect/carepartner/` prefixes dead on both; `connect/csr/v2/display/message` and `connect/v2/display/message` **live, POST-only** — in no prior note. 30 of a 30 request cap, GET+OPTIONS only | [findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md] | #2 |
