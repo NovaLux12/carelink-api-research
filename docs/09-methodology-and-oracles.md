@@ -102,6 +102,21 @@ nothing about a `2xx` on either method** (OBSERVED,
 [findings-log/2026-10-13-cors-method/FINDINGS.md §3, §4]). The `OPTIONS 200` in the table
 above is therefore the part that carries the signal, not the header.
 
+**One positive instance of the assumption, measured 2026-11-11 (area AP).** The
+`GET 403 + OPTIONS 200` row above presupposes that a gateway resolves `OPTIONS`
+**per route**. That had never been tested with a same-subtree absent-path control
+on any `clcloud.*` host. On `clcloud-trials.minimed.com`, under
+`/connect/carepartner/v2/`, it now has: an empty-body `OPTIONS` to the fabricated
+name `zz-ap-absent-4821` → **`403` `MissingAuthenticationTokenException`, 42 B,
+`f249b63cb2fcb66b…`**, the same name one segment deeper → the same `403`, and
+`discover/android/3.6` → the same `403` — while `v2/display/message` answered
+**`200`, 0 B, `ACAO: *`, `ACAM: OPTIONS`**, three cells away, in one run. So on
+that subtree the `200` **is** path-specific and the row above carries real signal
+there (OBSERVED, [findings-log/2026-11-11-area-ap-trials-options-specificity/FINDINGS.md
+§3–§4]). **Scope, because one subtree is not a family:** one host, one subtree,
+two fabricated depths; `.com`, `.eu` and every other base are **untested** for
+this, which is successor **AQ**'s question.
+
 **What the path axis does and does not show — read this before reusing the number.**
 The recorded path and the certainly-absent path are byte-identical here, but that is **not**
 a path-conditionality result: **all 8 cells returned the same no-route envelope, so nothing
