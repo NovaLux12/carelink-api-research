@@ -92,8 +92,20 @@ for c in claim:
 print("\n== spacing, clock A (t_sent, re-derivable) ==")
 neg = [(r["seq"], r["host"], round((ts(r["t_done"]) - ts(r["t_sent"])).total_seconds(), 3))
        for r in ROWS if ts(r["t_done"]) < ts(r["t_sent"])]
-gaps = [((ts(b["t_sent"]) - ts(a["t_sent"])).total_seconds(), a["seq"], b["seq"])
-        for a, b in zip(ROWS, ROWS[1:]) if a["host"] == b["host"]]
+# Gaps must be measured per host on the SEQ series, not on adjacent rows in file order.
+# File order interleaves hosts (carelinkhp rows sit between the three-row host bursts), so
+# `zip(ROWS, ROWS[1:])` silently skips every pair whose neighbours in the file belong to a
+# different host — here it missed carelinkhp seq 4->14 and reported 31 gaps where the ledger
+# holds 32. Caught by a verifier; the count is re-derived by grouping and sorting below.
+_groups = {}
+for _r in ROWS:
+    _groups.setdefault(_r["host"], []).append(_r)
+gaps = []
+for _h, _rs in _groups.items():
+    _rs = sorted(_rs, key=lambda r: r["seq"])
+    gaps.extend(((ts(b["t_sent"]) - ts(a["t_sent"])).total_seconds(), a["seq"], b["seq"])
+                for a, b in zip(_rs, _rs[1:]))
+gaps.sort(key=lambda g: g[1])
 vals = [g[0] for g in gaps]
 print(f"  gaps {len(vals)}  min {min(vals):.3f}  median {statistics.median(vals):.3f}  "
       f"max {max(vals):.3f}")

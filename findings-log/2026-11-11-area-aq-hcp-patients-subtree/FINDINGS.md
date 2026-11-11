@@ -66,13 +66,13 @@ published and no cause is asserted (`python3 verify.py` re-derives both; zero re
 
 ```
 clock A — t_sent (re-derivable from results.jsonl)
-  gaps 31   min 1.841 s   median 2.632 s   max 76.001 s
+  gaps 32   min 1.841 s   median 2.633 s   max 76.001 s
   under 2.5 s : seq 8->9 (1.841 s), seq 29->30 (2.229 s)
   under 2.0 s : seq 8->9 (1.841 s)
   impossible negative DURATIONS (t_done < t_sent): seq 1 -0.508 s, seq 8 -0.695 s, seq 29 -0.307 s
 
 clock B — kernel body mtimes (NOT re-derivable from a clean clone)
-  bodies stat-able 36 of 36   gaps 31
+  bodies stat-able 36 of 36   gaps 32
   min 2.594 s   median 2.630 s   max 76.628 s
   under 2.5 s : none          FLOOR ON THIS CLOCK: 2.594 s
 ```
@@ -82,7 +82,7 @@ The single sub-2.0 s gap is `seq 8→9`, and `seq 8` is one of the three rows wh
 `t_done` precedes its `t_sent` — arithmetically impossible, so at least one stamp on it is
 corrupt. Under the counting rule `docs/09` §4 already sets, a short gap measured off a
 provably corrupt series is an artefact of that corruption and is **not** evidence of
-underspacing: the kernel mtime counter reads **0 of 31 gaps under 2.5 s, floor 2.594 s**
+underspacing: the kernel mtime counter reads **0 of 32 gaps under 2.5 s, floor 2.594 s**
 (OBSERVED). **No delay rule is claimed breached, and no clean `t_sent` floor is claimed
 either** — clock A's floor is published as measured at 1.841 s.
 
@@ -331,3 +331,35 @@ area's successor and this pass did not touch it.
 
 No response body is committed; no bundle; no credential, internal hostname or machine path
 appears in any file. `results.jsonl` is 36 rows of metadata.
+
+## Correction (2026-11-11) — both clocks counted 31 gaps; the ledger holds 32
+
+A verifier caught this and was right. `verify.py` built its gap list as
+
+```python
+gaps = [... for a, b in zip(ROWS, ROWS[1:]) if a["host"] == b["host"]]
+```
+
+which pairs **adjacent rows in file order**. The ledger interleaves hosts: `carelinkhp` rows sit
+between the three-row bursts on the other hosts, so every pair whose two neighbours in the file
+belong to different hosts was silently dropped. One pair was lost — `carelinkhp` **seq 4 → 14**,
+a 27.423 s gap — and the count read 31 where 32 exist (26 + 2 + 2 + 2, from 27/3/3/3 rows).
+
+Fixed by grouping on host and sorting on `seq` before zipping. Corrected figures:
+
+```
+clock A — t_sent
+  gaps 32   min 1.841 s   median 2.633 s   max 76.001 s
+  under 2.5 s : seq 8->9 (1.841 s), seq 29->30 (2.229 s)
+  under 2.0 s : seq 8->9 (1.841 s)
+```
+
+**No verdict moves.** The missed gap is 27.4 s — long, not short — so it cannot make the pass look
+better spaced than it was, and the two sub-2.5 s gaps and the single sub-2.0 s gap are unchanged.
+Clock B's floor is unchanged at 2.594 s over the same corrected pairing.
+
+The lesson is the one this repository keeps relearning in a new shape: **a filter that looks like a
+pairing can be a selection.** `if a["host"] == b["host"]` reads as "keep same-host pairs"; it
+actually means "keep pairs that happen to be adjacent in the file *and* share a host", which is a
+strictly smaller set whenever the writer interleaves. The tell is arithmetic: 27 + 3 + 3 + 3 rows
+cannot produce 31 same-host gaps, and nobody divided.
