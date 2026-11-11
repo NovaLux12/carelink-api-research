@@ -17,6 +17,18 @@ Checks, each one able to FAIL — a check that cannot fail is not evidence
 
 Usage: verify.py <findings-dir>
 Exit:  0 = every check passed; 1 = a check failed (which one is printed)
+
+## Correction (2026-11-11) — the scratch default carried an absolute machine path
+
+`scratch` defaulted to `/home/<user>/projects/.../.loop/ar-scratch`, which is on
+`AGENTS.md` §7's scrub list. It now resolves from `__file__`, so the script still runs
+from a clean clone with the scratch in `.loop/`.
+
+This is an in-place edit to an append-only artefact, disclosed here for the same reason
+as the one in `derive.txt`: a machine path is never evidence, so removing it destroys no
+part of the audit trail, while leaving it in publishes something §7 says never to
+publish. The gate does not scan machine paths, so nothing caught it; it was found with
+`git grep -rn '/home/' -- .` while checking the end state.
 """
 import glob
 import json
@@ -150,8 +162,12 @@ print(f"  under 2.0 s: {len(under20)}  {[round(x,3) for x in under20]}")
 print(f"  impossible negative DURATIONS (t_done < t_sent): {neg if neg else 'none'}")
 
 print("\n== 6. clock B — kernel body mtimes, with a liveness proof ==")
-scratch = os.environ.get("AR_SCRATCH",
-                         "/home/jack/projects/carelink-api-research/.loop/ar-scratch")
+# Repo-relative by default: an absolute path here would put a machine path into a
+# committed file, which AGENTS.md §7 forbids. Resolved against the findings dir's
+# grandparent, so the script runs from a clean clone with the scratch in .loop/.
+_here = os.path.dirname(os.path.abspath(__file__))
+_repo = os.path.abspath(os.path.join(_here, "..", "..", ".."))
+scratch = os.environ.get("AR_SCRATCH", os.path.join(_repo, ".loop", "ar-scratch"))
 bodies = []
 for r in rows:
     p = os.path.join(scratch, r["tag"] + ".b")

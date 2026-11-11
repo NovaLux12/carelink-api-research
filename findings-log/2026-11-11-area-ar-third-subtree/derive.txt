@@ -1,4 +1,4 @@
-AR-DERIVE input: /home/jack/projects/carelink-api-research/.loop/aq-assets/main.js
+AR-DERIVE input: <repo>/.loop/aq-assets/main.js
 AR-DERIVE bundle: bytes=3397615 sha256=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
 AR-DERIVE pinned: bytes=3397615 sha256=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba reproduces=True
 AR-DERIVE literal vocabulary: 190 string literals starting at `hcp/`
@@ -32,3 +32,18 @@ AR-DERIVE CANDIDATE /hcp/user/  literals=34  first=hcp/user/acceptTermsOfUse
 AR-DERIVE CANDIDATE /hcp/clinics/  literals=32  first=hcp/clinics/access-data/disable
 AR-DERIVE CANDIDATE /hcp/reports/  literals=10  first=hcp/reports/generateAuditLogs
 AR-DERIVE VERDICT: PROCEED — a third subtree exists in the shipped build and its name was read, not guessed.
+
+## Correction (2026-11-11) — an absolute machine path, in a file §7 says must not carry one
+
+Line 1 recorded its input as an absolute path under `/home/<user>/…`, which is on `AGENTS.md`
+§7's scrub list. It now reads `<repo>/…`.
+
+This is an in-place edit to an append-only artefact, and the reason is the reason it is
+disclosed: **a machine path is never evidence.** Removing it destroys no part of the audit trail —
+the bundle is still fully identified by its byte count and sha256 on the line below — while leaving
+it in publishes something §7 says never to publish. The same redaction was applied to
+`verify.py`'s `AR_SCRATCH` default in the same commit.
+
+The gate does not scan machine paths, so nothing caught this. It was found by running the sweep
+`git grep -rn '/home/' -- .` while checking the end state — which is the check the previous round's
+lesson said to run before vouching for a clean tree, and which I had not run on this branch.
