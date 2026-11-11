@@ -114,8 +114,23 @@ name `zz-ap-absent-4821` → **`403` `MissingAuthenticationTokenException`, 42 B
 that subtree the `200` **is** path-specific and the row above carries real signal
 there (OBSERVED, [findings-log/2026-11-11-area-ap-trials-options-specificity/FINDINGS.md
 §3–§4]). **Scope, because one subtree is not a family:** one host, one subtree,
-two fabricated depths; `.com`, `.eu` and every other base are **untested** for
-this, which is successor **AQ**'s question.
+two fabricated depths; `.com`, `.eu` and every other base were **untested** for
+this by that pass, which is why it named a successor.
+
+**And the per-route reading is a REPRODUCTION, not a single observation (measured
+2026-11-11, area AZ).** The same nine fabricate-vs-real pairs were re-run on all three
+cumulus hosts with the same fabricated literal, and **18 of 18 cells match the earlier pass
+on status, byte count, full body digest, `ACAO`, `ACAM` and `x-amzn-errortype`** — nine
+fabricated siblings still `403` at `f249b63cb2fc…`, nine leaves still `200` / 0 B /
+`ACAO: *`. A fabricated name one segment **below** the leaf also answered the same `403` on
+two of the three hosts, so the leaf-depth control was not a depth artefact (OBSERVED,
+[findings-log/2026-11-11-area-az-options-stability/FINDINGS.md §3–§4]). **Bound, and it is
+the interval:** the gap was **10.23 h**, not the 24 h that pass's own closure condition asked
+for, so this is stability over ten hours and **not** over a day — nothing here measures the
+gateway's deployment cadence. ⚠ **The mechanism of the preflight remains unestablished and
+this pass did not attempt it:** an edge-generated `OPTIONS` reply and a per-route
+registration table predict every cell an unauthenticated request can send, and no observed
+response field distinguishes which layer answered (INFERRED).
 
 **What the path axis does and does not show — read this before reusing the number.**
 The recorded path and the certainly-absent path are byte-identical here, but that is **not**

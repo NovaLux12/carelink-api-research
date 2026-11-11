@@ -3602,7 +3602,7 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **11 open plus 49 closed**
+**The maintainer decision the paragraphs above deferred has been taken.** **10 open plus 49 closed**
 stand today (`AL` open — the `/hcp/configuration/` 405 across every host that mounts it;
 `AM` minted 2026-11-10 by the PR that closed `AK`, `AK` closed 2026-11-10 by claim #183,
 `AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
@@ -3614,7 +3614,7 @@ claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` c
 `^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 
-**Amendment (2026-11-11, from area AY's close).** The count moved to **11 open plus 49 closed**, and
+**Amendment (2026-11-11, from area AY's close).** The count moved to **10 open plus 49 closed**, and
 one thing about it is disclosed rather than smoothed over.
 
 **`AQ` was minted twice.** The `hcp/patients/` area **claimed it first (issue #199, 01:05:47)**
@@ -3804,46 +3804,6 @@ than edited into a page whose subject is a different subtree.
 ---
 
 
-### AZ. Is the per-route `OPTIONS` resolution **stable**, and which mechanism produces the preflight?
-
-**What is known (OBSERVED, [source: findings-log/2026-11-11-area-aq-options-per-route/FINDINGS.md] §3, §4).**
-On all three cumulus hosts, an empty-body `OPTIONS` to a fabricated name in `csr/v2`, bare `v2`
-and `carepartner/v6` answered **`403` at the no-route digest with no `ACAO`**, while the real
-`display/message` leaf in each subtree answered **`200`, 0 B, `ACAO: *`** — nine pairs, nine
-consistent answers. Read as a control, that makes the `200` a **route** signal in those three
-subtrees (INFERRED — nine cells to three subtree properties).
-
-**What is missing**, in increasing cost:
-
-1. **Stability.** Every cell in that pass, and in areas C, N, Z and AP before it, is a **single
-   observation** per base per host. Nothing says the preflight answers the same way tomorrow.
-2. **Depth.** The fabricated name sat at the leaf depth only. Area AP tested two depths on one
-   subtree (`-trials`, `403` at both); the other two hosts and the other two bases have one
-   depth each.
-3. **Mechanism.** `carepartner/v13/display/message` advertises `ACAM: OPTIONS` on a leaf whose
-   `GET` is `401` (live, GET-capable) while `v2/display/message` advertises `ACAM: OPTIONS` on a
-   leaf whose `GET` is `403` (unrouted) — **the same header shape marking two opposite GET
-   states**. That is why this repo refuses to read `ACAM` as a method register, but no pass has
-   said what the preflight is *answering from*. An edge-generated OPTIONS reply that never
-   reaches the route would produce both shapes; so would a per-route registration table.
-   **This pass does not distinguish them, and nothing in the record does.**
-
-**Blocker:** item 3 is not reachable by an unauthenticated request — separating an edge-generated
-preflight from a route-derived one needs either a `POST` (token-gated, `docs/10` §1, out of
-scope) or a response field that distinguishes them, and none has been observed on this family.
-Items 1 and 2 are cheap and are the whole claimable part.
-
-**Closes when:** the three fabricate-vs-real pairs are **re-run at least 24 h after** the AY pass,
-on at least two hosts, and each fabricated sibling still answers `403` at `f249b63cb2fc…` while
-its leaf still answers `200` — **or** any cell has moved, in which case the per-route reading is
-scoped to the pass date and the `AY` row gets a dated superseding note. **A negative counts**,
-and a *change* is the most informative outcome available. Secondarily: one fabricated name **one
-segment deeper** than the leaf, per base, closing item 2.
-
-**Assumptions (INFERRED):** that 24 h is a meaningful stability window for a gateway config —
-nothing here measures the deployment cadence, so the window is a convention, not a measured
-interval; and that the preflight's source is one mechanism across the three bases, which the
-identical no-route-`403`-no-CORS / `200`-CORS split suggests but does not show.
 
 
 ### AT. Does `hcp/patients` (the bare collection) have a handler that a `GET` cannot see?
