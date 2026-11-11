@@ -31,10 +31,23 @@
 # kill mid-sweep loses at most the in-flight cell.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-# LOOP is the shared per-host lock directory: <checkout>/.loop/worktrees/lau/… is
-# five levels below .loop. The lock is what makes the spacing claim true rather
-# than merely intended, and it is shared with the other workers on this host.
-LOOP="$(cd "$HERE/../../../../.." && pwd)"
+# LOOP is the shared per-host lock directory, and getting it right is what makes
+# the spacing claim true rather than merely intended — it is what serialises
+# workers on this host.
+#
+# CORRECTED 2026-11-11 (verifier round). This was `cd "$HERE/../../../../.."`,
+# which counted five levels up from the findings dir. In the main checkout that
+# is `/home`; in a worktree it is `/home/jack`. Neither is the repo root, so the
+# lock landed OUTSIDE `.loop/` — in the repo root on this run, as an untracked
+# `host-carelink.minimed.eu.lock` — and no second worker ever took it. The
+# spacing *measurement* survived (the sleep is inside `flock` either way, and the
+# floor was re-derived from body mtimes), but the cross-worker serialisation the
+# comment claims was never in force.
+#
+# The portable answer is git itself: `--git-common-dir` resolves to the shared
+# `.git` from ANY worktree, so its parent is the main checkout and `.loop` there
+# is the one shared lock directory. Depth-counting is the bug; do not restore it.
+LOOP="$(cd "$(dirname "$(git -C "$HERE" rev-parse --git-common-dir)")" && pwd)/.loop"
 LOGDIR=$HERE
 OUT=$LOGDIR/headers
 LISTS=$LOGDIR/lists
