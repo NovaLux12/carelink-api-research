@@ -4095,7 +4095,7 @@ verdict.
 
 ---
 
-### AY. Does the `/hcp`-ONLY trailing-slash result hold on the **other three** clinic hosts?
+### BB. Does the `/hcp`-ONLY trailing-slash result hold on the **other three** clinic hosts?
 
 **What is known (OBSERVED, [source: findings-log/2026-11-11-area-ax-trailing-slash/FINDINGS.md §4]).**
 On `carelink.medtronic.com`, the trailing-slash sensitivity area AN found is **`/hcp`-specific, not a
