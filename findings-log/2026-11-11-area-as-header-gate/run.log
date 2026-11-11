@@ -1,0 +1,10 @@
+2026-11-11T12:09:52.412Z seq=1 GET https://carelinkhp.minimed.eu/hcp/configuration/public/pow.crm.settings status=200 exit=0 tag=as-c1-pow-crm hdr=X-System-ID: ProWeb
+2026-11-11T12:09:55.231Z seq=2 GET https://carelinkhp.minimed.eu/hcp/patients/zz-as-absent-5531 status=404 exit=0 tag=as-c2-absent hdr=(none)
+2026-11-11T12:09:57.644Z seq=3 GET https://carelinkhp.minimed.eu/hcp/patients/care-partner/search status=400 exit=0 tag=as-q1-cps-with hdr=X-System-ID: ProWeb
+2026-11-11T12:10:00.243Z seq=4 GET https://carelinkhp.minimed.eu/hcp/patients/care-partner/search status=412 exit=0 tag=as-q2-cps-without hdr=(none)
+2026-11-11T12:10:02.877Z seq=5 GET https://carelinkhp.minimed.eu/hcp/patients/otc-linking/allowed status=401 exit=0 tag=as-q3-otc-with hdr=X-System-ID: ProWeb
+2026-11-11T12:10:05.502Z seq=6 GET https://carelinkhp.minimed.eu/hcp/patients/otc-linking/allowed status=412 exit=0 tag=as-q4-otc-without hdr=(none)
+2026-11-11T12:10:08.100Z seq=7 GET https://carelinkhp.minimed.eu/hcp/patients/zz-as-absent-5531/zz-as-depth2-5531 status=404 exit=0 tag=as-b1-absent-depth2 hdr=(none)
+2026-11-11T12:10:10.706Z seq=8 OPTIONS https://carelinkhp.minimed.eu/hcp/patients/care-partner/search status=200 exit=0 tag=as-o1-cps-options hdr=(none)
+2026-11-11T12:10:13.295Z seq=9 OPTIONS https://carelinkhp.minimed.eu/hcp/patients/otc-linking/allowed status=200 exit=0 tag=as-o2-otc-options hdr=(none)
+2026-11-11T12:10:51.288Z seq=10 OPTIONS https://carelinkhp.minimed.eu/hcp/patients/zz-as-absent-5531 status=404 exit=0 tag=as-o3-absent-options hdr=(none)

@@ -14,7 +14,10 @@ contact_links:
     # that the `about:` line below agrees with the page. No figure is repeated here on
     # purpose: a count written into a comment is a count that drifts.
 <<<<<<< HEAD
-    about: 9 open areas (AO, AR, AS, AT, AU, AV, AW, AZ, BB) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+<<<<<<< HEAD
+    about: 9 open areas (AO, AR, AT, AU, AV, AW, AZ, BA, BB) — every A–Z area is closed, and successors mint as AA, AB, … per docs/11.
+=======
+>>>>>>> origin/main
 =======
 >>>>>>> origin/main
   - name: Bridge bug? File it on carelink-bridge instead
