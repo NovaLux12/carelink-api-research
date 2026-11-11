@@ -1,0 +1,20 @@
+ledger rows 19
+
+== clock A: t_sent (committed, re-derivable) ==
+series: consecutive t_sent on the same host
+rows 19  same-host gaps 14
+min 1.726 s   max 5.502 s   mean 3.254 s
+under the declared 2.5 s: 1
+under the repository 2.0 s floor: 1
+  SHORT seq->7 carelink.medtronic.eu 1.726 s
+
+== impossible durations (t_done < t_sent) == 1
+  IMPOSSIBLE seq 6 carelink.medtronic.eu duration -0.807 s
+
+== clock B: kernel body mtimes (NOT re-derivable from a clone) ==
+bodies stat-able 19 of 19; series: consecutive body mtimes, same host
+rows 19  same-host gaps 14
+min 2.588 s   max 5.184 s   mean 3.237 s
+under the declared 2.5 s: 0
+under the repository 2.0 s floor: 0
+
