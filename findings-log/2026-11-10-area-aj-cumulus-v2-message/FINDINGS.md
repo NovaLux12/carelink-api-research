@@ -252,6 +252,36 @@ whose spread is 43 ms cannot measure a 2.5 s spacing rule. **So this pass has on
 clock, not two, and that clock contains a negative duration and a sub-floor gap.**
 
 What is claimed: the delay was slept inside the per-host `flock` as declared. What is
-**not** claimed: a clean spacing floor. `1.894 s`-class readings on a series that also
-reports an impossible negative are exactly what `docs/09` §4 says to publish rather
-than reconcile.
+**not** claimed: a clean spacing floor. A **2.022 s** floor with one gap under 2.5 s,
+on a series that also reports an impossible negative duration, is exactly what `docs/09`
+§4 says to publish rather than reconcile. (`1.894 s` belongs to area **AG**, not to this
+pass — cited here by mistake in the first version of this correction and corrected now.)
+
+## Correction (2026-11-10) — the spacing correction cited another lane's floor
+
+This file was edited in place earlier today to withdraw the kernel-mtime spacing figure
+(§8) and to correct a 403 count. Both edits stand. This section is the required
+append-only record of them, plus a third fix.
+
+**1 · "All twelve `403`s" → thirteen.** The ledger holds 13 × 403 (plus 3 × 401, 2 × 200).
+The enumeration given summed to 11. Digest uniformity is unaffected: all thirteen carry
+`f249b63cb2fcb66b…`.
+
+**2 · The kernel-mtime oracle is dead on this pass.** The 2.611 s floor originally
+published in §8 was an artefact: all 18 committed bodies carry the same mtime
+(`1794355484.4125…`, a 43 ms spread) because they were written by one checkout or copy
+step, not by curl at request time. A 43 ms spread cannot measure a 2.5 s rule. The pass
+therefore has **one** clock, and that clock carries a **2.022 s** floor over 15 gaps with
+1 gap under 2.5 s and **1 negative duration** (`seq 14`, `.eu`, `t_done − t_sent =
+−0.531 s`). No clean spacing floor is claimed.
+
+**3 · The correction of (2) cited the wrong lane's number.** The first version of that
+note said a "`1.894 s`-class reading" is what `docs/09` §4 says to publish. **1.894 s is
+area AG's floor**; AJ's is 2.022 s, and 1.894 appears nowhere in this pass's ledger. A
+claim about evidence that its own evidence cannot support, inside the paragraph written to
+fix that exact class of error. Corrected to 2.022 s.
+
+**Nothing here changes the finding.** The v2 `display/message` leaf is routed on
+`clcloud-trials.minimed.com` only (`GET` 403 + `OPTIONS` 200 with CORS) and is dead on
+both methods on `.com` and `.eu`; all twelve-thirteen 403s carry one digest; the
+`docs/09` §2 oracle reading is supported verbatim by that page.
