@@ -1,0 +1,33 @@
+ledger files walked            : 70
+json rows walked               : 3005
+404 rows on the four hosts     : 31
+rows whose CT could not be read: 0
+
+  8  host=carelink-support.medtronic.com   content-type=(absent)     bytes=0
+ 11  host=carelink.medtronic.com           content-type=(absent)     bytes=0
+  9  host=carelink.medtronic.eu            content-type=(absent)     bytes=0
+  3  host=carelinkhp.minimed.eu            content-type=(absent)     bytes=0
+
+404s carrying a Content-Type   : 0 of 31
+404s carrying a body           : 0 of 31
+
+files contributing a 404 row:
+  findings-log/2026-10-17-hcp-config-deployments/results.jsonl
+  findings-log/2026-11-10-area-ab-hcp-direct/results.jsonl
+  findings-log/2026-11-10-area-ag-allow-vs-acam/results.jsonl
+  findings-log/2026-11-10-area-ak-portal-spa-fallback/results.jsonl
+  findings-log/2026-11-11-area-an-hcp-boundary-mechanism/results.jsonl
+
+POSITIVE CONTROL — 200 rows on the same four hosts: 353
+  of those, Content-Type read as absent: 14
+  VERDICT: reader discriminates
+
+PER-FILE CAPABILITY — can each contributing ledger record a Content-Type at all?
+  findings-log/2026-10-17-hcp-config-deployments/results.jsonl: 12 404 row(s); its 50 200 row(s), 50 carry a type — capable
+  findings-log/2026-11-10-area-ab-hcp-direct/results.jsonl: 3 404 row(s); its 19 200 row(s), 19 carry a type — capable
+  findings-log/2026-11-10-area-ag-allow-vs-acam/results.jsonl: 2 404 row(s); its 5 200 row(s), 5 carry a type — capable
+  findings-log/2026-11-10-area-ak-portal-spa-fallback/results.jsonl: 4 404 row(s); its 12 200 row(s), 12 carry a type — capable
+  findings-log/2026-11-11-area-an-hcp-boundary-mechanism/results.jsonl: 10 404 row(s); its 9 200 row(s), 9 carry a type — capable
+
+contributing files that cannot testify about Content-Type: 0
+  none — 0-of-31 stands
