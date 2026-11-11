@@ -3602,7 +3602,7 @@ written:**
 
 #### Amendment (2026-10-16, maintainer): the namespace continues past Z — successors mint as `AA`, `AB`, …
 
-**The maintainer decision the paragraphs above deferred has been taken.** **9 open plus 45 closed**
+**The maintainer decision the paragraphs above deferred has been taken.** **9 open plus 46 closed**
 stand today (`AL` open — the `/hcp/configuration/` 405 across every host that mounts it;
 `AM` minted 2026-11-10 by the PR that closed `AK`, `AK` closed 2026-11-10 by claim #183,
 `AG` — `AD` minted 2026-10-19 by lane sl1 and closed 2026-11-10 on claim #164,
@@ -3614,7 +3614,7 @@ claim #161, `AF` closed 2026-11-10, `AG` closed 2026-11-10 by claim #179, `AI` c
 `^### [A-Z]{1,2}.` headings with
 `python3 scripts/research-checks.py`, not inherited).
 
-**Amendment (2026-11-11, from area AY's close).** The count moved to **9 open plus 45 closed**, and
+**Amendment (2026-11-11, from area AY's close).** The count moved to **9 open plus 46 closed**, and
 one thing about it is disclosed rather than smoothed over.
 
 **`AQ` was minted twice.** The `hcp/patients/` area **claimed it first (issue #199, 01:05:47)**
@@ -3845,111 +3845,6 @@ axis has assumed and none has tested.
 
 ---
 
-### AR. Does the `/hcp/configuration/` 405 constant extend to a **third** subtree under `/hcp/`?
-
-**What is known.** On all four clinic hosts, an absent path under `/hcp/configuration/` answers
-**405 + `Allow: POST, OPTIONS`** — 4 of 4, identical status, byte count, `Allow` value and
-`Server` string — while an absent path one level up, under `/hcp/`, answers a genuine **404**
-with **no `Content-Type` header at all**
-[source: findings-log/2026-11-11-area-al-405-all-hosts/FINDINGS.md] (OBSERVED; the
-handler-vs-configuration reading is INFERRED). So `405 + Allow` there carries **no information
-about a route's existence**, and area AG's refutation of its own assumption is a property of
-the handler rather than of two deployments.
-
-**What is missing.** The constant has been measured on **one** subtree. `hcp/patients/` is
-being tested in this run (area **AY**), which will say whether the constant reaches a second
-subtree — but two points do not establish a pattern, and the *value* of `Allow` has never been
-compared across subtrees. If `hcp/patients/` answers `Allow: GET, POST, OPTIONS` where
-`hcp/configuration/` answers `Allow: POST, OPTIONS`, then the constant is **per-subtree**, and
-`Allow` would be telling you something after all — just not about the individual route.
-
-**Blocker:** a third subtree whose route literals are **recorded in shipped code** rather than
-guessed. `/hcp/configuration/` and `hcp/patients/` are both derived from the portal bundles;
-a third must be derived the same way. If AQ finds none, this area is blocked on a bundle
-re-read, not on a request budget.
-
-**Closes when:** a third `/hcp/<subtree>/<absent>` cell is requested on at least two hosts,
-beside the same-host `/hcp/<absent>` 404 control and the `/hcp/configuration/<absent>` 405
-reference, and its status + full `Allow` value are recorded. **A negative counts**: if the
-third subtree answers 404 instead of 405, the constant is scoped to `/hcp/configuration/` after
-all and AL's four-host invariance is a coincidence of one subtree — which would be the more
-surprising and more useful result.
-
-**Assumptions (INFERRED):** that a subtree boundary is a property of how Apache mounts a
-handler, so a third mounted subtree should reproduce the shape; and that an absent path is the
-right probe for it, which holds only where the subtree is genuinely handled rather than
-rewritten.
-
-### AY (closed 2026-11-11) Do areas C and N's three "POST-only" verdicts survive a **same-subtree** absent-path `OPTIONS` control?
-
-Area AP ran, on `clcloud-trials.minimed.com`, the control `docs/09` §2's
-`GET 403 + OPTIONS 200 → live, POST-only` rule has always presupposed: an empty-body
-`OPTIONS` to a **fabricated** path inside the same subtree. It answered **`403` at the
-no-route digest**, at two depths, while `v2/display/message` answered `200`
-(OBSERVED, [source: findings-log/2026-11-11-area-ap-trials-options-specificity/FINDINGS.md §3]).
-So on that host, that subtree resolves `OPTIONS` **per route** — the rule's assumption
-holds there, for the first time measured rather than assumed.
-
-**That control has still never been run on `.com` or `.eu`, or under any base other than
-`/connect/carepartner/v2/`.** But three of this repo's route verdicts rest on exactly the
-same unvalidated step, and all three were established **before** any same-subtree control
-existed anywhere:
-
-| verdict | host(s) | cell that carries it | source |
-|---|---|---|---|
-| `connect/csr/v2/display/message` — live, POST-only | `.eu`, `.com`, `-trials` | `OPTIONS` 200 + `ACAO: *` | [source: findings-log/2026-10-11-pde-csr-oracle/FINDINGS.md:69] |
-| `connect/v2/display/message` (bare) — live, POST-only | `.eu`, `.com`, `-trials` | `OPTIONS` 200 + `ACAO: *` | [source: findings-log/2026-10-12-csr-cross-host/FINDINGS.md:58] |
-| `v6/display/message` — live, POST-only, on all three | `.eu`, `.com`, `-trials` | `OPTIONS` 200 + `ACAO: *` | [source: findings-log/2026-10-12-area-z-origin-reflection/FINDINGS.md] |
-
-Area C's one `OPTIONS`-on-a-certainly-absent-path cell
-(`connect/carepartner/v13/3f8a1c2e-…` → `403`) sits under **`v13`**, not under `csr/v2`,
-bare `v2` or `v6`, and on `.eu` only — so it does not bound those three verdicts. If the
-preflight on `.eu`/`.com` is subtree-wide rather than per-route, all three verdicts lose
-their `OPTIONS` half and fall back to "no `GET` route", which is a materially weaker claim
-than the pages currently make.
-
-**Blocker:** none but the request budget. It is 6–9 cells on two hosts — one fabricated
-sibling and one `OPTIONS` repeat per verdict — `GET` + empty-body `OPTIONS`, no token, and
-area AP's harness (`findings-log/2026-11-11-area-ap-trials-options-specificity/probe.sh`)
-already has the flock/sleep/ledger structure and the two controls.
-
-**Closes when:** every fabricated sibling under each base answers **`403` at
-`f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`** — in which case all
-three POST-only verdicts stand as measured and the per-route reading is established on all
-three cumulus hosts — **or** one of them answers `200`, in which case that verdict is
-downgraded to a no-`GET`-route negative and the downgrade is recorded against it. **A
-negative counts, and so does a partial retraction:** the third outcome, where some bases
-are per-route and others are subtree-wide, is the most informative and must not be collapsed
-into one verdict.
-
-**Assumptions (INFERRED):** that a fabricated name at the same depth as the route under
-test is the right sibling — reasoned from area AP's two depths answering `403`, and not
-established for `csr/v2`, bare `v2` or `v6`, whose paths sit at different depths; and that
-`.eu`/`.com` behave like `-trials` at all, which nothing here observes and area AP's
-single-host scope deliberately leaves open.
-
-**Result (2026-11-11, claim #209) — all three verdicts STAND; `OPTIONS` is per-route in all
-three subtrees, on all three hosts.** Nine fabricate-vs-real pairs (3 bases × 3 hosts): every
-fabricated sibling answered **`403` at the no-route digest** `f249b63cb2fcb66b…`, 42 B, **no
-`ACAO`/`ACAM`/`Allow`**, while the real `display/message` leaf in the same subtree answered
-**`200`, 0 B, `ACAO: *`** (OBSERVED,
-[source: findings-log/2026-11-11-area-aq-options-per-route/FINDINGS.md §3]). Both controls
-(`GET carepartner/v13/display/message` → `401` / 36 B / `d5512472…`; `GET
-carepartner/v2/zz-aq2-absent-7241` → `403` / 42 B / `f249b63c…`) reproduced as **gates** on each
-host before any question cell was issued, 6 of 6. **24 of a 24 cap**, `GET` + empty-body
-`OPTIONS`, zero failures. So the `OPTIONS` half of all three verdicts now rests on a measured
-per-route resolution rather than on the analogy area AP supplied from one host, and **no
-`## Correction` is owed to areas C, N or Z** — the condition that would have required one did
-not occur. "POST-only" stays **INFERRED**: no `POST` was sent and `ACAM` is not a method
-register. **Not established:** any base or host beyond the three tested, a preflight keyed on a
-hard-coded path list, or a depth other than the leaf's.
-
-⚠ **Letter note.** `AQ` was minted twice on `main`. The `hcp/patients/` area **claimed it first
-(issue #199, 01:05:47)** and **merged it (PR #203, 01:38:33)**, so it keeps `AQ` — that is the row
-in the table below. This area minted `### AQ.` as a heading at 01:23:30 but has not merged, so it is
-recorded as **`AY`** here. Area AR's and AS's cross-references to "area **AQ**" mean the
-`hcp/patients/` pass, which is what they were written for. Nothing else is renamed, and no letter
-appears twice.
 
 ### AZ. Is the per-route `OPTIONS` resolution **stable**, and which mechanism produces the preflight?
 
@@ -4224,6 +4119,50 @@ this successor makes rather than inherits.
 
 ---
 
+### BC. Is the `/hcp/configuration/` 405 exception a *mount*, and does `hcp/patients/` answer an absent child at **depth 2** the way it does at depth 1?
+
+**What is known (OBSERVED).** Area AR measured an absent child under three sibling subtrees the
+shipped clinic build names — `/hcp/user/`, `/hcp/clinics/`, `/hcp/reports/` — and every one
+answered a genuine **`404`, 0 B, no `Content-Type`**, at **depth 1 and depth 2**, on two hosts,
+while `/hcp/configuration/<absent>` answered **`405` + `Allow: POST, OPTIONS`** on those same two
+hosts in the same run [source: findings-log/2026-11-11-area-ar-third-subtree/FINDINGS.md].
+So the constant does **not** follow a handler class: `configuration` is the exception, and every
+other subtree tested behaves like bare `/hcp/` (OBSERVED for the six cells; **INFERRED** that the
+selector is a mount on that one prefix — a mechanism is not visible to a `GET`).
+
+**What is missing.** Two things, and they are different questions. **(a) The mechanism.** AR's
+six cells falsify `docs/11`'s AR assumption that "a subtree boundary is a property of how Apache
+mounts a handler, so a third mounted subtree should reproduce the shape" — a mounted sibling
+does not reproduce it. Nothing measured separates *a handler mounted on `/hcp/configuration/`
+whose own method filter answers before route resolution* from *a rewrite rule that special-cases
+that one prefix*; area AN found the `404` and the `405` are one layer's answers sharing every
+header but `Allow`, and that is consistent with **either** reading (**INFERRED**, not proof).
+**(b) The depth-2 control on `hcp/patients/`.** Area AQ controlled that subtree's absence at
+**depth 1 only**, and its candidate set includes nested names (`otc-linking/allowed`,
+`care-partner/search`) whose own depth was never controlled. AR's depth-2 cells are evidence
+about **its three** subtrees and say nothing about `patients`.
+
+**Blocker:** none on the request side — **(b)** is four cells, GET only, no token, no cookie, no
+auth, no wordlist, on the hosts this lane already owns. **(a)** is a **static** question: it needs
+the deployment configuration (an Apache `Location`/`RewriteRule`/`ErrorDocument` block), which is
+**not** served publicly and is **not** in the client bundles, so it may be undecidable from
+outside. Record that as a negative rather than probing for it.
+
+**Closes when:** (b) `hcp/patients/zz-<absent>/zz` is requested on two hosts beside the same-host
+`hcp/patients/zz-<absent>` depth-1 cell, the `/hcp/<absent>` 404 control and the
+`/hcp/configuration/<absent>` 405 reference, and both depths are recorded; **and** (a) either an
+artefact is found that names the mechanism, or the log states plainly that no unauthenticated
+`GET` and no shipped file can separate the two readings. **A negative counts on both halves** —
+"`patients` 404s at depth 2, so AR's shape generalises to a fourth subtree" is a result, and
+"the mechanism is not determinable from outside" is a result.
+
+**Assumptions (INFERRED):** that a nested `405` under `patients` is controlled by a depth-1
+control one level up (AQ's reading rests on that step, and it is the step (b) tests); and that a
+*mount* and a *single-prefix rewrite* produce byte-identical responses for every request shape a
+`GET` can construct, which is why (a) is blocked on an artefact rather than on a probe.
+
+---
+
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
@@ -4245,6 +4184,7 @@ being superseded — never silently. Letters are not reused.
 
 | Area | Closed | Verdict | Evidence | Closed by |
 |---|---|---|---|---|
+| AR — does the `/hcp/configuration/` 405 constant extend to a **third** subtree under `/hcp/`? | 2026-11-11 | **Negative, and the negative is the answer: the constant is scoped to `/hcp/configuration/` and does not follow a handler class.** Three subtrees were **derived from the shipped clinic bundle** (190 `hcp/` literals, 20 depth-1 segments, the two already-measured ones excluded, ranked by distinct literal count): `/hcp/user/` (34 literals), `/hcp/clinics/` (32), `/hcp/reports/` (10). All three answered a genuine **404, 0 B, no `Content-Type`** at **depth 1 AND depth 2**, on `carelink.medtronic.eu` and `carelink-support.medtronic.com` — **6 of 6 cells** — while `/hcp/configuration/zz-ar-absent-6293` answered **405 + `Allow: POST, OPTIONS`** on both hosts in the same run between the same locks (OBSERVED). **This falsifies `docs/11`'s own AR assumption** that a second mounted subtree would reproduce the shape, and it retires the two-point-pattern worry on the negative side: `configuration` is the outlier, and everything else measures like bare `/hcp/`. **The `Allow`-value question dissolves rather than resolving:** none of the six cells carries an `Allow` header at all, so there is no value to compare across subtrees — the strongest form of "not a subtree constant". **Correction check, measured not assumed:** a census finds **38 recorded `405` rows under `/hcp/`** across every committed ledger, all under `configuration` (21: AB 9, AG 6, AK 4, AR 2) or `patients` (17: AQ) — **no recorded `405` verdict anywhere sits under a subtree with no absent-path control, so no lane's work needs re-reading and no correction is appended**. ⚠ **One boundary is stated rather than smoothed over:** AQ's absent-path control is at **depth 1**, so its nested `405`s (`otc-linking/allowed`, `care-partner/search`) are controlled one level up rather than at their own depth — AR does not retract them but carries the gap as successor **BC**. **18 of a 18 cap**, **0 revisions**, GET only, no POST/OPTIONS/token/cookie/patient id, **6 of 6 controls first per host** (`pow.crm.settings` 200 at 96/97 B, digests `a977733a…`/`370e3bba…`; `/hcp/configuration/<absent>` 405 + `Allow`; `/hcp/<absent>` 404, 0 B), fabricated name `zz-ar-absent-6293` at **0** `git grep` hits, 2 hosts (the two this lane owns — `carelink.medtronic.com`, `carelinkhp` and the `clcloud` hosts untouched). **The derivation cost 0 requests** — the clinic bundle was already in this run's asset cache and `derive.py` verified its sha256 `2a7fa8e7…` against area AB's pin **before extracting**, so the cap bought only cells. Spacing: **two clocks, and clock B proven live** (**18 distinct** body mtimes, floor **2.590 s**, 0 of 16 under 2.5 s) against clock A's floor **2.060 s**, 1 gap under 2.5 s and 1 impossible negative duration (`seq 11`, −0.477 s) — the known corrupt-`t0` class, **no delay rule breached, no cause asserted**. **Not established:** *why* `configuration` is the exception (a mechanism, INFERRED, and possibly undecidable from outside — successor **BC**); the 15 subtrees the budget did not reach (`insights`, `dataUpload`, `anonymization`, `follow-up`, `settings-calculator`, `access-data`, `fastLinking`, `linkedPatient`, `sso`, `countries`, `registrationCheck`, `remoteLinking`, `locale`, `ping`, `v2`); any host other than the two owned here | [findings-log/2026-11-11-area-ar-third-subtree/FINDINGS.md] | #212 |
 | AX — is the trailing-slash sensitivity general — is `<prefix>` without its slash a fallback path for `/app`, for `/hcp/configuration`, and at the apex? | 2026-11-11 | **NEGATIVE, and the negative is the finding: the sensitivity is `/hcp`-SPECIFIC, not a property of this deployment's prefix selection.** On `carelink.medtronic.com`, bare `/app` and slashed `/app/` return the **byte-identical** entry document — `200`, 5518 B, `0f2c5f62…`, `cmp`-equal — so `/app` is **one slash-insensitive handler**, not two surfaces and not an absence (OBSERVED for the bytes; **INFERRED** that it is one handler, since byte identity cannot exclude two configurations emitting identical bytes). Bare and slashed `/hcp/configuration` **also agree** — both `404`, 0 B, no `Content-Type` — so bare-ness selects nothing there either, and `/hcp` is the **only** prefix measured whose two forms disagree (row 9 `200`/5518 B/`0f2c5f62…` reproducing area AN in-run). The apex pair is identical too: `/` and `//` both `200`/5518 B/`0f2c5f62…` under `--path-as-is` (OBSERVED), consistent with the normalised-path selection AN measured (**INFERRED** as to `merge_slashes`). **So AX's premise does not generalise:** the repository's recorded `/prefix/` verdicts do **not** acquire an unmeasured counterpart, and a client omitting the slash gets a `200` that says nothing at every prefix measured here — but for two different reasons, since at `/app` the fallback *is* the handler while at `/hcp` it is not (OBSERVED for the cells; **INFERRED** that the `/hcp` asymmetry is a rule keyed on the literal string `/hcp/` in the AN §6 sense, which this pass did not re-test). **One thing no area had recorded: the `/hcp/configuration/` 405 does not reach the subtree root** — `/hcp/configuration/` answers `404`, 0 B, no `Content-Type` while `/hcp/configuration/<absent>` answers `405` + `Allow: POST, OPTIONS` **in the same run** (OBSERVED, rows 8 vs 10), so area AL's handler-level constant is **narrowed, not contradicted**: it is scoped one segment **below** the root, and a `404` at that root is discriminating (**INFERRED**). **10 of a 10 cap**, one recorded revision declared before the 10th request (the PAIR-B slashed reference had been measured on `/hcp/configuration/<CHILD>`, never on the prefix root — a **design defect**, stated in `probe.sh` and §1a), GET only, no POST/OPTIONS/token/cookie/auth/wordlist, `carelink.medtronic.com` **only**, 2 of 2 controls first (`pow.crm.settings` 200/97 B/`370e3bba0d28…`; `/hcp/zz-ax-absent-8147` 404/0 B/no CT; 0 `git grep` hits), 0 failures, 0 retries. ⚠ **A harness defect is recorded, not smoothed over:** row 10's ledger row was **reconstructed from the retained `.h`/`.b` artefacts** after the inline ledger writer died on a nested-quote `SyntaxError` — the request was sent once and captured, and the row says so; its `t_sent` is reconstructed, so **clock B is the load-bearing measurement for that interval**. Spacing: clock A floor **2.568 s**, 9 gaps on 1 host (matching `sum(rows_per_host − 1) = 9`), **0** under 2.5 s, 0 impossible durations; clock B floor **2.799 s**, **0** under 2.5 s, **10 of 10 distinct request-time mtimes so the second clock is proven LIVE**. **Not claimed:** that the result holds on the other three clinic hosts (one host by design — successor **BB**); or any mechanism, since no GET can observe the pipeline behind a bare-prefix `200`. **Not a disclosure** — an SPA serving its own entry document, and a subtree answering `404` at its root, are ordinary configuration | [findings-log/2026-11-11-area-ax-trailing-slash/FINDINGS.md] | #211 |
 | AS — what do `hcp/patients/care-partner/search` and `hcp/patients/otc-linking/allowed` answer once `X-System-ID: ProWeb` is present? | 2026-11-11 | **Positive on both literals, and the `412` is in front of two LIVE routes — not an edge artefact in front of an absent one, so the correction AQ's successor contemplated is NOT owed.** With the header present, `GET hcp/patients/care-partner/search` answers **`400`, 237 B, `application/json`** carrying a Spring Bean-Validation envelope naming **`searchCarePartners.arg0`/`arg2` as `must not be null`** — and `searchCarePartners` is a **method name in no committed file as it stood before this pass** (`git grep -c` against `origin/main` = 0; at this head it is 3, all of them this pass's own output), so the payload is generated by the controller's own argument binder, past routing, past method resolution and past the gate (OBSERVED for the bytes; **INFERRED** for the handler reading). `GET hcp/patients/otc-linking/allowed` answers **`401`, 48 B** at digest **`247825a426460798…`** — the **`{"error":{"type":"InvalidToken","group":"AUTH"}}`** envelope areas AB and O record on **nine** cells of a different subtree (`/hcp/configuration/{access/config,appContext,whitelisted}` × 3 hosts), one source re-read, no strength word (`AGENTS.md` §2.1). **Both flip back to `412`, 0 B, no `Content-Type`** when the header is removed, in the same run and 2.5 s apart on the same host — so the flip is attributable to the header and the `412` column is stable across two passes (OBSERVED). **The `412` is therefore NOT area AG's `Allow`-constant failure wearing a different status code:** satisfying the gate produced route-specific answers on both literals, and **neither answered `404`** — the four possible outcomes were `200`/`401`/`405`/`404` and the observed pair was **`400`/`401`**. A `400` that names a handler method and two of its parameter positions is a stronger liveness proof than a `200` would have been. **New and not previously measured anywhere in this repository:** both literals answer a **header-less `OPTIONS` `200`, 18 B, `Allow: HEAD, GET, OPTIONS`**, one digest `0f06a4c8d34690d4…` — a **different `Allow` value** from the `POST, OPTIONS` all 17 of area AQ's `405` routes carry, so `Allow` here **varies per route** rather than being area AG's constant; and the **certainly-absent child answers `OPTIONS` `404`, 0 B, no `Allow`**, so that `200` is **per-route, not a subtree constant** — the control area AP had to buy on `clcloud-trials` for the `403` line, here landing the same way (OBSERVED). So the gate does **not** precede method resolution on these two: a header-less request for a registered method is `200` while the header-less `GET` is `412` (OBSERVED; **INFERRED** that the `412` is keyed on `GET` reaching the gated handler — two methods, not a rule). **The `OPTIONS` answer did not move the `GET` verdict:** `Allow` says `GET` is registered and the `GET` still answers `400`/`401`, which is what a `GET`-capable route behind a header gate and a token gate looks like. **10 of a 12 cap**, 2 unspent, **no recorded revision** (9 cells fixed before request 1; the 10th, the `OPTIONS` absence control, came out of the two cells the itemisation already reserved and was released only after the first 9 showed why it was load-bearing), `GET` + empty-body `OPTIONS` only, **one host** (`carelinkhp.minimed.eu`, the whole declared set — three sibling lanes held the rest), no POST/token/cookie/auth/wordlist and **no patient id — not even a fabricated one**; the only header ever sent is **`X-System-ID: ProWeb`**, a PUBLISHED non-secret value, printed in full and not redacted. **2 of 2 controls first** — `pow.crm.settings` +ProWeb → **200, 96 B, `a977733a53ee0d5f…`** reproducing AB/AQ on this host, and `/hcp/patients/zz-as-absent-5531` → **404, 0 B, no `Content-Type`** — then a **depth-2** fabricated child also `404`/0 B, so the absence shape holds at the question literals' depth. Fabricated names `zz-as-absent-5531`/`zz-as-depth2-5531`, **0 `git grep` hits** at this head. Spacing: **two clocks, both live** — `t_sent` floor **2.455 s** over **9** gaps (= 10 rows − 1, checked against the row count and not carried), **1** gap under 2.5 s, **0** under 2.0 s, **0** impossible negative durations (**this harness is not in the corrupt-`t0` class**); kernel body mtimes **10 of 10 stat-able and 10 DISTINCT** (AJ's dead-oracle artefact not repeated), floor **2.589 s**, **0** under 2.5 s, **9 of 10** inside their own `[t_sent, t_done]` window with the tenth published at −85 ms rather than dropped. The 37.96 s max is the deliberate between-batch pause before the reserve cell. **The two clocks disagree on a CLEAN series** — `seq 7→8` reads 2.455 s on `t_sent` and 2.589 s on the kernel clock — so **no delay rule is claimed breached and no clean `t_sent` floor is claimed**; the short reading is 45 ms of `date`-call overhead around a `sleep 2.5` (**INFERRED**). **Not established:** anything about the other three clinic hosts or the `clcloud.*` hosts (successor **AY**), the routes' `POST` behaviour (none sent), or the `400`'s validator and the `401`'s authorizer by mechanism (**INFERRED** both). **Not a disclosure** — every cell is an unauthenticated `GET` or empty-body `OPTIONS`, and every byte quoted is an error envelope served to any anonymous caller who sends the one published header | [findings-log/2026-11-11-area-as-header-gate/FINDINGS.md] | #210 |
 | AY — do areas C and N's three "POST-only" verdicts survive a **same-subtree** absent-path `OPTIONS` control? | 2026-11-11 | **Positive on all nine cells: `OPTIONS` resolves PER ROUTE in `csr/v2`, bare `v2` and `carepartner/v6`, on `.com`, `.eu` and `-trials` — so all three verdicts STAND and no correction is owed.** Every fabricated sibling answered **`403` at the no-route digest** `f249b63cb2fcb66b47e86f906c98f8fd912e82dd035b4e53d7e72fc1960cfd16`, 42 B, **no `ACAO`/`ACAM`/`Allow`**, while the real `display/message` leaf in the same subtree, host and run answered **`200`, 0 B, `ACAO: *`, `x-cache: Miss from cloudfront`** — 9 pairs, 9 consistent answers. Both controls were **gates** on every host (6 of 6 `GATE OK`: `GET carepartner/v13/display/message` 401 / 36 B / `d5512472…`, `GET carepartner/v2/zz-aq2-absent-7241` 403 / 42 B / `f249b63c…`) and no question cell was issued on a host whose gate had not passed. **24 of a 24 cap**, 0 failures, 0 retries, `GET` + empty-body `OPTIONS` only, `sleep 2.5` inside a per-host `flock`. This is the control `docs/09` §2's `GET 403 + OPTIONS 200 → live, POST-only` rule has always presupposed: established by area AP on `-trials` under one base, now measured on `.com` and `.eu` under three. **`ACAM` ordering reproduced the recorded values exactly** (`OPTIONS,POST` / `POST,OPTIONS` / `OPTIONS`) — corroboration only, being the same source family. **"POST-only" stays INFERRED** (no `POST` sent; `ACAM` is not a method register). **Not established:** any base or host outside the three tested, a preflight keyed on a hard-coded path list, any depth but the leaf's, or whether the preflight is edge-generated or route-derived (successor **AZ**). ⚠ **Letter collision disclosed:** `AQ` was minted twice on `main` — by this area (PR #201) and by the `hcp/patients/` area (PR #203) — so this row is **`AY`**, the later mint renamed; the `hcp/patients/` row keeps `AQ`, which is what area AR's cross-reference means | [findings-log/2026-11-11-area-aq-options-per-route/FINDINGS.md] | #209 |
