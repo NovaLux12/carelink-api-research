@@ -1,0 +1,125 @@
+deployment	country	category	code	name	family	shortName	patientListNonPremium	patientListPremium	dataCalendar	maxValue	minValue
+carelink.minimed.com	US	SENSOR	78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	MMT-5420	Instinct™ Sensor	INSTINCT	Instinct™ Sensor					
+carelink.minimed.com	US	SENSOR	N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	NA	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.com	US	SENSOR	SKU-N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	DE	SENSOR	78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	MMT-5420	Instinct™ Sensor	INSTINCT	Instinct™ Sensor					
+carelink.minimed.eu	DE	SENSOR	N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	NA	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	DE	SENSOR	SKU-N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	MMT-5420	Instinct™ Sensor	INSTINCT	Instinct™ Sensor					
+carelink.minimed.eu	GB	SENSOR	N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	NA	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	GB	SENSOR	SKU-N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct Go	Instinct Go	MiniMed Go	500	
+carelink.minimed.eu	US	SENSOR	78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	MMT-5420	Instinct™ Sensor	INSTINCT	Instinct™ Sensor					
+carelink.minimed.eu	US	SENSOR	N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	NA	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78893-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78953-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78954-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78955-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78956-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78957-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78958-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78959-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78960-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78963-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78964-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78965-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-78968-01	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
+carelink.minimed.eu	US	SENSOR	SKU-N/A	Instinct Sensor	INSTINCT	Instinct Sensor	Instinct	Instinct	MiniMed Go		
