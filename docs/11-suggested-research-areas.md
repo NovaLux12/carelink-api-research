@@ -3909,7 +3909,7 @@ established for `csr/v2`, bare `v2` or `v6`, whose paths sit at different depths
 `.eu`/`.com` behave like `-trials` at all, which nothing here observes and area AP's
 single-host scope deliberately leaves open.
 
-### AY. Do the two `GET`-capable `hcp/patients/` routes answer the same way on the **other three** clinic hosts?
+### BA. Do the two `GET`-capable `hcp/patients/` routes answer the same way on the **other three** clinic hosts?
 
 **What is known (OBSERVED, [source: findings-log/2026-11-11-area-as-header-gate/FINDINGS.md]
 §3, §5).** On `carelinkhp.minimed.eu`, with `X-System-ID: ProWeb` present,
