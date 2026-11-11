@@ -269,7 +269,9 @@ forward for the maintainer; the orchestrator decides.**
 > `carelinkhp.minimed.eu`, `carelink.medtronic.{com,eu}` and
 > `carelink-support.medtronic.com` each return **HTTP 200 + `text/html`, 5518 bytes**, for
 > any path that does not exist **at the apex or under `/app/`** — the body is that
-> deployment's own entry document, not an error page. **It stops at `/hcp/`:**
+> deployment's own entry document, not an error page (OBSERVED on `carelinkhp`, where `/`
+> and a fabricated path returned the same digest in one run; **INFERRED** on `.com`/`.eu`,
+> whose real `/` was never fetched). **It stops at `/hcp/`:**
 > `/hcp/<absent>` answers a real **`404`** (0 B, **no `Content-Type` header at all**) and
 > `/hcp/configuration/<absent>` answers **`405` + `Allow: POST, OPTIONS`** — on all four
 > hosts, including `carelinkhp`. So the status code *is* an oracle under `/hcp/` and is
@@ -284,7 +286,7 @@ forward for the maintainer; the orchestrator decides.**
 **The three sites the same sentence appears at, and what each needs** (verified by
 `grep -rn 5518`): `AGENTS.md:230` (the block above); `CONTRIBUTING-research.md:59` — same
 claim in prose, needs the same scope clause; `CONTRIBUTING-research.md:270` — the prompt
-scaffolding, same; and `docs/09-methodology-and-oracles.md:196` — the trap-table row
+scaffolding, same; and `docs/09-methodology-and-oracles.md:193` — the trap-table row
 **already corrects the gzip mechanism** and carries a `5518-byte SPA fallback` entry naming
 `carelinkhp.minimed.eu` for "**every** unknown path", which needs the same correction.
 **None of the four was edited here.**
@@ -318,3 +320,23 @@ scaffolding, same; and `docs/09-methodology-and-oracles.md:196` — the trap-tab
 ```bash
 ./probe.sh all
 ```
+
+## Correction (2026-11-10) — two fixes found by a fresh-context verifier
+
+**1 · A cross-reference was off by three lines.** §8 named the fourth 5518 site as
+`docs/09-methodology-and-oracles.md:196`. It is **`:193`** (and `docs/09` carries a
+second, different 5518 mention at `:145`). The row it names is real and correctly
+characterised; only the pointer was wrong. A citation that does not resolve is the
+one class this repo's gate cannot catch, so it is recorded rather than quietly fixed.
+
+**2 · The proposed §7 replacement stated an INFERRED claim flatly.** The block said the
+body "is that deployment's own entry document" without qualification. That is OBSERVED
+on `carelinkhp` — where `/` and a fabricated path returned the same digest in this run —
+but **INFERRED** on `.com` and `.eu`, whose real `/` the cap never bought (§5 says so
+explicitly). A maintainer pasting the block verbatim would have published an inference as
+an observation, which is the failure mode `AGENTS.md` §1 exists to prevent. The label is
+now inline in the proposed text.
+
+Neither changes a finding. The four-host map, the `/hcp/` boundary and the two distinct
+5518 B digests were independently re-derived from the ledger and the retained bodies by
+the verifier, which re-hashed 12 of 12 non-empty bodies against their recorded digests.
