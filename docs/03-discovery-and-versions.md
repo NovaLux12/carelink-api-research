@@ -201,6 +201,26 @@ too [source: PROBE-FINDINGS §3].
 > history is the evidence [source:
 > findings-log/2026-11-10-area-ah-discovery-4x/FINDINGS.md §3].
 
+> ⚠ **CORRECTED 2026-11-11 (area AO) — the five tails the blockquote above left open are now
+> measured, and the answer is split.** On `clcloud.minimed.com` and `clcloud.minimed.eu`,
+> `android/3.5`, `android/3.7` and `android/3.8` **do carry** `Auth0SSOConfiguration`, on all
+> three of their `CP[]` entries; `android/3.9` and `android/3.10` **do not carry it**, on either
+> of their two entries (OBSERVED, ten cells, one observation each; controls `3.6` present 3/3
+> and a fabricated tail present 0/2 reproduced first) [source:
+> findings-log/2026-11-11-area-ao-adr-pin-guard/FINDINGS.md §3]. **So the guard is *not* stopped
+> by key absence on `3.5`, `3.7` or `3.8`** — the pin's three near neighbours — while a bump to
+> `3.9` or `3.10` would land on an entry carrying no such key.
+>
+> **And the `??` fallback this paragraph is about was never the live path on any cell measured:**
+> in all 67 `CP[]` entries area AO and area AH read between them at base `v13` on three hosts,
+> `UseSSOConfiguration` and `Auth0SSOConfiguration` appear **together or not at all** — 0 entries
+> carry the Auth0 key while the selector is missing — and where both are present the selector
+> holds the literal `Auth0SSOConfiguration`, so the expression resolves on its **left** operand
+> (OBSERVED; the conclusion that the right operand is dead is INFERRED from `??`'s semantics).
+> **Runtime inertness remains unestablished** — the named-vs-unnamed failure is
+> `carelink-bridge`'s behaviour and no `GET` observes it. Successor **BD** tests whether that
+> co-presence is a `v13` artefact.
+
 ## 3a. A second version axis — the request body
 
 > **Added 2026-10-13 (area Q).** Everything in this section is **third-party source
