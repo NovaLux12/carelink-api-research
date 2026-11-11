@@ -119,8 +119,9 @@ because no other variable was moved).
 }
 ```
 
-**`searchCarePartners` is a method name that appears in no committed file** — `git grep -c
-'searchCarePartners' -- .` returns **0** at this head, and the string arrived with this response
+**`searchCarePartners` is a method name that appears in no committed file as it stood before this
+pass ran** — `git grep -c 'searchCarePartners' origin/main -- .` returns **0**, and the string
+arrived with this response
 (OBSERVED). The envelope is a Spring `MethodArgumentNotValidException`-shaped payload naming a
 **handler method and two of its parameter positions** (`arg0`, `arg2`; `arg1` is not named, so the
 `@Valid` parameter is not the first one). **INFERRED**, and labelled as such: that a controller ran,
@@ -295,3 +296,30 @@ equality.
 - **Not a disclosure.** Every cell is an unauthenticated `GET` or an empty-body `OPTIONS` against a
   public host, and every byte quoted is an error envelope the deployment serves to any anonymous
   caller who sends the one published header.
+
+## Correction (2026-11-11) — "returns 0 at this head" was false at this head
+
+A verifier caught this and was right. The sentence said:
+
+> **`searchCarePartners` is a method name that appears in no committed file** — `git grep -c
+> 'searchCarePartners' -- .` returns **0** at this head
+
+**It returns 3 at this head.** The three hits are this pass's own output: `FINDINGS.md` twice and
+this area's row in `docs/11`. The grep is run against a tree that already contains the writing
+about the grep.
+
+The claim is true, and it is still the load-bearing one — the method name is absent from every
+file that shipped before this pass:
+
+```
+git grep -c 'searchCarePartners' origin/main -- .   ->  0
+git grep -c 'searchCarePartners' -- .               ->  3   (this pass's own findings + docs row)
+```
+
+So the wording now names the base it is measured against instead of saying "this head". That is
+the whole fix; **no verdict moves** — the string is still absent from every committed bundle, so
+the `400` is still binder-generated at request time rather than a static artefact.
+
+This is the "a claim that falsifies its own evidence" shape from `AGENTS.md` §7 and the skill's
+list: if the evidence is a search, check your own text has not perturbed it. Writing "0 hits"
+into a file makes the next run of that grep return 1.
