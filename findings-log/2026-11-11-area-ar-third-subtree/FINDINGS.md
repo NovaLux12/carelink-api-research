@@ -226,7 +226,7 @@ and not one build timestamp.
 ```
 clock A — t_sent (re-derivable from results.jsonl)
   gaps 16   min 2.060 s   median 2.609 s   max 3.546 s
-  under 2.5 s : 1  (seq 9->10, 2.060 s)
+  under 2.5 s : 1  (seq 11->12, 2.060 s)
   under 2.0 s : 0
   impossible negative DURATIONS (t_done < t_sent): seq 11, -0.477 s
 
@@ -239,7 +239,7 @@ clock B — kernel body mtimes (NOT re-derivable from a clean clone)
 Gap count checked against the grouping rule rather than eyeballed: group by host, sort by `seq`,
 then zip — `sum(rows_per_host - 1)` = `8 + 8` = **16**, and both clocks produce **16**.
 
-The single sub-2.5 s gap on clock A is `seq 9→10`, and `seq 11` is the row whose own `t_done`
+The single sub-2.5 s gap on clock A is `seq 11→12`, and `seq 11` is the row whose own `t_done`
 precedes its `t_sent` — arithmetically impossible, so at least one stamp on it is corrupt. Under
 the counting rule `docs/09` §4 already sets, a short gap measured off a provably corrupt series is
 an artefact of that corruption and is not evidence of underspacing; the kernel clock reads **0 of
@@ -288,3 +288,23 @@ if it has moved, the derivation does **not** apply and `derive.py` exits `2`.
 
 **18 of a 18 cap**, GET only, **0** failures, **0** retries, **0** cap revisions, **2** hosts,
 **6 of 6** controls first, fabricated name `zz-ar-absent-6293` at **0** `git grep` hits.
+
+## Correction (2026-11-11) — the sub-2.5 s gap was attributed to the wrong pair
+
+A verifier found this. The page said the single sub-2.5 s gap on clock A was `seq 9→10`; it is
+`seq 11→12`, and `verify.py` has always printed the correct pair (`pairs under 2.5 s: [(2.06,
+'11->12')]`). Only the prose was wrong.
+
+`seq 11` is also the one row with an impossible negative duration (−0.477 s), which is what made
+the mislabelling tempting: the corrupt row is **adjacent** to the short gap but is not one of its
+endpoints. A row number and a value that sit near each other in a list are not the same claim.
+
+**No verdict moves**: the floor (2.060 s), the gap count (16), the median (2.609 s), the max
+(3.546 s) and clock B's "0 of 16 under 2.5 s" are all unchanged and all reproduce from the ledger.
+
+⚠ **A correction to this correction.** My first pass at this section also "corrected" the median
+from 2.609 to 2.621. That was wrong, and it was wrong in the exact way this repository keeps
+relearning: I took `gaps[n//2]` on an even-length list instead of the mean of the two middle
+values. `statistics.median` returns **2.609** — mean of 2.597 and 2.621 — and the original figure
+was right. Reverted. A repair that introduces a defect in the act of fixing one is worse than the
+defect, because it arrives with the authority of a correction.
