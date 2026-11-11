@@ -55,7 +55,7 @@ stated the rule.** That is the finding, and it is one source: this repository
 | Requests | **16 of a 20 cap** (4 unspent) — derivation below |
 | Method | `GET` only. No POST, no OPTIONS, no token, no cookie, no auth header, no wordlist |
 | Delay | `sleep 2.5` **inside** the per-host `flock`, before the send; **≥ 2.5 s between requests to the same host** |
-| Spacing, ledger clock | `.com` floor **2.399 s** over 6 gaps (1 under 2.5 s, **0 under 2.0 s**); `-trials` floor **2.985 s** over 6 gaps (0 under 2.5 s) |
+| Spacing, ledger clock | `.com` floor **2.399 s** over 7 gaps (1 under 2.5 s, **0 under 2.0 s**); `-trials` floor **2.985 s** over 7 gaps (0 under 2.5 s) |
 | Spacing, kernel body-mtime oracle | `.com` floor **2.962 s**, `-trials` floor **2.986 s**, **0 gaps under 2.5 s** on either host |
 | Failures | **0** — no 000, no 5xx, no timeout, `curl_exit: 0` on all 16 rows |
 | Retries | 0 |
@@ -228,3 +228,16 @@ Minted as **area AM** in `docs/11` — which cells the ADR 0002 guard is actuall
 now that the `Auth0SSOConfiguration` key is known to be absent on the 4.x family and on `3.4`.
 **Blocker:** a request budget, not a token. **INFERRED** labels where they belong, including
 that the guard's inertness is a property of the *cell*, not of the *version range*.
+
+## Correction (2026-11-10) — a gap count was one short
+
+The spacing table said each host's floor was measured "over **6** gaps". Both hosts have
+**7** same-host gaps once the `android/99.99` confirmation cell is included: `.com`
+`[3.0, 2.97, 3.723, 2.867, 2.399, 93.266, 193.087]`, `-trials`
+`[8.554, 3.12, 2.995, 2.985, 3.012, 70.439, 193.052]`.
+
+The **floors are unchanged** — `.com` 2.399 s, `-trials` 2.985 s — and so is the
+disclosure that `.com` carries one gap under 2.5 s. Only the denominator was stale: it
+was written before the last two cells were added, and the addenda were recorded in
+`probe.sh` without the count being re-read. Found by a fresh-context verifier; no
+statistic changes.
