@@ -379,10 +379,10 @@ behaviour. `/hcp` returning it is a **documentation** fact — anyone probing `/
 
 ## 9. Successors
 
-Both are minted in `docs/11` as **AQ** and **AR**, because this pass found two things it could not
+Both are minted in `docs/11` as **AW** and **AX**, because this pass found two things it could not
 close: one that **no GET can ever close**, and one that a GET **can** close cheaply.
 
-**AQ — the mechanism, with its blocker stated as a blocker.** *What excludes the fallback from
+**AW — the mechanism, with its blocker stated as a blocker.** *What excludes the fallback from
 `/hcp/…`: a `Location` selection, a rewrite phase order, or a configured `ErrorDocument`?*
 **Blocker: it is not observable from an unauthenticated GET at all** (§6) — every candidate
 produces identical bytes on every reachable path. **Closes when** a **PUBLISHED** vendor artefact
@@ -395,7 +395,7 @@ artefact would exist to find, which nothing in this repository names; and that a
 `ErrorDocument`-only deployment would be indistinguishable from a handler at the response level,
 which is exactly why `ErrorDocument` is in the successor rather than in this pass's verdict.
 
-**AR — the behaviour, which a GET can close.** *`/hcp` is a fallback path because the selector
+**AX — the behaviour, which a GET can close.** *`/hcp` is a fallback path because the selector
 keys on the trailing slash. Does the same trailing-slash sensitivity hold for every other prefix
 this family serves — i.e. is `<prefix>` without its slash a fallback path for `/app`,
 `/hcp/configuration` and the apex-equivalent forms?* **Closes when** each named prefix is requested
@@ -439,3 +439,26 @@ Both now read `**INFERRED:** so …`:
 The measurements themselves are unchanged and are all OBSERVED: `/hcp` 200 on 4 of 4,
 `/hcp/` 404 on 4 of 4, no 301 anywhere, `//hcp/…` 404, `/app/hcp/…` 200 fallback, and
 0 of 31 recorded 404s carrying a `Content-Type` or body against 339/353 typed 200s.
+
+## Correction (2026-11-11) — §9 named its successors AQ and AR; they are AW and AX
+
+A verifier caught this. §9 said *"Both are minted in `docs/11` as **AQ** and **AR**"* and then
+described them under those letters. `docs/11` mints them as **AW** (line 4056) and **AX**
+(line 4098), because **AQ** and **AR** were already taken when this lane rebased — AQ by the
+`hcp/patients/` subtree lane and AR by the 405-constant lane.
+
+So §9 pointed a reader at two live areas asking entirely different questions. A successor
+section whose letters are wrong is worse than one with no letters at all: it looks like a
+cross-reference and behaves like a decoy.
+
+Both letters corrected in §9's prose and in the two bold successor headings. `docs/11` itself
+was always correct — the defect was only in this document's description of it.
+
+Two other documentation defects the same verifier raised are fixed separately: the two causal
+sentences at §0 and §5 that carried no same-sentence `INFERRED` label (see the earlier
+`## Correction`), and a cosmetic cell-numbering divergence between §3 and `probe.sh` that
+changes no mapping.
+
+**No measurement moved.** `/hcp` 200 on 4/4, `/hcp/` 404 on 4/4, zero 3xx anywhere in 441 rows
+on these hosts or 2 996 rows corpus-wide, `/app/hcp/…` fallback, `//hcp/…` 404, and the
+0-of-31 404s-without-a-`Content-Type` census all reproduce.
