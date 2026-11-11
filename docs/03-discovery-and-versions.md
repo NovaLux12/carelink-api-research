@@ -861,8 +861,18 @@ the rule at the top of this subsection that is a route registered with a non-`GE
 method, on one host of three. Its sibling under the same base,
 `v2/discover/android/3.6`, is `GET` `200` but `OPTIONS` `403` on that host — so the
 `200` is not a blanket property of the subtree, though **no same-subtree
-absent-path `OPTIONS` control was bought** and that gap is successor **AM**
+absent-path `OPTIONS` control was bought** at the time
 [findings-log/2026-11-10-area-aj-cumulus-v2-message/FINDINGS.md].
+**Update 2026-11-11 (area AP): that control has now been bought on this host, and the
+`-trials` `200` survives it.** An empty-body `OPTIONS` to the fabricated name
+`connect/carepartner/v2/zz-ap-absent-4821` answered **`403` `MissingAuthenticationTokenException`,
+42 B, at the full no-route digest** — and so did the same name one segment deeper and the
+`v2/discover/android/3.6` counter-cell — while `v2/display/message` answered `200` in the same
+run. So `OPTIONS` resolves **per route** in that subtree on `-trials`, and the route-registered-
+with-a-non-`GET`-method reading above is **measured rather than assumed** for that host. It is
+still **not** extended to `.com` or `.eu`, which area AP did not touch, and "POST" stays
+**INFERRED** (`ACAM` is not a method register)
+[findings-log/2026-11-11-area-ap-trials-options-specificity/FINDINGS.md].
 ⚠ **Also corrected: the cumulus-v2 spike records this leaf as `GET`** — the client it
 cites (`carelink_client2.py:221` → `:238`) `POST`s, and so does its own header comment
 at `:42`. **The spike's `GET` is wrong, and the live `GET` is 403 on all three hosts**,
