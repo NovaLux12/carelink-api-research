@@ -50,8 +50,10 @@ make, and one that would need a dated `## Correction` in three log files.
   status **and** byte count **and** full digest **and** host; a mismatch exits 9 with no question
   cell issued for that host. All six gates printed `GATE OK` (§2).
 - **One fabricated name serves all three subtrees**: `zz-aq2-absent-7241`. It sits at the same
-  depth as each subtree's `display/message` leaf (two segments below the base) and has zero hits
-  repo-wide at this head (`git grep -c 'zz-aq2-absent-7241' -- .` → only `probe.sh`).
+  depth as each subtree's `display/message` leaf (two segments below the base). It had **zero hits
+  in the committed tree before this pass wrote anything** (`git grep -c 'zz-aq2-absent-7241'
+  origin/main -- .` → 0); at this head it appears only in this lane's own artefacts and in the
+  `docs/11` row describing them.
 - **The deciding cell** is one empty-body `OPTIONS` to that name inside the subtree, paired in
   the same run with the same `OPTIONS` to the real leaf. `403` at the no-route digest ⇒ per-route.
   `200` with CORS ⇒ subtree-wide, and that verdict's `OPTIONS` half does not stand.
@@ -231,30 +233,31 @@ compared as sets), and the count sentence reads **9 open plus 43 closed** as pri
 `python3 scripts/research-checks.py` at this head — quoted, not computed. The letter `AZ` is
 minted for the successor; `AY` is retired by this close.
 
-## Correction (2026-11-11) — this lane yielded the WRONG letter, on a false citation
+## Correction (2026-11-11) — §9's citation conflated two commits; the yield itself was right
 
-A verifier caught this and it was right twice over.
+A verifier found this and it is narrower than it first looked.
 
-§9 said `AQ` had been used twice and that **this pass was the later mint by five minutes**, so it
-yielded and recorded itself as `AY`. Both halves of that reasoning were wrong:
+§9 said the `hcp/patients/` area took `AQ` at **`a206944` (01:18 UTC, "PR #200/#203")** and closed
+it with the `| AQ —` row. Both halves of that citation are wrong in the same way — they merge two
+commits into one:
 
-| event | commit | time (UTC) |
+| what actually happened | commit | time (UTC) |
 |---|---|---|
-| this pass's `### AQ.` heading enters `main` | `5a24fd1` | **01:23:30** |
-| the `hcp/patients/` `\| AQ —` closed row enters `main` | `cae2127` | **01:38:32** |
+| `hcp/patients/` mints `AQ` **in prose**, as AR's successor name | `a206944` | 01:18:23 |
+| this pass's `### AQ.` **heading** enters `main` | `5a24fd1` | 01:23:30 |
+| the `| AQ —` **closed row** for `hcp/patients` enters `main` | `cae2127` | 01:38:32 |
 
-**This pass was first, by fifteen minutes.** The cited `a206944` — offered as the moment the
-`hcp/patients/` area took the letter — **contains no AQ row at all**: that commit closed area AL.
-`git show a206944:docs/11-suggested-research-areas.md | grep -cE '^(###|\|) AQ'` returns 0.
+`a206944` contains **no AQ row at all** — that commit closed area AL. The row the sentence names
+arrived twenty minutes later in a different PR.
 
-The `hcp/patients/` area did *claim* the letter earlier (issue #199, 01:05:47) but had not written
-it into the registry, and a claim is not a registration — the page is the namespace.
+**The yield decision stands, and on the correct grounds.** The `hcp/patients/` area claimed the
+letter in issue **#199 at 01:05:47**, eighteen minutes before this pass's heading landed, and it
+**merged at 01:38:33** while this pass has never merged. Under merge order — the rule this
+repository states — `hcp/patients` keeps `AQ` and this area is `AY`. The citation was wrong; the
+conclusion was not.
 
-**Fixed:** this area keeps **`AQ`**; the `hcp/patients/` closed row is re-lettered **`AY`**. Area
-AR's and AS's "area AQ" cross-references now point at `AY`, and docs/11 says so at both sites.
-
-The lesson is the one the skill keeps repeating in new shapes: **"who was first" is a question
-about the artefact, not about intent.** The honest check is `git log -S` against the file that
-holds the namespace — not a claim's timestamp, and not a commit that happens to sit nearby in the
-log. A citation offered to settle an ordering argument must be opened, because a plausible SHA
-nobody read is worse than no citation: it makes a wrong conclusion look sourced.
+⚠ **A correction to an earlier correction.** My first attempt at this section went further: I read
+`git log -S '### AQ.'` as settling "who was first" by when the *string* appeared (01:23:30) and
+re-lettered this area back to `AQ`. That was wrong. `git log -S` measures when a string entered a
+file, not who holds a claim — and the claim was taken at 01:05:47 and honoured by a merge at
+01:38:33. Reverted. **Appearance in a file is not registration; a claim plus a merge is.**
