@@ -197,7 +197,23 @@ def check_numbers(suite_log):
     # Area ids are one or two letters: A–Z, then AA, AB, … (widened 2026-10-16).
     areas = len(re.findall(r'^###\s+[A-Z]{1,2}\.\s', read('docs/11-suggested-research-areas.md'), re.M))
     areas_fail = False
-    for i, line in enumerate(read('.github/ISSUE_TEMPLATE/config.yml').splitlines(), 1):
+
+    # A FILE THAT CANNOT BE READ IS NOT A FILE THAT AGREES.
+    # On 2026-11-11 `config.yml` reached `main` carrying nine nested merge-conflict
+    # markers, and this check printed "config.yml agrees" — because it greps for
+    # `about: N open areas` and the surviving line said the right number. The file
+    # was corrupt YAML and the agreement was reported anyway. Whatever the regex
+    # finds, a marker in the file means nothing below it can be trusted, so this
+    # test comes FIRST and is a hard failure rather than a warning.
+    cfg_lines = read('.github/ISSUE_TEMPLATE/config.yml').splitlines()
+    for i, line in enumerate(cfg_lines, 1):
+        if re.match(r'^(<<<<<<<|=======|>>>>>>>)', line):
+            fail(f'.github/ISSUE_TEMPLATE/config.yml:{i} is a merge-conflict marker — '
+                 f'the file is not valid YAML and no count in it can be trusted')
+            areas_fail = True
+            break
+
+    for i, line in enumerate(cfg_lines, 1):
         m = re.search(r'about: (\d+) (?:open )?areas', line)
         if m and int(m.group(1)) != areas:
             fail(f'.github/ISSUE_TEMPLATE/config.yml:{i} states {m.group(1)} areas, '
