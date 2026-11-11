@@ -1,0 +1,61 @@
+== AREA AQ — derivation, zero requests ==
+eager bundle      : /home/jack/projects/carelink-api-research/.loop/aq-assets/main.js
+eager bytes       : 3397615
+eager sha256      : 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
+eager literal hits: 40 double-quoted, 0 single/backtick
+chunk source      : /home/jack/projects/carelink-api-research/findings-log/2026-10-14-area-k-clinic-controlflow/route-delta.json
+chunk chunk_only  : ['/hcp/sso/auth/otc/send', 'hcp/countries/dialCodes', 'hcp/patients/checkPhoneNumber']  (sha256 87d21d9b9a5920cc6f675d005a916c18dfa62f3c570cec927d9e8fe25c3ae033)
+
+PROBEABLE — eager bundle (21), no placeholder, safe to request:
+  hcp/patients/addPatient
+  hcp/patients/archivePatient
+  hcp/patients/care-partner/search
+  hcp/patients/clearPatientsFlags
+  hcp/patients/flagPatient
+  hcp/patients/getAllClinicArchivedPatients
+  hcp/patients/getAllClinicUnarchivedPatients
+  hcp/patients/getInviteToPersonalSubjectPlaceholder
+  hcp/patients/getInviteToPersonalTemplate
+  hcp/patients/getPatient
+  hcp/patients/getPatientsMealProfilesAndDailyHabits
+  hcp/patients/linkPatient
+  hcp/patients/otc-linking/allowed
+  hcp/patients/otc-linking/code/email/send
+  hcp/patients/otc-linking/code/sms/send
+  hcp/patients/sendInviteToPersonal
+  hcp/patients/unFlagPatient
+  hcp/patients/unarchivePatient
+  hcp/patients/unlinkPatient
+  hcp/patients/updatePatient
+  hcp/patients/updatePatientsMealProfilesAndDailyHabits
+
+PROBEABLE — chunk-only (1), from the committed route delta:
+  hcp/patients/checkPhoneNumber
+
+NEEDS-ID (15) — placeholder in the literal; RECORDED, NOT PROBED:
+  hcp/patients/((patientId))/care-partner
+  hcp/patients/((patientId))/care-partner/link
+  hcp/patients/((patientId))/care-partner/unlink
+  hcp/patients/((patientId))/control-codes
+  hcp/patients/((patientId))/insights/disable
+  hcp/patients/((patientId))/logbook/entries
+  hcp/patients/((patientId))/logbook/entries/filled
+  hcp/patients/((patientId))/logbook/entries/last
+  hcp/patients/((patientId))/otc-linking/code
+  hcp/patients/((patientId))/otc-linking/email/template
+  hcp/patients/((patientId))/otc-linking/sms/template
+  hcp/patients/((patientId))/preferences
+  hcp/patients/((patientId))/reports/supported
+  hcp/patients/((patientId))/send/follow-up
+  hcp/patients/((patientId))/toggle/blinded-cgm
+
+CLAIM-ONLY (1) — the claim names these, neither source does:
+  hcp/patients
+
+claimed set  (12): hcp/patients hcp/patients/archivePatient hcp/patients/checkPhoneNumber hcp/patients/getInviteToPersonalTemplate hcp/patients/getPatient hcp/patients/getPatientsMealProfilesAndDailyHabits hcp/patients/linkPatient hcp/patients/otc-linking/allowed hcp/patients/otc-linking/code/sms/send hcp/patients/sendInviteToPersonal hcp/patients/unlinkPatient hcp/patients/updatePatient
+derived set  (22): hcp/patients/addPatient hcp/patients/archivePatient hcp/patients/care-partner/search hcp/patients/checkPhoneNumber hcp/patients/clearPatientsFlags hcp/patients/flagPatient hcp/patients/getAllClinicArchivedPatients hcp/patients/getAllClinicUnarchivedPatients hcp/patients/getInviteToPersonalSubjectPlaceholder hcp/patients/getInviteToPersonalTemplate hcp/patients/getPatient hcp/patients/getPatientsMealProfilesAndDailyHabits hcp/patients/linkPatient hcp/patients/otc-linking/allowed hcp/patients/otc-linking/code/email/send hcp/patients/otc-linking/code/sms/send hcp/patients/sendInviteToPersonal hcp/patients/unFlagPatient hcp/patients/unarchivePatient hcp/patients/unlinkPatient hcp/patients/updatePatient hcp/patients/updatePatientsMealProfilesAndDailyHabits
+claimed but NOT derived: ['hcp/patients']
+derived but NOT claimed: ['hcp/patients/addPatient', 'hcp/patients/care-partner/search', 'hcp/patients/clearPatientsFlags', 'hcp/patients/flagPatient', 'hcp/patients/getAllClinicArchivedPatients', 'hcp/patients/getAllClinicUnarchivedPatients', 'hcp/patients/getInviteToPersonalSubjectPlaceholder', 'hcp/patients/otc-linking/code/email/send', 'hcp/patients/unFlagPatient', 'hcp/patients/unarchivePatient', 'hcp/patients/updatePatientsMealProfilesAndDailyHabits']
+
+DERIVE VERDICT: THE DERIVED SET WINS. 22 probeable literals derived against 12 claimed; 11 derived names are absent from the claim and 1 claimed name(s) appear in no build. The sweep issues the DERIVED set plus the 1 claim-only name(s), 23 candidates in total.
+BUILD-IDENTITY: sha256=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba recorded=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba reproduces=True
