@@ -1,9 +1,9 @@
 == AREA AQ — derivation, zero requests ==
-eager bundle      : /home/jack/projects/carelink-api-research/.loop/aq-assets/main.js
+eager bundle      : <repo>/.loop/aq-assets/main.js
 eager bytes       : 3397615
 eager sha256      : 2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba
 eager literal hits: 40 double-quoted, 0 single/backtick
-chunk source      : /home/jack/projects/carelink-api-research/findings-log/2026-10-14-area-k-clinic-controlflow/route-delta.json
+chunk source      : <repo>/findings-log/2026-10-14-area-k-clinic-controlflow/route-delta.json
 chunk chunk_only  : ['/hcp/sso/auth/otc/send', 'hcp/countries/dialCodes', 'hcp/patients/checkPhoneNumber']  (sha256 87d21d9b9a5920cc6f675d005a916c18dfa62f3c570cec927d9e8fe25c3ae033)
 
 PROBEABLE — eager bundle (21), no placeholder, safe to request:
@@ -59,3 +59,19 @@ derived but NOT claimed: ['hcp/patients/addPatient', 'hcp/patients/care-partner/
 
 DERIVE VERDICT: THE DERIVED SET WINS. 22 probeable literals derived against 12 claimed; 11 derived names are absent from the claim and 1 claimed name(s) appear in no build. The sweep issues the DERIVED set plus the 1 claim-only name(s), 23 candidates in total.
 BUILD-IDENTITY: sha256=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba recorded=2a7fa8e7af519c2b493caf62c00b46c5e75a357048444dbf7abff6136bfc02ba reproduces=True
+
+## Correction (2026-11-11) — two absolute machine paths redacted in place
+
+This file originally recorded its two inputs as absolute paths under `/home/<user>/…`, which is
+on `AGENTS.md` §7's scrub list. They now read `<repo>/…`.
+
+This is an in-place edit to an append-only artefact, and the reason it is permitted is the reason
+it is disclosed here: **the values redacted are not findings.** A machine path is never evidence
+for anything, so removing it destroys no part of the audit trail — while leaving it in publishes
+something §7 says never to publish. Both inputs remain fully identified: the eager bundle is
+pinned by its byte count and sha256 above, and the chunk corpus is a committed file under
+`findings-log/2026-10-14-area-k-clinic-controlflow/`.
+
+The same edit corrected `FINDINGS.md`'s file-inventory sentence, which had claimed no machine
+path appeared in any file while this one carried two. That sentence was written as a sign-off
+rather than a measurement, and it was false.

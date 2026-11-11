@@ -329,8 +329,11 @@ area's successor and this pass did not touch it.
 | `verify.txt` | its output at this head |
 | `run.log` | per-request line, UTC stamps, cap-stop guard |
 
-No response body is committed; no bundle; no credential, internal hostname or machine path
-appears in any file. `results.jsonl` is 36 rows of metadata.
+No response body is committed and no bundle is committed. `results.jsonl` is 36 rows of
+metadata. No credential or internal hostname appears in any file. **Machine paths:**
+`derive.txt` recorded two absolute `/home/<user>/…` paths when this log was first written —
+that is on `AGENTS.md` §7's scrub list — and they have been replaced with `<repo>/` (see the
+`## Correction` below). No other file in this directory carries one.
 
 ## Correction (2026-11-11) — both clocks counted 31 gaps; the ledger holds 32
 
@@ -363,3 +366,32 @@ pairing can be a selection.** `if a["host"] == b["host"]` reads as "keep same-ho
 actually means "keep pairs that happen to be adjacent in the file *and* share a host", which is a
 strictly smaller set whenever the writer interleaves. The tell is arithmetic: 27 + 3 + 3 + 3 rows
 cannot produce 31 same-host gaps, and nobody divided.
+
+## Correction (2026-11-11) — two absolute machine paths, and a claim that there were none
+
+A verifier flagged that `derive.py`'s re-run limit was never stated in one sentence. Checking
+that turned up a second, worse defect in the same neighbourhood.
+
+`derive.txt` recorded
+
+```
+eager bundle      : <home>/projects/carelink-api-research/.loop/aq-assets/main.js
+chunk source      : <home>/projects/carelink-api-research/findings-log/...
+```
+
+`/home/<user>` is on `AGENTS.md` §7's scrub list, and the same section of this file said
+*"no credential, internal hostname or machine path appears in any file."* **That sentence was
+false when it was written** — the file it was vouching for carried two. The gate does not check
+machine paths, so nothing caught it.
+
+Both replaced with `<repo>/`. The claim now names the exception and points here rather than
+asserting a clean sweep.
+
+`derive.py` also gained a **RE-RUN LIMIT** paragraph: it cannot be re-run from a clean clone
+because the eager bundle lives in `.loop/aq-assets/`, which `.gitignore` excludes. The figures
+stay auditable — `derive.txt` pins the bundle's byte count and sha256, and `probe.sh` re-fetches
+it as request 1 — but the limit is now stated instead of implied.
+
+The lesson is not "scrub harder". It is that **a sentence claiming an absence needs the same
+evidence as a sentence claiming a presence**, and this one had none: it was written as a
+sign-off, not as a measurement.
