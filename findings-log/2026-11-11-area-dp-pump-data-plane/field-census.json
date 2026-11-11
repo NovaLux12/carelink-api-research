@@ -1,0 +1,170 @@
+[
+ {
+  "token": "therapyAlgorithmState",
+  "meaning": "auto-mode state object",
+  "chunk_6746_hits": 5,
+  "eager_main_hits": 0,
+  "first_offset": 47334
+ },
+ {
+  "token": "autoModeShieldState",
+  "meaning": "AUTO_BASAL | SAFE_BASAL | FEATURE_OFF",
+  "chunk_6746_hits": 3,
+  "eager_main_hits": 0,
+  "first_offset": 47446
+ },
+ {
+  "token": "plgmLgsState",
+  "meaning": "FEATURE_OFF | REFRACTORY_PERIOD | MONITORING | SUSPEND_FIRED_PLGM | SUSPEND_FIRED_LGS",
+  "chunk_6746_hits": 2,
+  "eager_main_hits": 0,
+  "first_offset": 47485
+ },
+ {
+  "token": "lastAlarm",
+  "meaning": "alarm object: code, type, info, flash, datetime",
+  "chunk_6746_hits": 29,
+  "eager_main_hits": 0,
+  "first_offset": 75838
+ },
+ {
+  "token": "activeInsulin",
+  "meaning": "IOB; .amount == -1 is the no-IOB sentinel",
+  "chunk_6746_hits": 3,
+  "eager_main_hits": 0,
+  "first_offset": 78004
+ },
+ {
+  "token": "reservoirRemainingUnits",
+  "meaning": "reservoir, units form",
+  "chunk_6746_hits": 2,
+  "eager_main_hits": 0,
+  "first_offset": 76999
+ },
+ {
+  "token": "reservoirAmount",
+  "meaning": "reservoir, units form (fallback)",
+  "chunk_6746_hits": 4,
+  "eager_main_hits": 0,
+  "first_offset": 76980
+ },
+ {
+  "token": "reservoirLevelPercent",
+  "meaning": "reservoir, 5 snap-points 0/25/50/75/100",
+  "chunk_6746_hits": 4,
+  "eager_main_hits": 0,
+  "first_offset": 76930
+ },
+ {
+  "token": "medicalDeviceBatteryLevelPercent",
+  "meaning": "pump battery %",
+  "chunk_6746_hits": 4,
+  "eager_main_hits": 0,
+  "first_offset": 77083
+ },
+ {
+  "token": "conduitBatteryLevel",
+  "meaning": "transmitter battery",
+  "chunk_6746_hits": 5,
+  "eager_main_hits": 0,
+  "first_offset": 77206
+ },
+ {
+  "token": "conduitInRange",
+  "meaning": "transmitter in range",
+  "chunk_6746_hits": 6,
+  "eager_main_hits": 0,
+  "first_offset": 77172
+ },
+ {
+  "token": "sensorState",
+  "meaning": "sensor state enum",
+  "chunk_6746_hits": 15,
+  "eager_main_hits": 0,
+  "first_offset": 45353
+ },
+ {
+  "token": "calibStatus",
+  "meaning": "calibration status",
+  "chunk_6746_hits": 4,
+  "eager_main_hits": 0,
+  "first_offset": 76871
+ },
+ {
+  "token": "sensorDurationHours",
+  "meaning": "sensor age",
+  "chunk_6746_hits": 5,
+  "eager_main_hits": 0,
+  "first_offset": 76600
+ },
+ {
+  "token": "timeToNextCalibHours",
+  "meaning": "hours to next calibration",
+  "chunk_6746_hits": 4,
+  "eager_main_hits": 0,
+  "first_offset": 76532
+ },
+ {
+  "token": "markers",
+  "meaning": "event stream; the treatments gap",
+  "chunk_6746_hits": 1,
+  "eager_main_hits": 1,
+  "first_offset": 77986
+ },
+ {
+  "token": "lastSGTrend",
+  "meaning": "trend on the most recent SG",
+  "chunk_6746_hits": 6,
+  "eager_main_hits": 0,
+  "first_offset": 41049
+ },
+ {
+  "token": "sgs",
+  "meaning": "the SGV array",
+  "chunk_6746_hits": 7,
+  "eager_main_hits": 0,
+  "first_offset": 34359
+ },
+ {
+  "token": "bgUnits",
+  "meaning": "MGDL | MMOL_L",
+  "chunk_6746_hits": 53,
+  "eager_main_hits": 14,
+  "first_offset": 34012
+ },
+ {
+  "token": "systemStatusMessage",
+  "meaning": "pump status banner",
+  "chunk_6746_hits": 24,
+  "eager_main_hits": 0,
+  "first_offset": 45578
+ },
+ {
+  "token": "medicalDeviceSuspended",
+  "meaning": "pump suspended flag",
+  "chunk_6746_hits": 8,
+  "eager_main_hits": 0,
+  "first_offset": 47380
+ },
+ {
+  "token": "pumpModelNumber",
+  "meaning": "pump model",
+  "chunk_6746_hits": 5,
+  "eager_main_hits": 0,
+  "first_offset": 46746
+ },
+ {
+  "token": "medicalDeviceFamily",
+  "meaning": "reported device family",
+  "chunk_6746_hits": 5,
+  "eager_main_hits": 0,
+  "first_offset": 74282
+ },
+ {
+  "token": "deviceFamily",
+  "meaning": "routing discriminator",
+  "chunk_6746_hits": 10,
+  "eager_main_hits": 5,
+  "first_offset": 10825
+ }
+]
