@@ -4191,7 +4191,6 @@ token cost and all 19 name keys resolve to text — which answers item 2 without
 
 ---
 
-
 ## Closed areas
 
 Dated, with the verdict and the evidence. An area leaves this table only by
