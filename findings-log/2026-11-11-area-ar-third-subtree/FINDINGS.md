@@ -209,10 +209,12 @@ control.** So **no lane's work needs a correction**, and none is appended — th
 deliverable is satisfied by a measured negative, not by a retraction.
 
 ⚠ **One boundary is stated rather than left for a reader to discover.** AQ's absent-path control
-is at **depth 1**. AQ's candidate set includes nested names (`otc-linking/allowed`,
-`care-partner/search`), and AR's six depth-2 cells are evidence that *these three* subtrees `404`
-at depth 2 — not that `patients` does. AQ's nested `405`s are therefore controlled one level up
-rather than at their own depth. AR does not retract them (the same run measured `404`s at the same
+is at **depth 1**. AQ's candidate set includes nested names — its nested `405`s are
+`otc-linking/code/email/send` and `otc-linking/code/sms/send`, both at **depth 4** (its
+`otc-linking/allowed` and `care-partner/search` are **`412`s**, not `405`s, and must not be cited as
+evidence either way). AR's six depth-2 cells are evidence that *these three* subtrees `404` at
+depth 2 — not that `patients` does. AQ's nested `405`s are therefore controlled one level up rather
+than at their own depth. AR does not retract them (the same run measured `404`s at the same
 depth under the same parent, which no child-answering handler produces) but the gap is real and is
 carried as a successor condition rather than smoothed over.
 
@@ -308,3 +310,18 @@ relearning: I took `gaps[n//2]` on an even-length list instead of the mean of th
 values. `statistics.median` returns **2.609** — mean of 2.597 and 2.621 — and the original figure
 was right. Reverted. A repair that introduces a defect in the act of fixing one is worse than the
 defect, because it arrives with the authority of a correction.
+
+## Correction (2026-11-11) — the nested-405 examples were 412s
+
+A verifier found this. The boundary note above cited `otc-linking/allowed` and `care-partner/search`
+as examples of AQ's nested `405`s. **Both are `412`s in AQ's ledger**, and a `412` is an edge
+refusal for a missing header, not a method verdict — citing them as `405` evidence is wrong in both
+directions.
+
+The real nested `405`s are `otc-linking/code/email/send` and `otc-linking/code/sms/send`, both at
+**depth 4** — which actually makes the point *more* sharply than the original sentence did: the gap
+between AQ's depth-1 control and its deepest question cells is three segments, not one.
+
+**No verdict moves.** The claim being supported — that AQ's nested `405`s are controlled one level
+up rather than at their own depth — is unchanged and is if anything better supported by the real
+examples. The disclosure was honest; its illustration was not.
