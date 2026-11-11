@@ -253,7 +253,7 @@ breached on either clock:**
 
 **Not claimed:** that `/hcp`'s asymmetry holds or fails on the other three clinic hosts — this pass
 bought **one** host by design, and AX's own stated assumption (that a single host establishes a
-general property) is **not** satisfied by one host, which is successor **AY**. Also not claimed:
+general property) is **not** satisfied by one host, which is successor **BB**. Also not claimed:
 that no other prefix anywhere on this family is asymmetric — four prefixes were measured, not a
 census. And no mechanism is offered for any of it: **every causal reading above is INFERRED and says
 so in its sentence**, because area AN §6 established that the pipeline behind a bare-prefix `200` is
@@ -266,7 +266,7 @@ measured here, and at `/hcp` specifically it reads a false positive.
 
 ## 8. Successor
 
-Minted in `docs/11` as **AY**: *does the `/hcp`-only result hold on the other three clinic hosts —
+Minted in `docs/11` as **BB**: *does the `/hcp`-only result hold on the other three clinic hosts —
 is `/app` slash-insensitive there too, and is `/hcp` the only asymmetric prefix on each?*
 **Blocker:** none — GET only, no token, no cookie, no auth, no wordlist; a budget question.
 **Closes when** each of `carelink.medtronic.eu`, `carelink-support.medtronic.com` and
