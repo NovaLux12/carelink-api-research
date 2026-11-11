@@ -1,0 +1,182 @@
+# Area AI — the INSTINCT range, code by code
+
+Range recorded in docs/05: SKU-78893-01 … SKU-78968-01 (76 integers in the span).
+
+## Present in the patient FAMILY MAP (`personal.device.family.to.model.mapping`)
+
+INSTINCT row holds 30 strings: 13 `SKU-NNNNN-01` + 13 bare `NNNNN-01` + placeholders.
+
+| code | SKU-form in map | bare form in map |
+|---|---|---|
+| `78893` | yes | yes |
+| `78894` | **no** | **no** |
+| `78895` | **no** | **no** |
+| `78896` | **no** | **no** |
+| `78897` | **no** | **no** |
+| `78898` | **no** | **no** |
+| `78899` | **no** | **no** |
+| `78900` | **no** | **no** |
+| `78901` | **no** | **no** |
+| `78902` | **no** | **no** |
+| `78903` | **no** | **no** |
+| `78904` | **no** | **no** |
+| `78905` | **no** | **no** |
+| `78906` | **no** | **no** |
+| `78907` | **no** | **no** |
+| `78908` | **no** | **no** |
+| `78909` | **no** | **no** |
+| `78910` | **no** | **no** |
+| `78911` | **no** | **no** |
+| `78912` | **no** | **no** |
+| `78913` | **no** | **no** |
+| `78914` | **no** | **no** |
+| `78915` | **no** | **no** |
+| `78916` | **no** | **no** |
+| `78917` | **no** | **no** |
+| `78918` | **no** | **no** |
+| `78919` | **no** | **no** |
+| `78920` | **no** | **no** |
+| `78921` | **no** | **no** |
+| `78922` | **no** | **no** |
+| `78923` | **no** | **no** |
+| `78924` | **no** | **no** |
+| `78925` | **no** | **no** |
+| `78926` | **no** | **no** |
+| `78927` | **no** | **no** |
+| `78928` | **no** | **no** |
+| `78929` | **no** | **no** |
+| `78930` | **no** | **no** |
+| `78931` | **no** | **no** |
+| `78932` | **no** | **no** |
+| `78933` | **no** | **no** |
+| `78934` | **no** | **no** |
+| `78935` | **no** | **no** |
+| `78936` | **no** | **no** |
+| `78937` | **no** | **no** |
+| `78938` | **no** | **no** |
+| `78939` | **no** | **no** |
+| `78940` | **no** | **no** |
+| `78941` | **no** | **no** |
+| `78942` | **no** | **no** |
+| `78943` | **no** | **no** |
+| `78944` | **no** | **no** |
+| `78945` | **no** | **no** |
+| `78946` | **no** | **no** |
+| `78947` | **no** | **no** |
+| `78948` | **no** | **no** |
+| `78949` | **no** | **no** |
+| `78950` | **no** | **no** |
+| `78951` | **no** | **no** |
+| `78952` | **no** | **no** |
+| `78953` | yes | yes |
+| `78954` | yes | yes |
+| `78955` | yes | yes |
+| `78956` | yes | yes |
+| `78957` | yes | yes |
+| `78958` | yes | yes |
+| `78959` | yes | yes |
+| `78960` | yes | yes |
+| `78961` | **no** | **no** |
+| `78962` | **no** | **no** |
+| `78963` | yes | yes |
+| `78964` | yes | yes |
+| `78965` | yes | yes |
+| `78966` | **no** | **no** |
+| `78967` | **no** | **no** |
+| `78968` | yes | yes |
+
+## Present in the report-naming list (`reportFileNamingSupportedPumpModels`)
+
+List holds 236 entries; 13 are `SKU-NNNNN-01` and 13 are bare `NNNNN-01`.
+
+| code | SKU-form in list | bare form in list |
+|---|---|---|
+| `78893` | yes | yes |
+| `78894` | **no** | **no** |
+| `78895` | **no** | **no** |
+| `78896` | **no** | **no** |
+| `78897` | **no** | **no** |
+| `78898` | **no** | **no** |
+| `78899` | **no** | **no** |
+| `78900` | **no** | **no** |
+| `78901` | **no** | **no** |
+| `78902` | **no** | **no** |
+| `78903` | **no** | **no** |
+| `78904` | **no** | **no** |
+| `78905` | **no** | **no** |
+| `78906` | **no** | **no** |
+| `78907` | **no** | **no** |
+| `78908` | **no** | **no** |
+| `78909` | **no** | **no** |
+| `78910` | **no** | **no** |
+| `78911` | **no** | **no** |
+| `78912` | **no** | **no** |
+| `78913` | **no** | **no** |
+| `78914` | **no** | **no** |
+| `78915` | **no** | **no** |
+| `78916` | **no** | **no** |
+| `78917` | **no** | **no** |
+| `78918` | **no** | **no** |
+| `78919` | **no** | **no** |
+| `78920` | **no** | **no** |
+| `78921` | **no** | **no** |
+| `78922` | **no** | **no** |
+| `78923` | **no** | **no** |
+| `78924` | **no** | **no** |
+| `78925` | **no** | **no** |
+| `78926` | **no** | **no** |
+| `78927` | **no** | **no** |
+| `78928` | **no** | **no** |
+| `78929` | **no** | **no** |
+| `78930` | **no** | **no** |
+| `78931` | **no** | **no** |
+| `78932` | **no** | **no** |
+| `78933` | **no** | **no** |
+| `78934` | **no** | **no** |
+| `78935` | **no** | **no** |
+| `78936` | **no** | **no** |
+| `78937` | **no** | **no** |
+| `78938` | **no** | **no** |
+| `78939` | **no** | **no** |
+| `78940` | **no** | **no** |
+| `78941` | **no** | **no** |
+| `78942` | **no** | **no** |
+| `78943` | **no** | **no** |
+| `78944` | **no** | **no** |
+| `78945` | **no** | **no** |
+| `78946` | **no** | **no** |
+| `78947` | **no** | **no** |
+| `78948` | **no** | **no** |
+| `78949` | **no** | **no** |
+| `78950` | **no** | **no** |
+| `78951` | **no** | **no** |
+| `78952` | **no** | **no** |
+| `78953` | yes | yes |
+| `78954` | yes | yes |
+| `78955` | yes | yes |
+| `78956` | yes | yes |
+| `78957` | yes | yes |
+| `78958` | yes | yes |
+| `78959` | yes | yes |
+| `78960` | yes | yes |
+| `78961` | **no** | **no** |
+| `78962` | **no** | **no** |
+| `78963` | yes | yes |
+| `78964` | yes | yes |
+| `78965` | yes | yes |
+| `78966` | **no** | **no** |
+| `78967` | **no** | **no** |
+| `78968` | yes | yes |
+
+## The tail, 78961–78968, explicitly
+
+| code | family map | report list | first name it carries, if any |
+|---|---|---|---|
+| `78961` | **absent** | **absent** | — |
+| `78962` | **absent** | **absent** | — |
+| `78963` | present | present | (no display name in either document; family=list membership only) |
+| `78964` | present | present | (no display name in either document; family=list membership only) |
+| `78965` | present | present | (no display name in either document; family=list membership only) |
+| `78966` | **absent** | **absent** | — |
+| `78967` | **absent** | **absent** | — |
+| `78968` | present | present | (no display name in either document; family=list membership only) |
