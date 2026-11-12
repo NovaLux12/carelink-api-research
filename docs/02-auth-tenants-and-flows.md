@@ -100,6 +100,25 @@ depends on the reading**.
 `application/json`, 60 B, one identical digest on every host [source:
 findings-log/2026-10-12-area-i-auth0-tenant-behaviour/FINDINGS.md §3].
 
+> ⚠ **Corrected 2026-11-12 — the advertisement has been WITHDRAWN.** The field is
+> now **absent** from the discovery document on all three tenants reachable today
+> (`carelink-login.minimed.eu`, `.com`, `-trials`); the union field count fell
+> from **30 to 29** and the only missing field is `registration_endpoint`. The two
+> regional hosts (`-us`, `-ap`) were **unreachable**, not absent, so the honest
+> count is *three of three reachable*, not "all five". The 2026-10-12 statement
+> above was true when made and is retained per AGENTS.md §3.
+>
+> What this does **not** mean: it is not a claim that `/oidc/register` stopped
+> resolving. Only the **advertisement** was checked. The endpoint returned 404 to
+> `GET` while it *was* advertised, so an unadvertised 404 is not new behaviour.
+> `regression/hurl/02-sso-oidc.hurl` now pins the **absence**, so a
+> re-advertisement goes red in either direction. Record:
+> [findings-log/2026-11-12-registration-endpoint-withdrawn/FINDINGS.md](../findings-log/2026-11-12-registration-endpoint-withdrawn/FINDINGS.md).
+>
+> **No client behaviour depends on this.** `carelink-bridge` does not reference
+> `registration_endpoint` anywhere in `src/` or `test/`; its login path reads
+> `authorization_endpoint`, `token_endpoint` and `jwks_uri`, all still present.
+
 > ⚠ **Retracted 2026-10-12.** The original wording here was "absent on **all five**
 > … A published capability that does not exist, identically, everywhere." **That is
 > false**, and it is kept visible rather than deleted (AGENTS.md §3). The endpoint is
