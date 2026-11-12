@@ -68,12 +68,13 @@ so the exact source revision of this build is recorded by the vendor.
 alongside `uploader.jar`, not shaded into it.
 
 The `uploader.jks` keystore (7,478 B) is a **Java KeyStore** by file signature,
-but it does not open with the JVM's conventional default password and is not
-readable without the vendor's passphrase. **No attempt was made to brute-force
-it**; it is recorded here only as a shipped artefact. `uploader.policy` shows it
-is used as the `keystore` entry for a `signedBy`-based security policy granting
-`AllPermission` to three signing identities: `oracle` (the JRE), `whitecryption`
-(`lib/skb.jar`) and `medtronic` (`uploader.jar`).
+holding code-signing certificates only — see
+`findings-log/2026-11-12-uploader-wire-protocol/` §3 for its full contents.
+**It is not a TLS trust store and not a data key**, and it is not evidence of
+certificate pinning. `uploader.policy` shows it is used as the `keystore` entry for
+a `signedBy`-based security policy granting `AllPermission` to three signing
+identities: `oracle` (the JRE), `whitecryption` (`lib/skb.jar`) and `medtronic`
+(`uploader.jar`).
 
 ## 2. The installer is Intel-only and cannot run its own checks on Apple Silicon
 
