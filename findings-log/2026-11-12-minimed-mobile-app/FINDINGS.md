@@ -99,7 +99,7 @@ state machines**, parameterised by **device type**, **protocol version** and
 **permit version**. That is a structural map of the handshake recovered without
 decompiling a single instruction.
 
-## 4. The secure-repository network protocol: four message types
+## 4. The secure-repository protocol: a WebSocket with Play Integrity attestation
 
 The app has a `com.medtronic.securerepositories` package not present in the
 desktop uploader. Its `MessageType` enum is the protocol vocabulary:
@@ -121,15 +121,45 @@ public interface NetworkSecureRepository {
 }
 ```
 
-and the job sequence under `internal/sequencejobs/network/` is
-`InitJob`, `NonceJob`, `AJob`, `SJob`, `DJob`, plus `MessageTransformer`.
+**The transport is a WebSocket, not plain HTTP.** The job classes make this
+unambiguous — `NonceJob`, `SJob` and `InitJob` each hold a `WebSocketCommunicator`
+and a `WebSocketEventListener`, and `WebSocketCommunicator` wraps an
+`OkHttpClient` and `okhttp3.WebSocket`:
 
-**This is a challenge–response key-establishment protocol between the app and
-Medtronic's servers**, distinct from the desktop uploader's
-`{token, target}` POST envelope. `NONCE` → `KEY` → `ATTESTATION` → `DEVICE` reads
-as: obtain a server nonce, derive/obtain a key, attest the client, then exchange
-device data. **INFERRED from the names and job order**; the message bodies are not
+```java
+public WebSocketCommunicator(OkHttpClient client, String target, Certificate certificate);
+```
+
+and its methods are `connect()`, `closeConnection()`, `addListener()`,
+`removeListener()`, `sendStringMessage(String)`, `sendByteStringMessage(byte[])`,
+plus a nested `EchoWebSocketListener extends WebSocketListener` with
+`onOpen`/`onMessage`/`onClosed`/`onFailure`.
+
+**Two security properties follow from that signature, and neither is inferred:**
+
+1. **A `Certificate` is a constructor parameter.** The communicator is built with
+   a specific certificate supplied by the caller, and the class holds a
+   `PIN_PREFIX` static and a `certificateStatus` boolean. This is **certificate
+   pinning by construction** — it is not a network-security-config pin, it is
+   handed to the object that opens the socket.
+2. **`AJob` carries a `Long cloudProjectNumber`, a `Context`, and an
+   `IntegrityManager`, wired to a `com.google.android.gms.tasks.OnSuccessListener`.**
+   That is **Google Play Integrity API attestation** — the app asks Google to
+   attest that it is genuine and running on an unmodified device, and only then
+   proceeds. So the handshake is gated on device attestation, not just a
+   credential.
+
+The job sequence under `internal/sequencejobs/network/` is `InitJob`, `NonceJob`,
+`AJob`, `SJob`, `DJob`, plus `MessageTransformer`. Read against the message types
+and the attestation dependency, the handshake is: **open the socket (`InitJob`) →
+obtain a server nonce (`NonceJob`) → attest the device with Play Integrity
+(`AJob`) → establish the session (`SJob`) → exchange device data (`DJob`).**
+**INFERRED** from class composition and job order; the message bodies are not
 recovered.
+
+**A correction to an earlier reading in this record's own draft:** this is *not* a
+`POST`-based upload protocol equivalent to the desktop uploader's. It is a
+long-lived WebSocket session with a challenge–response handshake in front of it.
 
 ## 5. The strings are protected by a native packer
 
@@ -198,12 +228,16 @@ not yet been named.
 
 ## 8. What is not established
 
-- **Any upload endpoint URL.** The packer defeats static string recovery; this
-  needs either a runtime hook (Frida on a rooted device) or a mitmproxy capture
-  from a real phone.
+- **Any upload endpoint URL, or the WebSocket target.** The URL is passed into
+  `WebSocketCommunicator`'s constructor by a caller, and the packer defeats static
+  string recovery for the callers. This needs either a runtime hook (Frida on a
+  rooted device) or a mitmproxy capture from a real phone.
 - **The wire format** of the four `MessageType` messages.
 - **Whether SAKE is used for the server link at all**, or only for the pump BLE
   link. The library is present; which of the two links it secures is unproven.
+  The presence of a separate `KEY` message type and a Play Integrity attestation
+  suggests the server link has its own key establishment, so SAKE may be
+  BLE-only — **INFERRED, not shown**.
 - **The `msso_config.json` contents.**
 - Anything requiring the app to run.
 
@@ -215,13 +249,18 @@ In order of cost:
    packer's decryption function is a single named native entry point. Hooking it
    dumps every decrypted string the app uses, which would produce the endpoint
    list in one run. Requires a rooted device or an emulator.
-2. **mitmproxy with the app's own trust store** — but `libsqlcipher.so` and the
-   `securerepositories` protocol suggest mutual auth and/or pinning, so this may
-   need the certificate-pinning bypass too.
-3. **Static unpacking of `libvdlbwnyfem.so`** — 1.3 MB of aarch64; the decrypt
+2. **Static unpacking of `libvdlbwnyfem.so`** — 1.3 MB of aarch64; the decrypt
    routine and its key schedule are in there. This is the tractable static route,
-   and it is what the desktop uploader's `StringDecryptor` problem reduces to as
-   well.
+   and it is the same problem as the desktop uploader's `StringDecryptor`.
+3. **mitmproxy against the WebSocket** — the hardest of the three, and the one to
+   leave until last: the socket is built with a caller-supplied `Certificate` (so
+   pinning is by construction) and the handshake requires a **Play Integrity**
+   attestation token, which a repackaged or proxied client cannot obtain. A
+   proxied phone would need a Frida pinning bypass *and* would still present a
+   genuine attestation, so this may work on an unrooted device with a user
+   certificate — but the packing and the attestation are two independent obstacles
+   and only a real attempt will say which bites first.
 
 **A negative counts, and this record contains a firm one:** the mobile app does
-not share the desktop uploader's API surface.
+not share the desktop uploader's API surface, and it additionally gates its
+handshake on Play Integrity in a way the desktop client does not.
