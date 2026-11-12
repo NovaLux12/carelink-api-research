@@ -81,6 +81,18 @@ build, and it confirms **SAKE is not white-boxed in the production app** — it 
 plain AES-family primitives with the standard tables intact. It exports **163**
 `Java_com_medtronic_minimed_sake_SakeJNI_*` symbols.
 
+**⚠ But the Java side of `SakeJNI` is not in the DEX.** Measured across both DEX
+files: the byte string `SakeJNI` occurs **0** times, `medtronic/minimed/sake`
+occurs **0** times, and `BRIL` occurs **0** times. Yet `libandroid-sake-lib.so`
+exports 163 methods bound to exactly `com.medtronic.minimed.sake.SakeJNI`. **The
+class that declares those natives is supplied at runtime by the packer**, which
+is consistent with the 160 classes that are referenced but not defined (§5).
+
+So the dylib is analysable and the *Java contract it implements is not*, because
+the declaring class is packed. The symbol names on the native side are the only
+description of that contract available statically — which is why they are quoted
+in full below rather than summarised.
+
 **The protocol's struct vocabulary is readable from the symbol table**, which is a
 significant recovery — these are the field names of the handshake:
 
