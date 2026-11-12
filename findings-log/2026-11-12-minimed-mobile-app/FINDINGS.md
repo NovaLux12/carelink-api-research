@@ -7,6 +7,7 @@ phone. It is a new axis for this project: the CareLink Uploader analysed in
 documentation names **MiniMed Mobile's "Sync to CareLink"** as the primary upload
 path, with CareLink Connect being a care-partner *viewer* that does not upload.
 
+<!-- cap-counts: ledger-rows -->
 **Requests issued by this pass: 1** — a single `GET` to `d.apkpure.com` for the
 XAPK. **Cap: 1 of a 10 cap.** **Delay:** the standing rule is ≥2 s between
 requests to the same host; only one request was made, so no spacing applies and
@@ -183,15 +184,27 @@ $ grep -rhoE "https?://[a-zA-Z0-9.-]+" --include=*.java out/ | sort | uniq -c | 
      29 http://logback.qos.ch
      19 http://schemas.android.com
       8 https://www.slf4j.org
-      8 https://github.com
-      5 https://firebase.google.com
-      2 https://www.googleapis.com
-      1 https://teneo-cloud.medtronic.com      <- the chatbot, not upload
+      ...
+      1 https://teneo-cloud.medtronic.com
 ```
 
-**One Medtronic host in the entire decompiled tree, and it is the support
-chatbot.** Every upload endpoint is runtime-decrypted or built from the
-`securerepositories` protocol.
+**⚠ Corrected 2026-11-12 — the single host is not the chatbot.** This record
+originally read *"One Medtronic host in the entire decompiled tree, and it is the
+support chatbot."* **That is wrong.** `teneo-cloud.medtronic.com` is a **device
+enrolment, certificate and firmware-package API**, with 107 readable `teneo`
+classes: `EnrollmentClient` (`createEnrollment`, `completeEnrollment`,
+`checkCertificateStatus`), `SecureSessionClient` (`createSession`,
+`getDeviceToken`), `PackageUpdateClient` (`checkPackageUpdateEligibility`,
+`downloadPackage`), and an `AuthorityType` enum of
+**`Registration`, `Certificate`, `Firmware`**. It carries PKCS#7 enrolment bodies
+and drives the firmware-over-the-air feature. It does **not** carry pump therapy
+data. Full detail:
+`2026-11-12-minimed-mobile-app/APP-UPLOAD-SURFACE.md` §5.1.
+
+**The packer covers the DEX, not the whole artefact** — 160 classes are
+referenced but not defined, and they are what orchestrates Sync to CareLink. So
+the negative above is about the *readable* DEX and is weaker than it looks; see
+`APP-UPLOAD-SURFACE.md` §6.
 
 ## 6. Other artefacts worth naming
 
@@ -264,3 +277,45 @@ In order of cost:
 **A negative counts, and this record contains a firm one:** the mobile app does
 not share the desktop uploader's API surface, and it additionally gates its
 handshake on Play Integrity in a way the desktop client does not.
+
+---
+
+## 10 · Corrections, 2026-11-12 (see `APP-UPLOAD-SURFACE.md`)
+
+Two readings in this record are **wrong** and are corrected in the companion
+record. Both are measured against the same artefact, no new download.
+
+1. **§5, "`teneo-cloud.medtronic.com` … is the chatbot, not upload".** It is not
+   the chatbot. It is a device-enrolment / certificate / **firmware package** API:
+   107 plain-Java classes with readable routes
+   (`/enrollments`, `/authority-requests`, `/certificates/status`, `/device-tokens`,
+   `/secure-sessions`, `/package-statuses`, `/package-versions/available`) and an
+   `AuthorityType` enum of `Registration | Certificate | Firmware`. It is the FOTA
+   backend. It is still not the pump-therapy upload. See `APP-UPLOAD-SURFACE.md` §5.1.
+
+2. **§4, "the transport is a WebSocket, not plain HTTP".** True of the
+   `securerepositories` layer; **unproven for upload**. The only consumer of that
+   layer visible in the DEX is the **local database key store** —
+   `DatabaseKeyManager` stores `APP_LOGS_DATABASE_KEY` via `StorageSecureRepository`,
+   and `createNetworkSecureRepository()` (the half that would carry data) has **no
+   caller in the DEX**. See `APP-UPLOAD-SURFACE.md` §5.2.
+
+**The decisive finding, which §7 states correctly but for the weaker reason:**
+section 7 says the endpoints "never appear as strings because the packer
+materialises them at runtime". The stronger and now-measured version is that
+**160 of 860 `com/medtronic` classes are referenced by the DEX but not defined in
+it**, and they are exactly the business layer — `minimed/bl/**` **0** defined,
+`minimed/data/**` **0**, `minimed/ngpsdk/**` **0** — including
+`ui/menu/fb` (`SyncToCareLinkPresenter`), `bl/backend/*`,
+`data/repository/dbflow/snapshotqueue/NgpQueuedSnapshotDto`,
+`transferblock/TransferBlockDataDto`. The upload code is not encrypted *in place*;
+it is **deleted from the DEX and loaded from the payload**. So the negative is
+about the shipped plaintext, not about the running program, and **no static
+analysis of this APK can name the upload endpoint** — the §9 route 1 (hook
+`Loader.l`) is the only tractable one.
+
+Also corrected there: `assets/msso_config.json` is **13 random bytes**, not an
+encrypted CA MAS config, and no CA MAS SDK is linked at all (`com/ca/mas`,
+`MASFoundation` = 0 occurrences); the Symantec `.cer` is likewise 13 bytes, as
+§6 already suspected.
+

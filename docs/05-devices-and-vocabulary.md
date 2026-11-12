@@ -317,6 +317,58 @@ findings-log/probe-2026-10-08/recon/HCP-CONFIG-SCHEMA.md].
 > is left as written; the [regression pin](../regression/hurl/05-public-config.check.sh)
 > now carries 236.
 
+## Added 2026-11-12 — the transport axis and a **fourth** device table
+
+This section is an **addition, not a correction**: nothing above is wrong. Two
+things on this page were previously silent — which transport a family reaches
+the uploader over, and that the uploader ships its own series table — and both
+are now measured from the installed 3.15.0 payload
+[source: findings-log/2026-11-12-uploader-native-libraries/FINDINGS.md;
+findings-log/2026-11-12-uploader-installed-payload/FINDINGS.md §7].
+
+**1. The uploader's own partition is a fourth table, and it does not agree with
+the 16-family vocabulary.** `DSS/localweb/configuration.json` carries two
+`Serie`-keyed mappings — **OBSERVED**, and they are *uploader-side grouping*, which
+is not claimed to be the same partition as the web client's `deviceFamily`:
+
+| key | series → model codes (verbatim) |
+|---|---|
+| `bleModelSerieMappings` | `700`: MMT-1800/1801/1805 · `720G`: MMT-1809/1810/1817/1818 · `740G`: MMT-1811/1812 · `770G`: MMT-1880/1881/1882/1883 · `780G`: MMT-1884/1885/1886 · `PCL F3`: MMT-1900/1902/1904 |
+| `ngpModelSerieMappings` | `670G`: MMT-1581/1582/1780/1580/1781/1782/1780E · `620G`: MMT-1710_K/1710/1510/1510K · `640G`: MMT-1712/1512/1711/1511 · `630G`: MMT-1714/1715 |
+
+**36 distinct model codes, 10 series names, no code in both keys.** Three
+observations a reader of the tables above needs:
+
+- **No series name here is one of the 16 published family tokens** (`BLE780` vs
+  `780G`, `SIMPLERA` vs nothing, …). This is a *different vocabulary for the same
+  hardware*, so it cannot be matched against `deviceFamily` and must not be.
+- **`PCL F3` (MMT-1900/1902/1904) has no entry in any of the three tables above**
+  and no published family. It is the only series here that is also absent from
+  the patient family map, both portal builds and the report-naming list. What
+  `F3` abbreviates is **still unidentified** and no guess is offered.
+- **The split is by upload transport, not by generation** — see below — which is
+  why `700` (MMT-1800/1801/1805) sits under BLE while the numerically *higher*
+  `670G` codes (MMT-158x/178x) sit under NGP.
+
+**2. Transport, from the library that implements both paths.** The recovered
+`libuploader.dylib` is **one** dylib carrying a GAP/HCI scan state machine over
+Apple's CoreBluetooth delegate API **and** a POSIX serial-port backend
+(`interface/CBFactory.cpp`, `driverBle/**`, `windows_usart/SerialPortPOSIX.cpp`).
+INFERRED from that co-location plus the series split above, with the assumption
+stated: the `bleModelSerieMappings` families reach the pump over host BLE and the
+`ngpModelSerieMappings` families over a USB link device, both driven from the same
+library. **The library was not executed**, so this is a reading of the code
+layout, not an observation of a connection.
+
+> ⚠ **A negative that must be carried forward:** the recovered transport library
+> contains **no Medtronic BLE UUID, no model code and no alarm code** — 0 `MMT-`
+> hits, 0 UUID-shaped strings other than the Bluetooth SIG base UUID
+> (`00000000-0000-1000-8000-00805F9B34FB`), 0 pump vocabulary. The service and
+> characteristic UUIDs it looks for arrive as data, not as constants in the
+> binary. **The "no Medtronic BLE UUID could be decoded" negative therefore
+> survives the recovery unchanged**, and no UUID is offered here
+> [source: findings-log/2026-11-12-uploader-native-libraries/FINDINGS.md §5].
+
 ## Spelling traps
 
 Medtronic is not internally consistent, so **family matching must be case-insensitive and

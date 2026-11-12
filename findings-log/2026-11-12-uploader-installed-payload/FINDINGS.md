@@ -5,6 +5,7 @@ Apple M5 Mac (arm64), produced by
 `CareLinkUploader-ACC-7350-3.15.0-osx-installer.dmg`, itself downloaded from the
 authenticated route `/app/install-uploader`.
 
+<!-- cap-counts: ledger-rows -->
 **Requests issued by this pass: 4.** Two `GET`s to `blest.inrange.me` (one
 `curl`, one `dig`), plus three `dig` queries per hostname across three resolvers
 for `inrange.me` and `blest.inrange.me` — counted as the bounded probe set below.

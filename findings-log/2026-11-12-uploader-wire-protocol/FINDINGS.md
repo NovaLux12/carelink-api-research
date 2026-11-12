@@ -299,6 +299,64 @@ The blocker is not the jar. It is two absent artefacts:
 
 Neither requires credentials beyond the operator's own session.
 
+## Correction (2026-11-12)
+
+> ⚠ **The blocker in §7 has been resolved, and the sentence above is now wrong
+> in a way that would have cost a second pass.** `libuploader.dylib` was
+> recovered the same day and measured. It is **not** the library §7 describes.
+>
+> **What §7 said**, preserved verbatim so the retraction stays visible: *"**`libuploader.dylib`**
+> — 67 native HTTP bodies, `StringDecryptor`, all device names and BLE UUIDs,
+> and the `SakeJNI` surface. It is installed at `DSS/Uploader.bundle/Contents/Home/...`
+> but was not extracted in the pass that produced these records."*
+>
+> **Three of those four are false, and one of them was false about the install
+> path as well.** Measured against the recovered file (11 681 712 B, sha256
+> `8a927fe36646ed5a…`, **x86_64 only**):
+>
+> | §7 claimed the file holds | measured |
+> |---|---|
+> | the `SakeJNI` surface | ✅ **34 exports**, set-identical to the JAR's 34 `ACC_NATIVE` methods |
+> | 67 native HTTP bodies | ❌ **0** — no `HttpClientCommunicator` symbol of any kind |
+> | `StringDecryptor` | ❌ **0** — the string does not occur in the file |
+> | all device names and BLE UUIDs | ❌ **0** — no `MMT-` code, no UUID but the SIG base UUID, no pump vocabulary |
+>
+> The install path in §7 is also wrong: the file is unpacked to
+> `DSS/lib/macos/x86_64/libuploader.dylib`, not under
+> `Uploader.bundle/Contents/Home/`. It is the **BLE/transport** library —
+> `BRILJNI` (287 exports), `GattStreamJNI` (56), `SakeJNI` (34) and
+> `uploader.Loader.l` (1) — and nothing else.
+>
+> **The consequence for §1 and §5 is the part that matters.** The JAR declares
+> **1 370 native methods across 38 classes**; this library serves **378** of
+> them. The HTTP bodies and the string decryptor live in at least one **further,
+> still-unlocated** artefact. So *"the blocker is one absent dylib"* was a wrong
+> model of the gap, and §1's ceiling statement stands unchanged: URL assembly,
+> headers, TLS configuration and the SKB glue remain unreachable statically.
+> **§5's negative survives the recovery in full** — the recovered library
+> contains zero Medtronic BLE UUIDs, so *"No Medtronic BLE UUID could be decoded"*
+> is still true and is now true of the one artefact §7 named as the place they
+> would be found.
+>
+> **§4's SKB sentence is also superseded.** It read *"the white-box core is
+> `libSecureKeyBoxJava.dylib`, which is absent from both the jar and the
+> installed `lib/` directory"*. The file is recovered (6 502 032 B, **universal
+> x86_64 + arm64**), and it is the SKB engine — `SKB_DrbgSha`, `SKB_GetPublicKey`,
+> `SKB_WrapData`, `SKB_CacheEngine`, twelve mangled `SKB_Get…` accessors and the
+> `AntiDebug`/`Jailbreak`/`Root` callbacks. **The verdict in §4 is not changed by
+> this**: no claim is made that SKB is broken or that its white-box tables are
+> recoverable, and *"not worth attacking, because it is unnecessary"* stands.
+>
+> **One correction to the count circulated with the recovery, recorded here
+> because §7's blocker sentence is what sent people looking:** the figure "379
+> `BRILJNI` symbols" is a substring miscount (`grep -c 'Java_'` counts 379
+> occurrences of a five-character literal, one of which begins no symbol). The
+> real export count is **287**.
+>
+> Full record, including the build-path leak, the BRIL identification and the
+> Apple-Silicon architecture finding:
+> `findings-log/2026-11-12-uploader-native-libraries/FINDINGS.md`.
+
 ## 8. Not claimed
 
 - No HTTP verb, header, URL path or `Content-Type` beyond the `{token, target}`
