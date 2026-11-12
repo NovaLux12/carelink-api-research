@@ -319,3 +319,45 @@ encrypted CA MAS config, and no CA MAS SDK is linked at all (`com/ca/mas`,
 `MASFoundation` = 0 occurrences); the Symantec `.cer` is likewise 13 bytes, as
 §6 already suspected.
 
+## Correction (2026-11-12)
+
+**`SakeJNI` is packed: the dylib is analysable, its Java contract is not.**
+
+§3 of this record quotes 163 `Java_com_medtronic_minimed_sake_SakeJNI_*` exports
+from `libandroid-sake-lib.so` and lists the handshake struct vocabulary they
+carry. That measurement is correct and stands. What this record did **not** say,
+and should have, is that **the Java class declaring those natives is not in the
+DEX.**
+
+Measured across both DEX files:
+
+```
+SakeJNI                       0 occurrences
+medtronic/minimed/sake        0 occurrences
+BRIL                          0 occurrences
+```
+
+But `libandroid-sake-lib.so` exports 163 methods bound to exactly
+`com.medtronic.minimed.sake.SakeJNI`. **The declaring class is supplied at
+runtime by the packer**, which is consistent with the 160 classes §5 records as
+referenced but not defined.
+
+**Why this matters:** §3 as originally written implies the SAKE layer is
+readable end to end. It is not. The *native* side is fully analysable and its
+symbol names are the best static description of the protocol available; the
+*Java contract* that calls into it is packed, and no static reading of this
+artefact recovers it. A reimplementation must therefore work from the 163 symbol
+names and the OpenMinimed reconstruction, not from a decompiled calling
+convention.
+
+**Also verified, and it is a positive:** the jadx run reported 7 errors, so the
+decompile was checked for completeness before its negatives were relied on.
+
+- **0** `securerepositories` classes missing — all 63 DEX-defined classes have a
+  `.java` file.
+- **0** files carry a jadx decompile-failure marker.
+- The 63-defined vs 33-files difference is **inner classes**, which jadx nests
+  inside the parent file.
+
+So the negatives in this record and in `APP-UPLOAD-SURFACE.md` are taken over a
+complete decompile, not a partial one.
