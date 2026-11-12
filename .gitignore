@@ -5,3 +5,37 @@ __pycache__/
 .loop/
 .drift/
 counts.json
+
+# ---------------------------------------------------------------------------
+# Vendor artefacts — never commit these.
+#
+# The CareLink uploader is proprietary Medtronic software. Its JARs and the
+# installer are not ours to redistribute, and they carry material that must not
+# enter a public repo:
+#
+#   * `uploader.jks` / `uploader.policy` — keystore and security policy
+#   * `uploader.cfg`, `localweb/*.json` — runtime configuration, some of which
+#     carries base64 key material (`sakeKey`, `secureToken`) even when shipped
+#     as templates
+#   * `CareLinkUploader-install.txt` — the install log, which records the
+#     operator's macOS account name in `su <user> -c ...` lines. That is a
+#     personal identifier and must never be committed.
+#   * any `.dmg`, `.app` bundle, or extracted `.dat` payload
+#
+# Findings about these artefacts are published in findings-log/ as prose and
+# derived numbers. The artefacts themselves stay local.
+# ---------------------------------------------------------------------------
+*.dmg
+*.jar
+*.jks
+*.app/
+*.dat
+App/
+Extracted/
+mac-copy/
+uploader.log
+CareLinkUploader-install.txt
+localweb/
+*.pkcs12
+*.p12
+*.keystore
