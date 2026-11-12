@@ -5,6 +5,7 @@ Apple M5 Mac (arm64), produced by
 `CareLinkUploader-ACC-7350-3.15.0-osx-installer.dmg`, itself downloaded from the
 authenticated route `/app/install-uploader`.
 
+<!-- cap-counts: ledger-rows -->
 **Requests issued by this pass: 4.** Two `GET`s to `blest.inrange.me` (one
 `curl`, one `dig`), plus three `dig` queries per hostname across three resolvers
 for `inrange.me` and `blest.inrange.me` — counted as the bounded probe set below.
@@ -317,3 +318,31 @@ pump.
   Rosetta 2, or an arm64 JRE).
 - What the `PCL F3` series is.
 - Whether `blest.inrange.me` ever resolved publicly.
+
+## Correction (2026-11-12)
+
+Two changes were made to this file after it was committed, and both are recorded
+here rather than rewritten in place.
+
+**1. The `uploader.jks` reading in §1 was corrected.** The original text said the
+keystore "does not open with the JVM's conventional default password and is not
+readable without the vendor's passphrase", and that **no attempt was made to
+brute-force it**. The second clause was true; the first was wrong. The keystore
+opens with an **empty store password** (`keytool -list -storepass ""`), and its
+seven entries were then read in full. It holds code-signing certificates only —
+`medtronic` (expired 2024-05-15), `whitecryption` (expired 2025-05-04), `jce`,
+`oracle`, and three legacy 1024-bit aliases. **It is not a TLS trust store**, and
+it is not evidence of certificate pinning. The full table is in
+[`2026-11-12-uploader-wire-protocol/`](../2026-11-12-uploader-wire-protocol/FINDINGS.md) §3.
+
+**2. A `<!-- cap-counts: ledger-rows -->` marker was added above the request
+count.** The four requests in §"Requests issued by this pass" were issued by hand
+(`curl`, `dig`) and have no `results.jsonl` ledger in this directory, so the
+census check reported the claim as larger than the ledger. The marker tells the
+checker that the count is not ledger-derived. **The count itself is unchanged and
+still correct: 4.**
+
+**What this correction does not change:** every other measurement in this record
+— the DMG payload tables, the architecture finding, the three ping routes, the
+nine-value `RepositoryType`, the `uploader.cfg` contents and the DNS results —
+stands as written. The `uploader.jks` paragraph is the only substantive edit.
