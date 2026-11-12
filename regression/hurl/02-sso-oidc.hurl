@@ -79,7 +79,13 @@ jsonpath "$.issuer" == "https://carelink-login-trials.minimed.com/"
 jsonpath "$.authorization_endpoint" == "https://carelink-login-trials.minimed.com/authorize"
 jsonpath "$.token_endpoint" == "https://carelink-login-trials.minimed.com/oauth/token"
 jsonpath "$.jwks_uri" == "https://carelink-login-trials.minimed.com/.well-known/jwks.json"
-jsonpath "$.registration_endpoint" == "https://carelink-login-trials.minimed.com/oidc/register"
+# 2026-11-12: Medtronic WITHDREW this advertisement. It was present on all five
+# tenants on 2026-10-12 (docs/02 §3) and is absent on all three tenants reachable
+# on 2026-11-12 — the union field count went 30 -> 29 and the only missing field
+# is this one. Pinning the ABSENCE so a re-advertisement also goes red rather
+# than silently passing. Record:
+# findings-log/2026-11-12-registration-endpoint-withdrawn/FINDINGS.md
+jsonpath "$.registration_endpoint" not exists
 jsonpath "$.grant_types_supported" contains "authorization_code"
 jsonpath "$.grant_types_supported" contains "refresh_token"
 jsonpath "$.code_challenge_methods_supported" contains "S256"
