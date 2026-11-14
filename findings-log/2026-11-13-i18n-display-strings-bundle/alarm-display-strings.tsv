@@ -1,0 +1,71 @@
+# CareLink i18n alarm display strings — connect.ble.<code>, en.json @ ocl 15.5
+# source: https://carelink.minimed.eu/crm/ocl/15.5/i18n/ui/app/en.json
+#        sha256 a6b8180b87c022d65ae48700d240f5a2a80db3ad9db6b3c8fff3a5c707cd7f9f, 137123 B
+# verbatim values, no paraphrase. 'delivery_stopped' flags the literal phrase,
+# NOT a semantic classification.
+# dp_role: canon = one of area DP's 19 canonical name keys; alias = a code DP's
+#          alias table folds into another key; unrendered = not in DP's 137-code table at all
+code	display_string_en	delivery_stopped	dp_role
+002	Pump Error. Delivery Stopped	yes	canon
+006	Pump Battery Out Limit	no	canon
+007	Delivery Stopped. Check BG	yes	canon
+011	Replace Pump Battery Now	no	canon
+012	Auto Suspend Limit Reached. Delivery Stopped	yes	canon
+024	Critical Pump Error. Stop Pump Use. Use Other Treatment	no	canon
+025	Pump Power Error. Record Settings	no	canon
+029	Pump Restarted. Delivery Stopped	yes	canon
+037	Pump Motor Error. Delivery Stopped	yes	canon
+051	Bolus Stopped	no	canon
+052	Delivery Limit Exceeded. Check BG	no	canon
+057	Pump Battery Not Compatible	no	canon
+058	Insert A New AA Battery	no	canon
+061	Pump Button Error. Delivery Stopped	yes	canon
+062	New notification received from CareLink	no	canon
+066	No Reservoir Detected During Infusion Set Change	no	canon
+069	Loading Incomplete During Infusion Set Change	no	canon
+073	Replace Pump Battery Now	no	alias
+077	Pump Settings Error. Delivery Stopped	yes	canon
+084	Pump Battery Removed. Replace Battery	no	canon
+100	Bolus Entry Timed Out Before Delivery	no	unrendered
+103	BG Check Reminder	no	unrendered
+104	Replace Pump Battery Soon	no	unrendered
+105	Reservoir Low. Change Reservoir Soon	no	unrendered
+107	Missed Meal Bolus Reminder	no	unrendered
+109	Set Change Reminder	no	unrendered
+110	Silenced Sensor Alert. Check Alarm History	no	unrendered
+113	Reservoir Empty. Change Reservoir Now	no	unrendered
+117	Active Insulin Cleared	no	unrendered
+130	Rewind Required. Delivery Stopped	yes	unrendered
+140	Delivery Suspended. Connect Infusion Set	no	unrendered
+775	Calibrate Now	no	unrendered
+776	Calibration Error	no	unrendered
+777	Change Sensor	no	unrendered
+779	Recharge Transmitter Now	no	unrendered
+780	Lost Sensor Signal	no	unrendered
+784	SG Rising Rapidly	no	unrendered
+794	Sensor Expired. Change Sensor	no	unrendered
+795	Lost Sensor Signal. Check Transmitter	no	unrendered
+796	No Sensor Signal	no	unrendered
+797	Sensor Connected	no	unrendered
+801	Do Not Calibrate. Wait Up To 3 Hours	no	unrendered
+802	Low Sensor Glucose	no	unrendered
+803	Low Sensor Glucose. Check BG	no	unrendered
+805	Alert Before Low. Check BG	no	unrendered
+807	Basal Delivery Resumed. Check BG	no	unrendered
+809	Suspend On Low. Delivery Stopped. Check BG	yes	unrendered
+810	Suspend Before Low. Delivery Stopped. Check BG	yes	unrendered
+812	Call Emergency Assistance	no	unrendered
+814	Basal Resumed. SG Still Under Low Limit. Check BG	no	unrendered
+815	Low Limit Changed. Basal Manually Resumed. Check BG	no	unrendered
+816	High Sensor Glucose	no	unrendered
+817	Alert Before High. Check BG	no	unrendered
+819	Auto Mode Exit. Basal Delivery Started. BG Required	no	unrendered
+821	Minimum Delivery Timeout. BG Required	no	unrendered
+822	Maximum Delivery Timeout. BG Required	no	unrendered
+823	High Sensor Glucose For Over 1 Hour	no	unrendered
+827	Urgent Low Sensor Glucose. Check BG	no	unrendered
+829	BG Required	no	unrendered
+832	Calibration Required	no	unrendered
+833	Correction Bolus Recommended	no	unrendered
+869	Calibration Reminder	no	unrendered
+870	Recharge Transmitter Soon	no	unrendered

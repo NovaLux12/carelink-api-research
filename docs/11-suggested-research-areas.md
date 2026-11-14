@@ -19,10 +19,24 @@ everything else on this page moves.
 | Area | Blocker |
 |---|---|
 | `deviceFamily` wire shape | one logged `monitor/data` response |
-| NGP alarm-code vocabulary | an authenticated `application` config |
 | `relativeOffset` clock semantics | any real payload |
 | Report bodies from `commoncore` | a clinician-scoped token |
 | Does a `200` carry `Access-Control-Allow-Origin`? | one authenticated cross-origin request. Every browser-visible response on `clcloud.*` today is an error (401/403) and **none carry CORS**, so callability from a browser is unproven in both directions (see [`10-open-questions.md`](10-open-questions.md) §1) |
+
+> ⚠ **Removed from this table 2026-11-13 (i18n display-strings pass).** The row read
+> **"NGP alarm-code vocabulary | an authenticated `application` config"**. **It is not
+> blocked on a token and never was.** The whole vocabulary — 63 `connect.ble.<code>`
+> display strings, 117 symbolic `cp-notifications.alarm.<NAME>` names, 11 alarm groups
+> and 140 bare status tokens — is one unauthenticated `GET` of
+> `{personal.crm.settings.base.uri}/ocl/{…version}/i18n/ui/app/{locale}.json`, a
+> **137,123 B** body, sha256 `a6b8180b87c022d65ae48700d240f5a2a80db3ad9db6b3c8fff3a5c707cd7f9f`,
+> **byte-identical on `carelink.minimed.eu`, `carelink.minimed.com` and
+> `carelink-support.minimed.eu`**. Both path values are published in the 69-key config
+> document this repo already fetches. **What remains token-gated is *population*, not
+> vocabulary** — whether a real 780G sends these codes on `connect/data` — and that
+> survives as **area BD item 1**, which is where this row's honest remnant went.
+> The correction to `docs/10` §1 `:38` and §2 `:80` was made the same day
+> [source: findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md §2–§5, §7.3].
 
 #### Addendum (2026-10-13, from the `commoncore-trials` pass): the `commoncore` 403s are the gateway's *no-route* error, so "six endpoints on `commoncore.medtronic.{eu,com}`" is unproven
 
@@ -1957,7 +1971,15 @@ two of the three targets forward:
    Partial compensating result: NGP `lastAlarm.code` is a **number** on the wire,
    rendered zero-padded by the UI (chunk byte 76,305), which settles the representation
    half of `docs/10` row 39. The NGP alarm *vocabulary* itself (#84) stays unpublished.
-   `alarmCode` occurs zero times across patient + portals + 211 chunks.
+   ⚠ **CORRECTED 2026-11-13 — this clause is FALSE and its own sentence is why.** Two
+   paragraphs above, this block says the route literal is all the chunks carry; the
+   conclusion drawn was that the vocabulary is unpublished. It is published, one
+   unauthenticated `GET` away, in an i18n bundle that was **never in the corpus this area
+   swept** (`crm/ocl/<version>/i18n/ui/app/<locale>.json`, 137,123 B, sha256 `a6b8180b…`;
+   63 `connect.ble.<code>` display strings, 117 symbolic names, 11 groups, 140 bare status
+   tokens). `alarmCode` occurring 0 times across patient + portals + 211 chunks stands and
+   is not the same question [source:
+   findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md §3–§5, §9].
 
 **Close position:** area P closes on this evidence. Prior negative
 (`findings-log/2026-10-13-area-p-static-schema-recovery/FINDINGS.md`) is preserved as
@@ -4028,15 +4050,28 @@ and the alarm-code normalisation table at chunk-byte 84,476 maps **73 source cod
 1. **Population.** Whether a 780G on current firmware actually populates `therapyAlgorithmState` and `lastAlarm`
    on `connect/data`, or whether those fields are Guardian-era. DP's evidence is that the client *reads* them; it
    is not evidence the vendor *sends* them.
-2. **The display text.** The 19 targets are i18n key suffixes (`connect.ble.062` etc.). The human-readable strings
-   live in translation bundles DP did not fetch — so the vocabulary is enumerated but not *translated*, and an
-   operator cannot yet read what `024` means.
+2. **The display text.** ⚠ **ANSWERED 2026-11-13 — this item is closed, by route (b), at
+   one request.** The 19 targets *are* i18n key suffixes (`connect.ble.062` etc.), and the
+   bundle that defines them is an unauthenticated static file:
+   `{personal.crm.settings.base.uri}/ocl/{…version}/i18n/ui/app/{locale}.json` — **200,
+   137,123 B, sha256 `a6b8180b…`, byte-identical on `.eu`, `.com` and `carelink-support`**.
+   It carries **63 `connect.ble.<code>` display strings** (all 19 of DP's canonical keys
+   resolve), plus 117 symbolic `cp-notifications.alarm.<NAME>` names, 11 alarm groups and
+   140 bare status tokens. **Do not restate this item as open; do not re-fetch to confirm.**
+   Two corrections it carries: **`connect.ble.811` does not exist** (810 and 812 do), and
+   **only 10 of the 63 carry the phrase "Delivery Stopped" — `024` does not** (it reads
+   *"Critical Pump Error. Stop Pump Use. Use Other Treatment"*). Full table in
+   `alarm-display-strings.tsv` [source:
+   findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md §3–§5, §7.4].
 3. **The `plgmLgsState` transition semantics.** `SUSPEND_FIRED_PLGM` and `SUSPEND_FIRED_LGS` both mean delivery
    stopped; nothing in the client distinguishes them by cause, and no pass has said how long a fired state persists.
 
 **Closes when:** either (a) one authenticated `connect/data` body from a real pump is read key-names-only and the
 two fields are recorded present/absent with their values, **or** (b) the translation bundles are fetched at zero
 token cost and all 19 name keys resolve to text — which answers item 2 without a token and is the cheaper half.
+
+**Item 2 is DONE (2026-11-13, route (b), one request); items 1 and 3 remain.** Item 1 is
+now the only genuinely token-gated half of this area, so BD's blocker is scoped to it.
 
 **A negative counts**, and (b) is reachable today: it is a static fetch of an i18n asset, not a route probe.
 
