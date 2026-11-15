@@ -1,0 +1,9 @@
+{"n": 1, "t": "2026-11-15T00:12:00Z", "method": "GET", "url": "https://carelink.minimed.eu/patient/countries/settings?countryCode=GB&language=en", "auth": true, "status": 200, "note": "blePereodicDataEndpoint = https://clcloud.minimed.eu/connect/carepartner/v6/display/message"}
+{"n": 2, "t": "2026-11-15T00:12:03Z", "method": "GET", "url": "https://carelink.minimed.eu/patient/users/me", "auth": true, "status": 200, "note": "no username key; has id + accountId"}
+{"n": 3, "t": "2026-11-15T00:12:06Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v6/display/message", "auth": true, "status": 400, "note": "body {username,role,patientId} -> {message:Bad Request}"}
+{"n": 4, "t": "2026-11-15T00:12:09Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v6/display/message", "auth": true, "status": 400, "note": "body {username,role} \u2014 identical response"}
+{"n": 5, "t": "2026-11-15T00:12:12Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v6/display/message", "auth": true, "status": 400, "note": "body + appVersion 3.8.0 \u2014 identical"}
+{"n": 6, "t": "2026-11-15T00:12:15Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v6/display/message", "auth": true, "status": 400, "note": "body {username} only \u2014 identical, so not a field-shape rejection"}
+{"n": 7, "t": "2026-11-15T00:12:18Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v13/display/message", "auth": true, "status": 400, "note": "v13 with bridge body \u2014 identical"}
+{"n": 8, "t": "2026-11-15T00:12:21Z", "method": "POST", "url": "https://clcloud.minimed.eu/connect/carepartner/v13/display/message", "auth": true, "status": 400, "note": "v13 with appVersion \u2014 identical"}
+{"n": 9, "t": "2026-11-15T00:12:24Z", "method": "GET", "url": "https://carelink.minimed.eu/patient/users/me", "auth": true, "status": 200, "note": "re-read to confirm username absence"}
