@@ -358,7 +358,7 @@ Every open question, with what would settle it, is in
 | Question | Blocked on |
 |---|---|
 | Which field carries `deviceFamily`, and in what casing | an authenticated `monitor/data` response |
-| The NGP alarm-code vocabulary | an authenticated `application` config — 73 `hcp/configuration/*` paths probed, all closed |
+| The NGP alarm-code vocabulary | ⚠ **NOT BLOCKED — corrected 2026-11-13, published unauthenticated at one `GET`.** 73 `hcp/configuration/*` paths probed, all closed; the vocabulary was never a route, it is a static i18n file: `{personal.crm.settings.base.uri}/ocl/{…version}/i18n/ui/app/{locale}.json` — 137,123 B, sha256 `a6b8180b…`, byte-identical on `.eu`, `.com` and `carelink-support`. 63 `connect.ble.<code>` display strings + 117 symbolic names + 11 groups [findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md] |
 | `relativeOffset` semantics for pump-offset rounding | a real token |
 | Report bodies from `commoncore` | an authenticated request — **never archived in any crawl** |
 

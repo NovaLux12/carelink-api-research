@@ -491,6 +491,24 @@ human-readable names come from i18n keys `connect.ble.<code>` and no such key ex
 in the 215-chunk corpus. See
 [findings-log/2026-10-14-area-s5-ngp-alarm-vocabulary-static/FINDINGS.md].
 
+> ⚠ **Corrected 2026-11-13 (i18n display-strings pass) — the last sentence is right about
+> the corpus and wrong about the world.** "No such key exists in the 215-chunk corpus" is
+> true and remains true; it was read as "the key exists nowhere", and that is false. The
+> key family is defined in a static i18n bundle on the same hosts, with no credential:
+> `{personal.crm.settings.base.uri}/ocl/{…version}/i18n/ui/app/{locale}.json` — **200,
+> 137,123 B**, sha256 `a6b8180b87c022d65ae48700d240f5a2a80db3ad9db6b3c8fff3a5c707cd7f9f`,
+> byte-identical on `carelink.minimed.eu`, `carelink.minimed.com` and
+> `carelink-support.minimed.eu`. It defines **63 `connect.ble.<code>` keys** with display
+> text, **117 `cp-notifications.alarm.<NAME>`** symbolic names, **11 alarm groups** and
+> **140 bare status tokens** (`SENSOR_OFF`, `SG_BELOW_40_MGDL`, …). The 62-canonical-code
+> count above and the two exclusions (`00-1`, `121`) **stand** — the bundle has no key for
+> either, which confirms them from the display side. Two additions: **`connect.ble.811`
+> does not exist** (810 and 812 do), and **only 10 of the 63 carry "Delivery Stopped"** —
+> `024` reads *"Critical Pump Error. Stop Pump Use. Use Other Treatment"* and is not one.
+> Full tables in `alarm-display-strings.tsv`, `symbolic-alarm-names.tsv`,
+> `alarm-groups.tsv` [source:
+> findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md §3–§5].
+
 ## The field name: reported by three clients, observed on no response
 
 > ⚠ **Heading corrected 2026-10-14 (area R).** It read "The field name is

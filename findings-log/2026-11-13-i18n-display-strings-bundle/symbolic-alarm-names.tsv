@@ -1,0 +1,121 @@
+# CareLink i18n symbolic alarm-name vocabulary — cp-notifications.alarm.<NAME>
+# source: https://carelink.minimed.eu/crm/ocl/15.5/i18n/ui/app/en.json
+#        sha256 a6b8180b87c022d65ae48700d240f5a2a80db3ad9db6b3c8fff3a5c707cd7f9f, 137123 B
+name	display_string_en
+ACTIVE_INSULIN_CLEARED	Active Insulin Cleared
+ACTIVE_INSULIN_RESET	Active Insulin Reset
+ALERT_BEFORE_HIGH	Alert Before High
+ALERT_BEFORE_LOW	Alert Before Low
+ALERT_ON_HIGH	Alert On High
+ALERT_ON_LOW	Alert on Low
+AM_BG_REQUIRED	Auto Mode BG Required
+AM_CALIBRATION_REQUIRED	Auto Mode Calibration Required
+AM_CORRECTION_BOLUS	Auto Mode Correction Bolus
+AM_DELIVERY_TIMEOUT	Auto Mode Delivery Timeout
+AM_EXIT	Auto Mode Exit
+AUTO_SUSPEND_LIMIT_REACHED	Auto Suspend Limit Reached
+BASAL_DELIVERY_RESUMED	Basal Delivery Resumed
+BG_NEEDED	BG Needed
+BLOOD_GLUCOSE	Blood Glucose
+BOLUS_NOT_DELIVERED	Bolus Not Delivered
+BOLUS_STOPPED	Bolus Stopped
+CALIBRATE_NOW	Calibrate Now
+CALIBRATE_SENSOR	Calibrate Sensor
+CALIBRATION_NOT_ACCEPTED	Calibration Not Accepted
+CALIBRATION_REMINDER	Calibration Reminder
+CAL_REQUIRED_ALERT	Calibration Needed
+CHANGE_SENSOR	Change Sensor
+CHECK_BG	BG Check Reminder
+CHECK_SENSOR	Check Sensor
+CONNECTION_ERROR	Connection Error
+CONSIDER_SENSOR_CHANGE	Consider Sensor Change
+CORRECT_HIGH_GLUCOSE	Correct High Glucose
+CRITICAL_PUMP_ERROR	Critical Pump Error
+DELIVERY_LIMIT_EXCEEDED	Delivery Limit Exceeded
+DELIVERY_STOPPED	Insulin Delivery stopped
+DELIVERY_SUSPENDED	Delivery Suspended
+ENTER_BG	Enter BG
+FALLING_RAPIDLY	Fall Alert
+FALL_ALERT	Fall Alert
+FIRST_CALIBRATION_SUCCESSFUL	First Calibration Successful
+HIGH_LIMIT_SENSOR	High SG Predicted
+HIGH_PREDICTED	High Predicted
+HIGH_PREDICT_ALERT	High Predicted
+HIGH_SENSOR	High Sensor Glucose
+HIGH_SG	Transmitter Battery Low
+HIGH_SG_ALERT	High Sensor Glucose
+INCOMPLETE_FILL_CANNULA_STEP	Incomplete Fill Cannula Step
+INPEN_TEMPERATURE	InPen temperature
+INSERTION_ISSUE	Insertion Issue
+INSTINCT_APP_CLOSED	Instinct App Closed
+INSULIN_AGE	Insulin Age
+INSULIN_FLOW_BLOCKED	Insulin Flow Blocked
+LIMITED_SMARTGUARD_AUTOMATION	Limited SmartGuard automation
+LIMIT_CHANGED	Limit Changed
+LONG_ACTING_INSULIN	Long-acting insulin
+LOST_PUMP_COMMUNICATION	Lost Pump Communication
+LOST_SENSOR_ALERT	Lost Sensor Communication
+LOST_SENSOR_COMMUNICATION	Lost Sensor Communication
+LOST_SENSOR_SIGNAL	Lost Sensor Signal
+LOW_LIMIT_SENSOR	Low SG Predicted
+LOW_PREDICTED	Low Predicted
+LOW_PREDICT_ALERT	Low Predicted
+LOW_RESERVOIR	Low Reservoir
+LOW_SENSOR	Low Sensor Glucose
+LOW_SENSOR_LIFE	Low Sensor Life
+LOW_SG_ALERT	Low Sensor Glucose
+MINI_MED_APP_CLOSED	CareLink MiniMed App Closed
+MISSED_DOSE	Missed Dose
+MISSED_MEAL_BOLUS	Missed Meal Bolus
+MISSED_MEAL_BOLUS_REMINDER	Missed Meal Bolus Reminder
+MOBILE_DEVICE_BATTERY_LOW	Mobile Device Battery Low
+NEW_PUMP_UPDATE_AVAILABLE	New Pump Update Available
+NO_BLE	Bluetooth off
+NO_DATA_AVAILABLE	No Data Available
+NO_SG_VALUES	No SG Values
+PDD_BATT_ALERT	Mobile Device Battery Low
+PERSONAL_REMINDER	Personal Reminder
+PROLONGED_HIGH_SENSOR_GLUCOSE	Prolonged High Sensor Glucose
+PUMP_BATTERY	Pump Battery
+PUMP_BATTERY_LOW	Pump Battery Low
+PUMP_ERROR	Pump Error
+PUMP_SOFTWARE_UPDATE	Pump Software Update
+PUMP_TEMPERATURE	Pump Temperature
+REPLACE_INPEN	Replace InPen
+RESERVOIR	Reservoir
+RISE_ALERT	Rise Alert
+RISING_RAPIDLY	Rise Alert
+RISING_SENSOR_GLUCOSE	Rising Sensor Glucose
+SENSOR_CALIBRATION	Sensor Calibration
+SENSOR_CONNECTED	Sensor Connected
+SENSOR_ENDING_REMAINDER	Sensor Ending Reminder
+SENSOR_END_OF_LIFE	Sensor End of Life
+SENSOR_EXPIRED	Sensor Expired
+SENSOR_FAILED_TO_PAIR_WITH_PUMP	Sensor Failed To Pair With Pump
+SENSOR_GLUCOSE_NOT_AVAILABLE	Sensor Glucose Not Available
+SENSOR_NOT_NEW	Sensor Not New
+SENSOR_TEMPERATURE	Sensor Temperature
+SENSOR_UPDATING	Sensor Updating
+SET_CHANGE_REMINDER	Set Change Reminder
+SG_BG_REQUIRED	SmartGuard BG Required
+SG_DELIVERY_TIMEOUT	SmartGuard Delivery Timeout
+SG_EXIT	SmartGuard Exit
+SG_REMINDER	SmartGuard Reminder (Sensor Glucose Values Unavailable)
+SG_WILL_EXIT_SOON	SmartGuard will exit soon
+SILENCED_SENSOR	Silenced Sensor Alert Occurred
+SMARTGUARD_BG_REQUIRED	SmartGuard BG Required
+SMARTGUARD_DELIVERY_TIMEOUT	SmartGuard Delivery Timeout
+SMARTGUARD_EXIT	SmartGuard Exit
+SUSPEND_BEFORE_LOW	Suspend Before Low
+SUSPEND_ON_LOW	Suspend On Low
+THRESHOLD_SUSPEND	Threshold Suspend
+TIME_ZONE_NOT_SYNCED	Time Zone not Synced
+TRANSMITTER_BATTERY	Transmitter Battery
+TRANSMITTER_BATTERY_EMPTY	Transmitter Battery Empty
+TRANSMITTER_ERROR	Transmitter Error
+TRANS_ERROR_ALERT	Connection Error
+UNRESPONSIVE_USER	Unresponsive User
+URGENT_LOW_SENSOR	Urgent Low Sensor Glucose
+URGENT_LOW_SG_ALERT	Urgent Low Sensor Glucose
+VERY_HIGH_BASAL	Very High Basal
+WARM_UP_NOT_STARTED	Warm up not started

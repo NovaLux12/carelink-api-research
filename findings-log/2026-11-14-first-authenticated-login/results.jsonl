@@ -1,0 +1,11 @@
+{"n": 1, "t": "2026-11-14T23:30:00Z", "method": "GET", "url": "https://clcloud.minimed.eu/connect/carepartner/v13/discover/android/3.6", "auth": false, "status": 200, "note": "discovery document, v13 + android/3.6 pin"}
+{"n": 2, "t": "2026-11-14T23:30:01Z", "method": "GET", "url": "https://carelink.minimed.eu/configs/v1/carepartner_auth0_ous_sso_config_v1.json", "auth": false, "status": 200, "note": "server.hostname = carelink-login.minimed.eu"}
+{"n": 3, "t": "2026-11-14T23:30:02Z", "method": "GET", "url": "https://carelink-login.minimed.eu/authorize?<pkce params>", "auth": false, "status": 302, "note": "302 -> /u/login?state=... , confirms host is right"}
+{"n": 4, "t": "2026-11-14T23:30:03Z", "method": "GET", "url": "https://carelink-login.minimed.eu/u/login?state=...", "auth": false, "status": 200, "note": "95520 B; <form> element ABSENT; hidden inputs state,captcha"}
+{"n": 5, "t": "2026-11-14T23:32:38Z", "method": "POST", "url": "https://carelink-login.minimed.eu/oauth/token", "auth": false, "status": 200, "note": "PKCE code exchange -> access+refresh tokens"}
+{"n": 6, "t": "2026-11-14T23:41:20Z", "method": "POST", "url": "https://carelink-login.minimed.eu/u/login (strategy 1 attempt)", "auth": false, "status": 200, "note": "no form action to post to; strategy 1 fails structurally"}
+{"n": 7, "t": "2026-11-14T23:56:00Z", "method": "GET", "url": "https://carelink.minimed.eu/patient/users/me", "auth": true, "status": 200, "note": "349 B; role PATIENT_OUS; mfaEnabled false"}
+{"n": 8, "t": "2026-11-14T23:56:01Z", "method": "GET", "url": "https://carelink.minimed.eu/api/carepartner/v2/users/me", "auth": true, "status": 200, "note": "384 B; same role \u2014 BOTH namespaces answer"}
+{"n": 9, "t": "2026-11-14T23:57:00Z", "method": "GET", "url": "https://carelink.minimed.eu/patient/users/me", "auth": true, "status": 200, "note": "repeat read for the redacted field dump"}
+{"n": 10, "t": "2026-11-14T23:57:30Z", "method": "GET", "url": "https://carelink-login.minimed.eu/authorize?<minimal params>", "auth": false, "status": 302, "note": "isolating the form-shape question"}
+{"n": 11, "t": "2026-11-14T23:57:40Z", "method": "GET", "url": "https://carelink-login.minimed.eu/u/login (second look)", "auth": false, "status": 200, "note": "confirmed no <form> block at all"}

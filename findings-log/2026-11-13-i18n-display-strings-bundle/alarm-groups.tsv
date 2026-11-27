@@ -1,0 +1,14 @@
+# CareLink i18n alarm-group vocabulary — cp-notifications.alarmGroup.<NAME>
+# same source/digest as symbolic-alarm-names.tsv. 11 members.
+name	display_string_en
+ADVANCED_ALERTS	Status Messages
+AUTO_MODE	Auto Mode
+DEVICE_STATUS	Device Status
+HIGH_ALERTS	High Alerts
+INSULIN_ALERTS	Insulin Delivery Alarms
+INSULIN_DELIVERY_STOPPED	Insulin Delivery Stopped
+LOW_ALERTS	Low Alerts
+REMINDERS	Reminders
+REMINDERS_ALERTS	Alerts and Reminders
+SENSOR_ERRORS	Sensor Errors
+SMARTGUARD	SmartGuard
