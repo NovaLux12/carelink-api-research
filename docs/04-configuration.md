@@ -702,6 +702,24 @@ reading on a patient's screen in 30 countries, ~18× apart** (OBSERVED,
 `MMOL_L`/`MMOL_L` today and is **not** in the set; `IT` and `ES` were recorded
 `MG_DL`/`MG_DL` on 2026-10-08 and return `MG_DL`/`MMOL_L` now.
 
+**The DATA payload's `bgUnits` can also be wrong, and country config cannot be
+used to correct it.** On 2026-11-27 a live GB account (a mmol/L country by both
+keys above) received a `display/message` payload declaring `"bgUnits":"MMOL_L"`
+whose own values were mg/dL: `sgs[].sg` 160/148/145, `sgBelowLimit: 50`,
+`limits[].lowLimit: 68`. A low limit of `68` is 3.78 mmol/L — exactly the pump's
+configured alert — and would be an impossible 68 mmol/L, so **the payload's own
+limits refute its declared unit** (OBSERVED, values; INFERRED, that the declaration
+is the wrong side of the disagreement).
+
+This is a *different* failure from the country-settings one above: it is the data
+leg disagreeing with itself, not two config keys disagreeing with each other. A
+client that keys off `data.bgunits ?? data.bgUnits` alone will mis-scale by ~18
+on such a payload, and consulting country config does not help because the account
+is correctly in the mmol/L set. **The workable test is plausibility, not the
+label:** if a payload declares mmol/L but carries any glucose value, limit or
+threshold above ~40, the declaration is mg/dL wearing the wrong name. See
+[source: findings-log/2026-11-27-display-message-field-semantics/FINDINGS.md §2].
+
 **Carbohydrate units disagree the same way, in 5 countries** — `carbDefaultUnit`
 `EXCHANGES` against `carbohydrateUnitsDefault` `GRAMS` in **AM ES GE KZ**, plus
 **AE**, where `carbDefaultUnit` is the lowercase string `grams` where all 116
