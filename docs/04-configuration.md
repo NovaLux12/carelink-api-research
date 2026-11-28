@@ -720,6 +720,40 @@ label:** if a payload declares mmol/L but carries any glucose value, limit or
 threshold above ~40, the declaration is mg/dL wearing the wrong name. See
 [source: findings-log/2026-11-27-display-message-field-semantics/FINDINGS.md §2].
 
+**The `sgs[]` array is 288 entries and its slots are NOT settled.** Reading it as a
+ring buffer of write-once five-minute slots is wrong in both directions, and this
+matters to any client that de-duplicates on a high-water mark:
+
+- **A slot can be absent on one poll and present on a later one** — the vendor fills
+  it late. Observed on 2026-11-28: `10:15:01` did not exist in one payload and was
+  present, with a value, 11 minutes later.
+- **A slot already served can be absent from a later poll and return with the same
+  value.** `10:07:00` was absent → present → absent → present across four polls
+  ~2 h 24 min apart, the same reading throughout.
+- **`sgs[]` length is constant at 288** across every payload observed; the
+  **populated** count is not — it moved 249 → 257 → 249 → 280 across the same four
+  polls. Counting populated slots is not a measure of coverage.
+
+**A value, once served, never changed:** 0 differences across 289 distinct readings
+seen more than once. **Presence is provisional; content is stable.** So a client
+must de-duplicate on *which timestamps it has already forwarded*, not on *whether a
+timestamp is newer than the newest it has forwarded* — the latter silently discards
+every late fill. See
+[source: findings-log/2026-11-28-display-message-slot-mutability/FINDINGS.md §§1–2].
+
+An **empty** slot is `sg: 0` plus a `sensorState`, and at least four states occur:
+`NO_ERROR_MESSAGE` (populated), `NO_DATA_FROM_PUMP` (the pump had no value),
+`DO_NOT_CALIBRATE` (the sensor refused a calibration — **not** a missing reading),
+and `WARM_UP`. Inferring "no reading" from `sg === 0` alone gets the value right and
+the cause wrong, discarding the in-band signal that the sensor needs attention
+[source: findings-log/2026-11-28-display-message-slot-mutability/FINDINGS.md §2].
+
+**`relativeOffset` cannot date a slot across polls.** Within one payload the offsets
+step by exactly 300 s, but they reset against that payload's own anchor: the value
+`-750` landed on `10:21:34`, `10:14:42` and `10:22:31` in three consecutive polls.
+Date slots from `sgs[].datetime`, a full ISO-8601 timestamp
+[source: findings-log/2026-11-28-display-message-slot-mutability/FINDINGS.md §3].
+
 **Carbohydrate units disagree the same way, in 5 countries** — `carbDefaultUnit`
 `EXCHANGES` against `carbohydrateUnitsDefault` `GRAMS` in **AM ES GE KZ**, plus
 **AE**, where `carbDefaultUnit` is the lowercase string `grams` where all 116
