@@ -1,0 +1,2 @@
+{"n":1,"method":"GET","host":"carelink.minimed.eu","path":"/patient/users/me","status":200,"ts":"2026-11-28T15:33:00Z","note":"resolve patientId for the data-leg body"}
+{"n":2,"method":"POST","host":"clcloud.minimed.eu","path":"/connect/carepartner/v6/display/message","status":200,"ts":"2026-11-28T15:34:00Z","note":"single read-only data capture; 55631 bytes"}
