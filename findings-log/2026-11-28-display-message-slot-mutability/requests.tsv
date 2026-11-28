@@ -1,0 +1,10 @@
+1	carelink.minimed.eu	/patient/countries/settings?countryCode=gb&language=en	GET	200	-	country settings; supplies blePereodicDataEndpoint
+2	carelink.minimed.eu	/patient/connect/data?cpSerialNumber=NONE&msgType=last24hours	GET	500	-	legacy data leg; upstream error, no auth problem
+3	clcloud.minimed.eu	/patient/countries/settings?countryCode=gb&language=en	GET	403	-	sibling host; path not served here (as corpus records)
+4	clcloud.minimed.eu	/patient/connect/data?cpSerialNumber=NONE&msgType=last24hours	GET	500	-	sibling host data leg; same upstream error
+5	carelink.minimed.eu	/patient/users/me	GET	200	-	identity; carries role + id and NO username field
+6	clcloud.minimed.eu	/connect/carepartner/v6/display/message	POST	400	-	malformed control: empty username field
+7	clcloud.minimed.eu	/connect/carepartner/v6/display/message	POST	200	55899	POLL 1 — 288 slots, 249 populated, captured 10:24:54Z
+8	clcloud.minimed.eu	/connect/carepartner/v6/display/message	POST	200	-	POLL 2 — 288 slots, 257 populated, captured ~10:25:30Z
+9	clcloud.minimed.eu	/connect/carepartner/v6/display/message	POST	200	-	POLL 3 — 288 slots, 249 populated, captured ~10:36:00Z
+10	clcloud.minimed.eu	/connect/carepartner/v6/display/message	POST	200	-	POLL 4 — 288 slots, 280 populated, captured ~13:00:00Z
