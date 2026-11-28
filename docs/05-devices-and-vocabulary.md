@@ -509,6 +509,40 @@ in the 215-chunk corpus. See
 > `alarm-groups.tsv` [source:
 > findings-log/2026-11-13-i18n-display-strings-bundle/FINDINGS.md §3–§5].
 
+### ✅ OBSERVED live 2026-11-28 — the mapping a real 780G actually sends
+
+A live GB account with a 780G + Instinct settled the question the sections above
+left open. The payload's `notificationHistory[].faultId` **is** the numeric alarm
+code, and `referenceGUID` can be decoded to confirm it — bytes `[4:6]`
+little-endian give `faultId` directly. Because `faultId` and `lastAlarm.code` are
+the same integer for the same event, every `messageId` string maps to a numeric
+code **directly, with no inference**:
+
+| code | messageId |
+|---|---|
+| 100 | `BC_SID_BOLUS_ENTRY_TIMED_OUT` |
+| 117 | (timed-out-class event) |
+| 802 | `BC_SID_LOW_SD_CHECK_BG` |
+| 803 | `BC_SID_LOW_SG_INSULIN_DELIVERY_SUSPENDED_SINCE_X_CHECK_BG` |
+| 808 | `BC_SID_MAXIMUM_2_HOUR_SUSPEND_TIME_REACHED_CHECK_BG` |
+| 810 | `BC_MESSAGE_DELIVERY_STOPPED_SG_APPROACHILG_LOW_LIMIT_CHECK_BG` |
+| 827 | `BC_MESSAGE_SG_UNDER_50_MG_DL` |
+
+Two corrections to the alias-table picture above fall out of this:
+
+- **The vendor alias map is wrong about 808.** It canonicalises `808 → 807`,
+  *"Basal Delivery Resumed. Check BG"*. The live payload says 808 is *maximum
+  2-hour suspend time reached*. Adopting the vendor text would render a two-hour
+  insulin suspension as a reassuring "delivery resumed" — worse than no text.
+- **`triggeredDateTime` is the alarm moment; `dateTime` is the clear moment.**
+  Clients keying off `lastAlarm.datetime` are publishing the clear time, which
+  lags the trigger by 3 s to 36 minutes on this account (median 133 s, n=10).
+  `lastAlarm` does not carry `triggeredDateTime` at all — only
+  `notificationHistory` does, and that list keeps roughly 24 hours.
+
+Full field-level detail, including the decode of `referenceGUID` and the retention
+bracket: [source: findings-log/2026-11-28-alarm-semantics/FINDINGS.md].
+
 ## The field name: reported by three clients, observed on no response
 
 > ⚠ **Heading corrected 2026-10-14 (area R).** It read "The field name is
